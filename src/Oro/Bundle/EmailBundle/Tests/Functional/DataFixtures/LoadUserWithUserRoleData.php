@@ -7,48 +7,39 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadUserWithUserRoleData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadBusinessUnit::class, LoadOrganization::class];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getDependencies()
-    {
-        return [LoadBusinessUnit::class];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         /** @var UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository(Organization::class)->getFirst();
+        /** @var Organization $organization */
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
         $role = $manager->getRepository(Role::class)->findOneBy(['role' => 'ROLE_USER']);
 
         $user = $userManager->createUser();
         $user
-            ->setOwner($this->getReference('business_unit'))
+            ->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT))
             ->setUsername('limited_user')
             ->setEmail('limited_user@test.com')
             ->setPlainPassword('limited_user')
@@ -68,6 +59,6 @@ class LoadUserWithUserRoleData extends AbstractFixture implements ContainerAware
         $userManager->updateUser($user);
         $manager->flush();
 
-        $this->setReference($user->getUsername(), $user);
+        $this->setReference($user->getUserIdentifier(), $user);
     }
 }

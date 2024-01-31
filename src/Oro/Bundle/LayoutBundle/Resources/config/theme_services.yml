@@ -22,6 +22,11 @@ services:
             - '@oro_layout.theme_extension.configuration.provider'
             - '%oro_layout.enabled_themes%'
 
+    oro_layout.current_theme_provider:
+        class: Oro\Component\Layout\Extension\Theme\Model\CurrentThemeProvider
+        arguments:
+            - '@request_stack'
+
     oro_layout.loader:
         class:  Oro\Component\Layout\Loader\LayoutUpdateLoader
         calls:

@@ -214,6 +214,37 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, 0);
     }
 
+    public function testSerializationCallsInit(): void
+    {
+        $loader = $this->createLoader();
+        $serialized = serialize($loader);
+        $unserialized = unserialize($serialized);
+        $reflection = new \ReflectionClass($unserialized);
+        $this->assertEquals(
+            $reflection->getProperty('folderPlaceholder')->getValue($loader),
+            $reflection->getProperty('folderPlaceholder')->getValue($unserialized)
+        );
+        $this->assertEquals(
+            $reflection->getProperty('folderPattern')->getValue($loader),
+            $reflection->getProperty('folderPattern')->getValue($unserialized)
+        );
+        $this->assertSame(
+            $reflection->getProperty('registeredRelativeFilePaths')->getValue($loader),
+            $reflection->getProperty('registeredRelativeFilePaths')->getValue($unserialized)
+        );
+
+        $this->assertCount(
+            count($reflection->getProperty('fileResourceLoaders')->getValue($loader)),
+            $reflection->getProperty('fileResourceLoaders')->getValue($unserialized)
+        );
+
+        // this property is only populated if initialize was called
+        $this->assertSame(
+            $reflection->getProperty('preparedRelativeFilePaths')->getValue($loader),
+            $reflection->getProperty('preparedRelativeFilePaths')->getValue($unserialized)
+        );
+    }
+
     private function createLoader(): FolderingCumulativeFileLoader
     {
         return new FolderingCumulativeFileLoader(

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClient;
@@ -27,7 +28,7 @@ class RoleController extends AbstractController
      * @Acl(
      *      id="oro_user_role_create",
      *      type="entity",
-     *      class="OroUserBundle:Role",
+     *      class="Oro\Bundle\UserBundle\Entity\Role",
      *      permission="CREATE"
      * )
      * @Route("/create", name="oro_user_role_create")
@@ -44,7 +45,7 @@ class RoleController extends AbstractController
      * @Acl(
      *      id="oro_user_role_view",
      *      type="entity",
-     *      class="OroUserBundle:Role",
+     *      class="Oro\Bundle\UserBundle\Entity\Role",
      *      permission="VIEW"
      * )
      *
@@ -73,7 +74,7 @@ class RoleController extends AbstractController
      * @Acl(
      *      id="oro_user_role_update",
      *      type="entity",
-     *      class="OroUserBundle:Role",
+     *      class="Oro\Bundle\UserBundle\Entity\Role",
      *      permission="EDIT"
      * )
      * @Route("/update/{id}", name="oro_user_role_update", requirements={"id"="\d+"}, defaults={"id"=0})
@@ -98,7 +99,7 @@ class RoleController extends AbstractController
      * @Acl(
      *      id="oro_user_role_view",
      *      type="entity",
-     *      class="OroUserBundle:Role",
+     *      class="Oro\Bundle\UserBundle\Entity\Role",
      *      permission="VIEW"
      * )
      * @Template
@@ -119,21 +120,21 @@ class RoleController extends AbstractController
     protected function update(Role $role, Request $request)
     {
         /** @var AclRoleHandler $aclRoleHandler */
-        $aclRoleHandler = $this->get(AclRoleHandler::class);
+        $aclRoleHandler = $this->container->get(AclRoleHandler::class);
         $aclRoleHandler->createForm($role);
 
         if ($aclRoleHandler->process($role)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.user.controller.role.message.saved')
+                $this->container->get(TranslatorInterface::class)->trans('oro.user.controller.role.message.saved')
             );
 
-            if ($this->get(ConnectionChecker::class)->checkConnection()) {
-                $publisher = $this->get(WebsocketClient::class);
+            if ($this->container->get(ConnectionChecker::class)->checkConnection()) {
+                $publisher = $this->container->get(WebsocketClient::class);
                 $publisher->publish('oro/outdated_user_page', ['role' => $role->getRole()]);
             }
 
-            return $this->get(Router::class)->redirect($role);
+            return $this->container->get(Router::class)->redirect($role);
         }
 
         $form = $aclRoleHandler->createView();
@@ -153,17 +154,17 @@ class RoleController extends AbstractController
 
     protected function getRolePrivilegeCategoryProvider(): RolePrivilegeCategoryProvider
     {
-        return $this->get(RolePrivilegeCategoryProvider::class);
+        return $this->container->get(RolePrivilegeCategoryProvider::class);
     }
 
     protected function getRolePrivilegeCapabilityProvider(): RolePrivilegeCapabilityProvider
     {
-        return $this->get(RolePrivilegeCapabilityProvider::class);
+        return $this->container->get(RolePrivilegeCapabilityProvider::class);
     }
 
     protected function hasAssignedUsers(Role $role): bool
     {
-        return $this->get('doctrine')->getManagerForClass(Role::class)
+        return $this->container->get(ManagerRegistry::class)->getManagerForClass(Role::class)
             ->getRepository(Role::class)
             ->hasAssignedUsers($role);
     }
@@ -183,6 +184,7 @@ class RoleController extends AbstractController
                 AclRoleHandler::class,
                 ConnectionChecker::class,
                 WebsocketClient::class,
+                ManagerRegistry::class,
             ]
         );
     }

@@ -26,7 +26,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
                 'options'       => null,
             ],
             'custom class name' => [
-                'expectedClass' => new Length(['min' => 2, 'max' => 255, 'allowEmptyString' => false]),
+                'expectedClass' => new Length(['min' => 2, 'max' => 255]),
                 'name'          => Length::class,
                 'options'       => ['min' => 2, 'max' => 255],
             ],
@@ -81,7 +81,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expected'    => [
-                    new Length(['min' => 1, 'max' => 2, 'allowEmptyString' => false])
+                    new Length(['min' => 1, 'max' => 2])
                 ]
             ],
         ];

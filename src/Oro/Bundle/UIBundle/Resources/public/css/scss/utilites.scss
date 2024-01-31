@@ -10,6 +10,10 @@
     @extend %hide;
 }
 
+.empty-hidden:empty {
+    display: none;
+}
+
 .nowrap {
     white-space: nowrap;
 }

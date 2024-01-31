@@ -9,17 +9,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroCronBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v2_1';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroCronScheduleTable($schema);
@@ -28,7 +28,7 @@ class OroCronBundleInstaller implements Installation
     /**
      * Create oro_cron_schedule table
      */
-    protected function createOroCronScheduleTable(Schema $schema)
+    private function createOroCronScheduleTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_cron_schedule');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);

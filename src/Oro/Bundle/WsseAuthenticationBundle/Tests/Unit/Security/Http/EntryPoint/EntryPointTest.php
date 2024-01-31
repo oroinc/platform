@@ -32,11 +32,8 @@ class EntryPointTest extends \PHPUnit\Framework\TestCase
     public function testStart(): void
     {
         $authenticationException = new AuthenticationException('TheAuthenticationExceptionMessage');
-
         $response = $this->entryPoint->start($this->request, $authenticationException);
-
         $this->assertEquals(401, $response->getStatusCode());
-
         $this->assertMatchesRegularExpression(
             sprintf(
                 '/^WSSE realm="%s", profile="%s"$/',
@@ -50,9 +47,7 @@ class EntryPointTest extends \PHPUnit\Framework\TestCase
     public function testStartWithNoException(): void
     {
         $response = $this->entryPoint->start($this->request);
-
         $this->assertEquals(401, $response->getStatusCode());
-
         $this->assertMatchesRegularExpression(
             sprintf(
                 '/^WSSE realm="%s", profile="%s"$/',

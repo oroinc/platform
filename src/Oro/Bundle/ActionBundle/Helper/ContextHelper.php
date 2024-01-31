@@ -14,6 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class ContextHelper
 {
     const ROUTE_PARAM = 'route';
+    const ROUTE_PARAMETERS = 'route_params';
     const ENTITY_ID_PARAM = 'entityId';
     const ENTITY_CLASS_PARAM = 'entityClass';
     const DATAGRID_PARAM = 'datagrid';
@@ -50,8 +51,10 @@ class ContextHelper
     {
         if (null === $context) {
             $route = $this->getRequestParameter(self::ROUTE_PARAM) ?: $this->getRequestParameter('_route');
+            $routeParameters = $this->getRequestParameter('_route_params', []);
             $context = [
                 self::ROUTE_PARAM => $route,
+                self::ROUTE_PARAMETERS => urlencode(json_encode($routeParameters)),
                 self::ENTITY_ID_PARAM => $this->getRequestParameter(self::ENTITY_ID_PARAM),
                 self::ENTITY_CLASS_PARAM => $this->getRequestParameter(self::ENTITY_CLASS_PARAM),
                 self::DATAGRID_PARAM => $this->getRequestParameter(self::DATAGRID_PARAM),
@@ -75,8 +78,9 @@ class ContextHelper
             throw new \RuntimeException('Master Request is not defined');
         }
         $params = [
-            self::ROUTE_PARAM => $request->get('_route'),
-            self::FROM_URL_PARAM => $request->getRequestUri()
+            self::ROUTE_PARAM => $request->attributes->get('_route'),
+            self::ROUTE_PARAMETERS => $request->attributes->get('_route_params', []),
+            self::FROM_URL_PARAM => $request->getRequestUri(),
         ];
 
         $entity = array_key_exists('entity', $context) && is_object($context['entity']) ? $context['entity'] : null;

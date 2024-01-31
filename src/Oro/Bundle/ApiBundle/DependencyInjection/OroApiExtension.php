@@ -232,10 +232,8 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('oro_api.max_delete_entities', $config['max_delete_entities']);
 
         $configFiles = [];
-        $cacheManagerConfigKeys = [];
         foreach ($config['config_files'] as $configKey => $fileConfig) {
             $configFiles[$configKey] = $fileConfig['file_name'];
-            $cacheManagerConfigKeys[$configKey] = $fileConfig['request_type'] ?? [];
         }
         $cacheManagerApiDocViews = [];
         foreach ($apiDocViews as $view => $viewConfig) {
@@ -247,8 +245,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(0, $configFiles);
         $container
             ->getDefinition(self::CACHE_MANAGER_SERVICE_ID)
-            ->replaceArgument(0, $cacheManagerConfigKeys)
-            ->replaceArgument(1, $cacheManagerApiDocViews);
+            ->replaceArgument(0, $cacheManagerApiDocViews);
     }
 
     private function registerActionProcessors(ContainerBuilder $container, array $config): void

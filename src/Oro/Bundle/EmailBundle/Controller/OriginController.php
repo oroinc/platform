@@ -24,7 +24,7 @@ class OriginController extends AbstractController
      */
     public function listAction()
     {
-        $originProvider = $this->get(OriginFolderFilterProvider::class);
+        $originProvider = $this->container->get(OriginFolderFilterProvider::class);
         return new JsonResponse($originProvider->getListTypeChoices(true));
     }
 

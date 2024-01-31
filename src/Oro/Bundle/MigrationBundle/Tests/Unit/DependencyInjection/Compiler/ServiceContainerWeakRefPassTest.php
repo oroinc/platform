@@ -4,7 +4,6 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\MigrationBundle\Container\MigrationContainer;
 use Oro\Bundle\MigrationBundle\DependencyInjection\Compiler\ServiceContainerWeakRefPass;
-use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -78,12 +77,6 @@ class ServiceContainerWeakRefPassTest extends \PHPUnit\Framework\TestCase
                 'service_alias_52'           => new ServiceClosureArgument(
                     new Reference('service_5', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)
                 ),
-                PsrContainerInterface::class => new ServiceClosureArgument(
-                    new Reference('service_container', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)
-                ),
-                ContainerInterface::class    => new ServiceClosureArgument(
-                    new Reference('service_container', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)
-                )
             ],
             $serviceLocatorDef->getArgument(0)
         );

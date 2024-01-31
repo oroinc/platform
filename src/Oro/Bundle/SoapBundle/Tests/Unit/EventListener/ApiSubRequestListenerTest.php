@@ -25,7 +25,7 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         $request = $this->createRequest();
         self::assertEquals('xml', $request->getRequestFormat(null));
 
-        $this->listener->onKernelRequest($this->createEvent($request, HttpKernelInterface::MASTER_REQUEST));
+        $this->listener->onKernelRequest($this->createEvent($request, HttpKernelInterface::MAIN_REQUEST));
         self::assertEquals('xml', $request->getRequestFormat(null));
     }
 

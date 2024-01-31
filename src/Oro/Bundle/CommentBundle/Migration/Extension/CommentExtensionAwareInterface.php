@@ -3,12 +3,9 @@
 namespace Oro\Bundle\CommentBundle\Migration\Extension;
 
 /**
- * CommentExtensionAwareInterface should be implemented by migrations that depends on a CommentExtension.
+ * This interface should be implemented by migrations that depend on {@see CommentExtension}.
  */
 interface CommentExtensionAwareInterface
 {
-    /**
-     * Sets the CommentExtension
-     */
     public function setCommentExtension(CommentExtension $commentExtension);
 }

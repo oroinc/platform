@@ -136,22 +136,22 @@ class ConfigFieldGridController extends AbstractController
 
     private function getExtendConfigProvider(): ConfigProvider
     {
-        return $this->get(ConfigManager::class)->getProvider('extend');
+        return $this->container->get(ConfigManager::class)->getProvider('extend');
     }
 
     protected function getTranslator(): TranslatorInterface
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 
     protected function getCreateUpdateConfigFieldHandler(): CreateUpdateConfigFieldHandler
     {
-        return $this->get(CreateUpdateConfigFieldHandler::class);
+        return $this->container->get(CreateUpdateConfigFieldHandler::class);
     }
 
     protected function getRemoveRestoreConfigFieldHandler(): RemoveRestoreConfigFieldHandler
     {
-        return $this->get(RemoveRestoreConfigFieldHandler::class);
+        return $this->container->get(RemoveRestoreConfigFieldHandler::class);
     }
 
     /**

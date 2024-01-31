@@ -27,8 +27,10 @@ abstract class AbstractConfigVirtualProvider
     /**
      * Gets initialized virtual items.
      *
-     * When OroSomeBundle:SomeEntity extends OroAddressBundle:AbstractAddress and AbstractAddress has configured
-     * virtual item all AbstractAddress virtual fields will be available in scope of OroSomeBundle:SomeEntity
+     * When Oro\Bundle\SomeBundle\Entity\SomeEntity extends Oro\Bundle\AddressBundle\Entity\AbstractAddress and
+     * AbstractAddress has configured
+     * virtual item all AbstractAddress virtual fields will be available in scope of
+     * Oro\Bundle\SomeBundle\Entity\SomeEntity
      *
      * @return array
      */

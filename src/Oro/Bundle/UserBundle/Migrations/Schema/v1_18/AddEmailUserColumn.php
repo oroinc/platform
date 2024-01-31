@@ -7,36 +7,20 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * Depends to the UserBundle
- *
- * Class AddEmailUserColumn
- * @package Oro\Bundle\UserBundle\Migrations\Schema\v1_18
- */
 class AddEmailUserColumn implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 2;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::updateOroEmailUserTable($schema);
-    }
-
-    /**
-     * Add origin to EmailUser
-     *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function updateOroEmailUserTable(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_user');
         $table->addForeignKeyConstraint(
@@ -45,6 +29,6 @@ class AddEmailUserColumn implements Migration, OrderedMigrationInterface
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
         );
-        $table->addIndex(['origin_id'], 'IDX_91F5CFF656A273CC', []);
+        $table->addIndex(['origin_id'], 'IDX_91F5CFF656A273CC');
     }
 }

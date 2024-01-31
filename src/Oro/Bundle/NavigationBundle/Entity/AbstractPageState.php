@@ -68,7 +68,6 @@ class AbstractPageState
 
     public function __construct()
     {
-        $this->pageHash = self::generateHash($this->pageId);
     }
 
     /**
@@ -112,8 +111,7 @@ class AbstractPageState
      */
     public function setPageId($pageId)
     {
-        $this->pageId   = $pageId;
-        $this->pageHash = self::generateHash($pageId);
+        $this->pageId = $pageId;
 
         return $this;
     }
@@ -139,14 +137,11 @@ class AbstractPageState
     }
 
     /**
-     * Generate unique hash for page id
-     *
-     * @param  string $pageId
-     * @return string
+     * Generate unique hash by page id and user id
      */
-    public static function generateHash($pageId)
+    public static function generateHash(string $pageId, string $userId): string
     {
-        return md5($pageId);
+        return md5(sprintf('%s_%s', $pageId, $userId));
     }
 
     /**
@@ -225,6 +220,7 @@ class AbstractPageState
      */
     public function doPrePersist()
     {
+        $this->pageHash = self::generateHash($this->pageId, $this->user->getId());
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->updatedAt = clone $this->createdAt;
     }

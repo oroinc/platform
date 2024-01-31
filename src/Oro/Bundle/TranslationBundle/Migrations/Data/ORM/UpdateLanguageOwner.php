@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
@@ -15,48 +16,35 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 class UpdateLanguageOwner extends AbstractFixture implements DependentFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [
-            LoadLanguageData::class
-        ];
+        return [LoadLanguageData::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = $this->getUser($manager);
-
-        /* @var $languages Language[] */
+        /* @var Language[] $languages */
         $languages = $manager->getRepository(Language::class)->findAll();
-
         foreach ($languages as $language) {
-            $language
-                ->setOrganization($user->getOrganization());
+            $language->setOrganization($user->getOrganization());
         }
-
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     *
-     * @throws \RuntimeException
-     *
-     * @return User
-     */
-    protected function getUser(ObjectManager $manager)
+    protected function getUser(ObjectManager $manager): User
     {
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
         if (!$role) {
             throw new \RuntimeException(sprintf('%s role should exist.', LoadRolesData::ROLE_ADMINISTRATOR));
         }
 
-        $user = $manager->getRepository('OroUserBundle:Role')->getFirstMatchedUser($role);
+        $user = $manager->getRepository(Role::class)->getFirstMatchedUser($role);
         if (!$user) {
             throw new \RuntimeException(
                 sprintf('At least one user with role %s should exist.', LoadRolesData::ROLE_ADMINISTRATOR)

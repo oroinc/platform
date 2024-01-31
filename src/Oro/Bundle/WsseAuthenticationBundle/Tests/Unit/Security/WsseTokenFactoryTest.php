@@ -12,7 +12,7 @@ class WsseTokenFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $factory = new WsseTokenFactory();
         $user = new User();
-        $token = $factory->create($user, 'credentials', 'providerKey', $user->getUserRoles());
+        $token = $factory->create($user, 'firewallName', $user->getUserRoles());
 
         self::assertInstanceOf(WsseToken::class, $token);
     }

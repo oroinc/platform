@@ -3,22 +3,13 @@
 namespace Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Psr\Container\ContainerInterface;
 
 /**
  * Check MySQL Full Text compatibility
- *
- * @method ContainerInterface getContainer()
  */
 trait MysqlVersionCheckTrait
 {
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
-
     /**
      * @return bool
      */

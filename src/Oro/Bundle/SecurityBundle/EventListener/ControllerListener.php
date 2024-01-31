@@ -50,14 +50,14 @@ class ControllerListener
                         'Invoked controller "%s::%s". (%s)',
                         $className,
                         $method,
-                        $event->getRequestType() === HttpKernelInterface::MASTER_REQUEST
-                            ? 'MASTER_REQUEST'
+                        $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST
+                            ? 'MAIN_REQUEST'
                             : 'SUB_REQUEST'
                     )
                 );
 
                 if (!$this->classAuthorizationChecker->isClassMethodGranted($className, $method)) {
-                    if ($event->getRequestType() === HttpKernelInterface::MASTER_REQUEST) {
+                    if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
                         throw new AccessDeniedException(sprintf('Access denied to %s::%s.', $className, $method));
                     }
                 }

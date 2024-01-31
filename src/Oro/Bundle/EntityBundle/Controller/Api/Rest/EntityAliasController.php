@@ -26,11 +26,11 @@ class EntityAliasController extends AbstractFOSRestController
     public function cgetAction()
     {
         /** @var EntityAliasResolver $resolver */
-        $resolver = $this->get('oro_entity.entity_alias_resolver');
+        $resolver = $this->container->get('oro_entity.entity_alias_resolver');
         /** @var EntityClassNameHelper $entityClassNameHelper */
-        $entityClassNameHelper = $this->get('oro_entity.entity_class_name_helper');
+        $entityClassNameHelper = $this->container->get('oro_entity.entity_class_name_helper');
         /** @var  $entityClassNameHelper */
-        $entityConfigManager = $this->get('oro_entity_config.config_manager');
+        $entityConfigManager = $this->container->get('oro_entity_config.config_manager');
 
         $result = [];
         foreach ($resolver->getAll() as $className => $entityAlias) {

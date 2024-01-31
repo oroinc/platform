@@ -15,22 +15,24 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
+class BusinessUnitManagerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    /** @var MockObject|EntityManager */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BusinessUnitRepository */
+    /** @var MockObject|BusinessUnitRepository */
     private $buRepo;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
+    /** @var MockObject|EntityRepository */
     private $userRepo;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
+    /** @var MockObject|TokenAccessorInterface */
     private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
+    /** @var MockObject|AclHelper */
     private $aclHelper;
 
     /** @var BusinessUnitManager */
@@ -45,8 +47,8 @@ class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
         $this->em->expects($this->any())
             ->method('getRepository')
             ->willReturnMap([
-                ['OroOrganizationBundle:BusinessUnit', $this->buRepo],
-                ['OroUserBundle:User', $this->userRepo],
+                [\Oro\Bundle\OrganizationBundle\Entity\BusinessUnit::class, $this->buRepo],
+                [\Oro\Bundle\UserBundle\Entity\User::class, $this->userRepo],
             ]);
 
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

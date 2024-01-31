@@ -126,7 +126,7 @@ class ImportStrategyListener implements ImportStrategyListenerInterface
     {
         if (null === $this->defaultOrganization) {
             /** @var EntityRepository $entityRepository */
-            $entityRepository = $this->registry->getRepository('OroOrganizationBundle:Organization');
+            $entityRepository = $this->registry->getRepository(Organization::class);
             $organizations = $entityRepository->createQueryBuilder('e')
                 ->setMaxResults(2)
                 ->getQuery()

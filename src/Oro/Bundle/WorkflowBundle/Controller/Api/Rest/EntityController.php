@@ -22,7 +22,7 @@ class EntityController extends AbstractFOSRestController
     {
         $statusCode = Response::HTTP_OK;
         /** @var EntityWithFieldsProvider $provider */
-        $provider = $this->get('oro_workflow.entity_field_list_provider');
+        $provider = $this->container->get('oro_workflow.entity_field_list_provider');
         try {
             $result = $provider->getFields(false, false, true, false, true, true);
         } catch (InvalidEntityException $ex) {

@@ -1,0 +1,11 @@
+services:
+    security.user_password_hasher:
+        class: Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher
+        public: true
+        arguments:
+          [ '@security.password_hasher_factory' ]
+    
+    security.event_listener.login_success_listener:
+        class: Oro\Bundle\TestFrameworkBundle\Security\CsrfSuccessLoginListener
+        tags:
+            - { name: kernel.event_listener, event: Symfony\Component\Security\Http\Event\LoginSuccessEvent, method: onSuccess, priority: 100 }

@@ -35,7 +35,7 @@ class EntityReaderByIdTest extends WebTestCase
     public function testReaderProperlyInitialized()
     {
         $stubQuery = new Query($this->entityManager);
-        $stubQuery->setDQL('SELECT c FROM OroIntegrationBundle:Channel c');
+        $stubQuery->setDQL('SELECT c FROM Oro\Bundle\IntegrationBundle\Entity\Channel c');
 
         $jobInstance = new JobInstance();
         $jobInstance->setRawConfiguration([

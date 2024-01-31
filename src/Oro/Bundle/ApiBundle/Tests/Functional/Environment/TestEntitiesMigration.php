@@ -4,14 +4,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
-use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtension;
 use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtensionAwareInterface;
+use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -26,33 +26,9 @@ class TestEntitiesMigration implements
     SerializedFieldsExtensionAwareInterface,
     ActivityExtensionAwareInterface
 {
-    private ExtendExtension $extendExtension;
-    private SerializedFieldsExtension $serializedFieldsExtension;
-    private ActivityExtension $activityExtension;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension): void
-    {
-        $this->extendExtension = $extendExtension;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setSerializedFieldsExtension(SerializedFieldsExtension $serializedFieldsExtension): void
-    {
-        $this->serializedFieldsExtension = $serializedFieldsExtension;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setActivityExtension(ActivityExtension $activityExtension): void
-    {
-        $this->activityExtension = $activityExtension;
-    }
+    use ExtendExtensionAwareTrait;
+    use SerializedFieldsExtensionAwareTrait;
+    use ActivityExtensionAwareTrait;
 
     /**
      * {@inheritDoc}

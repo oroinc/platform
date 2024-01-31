@@ -277,13 +277,21 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
     {
         $rootMetadata = $this->getClassMetadataMock();
         $toOne1Metadata = $this->getClassMetadataMock();
-        $toOne1Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toOne1_id']);
+        $toOne1Metadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['toOne1_id']);
         $toOne1toOne11Metadata = $this->getClassMetadataMock();
-        $toOne1toOne11Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toOne11_id']);
+        $toOne1toOne11Metadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['toOne11_id']);
         $toOne1toMany11Metadata = $this->getClassMetadataMock();
-        $toOne1toMany11Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toMany11_id']);
+        $toOne1toMany11Metadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['toMany11_id']);
         $toMany1Metadata = $this->getClassMetadataMock();
-        $toMany1Metadata->expects(self::any())->method('getIdentifierFieldNames')->willReturn(['toMany1_id']);
+        $toMany1Metadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['toMany1_id']);
 
         $rootMetadata->expects(self::any())
             ->method('hasAssociation')

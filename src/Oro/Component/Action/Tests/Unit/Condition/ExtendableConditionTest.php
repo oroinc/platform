@@ -6,7 +6,9 @@ use Oro\Component\Action\Condition\ExtendableCondition;
 use Oro\Component\Action\Event\ExtendableConditionEvent;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -29,11 +31,17 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->flashBag = $this->createMock(FlashBag::class);
+        $session = $this->createMock(Session::class);
+        $session->method('getFlashBag')
+            ->willReturn($this->flashBag);
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getSession')
+            ->willReturn($session);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->extendableCondition = new ExtendableCondition(
             $this->eventDispatcher,
-            $this->flashBag,
+            $requestStack,
             $this->translator
         );
         $this->extendableCondition->setContextAccessor(new ContextAccessor());

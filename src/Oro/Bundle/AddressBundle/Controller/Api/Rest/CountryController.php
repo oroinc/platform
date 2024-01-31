@@ -46,6 +46,6 @@ class CountryController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_address.api.manager.country');
+        return $this->container->get('oro_address.api.manager.country');
     }
 }

@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Functional\Commands;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\WsseAuthenticationBundle\Command\DeleteNoncesCommand;
 use Oro\Bundle\WsseAuthenticationBundle\Command\GenerateWsseHeaderCommand;
@@ -20,31 +21,27 @@ class CommandsTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
+        $this->loadFixtures([LoadUser::class]);
     }
 
     public function testGenerateWsse(): array
     {
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
-
-        $container = $this->client->getContainer();
-
         $application = new Application($kernel);
         $application->setAutoExit(false);
+        $doctrine = self::getContainer()->get('doctrine');
 
-        $doctrine = $container->get('doctrine');
-
-        /** @var Organization $organization */
-        $organization = $doctrine->getRepository(Organization::class)->getFirst();
-        $user = $container->get('oro_user.manager')->findUserByUsername('admin');
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
         $apiKey = $doctrine->getRepository(UserApi::class)
-            ->findOneBy(['user' => $user, 'organization' => $organization]);
+            ->findOneBy(['user' => $user, 'organization' => $user->getOrganization()]);
 
         self::assertInstanceOf(UserApi::class, $apiKey, '$apiKey is not an object');
 
         $command = new GenerateWSSEHeaderCommand(
             $doctrine,
-            $this->getContainer()->get('oro_wsse_authentication.service_locator.encoder')
+            self::getContainer()->get('oro_wsse_authentication.service_locator.hasher')
         );
         $command->setApplication($application);
         $commandTester = new CommandTester($command);
@@ -66,7 +63,6 @@ class CommandsTest extends WebTestCase
     public function testApiWithWsse(array $header): array
     {
         $response = $this->checkWsse($header);
-
         $this->assertJsonResponseStatusCodeEquals($response, 201);
 
         return $header;
@@ -76,7 +72,6 @@ class CommandsTest extends WebTestCase
     {
         // Restore kernel after console command.
         $this->client->getKernel()->boot();
-
         $request = $this->prepareData();
         $this->client->request(
             'POST',
@@ -114,17 +109,13 @@ class CommandsTest extends WebTestCase
     public function testDeleteNonces(array $header): array
     {
         $nonceCache = $this->getNonceCache(self::FIREWALL_NAME);
-
         $this->assertTrue($nonceCache->hasItem($this->getNonceCacheKey($this->getNonce($header[4][1]))));
-
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
-
         $application = new Application($kernel);
         $application->setAutoExit(false);
-
         $command = new DeleteNoncesCommand(
-            $this->getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache')
+            self::getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache')
         );
         $command->setApplication($application);
         $commandTester = new CommandTester($command);
@@ -133,7 +124,6 @@ class CommandsTest extends WebTestCase
             '--env' => $kernel->getEnvironment(),
             '--firewall' => self::FIREWALL_NAME,
         ]);
-
         $this->assertFalse($nonceCache->hasItem($this->getNonceCacheKey($this->getNonce($header[4][1]))));
         self::assertStringContainsString('Deleted nonce cache', $commandTester->getDisplay());
 
@@ -142,7 +132,7 @@ class CommandsTest extends WebTestCase
 
     private function getNonceCache(string $firewallName): AdapterInterface
     {
-        $nonceCacheServiceLocator = $this->getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache');
+        $nonceCacheServiceLocator = self::getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache');
 
         return $nonceCacheServiceLocator->get('oro_wsse_authentication.nonce_cache.' . $firewallName);
     }

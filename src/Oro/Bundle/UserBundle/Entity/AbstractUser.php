@@ -30,7 +30,6 @@ abstract class AbstractUser implements
 {
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
-    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
 
     /**
      * @ORM\Id
@@ -225,7 +224,7 @@ abstract class AbstractUser implements
      */
     public function __toString()
     {
-        return (string)$this->getUsername();
+        return (string)$this->getUserIdentifier();
     }
 
     /**
@@ -242,6 +241,21 @@ abstract class AbstractUser implements
     public function getUsername()
     {
         return $this->username;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUserIdentifier($username): self
+    {
+        $this->username = $username;
+
+        return $this;
     }
 
     /**
@@ -341,7 +355,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritdoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -674,7 +688,7 @@ abstract class AbstractUser implements
             return false;
         }
 
-        if ($this->getUsername() !== $user->getUsername()) {
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
             return false;
         }
 

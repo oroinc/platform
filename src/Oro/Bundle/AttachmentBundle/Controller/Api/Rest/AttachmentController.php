@@ -47,7 +47,7 @@ class AttachmentController extends RestController
      *      id="oro_attachment_delete",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroAttachmentBundle:Attachment"
+     *      class="Oro\Bundle\AttachmentBundle\Entity\Attachment"
      * )
      *
      * @return Response
@@ -64,7 +64,7 @@ class AttachmentController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_attachment.manager.api');
+        return $this->container->get('oro_attachment.manager.api');
     }
 
     /**

@@ -4,8 +4,6 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -13,12 +11,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class CacheManager
 {
-    /** @var array [config key => [request type aspect, ...], ...] */
-    private array $configKeys;
     /** @var array [view => [request type aspect, ...], ...] */
     private array $apiDocViews;
-    private RequestExpressionMatcher $matcher;
-    private ConfigCacheFactory $configCacheFactory;
     private ConfigCacheWarmer $configCacheWarmer;
     private EntityAliasResolverRegistry $entityAliasResolverRegistry;
     private ResourcesCacheWarmer $resourcesCacheWarmer;
@@ -28,20 +22,14 @@ class CacheManager
     private array $resettableServices = [];
 
     public function __construct(
-        array $configKeys,
         array $apiDocViews,
-        RequestExpressionMatcher $matcher,
-        ConfigCacheFactory $configCacheFactory,
         ConfigCacheWarmer $configCacheWarmer,
         EntityAliasResolverRegistry $entityAliasResolverRegistry,
         ResourcesCacheWarmer $resourcesCacheWarmer,
         ApiDocExtractor $apiDocExtractor,
         ConfigProvider $configProvider
     ) {
-        $this->configKeys = $configKeys;
         $this->apiDocViews = $apiDocViews;
-        $this->matcher = $matcher;
-        $this->configCacheFactory = $configCacheFactory;
         $this->configCacheWarmer = $configCacheWarmer;
         $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
         $this->resourcesCacheWarmer = $resourcesCacheWarmer;
@@ -50,59 +38,33 @@ class CacheManager
     }
 
     /**
-     * Clears all API caches except API documentation cache.
-     * To clear API documentation cache the clearApiDocCache() method should be used.
+     * Clears all API caches except API system cache and API documentation cache.
+     * To rebuild API system cache the {@see warmUpConfigCache()} method should be used.
+     * To clear API documentation cache the {@see clearApiDocCache()} method should be used.
      */
     public function clearCaches(): void
     {
-        $this->configCacheWarmer->warmUp();
         $this->entityAliasResolverRegistry->clearCache();
         $this->resourcesCacheWarmer->clearCache();
     }
 
     /**
-     * Warms up all API caches except API documentation cache.
-     * To warm up API documentation cache the warmUpApiDocCache() method should be used.
+     * Warms up all API caches except API system cache and API documentation cache.
+     * To warm up API system cache the {@see warmUpConfigCache()} method should be used.
+     * To warm up API documentation cache the {@see warmUpApiDocCache()} method should be used.
      */
     public function warmUpCaches(): void
     {
-        $this->configCacheWarmer->warmUp();
         $this->entityAliasResolverRegistry->warmUpCache();
         $this->resourcesCacheWarmer->warmUpCache();
     }
 
     /**
-     * Warms up all dirty API caches and clears all affected API documentation caches.
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * Warms up API system cache.
      */
-    public function warmUpDirtyCaches(): void
+    public function warmUpConfigCache(): void
     {
-        $dirtyRequestTypeExpressions = [];
-        foreach ($this->configKeys as $configKey => $aspects) {
-            if (!$this->configCacheFactory->getCache($configKey)->isFresh()) {
-                $this->configCacheWarmer->warmUp($configKey);
-                $dirtyRequestTypeExpressions[] = implode('&', $aspects);
-            }
-        }
-        if (!empty($dirtyRequestTypeExpressions)) {
-            $this->entityAliasResolverRegistry->warmUpCache();
-            $this->resourcesCacheWarmer->warmUpCache();
-            if ($this->isApiDocCacheEnabled()) {
-                $toClearApiDocView = [];
-                foreach ($dirtyRequestTypeExpressions as $dirtyExpr) {
-                    foreach ($this->apiDocViews as $view => $aspects) {
-                        if ($this->matchRequestType($dirtyExpr, $aspects)) {
-                            $toClearApiDocView[] = $view;
-                        }
-                    }
-                }
-                if (!empty($toClearApiDocView)) {
-                    foreach (array_unique($toClearApiDocView) as $view) {
-                        $this->clearApiDocCache($view);
-                    }
-                }
-            }
-        }
+        $this->configCacheWarmer->warmUpCache();
     }
 
     /**
@@ -169,13 +131,5 @@ class CacheManager
         foreach ($this->resettableServices as $service) {
             $service->reset();
         }
-    }
-
-    private function matchRequestType(string $expr, array $toMatchAspects): bool
-    {
-        return
-            !$expr
-            || empty($toMatchAspects)
-            || $this->matcher->matchValue($expr, new RequestType($toMatchAspects));
     }
 }

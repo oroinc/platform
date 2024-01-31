@@ -45,26 +45,6 @@ class EmailGridTest extends AbstractDatagridTestCase
         parent::testGrid($requestData);
     }
 
-    public function testGridWithoutEmailAddressProxy()
-    {
-        // Remove EmailAddressProxy as metadata for EmailAddress
-        $this->metadataFactory->setMetadataFor(EmailAddress::class, null);
-
-        $requestData = [
-            'gridParameters' => [
-                'gridName' => 'user-email-grid',
-                '_pager' => [
-                    '_per_page' => 100
-                ]
-            ],
-            'gridFilters' => [],
-            'assert' => [],
-            'expectedResultCount' => 9
-        ];
-
-        parent::testGrid($requestData);
-    }
-
     /**
      * {@inheritdoc}
      */

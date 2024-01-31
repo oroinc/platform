@@ -68,7 +68,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
-            ->willReturn(false);
+            ->willReturn(null);
 
         $template = 'rendered_template_content';
         $this->twig->expects(self::once())

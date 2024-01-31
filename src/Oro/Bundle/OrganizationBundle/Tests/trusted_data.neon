@@ -5,7 +5,7 @@ trusted_data:
             getOrganizationsPartialData:
                 fields: true
             updateWithOrganization:
-                tableName: true
+                entityClass: true
         Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository:
             getGridFilterChoices:
                 entity: true

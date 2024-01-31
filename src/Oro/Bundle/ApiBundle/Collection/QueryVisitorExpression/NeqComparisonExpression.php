@@ -26,6 +26,6 @@ class NeqComparisonExpression implements ComparisonExpressionInterface
         $visitor->addParameter($parameterName, $value);
 
         return $visitor->getExpressionBuilder()
-            ->neq($expression, $visitor->buildPlaceholder($parameterName));
+            ->neq($expression, $visitor->buildParameterExpression($parameterName, $value));
     }
 }

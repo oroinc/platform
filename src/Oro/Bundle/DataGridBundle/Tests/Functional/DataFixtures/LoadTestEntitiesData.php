@@ -5,18 +5,15 @@ namespace Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
-class LoadTestEntitiesData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class LoadTestEntitiesData extends AbstractFixture implements DependentFixtureInterface
 {
-    use ContainerAwareTrait;
-    const FIRST_SIMPLE_USER_ENTITY = 'firstSimpleUserEntity';
-    const SECOND_SIMPLE_USER_ENTITY = 'secondSimpleUserEntity';
-    const THIRD_SIMPLE_USER_ENTITY = 'thirdSimpleUserEntity';
-    const FIRST_NOT_SIMPLE_USER_ENTITY = 'firstNotSimpleUserEntity';
+    public const FIRST_SIMPLE_USER_ENTITY = 'firstSimpleUserEntity';
+    public const SECOND_SIMPLE_USER_ENTITY = 'secondSimpleUserEntity';
+    public const THIRD_SIMPLE_USER_ENTITY = 'thirdSimpleUserEntity';
+    public const FIRST_NOT_SIMPLE_USER_ENTITY = 'firstNotSimpleUserEntity';
 
     private static $testEntities = [
         [
@@ -38,29 +35,26 @@ class LoadTestEntitiesData extends AbstractFixture implements ContainerAwareInte
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [LoadUserData::class];
+        return [LoadUserData::class, LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-
         foreach (self::$testEntities as $info) {
             $testEntity = new TestEntity();
             $testEntity->setName($info['name']);
-            $testEntity->setOrganization($organization);
+            $testEntity->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
             $testEntity->setOwner($this->getReference($info['user']));
             $manager->persist($testEntity);
             $this->setReference($info['name'], $testEntity);
         }
-
         $manager->flush();
     }
 }

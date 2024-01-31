@@ -116,7 +116,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritDoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -151,5 +151,10 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     public function addUserRole(Role $role): self
     {
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getUserIdentifier();
     }
 }

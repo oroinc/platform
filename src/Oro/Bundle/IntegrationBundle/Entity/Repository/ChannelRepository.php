@@ -64,7 +64,7 @@ class ChannelRepository extends EntityRepository
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder()
             ->select('status')
-            ->from('OroIntegrationBundle:Status', 'status')
+            ->from(Status::class, 'status')
             ->where('status.channel = :integration')
             ->andWhere('status.connector = :connector')
             ->setParameters(['integration' => $integration, 'connector' => (string)$connector])
@@ -125,7 +125,7 @@ class ChannelRepository extends EntityRepository
     public function getOrLoadById($id)
     {
         $unitOfWork  = $this->getEntityManager()->getUnitOfWork();
-        $integration = $this->getEntityManager()->find('OroIntegrationBundle:Channel', $id);
+        $integration = $this->getEntityManager()->find(Integration::class, $id);
         if ($integration === null) {
             return false;
         }

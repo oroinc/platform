@@ -219,6 +219,25 @@
         .control-group-container {
             margin-top: $form-container-control-row-space;
         }
+
+        &.control-group-datetime {
+            .fields-row {
+                display: flex;
+            }
+
+            input[type='text'] {
+                &.datepicker-input {
+                    width: auto;
+                    flex-basis: 100%;
+                }
+
+                &.timepicker-input {
+                    width: auto;
+                    min-width: 100px;
+                    flex-basis: 100px;
+                }
+            }
+        }
     }
 
     .control-label {

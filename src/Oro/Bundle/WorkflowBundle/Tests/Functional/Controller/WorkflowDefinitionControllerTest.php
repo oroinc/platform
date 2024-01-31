@@ -93,7 +93,11 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         );
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        self::assertStringContainsString('"availableDestinations":', $crawler->html());
+
+        $pageComponentOptions = $crawler
+            ->filter('form[name="oro_workflow_definition_form"]')
+            ->attr('data-page-component-options');
+        self::assertStringContainsString('"availableDestinations":', $pageComponentOptions);
     }
 
     public function testViewAction()

@@ -9,18 +9,14 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        static::oroAutoResponseRuleTable($schema);
+        $schema->getTable('oro_email_auto_response_rule')
+            ->addColumn('definition', 'text', ['notnull' => false]);
+
         $queries->addPostQuery(new MigrateAutoresponseRuleConditionsQuery());
         $queries->addPostQuery('DROP TABLE oro_email_response_rule_cond');
-    }
-
-    public static function oroAutoResponseRuleTable(Schema $schema)
-    {
-        $table = $schema->getTable('oro_email_auto_response_rule');
-        $table->addColumn('definition', 'text', ['notnull' => false]);
     }
 }

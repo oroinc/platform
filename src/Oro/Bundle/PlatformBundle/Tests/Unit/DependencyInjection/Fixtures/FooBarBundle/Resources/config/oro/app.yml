@@ -1,0 +1,7 @@
+oro_security:
+    access_control:
+        - { path: ^/contact-us$, roles: FOO_BAR_ROLE_20, priority: 20 }
+        - { path: ^/test-us$, ip: 127.0.0.1, roles: FOO_BAR_ROLE_-10, priority: -10 }
+        - { path: ^/test-us/test$, roles: FOO_BAR_ROLE_0 }
+        - { path: ^/test-us/test/us$, roles: FOO_BAR_ROLE_0 }
+        - { path: ^/sort-us$, roles: FOO_BAR_ROLE_0 }

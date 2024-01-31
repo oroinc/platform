@@ -30,7 +30,7 @@ class SegmentType extends AbstractQueryDesignerType
                 'type',
                 EntityType::class,
                 [
-                    'class'       => 'OroSegmentBundle:SegmentType',
+                    'class'       => \Oro\Bundle\SegmentBundle\Entity\SegmentType::class,
                     'choice_label'    => 'label',
                     'required'    => true,
                     'placeholder' => 'oro.segment.form.choose_segment_type',

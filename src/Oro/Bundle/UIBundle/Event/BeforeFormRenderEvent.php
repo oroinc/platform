@@ -12,40 +12,13 @@ use Twig\Environment;
  */
 class BeforeFormRenderEvent extends Event
 {
-    /**
-     * @var FormView
-     */
-    protected $form;
-
-    /**
-     * Array of form data collected in entity update template
-     *
-     * @var array
-     */
-    protected $formData;
-
-    /**
-     * @var object|null
-     */
-    protected $entity;
-
-    /**
-     * @var Environment
-     */
-    protected $twigEnvironment;
-
-    /**
-     * @param FormView          $form
-     * @param array             $formData
-     * @param Environment       $twigEnvironment
-     * @param object|null       $entity
-     */
-    public function __construct(FormView $form, array $formData, Environment $twigEnvironment, $entity)
-    {
-        $this->form = $form;
-        $this->formData = $formData;
-        $this->twigEnvironment = $twigEnvironment;
-        $this->entity = $entity;
+    public function __construct(
+        protected FormView $form,
+        protected array $formData,
+        protected Environment $twigEnvironment,
+        protected ?object $entity = null,
+        protected ?string $pageId = null
+    ) {
     }
 
     /**
@@ -83,5 +56,10 @@ class BeforeFormRenderEvent extends Event
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function getPageId(): ?string
+    {
+        return $this->pageId;
     }
 }

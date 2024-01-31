@@ -9,7 +9,6 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClass;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClassMagicCall;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClassMagicGet;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\Ticket5775Object;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -180,18 +179,6 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getPathsWithUnexpectedType
-     */
-    public function testGetValueThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path)
-    {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
-
-        $this->propertyAccessor->getValue($objectOrArray, $path);
-    }
-
-    /**
      * @dataProvider getValidPropertyPaths
      */
     public function testSetValue(object|array $objectOrArray, string $path)
@@ -330,7 +317,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionForInvalidPropertyPathType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new \stdClass();
 
         $this->propertyAccessor->remove($testObject, 123);

@@ -8,13 +8,14 @@ use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
 use Gos\Bundle\WebSocketBundle\Event\ClientConnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
+use Oro\Bundle\SyncBundle\Authentication\Ticket\InMemoryAnonymousTicket;
 use Oro\Bundle\SyncBundle\EventListener\ClientEventListener;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use Oro\Bundle\UserBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
-use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class ClientEventListenerTest extends TestCase
@@ -68,7 +69,9 @@ class ClientEventListenerTest extends TestCase
 
     public function testOnClientConnectWithStorageException(): void
     {
-        $token = new TicketToken('sampleUser', 'sampleTicketDigest', 'sampleKey', ['sampleRole']);
+        $user = (new User())->setUserIdentifier('test');
+        $token = new TicketToken($user, 'sampleKey', ['sampleRole']);
+        $token->setAttribute('ticketId', 'sampleTicketDigest');
         $this->websocketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
             ->with($this->connection)
@@ -92,8 +95,9 @@ class ClientEventListenerTest extends TestCase
     {
         $token = new AnonymousTicketToken(
             'sampleTicketDigest',
-            AuthenticationProviderInterface::USERNAME_NONE_PROVIDED
+            new InMemoryAnonymousTicket('anonymous-test')
         );
+        $token->setAttribute('ticketId', 'sampleTicketDigest');
 
         $this->websocketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
@@ -110,8 +114,10 @@ class ClientEventListenerTest extends TestCase
 
     public function testOnClientConnect(): void
     {
-        $user = 'sampleUser';
-        $token = new TicketToken($user, 'sampleTicketDigest', 'sampleKey', ['sampleRole']);
+        $user = (new User())->setUserIdentifier('test');
+        $token = new TicketToken($user, 'sampleKey', ['sampleRole']);
+        $token->setAttribute('ticketId', 'sampleTicketDigest');
+
         $this->websocketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
             ->with($this->connection)

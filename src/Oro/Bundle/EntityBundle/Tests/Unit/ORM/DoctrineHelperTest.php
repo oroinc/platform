@@ -16,6 +16,8 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ReflectionProperty;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -24,17 +26,17 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ReflectionProperty;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
+class DoctrineHelperTest extends TestCase
 {
     private const TEST_IDENTIFIER = 42;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /** @var MockObject|ManagerRegistry */
     private $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     private $classMetadata;
 
     /** @var DoctrineHelper */
@@ -116,20 +118,6 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $class = ItemStubProxy::class;
         $expectedClass = 'ItemStubProxy';
-        $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($class));
-        // test internal cache
-        $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($class));
-    }
-
-    public function testGetEntityClassForEntityType()
-    {
-        $class = 'OroEntityBundle:ItemStub';
-        $expectedClass = ItemStub::class;
-        $this->registry->expects($this->once())
-            ->method('getAliasNamespace')
-            ->willReturnMap([
-                ['OroEntityBundle', 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub']
-            ]);
         $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($class));
         // test internal cache
         $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($class));

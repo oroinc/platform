@@ -18,7 +18,7 @@ class FixDecimalChangeSetListener
 {
     public function onFlush(OnFlushEventArgs $eventArgs)
     {
-        $em = $eventArgs->getEntityManager();
+        $em = $eventArgs->getObjectManager();
         $uow = $em->getUnitOfWork();
         $scheduledUpdates = $uow->getScheduledEntityUpdates();
         foreach ($scheduledUpdates as $entity) {

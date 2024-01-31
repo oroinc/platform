@@ -3,29 +3,37 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
-class LoadBusinessUnitData extends AbstractFixture
+class LoadBusinessUnitData extends AbstractFixture implements DependentFixtureInterface
 {
-    const BUSINESS_UNIT_1 = 'business_unit_1';
-    const BUSINESS_UNIT_2 = 'business_unit_2';
+    public const BUSINESS_UNIT_1 = 'business_unit_1';
+    public const BUSINESS_UNIT_2 = 'business_unit_2';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function getDependencies(): array
     {
-        $organization = $manager->getRepository(Organization::class)->getFirst();
+        return [LoadOrganization::class];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function load(ObjectManager $manager): void
+    {
         $businessUnits = [self::BUSINESS_UNIT_1, self::BUSINESS_UNIT_2];
         foreach ($businessUnits as $businessUnitName) {
             $businessUnit = new BusinessUnit();
             $businessUnit->setName($businessUnitName);
-            $businessUnit->setOrganization($organization);
+            $businessUnit->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
             $manager->persist($businessUnit);
-            $manager->flush();
             $this->setReference($businessUnitName, $businessUnit);
         }
+        $manager->flush();
     }
 }

@@ -42,7 +42,7 @@ class OwnerTreeListener
             return;
         }
 
-        $uow = $args->getEntityManager()->getUnitOfWork();
+        $uow = $args->getObjectManager()->getUnitOfWork();
         $this->isCacheOutdated =
             $this->checkInsertedOrDeletedEntities($uow->getScheduledEntityInsertions())
             || $this->checkInsertedOrDeletedEntities($uow->getScheduledEntityDeletions())

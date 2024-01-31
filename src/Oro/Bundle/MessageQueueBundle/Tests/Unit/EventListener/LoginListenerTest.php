@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -68,7 +69,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         $this->consumerHeartbeat->expects($this->never())
             ->method('isAlive');
 
-        $token = new UsernamePasswordToken('anon', '', 'key', ['anon']);
+        $token = new UsernamePasswordToken($this->createMock(UserInterface::class), 'key', ['anon']);
         $event = new InteractiveLoginEvent($this->request, $token);
 
         $listener->onLogin($event);
@@ -78,7 +79,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnLoginWithAnonUser()
     {
-        $token = new UsernamePasswordToken('anon', '', 'key', ['anon']);
+        $token = new UsernamePasswordToken($this->createMock(UserInterface::class), 'key', ['anon']);
         $event = new InteractiveLoginEvent($this->request, $token);
 
         $this->listener->onLogin($event);
@@ -89,7 +90,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnLoginWithNotOutdatedState()
     {
         $user = new User();
-        $token = new UsernamePasswordToken($user, '', 'key', ['user']);
+        $token = new UsernamePasswordToken($user, 'key', ['user']);
         $event = new InteractiveLoginEvent($this->request, $token);
 
         $this->consumerHeartbeat->expects($this->once())
@@ -104,7 +105,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnLoginWithOutdatedState()
     {
         $user = new User();
-        $token = new UsernamePasswordToken($user, '', 'key', ['user']);
+        $token = new UsernamePasswordToken($user, 'key', ['user']);
         $event = new InteractiveLoginEvent($this->request, $token);
 
         $this->consumerHeartbeat->expects($this->once())

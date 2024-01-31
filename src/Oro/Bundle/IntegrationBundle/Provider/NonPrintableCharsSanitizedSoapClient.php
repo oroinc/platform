@@ -4,12 +4,15 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Oro\Bundle\IntegrationBundle\Utils\NonPrintableCharsStringSanitizer;
 
+/**
+ * Client for SOAP API that removes non-printable characters from requests and responses.
+ */
 class NonPrintableCharsSanitizedSoapClient extends \SoapClient
 {
     /**
      * {@inheritDoc}
      */
-    public function __doRequest($request, $location, $action, $version, $one_way = 0)
+    public function __doRequest($request, $location, $action, $version, $one_way = 0): ?string
     {
         $response = parent::__doRequest($request, $location, $action, $version, $one_way);
 
@@ -27,7 +30,7 @@ class NonPrintableCharsSanitizedSoapClient extends \SoapClient
         $options = null,
         $input_headers = null,
         &$output_headers = null
-    ) {
+    ): mixed {
         if (is_array($arguments)) {
             array_walk_recursive(
                 $arguments,

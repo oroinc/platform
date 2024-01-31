@@ -149,7 +149,7 @@ class SearchIndexRepository extends ServiceEntityRepository implements DBALPersi
      * Returns array of search items in following format:
      * array(
      *      '<entityClass>' => array(
-     *          <entityIdentifier> => <instance of OroSearchBundle:Item>,
+     *          <entityIdentifier> => <instance of Oro\Bundle\SearchBundle\Entity\Item>,
      *          ...
      *      ),
      *      ...

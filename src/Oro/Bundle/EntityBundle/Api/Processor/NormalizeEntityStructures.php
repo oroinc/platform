@@ -38,10 +38,10 @@ class NormalizeEntityStructures implements ProcessorInterface
             return;
         }
 
-        $config = $context->getConfig();
+        $requestType = $context->getRequestType();
         $normalizedData = [];
         foreach ($data as $key => $value) {
-            $normalizedData[$key] = $this->normalizer->normalize($value, $config);
+            $normalizedData[$key] = $this->normalizer->normalize($value, $requestType);
         }
         $context->setResult($normalizedData);
 

@@ -18,13 +18,13 @@ services:
         parent: oro_workflow.datagrid.abstract_entity_name_provider
         public: true
         calls:
-            - [setEntityName, ["OroWorkflowBundle:ProcessDefinition"]]
+            - [setEntityName, ['Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition']]
 
     oro_workflow.datagrid.workflow_definition_entity_name_provider:
         parent: oro_workflow.datagrid.abstract_entity_name_provider
         public: true
         calls:
-            - [setEntityName, ["OroWorkflowBundle:WorkflowDefinition"]]
+            - [setEntityName, ['Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition']]
 
     oro_workflow.datagrid.listener.workflow_step_column:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener'

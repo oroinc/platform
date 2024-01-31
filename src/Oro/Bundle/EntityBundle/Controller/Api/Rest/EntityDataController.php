@@ -32,7 +32,7 @@ class EntityDataController extends AbstractFOSRestController
      */
     public function patchAction($className, $id)
     {
-        $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
+        $data = json_decode($this->container->get('request_stack')->getCurrentRequest()->getContent(), true);
         [$form, $data] = $this->getManager()->patch($className, $id, $data);
 
         if ($form->getErrors(true)->count() > 0) {
@@ -50,6 +50,6 @@ class EntityDataController extends AbstractFOSRestController
      */
     public function getManager()
     {
-        return $this->get('oro_entity.manager.api.entity_data_api_manager');
+        return $this->container->get('oro_entity.manager.api.entity_data_api_manager');
     }
 }

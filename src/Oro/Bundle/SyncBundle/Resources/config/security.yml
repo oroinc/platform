@@ -3,20 +3,14 @@ parameters:
     oro_sync.security.ticket_authentication_provider.ticket_ttl: 300
 
 services:
-    oro_sync.security.ticket_authentication_provider:
-        class: Oro\Bundle\SyncBundle\Security\TicketAuthenticationProvider
+    oro_sync.authentication.websocket_authentication_by_ticket_provider:
+        class: Oro\Bundle\SyncBundle\Authentication\Provider\WebsocketAuthenticationByTicketProvider
         arguments:
             - '@oro_sync.authentication.ticket_digest_generator'
             - '@oro_user.security.provider'
             - '%oro_sync.security.ticket_authentication_provider.key%'
             - '%kernel.secret%'
             - '%oro_sync.security.ticket_authentication_provider.ticket_ttl%'
-
-    oro_sync.authentication.websocket_authentication_by_ticket_provider:
-        class: Oro\Bundle\SyncBundle\Authentication\Provider\WebsocketAuthenticationByTicketProvider
-        arguments:
-            - '@oro_sync.security.ticket_authentication_provider'
-            - '%oro_sync.security.ticket_authentication_provider.key%'
 
     oro_sync.event_listener.client:
         class: Oro\Bundle\SyncBundle\EventListener\ClientEventListener

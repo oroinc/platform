@@ -13,7 +13,8 @@ data:
             messageIds: null
             xMessageId: null
             xThreadId: null
-            references: []
+            references:
+                - '<other@email-api.func-test>'
             acceptLanguage: null
             bodySynced: true
             from:
@@ -61,14 +62,14 @@ data:
             sentAt: '2022-05-01T12:01:00Z'
             importance: normal
             internalDate: '2022-05-01T12:05:00Z'
-            head: true
+            head: false
             messageId: '<id3@email-api.func-test>'
             messageIds: null
             xMessageId: null
             xThreadId: null
             references:
-                - '<test2@email-api.func-test>'
-                - '<test3@email-api.func-test>'
+                - '<id2@email-api.func-test>'
+                - '<test1@email-api.func-test>'
             acceptLanguage: null
             bodySynced: true
             from:

@@ -460,7 +460,7 @@ services:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
 
     oro_security.token.provider.rememberme:
-        class: Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider
+        class: Oro\Bundle\SecurityBundle\Authentication\Provider\DoctrineTokenProviderDecorator
         public: true
         arguments:
             - '@doctrine.dbal.default_connection'
@@ -471,13 +471,12 @@ services:
     oro_security.authentication.organization_guesser:
         class: Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser
 
-    oro_security.authentication.listener.basic:
-        class: Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
+    oro_security.authentication.authenticator.basic:
+        class: Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticator
         arguments:
             - '@security.token_storage'
-            - '@security.authentication.manager'
-            - null
-            - null
+            - ~
+            - ~
             - '@oro_organization.organization_manager'
             - '@?logger'
         calls:
@@ -485,26 +484,18 @@ services:
         public: false
         abstract: true
 
-    oro_security.authentication.provider.username_password_organization:
-        class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
+    oro_security.authentication.authenticator.organization_form_login:
+        class: Oro\Bundle\SecurityBundle\Authentication\Authenticator\UsernamePasswordOrganizationAuthenticator
         arguments:
-            - ~ # UserProviderInterface $userProvider
-            - ~ # UserCheckerInterface $userChecker
-            - ~ # string $providerKey
-            - '@security.encoder_factory'
-            - '%security.authentication.hide_user_not_found%'
+            - '@security.http_utils'
+            - ~
+            - ~
+            - ~
+            - ~
+            - ~
+            - { main: 'oro_user.login.errors.bad_credentials', frontend: 'oro_customer.login.errors.bad_credentials' }
         calls:
             - [setTokenFactory, ['@oro_security.token.factory.username_password_organization']]
-            - [setOrganizationGuesser, ['@oro_security.authentication.organization_guesser']]
-        abstract: true
-        public: false
-
-    oro_security.authentication.provider.organization_rememberme:
-        class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
-        arguments:
-            - ~ # UserCheckerInterface $userChecker
-        calls:
-            - [setTokenFactory, ['@oro_security.token.factory.organization_rememberme']]
             - [setOrganizationGuesser, ['@oro_security.authentication.organization_guesser']]
         abstract: true
         public: false
@@ -582,6 +573,12 @@ services:
         arguments:
             - '%kernel.cache_dir%/oro/configurable_permissions.php'
             - '%kernel.debug%'
+
+    oro_security.permission_policy_header_provider:
+        class: Oro\Bundle\SecurityBundle\Provider\PermissionsPolicyHeaderProvider
+        arguments:
+            - !abstract '$enabled defined in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension'
+            - !abstract '$directives defined in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension'
 
     oro_security.configuration.builder.permission_configuration:
         class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
@@ -764,6 +761,13 @@ services:
             - '@oro_security.csrf_token_manager'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -10 }
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    oro_security.event_listener.permissions_policy_header_request_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\PermissionsPolicyHeaderRequestListener
+        arguments:
+            - '@oro_security.permission_policy_header_provider'
+        tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
     oro_security.access_rule_executor:

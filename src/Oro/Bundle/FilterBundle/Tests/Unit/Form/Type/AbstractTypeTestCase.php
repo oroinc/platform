@@ -6,6 +6,7 @@ use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,8 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 {
-    /** @var \Symfony\Component\Form\FormFactory */
-    protected $factory;
+    protected FormFactoryInterface $factory;
 
     /** @var string */
     protected $defaultTimezone;

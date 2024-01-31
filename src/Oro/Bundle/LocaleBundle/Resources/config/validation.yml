@@ -7,7 +7,6 @@ Oro\Bundle\LocaleBundle\Entity\Localization:
             - Length:
                 min: 2
                 max: 255
-                allowEmptyString: false
             - NotBlank: ~
         titles:
             - Valid: ~
@@ -19,7 +18,6 @@ Oro\Bundle\LocaleBundle\Entity\Localization:
             - Length:
                 min: 2
                 max: 16
-                allowEmptyString: false
             - NotBlank: ~
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:

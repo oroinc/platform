@@ -118,7 +118,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
             return;
         }
 
-        $uow = $args->getEntityManager()->getUnitOfWork();
+        $uow = $args->getObjectManager()->getUnitOfWork();
         // adds managed objects with updated tags into "preparedTaggedObjects" for further processing
         $this->preparedTaggedObjects = array_merge(
             $this->preparedTaggedObjects,
@@ -153,7 +153,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
         $this->preparedTaggedObjects = [];
         // persist tags of all $taggables objects
         array_walk($taggables, [$this->getTagImportManager(), 'persistTags']);
-        $args->getEntityManager()->flush();
+        $args->getObjectManager()->flush();
     }
 
     public function normalizeEntity(NormalizeEntityEvent $event)

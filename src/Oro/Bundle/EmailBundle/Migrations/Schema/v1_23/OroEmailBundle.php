@@ -9,16 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        static::oroEmailTable($schema);
-    }
-
-    public static function oroEmailTable(Schema $schema)
-    {
-        $emailTable = $schema->getTable('oro_email');
-        $emailTable->changeColumn('subject', ['length' => 998]);
+        $schema->getTable('oro_email')
+            ->changeColumn('subject', ['length' => 998]);
     }
 }

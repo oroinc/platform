@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisor;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
@@ -94,7 +93,7 @@ class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\Te
 
         $finderMock->expects(self::once())
             ->method('getIterator')
-            ->willReturn(new ArrayCollection([$file1]));
+            ->willReturn(new \ArrayIterator([$file1]));
 
         $this->reader->expects(self::once())
             ->method('read')

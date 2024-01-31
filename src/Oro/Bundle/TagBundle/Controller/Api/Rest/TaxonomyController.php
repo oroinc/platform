@@ -24,7 +24,7 @@ class TaxonomyController extends RestController
      * @Acl(
      *      id="oro_taxonomy_delete",
      *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
+     *      class="Oro\Bundle\TagBundle\Entity\Taxonomy",
      *      permission="DELETE"
      * )
      * @return Response
@@ -39,7 +39,7 @@ class TaxonomyController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_tag.taxonomy.manager.api');
+        return $this->container->get('oro_tag.taxonomy.manager.api');
     }
 
     /**
@@ -55,6 +55,6 @@ class TaxonomyController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_tag.form.handler.api');
+        return $this->container->get('oro_tag.form.handler.api');
     }
 }

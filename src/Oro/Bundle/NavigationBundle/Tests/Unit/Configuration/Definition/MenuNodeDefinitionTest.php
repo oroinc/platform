@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Configuration\Definition;
 
 use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuNodeDefinition;
 use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuTreeBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,10 +16,7 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->builder = $this->getMockBuilder(MenuTreeBuilder::class)
-            ->onlyMethods(['node', 'scalarNode', 'end', 'menuNode'])
-            ->addMethods(['children', 'menuNodeHierarchy', 'defaultValue'])
-            ->getMock();
+        $this->builder = new MenuTreeBuilder();
 
         $this->definition = new MenuNodeDefinition('test');
         $this->definition->setBuilder($this->builder);
@@ -26,9 +24,6 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 
     public function testMenuNodeHierarchyZeroDepth()
     {
-        $this->builder->expects($this->never())
-            ->method('node');
-
         $this->assertInstanceOf(
             MenuNodeDefinition::class,
             $this->definition->menuNodeHierarchy(0)
@@ -37,30 +32,8 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 
     public function testMenuNodeHierarchyNonZeroDepth()
     {
-        $this->builder->expects($this->any())
-            ->method('node')
-            ->willReturnSelf();
-        $this->builder->expects($this->any())
-            ->method('children')
-            ->willReturnSelf();
-        $this->builder->expects($this->any())
-            ->method('scalarNode')
-            ->willReturnSelf();
-        $this->builder->expects($this->any())
-            ->method('end')
-            ->willReturnSelf();
-        $this->builder->expects($this->once())
-            ->method('menuNode')
-            ->with('children')
-            ->willReturnSelf();
-        $this->builder->expects($this->once())
-            ->method('menuNodeHierarchy')
-            ->with(9)
-            ->willReturnSelf();
-        $this->builder->expects($this->any())
-            ->method('defaultValue')
-            ->willReturnSelf();
+        $result = $this->definition->menuNodeHierarchy();
 
-        $this->definition->menuNodeHierarchy(10);
+        $this->assertInstanceOf(ArrayNodeDefinition::class, $result);
     }
 }

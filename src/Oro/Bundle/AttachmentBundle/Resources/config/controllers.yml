@@ -12,6 +12,7 @@ services:
         tags:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: 'oro_attachment.imagine.filter_service', key: Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService }
+            - { name: monolog.logger, channel: oro_attachment }
 
     oro_attachment.controller.file:
         class: Oro\Bundle\AttachmentBundle\Controller\FileController

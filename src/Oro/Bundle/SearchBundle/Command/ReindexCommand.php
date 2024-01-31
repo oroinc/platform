@@ -51,8 +51,7 @@ The <info>%command.name%</info> command rebuilds the search index.
   <info>php %command.full_name%</info>
 
 You can limit the reindexation to a specific entity with the <info>--class</info> option.
-Both the FQCN (Oro\Bundle\UserBundle\Entity\User) and short (OroUserBundle:User)
-class names are accepted:
+The FQCN (Oro\Bundle\UserBundle\Entity\User) class names are accepted:
 
   <info>php %command.full_name% <entityClass></info>
 

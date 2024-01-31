@@ -218,11 +218,26 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
         array $permissions
     ): bool {
         $objectOrganizationId = $this->getOrganizationId($object);
+        if (null === $objectOrganizationId) {
+            return false;
+        }
+        if ($objectOrganizationId === $securityToken->getOrganization()->getId()) {
+            return false;
+        }
 
-        // check entity organization with current organization
-        return
-            null !== $objectOrganizationId
-            && $objectOrganizationId !== $securityToken->getOrganization()->getId();
+        /**
+         * for GLOBAL access level isAssociatedWithOrganization() will be called in {@see isAccessGrantedByAccessLevel}
+         * for SYSTEM access level we do not need to call isAssociatedWithOrganization()
+         */
+        if ($accessLevel >= AccessLevel::GLOBAL_LEVEL) {
+            return true;
+        }
+
+        return !$this->decisionMaker->isAssociatedWithOrganization(
+            $securityToken->getUser(),
+            $object,
+            $securityToken->getOrganization()
+        );
     }
 
     protected function getOrganizationId(object $object): int|string|null

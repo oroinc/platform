@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
@@ -112,7 +113,7 @@ class ImportExportController extends AbstractController
         $configurationsByAlias = $this->getImportConfigurations($configAlias);
         $configsWithForm = [];
         $importForm = null;
-        $aclChecker = $this->get('security.authorization_checker');
+        $aclChecker = $this->container->get('security.authorization_checker');
         $entityVisibility = [];
 
         foreach ($configurationsByAlias as $configuration) {
@@ -163,7 +164,7 @@ class ImportExportController extends AbstractController
 
     private function getImportConfigurations(string $configAlias): array
     {
-        $configurationsByAlias = $this
+        $configurationsByAlias = $this->container
             ->get(GetImportExportConfigurationExtension::class)
             ->getConfiguration($configAlias);
 
@@ -250,7 +251,7 @@ class ImportExportController extends AbstractController
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
-        $this->get(MessageProducerInterface::class)->send(
+        $this->container->get(MessageProducerInterface::class)->send(
             PreImportTopic::getName(),
             [
                 'fileName' => $fileName,
@@ -265,7 +266,7 @@ class ImportExportController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'message' => $this
+            'message' => $this->container
                 ->get(TranslatorInterface::class)
                 ->trans('oro.importexport.import.validate.success.message'),
         ]);
@@ -291,7 +292,7 @@ class ImportExportController extends AbstractController
         $originFileName = $request->get('originFileName', null);
         $importProcessorTopicName  = $request->get('importProcessorTopicName') ?: PreImportTopic::getName();
 
-        $this->get(MessageProducerInterface::class)->send(
+        $this->container->get(MessageProducerInterface::class)->send(
             $importProcessorTopicName,
             [
                 'fileName' => $fileName,
@@ -306,7 +307,8 @@ class ImportExportController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'message' => $this->get(TranslatorInterface::class)->trans('oro.importexport.import.success.message'),
+            'message' => $this->container->get(TranslatorInterface::class)
+                ->trans('oro.importexport.import.success.message'),
         ]);
     }
 
@@ -326,7 +328,7 @@ class ImportExportController extends AbstractController
         $options = $this->getOptionsFromRequest($request);
         $token = $this->getSecurityToken()->getToken();
 
-        $this->get(MessageProducerInterface::class)->send(PreExportTopic::getName(), [
+        $this->container->get(MessageProducerInterface::class)->send(PreExportTopic::getName(), [
             'jobName' => $jobName,
             'processorAlias' => $processorAlias,
             'outputFilePrefix' => $filePrefix,
@@ -475,14 +477,14 @@ class ImportExportController extends AbstractController
             throw new ImportExportExpiredException();
         }
 
-        $jobRepository = $this->getDoctrine()->getManagerForClass(Job::class)->getRepository(Job::class);
+        $jobRepository = $this->container->get('doctrine')->getManagerForClass(Job::class)->getRepository(Job::class);
         $job = $jobRepository->find($result->getJobId());
 
         if (!$job) {
             throw new NotFoundHttpException(sprintf('Job %s not found', $result->getJobId()));
         }
 
-        $content = $this->get(ImportExportResultSummarizer::class)->getErrorLog($job);
+        $content = $this->container->get(ImportExportResultSummarizer::class)->getErrorLog($job);
 
         return new Response($content, 200, ['Content-Type' => 'text/x-log']);
     }
@@ -492,7 +494,7 @@ class ImportExportController extends AbstractController
      */
     protected function getFileManager()
     {
-        return $this->get(FileManager::class);
+        return $this->container->get(FileManager::class);
     }
 
     /**
@@ -500,7 +502,7 @@ class ImportExportController extends AbstractController
      */
     protected function getExportHandler()
     {
-        return $this->get(ExportHandler::class);
+        return $this->container->get(ExportHandler::class);
     }
 
     /**
@@ -524,7 +526,7 @@ class ImportExportController extends AbstractController
      */
     protected function getCsvFileHandler()
     {
-        return $this->get(CsvFileHandler::class);
+        return $this->container->get(CsvFileHandler::class);
     }
 
     /**
@@ -532,7 +534,7 @@ class ImportExportController extends AbstractController
      */
     protected function getSecurityToken()
     {
-        return $this->get('security.token_storage');
+        return $this->container->get('security.token_storage');
     }
 
     /**
@@ -568,6 +570,7 @@ class ImportExportController extends AbstractController
                 GetImportExportConfigurationExtension::class,
                 ExportHandler::class,
                 ImportExportResultSummarizer::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

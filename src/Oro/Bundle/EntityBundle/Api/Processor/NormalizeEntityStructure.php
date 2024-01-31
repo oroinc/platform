@@ -39,7 +39,7 @@ class NormalizeEntityStructure implements ProcessorInterface
         }
 
         $context->setResult(
-            $this->normalizer->normalize($data, $context->getConfig())
+            $this->normalizer->normalize($data, $context->getRequestType())
         );
 
         // skip default normalization

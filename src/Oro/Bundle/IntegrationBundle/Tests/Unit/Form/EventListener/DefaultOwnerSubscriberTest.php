@@ -121,7 +121,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
                     'constraints' => new NotBlank()
                 ]
             )
-            ->willReturn(true);
+            ->willReturn($form);
 
         $event = new  FormEvent($form, $integration);
         $this->subscriber->preSet($event);
@@ -158,7 +158,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
                     'constraints' => new NotBlank(),
                 ]
             )
-            ->willReturn(true);
+            ->willReturn($form);
 
         $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);
@@ -198,7 +198,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
                     'constraints' => new NotBlank(),
                 ]
             )
-            ->willReturn(true);
+            ->willReturn($form);
 
         $event = new  FormEvent($form, $integration);
         $this->subscriber->preSet($event);
@@ -238,7 +238,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
                     'constraints' => new NotBlank(),
                 ]
             )
-            ->willReturn(true);
+            ->willReturn($form);
 
         $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);

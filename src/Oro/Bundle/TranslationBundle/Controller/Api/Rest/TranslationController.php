@@ -58,7 +58,7 @@ class TranslationController extends AbstractFOSRestController
         $limit = (int)$request->get('limit', RestGetController::ITEMS_PER_PAGE);
         $domain = $request->get('domain', 'messages');
 
-        $result = $this->get('translator')->getTranslations([$domain]);
+        $result = $this->container->get('translator')->getTranslations([$domain]);
 
         $data = [];
         $count = 0;
@@ -72,7 +72,7 @@ class TranslationController extends AbstractFOSRestController
 
         $response = $this->handleView($this->view($data, Response::HTTP_OK));
         /** @var IncludeHandlerInterface $includeHandler */
-        $includeHandler = $this->get('oro_soap.handler.include');
+        $includeHandler = $this->container->get('oro_soap.handler.include');
         $includeHandler->handle(new Context(
             $this,
             $request,
@@ -101,11 +101,11 @@ class TranslationController extends AbstractFOSRestController
         }
 
         /** @var TranslationManager $translationManager */
-        $translationManager = $this->get('oro_translation.manager.translation');
+        $translationManager = $this->container->get('oro_translation.manager.translation');
         $translation = $translationManager->saveTranslation($key, $value, $locale, $domain, Translation::SCOPE_UI);
         $translationManager->flush();
 
-        $translator = $this->get('translator');
+        $translator = $this->container->get('translator');
         $translated = null !== $translation;
         $response = [
             'status' => $translated,

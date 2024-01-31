@@ -4,6 +4,9 @@ namespace Oro\Bundle\ScopeBundle\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Fetches context from request.
+ */
 class ContextRequestHelper
 {
     /**
@@ -13,7 +16,7 @@ class ContextRequestHelper
      */
     public function getFromRequest(Request $request, array $allowedKeys = [])
     {
-        $context = (array)$request->query->get('context', []);
+        $context = $request->query->all('context');
         $notAllowedKeys = array_intersect(array_keys($context), array_flip($allowedKeys));
         if (count($notAllowedKeys) || count($context) !== count($allowedKeys)) {
             throw new \RuntimeException(

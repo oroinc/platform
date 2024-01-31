@@ -118,12 +118,17 @@
     > .responsive-section {
         &:not(.responsive-small) {
             .responsive-cell {
-                &:first-child {
+                &:nth-child(2n - 1) {
                     padding-right: $horizontal-padding;
                 }
 
-                &:last-child {
+                &:nth-child(2n) {
                     padding-left: $horizontal-padding;
+                }
+
+                &:not(:first-child),
+                &:not(:nth-child(2)) {
+                    padding-top: $vertical-padding;
                 }
 
                 &:only-child {

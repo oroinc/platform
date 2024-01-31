@@ -7,6 +7,8 @@ use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -15,14 +17,14 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Test\FormInterface;
 
-class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
+class AddressCountryAndRegionSubscriberTest extends TestCase
 {
     private const TEST_COUNTRY_NAME = 'testCountry';
 
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectManager|MockObject */
     private $om;
 
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormFactoryInterface|MockObject */
     private $formBuilder;
 
     /** @var AddressCountryAndRegionSubscriber */
@@ -197,7 +199,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->om->expects($this->once())
             ->method('getRepository')
-            ->with('OroAddressBundle:Country')
+            ->with(Country::class)
             ->willReturn($repository);
 
         $configMock = $this->createMock(FormConfigInterface::class);
@@ -266,7 +268,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->om->expects($this->once())
             ->method('getRepository')
-            ->with('OroAddressBundle:Country')
+            ->with(Country::class)
             ->willReturn($repository);
 
         $startData = [

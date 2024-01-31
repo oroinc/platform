@@ -37,7 +37,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
         $this->userProvider = new UserProvider($this->userLoader, $this->doctrine);
     }
 
-    public function testLoadUserForExistingUsername()
+    public function testLoadUserForExistingUserIdentifier()
     {
         $username = 'foobar';
         $user = $this->createMock(self::USER_CLASS);
@@ -49,11 +49,11 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(
             $user,
-            $this->userProvider->loadUserByUsername($username)
+            $this->userProvider->loadUserByIdentifier($username)
         );
     }
 
-    public function testLoadUserForNotExistingUsername()
+    public function testLoadUserForNotExistingUserIdentifier()
     {
         $this->expectException(UserNotFoundException::class);
         $username = 'foobar';
@@ -62,7 +62,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
             ->with($username)
             ->willReturn(null);
 
-        $this->userProvider->loadUserByUsername($username);
+        $this->userProvider->loadUserByIdentifier($username);
     }
 
     public function testRefreshUserNotFound()

@@ -149,7 +149,7 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
     {
         $onFlushEventArgs = $this->createMock(OnFlushEventArgs::class);
         $onFlushEventArgs->expects($this->once())
-            ->method('getEntityManager')
+            ->method('getObjectManager')
             ->willReturn($entityManager = $this->createMock(EntityManagerInterface::class));
 
         $entityManager->expects($this->once())

@@ -15,3 +15,29 @@ oro_behat_extension:
         Product Attribute Audit Grid:
             class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
             selector: 'div[data-page-component-name^="auditfield-log-grid"]'
+
+        Product Attribute Form:
+            selector: 'form[name="oro_entity_config_type"]'
+            class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+            options:
+                mapping:
+                    Frontend Show On View: 'oro_entity_config_type[frontend][is_displayable]'
+                    Frontend Show On Form: 'oro_entity_config_type[frontend][is_editable]'
+                    Frontend Exportable: 'oro_entity_config_type[frontend][use_in_export]'
+                    Frontend Searchable: 'oro_entity_config_type[attribute][searchable]'
+                    Frontend Filterable: 'oro_entity_config_type[attribute][filterable]'
+                    Frontend Filter By: 'oro_entity_config_type[attribute][filter_by]'
+                    Frontend Sortable: 'oro_entity_config_type[attribute][sortable]'
+                    Frontend Similar Products Boost: 'oro_entity_config_type[attribute][similar_products_boost_value]'
+                    Frontend Global Search Boost: 'oro_entity_config_type[attribute][search_boost]'
+                    Backend Column Position: 'oro_entity_config_type[importexport][order]'
+                    Backend Exclude Column: 'oro_entity_config_type[importexport][order]'
+                    Backend Contact Information: 'oro_entity_config_type[entity][contact_information]'
+                    Backend Show On Form: 'oro_entity_config_type[form][is_enabled]'
+                    Backend Available In Email Templates: 'oro_entity_config_type[email][available_in_template]'
+                    Backend Add To Grid Settings: 'oro_entity_config_type[datagrid][is_visible]'
+                    Backend Show Grid Filter: 'oro_entity_config_type[datagrid][show_filter]'
+                    Backend Grid Order: 'oro_entity_config_type[datagrid][order]'
+                    Backend Show On View: 'oro_entity_config_type[view][is_displayable]'
+                    Backend Priority: 'oro_entity_config_type[view][priority]'
+                    Backend Searchable: 'oro_entity_config_type[search][searchable]'

@@ -25,17 +25,18 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
     public function testProcessBaseConfiguration(): void
     {
         $themeConfig = [
-            'label'              => 'test label',
-            'description'        => 'test description',
-            'parent'             => 'test_parent',
-            'directory'          => 'test_directory',
-            'groups'             => ['test group'],
-            'icon'               => 'test.ico',
-            'image_placeholders' => ['placeholder' => '/path/to/test.img'],
-            'rtl_support'        => true,
-            'logo'               => 'test_logo.jpg',
-            'screenshot'         => 'test_screenshot.jpg',
-            'extra_js_builds'    => []
+            'label'               => 'test label',
+            'description'         => 'test description',
+            'parent'              => 'test_parent',
+            'directory'           => 'test_directory',
+            'groups'              => ['test group'],
+            'icon'                => 'test.ico',
+            'image_placeholders'  => ['placeholder' => '/path/to/test.img'],
+            'rtl_support'         => true,
+            'logo'                => 'test_logo.jpg',
+            'screenshot'          => 'test_screenshot.jpg',
+            'extra_js_builds'     => [],
+            'resolve_extra_paths' => ['/bundles/orothemedefault51']
         ];
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
         self::assertSame($themeConfig, $result['test_theme']);

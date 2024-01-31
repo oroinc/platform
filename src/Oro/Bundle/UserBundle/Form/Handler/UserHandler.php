@@ -12,7 +12,6 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -23,9 +22,6 @@ class UserHandler extends AbstractUserHandler
     use RequestHandlerTrait;
 
     public const INVITE_USER_TEMPLATE = 'invite_user';
-
-    /** @var FlashBagInterface */
-    protected $flashBag;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -45,7 +41,6 @@ class UserHandler extends AbstractUserHandler
         UserManager $manager,
         EmailTemplateManager $emailTemplateManager = null,
         ConfigManager $userConfigManager = null,
-        FlashBagInterface $flashBag = null,
         TranslatorInterface $translator = null,
         LoggerInterface $logger = null
     ) {
@@ -53,7 +48,6 @@ class UserHandler extends AbstractUserHandler
 
         $this->emailTemplateManager = $emailTemplateManager;
         $this->userConfigManager = $userConfigManager;
-        $this->flashBag = $flashBag;
         $this->translator = $translator;
         $this->logger = $logger;
     }
@@ -106,7 +100,7 @@ class UserHandler extends AbstractUserHandler
                 $this->sendInviteMail($user, $plainPassword);
             } catch (\Exception $ex) {
                 $this->logger->error('Invitation email sending failed.', ['exception' => $ex]);
-                $this->flashBag->add(
+                $this->requestStack?->getSession()?->getFlashBag()->add(
                     'warning',
                     $this->translator->trans('oro.user.controller.invite.fail.message')
                 );

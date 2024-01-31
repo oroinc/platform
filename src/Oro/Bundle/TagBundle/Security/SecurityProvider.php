@@ -5,8 +5,12 @@ namespace Oro\Bundle\TagBundle\Security;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider as SearchSecurityProvider;
+use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Protects taggable entities by ACL.
+ */
 class SecurityProvider
 {
     const ENTITY_PERMISSION = 'VIEW';
@@ -79,7 +83,7 @@ class SecurityProvider
     protected function getTaggableEntities(EntityManager $em)
     {
         $qb = $em->createQueryBuilder()
-            ->from('OroTagBundle:Tagging', 't')
+            ->from(Tagging::class, 't')
             ->select('t.entityName')
             ->distinct(true);
 

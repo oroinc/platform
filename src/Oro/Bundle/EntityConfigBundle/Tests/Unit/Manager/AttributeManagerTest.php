@@ -17,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -334,6 +335,43 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertEquals($expectation, $this->manager->isSystem($attribute));
+    }
+
+    /**
+     * @dataProvider isSearchableDataProvider
+     */
+    public function testIsSearchable(bool $expectation): void
+    {
+        $attribute = new FieldConfigModel('sku', 'string');
+        $attribute->setEntity(new EntityConfigModel(TestEntity1::class));
+        $attribute->fromArray('attribute', ['searchable' => $expectation]);
+
+        $config = $this->createMock(ConfigInterface::class);
+        $config->expects($this->once())
+            ->method('is')
+            ->with('searchable')
+            ->willReturn($expectation);
+
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($attribute->getEntity()->getClassName(), $attribute->getFieldName())
+            ->willReturn($config);
+
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('attribute')
+            ->willReturn($configProvider);
+
+        $this->assertEquals($expectation, $this->manager->isSearchable($attribute));
+    }
+
+    public function isSearchableDataProvider(): array
+    {
+        return [
+            'searchable'     => [true],
+            'not searchable' => [false]
+        ];
     }
 
     /**

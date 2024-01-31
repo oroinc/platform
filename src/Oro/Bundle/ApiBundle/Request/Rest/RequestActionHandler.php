@@ -87,7 +87,10 @@ class RequestActionHandler extends BaseRequestActionHandler
                 $response = $view->getResponse();
                 $data = $view->getData();
                 if (null !== $data) {
-                    $encoder = new JsonEncode();
+                    // Allow json_encode to convert float to integer.
+                    $encoder = new JsonEncode([
+                        JsonEncode::OPTIONS => 0,
+                    ]);
                     $response->setContent($encoder->encode($data, $format));
                 } elseif (Response::HTTP_OK === $view->getStatusCode()) {
                     $response->headers->set('Content-Length', 0);

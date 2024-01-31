@@ -24,7 +24,7 @@ class UserEmailOriginTransportFactoryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->transportFactory = $this->createMock(Transport::class);
+        $this->transportFactory = new Transport([]);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->dsnFromUserEmailOriginFactory = $this->createMock(DsnFromUserEmailOriginFactory::class);
         $this->requestStack = new RequestStack();

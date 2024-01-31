@@ -4,7 +4,11 @@ namespace Oro\Bundle\IntegrationBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 
+/**
+ * Deletes integration and related data
+ */
 class DeleteManager
 {
     /** @var EntityManager */
@@ -44,7 +48,7 @@ class DeleteManager
                 }
             }
 
-            $this->removeFromEntityByChannelId('OroIntegrationBundle:Status', $integration);
+            $this->removeFromEntityByChannelId(Status::class, $integration);
 
             $this->em->remove($integration);
             $this->em->flush();

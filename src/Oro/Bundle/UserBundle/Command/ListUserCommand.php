@@ -81,7 +81,7 @@ HELP
         /** @var QueryBuilder $builder */
         $builder = $this->doctrine
             ->getManagerForClass(User::class)
-            ->getRepository('OroUserBundle:User')
+            ->getRepository(User::class)
             ->createQueryBuilder('u');
         $builder->orderBy('u.enabled', 'DESC')
             ->addOrderBy('u.id', 'ASC');
@@ -122,7 +122,7 @@ HELP
     {
         return [
             $user->getId(),
-            $user->getUsername(),
+            $user->getUserIdentifier(),
             sprintf(
                 '%s (%s)',
                 $user->isEnabled() ? 'Enabled' : 'Disabled',

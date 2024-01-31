@@ -15,7 +15,7 @@ class GmailAccessTokenController extends AbstractAccessTokenController
      */
     protected function getOAuthProvider(): OAuthProviderInterface
     {
-        return $this->get(GoogleOAuthProvider::class);
+        return $this->container->get(GoogleOAuthProvider::class);
     }
 
     public static function getSubscribedServices(): array

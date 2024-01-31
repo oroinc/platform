@@ -64,7 +64,7 @@ class GridController extends AbstractController
      */
     public function getAction($gridName)
     {
-        $gridManager = $this->get(Manager::class);
+        $gridManager = $this->container->get(Manager::class);
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->getAclResource();
 
@@ -81,7 +81,7 @@ class GridController extends AbstractController
                 return new JsonResponse(
                     [
                         'type'    => UserInputErrorExceptionInterface::TYPE,
-                        'message' => $this
+                        'message' => $this->container
                             ->get(TranslatorInterface::class)->trans($e->getMessageTemplate(), $e->getMessageParams())
                     ],
                     500
@@ -100,7 +100,7 @@ class GridController extends AbstractController
     {
         $filterNames = $request->query->get('filterNames', []);
 
-        $gridManager = $this->get(Manager::class);
+        $gridManager = $this->container->get(Manager::class);
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->getAclResource();
 
@@ -178,15 +178,15 @@ class GridController extends AbstractController
      */
     public function massActionAction(Request $request, $gridName, $actionName)
     {
-        $massActionDispatcher = $this->get(MassActionDispatcher::class);
+        $massActionDispatcher = $this->container->get(MassActionDispatcher::class);
 
         try {
             $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
         } catch (LogicException $e) {
-            if ($this->get(KernelInterface::class)->isDebug()) {
+            if ($this->container->get(KernelInterface::class)->isDebug()) {
                 throw $e;
             } else {
-                $this->get(LoggerInterface::class)->error($e->getMessage());
+                $this->container->get(LoggerInterface::class)->error($e->getMessage());
                 return new JsonResponse(null, JsonResponse::HTTP_FORBIDDEN);
             }
         }

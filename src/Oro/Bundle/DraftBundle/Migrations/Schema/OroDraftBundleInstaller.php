@@ -40,9 +40,9 @@ class OroDraftBundleInstaller implements Installation
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
-        $table->addIndex(['user_owner_id'], 'IDX_9B6914467E3C61F9', []);
-        $table->addIndex(['organization_id'], 'IDX_9B69144632C8A3DE', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['user_owner_id'], 'IDX_9B6914467E3C61F9');
+        $table->addIndex(['organization_id'], 'IDX_9B69144632C8A3DE');
     }
 
     /**

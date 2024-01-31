@@ -5,42 +5,28 @@ namespace Oro\Bundle\OrganizationBundle\Migrations\Schema;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- */
 class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
-    /** @var ExtendExtension */
-    private $extendExtension;
+    use ExtendExtensionAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_7';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroOrganizationTable($schema);
@@ -55,36 +41,36 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
     /**
      * Create oro_organization table
      */
-    protected function createOroOrganizationTable(Schema $schema)
+    private function createOroOrganizationTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_organization');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('description', 'text', ['notnull' => false]);
-        $table->addColumn(
-            'created_at',
-            'datetime',
-            ['default' => null, 'notnull' => false, 'comment' => '(DC2Type:datetime)']
-        );
-        $table->addColumn(
-            'updated_at',
-            'datetime',
-            ['default' => null, 'notnull' => false, 'comment' => '(DC2Type:datetime)']
-        );
+        $table->addColumn('created_at', 'datetime', [
+            'default' => null,
+            'notnull' => false,
+            'comment' => '(DC2Type:datetime)'
+        ]);
+        $table->addColumn('updated_at', 'datetime', [
+            'default' => null,
+            'notnull' => false,
+            'comment' => '(DC2Type:datetime)'
+        ]);
         $table->addColumn('enabled', 'boolean', ['default' => '1']);
-        $table->addUniqueIndex(['name'], 'uniq_bb42b65d5e237e06');
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['name'], 'uniq_bb42b65d5e237e06');
     }
 
     /**
      * Create oro_business_unit table
      */
-    protected function createOroBusinessUnitTable(Schema $schema)
+    private function createOroBusinessUnitTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_business_unit');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
-        $table->addColumn('organization_id', 'integer', []);
+        $table->addColumn('organization_id', 'integer');
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('phone', 'string', ['notnull' => false, 'length' => 100]);
         $table->addColumn('website', 'string', ['notnull' => false, 'length' => 255]);
@@ -106,15 +92,15 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
                 ]
             ]
         );
-        $table->addIndex(['organization_id'], 'idx_c033b2d532c8a3de', []);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['business_unit_owner_id'], 'idx_c033b2d559294170', []);
+        $table->addIndex(['organization_id'], 'idx_c033b2d532c8a3de');
+        $table->addIndex(['business_unit_owner_id'], 'idx_c033b2d559294170');
     }
 
     /**
      * Add oro_business_unit foreign keys.
      */
-    protected function addOroBusinessUnitForeignKeys(Schema $schema)
+    private function addOroBusinessUnitForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_business_unit');
         $table->addForeignKeyConstraint(
@@ -131,7 +117,7 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
         );
     }
 
-    protected function addRelationsToScope(Schema $schema)
+    private function addRelationsToScope(Schema $schema): void
     {
         if ($schema->hasTable('oro_scope')) {
             $this->extendExtension->addManyToOneRelation(
@@ -147,8 +133,7 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
                         'on_delete' => 'CASCADE',
                         'nullable' => true
                     ]
-                ],
-                RelationType::MANY_TO_ONE
+                ]
             );
         }
     }

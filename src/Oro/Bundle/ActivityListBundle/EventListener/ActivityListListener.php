@@ -46,7 +46,7 @@ class ActivityListListener
      */
     public function onFlush(OnFlushEventArgs $args)
     {
-        $entityManager = $args->getEntityManager();
+        $entityManager = $args->getObjectManager();
         $unitOfWork    = $entityManager->getUnitOfWork();
 
         $this->collectInsertedEntities($unitOfWork->getScheduledEntityInsertions());
@@ -69,7 +69,7 @@ class ActivityListListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        $entityManager = $args->getEntityManager();
+        $entityManager = $args->getObjectManager();
 
         $this->activityListManager->processDeletedEntities($this->deletedEntities, $entityManager);
         $this->deletedEntities = [];

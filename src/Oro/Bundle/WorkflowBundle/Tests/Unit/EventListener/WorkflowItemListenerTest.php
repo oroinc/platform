@@ -210,7 +210,7 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
     {
         $event = $this->createMock(LifecycleEventArgs::class);
         $event->expects($this->any())
-            ->method('getEntity')
+            ->method('getObject')
             ->willReturn($entity);
         $event->expects($this->exactly($entityManager ? 1 : 0))
             ->method('getObjectManager')

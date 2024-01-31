@@ -26,9 +26,7 @@ class ApiSourceListener
 
     public function clearCache(): void
     {
-        // clear all api caches data
         $this->cacheManager->clearCaches();
-        // clear the cache for API documentation
         $this->cacheManager->clearApiDocCache();
     }
 

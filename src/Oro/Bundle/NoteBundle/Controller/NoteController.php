@@ -84,7 +84,7 @@ class NoteController extends AbstractController
      */
     public function infoAction(Request $request, Note $entity, $renderContexts)
     {
-        $attachmentProvider = $this->get(AttachmentProvider::class);
+        $attachmentProvider = $this->container->get(AttachmentProvider::class);
         $attachment = $attachmentProvider->getAttachmentInfo($entity);
 
         return [
@@ -147,7 +147,7 @@ class NoteController extends AbstractController
      */
     public function updateAction(Note $entity)
     {
-        $formAction = $this->get('router')->generate('oro_note_update', ['id' => $entity->getId()]);
+        $formAction = $this->container->get('router')->generate('oro_note_update', ['id' => $entity->getId()]);
 
         return $this->update($entity, $formAction);
     }
@@ -159,13 +159,13 @@ class NoteController extends AbstractController
             'saved'  => false
         ];
 
-        if ($this->get(NoteHandler::class)->process($entity)) {
+        if ($this->container->get(NoteHandler::class)->process($entity)) {
             $responseData['saved'] = true;
             $responseData['model'] = $this->getNoteManager()->getEntityViewModel($entity);
         }
         $responseData['form']        = $this->getForm()->createView();
         $responseData['formAction']  = $formAction;
-        $translator = $this->get(TranslatorInterface::class);
+        $translator = $this->container->get(TranslatorInterface::class);
         if ($entity->getId()) {
             $responseData['submitLabel'] = $translator->trans('oro.note.save.label');
         } else {
@@ -177,17 +177,17 @@ class NoteController extends AbstractController
 
     public function getForm(): FormInterface
     {
-        return $this->get('oro_note.form.note');
+        return $this->container->get('oro_note.form.note');
     }
 
     protected function getNoteManager(): NoteManager
     {
-        return $this->get(NoteManager::class);
+        return $this->container->get(NoteManager::class);
     }
 
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     /**

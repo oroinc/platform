@@ -34,13 +34,14 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
             sprintf('Expected argument of type "%s", "%s" given', FieldNameLength::class, Length::class)
         );
 
-        $this->validator->validate(self::STRING, new Length(['min' => 1, 'allowEmptyString' => false]));
+        $this->validator->validate(self::STRING, new Length(['min' => 1]));
     }
 
     public function testValidateWhenMaxLengthExceeded()
     {
         $maxLength = 22;
-        $value = substr(self::STRING, 0, 23);
+        $length = 23;
+        $value = substr(self::STRING, 0, $length);
 
         $this->nameGenerator->expects($this->once())
             ->method('getMaxCustomEntityFieldNameSize')
@@ -52,6 +53,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation($constraint->maxMessage)
             ->setParameter('{{ value }}', '"' . $value . '"')
             ->setParameter('{{ limit }}', $maxLength)
+            ->setParameter('{{ value_length }}', $length)
             ->setInvalidValue($value)
             ->setPlural($maxLength)
             ->setCode(FieldNameLength::TOO_LONG_ERROR)
@@ -85,6 +87,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
     public function testValidateMinLengthExceeded()
     {
         $minLength = 2;
+        $length = 1;
         $value = 'A';
 
         $constraint = new FieldNameLength();
@@ -93,6 +96,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation($constraint->minMessage)
             ->setParameter('{{ value }}', '"' . $value . '"')
             ->setParameter('{{ limit }}', $minLength)
+            ->setParameter('{{ value_length }}', $length)
             ->setInvalidValue($value)
             ->setPlural($minLength)
             ->setCode(FieldNameLength::TOO_SHORT_ERROR)

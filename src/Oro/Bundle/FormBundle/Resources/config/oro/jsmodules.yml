@@ -57,6 +57,7 @@ dynamic-imports:
         - oroform/js/validator/datetime
         - oroform/js/validator/email
         - oroform/js/validator/length
+        - oroform/js/validator/not-blank-group
         - oroform/js/validator/notblank
         - oroform/js/validator/notnull
         - oroform/js/validator/number

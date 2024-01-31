@@ -9,7 +9,6 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\EventListener\NavigationListener;
 use Oro\Bundle\ReportBundle\Tests\Functional\DataFixtures\LoadReportsData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
  * @dbIsolationPerTest
@@ -26,7 +25,7 @@ class NavigationListenerTest extends WebTestCase
             ->createQueryBuilder('report')->delete()->getQuery()->execute();
         $this->loadFixtures([LoadReportsData::class]);
 
-        $this->updateUserSecurityToken(LoadAdminUserData::DEFAULT_ADMIN_EMAIL);
+        $this->updateUserSecurityToken(self::AUTH_USER);
     }
 
     public function testOnNavigationConfigure()

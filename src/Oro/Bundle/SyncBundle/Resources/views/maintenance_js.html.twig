@@ -6,7 +6,7 @@
 
         sync.subscribe('oro/maintenance', function (response) {
             var userId = null;
-            {% if app.user is not null %}
+            {% if is_authenticated() %}
                 userId = {{ app.user.id|raw }};
             {% endif %}
 

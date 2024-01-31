@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tools;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
@@ -17,6 +18,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -178,7 +180,7 @@ class EmailOriginHelper
 
             $authorizedRoles = $emailOwner->getAuthorizedRoles();
             foreach ($authorizedRoles as $role) {
-                $users = $this->getEntityManager()->getRepository('OroUserBundle:Role')
+                $users = $this->getEntityManager()->getRepository(Role::class)
                     ->getUserQueryBuilder($role)
                     ->getQuery()->getResult();
 
@@ -329,7 +331,7 @@ class EmailOriginHelper
     protected function getEntityManager()
     {
         if (null === $this->em) {
-            $this->em = $this->doctrineHelper->getEntityManager('OroEmailBundle:Email');
+            $this->em = $this->doctrineHelper->getEntityManager(Email::class);
         }
 
         return $this->em;

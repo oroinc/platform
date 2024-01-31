@@ -14,25 +14,21 @@ class OroEmailBundle implements Migration
     /**
      * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addEmailFolderFields($schema);
-        self::addEmailOriginFields($schema);
-        self::updateMailboxName($schema, $queries);
-        self::updateEmailRecipientConstraint($schema);
+        $this->addEmailFolderFields($schema);
+        $this->addEmailOriginFields($schema);
+        $this->updateMailboxName($schema, $queries);
+        $this->updateEmailRecipientConstraint($schema);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function addEmailFolderFields(Schema $schema)
+    private function addEmailFolderFields(Schema $schema): void
     {
-        $emailFolderTable = $schema->getTable('oro_email_folder');
-
-        $emailFolderTable->addColumn('sync_enabled', 'boolean', ['default' => false]);
-        $emailFolderTable->addColumn('parent_folder_id', 'integer', ['notnull' => false]);
-        $emailFolderTable->addForeignKeyConstraint(
-            $emailFolderTable,
+        $table = $schema->getTable('oro_email_folder');
+        $table->addColumn('sync_enabled', 'boolean', ['default' => false]);
+        $table->addColumn('parent_folder_id', 'integer', ['notnull' => false]);
+        $table->addForeignKeyConstraint(
+            $table,
             ['parent_folder_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null],
@@ -40,18 +36,14 @@ class OroEmailBundle implements Migration
         );
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function addEmailOriginFields(Schema $schema)
+    private function addEmailOriginFields(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');
-
         $table->addColumn('mailbox_name', 'string', ['length' => 64, 'notnull' => true, 'default' => '']);
         $table->addIndex(['mailbox_name'], 'IDX_mailbox_name', []);
     }
 
-    public static function updateMailboxName(Schema $schema, QueryBag $queries)
+    private function updateMailboxName(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_origin');
         $sql = 'UPDATE oro_email_origin SET mailbox_name = %s WHERE name = :name';
@@ -86,13 +78,9 @@ class OroEmailBundle implements Migration
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function updateEmailRecipientConstraint(Schema $schema)
+    private function updateEmailRecipientConstraint(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_recipient');
-
         $table->removeForeignKey('FK_7DAF9656A832C1C9');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email'),

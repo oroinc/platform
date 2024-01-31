@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterfa
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -44,7 +45,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
 
         $token->expects($this->once())
             ->method('getUser')
-            ->willReturn('test');
+            ->willReturn($this->createMock(UserInterface::class));
 
         $this->assertEquals(
             [

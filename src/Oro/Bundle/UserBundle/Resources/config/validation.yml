@@ -12,13 +12,11 @@ Oro\Bundle\UserBundle\Entity\User:
             - Length:
                 min: 3
                 max: 255
-                allowEmptyString: false
         email:
             - NotBlank: ~
             - Length:
                 min: 6
                 max: 255
-                allowEmptyString: false
                 groups: [UserForm, Registration]
             - Email:        ~
         plainPassword:

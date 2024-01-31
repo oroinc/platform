@@ -24,7 +24,6 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         parent::setUp();
 
         $this->extension = new SearchFilterExtension(
-            $this->configurationProvider,
             $this->filterBag,
             $this->filtersProvider,
             $this->filtersMetadataProvider,

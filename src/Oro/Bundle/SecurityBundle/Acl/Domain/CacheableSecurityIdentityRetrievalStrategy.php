@@ -27,7 +27,7 @@ class CacheableSecurityIdentityRetrievalStrategy implements SecurityIdentityRetr
      */
     public function getSecurityIdentities(TokenInterface $token)
     {
-        $username = $token->getUsername();
+        $username = $token->getUserIdentifier();
         if (isset($this->sids[$username])) {
             return $this->sids[$username];
         }
