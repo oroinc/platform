@@ -163,4 +163,17 @@
         max-width: 140px;
         padding-left: 39px;
     }
+
+    &-quantity-btn {
+        position: absolute;
+        top: 0;
+
+        &--minus {
+            left: 0;
+        }
+
+        &--plus {
+            right: 0;
+        }
+    }
 }

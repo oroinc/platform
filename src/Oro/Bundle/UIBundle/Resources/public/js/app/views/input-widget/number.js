@@ -1,4 +1,4 @@
-define(function(require) {
+define(function (require) {
     'use strict';
 
     const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
@@ -40,6 +40,7 @@ define(function(require) {
         },
 
         initializeWidget: function() {
+            this._appendButtons();
             this._setPrecision();
             this._setLimitDecimals();
             this._setAttr();
@@ -114,6 +115,36 @@ define(function(require) {
                 });
                 this.$el.val(localizedFloat);
             }
+        },
+
+        _appendButtons() {
+            $('<button />', {
+                type: 'button',
+                class: "btn btn--plain btn--icon input-quantity-btn input-quantity-btn--minus",
+                html: _.macros('oroui::renderIcon')({
+                    name: 'minus'
+                }),
+                click: () => {
+                    if (Number(this.$el.val()) <= 1) {
+                        return;
+                    }
+
+                    this.$el.val(Number(this.$el.val()) - 1);
+                }
+            }).insertBefore(this.$el);
+
+            $('<button />', {
+                type: 'button',
+                class: "btn btn--plain btn--icon input-quantity-btn input-quantity-btn--plus",
+                html: _.macros('oroui::renderIcon')({
+                    name: 'plus'
+                }),
+                click: () => {
+                    this.$el.val(Number(this.$el.val()) + 1);
+                }
+            }).insertAfter(this.$el);
+
+            this.$el.parent().css("position", "relative");
         },
 
         _rememberAttr: function() {
