@@ -165,6 +165,21 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getPropagableExtras());
     }
 
+    public function testConfigSections()
+    {
+        self::assertFalse($this->context->hasConfigSection('test'));
+        self::assertNull($this->context->getConfigSection('test'));
+
+        $sectionConfig = ['key' => 'val'];
+
+        $this->context->setConfigSection('test', $sectionConfig);
+        self::assertTrue($this->context->hasConfigSection('test'));
+        self::assertEquals($sectionConfig, $this->context->getConfigSection('test'));
+
+        $this->context->setConfigSection('test', null);
+        self::assertTrue($this->context->hasConfigSection('test'));
+    }
+
     public function testFilters()
     {
         self::assertFalse($this->context->hasFilters());
@@ -175,7 +190,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setFilters($filters);
         self::assertTrue($this->context->hasFilters());
         self::assertEquals($filters, $this->context->getFilters());
-        self::assertEquals($filters, $this->context->get(FiltersConfigExtra::NAME));
+        self::assertEquals($filters, $this->context->getConfigSection(FiltersConfigExtra::NAME));
 
         $this->context->setFilters(null);
         self::assertTrue($this->context->hasFilters());
@@ -191,7 +206,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setSorters($sorters);
         self::assertTrue($this->context->hasSorters());
         self::assertEquals($sorters, $this->context->getSorters());
-        self::assertEquals($sorters, $this->context->get(SortersConfigExtra::NAME));
+        self::assertEquals($sorters, $this->context->getConfigSection(SortersConfigExtra::NAME));
 
         $this->context->setSorters(null);
         self::assertTrue($this->context->hasSorters());
