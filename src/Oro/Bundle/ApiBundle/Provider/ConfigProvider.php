@@ -178,8 +178,8 @@ class ConfigProvider implements ResetInterface
         foreach ($extras as $extra) {
             if ($extra instanceof ConfigExtraSectionInterface) {
                 $sectionName = $extra->getName();
-                if ($context->has($sectionName)) {
-                    $config->set($sectionName, $context->get($sectionName));
+                if ($context->hasConfigSection($sectionName)) {
+                    $config->set($sectionName, $context->getConfigSection($sectionName));
                 }
             }
         }
