@@ -175,4 +175,15 @@ class ThemeManager
 
         return array_reverse($themesHierarchy);
     }
+
+    public function themeHasParent(string $theme, array $parentThemes): bool
+    {
+        $hierarchy = $this->getThemesHierarchy($theme);
+        foreach ($hierarchy as $currentTheme) {
+            if (in_array($currentTheme->getName(), $parentThemes)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
