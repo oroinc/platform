@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
@@ -40,7 +40,10 @@ define(function (require) {
         },
 
         initializeWidget: function() {
-            this._appendButtons();
+            if (this.$el.attr('inputmode') === 'decimal') {
+                this._appendButtons();
+            }
+
             this._setPrecision();
             this._setLimitDecimals();
             this._setAttr();
@@ -119,12 +122,12 @@ define(function (require) {
 
         _appendButtons() {
             $('<button />', {
-                type: 'button',
-                class: "btn btn--plain btn--icon input-quantity-btn input-quantity-btn--minus",
-                html: _.macros('oroui::renderIcon')({
+                'type': 'button',
+                'class': 'btn btn--plain btn--icon input-quantity-btn input-quantity-btn--minus',
+                'html': _.macros('oroui::renderIcon')({
                     name: 'minus'
                 }),
-                click: () => {
+                'click': () => {
                     if (Number(this.$el.val()) <= 1) {
                         return;
                     }
@@ -134,17 +137,17 @@ define(function (require) {
             }).insertBefore(this.$el);
 
             $('<button />', {
-                type: 'button',
-                class: "btn btn--plain btn--icon input-quantity-btn input-quantity-btn--plus",
-                html: _.macros('oroui::renderIcon')({
+                'type': 'button',
+                'class': 'btn btn--plain btn--icon input-quantity-btn input-quantity-btn--plus',
+                'html': _.macros('oroui::renderIcon')({
                     name: 'plus'
                 }),
-                click: () => {
+                'click': () => {
                     this.$el.val(Number(this.$el.val()) + 1);
                 }
             }).insertAfter(this.$el);
 
-            this.$el.parent().css("position", "relative");
+            this.$el.parent().css('position', 'relative');
         },
 
         _rememberAttr: function() {

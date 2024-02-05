@@ -164,6 +164,11 @@
         padding-left: 39px;
     }
 
+    &[inputmode='decimal'] {
+        padding-left: $input-btn-size;
+        padding-right: $input-btn-size;
+    }
+
     &-quantity-btn {
         position: absolute;
         top: 0;
