@@ -142,4 +142,25 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->hasResult());
         $this->assertNull($context->getResult());
     }
+
+    public function testGetChecksum()
+    {
+        $context = new Context();
+        $this->assertEquals('', $context->getChecksum());
+
+        $context->setAction('test');
+        $this->assertEquals('5f806996b5064aae1b0c0a2cc0f90d1550f05af7', $context->getChecksum());
+
+        $context->set('key1', 'val1');
+        $this->assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
+
+        $context->set('key2', null);
+        $this->assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
+
+        $context->set('key3', ['key' => 'val']);
+        $this->assertEquals('b382be496f9cc9ba10e545c41ddd1ca9d9f9fb5a', $context->getChecksum());
+
+        $context->remove('key3');
+        $this->assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
+    }
 }

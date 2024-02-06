@@ -1895,17 +1895,20 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     private function addProcessor(
         ProcessorBagConfigBuilder $processorBagConfigBuilder,
         string $processorId,
-        string $dataType = null,
+        string $dataType,
         string|array|null $requestType = null
     ): string {
         $attributes = [];
-        if (null !== $dataType) {
-            $attributes['dataType'] = $dataType;
-        }
         if (null !== $requestType) {
             $attributes['requestType'] = is_array($requestType) ? ['&' => $requestType] : $requestType;
         }
-        $processorBagConfigBuilder->addProcessor($processorId, $attributes, 'normalize_value', null, -10);
+        $processorBagConfigBuilder->addProcessor(
+            $processorId,
+            $attributes,
+            'normalize_value.' . $dataType,
+            null,
+            -10
+        );
 
         return $processorId;
     }

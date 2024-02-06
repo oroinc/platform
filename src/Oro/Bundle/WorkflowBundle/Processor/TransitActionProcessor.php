@@ -12,6 +12,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * The main processor for "transit" action.
+ */
 class TransitActionProcessor extends ActionProcessor
 {
     use ValidateTransitionContextTrait;
@@ -35,7 +38,7 @@ class TransitActionProcessor extends ActionProcessor
     {
         $this->validateContextType($context);
 
-        $processors = $this->processorBag->getProcessors($context);
+        $processors = $this->getProcessors($context);
 
         /** @var ProcessorInterface $processor */
         foreach ($processors as $processor) {
