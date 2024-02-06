@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\ChainProcessor\AbstractMatcher as Matcher;
+use Oro\Component\ChainProcessor\ApplicableCheckerInterface;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
@@ -31,6 +32,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DebugCommand extends AbstractDebugCommand
 {
     private const MAX_ELEMENTS_PER_LINE = 2;
+    private const HIDDEN_ACTIONS = [
+        'customize_loaded_data.identifier_only'
+    ];
 
     /** @var string */
     protected static $defaultName = 'oro:api:debug';
@@ -177,6 +181,9 @@ HELP
         return Command::SUCCESS;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function dumpActions(OutputInterface $output): void
     {
         $publicActions = $this->getPublicActions();
@@ -186,20 +193,25 @@ HELP
         $totalNumberOfProcessors = 0;
         $allProcessorsIds = [];
         foreach ($this->processorBag->getActions() as $action) {
+            if (\in_array($action, self::HIDDEN_ACTIONS, true)) {
+                continue;
+            }
             $processorIds = $this->getProcessorIds($action);
             $allProcessorsIds[] = $processorIds;
             $numberOfProcessors = \count($processorIds);
             $totalNumberOfProcessors += $numberOfProcessors;
-            $processorInfo = [
-                $numberOfProcessors,
-                'customize_loaded_data' !== $action && 'customize_form_data' !== $action
-                    ? $this->processorBag->getActionGroups($action)
-                    : []
-            ];
+            $action = $this->resolveAction($action);
+            $processorGroups = $this->processorBag->getActionGroups($action);
             if (\in_array($action, $publicActions, true)) {
-                $processorsForPublicActions[$action] = $processorInfo;
+                $processorsForPublicActions[$action] = [$numberOfProcessors, $processorGroups];
+            } elseif (isset($processorsForOtherActions[$action])) {
+                $processorsForOtherActions[$action][0] += $numberOfProcessors;
+                $processorsForOtherActions[$action][1] += array_merge(
+                    $processorsForOtherActions[$action][1],
+                    $processorGroups
+                );
             } else {
-                $processorsForOtherActions[$action] = $processorInfo;
+                $processorsForOtherActions[$action] = [$numberOfProcessors, $processorGroups];
             }
         }
         $allProcessorsIds = array_unique(array_merge(...$allProcessorsIds));
@@ -278,6 +290,9 @@ HELP
         $processorsMap = [];
         $actions = $this->processorBag->getActions();
         foreach ($actions as $action) {
+            if (\in_array($action, self::HIDDEN_ACTIONS, true)) {
+                continue;
+            }
             $context->setAction($action);
             $processors = $this->processorBag->getProcessors($context);
             $processors->setApplicableChecker($applicableChecker);
@@ -289,6 +304,7 @@ HELP
                 if (!isset($processorsMap[$className])) {
                     $processorsMap[$className] = [];
                 }
+                $action = $this->resolveAction($action);
                 if (!\in_array($action, $processorsMap[$className], true)) {
                     $processorsMap[$className][] = $action;
                 }
@@ -315,6 +331,9 @@ HELP
         $processorClasses = [];
         $actions = $this->processorBag->getActions();
         foreach ($actions as $action) {
+            if (\in_array($action, self::HIDDEN_ACTIONS, true)) {
+                continue;
+            }
             $context->setAction($action);
             $processors = $this->processorBag->getProcessors($context);
             $processors->setApplicableChecker($applicableChecker);
@@ -350,35 +369,66 @@ HELP
         bool $noDocs
     ): void {
         $output->writeln('The processors are displayed in the order they are executed.');
-
         $table = new Table($output);
         $table->setHeaders(['Processor', 'Attributes']);
 
-        $context = new Context();
-        $context->setAction($action);
-        $context->set(ApiContext::REQUEST_TYPE, $requestType);
-        $specifiedAttributes = [];
-        foreach ($attributes as $attribute) {
-            [$name, $value] = explode(':', $attribute, 2);
-            $value = $this->getTypedValue($value);
-            if ('group' === $name) {
-                $context->setFirstGroup($value);
-                $context->setLastGroup($value);
-            } else {
-                $context->set($name, $value);
-                $specifiedAttributes[] = $name;
+        $actionMap = [];
+        $existingActions = $this->processorBag->getActions();
+        foreach ($existingActions as $existingAction) {
+            $actionMap[$this->resolveAction($existingAction)][] = $existingAction;
+        }
+
+        $tableRowCount = 0;
+        $targetActions = $actionMap[$action] ?? [];
+        foreach ($targetActions as $targetAction) {
+            $context = new Context();
+            $context->setAction($targetAction);
+            $context->set(ApiContext::REQUEST_TYPE, $requestType);
+            $specifiedAttributes = [];
+            foreach ($attributes as $attribute) {
+                [$name, $value] = explode(':', $attribute, 2);
+                $value = $this->getTypedValue($value);
+                if ('group' === $name) {
+                    $context->setFirstGroup($value);
+                    $context->setLastGroup($value);
+                } else {
+                    $context->set($name, $value);
+                    $specifiedAttributes[] = $name;
+                }
+            }
+            $applicableChecker = new ChainApplicableChecker();
+            $applicableChecker->addChecker(new Util\RequestTypeApplicableChecker());
+            $applicableChecker->addChecker(new Util\AttributesApplicableChecker($specifiedAttributes));
+            if (!\in_array($targetAction, self::HIDDEN_ACTIONS, true)) {
+                $this->dumpDetailsAboutProcessors($table, $tableRowCount, $context, $applicableChecker, $noDocs);
             }
         }
+
+        $table->render();
+    }
+
+    private function dumpDetailsAboutProcessors(
+        Table $table,
+        int &$tableRowCount,
+        Context $context,
+        ApplicableCheckerInterface $applicableChecker,
+        bool $noDocs
+    ): void {
+        $action = $context->getAction();
         $processors = $this->processorBag->getProcessors($context);
-
-        $applicableChecker = new ChainApplicableChecker();
-        $applicableChecker->addChecker(new Util\RequestTypeApplicableChecker());
-        $applicableChecker->addChecker(new Util\AttributesApplicableChecker($specifiedAttributes));
         $processors->setApplicableChecker($applicableChecker);
-
-        $i = 0;
         foreach ($processors as $processor) {
-            if ($i > 0) {
+            $targetAction = $this->resolveAction($action);
+            $processorAttributes = $processors->getProcessorAttributes();
+            if ($targetAction !== $action) {
+                $processorGroup = substr($action, strpos($action, '.') + 1);
+                if ($context->getFirstGroup() && $context->getFirstGroup() !== $processorGroup) {
+                    continue;
+                }
+                $processorAttributes = ['group' => $processorGroup] + $processorAttributes;
+            }
+
+            if ($tableRowCount > 0) {
                 $table->addRow(new TableSeparator());
             }
 
@@ -399,12 +449,10 @@ HELP
                 }
             }
 
-            $attributesColumn = $this->formatProcessorAttributes($processors->getProcessorAttributes(), $action);
+            $attributesColumn = $this->formatProcessorAttributes($processorAttributes, $targetAction);
             $table->addRow([$processorColumn, $attributesColumn]);
-            $i++;
+            $tableRowCount++;
         }
-
-        $table->render();
     }
 
     private function getClassDocComment(string $className): string
@@ -560,5 +608,15 @@ HELP
         }
 
         return array_unique($result);
+    }
+
+    private function resolveAction(string $action): string
+    {
+        $delimiterPas = strpos($action, '.');
+        if (false === $delimiterPas) {
+            return $action;
+        }
+
+        return substr($action, 0, $delimiterPas);
     }
 }

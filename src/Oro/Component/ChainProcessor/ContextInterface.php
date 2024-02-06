@@ -104,4 +104,9 @@ interface ContextInterface extends \ArrayAccess
      * Removes result data.
      */
     public function removeResult(): void;
+
+    /**
+     * Gets a checksum for all attributes of the context.
+     */
+    public function getChecksum(): string;
 }

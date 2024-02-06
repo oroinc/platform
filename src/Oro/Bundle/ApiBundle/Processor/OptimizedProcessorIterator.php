@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Component\ChainProcessor\ApplicableCheckerInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
@@ -27,6 +28,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
      * @param ComponentContextInterface  $context
      * @param ApplicableCheckerInterface $applicableChecker
      * @param ProcessorRegistryInterface $processorRegistry
+     * @param ParameterBagInterface|null $applicableCache
      */
     public function __construct(
         array $processors,
@@ -34,9 +36,10 @@ class OptimizedProcessorIterator extends ProcessorIterator
         array $processorGroups,
         ComponentContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
-        ProcessorRegistryInterface $processorRegistry
+        ProcessorRegistryInterface $processorRegistry,
+        ?ParameterBagInterface $applicableCache = null
     ) {
-        parent::__construct($processors, $context, $applicableChecker, $processorRegistry);
+        parent::__construct($processors, $context, $applicableChecker, $processorRegistry, $applicableCache);
         $this->groups = $groups;
         $this->processorGroups = $processorGroups;
     }
@@ -89,7 +92,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
     protected function tryMoveToNextApplicable(): bool
     {
         $skippedGroups = $this->context->getSkippedGroups();
-        if (!empty($skippedGroups)) {
+        if ($skippedGroups) {
             $this->processSkippedGroups($skippedGroups);
         }
 
@@ -108,12 +111,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
             return false;
         }
 
-        $applicable = $this->applicableChecker->isApplicable(
-            $this->context,
-            $this->processors[$this->index][1]
-        );
-
-        return ApplicableCheckerInterface::NOT_APPLICABLE !== $applicable;
+        return ApplicableCheckerInterface::NOT_APPLICABLE !== $this->isApplicable();
     }
 
     /**
