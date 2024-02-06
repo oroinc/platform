@@ -14,32 +14,35 @@ use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 {
-    private function getOptimizedProcessorIterator(
+    private const TEST_ACTION = 'test_action';
+
+    private function getProcessorIterator(
         array $processors,
         array $groups,
         Context $context,
-        ApplicableCheckerInterface $applicableChecker = null
+        ApplicableCheckerInterface $applicableChecker = null,
+        bool $withApplicableCache = false
     ): OptimizedProcessorIterator {
-        $chainApplicableChecker = new ChainApplicableChecker();
-        if ($applicableChecker) {
-            $chainApplicableChecker->addChecker($applicableChecker);
-        }
-
-        $factory = new OptimizedProcessorIteratorFactory();
         $processorBag = $this->createMock(ProcessorBagInterface::class);
-        $factory->setProcessorBag($processorBag);
         $processorBag->expects(self::any())
             ->method('getActionGroups')
             ->with($context->getAction())
             ->willReturn($groups);
 
+        $factory = new OptimizedProcessorIteratorFactory();
+        $factory->setProcessorBag($processorBag);
+        if ($withApplicableCache) {
+            $factory->setActionsWithApplicableCache([self::TEST_ACTION]);
+        }
+
         return $factory->createProcessorIterator(
             $processors,
             $context,
-            $chainApplicableChecker,
+            $applicableChecker ?? new ChainApplicableChecker(),
             $this->getProcessorRegistry()
         );
     }
@@ -47,7 +50,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
     private function getContext(): Context
     {
         $context = new Context();
-        $context->setAction('test');
+        $context->setAction(self::TEST_ACTION);
 
         return $context;
     }
@@ -68,7 +71,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
      * @param array                      $expectedProcessors [processor id => group, ...]
      * @param OptimizedProcessorIterator $processors
      */
-    private function assertProcessors(array $expectedProcessors, OptimizedProcessorIterator $processors)
+    private static function assertProcessors(array $expectedProcessors, OptimizedProcessorIterator $processors): void
     {
         $actualProcessors = [];
         /** @var ProcessorMock $processor */
@@ -77,10 +80,78 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             self::assertEquals($processor->getProcessorId(), $processors->getProcessorId());
         }
 
-        self::assertEquals($expectedProcessors, $actualProcessors);
+        self::assertSame($expectedProcessors, $actualProcessors);
     }
 
-    public function testNoApplicableRules()
+    public function testEmptyIterator(): void
+    {
+        $iterator = $this->getProcessorIterator([], [], $this->getContext());
+
+        self::assertProcessors([], $iterator);
+    }
+
+    public function testIterator(): void
+    {
+        $context = $this->getContext();
+
+        $processors = [
+            ['processor1', []],
+            ['processor2', ['disabled' => true]],
+            ['processor3', ['group' => 'group1']],
+            ['processor4', ['group' => 'group1', 'disabled' => true]],
+            ['processor5', ['group' => 'group2']],
+            ['processor6', ['group' => 'group2', 'disabled' => true]]
+        ];
+
+        $iterator = $this->getProcessorIterator(
+            $processors,
+            ['group1'],
+            $context,
+            new NotDisabledApplicableChecker()
+        );
+
+        self::assertProcessors(
+            [
+                'processor1' => null,
+                'processor3' => 'group1',
+                'processor5' => 'group2'
+            ],
+            $iterator
+        );
+    }
+
+    public function testIteratorWithApplicableCache(): void
+    {
+        $context = $this->getContext();
+
+        $processors = [
+            ['processor1', []],
+            ['processor2', ['disabled' => true]],
+            ['processor3', ['group' => 'group1']],
+            ['processor4', ['group' => 'group1', 'disabled' => true]],
+            ['processor5', ['group' => 'group2']],
+            ['processor6', ['group' => 'group2', 'disabled' => true]]
+        ];
+
+        $iterator = $this->getProcessorIterator(
+            $processors,
+            ['group1'],
+            $context,
+            new NotDisabledApplicableChecker(),
+            true
+        );
+
+        self::assertProcessors(
+            [
+                'processor1' => null,
+                'processor3' => 'group1',
+                'processor5' => 'group2'
+            ],
+            $iterator
+        );
+    }
+
+    public function testNoApplicableRules(): void
     {
         $context = $this->getContext();
 
@@ -90,9 +161,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor3', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor2' => 'group1',
@@ -102,7 +173,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNoGroupRelatedApplicableRules()
+    public function testNoGroupRelatedApplicableRules(): void
     {
         $context = $this->getContext();
 
@@ -113,14 +184,14 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor4', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator(
+        $iterator = $this->getProcessorIterator(
             $processors,
             ['group1'],
             $context,
             new NotDisabledApplicableChecker()
         );
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor2' => 'group1',
@@ -130,7 +201,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSkipGroups()
+    public function testSkipGroups(): void
     {
         $context = $this->getContext();
         $context->skipGroup('group1');
@@ -147,9 +218,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor8', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor4' => 'group2',
@@ -160,7 +231,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSkipGroupsWithoutUngroupedProcessors()
+    public function testSkipGroupsWithoutUngroupedProcessors(): void
     {
         $context = $this->getContext();
         $context->skipGroup('group1');
@@ -175,9 +246,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor6', ['group' => 'group3']]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor3' => 'group2',
                 'processor4' => 'group2'
@@ -186,7 +257,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLastGroup()
+    public function testLastGroup(): void
     {
         $context = $this->getContext();
         $context->setLastGroup('group2');
@@ -202,9 +273,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor8', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor2' => 'group1',
@@ -217,7 +288,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUnknownLastGroup()
+    public function testUnknownLastGroup(): void
     {
         $context = $this->getContext();
         $context->setLastGroup('unknown_group');
@@ -228,9 +299,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor3', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor2' => 'group1',
@@ -240,7 +311,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLastGroupWithoutUngroupedProcessors()
+    public function testLastGroupWithoutUngroupedProcessors(): void
     {
         $context = $this->getContext();
         $context->setLastGroup('group2');
@@ -254,9 +325,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor6', ['group' => 'group3']]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => 'group1',
                 'processor2' => 'group1',
@@ -267,7 +338,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCombinationOfLastGroupAndSkipGroup()
+    public function testCombinationOfLastGroupAndSkipGroup(): void
     {
         $context = $this->getContext();
         $context->skipGroup('group1');
@@ -284,9 +355,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor8', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor4' => 'group2',
@@ -297,7 +368,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLastGroupShouldBeSkipped()
+    public function testLastGroupShouldBeSkipped(): void
     {
         $context = $this->getContext();
         $context->skipGroup('group1');
@@ -315,9 +386,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor8', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor8' => null
@@ -326,7 +397,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroup()
+    public function testFirstGroup(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group2');
@@ -342,9 +413,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor8', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor4' => 'group2',
@@ -357,7 +428,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUnknownFirstGroup()
+    public function testUnknownFirstGroup(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('unknown_group');
@@ -368,9 +439,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor3', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor2' => 'group1',
@@ -380,7 +451,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupWithoutUngroupedProcessors()
+    public function testFirstGroupWithoutUngroupedProcessors(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group2');
@@ -394,9 +465,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor6', ['group' => 'group3']]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor3' => 'group2',
                 'processor4' => 'group2',
@@ -407,7 +478,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupEqualsToLastGroup()
+    public function testFirstGroupEqualsToLastGroup(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group2');
@@ -424,9 +495,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor8', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor4' => 'group2',
@@ -437,7 +508,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAllProcessorsFromLastGroupAreNotApplicable()
+    public function testAllProcessorsFromLastGroupAreNotApplicable(): void
     {
         $context = $this->getContext();
         $context->setLastGroup('group1');
@@ -450,14 +521,14 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor5', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator(
+        $iterator = $this->getProcessorIterator(
             $processors,
             ['group1', 'group2'],
             $context,
             new NotDisabledApplicableChecker()
         );
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor5' => null
@@ -466,7 +537,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstProcessorFromLastGroupAreNotApplicable()
+    public function testFirstProcessorFromLastGroupAreNotApplicable(): void
     {
         $context = $this->getContext();
         $context->setLastGroup('group1');
@@ -479,14 +550,14 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor5', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator(
+        $iterator = $this->getProcessorIterator(
             $processors,
             ['group1', 'group2'],
             $context,
             new NotDisabledApplicableChecker()
         );
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor3' => 'group1',
@@ -496,7 +567,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLastProcessorFromLastGroupAreNotApplicable()
+    public function testLastProcessorFromLastGroupAreNotApplicable(): void
     {
         $context = $this->getContext();
         $context->setLastGroup('group1');
@@ -509,14 +580,14 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor5', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator(
+        $iterator = $this->getProcessorIterator(
             $processors,
             ['group1', 'group2'],
             $context,
             new NotDisabledApplicableChecker()
         );
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor2' => 'group1',
@@ -526,7 +597,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupAfterLastGroup()
+    public function testFirstGroupAfterLastGroup(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group4');
@@ -542,13 +613,13 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor7', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator(
+        $iterator = $this->getProcessorIterator(
             $processors,
             ['group1', 'group2', 'group3', 'group4', 'group5'],
             $context
         );
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor7' => null
@@ -557,7 +628,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupAfterLastGroupWithoutUngroupedProcessors()
+    public function testFirstGroupAfterLastGroupWithoutUngroupedProcessors(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group4');
@@ -571,19 +642,16 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor5', ['group' => 'group5']]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator(
+        $iterator = $this->getProcessorIterator(
             $processors,
             ['group1', 'group2', 'group3', 'group4', 'group5'],
             $context
         );
 
-        $this->assertProcessors(
-            [],
-            $iterator
-        );
+        self::assertProcessors([], $iterator);
     }
 
-    public function testFirstGroupEqualsLastGroup()
+    public function testFirstGroupEqualsLastGroup(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group2');
@@ -597,9 +665,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor5', []]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1' => null,
                 'processor3' => 'group2',
@@ -609,7 +677,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupEqualsLastGroupWithoutUngroupedProcessors()
+    public function testFirstGroupEqualsLastGroupWithoutUngroupedProcessors(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group2');
@@ -621,15 +689,15 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor3', ['group' => 'group3']]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             ['processor2' => 'group2'],
             $iterator
         );
     }
 
-    public function testFirstGroupEqualsLastGroupWithoutProcessorsInThisGroup()
+    public function testFirstGroupEqualsLastGroupWithoutProcessorsInThisGroup(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group2');
@@ -640,15 +708,12 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor3', ['group' => 'group3']]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
-            [],
-            $iterator
-        );
+        self::assertProcessors([], $iterator);
     }
 
-    public function testFirstGroupAndLastGroupWithoutProcessorsInFirstGroup()
+    public function testFirstGroupAndLastGroupWithoutProcessorsInFirstGroup(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group2');
@@ -659,15 +724,15 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor3', ['group' => 'group3']]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             ['processor3' => 'group3'],
             $iterator
         );
     }
 
-    public function testFirstGroupAndLastGroupWithoutProcessorsInLastGroup()
+    public function testFirstGroupAndLastGroupWithoutProcessorsInLastGroup(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group1');
@@ -678,9 +743,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             ['processor3', ['group' => 'group3']]
         ];
 
-        $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
+        $iterator = $this->getProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
-        $this->assertProcessors(
+        self::assertProcessors(
             ['processor1' => 'group1'],
             $iterator
         );

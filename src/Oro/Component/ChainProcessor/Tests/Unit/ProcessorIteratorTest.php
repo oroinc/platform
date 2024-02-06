@@ -2,125 +2,57 @@
 
 namespace Oro\Component\ChainProcessor\Tests\Unit;
 
+use Oro\Component\ChainProcessor\ApplicableCheckerInterface;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorIterator;
+use Oro\Component\ChainProcessor\ProcessorIteratorFactory;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
 class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEmptyIterator()
-    {
-        $context = new Context();
-        $processors = [];
+    private const TEST_ACTION = 'test_action';
 
-        $iterator = new ProcessorIterator(
+    private function getProcessorIterator(
+        array $processors,
+        Context $context,
+        ApplicableCheckerInterface $applicableChecker = null,
+        bool $withApplicableCache = false
+    ): ProcessorIterator {
+        $factory = new ProcessorIteratorFactory();
+        if ($withApplicableCache) {
+            $factory->setActionsWithApplicableCache([self::TEST_ACTION]);
+        }
+
+        return $factory->createProcessorIterator(
             $processors,
             $context,
-            new ChainApplicableChecker(),
+            $applicableChecker ?? new ChainApplicableChecker(),
             $this->getProcessorRegistry()
-        );
-
-        $this->assertProcessors(
-            [],
-            $iterator
         );
     }
 
-    public function testProcessorsForKnownAction()
+    private function getContext(): Context
     {
         $context = new Context();
-        $processors = [
-            ['processor1', []],
-            ['processor2', []]
-        ];
+        $context->setAction(self::TEST_ACTION);
 
-        $iterator = new ProcessorIterator(
-            $processors,
-            $context,
-            new ChainApplicableChecker(),
-            $this->getProcessorRegistry()
-        );
-
-        $this->assertProcessors(
-            [
-                'processor1',
-                'processor2',
-            ],
-            $iterator
-        );
+        return $context;
     }
 
-    public function testApplicableCheckerGetterAndSetter()
-    {
-        $applicableChecker = new ChainApplicableChecker();
-
-        $iterator = new ProcessorIterator(
-            [],
-            new Context(),
-            $applicableChecker,
-            $this->getProcessorRegistry()
-        );
-
-        $this->assertSame($applicableChecker, $iterator->getApplicableChecker());
-
-        $newApplicableChecker = new ChainApplicableChecker();
-        $iterator->setApplicableChecker($newApplicableChecker);
-        $this->assertSame($newApplicableChecker, $iterator->getApplicableChecker());
-    }
-
-    public function testServiceProperties()
-    {
-        $context = new Context();
-        $context->setAction('action1');
-
-        $processors = [
-            ['processor1', ['group' => 'group1', 'attr1' => 'val1']],
-            ['processor2', ['group' => 'group2', 'attr1' => 'val1']]
-        ];
-
-        $iterator = new ProcessorIterator(
-            $processors,
-            $context,
-            new ChainApplicableChecker(),
-            $this->getProcessorRegistry()
-        );
-
-        $iterator->rewind();
-        $this->assertEquals('processor1', $iterator->getProcessorId());
-        $this->assertEquals('action1', $iterator->getAction());
-        $this->assertEquals('group1', $iterator->getGroup());
-        $this->assertEquals(['group' => 'group1', 'attr1' => 'val1'], $iterator->getProcessorAttributes());
-
-        $iterator->next();
-        $this->assertEquals('processor2', $iterator->getProcessorId());
-        $this->assertEquals('action1', $iterator->getAction());
-        $this->assertEquals('group2', $iterator->getGroup());
-        $this->assertEquals(['group' => 'group2', 'attr1' => 'val1'], $iterator->getProcessorAttributes());
-    }
-
-    /**
-     * @return ProcessorRegistryInterface
-     */
-    protected function getProcessorRegistry()
+    private function getProcessorRegistry(): ProcessorRegistryInterface
     {
         $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
-        $processorRegistry->expects($this->any())
+        $processorRegistry->expects(self::any())
             ->method('getProcessor')
-            ->willReturnCallback(
-                function ($processorId) {
-                    return new ProcessorMock($processorId);
-                }
-            );
+            ->willReturnCallback(function ($processorId) {
+                return new ProcessorMock($processorId);
+            });
 
         return $processorRegistry;
     }
 
-    /**
-     * @param string[]  $expectedProcessorIds
-     * @param \Iterator $processors
-     */
-    protected function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
+    private static function assertProcessors(array $expectedProcessorIds, \Iterator $processors): void
     {
         $processorIds = [];
         /** @var ProcessorMock $processor */
@@ -128,6 +60,95 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
             $processorIds[] = $processor->getProcessorId();
         }
 
-        $this->assertEquals($expectedProcessorIds, $processorIds);
+        self::assertSame($expectedProcessorIds, $processorIds);
+    }
+
+    public function testEmptyIterator(): void
+    {
+        $iterator = $this->getProcessorIterator([], $this->getContext());
+
+        self::assertProcessors([], $iterator);
+    }
+
+    public function testIterator(): void
+    {
+        $processors = [
+            ['processor1', []],
+            ['processor2', ['disabled' => true]],
+            ['processor3', []]
+        ];
+
+        $iterator = $this->getProcessorIterator(
+            $processors,
+            $this->getContext(),
+            new NotDisabledApplicableChecker()
+        );
+
+        self::assertProcessors(
+            [
+                'processor1',
+                'processor3'
+            ],
+            $iterator
+        );
+    }
+
+    public function testIteratorWithApplicableCache(): void
+    {
+        $processors = [
+            ['processor1', []],
+            ['processor2', ['disabled' => true]],
+            ['processor3', []]
+        ];
+
+        $iterator = $this->getProcessorIterator(
+            $processors,
+            $this->getContext(),
+            new NotDisabledApplicableChecker(),
+            true
+        );
+
+        self::assertProcessors(
+            [
+                'processor1',
+                'processor3'
+            ],
+            $iterator
+        );
+    }
+
+    public function testApplicableCheckerGetterAndSetter(): void
+    {
+        $applicableChecker = new ChainApplicableChecker();
+
+        $iterator = $this->getProcessorIterator([], $this->getContext(), $applicableChecker);
+
+        self::assertSame($applicableChecker, $iterator->getApplicableChecker());
+
+        $newApplicableChecker = new ChainApplicableChecker();
+        $iterator->setApplicableChecker($newApplicableChecker);
+        self::assertSame($newApplicableChecker, $iterator->getApplicableChecker());
+    }
+
+    public function testServiceProperties(): void
+    {
+        $processors = [
+            ['processor1', ['group' => 'group1', 'attr1' => 'val1']],
+            ['processor2', ['group' => 'group2', 'attr1' => 'val1']]
+        ];
+
+        $iterator = $this->getProcessorIterator($processors, $this->getContext());
+
+        $iterator->rewind();
+        self::assertEquals('processor1', $iterator->getProcessorId());
+        self::assertEquals(self::TEST_ACTION, $iterator->getAction());
+        self::assertEquals('group1', $iterator->getGroup());
+        self::assertEquals(['group' => 'group1', 'attr1' => 'val1'], $iterator->getProcessorAttributes());
+
+        $iterator->next();
+        self::assertEquals('processor2', $iterator->getProcessorId());
+        self::assertEquals(self::TEST_ACTION, $iterator->getAction());
+        self::assertEquals('group2', $iterator->getGroup());
+        self::assertEquals(['group' => 'group2', 'attr1' => 'val1'], $iterator->getProcessorAttributes());
     }
 }

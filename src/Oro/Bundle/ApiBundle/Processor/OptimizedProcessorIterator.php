@@ -89,7 +89,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
     protected function tryMoveToNextApplicable(): bool
     {
         $skippedGroups = $this->context->getSkippedGroups();
-        if (!empty($skippedGroups)) {
+        if ($skippedGroups) {
             $this->processSkippedGroups($skippedGroups);
         }
 
@@ -108,12 +108,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
             return false;
         }
 
-        $applicable = $this->applicableChecker->isApplicable(
-            $this->context,
-            $this->processors[$this->index][1]
-        );
-
-        return ApplicableCheckerInterface::NOT_APPLICABLE !== $applicable;
+        return ApplicableCheckerInterface::NOT_APPLICABLE !== $this->isApplicable();
     }
 
     /**
