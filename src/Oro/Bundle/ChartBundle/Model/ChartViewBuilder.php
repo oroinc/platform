@@ -204,10 +204,6 @@ class ChartViewBuilder
             $data['label'] = $this->datagridColumnsDefinition[$fieldName]['label'];
         }
 
-        if (!isset($data['type']) && isset($this->datagridColumnsDefinition[$fieldName]['frontend_type'])) {
-            $data['type'] = $this->datagridColumnsDefinition[$fieldName]['frontend_type'];
-        }
-
         if (!isset($data['type'])) {
             $configFieldData = $this->getChartConfigDataSchemaField($key);
             $data['type'] = $configFieldData['default_type'];
