@@ -61,6 +61,10 @@ define(function(require) {
                 data.container.data('inputWidget', this);
                 data.dropdown.data('inputWidget', this);
             }
+        },
+
+        initializeWidget() {
+            Select2InputWidgetView.__super__.initializeWidget.call(this);
 
             this.updateFixedMode();
         },
