@@ -8,6 +8,7 @@ aliases:
     oro/select2-grid-component$: oroform/js/app/components/select2-grid-component
     oro/select2-relation-component$: oroform/js/app/components/select2-relation-component
     oro/select2-tree-autocomplete-component$: oroform/js/app/components/select2-tree-autocomplete-component
+    oro/select2-dependent-component$: oroform/js/app/components/select2-dependent-component
     tinymce/tinymce$: oroform/js/extend/tinymce
     xregexp$: xregexp/xregexp-all
 app-modules:
@@ -24,6 +25,7 @@ dynamic-imports:
         - oro/select2-grid-component
         - oro/select2-relation-component
         - oro/select2-tree-autocomplete-component
+        - oro/select2-dependent-component
         - oroform/js/app/components/inline-editable-view-component
         - oroform/js/app/components/select-create-inline-type-async-component
         - oroform/js/app/components/select-create-inline-type-component
