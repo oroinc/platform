@@ -1,6 +1,8 @@
 /* @theme: default; */
 
 .form-row {
+    position: relative;
+
     &__label {
         margin-bottom: $form-row-label-offset-x;
     }
