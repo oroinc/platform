@@ -139,7 +139,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testSetOptionsWithDataGridColumnsDefinitionMerge()
     {
-        $columnsDefinition = ['bar' => ['name' => 'bar', 'label' => 'Foo label', 'frontend_type' => 'int']];
+        $columnsDefinition = ['bar' => ['name' => 'bar', 'label' => 'Foo label']];
 
         $config = DatagridConfiguration::create(['columns' => $columnsDefinition]);
 
@@ -147,6 +147,10 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $datagrid->expects(self::once())
             ->method('getConfig')
             ->willReturn($config);
+        $this->configProvider->expects(self::once())
+            ->method('getChartConfig')
+            ->with('foo')
+            ->willReturn(['data_schema' => [['name' => 'foo', 'default_type' => 'int']]]);
 
         $options = ['name' => 'foo', 'data_schema' => ['foo' => 'bar'], 'settings' => []];
         $expectedOptions = $options;
