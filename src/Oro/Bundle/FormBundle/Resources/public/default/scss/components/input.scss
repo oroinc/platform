@@ -168,17 +168,4 @@
         padding-left: $input-btn-size;
         padding-right: $input-btn-size;
     }
-
-    &-quantity-btn {
-        position: absolute;
-        top: 0;
-
-        &--minus {
-            left: 0;
-        }
-
-        &--plus {
-            right: 0;
-        }
-    }
 }
