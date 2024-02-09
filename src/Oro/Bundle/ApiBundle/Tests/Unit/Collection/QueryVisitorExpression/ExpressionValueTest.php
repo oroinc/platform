@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit\Collection\QueryVisitorExpression;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExpressionValue;
 
