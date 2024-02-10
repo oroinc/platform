@@ -48,12 +48,10 @@ services:
     oro_api.processor_iterator_factory:
         class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIteratorFactory
         arguments:
-            - ['customize_loaded_data', 'customize_loaded_data.identifier_only', 'customize_form_data', 'normalize_value']
+            - ['customize_loaded_data', 'customize_loaded_data.identifier_only', 'customize_form_data']
 
     oro_api.processor_iterator_factory.ungrouped:
         class: Oro\Component\ChainProcessor\ProcessorIteratorFactory
-        arguments:
-            - ['get_config', 'get_metadata']
 
     oro_api.processor_applicable_checker_factory:
         class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory
