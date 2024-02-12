@@ -484,3 +484,7 @@ services:
             - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\ProductBundle\Entity\ProductName }
             - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\ProductBundle\Entity\ProductShortDescription }
             - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\ProductBundle\Entity\ProductDescription }
+
+    oro_locale.helper.localized_value_extractor:
+        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizedValueExtractor'
+        public: false
