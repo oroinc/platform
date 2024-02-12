@@ -163,4 +163,9 @@
         max-width: 140px;
         padding-left: 39px;
     }
+
+    &[inputmode='decimal'] {
+        padding-left: $input-btn-size;
+        padding-right: $input-btn-size;
+    }
 }

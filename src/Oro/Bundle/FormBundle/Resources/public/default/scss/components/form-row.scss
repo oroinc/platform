@@ -19,3 +19,23 @@
         }
     }
 }
+
+.form-quantity-row {
+    position: relative;
+
+    .input-quantity-btn {
+        position: absolute;
+        top: 1px;
+        bottom: 1px;
+        min-height: $form-row-input-button-min-height;
+        padding: $form-row-input-button-padding;
+
+        &--minus {
+            left: 1px;
+        }
+
+        &--plus {
+            right: 1px;
+        }
+    }
+}
