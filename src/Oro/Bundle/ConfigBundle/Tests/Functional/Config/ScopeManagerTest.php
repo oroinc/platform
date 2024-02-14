@@ -1,12 +1,13 @@
 <?php
 
-namespace Functional\Config;
+namespace Oro\Bundle\ConfigBundle\Tests\Functional\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Tests\Functional\DataFixtures\LoadConfigValue;
 use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class ScopeManager extends WebTestCase
+class ScopeManagerTest extends WebTestCase
 {
     use ConfigManagerAwareTestTrait;
 
@@ -16,6 +17,8 @@ class ScopeManager extends WebTestCase
     {
         $this->initClient();
         $this->configManager = self::getConfigManager();
+
+        $this->loadFixtures([LoadConfigValue::class]);
     }
 
     /**
@@ -23,7 +26,7 @@ class ScopeManager extends WebTestCase
      */
     public function testSetBooleanValues(mixed $value, mixed $expected): void
     {
-        $key = 'oro_user.password_numbers';
+        $key = 'oro_test_framework.boolean_type';
         $this->configManager->set($key, $value);
         $this->configManager->flush();
 
@@ -51,7 +54,7 @@ class ScopeManager extends WebTestCase
      */
     public function testSetIntegerValues(mixed $value, mixed $expected): void
     {
-        $key = 'oro_user.password_min_length';
+        $key = 'oro_test_framework.integer_type';
         $this->configManager->set($key, $value);
         $this->configManager->flush();
 
@@ -75,7 +78,7 @@ class ScopeManager extends WebTestCase
      */
     public function testSetFloatValues(mixed $value, mixed $expected): void
     {
-        $key = 'oro_seo.sitemap_priority_product';
+        $key = 'oro_test_framework.float_type';
         $this->configManager->set($key, $value);
         $this->configManager->flush();
 
