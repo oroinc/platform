@@ -1,0 +1,20 @@
+system_configuration:
+    fields:
+        oro_test_framework.boolean_type:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            ui_only: true
+            options:
+                required: false
+        oro_test_framework.integer_type:
+            data_type: integer
+            type: Symfony\Component\Form\Extension\Core\Type\IntegerType
+            ui_only: true
+            options:
+                required: false
+        oro_test_framework.float_type:
+            data_type: decimal
+            type: Symfony\Component\Form\Extension\Core\Type\NumberType
+            ui_only: true
+            options:
+                required: false
