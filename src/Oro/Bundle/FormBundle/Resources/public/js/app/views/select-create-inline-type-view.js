@@ -76,6 +76,7 @@ define(function(require) {
                 stateEnabled: false,
                 incrementalPosition: true,
                 dialogOptions: {
+                    dialogClass: 'stretched',
                     modal: true,
                     allowMaximize: true,
                     width: 1280,
@@ -201,6 +202,7 @@ define(function(require) {
                 stateEnabled: false,
                 incrementalPosition: true,
                 dialogOptions: {
+                    dialogClass: 'stretched',
                     modal: true,
                     allowMaximize: true,
                     width: 1280,
