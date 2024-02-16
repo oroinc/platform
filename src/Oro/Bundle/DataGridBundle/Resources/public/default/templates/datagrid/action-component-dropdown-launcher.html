@@ -41,14 +41,28 @@
        <% attributesTemplate(attributes) %>>
         <% if (launcherMode == 'icon-text') { %>
             <%= renderLauncherIcon(obj) %>
-            <%- label %>
+            <% if (obj.entityName) { %>
+                <span class="action-label">
+                    <%- label %>
+                    <span class="entity-name"><%- obj.entityName %></span>
+                </span>
+            <% } else { %>
+                <%- label %>
+            <% } %>
         <% } else if (launcherMode == 'icon-only') { %>
             <%= renderLauncherIcon(obj) %>
         <% } else if (launcherMode == 'text-only') { %>
             <% if (iconClassName) { %>
                 <%= renderLauncherIcon(obj) %>
             <% } %>
-            <%- label %>
+            <% if (obj.entityName) { %>
+                <span class="action-label">
+                    <%- label %>
+                    <span class="entity-name"><%- obj.entityName %></span>
+                </span>
+            <% } else { %>
+                <%- label %>
+            <% } %>
         <% } %>
     </a>
     <div class="dropdown-menu" aria-labelledby="<%- togglerId %>"></div>

@@ -39,25 +39,38 @@
 %>
 
 <% if (links) { %><div class="btn-group"><% } %>
-
 <<%- tagName %>
     <% if (tagName === "a") { %> href="<%- link %>" role="button"<% } %>
     class="<%- actionClassNames.join(' ') %>"
     title="<%- title %>"
     <% if (obj.ariaLabel) { %>
-    aria-label="<%- ariaLabel %>"
+        aria-label="<%- ariaLabel %>"
     <% } %>
     <% attributesTemplate(attributes) %>
     <% if (links) { %> data-toggle="dropdown" data-inherit-parent-width="loosely" role="button" id="<%- togglerId %>"
         aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"<% } %>>
     <% if (launcherMode == 'icon-text') { %>
         <%= renderLauncherIcon(obj) %>
-        <%- label %>
+        <% if (obj.entityName) { %>
+            <span class="action-label">
+                <%- label %>
+                <span class="entity-name"><%- obj.entityName %></span>
+            </span>
+        <% } else { %>
+            <%- label %>
+        <% } %>
     <% } else if (launcherMode == 'icon-only') { %>
         <%= renderLauncherIcon(obj) %>
     <% } else if (launcherMode == 'text-only') { %>
         <%= renderLauncherIcon(obj) %>
-        <%- label %>
+        <% if (obj.entityName) { %>
+            <span class="action-label">
+                <%- label %>
+                <span class="entity-name"><%- obj.entityName %></span>
+            </span>
+        <% } else { %>
+            <%- label %>
+        <% } %>
     <% } %>
 </<%- tagName %>>
 

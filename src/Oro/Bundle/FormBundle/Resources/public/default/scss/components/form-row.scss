@@ -23,6 +23,11 @@
 .form-quantity-row {
     position: relative;
 
+    .input {
+        padding-left: $input-btn-size;
+        padding-right: $input-btn-size;
+    }
+
     .input-quantity-btn {
         position: absolute;
         top: 1px;
