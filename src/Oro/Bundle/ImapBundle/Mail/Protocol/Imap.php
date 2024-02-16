@@ -38,6 +38,7 @@ class Imap extends \Laminas\Mail\Protocol\Imap
 
         $result = [];
         $tokens = null; // define $tokens variable before first use
+        $data = [];
         while (!$this->readLine($tokens, $tag)) {
             // ignore other responses
             if ($tokens[1] != 'FETCH') {
@@ -64,7 +65,6 @@ class Imap extends \Laminas\Mail\Protocol\Imap
                     }
                 }
             } else {
-                $data = [];
                 while (key($tokens[2]) !== null) {
                     $data[current($tokens[2])] = next($tokens[2]);
                     next($tokens[2]);
