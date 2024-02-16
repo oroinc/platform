@@ -16,6 +16,7 @@ class Context extends ParameterBag implements ContextInterface
     private array $skippedGroups = [];
     private mixed $result = null;
     private bool $resultExists = false;
+    private ?string $checksum = null;
 
     /**
      * {@inheritDoc}
@@ -143,5 +144,82 @@ class Context extends ParameterBag implements ContextInterface
     {
         $this->result = null;
         $this->resultExists = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getChecksum(): string
+    {
+        if (null === $this->checksum) {
+            $this->checksum = self::buildChecksum($this->toArray());
+        }
+
+        return $this->checksum;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function set(string $key, mixed $value): void
+    {
+        parent::set($key, $value);
+        $this->checksum = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function remove(string $key): void
+    {
+        parent::remove($key);
+        $this->checksum = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function clear(): void
+    {
+        parent::clear();
+        $this->checksum = null;
+    }
+
+    private static function buildChecksum(array $items): string
+    {
+        if (!$items) {
+            return '';
+        }
+
+        $checksum = '';
+        ksort($items, SORT_STRING);
+        foreach ($items as $key => $val) {
+            $val = self::prepareChecksumItem($val);
+            if (null !== $val) {
+                $checksum .= $key . '=' . $val . ';';
+            }
+        }
+
+        return sha1($checksum);
+    }
+
+    private static function prepareChecksumItem(mixed $val): ?string
+    {
+        if (is_scalar($val)) {
+            return $val ? 's:' . $val : null;
+        }
+        if (\is_array($val)) {
+            $strVal = '[';
+            foreach ($val as $k => $v) {
+                $strVal .= $k . self::prepareChecksumItem($v);
+            }
+
+            return $strVal . ']';
+        }
+        if (\is_object($val) && method_exists($val, '__toString')) {
+            return 'o:' . $val;
+        }
+
+        return null;
     }
 }

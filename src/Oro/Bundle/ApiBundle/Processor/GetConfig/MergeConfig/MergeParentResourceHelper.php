@@ -43,10 +43,10 @@ class MergeParentResourceHelper
         foreach ($parentConfig as $sectionName => $parentSection) {
             if ($parentSection instanceof EntityConfigInterface) {
                 $parentSection->setExclusionPolicy(null);
-                if ($context->has($sectionName)) {
-                    $this->mergeConfigSection($parentSection, $context->get($sectionName));
+                if ($context->hasConfigSection($sectionName)) {
+                    $this->mergeConfigSection($parentSection, $context->getConfigSection($sectionName));
                 }
-                $context->set($sectionName, $parentSection);
+                $context->setConfigSection($sectionName, $parentSection);
             }
         }
     }

@@ -46,7 +46,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
         $sourceGroup = $context->getFirstGroup();
         if ($context->hasErrors()) {
             $initialErrorCount = \count($context->getErrors());
-            $processors = $this->processorBag->getProcessors($context);
+            $processors = $this->getProcessors($context);
             $processorId = null;
             $group = null;
             try {

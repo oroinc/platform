@@ -29,7 +29,7 @@ class ChainProcessor implements ProcessorInterface
      */
     protected function executeProcessors(ContextInterface $context): void
     {
-        $processors = $this->processorBag->getProcessors($context);
+        $processors = $this->getProcessors($context);
         /** @var ProcessorInterface $processor */
         foreach ($processors as $processor) {
             try {
@@ -43,5 +43,10 @@ class ChainProcessor implements ProcessorInterface
                 );
             }
         }
+    }
+
+    protected function getProcessors(ContextInterface $context): ProcessorIterator
+    {
+        return $this->processorBag->getProcessors($context);
     }
 }

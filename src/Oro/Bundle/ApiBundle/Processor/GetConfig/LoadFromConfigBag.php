@@ -194,8 +194,8 @@ class LoadFromConfigBag implements ProcessorInterface
         foreach ($extras as $extra) {
             if ($extra instanceof ConfigExtraSectionInterface) {
                 $sectionName = $extra->getName();
-                if (!empty($config[$sectionName]) && !$context->has($sectionName)) {
-                    $context->set(
+                if (!empty($config[$sectionName]) && !$context->hasConfigSection($sectionName)) {
+                    $context->setConfigSection(
                         $sectionName,
                         $this->loadConfigObject($extra->getConfigType(), $config[$sectionName])
                     );
