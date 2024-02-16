@@ -14,7 +14,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
+    /** @var ActionProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processor;
 
     /** @var ConfigProvider */
@@ -80,7 +80,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 
                 $definition->addField('test_field');
                 $context->setResult($definition);
-                $context->set('test_section_extra', ['test_section_key' => 'value']);
+                $context->setConfigSection('test_section_extra', ['test_section_key' => 'value']);
             });
 
         $result = $this->configProvider->getConfig($className, $version, $requestType, [$extra, $sectionExtra]);
@@ -140,7 +140,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 
                 $definition->addField('test_field');
                 $context->setResult($definition);
-                $context->set('test_section_extra', ['test_section_key' => 'value']);
+                $context->setConfigSection('test_section_extra', ['test_section_key' => 'value']);
             });
 
         $this->configProvider->disableFullConfigsCache();
@@ -204,7 +204,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 
                 $definition->addField('test_field');
                 $context->setResult($definition);
-                $context->set('test_section_extra', ['test_section_key' => 'value']);
+                $context->setConfigSection('test_section_extra', ['test_section_key' => 'value']);
             });
 
         $result = $this->configProvider->getConfig(

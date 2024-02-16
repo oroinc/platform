@@ -705,4 +705,28 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($block, $this->scrollData->getBlock('someId'));
     }
+
+    public function testRemoveField(): void
+    {
+        $data = [
+            ScrollData::DATA_BLOCKS => [
+                'someId' => [
+                    ScrollData::SUB_BLOCKS => [
+                        [
+                            ScrollData::DATA => [
+                                ScrollData::TITLE => 'test title',
+                                ScrollData::PRIORITY => 25,
+                                ScrollData::BLOCK_CLASS => 'active',
+                                ScrollData::USE_SUB_BLOCK_DIVIDER => false,
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->scrollData->setData($data);
+        $this->scrollData->removeField(ScrollData::TITLE);
+        $this->assertFalse($this->scrollData->hasNamedField(ScrollData::TITLE));
+    }
 }

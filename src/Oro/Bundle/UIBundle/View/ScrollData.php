@@ -286,6 +286,18 @@ class ScrollData
         }
     }
 
+    public function removeField($fieldId): void
+    {
+        foreach ($this->data[self::DATA_BLOCKS] as &$blockData) {
+            foreach ($blockData[self::SUB_BLOCKS] as &$subblock) {
+                if (isset($subblock[self::DATA][$fieldId])) {
+                    unset($subblock[self::DATA][$fieldId]);
+                    break;
+                }
+            }
+        }
+    }
+
     /**
      * @return array
      */

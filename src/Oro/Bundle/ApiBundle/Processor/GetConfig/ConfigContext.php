@@ -42,6 +42,7 @@ class ConfigContext extends ApiContext
 
     /** @var ConfigExtraInterface[] */
     private array $extras = [];
+    private array $configSections = [];
     /** @var string[]|null */
     private ?array $explicitlyConfiguredFieldNames = null;
 
@@ -287,11 +288,35 @@ class ConfigContext extends ApiContext
     }
 
     /**
+     * Checks whether a definition of configuration section exists.
+     */
+    public function hasConfigSection(string $sectionName): bool
+    {
+        return \array_key_exists($sectionName, $this->configSections);
+    }
+
+    /**
+     * Gets a definition of configuration section.
+     */
+    public function getConfigSection(string $sectionName): mixed
+    {
+        return $this->configSections[$sectionName] ?? null;
+    }
+
+    /**
+     * Sets a definition of a configuration section.
+     */
+    public function setConfigSection(string $sectionName, mixed $sectionConfig): void
+    {
+        $this->configSections[$sectionName] = $sectionConfig;
+    }
+
+    /**
      * Checks whether a definition of filters exists.
      */
     public function hasFilters(): bool
     {
-        return $this->has(FiltersConfigExtra::NAME);
+        return $this->hasConfigSection(FiltersConfigExtra::NAME);
     }
 
     /**
@@ -299,7 +324,7 @@ class ConfigContext extends ApiContext
      */
     public function getFilters(): ?FiltersConfig
     {
-        return $this->get(FiltersConfigExtra::NAME);
+        return $this->getConfigSection(FiltersConfigExtra::NAME);
     }
 
     /**
@@ -307,7 +332,7 @@ class ConfigContext extends ApiContext
      */
     public function setFilters(?FiltersConfig $filters): void
     {
-        $this->set(FiltersConfigExtra::NAME, $filters);
+        $this->setConfigSection(FiltersConfigExtra::NAME, $filters);
     }
 
     /**
@@ -315,7 +340,7 @@ class ConfigContext extends ApiContext
      */
     public function hasSorters(): bool
     {
-        return $this->has(SortersConfigExtra::NAME);
+        return $this->hasConfigSection(SortersConfigExtra::NAME);
     }
 
     /**
@@ -323,7 +348,7 @@ class ConfigContext extends ApiContext
      */
     public function getSorters(): ?SortersConfig
     {
-        return $this->get(SortersConfigExtra::NAME);
+        return $this->getConfigSection(SortersConfigExtra::NAME);
     }
 
     /**
@@ -331,6 +356,6 @@ class ConfigContext extends ApiContext
      */
     public function setSorters(?SortersConfig $sorters): void
     {
-        $this->set(SortersConfigExtra::NAME, $sorters);
+        $this->setConfigSection(SortersConfigExtra::NAME, $sorters);
     }
 }

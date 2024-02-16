@@ -134,6 +134,13 @@ class AttributeFormViewListener
 
         foreach ($attributes as $attribute) {
             $fieldId = $attribute->getFieldName();
+
+            // Check is form view contains attribute field to avoid
+            // error in FormView::offsetGet after remove field from form
+            if (!$formView->offsetExists($fieldId)) {
+                continue;
+            }
+
             $attributeView = $formView->offsetGet($fieldId);
 
             if (!$attributeView->isRendered()) {
