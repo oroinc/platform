@@ -8,4 +8,5 @@ $oro-toolbar-open-content-box-shadow: inset 1px 1px 3px 0 rgba(0 0 0 / 30%) !def
 $oro-toolbar-fullscreen-link-border: 1px solid get-color('additional-old', 'light') !default;
 $oro-toolbar-divider-color: rgba(get-color('neutral', 'white-100'), .55) !default;
 $oro-toolbar-icon-color: get-color('neutral', 'white-100') !default;
-$oro-toolbar-padding: 8px 12px !default;
+$oro-toolbar-padding: 8px 0 !default;
+$oro-toolbar-gap: 12px !default;

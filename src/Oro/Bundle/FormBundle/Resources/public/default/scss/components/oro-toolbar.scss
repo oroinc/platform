@@ -10,6 +10,13 @@
     &__content {
         display: flex;
         align-items: center;
+        gap: $oro-toolbar-gap;
+
+        .divider {
+            height: 14px;
+            width: 1px;
+            background-color: $oro-toolbar-divider-color;
+        }
     }
 
     &__list {
@@ -40,23 +47,6 @@
 
         &--active {
             font-weight: font-weight('bold');
-        }
-
-        &--divider {
-            &:not(:last-child) {
-                position: relative;
-
-                &:before {
-                    content: '';
-                    position: absolute;
-                    height: 14px;
-                    top: 50%;
-                    margin-top: -7px;
-                    right: 0;
-                    width: 1px;
-                    background-color: $oro-toolbar-divider-color;
-                }
-            }
         }
     }
 
