@@ -3,11 +3,14 @@
 namespace Oro\Bundle\DataGridBundle\Async\Topic;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
 use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,6 +26,9 @@ class DatagridPreExportTopic extends AbstractTopic implements JobAwareTopicInter
 
     private TokenAccessorInterface $tokenAccessor;
 
+    /** @var ChainConfigurationProvider $configurationProvider  */
+    private ConfigurationProviderInterface $configurationProvider;
+
     public function __construct(
         int                    $batchSize,
         TokenAccessorInterface $tokenAccessor,
@@ -31,6 +37,11 @@ class DatagridPreExportTopic extends AbstractTopic implements JobAwareTopicInter
         $this->batchSize = $batchSize;
         $this->tokenAccessor = $tokenAccessor;
         $this->outputFormats = $outputFormats;
+    }
+
+    public function setConfigurationProvider(ConfigurationProviderInterface $configurationProvider): void
+    {
+        $this->configurationProvider = $configurationProvider;
     }
 
     public static function getName(): string
@@ -85,6 +96,15 @@ class DatagridPreExportTopic extends AbstractTopic implements JobAwareTopicInter
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ])
             ->addAllowedTypes('gridName', 'string')
+            ->addAllowedValues('gridName', function (string $gridName) {
+                try {
+                    $this->configurationProvider->getConfiguration($gridName);
+                } catch (\Throwable $e) {
+                    throw new InvalidOptionsException(sprintf('Grid %s configuration is not valid', $gridName));
+                }
+
+                return true;
+            })
             ->addAllowedTypes('gridParameters', 'array')
             ->addAllowedTypes(FormatterProvider::FORMAT_TYPE, 'string')
             ->addNormalizer('gridParameters', static function (Options $options, array $value) {

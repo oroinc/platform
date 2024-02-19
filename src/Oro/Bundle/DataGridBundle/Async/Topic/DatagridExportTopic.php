@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Async\Topic;
 
+use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -11,6 +14,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DatagridExportTopic extends AbstractTopic
 {
+    /** @var ChainConfigurationProvider $configurationProvider  */
+    private ConfigurationProviderInterface $configurationProvider;
+
+    public function setConfigurationProvider(ConfigurationProviderInterface $configurationProvider): void
+    {
+        $this->configurationProvider = $configurationProvider;
+    }
+
     public static function getName(): string
     {
         return 'oro.datagrid.export';
@@ -80,6 +91,15 @@ class DatagridExportTopic extends AbstractTopic
                 ]
             )
             ->setAllowedTypes('gridName', 'string')
+            ->addAllowedValues('gridName', function (string $gridName) {
+                try {
+                    $this->configurationProvider->getConfiguration($gridName);
+                } catch (\Throwable $e) {
+                    throw new InvalidOptionsException(sprintf('Grid %s configuration is not valid', $gridName));
+                }
+
+                return true;
+            })
             ->setAllowedTypes('gridParameters', 'array')
             ->setAllowedTypes(FormatterProvider::FORMAT_TYPE, 'string')
             ->setAllowedTypes('materializedViewName', 'string')

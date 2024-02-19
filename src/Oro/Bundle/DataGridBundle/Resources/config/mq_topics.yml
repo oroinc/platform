@@ -7,5 +7,9 @@ services:
         arguments:
             - '%oro_datagrid.export.size_of_batch%'
             - '@oro_security.token_accessor'
+        calls:
+            - [ 'setConfigurationProvider', ['@oro_datagrid.configuration.provider.chain'] ]
 
-    Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic: ~
+    Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic:
+        calls:
+            - [ 'setConfigurationProvider', ['@oro_datagrid.configuration.provider.chain'] ]

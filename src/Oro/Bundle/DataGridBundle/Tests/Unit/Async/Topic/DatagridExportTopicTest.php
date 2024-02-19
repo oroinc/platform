@@ -3,6 +3,9 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Topic;
 
 use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
@@ -11,16 +14,40 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class DatagridExportTopicTest extends AbstractTopicTestCase
 {
+    private const VALID_GRID_NAME = 'grid-name';
+
+    private const INVALID_GRID_NAME = 'invalid-grid-name';
+
+    private ConfigurationProviderInterface $configurationProvider;
+
+    protected function setUp(): void
+    {
+        $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);
+
+        $this->configurationProvider
+            ->method('getConfiguration')
+            ->willReturnCallback(function ($gridName) {
+                if ($gridName === self::INVALID_GRID_NAME) {
+                    throw new RuntimeException(sprintf('Grid %s configuration is not valid', $gridName));
+                }
+
+                return DatagridConfiguration::createNamed($gridName, ['extend_entity_name' => \stdClass::class]);
+            });
+
+        parent::setUp();
+    }
+
     protected function getTopic(): TopicInterface
     {
-        return new DatagridExportTopic();
+        $topic = new DatagridExportTopic();
+        $topic->setConfigurationProvider($this->configurationProvider);
+        return $topic;
     }
 
     public function validBodyDataProvider(): array
     {
         $jobId = 1;
         $format = 'csv';
-        $gridName = 'grid-name';
         $materializedViewName = 'sample_name';
 
         return [
@@ -29,7 +56,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'jobId' => $jobId,
                     'outputFormat' => $format,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 0,
                         'rowsLimit' => 42,
@@ -38,7 +65,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                 'expectedBody' => [
                     'jobId' => $jobId,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'gridParameters' => [],
                         FormatterProvider::FORMAT_TYPE => 'excel',
                         'materializedViewName' => $materializedViewName,
@@ -55,7 +82,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'outputFormat' => $format,
                     'writerBatchSize' => 4242,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'gridParameters' => ['sample-key' => 'sample-value'],
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 0,
@@ -67,7 +94,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'outputFormat' => $format,
                     'writerBatchSize' => 4242,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'gridParameters' => ['sample-key' => 'sample-value'],
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 0,
@@ -86,7 +113,6 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
     {
         $jobId = 1;
         $format = 'csv';
-        $gridName = 'grid-name';
         $materializedViewName = 'sample_name';
 
         return [
@@ -120,7 +146,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'jobId' => 'sample-string',
                     'outputFormat' => $format,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 0,
                         'rowsLimit' => 42,
@@ -135,7 +161,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'jobId' => $jobId,
                     'outputFormat' => [],
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 0,
                         'rowsLimit' => 42,
@@ -151,7 +177,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'outputFormat' => $format,
                     'writerBatchSize' => 'sample-string',
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 0,
                         'rowsLimit' => 42,
@@ -161,13 +187,28 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                 'exceptionMessage' =>
                     '/The option "writerBatchSize" with value "sample-string" is expected to be of type "int"/',
             ],
+            'contextParameters[gridName] is invalid ' => [
+                'body' => [
+                    'jobId' => $jobId,
+                    'outputFormat' => $format,
+                    'contextParameters' => [
+                        'gridName' => self::INVALID_GRID_NAME,
+                        'materializedViewName' => $materializedViewName,
+                        'rowsOffset' => 0,
+                        'rowsLimit' => 42,
+                    ],
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' =>
+                    sprintf('/Grid %s configuration is not valid/', self::INVALID_GRID_NAME),
+            ],
             'contextParameters[formatType] type is invalid' => [
                 'body' => [
                     'jobId' => $jobId,
                     'outputFormat' => $format,
                     'writerBatchSize' => 4242,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         FormatterProvider::FORMAT_TYPE => [],
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 0,
@@ -185,7 +226,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'outputFormat' => $format,
                     'writerBatchSize' => 4242,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'materializedViewName' => [],
                         'rowsOffset' => 'sample-string',
                         'rowsLimit' => 42,
@@ -202,7 +243,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'outputFormat' => $format,
                     'writerBatchSize' => 4242,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 'sample-string',
                         'rowsLimit' => 42,
@@ -219,7 +260,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'outputFormat' => $format,
                     'writerBatchSize' => 4242,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'materializedViewName' => $materializedViewName,
                         'rowsOffset' => 0,
                         'rowsLimit' => 'sample-string',
