@@ -2904,4 +2904,30 @@ JS;
     {
         $this->visitPath($this->rememberedURL);
     }
+
+    /**
+     * Example: And I remember element "Add" value as "my_data"
+     *
+     * @When /^(?:|I )remember element "(?P<fieldName>(?:[^"]|\\")*)" value as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function rememberElementValue(string $elementName, string $alias)
+    {
+        $element = $this->createElement($elementName);
+        VariableStorage::storeData($alias, $element->getValue());
+    }
+
+    /**
+     * Example: And I remember route parameter "id" value as "userId"
+     *
+     * @When /^(?:|I )remember route parameter "(?P<parameterName>(?:[^"]|\\")*)" value as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function rememberRouteParameterValue(string $parameterName, string $alias): void
+    {
+        $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
+        $urlPath = preg_replace('/^.*\.php/', '', $urlPath);
+        $routeAttributes = $this->getAppContainer()->get('router')->match($urlPath);
+
+        self::assertArrayHasKey($parameterName, $routeAttributes);
+        VariableStorage::storeData($alias, $routeAttributes[$parameterName]);
+    }
 }

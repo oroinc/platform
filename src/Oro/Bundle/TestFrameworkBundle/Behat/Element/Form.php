@@ -7,6 +7,7 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Environment\BehatSecretsReader;
 use Oro\Bundle\TestFrameworkBundle\Exception\BehatSecretsReaderException;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
 /**
@@ -335,6 +336,7 @@ class Form extends Element
             return $value;
         }
 
+        $value = VariableStorage::normalizeValue($value);
         $value = trim($value);
         # Replace non-breaking space with regular space
         $value = str_replace("\xE2\x80\xAF", ' ', $value);
