@@ -45,7 +45,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     {
         /** @var NormalizeResultContext $context */
 
-        $processors = $this->processorBag->getProcessors($context);
+        $processors = $this->getProcessors($context);
         $processorId = null;
         $group = null;
         try {
@@ -222,7 +222,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     protected function executeNormalizeResultProcessors(NormalizeResultContext $context)
     {
         $context->setFirstGroup(ApiActionGroup::NORMALIZE_RESULT);
-        $processors = $this->processorBag->getProcessors($context);
+        $processors = $this->getProcessors($context);
         /** @var ProcessorInterface $processor */
         foreach ($processors as $processor) {
             try {

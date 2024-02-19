@@ -50,6 +50,8 @@ services:
 
     oro_api.processor_iterator_factory.ungrouped:
         class: Oro\Component\ChainProcessor\ProcessorIteratorFactory
+        calls:
+            - [setActionsWithApplicableCache, [['customize_loaded_data.identifier_only', 'customize_loaded_data.item', 'customize_loaded_data.collection']]]
 
     oro_api.processor_applicable_checker_factory:
         class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory

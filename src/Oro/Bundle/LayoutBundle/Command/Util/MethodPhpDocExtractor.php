@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\LayoutBundle\Command\Util;
 
+use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\ContextFactory;
 
@@ -61,10 +62,14 @@ class MethodPhpDocExtractor
             }
         }
 
-        $docBlock = $this->docBlockFactory->create(
-            $reflectionMethod,
-            $this->contextFactory->createFromReflector($reflectionMethod)
-        );
+        if (!$reflectionMethod->getDocComment()) {
+            $docBlock = new DocBlock();
+        } else {
+            $docBlock = $this->docBlockFactory->create(
+                $reflectionMethod,
+                $this->contextFactory->createFromReflector($reflectionMethod)
+            );
+        }
         $methodInfo['description'] = trim($docBlock->getSummary());
         $description = \trim((string)$docBlock->getDescription());
         if (!empty($description)) {

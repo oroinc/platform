@@ -24,11 +24,16 @@ use Symfony\Component\DependencyInjection\Reference;
  *   it is added with FALSE value. If such processor has this attribute and its value is NULL,
  *   the attribute is removed.
  * * Makes the "event" attribute for "customize_form_data" processors mandatory to prevent potential logical errors.
- * * By performance reasons "customize_form_data" processors are grouped by event.
+ * * By performance reasons "customize_loaded_data" processors are split to
+ *   "customize_loaded_data.item" and "customize_loaded_data.collection" processors.
+ * * By performance reasons "customize_loaded_data" processors with "identifier_only" attribute equals TRUE
+ *   are copied as "customize_loaded_data.identifier_only" processors and this attribute is removed for
+ *   the copied processors.
+ * * By performance reasons "customize_form_data" processors are split per event processors.
  *   The "event" attribute is removed.
  * * By performance reasons "identifier_fields_only" config extra for "get_config" processors
  *   is moved to "identifier_fields_only" attribute.
- * * By performance reasons "normalize_value" processors are grouped by data type.
+ * * By performance reasons "normalize_value" processors are split per data type processors.
  *   The "dataType" attribute is removed.
  *
  * @see \Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler
@@ -55,9 +60,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     private const COLLECTION_ATTRIBUTE      = 'collection';
     private const EVENT_ATTRIBUTE           = 'event';
 
-    private const ITEM_GROUP       = 'item';
-    private const COLLECTION_GROUP = 'collection';
-
     /**
      * {@inheritdoc}
      */
@@ -72,26 +74,10 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
                 }
             }
         }
-        $groups[self::CUSTOMIZE_LOADED_DATA_ACTION] = [self::ITEM_GROUP => 0, self::COLLECTION_GROUP => -1];
-        $groups[self::CUSTOMIZE_FORM_DATA_ACTION] = [
-            CustomizeFormDataContext::EVENT_PRE_SUBMIT      => 0,
-            CustomizeFormDataContext::EVENT_SUBMIT          => -1,
-            CustomizeFormDataContext::EVENT_POST_SUBMIT     => -2,
-            CustomizeFormDataContext::EVENT_PRE_VALIDATE    => -3,
-            CustomizeFormDataContext::EVENT_POST_VALIDATE   => -4,
-            CustomizeFormDataContext::EVENT_PRE_FLUSH_DATA  => -5,
-            CustomizeFormDataContext::EVENT_POST_FLUSH_DATA => -6,
-            CustomizeFormDataContext::EVENT_POST_SAVE_DATA  => -7
-        ];
         $processors = ProcessorsLoader::loadProcessors($container, DependencyInjectionUtil::PROCESSOR_TAG);
         $builder = new ProcessorBagConfigBuilder($groups, $processors);
         $loadedGroups = $builder->getAllGroups();
-        $loadedProcessors = $this->normalizeProcessors($builder->getAllProcessors(), $groups);
-        if (!empty($loadedProcessors[self::NORMALIZE_VALUE_ACTION])) {
-            $loadedGroups[self::NORMALIZE_VALUE_ACTION] = $this->extractGroups(
-                $loadedProcessors[self::NORMALIZE_VALUE_ACTION]
-            );
-        }
+        $loadedProcessors = $this->normalizeProcessors($builder->getAllProcessors());
         $container->getDefinition(self::PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID)
             ->replaceArgument(0, array_keys($loadedProcessors))
             ->replaceArgument(
@@ -129,22 +115,28 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
 
     /**
      * @param array $allProcessors [action => [[processor id, [attribute name => attribute value, ...]], ...], ...]
-     * @param array $allGroups     [action => [group name => group priority, ...], ...]
      *
      * @return array [action => [[processor id, [attribute name => attribute value, ...]], ...], ...]
      */
-    private function normalizeProcessors(array $allProcessors, array $allGroups): array
+    private function normalizeProcessors(array $allProcessors): array
     {
         if (!empty($allProcessors[self::CUSTOMIZE_LOADED_DATA_ACTION])) {
-            $allProcessors[self::CUSTOMIZE_LOADED_DATA_ACTION] = $this->normalizeCustomizeLoadedDataProcessors(
+            $normalizedProcessors = $this->normalizeCustomizeLoadedDataProcessors(
                 $allProcessors[self::CUSTOMIZE_LOADED_DATA_ACTION]
             );
+            foreach ($normalizedProcessors as $group => $groupProcessors) {
+                $allProcessors[self::CUSTOMIZE_LOADED_DATA_ACTION . '.' . $group] = $groupProcessors;
+            }
+            unset($allProcessors[self::CUSTOMIZE_LOADED_DATA_ACTION]);
         }
         if (!empty($allProcessors[self::CUSTOMIZE_FORM_DATA_ACTION])) {
-            $allProcessors[self::CUSTOMIZE_FORM_DATA_ACTION] = $this->normalizeCustomizeFormDataProcessors(
-                $allProcessors[self::CUSTOMIZE_FORM_DATA_ACTION],
-                array_keys($allGroups[self::CUSTOMIZE_FORM_DATA_ACTION])
+            $normalizedProcessors = $this->normalizeCustomizeFormDataProcessors(
+                $allProcessors[self::CUSTOMIZE_FORM_DATA_ACTION]
             );
+            foreach ($normalizedProcessors as $group => $groupProcessors) {
+                $allProcessors[self::CUSTOMIZE_FORM_DATA_ACTION . '.' . $group] = $groupProcessors;
+            }
+            unset($allProcessors[self::CUSTOMIZE_FORM_DATA_ACTION]);
         }
         if (!empty($allProcessors[self::GET_CONFIG_ACTION])) {
             $allProcessors[self::GET_CONFIG_ACTION] = $this->normalizeGetConfigProcessors(
@@ -157,9 +149,13 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             );
         }
         if (!empty($allProcessors[self::NORMALIZE_VALUE_ACTION])) {
-            $allProcessors[self::NORMALIZE_VALUE_ACTION] = $this->normalizeNormalizeValueProcessors(
+            $normalizedProcessors = $this->normalizeNormalizeValueProcessors(
                 $allProcessors[self::NORMALIZE_VALUE_ACTION]
             );
+            foreach ($normalizedProcessors as $group => $groupProcessors) {
+                $allProcessors[self::NORMALIZE_VALUE_ACTION . '.' . $group] = $groupProcessors;
+            }
+            unset($allProcessors[self::NORMALIZE_VALUE_ACTION]);
         }
 
         ksort($allProcessors);
@@ -168,33 +164,14 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param array $processors
-     *
-     * @return string[]
-     */
-    private function extractGroups(array $processors): array
-    {
-        $groupMap = [];
-        foreach ($processors as $item) {
-            if (!empty($item[1][self::GROUP_ATTRIBUTE])) {
-                $group = $item[1][self::GROUP_ATTRIBUTE];
-                if (!isset($groupMap[$group])) {
-                    $groupMap[$group] = true;
-                }
-            }
-        }
-
-        return array_keys($groupMap);
-    }
-
-    /**
      * Normalizes processors for "customize_loaded_data" action
-     * and split them to "item" and "collection" groups.
+     * and split them to "item", "collection" and "identifier_only" groups.
      */
     private function normalizeCustomizeLoadedDataProcessors(array $processors): array
     {
         $itemProcessors = [];
         $collectionProcessors = [];
+        $identifierOnlyProcessors = [];
         foreach ($processors as $item) {
             $this->assertNoGroupAttribute(
                 $item[0],
@@ -206,7 +183,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
                 && $item[1][self::COLLECTION_ATTRIBUTE];
             unset($item[1][self::COLLECTION_ATTRIBUTE]);
             if ($isCollectionProcessor) {
-                $item[1][self::GROUP_ATTRIBUTE] = self::COLLECTION_GROUP;
                 // "identifier_only" attribute is not supported for collections
                 if (\array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])) {
                     throw new LogicException(sprintf(
@@ -219,7 +195,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
                 }
                 $collectionProcessors[] = $item;
             } else {
-                $item[1][self::GROUP_ATTRIBUTE] = self::ITEM_GROUP;
                 // normalize "identifier_only" attribute
                 if (!\array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])) {
                     // add "identifier_only" attribute to the beginning of an attributes array,
@@ -227,25 +202,44 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
                     $item[1] = [self::IDENTIFIER_ONLY_ATTRIBUTE => false] + $item[1];
                 } elseif (null === $item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]) {
                     unset($item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]);
+                } else {
+                    $isIdentifierOnly = $item[1][self::IDENTIFIER_ONLY_ATTRIBUTE];
+                    unset($item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]);
+                    $item[1] = [self::IDENTIFIER_ONLY_ATTRIBUTE => $isIdentifierOnly] + $item[1];
                 }
                 $itemProcessors[] = $item;
+                if (\array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])
+                    && $item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]
+                ) {
+                    unset($item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]);
+                    $identifierOnlyProcessors[] = $item;
+                }
             }
         }
 
-        return array_merge($itemProcessors, $collectionProcessors);
+        return [
+            'item'            => $itemProcessors,
+            'collection'      => $collectionProcessors,
+            'identifier_only' => $identifierOnlyProcessors
+        ];
     }
 
     /**
      * Normalizes processors for "customize_form_data" action
      * and split them to groups by events.
-     *
-     * @param array    $processors
-     * @param string[] $allEvents
-     *
-     * @return array
      */
-    private function normalizeCustomizeFormDataProcessors(array $processors, array $allEvents): array
+    private function normalizeCustomizeFormDataProcessors(array $processors): array
     {
+        $allEvents = [
+            CustomizeFormDataContext::EVENT_PRE_SUBMIT,
+            CustomizeFormDataContext::EVENT_SUBMIT,
+            CustomizeFormDataContext::EVENT_POST_SUBMIT,
+            CustomizeFormDataContext::EVENT_PRE_VALIDATE,
+            CustomizeFormDataContext::EVENT_POST_VALIDATE,
+            CustomizeFormDataContext::EVENT_PRE_FLUSH_DATA,
+            CustomizeFormDataContext::EVENT_POST_FLUSH_DATA,
+            CustomizeFormDataContext::EVENT_POST_SAVE_DATA
+        ];
         $groupedProcessors = [];
         foreach ($processors as $item) {
             $this->assertNoGroupAttribute(
@@ -257,19 +251,16 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             $events = $this->parseCustomizeFormDataEventAttribute($item[0], $item[1], $allEvents);
             unset($item[1][self::EVENT_ATTRIBUTE]);
             foreach ($events as $event) {
-                $item[1][self::GROUP_ATTRIBUTE] = $event;
                 $groupedProcessors[$event][] = $item;
             }
         }
 
-        $sortedByEventProcessors = [];
+        $result = [];
         foreach ($allEvents as $event) {
-            if (isset($groupedProcessors[$event])) {
-                $sortedByEventProcessors[] = $groupedProcessors[$event];
-            }
+            $result[$event] = $groupedProcessors[$event] ?? [];
         }
 
-        return array_merge(...$sortedByEventProcessors);
+        return $result;
     }
 
     /**
@@ -340,7 +331,8 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * Validates processors for "normalize_value" action.
+     * Normalizes processors for "normalize_value" action
+     * and split them to groups by data types.
      */
     private function normalizeNormalizeValueProcessors(array $processors): array
     {
@@ -349,8 +341,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             $dataTypes = $this->parseDataTypeAttribute($item[0], $item[1], self::NORMALIZE_VALUE_ACTION);
             unset($item[1][self::DATA_TYPE_ATTRIBUTE]);
             foreach ($dataTypes as $dataType) {
-                $item[1][self::GROUP_ATTRIBUTE] = $dataType;
-                $result[] = $item;
+                $result[$dataType][] = $item;
             }
         }
 
@@ -425,7 +416,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
      * @param array    $attributes
      * @param string[] $allEvents
      *
-     * @return array
+     * @return string[]
      */
     private function parseCustomizeFormDataEventAttribute(
         string $processorId,

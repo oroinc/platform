@@ -25,6 +25,9 @@ class Context extends ParameterBag implements ContextInterface
     /** @var bool */
     private $resultExists = false;
 
+    /** @var string|null */
+    private $checksum = null;
+
     /**
      * {@inheritdoc}
      */
@@ -151,5 +154,92 @@ class Context extends ParameterBag implements ContextInterface
     {
         $this->result = null;
         $this->resultExists = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getChecksum()
+    {
+        if (null === $this->checksum) {
+            $this->checksum = self::buildChecksum($this->toArray());
+        }
+
+        return $this->checksum;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function set($key, $value)
+    {
+        parent::set($key, $value);
+        $this->checksum = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function remove($key)
+    {
+        parent::remove($key);
+        $this->checksum = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function clear()
+    {
+        parent::clear();
+        $this->checksum = null;
+    }
+
+    /**
+     * @param array $items
+     *
+     * @return string
+     */
+    private static function buildChecksum($items)
+    {
+        if (!$items) {
+            return '';
+        }
+
+        $checksum = '';
+        ksort($items, SORT_STRING);
+        foreach ($items as $key => $val) {
+            $val = self::prepareChecksumItem($val);
+            if (null !== $val) {
+                $checksum .= $key . '=' . $val . ';';
+            }
+        }
+
+        return sha1($checksum);
+    }
+
+    /**
+     * @param mixed $val
+     *
+     * @return string|null
+     */
+    private static function prepareChecksumItem($val)
+    {
+        if (is_scalar($val)) {
+            return $val ? 's:' . $val : null;
+        }
+        if (\is_array($val)) {
+            $strVal = '[';
+            foreach ($val as $k => $v) {
+                $strVal .= $k . self::prepareChecksumItem($v);
+            }
+
+            return $strVal . ']';
+        }
+        if (\is_object($val) && method_exists($val, '__toString')) {
+            return 'o:' . $val;
+        }
+
+        return null;
     }
 }

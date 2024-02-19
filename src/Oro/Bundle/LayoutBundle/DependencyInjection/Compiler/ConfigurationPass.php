@@ -3,6 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\LayoutBundle\Command\DebugCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugDataProviderSignatureCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugLayoutBlockTypeSignatureCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugLayoutContextConfiguratorsSignatureCommand;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -78,6 +81,18 @@ class ConfigurationPass implements CompilerPassInterface
         $commandDef = $container->getDefinition(DebugCommand::class);
         $commandDef->replaceArgument(2, array_keys($blockTypes));
         $commandDef->replaceArgument(3, array_keys($dataProviders));
+        $dateProviderCommandDef = $container->getDefinition(DebugDataProviderSignatureCommand::class);
+        $dateProviderCommandDef->setArgument('$dataProviders', array_keys($dataProviders));
+
+        $blockTypeCommandDef = $container->getDefinition(DebugLayoutBlockTypeSignatureCommand::class);
+        $blockTypeCommandDef->setArgument('$blockTypes', array_keys($blockTypes));
+
+        $contextConfiguratorIds = $this->getContextConfigurators($container, $servicesForServiceLocator);
+        $contextConfigCommandDef = $container->getDefinition(DebugLayoutContextConfiguratorsSignatureCommand::class);
+        $contextConfigCommandDef->setArgument(
+            '$contextConfigurators',
+            $this->getContextConfiguratorsAsServices($contextConfiguratorIds)
+        );
     }
 
     private function getBlockTypes(ContainerBuilder $container, array &$servicesForServiceLocator): array
@@ -165,6 +180,19 @@ class ConfigurationPass implements CompilerPassInterface
         }
 
         return $configurators;
+    }
+
+    private function getContextConfiguratorsAsServices(array $contextConfigIds): array
+    {
+        $configServices = [];
+        foreach ($contextConfigIds as $configurator) {
+            $configServices[$configurator] = [
+                'id' => $configurator,
+                'service' => new Reference($configurator)
+            ];
+        }
+
+        return $configServices;
     }
 
     private function getDataProviders(ContainerBuilder $container, array &$servicesForServiceLocator): array

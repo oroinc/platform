@@ -36,7 +36,8 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
             'rtl_support'        => true,
             'logo'               => 'test_logo.jpg',
             'screenshot'         => 'test_screenshot.jpg',
-            'extra_js_builds'    => []
+            'extra_js_builds'    => [],
+            'resolve_extra_paths' => ['/bundles/orothemedefault51']
         ];
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
         self::assertSame($themeConfig, $result['test_theme']);

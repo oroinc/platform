@@ -19,6 +19,9 @@ class ProcessorIterator implements \Iterator
     /** @var ProcessorRegistryInterface */
     protected $processorRegistry;
 
+    /** @var ParameterBagInterface|null */
+    private $applicableCache;
+
     /** @var int */
     protected $index;
 
@@ -35,6 +38,11 @@ class ProcessorIterator implements \Iterator
         $this->context = $context;
         $this->applicableChecker = $applicableChecker;
         $this->processorRegistry = $processorRegistry;
+    }
+
+    public function setApplicableCache(?ParameterBagInterface $applicableCache): void
+    {
+        $this->applicableCache = $applicableCache;
     }
 
     /**
@@ -156,14 +164,33 @@ class ProcessorIterator implements \Iterator
     {
         $this->index++;
         while ($this->index <= $this->maxIndex) {
-            $applicable = $this->applicableChecker->isApplicable(
-                $this->context,
-                $this->processors[$this->index][1]
-            );
-            if (ApplicableCheckerInterface::NOT_APPLICABLE !== $applicable) {
+            if (ApplicableCheckerInterface::NOT_APPLICABLE !== $this->isApplicable()) {
                 break;
             }
             $this->index++;
         }
+    }
+
+    /**
+     * Checks if the current processor is applicable to be executed.
+     */
+    protected function isApplicable(): int
+    {
+        $processorAttributes = $this->processors[$this->index][1];
+
+        if (null === $this->applicableCache) {
+            return $this->applicableChecker->isApplicable($this->context, $processorAttributes);
+        }
+
+        $cacheKey = $processorAttributes
+            ? $this->index . ':' . $this->context->getChecksum()
+            : '-:' . $this->context->getChecksum();
+        $applicable = $this->applicableCache->get($cacheKey);
+        if (null === $applicable) {
+            $applicable = $this->applicableChecker->isApplicable($this->context, $processorAttributes);
+            $this->applicableCache->set($cacheKey, $applicable);
+        }
+
+        return $applicable;
     }
 }
