@@ -5,7 +5,6 @@ namespace Oro\Bundle\ReportBundle\Grid;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Entity\Report;
@@ -50,13 +49,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
      */
     public function isReportValid(string $gridName): bool
     {
-        try {
-            $this->getConfiguration($gridName);
-        } catch (InvalidConfigurationException $e) {
-            return false;
-        }
-
-        return true;
+        return $this->isValidConfiguration($gridName);
     }
 
     public function getBuilder(): DatagridConfigurationBuilder
@@ -77,5 +70,16 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         $this->builder->setSource($report);
 
         return $this->builder->getConfiguration();
+    }
+
+    public function isValidConfiguration(string $gridName): bool
+    {
+        try {
+            $this->getConfiguration($gridName);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return true;
     }
 }
