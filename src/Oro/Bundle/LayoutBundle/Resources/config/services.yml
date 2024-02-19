@@ -105,6 +105,11 @@ services:
         tags:
             - { name: layout.context_configurator }
 
+    oro_layout.layout_context_configurator.response_status_code:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ResponseStatusCodeContextConfigurator
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.layout_context_configurator.action:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator
         tags:

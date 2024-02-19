@@ -344,6 +344,32 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
+    public function testShouldReturn200StatusCodeByDefault(): void
+    {
+        $this->setupLayoutExpectations();
+        $layoutAnnotation = new LayoutAnnotation([]);
+        $responseEvent = $this->createResponseForControllerResultEvent(
+            ['_layout' => $layoutAnnotation],
+            []
+        );
+        $this->listener->onKernelView($responseEvent);
+        self::assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+        self::assertEquals(200, $responseEvent->getResponse()->getStatusCode());
+    }
+
+    public function testShouldReturnSpecificStatusCode(): void
+    {
+        $this->setupLayoutExpectations();
+        $layoutAnnotation = new LayoutAnnotation([]);
+        $responseEvent = $this->createResponseForControllerResultEvent(
+            ['_layout' => $layoutAnnotation],
+            ['response_status_code' => 422]
+        );
+        $this->listener->onKernelView($responseEvent);
+        self::assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+        self::assertEquals(422, $responseEvent->getResponse()->getStatusCode());
+    }
+
     private function setupLayoutExpectations(
         ?LayoutBuilderInterface $builder = null,
         \Closure $assertContextCallback = null,
@@ -364,7 +390,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
                     if (!$context->isResolved()) {
                         $context->getResolver()
                             ->setDefined(['theme'])
-                            ->setDefaults(['action' => '']);
+                            ->setDefaults(['action' => '', 'response_status_code' => 200]);
                         $context->resolve();
                     }
 

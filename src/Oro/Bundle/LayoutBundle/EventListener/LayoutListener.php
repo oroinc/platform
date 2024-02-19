@@ -93,6 +93,8 @@ class LayoutListener implements ServiceSubscriberInterface
             $response = $this->getLayoutResponse($context, $request, $layoutManager);
         }
 
+        $response->setStatusCode($context->getOr('response_status_code', 200));
+
         $event->setResponse($response);
     }
 

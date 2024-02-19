@@ -1548,7 +1548,15 @@ JS;
      */
     public function clickOnEmptySpace()
     {
-        $this->getPage()->find('css', '#container')->click();
+        $overlay = $this->getPage()->find('css', '#oro-dropdown-mask');
+        if ($overlay?->isVisible()) {
+            $overlay->click();
+        } else {
+            $container = $this->getPage()->find('css', '#container');
+            if ($container?->isVisible()) {
+                $container->click();
+            }
+        }
     }
 
     /**

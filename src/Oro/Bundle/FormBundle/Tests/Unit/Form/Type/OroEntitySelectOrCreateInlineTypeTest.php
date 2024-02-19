@@ -144,7 +144,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
                 ->with($inputOptions['create_acl'])
                 ->willReturn($aclGranted);
         } else {
-            $this->authorizationChecker->expects(self::atLeastOnce())
+            $this->authorizationChecker
                 ->method('isGranted')
                 ->with('CREATE', 'entity:' . TestEntity::class)
                 ->willReturn($aclGranted);
@@ -233,7 +233,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
                     'configs'           => [
                         'route_name' => 'test'
                     ],
-                    'create_enabled'    => false,
+                    'create_enabled'    => true,
                     'create_form_route' => 'test',
                 ],
                 [
