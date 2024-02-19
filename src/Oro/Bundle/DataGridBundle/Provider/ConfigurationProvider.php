@@ -59,4 +59,15 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             PropertyAccess::createPropertyAccessorWithDotSyntax()
         );
     }
+
+    public function isValidConfiguration(string $gridName): bool
+    {
+        try {
+            $this->getConfiguration($gridName);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return true;
+    }
 }

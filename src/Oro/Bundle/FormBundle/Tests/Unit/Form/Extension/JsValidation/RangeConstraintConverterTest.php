@@ -93,6 +93,40 @@ class RangeConstraintConverterTest extends TestCase
         self::assertEquals($constraint, $this->converter->convertConstraint($constraint));
     }
 
+    public function testConvertWhenPropertyIsNotReadable(): void
+    {
+        $constraint = new Range([
+            'minPropertyPath' => 'child.propertyMin',
+            'maxPropertyPath' => 'child.propertyMax',
+        ]);
+
+        $formData = new \stdClass();
+        $parentForm = $this->createMock(FormInterface::class);
+        $parentForm
+            ->expects(self::once())
+            ->method('getData')
+            ->willReturn($formData);
+
+        $this->form
+            ->expects(self::once())
+            ->method('getParent')
+            ->willReturn($parentForm);
+
+        $this->propertyAccessor
+            ->expects(self::exactly(2))
+            ->method('isReadable')
+            ->willReturnMap([
+                [$formData, 'child.propertyMin', false],
+                [$formData, 'child.propertyMax', false],
+            ]);
+        $this->propertyAccessor
+            ->expects(self::never())
+            ->method('getValue')
+            ->withAnyParameters();
+
+        self::assertEquals($constraint, $this->converter->convertConstraint($constraint, $this->form));
+    }
+
     public function testConvertWithJsValidationPayload(): void
     {
         $constraint = new Range([
@@ -112,6 +146,13 @@ class RangeConstraintConverterTest extends TestCase
             ->method('getParent')
             ->willReturn($parentForm);
 
+        $this->propertyAccessor
+            ->expects(self::exactly(2))
+            ->method('isReadable')
+            ->willReturnMap([
+                [$formData, 'propertyMin', true],
+                [$formData, 'propertyMax', true],
+            ]);
         $this->propertyAccessor
             ->expects(self::exactly(2))
             ->method('getValue')

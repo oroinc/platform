@@ -220,6 +220,9 @@ class Form extends Element
      */
     protected function findFieldByLabel($locator, $failOnError = true)
     {
+        if (!is_string($locator)) {
+            return null;
+        }
         $label = $this->findLabel($locator);
         if (!$label) {
             return null;

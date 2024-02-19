@@ -14,17 +14,15 @@ use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ConfigurationProviderTest extends SegmentDefinitionTestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
+    private ManagerRegistry|MockObject $doctrine;
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private ConfigManager|MockObject $configManager;
 
-    /** @var ConfigurationProvider */
-    private $provider;
+    private ConfigurationProvider $provider;
 
     protected function setUp(): void
     {
@@ -49,26 +47,51 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         $this->provider = new ConfigurationProvider($builder, $this->doctrine);
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
-        $this->assertTrue($this->provider->isApplicable(Segment::GRID_PREFIX . '2'));
-        $this->assertFalse($this->provider->isApplicable(Report::GRID_PREFIX . '2'));
+        self::assertTrue($this->provider->isApplicable(Segment::GRID_PREFIX . '2'));
+        self::assertFalse($this->provider->isApplicable(Report::GRID_PREFIX . '2'));
     }
 
-    public function testGetConfiguration()
+    public function testValidConfiguration(): void
+    {
+        $id = 2;
+        $gridName = Segment::GRID_PREFIX . $id;
+        $segmentRepository = $this->createMock(EntityRepository::class);
+        $segmentRepository
+            ->expects(self::once())
+            ->method('find')
+            ->with($id)
+            ->willReturn($this->getSegment(identifier: $id));
+
+        $this->doctrine
+            ->expects(self::once())
+            ->method('getRepository')
+            ->with(Segment::class)
+            ->willReturn($segmentRepository);
+
+        self::assertTrue($this->provider->isValidConfiguration($gridName));
+    }
+
+    public function testNotValidConfiguration(): void
+    {
+        self::assertFalse($this->provider->isValidConfiguration(Segment::GRID_PREFIX . '2'));
+    }
+
+    public function testGetConfiguration(): void
     {
         $metadata = new EntityMetadata(User::class);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getEntityMetadata')
             ->willReturn($metadata);
 
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with(2)
             ->willReturn($this->getSegment());
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(Segment::class)
             ->willReturn($repository);
@@ -79,20 +102,20 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
     /**
      * @dataProvider definitionProvider
      */
-    public function testIsConfigurationValid(mixed $definition, bool $expectedResult)
+    public function testIsConfigurationValid(mixed $definition, bool $expectedResult): void
     {
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with(2)
             ->willReturn($this->getSegment($definition));
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(Segment::class)
             ->willReturn($repository);
         $result = $this->provider->isConfigurationValid(Segment::GRID_PREFIX . '2');
-        $this->assertEquals($expectedResult, $result);
+        self::assertEquals($expectedResult, $result);
     }
 
     public function definitionProvider(): array
@@ -103,7 +126,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         ];
     }
 
-    public function testDoNotProcessInvalidSegmentGridName()
+    public function testDoNotProcessInvalidSegmentGridName(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The segment ID not found in the "oro_segment_grid_" grid name.');

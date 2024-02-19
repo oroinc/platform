@@ -60,6 +60,10 @@ define(function(require) {
                 const data = this.$el.data(this.widgetFunctionName);
                 data.container.data('inputWidget', this);
                 data.dropdown.data('inputWidget', this);
+
+                if (this.$el.attr('readonly')) {
+                    this.$el.select2('readonly', true);
+                }
             }
 
             this.updateFixedMode();

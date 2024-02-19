@@ -294,7 +294,7 @@ define(function(require) {
             if (adoptedActionsContainer.length > 0) {
                 const self = this;
                 const form = adoptedActionsContainer.closest('form');
-                const actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
+                const actions = adoptedActionsContainer.find(':input, a, [data-action-name]');
 
                 if (form.length > 0) {
                     this.form = form;

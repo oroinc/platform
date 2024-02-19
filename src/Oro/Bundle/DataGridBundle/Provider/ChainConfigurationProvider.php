@@ -50,4 +50,15 @@ class ChainConfigurationProvider implements ConfigurationProviderInterface
     {
         return $this->providers;
     }
+
+    public function isValidConfiguration(string $gridName): bool
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider->isApplicable($gridName) && $provider->isValidConfiguration($gridName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
