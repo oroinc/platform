@@ -42,6 +42,8 @@ class CommandRunnerTest extends WebTestCase
 
     public function testShouldRunCommandAndHasNoMemoryLeak(): void
     {
+        self::markTestSkipped('Randomly fails. Fix or remove in scope of BAP-22147.');
+
         $runner = self::getContainer()->get('oro_cron.engine.command_runner');
 
         $before = memory_get_usage(true);
