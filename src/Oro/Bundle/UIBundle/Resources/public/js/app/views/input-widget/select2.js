@@ -48,6 +48,9 @@ define(function(require) {
          * @inheritdoc
          */
         initialize: function(options) {
+            if (options.containerCssClass) {
+                this.initializeOptions = {...this.initializeOptions, ...{containerCssClass: options.containerCssClass}};
+            }
             // fix select2.each2 bug, when empty string is FALSE
             const elCases = this.$el.attr('class');
 

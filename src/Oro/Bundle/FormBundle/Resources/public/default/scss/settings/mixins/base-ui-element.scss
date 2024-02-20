@@ -42,5 +42,10 @@
         &.full {
             width: 100%;
         }
+
+        &--inline,
+        &.inline {
+            width: initial;
+        }
     }
 }

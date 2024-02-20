@@ -38,3 +38,9 @@ $select2-results-disabled-background: $base-ui-element-bg-color-disabled-state !
 $select2-more-results-background: get-var-color('primary', 'light') !default;
 
 $select2-results-selected-disabled-display: none !default;
+
+// Select2 plain
+
+$select2-plain-select2-chosen-border: 1px dotted !default;
+$select2-plain-select2-chosen-gap: spacing('xs') !default;
+$select2-plain-select2-chosen-line-height: 1.62 !default;

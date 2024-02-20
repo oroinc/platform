@@ -38,7 +38,7 @@
     {% endif %}
 
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' breadcrumbs start-scroll-from-end invisible-scrollbar'
+        '~class': ' breadcrumbs scrollable-container start-scroll-from-end invisible-scrollbar horizontal-scrolling'
     }) %}
     {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
     <nav aria-label="{{ 'oro.ui.breadcrumb.aria_label'|trans }}">

@@ -59,3 +59,21 @@
         padding-bottom: $select-firefox-inner-offset-bottom;
     }
 }
+
+.select-plain {
+    --select-arrow-position: #{$select-plain-arrow-position};
+
+    display: inline-flex;
+    padding-left: $select-plain-padding-start;
+    padding-right: $select-plain-padding-end;
+
+    border-width: 0;
+    background: $select-bg-dark;
+    font-size: $select-plain-font-size;
+    line-height: $select-plain-line-height;
+    font-weight: $select-plain-font-weight;
+
+    @include element-state('hover') {
+        background-color: $select-plain-background-color-hover;
+    }
+}
