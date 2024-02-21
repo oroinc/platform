@@ -1351,7 +1351,14 @@ class OroMainContext extends MinkContext implements
         }
 
         $this->spin(function () use ($button) {
-            $this->pressButtonInModalWindow($button);
+            try {
+                $this->pressButtonInModalWindow($button);
+                return true;
+            } catch (NoSuchElement $exception) {
+                return false;
+            }
+
+            return true;
         }, 5);
     }
 
