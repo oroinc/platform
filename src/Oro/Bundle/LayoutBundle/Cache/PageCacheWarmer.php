@@ -50,7 +50,9 @@ class PageCacheWarmer implements CacheWarmerInterface
     private function warmPageCache(Request $request): void
     {
         try {
+            ob_start();
             $this->httpKernel->handle($request);
+            ob_end_clean();
         } catch (\Throwable $exception) {
             $this->logger->warning(
                 'Failed to warmup page cache: {message}',

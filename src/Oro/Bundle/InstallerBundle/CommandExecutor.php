@@ -6,6 +6,8 @@ use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Component\PhpUtils\Tools\CommandExecutor\AbstractCommandExecutor;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -18,24 +20,27 @@ class CommandExecutor extends AbstractCommandExecutor
     private const DEFAULT_TIMEOUT = 300;
 
     private OutputInterface $output;
+    private InputInterface $input;
     private Application $application;
     private OroDataCacheManager $dataCacheManager;
     private ?int $lastCommandExitCode = null;
     private ?string $lastCommandLine = null;
 
     public function __construct(
-        ?string $env,
+        InputInterface $input,
         OutputInterface $output,
         Application $application,
         OroDataCacheManager $dataCacheManager = null
     ) {
-        $this->env = $env;
+        $this->input = $input;
         $this->output = $output;
         $this->application = $application;
         $this->dataCacheManager = $dataCacheManager;
         $this->defaultOptions = [
             'process-timeout' => self::DEFAULT_TIMEOUT
         ];
+
+        $this->env = $input->hasOption('env') ? $input->getOption('env') : null;
     }
 
     /**
@@ -87,11 +92,19 @@ class CommandExecutor extends AbstractCommandExecutor
 
             $this->lastCommandLine = $process->getCommandLine();
 
-            $output = $this->output;
+            $output = new ConsoleOutput(
+                $this->output->getVerbosity(),
+                $this->output->isDecorated(),
+                $this->output->getFormatter()
+            );
             try {
                 $process->run(
                     function ($type, $data) use ($output) {
-                        $output->write($data);
+                        if (Process::ERR === $type) {
+                            $output->getErrorOutput()->write($data);
+                        } else {
+                            $output->write($data);
+                        }
                     }
                 );
             } finally {
@@ -150,10 +163,19 @@ class CommandExecutor extends AbstractCommandExecutor
 
     /**
      * {@inheritDoc}
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function prepareParameters(string $command, array $params): array
     {
         $params = parent::prepareParameters($command, $params);
+
+        if (!$this->output->isDecorated()) {
+            $params['--no-ansi'] = true;
+        }
+        if (!$this->input->isInteractive()) {
+            $params['--no-interaction'] = true;
+        }
 
         if (!$this->hasVerbosityParameter($params)) {
             switch ($this->output->getVerbosity()) {
