@@ -36,10 +36,7 @@ class TransitActionProcessor extends ActionProcessor
      */
     protected function executeProcessors(ContextInterface $context): void
     {
-        /** TransitionContext $context */
-
-        $processors = $this->processorBag->getProcessors($context);
-
+        $processors = $this->getProcessors($context);
         /** @var ProcessorInterface $processor */
         foreach ($processors as $processor) {
             try {
