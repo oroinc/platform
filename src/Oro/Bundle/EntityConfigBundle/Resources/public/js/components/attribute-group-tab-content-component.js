@@ -46,7 +46,7 @@ define(function(require) {
         },
 
         _show: function() {
-            this.el.siblings('.' + this.el[0].className).hide();
+            this.el.siblings(['', ...this.el[0].classList].join('.')).hide();
             this.el.show();
             mediator.trigger('layout:reposition');
         }
