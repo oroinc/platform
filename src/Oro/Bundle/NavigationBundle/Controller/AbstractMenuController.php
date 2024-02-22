@@ -7,6 +7,7 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Event\BeforeMenuHandleUpdateEvent;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateWithScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
@@ -117,6 +118,8 @@ abstract class AbstractMenuController extends AbstractController
             ]
         );
 
+        $this->dispatchBeforeMenuHandleUpdate($menuName, $context);
+
         return $this->handleUpdate($menuUpdate, $context, $menu);
     }
 
@@ -139,7 +142,17 @@ abstract class AbstractMenuController extends AbstractController
             );
         }
 
+        $this->dispatchBeforeMenuHandleUpdate($menuName, $context);
+
         return $this->handleUpdate($menuUpdate, $context, $menu);
+    }
+
+    protected function dispatchBeforeMenuHandleUpdate(string $menuName, array $context): void
+    {
+        $this->container->get(EventDispatcherInterface::class)->dispatch(
+            new BeforeMenuHandleUpdateEvent($menuName, $context),
+            BeforeMenuHandleUpdateEvent::NAME
+        );
     }
 
     protected function move(Request $request, string $menuName, array $context = []): Response|RedirectResponse
