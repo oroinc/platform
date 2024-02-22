@@ -46,7 +46,7 @@ class SuiteConfigurationDividerTest extends \PHPUnit\Framework\TestCase
             /** @var Suite $config */
             foreach ($suiteConfigs as $config) {
                 $this->assertTrue(
-                    in_array($config->getName(), $expectedSets[$setName]),
+                    in_array($config->getName(), $expectedSets[$setName], true),
                     sprintf('Set "%s" not have "%s" suite', $setName, $config->getName())
                 );
             }

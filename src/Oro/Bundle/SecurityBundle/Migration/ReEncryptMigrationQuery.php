@@ -60,7 +60,7 @@ class ReEncryptMigrationQuery implements MigrationQuery, ConnectionAwareInterfac
             ->select($select)
             ->from($this->table);
 
-        foreach ($selectIntegrationsQB->execute()->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+        foreach ($selectIntegrationsQB->execute()->fetchAllAssociative() as $row) {
             $updateData = [];
             foreach ($this->fields as $field) {
                 if (isset($row[$field])) {

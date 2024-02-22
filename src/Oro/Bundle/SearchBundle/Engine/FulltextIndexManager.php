@@ -6,6 +6,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
+/**
+ * Manager to create fulltext index.
+ */
 class FulltextIndexManager
 {
     /**
@@ -52,7 +55,7 @@ class FulltextIndexManager
     public function createIndexes()
     {
         try {
-            $this->connection->query($this->getQuery());
+            $this->connection->executeQuery($this->getQuery());
         } catch (DBALException $exception) {
             return false;
         }

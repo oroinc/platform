@@ -63,7 +63,7 @@ abstract class RemoveAssociationQuery extends ParametrizedMigrationQuery impleme
      */
     public function execute(LoggerInterface $logger): void
     {
-        $sourceEntityRow = $this->connection->fetchAssoc(
+        $sourceEntityRow = $this->connection->fetchAssociative(
             'SELECT e.id, e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1',
             [$this->sourceEntityClass]
         );

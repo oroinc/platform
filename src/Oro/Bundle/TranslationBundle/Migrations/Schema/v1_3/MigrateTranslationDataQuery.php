@@ -107,7 +107,7 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $query);
 
-        return array_column($this->connection->fetchAll($query), 'locale');
+        return array_column($this->connection->fetchAllAssociative($query), 'locale');
     }
 
     /**
@@ -140,7 +140,7 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $query[0]);
 
-        $aggregatedItems = $this->connection->fetchAll($query[0]);
+        $aggregatedItems = $this->connection->fetchAllAssociative($query[0]);
 
         $items = [];
         foreach ($aggregatedItems as $item) {

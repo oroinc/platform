@@ -58,7 +58,7 @@ class UpdateFallbackExcludedQuery extends ParametrizedMigrationQuery implements 
             ->where($qb->expr()->eq('f.field_name', ':field_name'))
             ->setParameter('field_name', 'fallback')
             ->execute()
-            ->fetchAll(\PDO::FETCH_ASSOC);
+            ->fetchAllAssociative();
 
         foreach ($rows as $row) {
             $class = $row['class_name'];

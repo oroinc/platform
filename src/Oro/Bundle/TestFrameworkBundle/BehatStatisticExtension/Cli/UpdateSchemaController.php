@@ -12,6 +12,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Controller to update schema
+ */
 class UpdateSchemaController implements Controller
 {
     /**
@@ -74,7 +77,7 @@ class UpdateSchemaController implements Controller
         $queries = $schemaDiff->toSql($this->connection->getDatabasePlatform());
 
         foreach ($queries as $query) {
-            $this->connection->query($query);
+            $this->connection->executeQuery($query);
         }
 
         $this->connection->close();

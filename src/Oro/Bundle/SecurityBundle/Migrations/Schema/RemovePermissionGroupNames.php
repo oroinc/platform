@@ -86,7 +86,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql, $params, $types);
 
         $result = [];
-        $rows = $this->connection->fetchAll($sql, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($sql, $params, $types);
         foreach ($rows as $row) {
             $result[] = [
                 'id' => $row['id'],

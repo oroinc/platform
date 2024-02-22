@@ -188,7 +188,7 @@ class UpdateEntityConfigDataQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT id, data FROM oro_entity_config';
         $this->logQuery($logger, $sql);
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
 
         foreach ($rows as $key => $row) {
             $type = Type::getType(Types::ARRAY);

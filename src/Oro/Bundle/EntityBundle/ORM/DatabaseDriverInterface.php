@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
+/**
+ * Interface for Database Drivers
+ */
 interface DatabaseDriverInterface
 {
-    const DRIVER_POSTGRESQL = 'pdo_pgsql';
-    const DRIVER_MYSQL      = 'pdo_mysql';
+    const DRIVER_POSTGRESQL = 'postgresql';
+    const DRIVER_MYSQL      = 'mysql';
 
     /**
      * @return string

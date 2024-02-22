@@ -8,6 +8,9 @@ use Oro\Bundle\MigrationBundle\Migration\DataStorageInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * The migration to load entity configuration state query.
+ */
 class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
 {
     /** @var DataStorageInterface */
@@ -46,7 +49,7 @@ class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
         $entityConfigs = [];
         $sql           = 'SELECT e.class_name, e.data FROM oro_entity_config e';
         $this->logQuery($logger, $sql);
-        foreach ($this->connection->fetchAll($sql) as $row) {
+        foreach ($this->connection->fetchAllAssociative($sql) as $row) {
             $data = $this->connection->convertToPHPValue($row['data'], 'array');
             if (isset($data['extend']['state']) && $data['extend']['state'] !== ExtendScope::STATE_ACTIVE) {
                 $entityConfigs[$row['class_name']] = $data['extend']['state'];
@@ -58,7 +61,7 @@ class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
             . 'FROM oro_entity_config e '
             . 'INNER JOIN oro_entity_config_field f ON f.entity_id = e.id';
         $this->logQuery($logger, $sql);
-        foreach ($this->connection->fetchAll($sql) as $row) {
+        foreach ($this->connection->fetchAllAssociative($sql) as $row) {
             $data = $this->connection->convertToPHPValue($row['data'], 'array');
             if (isset($data['extend']['state']) && $data['extend']['state'] !== ExtendScope::STATE_ACTIVE) {
                 $fieldConfigs[$row['class_name']][$row['field_name']] = $data['extend']['state'];

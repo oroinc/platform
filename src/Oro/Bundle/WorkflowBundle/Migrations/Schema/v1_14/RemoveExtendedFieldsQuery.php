@@ -80,7 +80,7 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $query, $params, $types);
 
         // prepare update queries
-        $rows = $this->connection->fetchAll($query, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($query, $params, $types);
 
         return array_filter(
             $rows,

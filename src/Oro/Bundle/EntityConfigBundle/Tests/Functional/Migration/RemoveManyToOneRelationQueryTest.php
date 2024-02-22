@@ -196,7 +196,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
                 WHERE e.class_name = ? 
                 LIMIT 1';
 
-        return $this->connection->fetchAssoc(
+        return $this->connection->fetchAssociative(
             $getEntitySql,
             [$entityClass]
         );
@@ -211,7 +211,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
             AND field_name = ?
             LIMIT 1';
 
-        return $this->connection->fetchAssoc(
+        return $this->connection->fetchAssociative(
             $getFieldSql,
             [
                 $entityClass,

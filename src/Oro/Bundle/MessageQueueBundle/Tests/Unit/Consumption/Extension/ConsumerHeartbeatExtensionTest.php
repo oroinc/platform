@@ -10,14 +10,13 @@ use Psr\Log\LoggerInterface;
 
 class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConsumerHeartbeat */
-    private $consumerHeartbeat;
+    private \PHPUnit\Framework\MockObject\MockObject|ConsumerHeartbeat $consumerHeartbeat;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
 
-    /** @var ConsumerHeartbeatExtension */
-    private $extension;
+    private ConsumerHeartbeatExtension $extension;
+
+    private Context $context;
 
     protected function setUp(): void
     {

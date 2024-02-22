@@ -102,7 +102,7 @@ class UpdateEntityConfigEntityValueQuery implements
 
         $parameters = [$value, $this->entityName, $this->scope, $this->code];
         $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
+        $statement->executeQuery($parameters);
         $this->logQuery($logger, $sql, $parameters);
 
         $logger->debug($sql);
@@ -112,7 +112,7 @@ class UpdateEntityConfigEntityValueQuery implements
     {
         $sql = 'SELECT data FROM oro_entity_config WHERE class_name = ? LIMIT 1';
         $parameters = [$this->entityName];
-        $data = $this->connection->fetchColumn($sql, $parameters);
+        $data = $this->connection->fetchOne($sql, $parameters);
         $this->logQuery($logger, $sql, $parameters);
 
         $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
@@ -136,7 +136,7 @@ class UpdateEntityConfigEntityValueQuery implements
             $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
             $parameters = [$data, $this->entityName];
             $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
             $this->logQuery($logger, $sql, $parameters);
         }
     }

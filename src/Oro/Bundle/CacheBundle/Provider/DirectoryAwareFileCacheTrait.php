@@ -11,6 +11,8 @@ namespace Oro\Bundle\CacheBundle\Provider;
  */
 trait DirectoryAwareFileCacheTrait
 {
+    protected string $directory;
+
     public function setDirectory(string $directory): void
     {
         $this->directory = $directory;

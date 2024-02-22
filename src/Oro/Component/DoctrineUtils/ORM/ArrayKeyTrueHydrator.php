@@ -32,7 +32,7 @@ class ArrayKeyTrueHydrator extends AbstractHydrator
     protected function hydrateAllData(): array
     {
         $result = [];
-        while ($data = $this->_stmt->fetch(\PDO::FETCH_COLUMN)) {
+        while ($data = $this->_stmt->fetchOne()) {
             $result[$data] = true;
         }
 

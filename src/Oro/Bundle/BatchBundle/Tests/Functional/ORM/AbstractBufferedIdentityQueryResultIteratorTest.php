@@ -150,7 +150,7 @@ abstract class AbstractBufferedIdentityQueryResultIteratorTest extends WebTestCa
             if ($i % 3 == 0) {
                 $id = $item->getId();
                 $em->getConnection()
-                    ->exec("update test_search_item set stringValue = 'processed' where id = {$id}");
+                    ->executeStatement("update test_search_item set stringValue = 'processed' where id = {$id}");
             }
             $iteratorResult[] = $item;
         }
@@ -180,7 +180,7 @@ abstract class AbstractBufferedIdentityQueryResultIteratorTest extends WebTestCa
         foreach ($iterator as $item) {
             $id = $item->getId();
             $em->getConnection()
-                ->exec("delete from test_search_item_value where id = {$id}");
+                ->executeStatement("delete from test_search_item_value where id = {$id}");
         }
 
         $queryBuilder = $em->getRepository(ItemValue::class)->createQueryBuilder('value');

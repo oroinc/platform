@@ -22,6 +22,16 @@ class DraftableEntityStub implements DraftableInterface
     private $values = [];
 
     /**
+     * @var string|null
+     */
+    private $title;
+
+    /**
+     * @var string|null
+     */
+    private $content;
+
+    /**
      * @return integer
      */
     public function getId(): int

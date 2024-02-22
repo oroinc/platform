@@ -68,7 +68,7 @@ class PdoMysqlTest extends \PHPUnit\Framework\TestCase
         $expectedSql = 'SET FOREIGN_KEY_CHECKS = 1';
 
         $this->connection->expects($this->once())
-            ->method('exec')
+            ->method('executeStatement')
             ->with($expectedSql);
 
         $this->testable->enable();
@@ -79,7 +79,7 @@ class PdoMysqlTest extends \PHPUnit\Framework\TestCase
         $expectedSql = 'SET FOREIGN_KEY_CHECKS = 0';
 
         $this->connection->expects($this->once())
-            ->method('exec')
+            ->method('executeStatement')
             ->with($expectedSql);
 
         $this->testable->disable();

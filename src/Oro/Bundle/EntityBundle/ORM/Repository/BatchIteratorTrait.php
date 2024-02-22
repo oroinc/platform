@@ -7,6 +7,9 @@ use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\SingleObjectIterableResultDecorator;
 
+/**
+ * Getting iterator trait for metadata class
+ */
 trait BatchIteratorTrait
 {
     /**

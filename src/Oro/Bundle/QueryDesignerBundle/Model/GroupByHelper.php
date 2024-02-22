@@ -50,12 +50,12 @@ class GroupByHelper
      */
     protected function getPreparedGroupBy($groupBy)
     {
-        if (!is_array($groupBy)) {
+        if (null !== $groupBy && !is_array($groupBy)) {
             $groupBy = explode(',', $groupBy);
         }
 
         $result = [];
-        foreach ($groupBy as $groupByPart) {
+        foreach ($groupBy ?? [] as $groupByPart) {
             $groupByPart = trim((string)$groupByPart);
             if ($groupByPart) {
                 $result[] = $groupByPart;

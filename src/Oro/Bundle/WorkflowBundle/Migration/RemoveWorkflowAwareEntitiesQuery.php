@@ -6,7 +6,6 @@ namespace Oro\Bundle\WorkflowBundle\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
@@ -52,17 +51,10 @@ class RemoveWorkflowAwareEntitiesQuery extends ParametrizedMigrationQuery
     private function getIds(LoggerInterface $logger): array
     {
         $qb = $this->connection->createQueryBuilder();
-        $dbDriver = $this->connection->getDriver()->getName();
-        $condition = match ($dbDriver) {
-            DatabaseDriverInterface::DRIVER_MYSQL => $qb->expr()->andX(
-                $qb->expr()->eq('CAST(wi.entity_id as unsigned integer)', 'e.id'),
-                $qb->expr()->eq('wi.entity_class', ':class_name')
-            ),
-            default => $qb->expr()->andX(
-                $qb->expr()->eq('CAST(wi.entity_id as integer)', 'e.id'),
-                $qb->expr()->eq('wi.entity_class', ':class_name')
-            ),
-        };
+        $condition = $qb->expr()->and(
+            $qb->expr()->eq('CAST(wi.entity_id as integer)', 'e.id'),
+            $qb->expr()->eq('wi.entity_class', ':class_name')
+        );
 
         $sql = $qb->select('e.id')
             ->from($this->tableName, 'e')
@@ -79,6 +71,6 @@ class RemoveWorkflowAwareEntitiesQuery extends ParametrizedMigrationQuery
         $types = ['class_name' => Types::STRING, 'workflow_name' => Types::STRING];
 
         $this->logQuery($logger, $sql, $params, $types);
-        return array_column($this->connection->fetchAll($sql, $params, $types), 'id');
+        return array_column($this->connection->fetchAllAssociative($sql, $params, $types), 'id');
     }
 }

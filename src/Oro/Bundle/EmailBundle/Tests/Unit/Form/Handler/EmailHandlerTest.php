@@ -114,7 +114,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('setData')
             ->with($model);
 
-        if (in_array($method, ['POST', 'PUT'])) {
+        if (in_array($method, ['POST', 'PUT'], true)) {
             $this->form->expects(self::once())
                 ->method('submit')
                 ->with(self::FORM_DATA);

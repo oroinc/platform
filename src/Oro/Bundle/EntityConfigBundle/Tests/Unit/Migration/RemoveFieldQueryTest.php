@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Statement;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveFieldQuery;
 use Psr\Log\LoggerInterface;
 
@@ -27,7 +27,7 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
         $migration->setConnection($this->connector);
 
         $this->connector->expects(self::once())
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->willReturn(null);
         $this->connector->expects(self::never())
             ->method('prepare');
@@ -44,7 +44,7 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
 
         $dbData = 'someDbData';
         $this->connector->expects(self::exactly(2))
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(
                 ['id' => 1],
                 ['data' => $dbData]
@@ -107,11 +107,11 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
 
         $statement1 = $this->createMock(Statement::class);
         $statement1->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with([1]);
         $statement2 = $this->createMock(Statement::class);
         $statement2->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with([$toDbData, $entityClass]);
         $this->connector->expects(self::exactly(2))
             ->method('prepare')

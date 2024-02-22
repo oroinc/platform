@@ -78,7 +78,7 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
             AND field_name = ?
             LIMIT 1';
 
-        return $this->connection->fetchAssoc(
+        return $this->connection->fetchAssociative(
             $getFieldSql,
             [
                 $entityClass,
@@ -111,14 +111,14 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql, $parameters);
         if (!$dryRun) {
             $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
         }
     }
 
     protected function updateClassConfig(LoggerInterface $logger, bool $dryRun = false)
     {
         $sql = 'SELECT e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1';
-        $row = $this->connection->fetchAssoc($sql, [$this->entityClass]);
+        $row = $this->connection->fetchAssociative($sql, [$this->entityClass]);
         if ($row) {
             $data = $this->connection->convertToPHPValue($row['data'], Types::ARRAY);
             if (isset($data['extend']['schema']['property'][$this->entityField])) {

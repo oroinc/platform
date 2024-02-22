@@ -112,7 +112,7 @@ class UpdateNotificationRuleWorkflowTransitionQuery extends ParametrizedMigratio
      */
     private function getTemplateId(): int
     {
-        return $this->connection->fetchColumn(
+        return $this->connection->fetchOne(
             'SELECT id FROM oro_email_template WHERE name = :name',
             [
                 'name' => $this->templateName

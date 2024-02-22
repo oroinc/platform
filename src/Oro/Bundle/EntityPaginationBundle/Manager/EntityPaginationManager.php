@@ -7,14 +7,16 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 
+/**
+ * Manager for handling pagination on page
+ */
 class EntityPaginationManager
 {
     const VIEW_SCOPE = 'view';
     const EDIT_SCOPE = 'edit';
 
-    public function __construct(ConfigManager $configManager)
+    public function __construct(private ConfigManager $configManager)
     {
-        $this->configManager = $configManager;
     }
 
     /**

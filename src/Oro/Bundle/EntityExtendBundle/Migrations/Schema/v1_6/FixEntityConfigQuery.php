@@ -38,7 +38,7 @@ class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
             $rows = $entityConfigQb
                 ->setFirstResult($i * static::LIMIT)
                 ->execute()
-                ->fetchAll(\PDO::FETCH_ASSOC);
+                ->fetchAllAssociative();
 
             foreach ($rows as $row) {
                 $this->processRow($row);
@@ -98,7 +98,7 @@ class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
         return $this->createEntityConfigQb()
             ->select('COUNT(1)')
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**

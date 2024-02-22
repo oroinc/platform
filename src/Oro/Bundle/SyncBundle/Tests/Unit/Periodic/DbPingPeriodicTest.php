@@ -37,7 +37,7 @@ class DbPingPeriodicTest extends TestCase
     {
         $statement1 = $this->createMock(Statement::class);
         $statement1->expects(self::once())
-            ->method('execute');
+            ->method('executeQuery');
 
         $connection1 = $this->createMock(Connection::class);
         $connection1->expects(self::once())
@@ -62,7 +62,7 @@ class DbPingPeriodicTest extends TestCase
     {
         $statement1 = $this->createMock(Statement::class);
         $statement1->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willThrowException(new DBALException());
 
         $connection = $this->createMock(Connection::class);

@@ -76,7 +76,7 @@ class UpdateFileRelation extends ParametrizedMigrationQuery
         $result = [];
         $sql    = 'SELECT id, class_name, data FROM oro_entity_config';
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
         foreach ($rows as $row) {
             $result[$row['id']] = $this->connection->convertToPHPValue($row['data'], 'array');
         }

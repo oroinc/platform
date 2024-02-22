@@ -14,7 +14,7 @@ class PinbarTabUrlNormalizer implements PinbarTabUrlNormalizerInterface
      */
     public function getNormalizedUrl(string $url): string
     {
-        $urlQuery = parse_url($url, PHP_URL_QUERY);
+        $urlQuery = (string)parse_url($url, PHP_URL_QUERY);
         parse_str($urlQuery, $urlQueryArray);
 
         $this->normalizeDatagridParameters($urlQueryArray);

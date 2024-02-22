@@ -57,7 +57,7 @@ class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT id, data FROM oro_entity_config';
         $this->logQuery($logger, $sql);
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
 
         $entities = [];
 
@@ -91,7 +91,7 @@ class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $sql, $params);
 
-        $rows = $this->connection->fetchAll($sql, $params);
+        $rows = $this->connection->fetchAllAssociative($sql, $params);
 
         $entities = [];
 

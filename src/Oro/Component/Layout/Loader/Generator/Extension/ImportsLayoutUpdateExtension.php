@@ -29,7 +29,7 @@ class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensi
 
         // imported layout update
         $delimiter = PathProviderInterface::DELIMITER;
-        if (str_contains($data->getFilename(), $delimiter . ImportVisitor::IMPORT_FOLDER . $delimiter)) {
+        if (str_contains($data->getFilename() ?? '', $delimiter . ImportVisitor::IMPORT_FOLDER . $delimiter)) {
             $visitorCollection->append(new ImportLayoutUpdateVisitor());
         }
     }

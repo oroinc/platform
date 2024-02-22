@@ -51,7 +51,7 @@ class Symfony54PercentToLocalizedStringTransformer implements DataTransformerInt
     public function __construct(
         int $scale = null,
         string $type = null,
-        int $roundingMode = null,
+        int $roundingMode = \NumberFormatter::ROUNDING_MODE,
         bool $html5Format = false
     ) {
         if (null === $type) {

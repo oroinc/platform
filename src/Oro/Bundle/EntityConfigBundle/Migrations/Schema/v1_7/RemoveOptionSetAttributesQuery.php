@@ -74,7 +74,7 @@ class RemoveOptionSetAttributesQuery extends ParametrizedMigrationQuery
             'SELECT id, data FROM oro_entity_config_field WHERE id IN (%s)',
             implode(',', $configFieldIds)
         );
-        $rows  = $this->connection->fetchAll($query);
+        $rows  = $this->connection->fetchAllAssociative($query);
 
         $result = [];
         foreach ($rows as $row) {

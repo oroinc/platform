@@ -188,7 +188,7 @@ class PdoMysql extends BaseDriver
     protected function getFullTextMinWordLength()
     {
         if (null === $this->fullTextMinWordLength) {
-            $this->fullTextMinWordLength = (int)$this->entityManager->getConnection()->fetchColumn(
+            $this->fullTextMinWordLength = (int)$this->entityManager->getConnection()->fetchOne(
                 "SHOW VARIABLES LIKE 'ft_min_word_len'",
                 [],
                 1
@@ -396,11 +396,11 @@ class PdoMysql extends BaseDriver
      */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
-        $connection->query('SET FOREIGN_KEY_CHECKS=0');
+        $connection->executeQuery('SET FOREIGN_KEY_CHECKS=0');
 
         parent::truncateEntities($dbPlatform, $connection);
 
-        $connection->query('SET FOREIGN_KEY_CHECKS=1');
+        $connection->executeQuery('SET FOREIGN_KEY_CHECKS=1');
     }
 
     /**

@@ -187,7 +187,7 @@ class UpdateWorkflowDefinitionConfigurationQuery extends ParametrizedMigrationQu
         $sql = 'SELECT name, configuration FROM oro_workflow_definition';
         $this->logQuery($logger, $sql);
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
 
         foreach ($rows as $key => $row) {
             $type = Type::getType(Types::ARRAY);

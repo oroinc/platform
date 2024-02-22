@@ -63,7 +63,7 @@ class CleanupEntityConfigQuery extends AbstractEntityConfigQuery
             $rows = $fieldsConfigQb
                 ->setFirstResult($i * $this->getRowBatchLimit())
                 ->execute()
-                ->fetchAll(\PDO::FETCH_ASSOC);
+                ->fetchAllAssociative();
 
             foreach ($rows as $row) {
                 $this->processFieldRow($row, $logger);
@@ -175,7 +175,7 @@ class CleanupEntityConfigQuery extends AbstractEntityConfigQuery
             ->select('COUNT(1)')
             ->resetQueryParts(['orderBy'])
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     private function createFieldsConfigQb(): QueryBuilder
@@ -192,6 +192,6 @@ class CleanupEntityConfigQuery extends AbstractEntityConfigQuery
             ->select('COUNT(1)')
             ->resetQueryParts(['orderBy'])
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 }

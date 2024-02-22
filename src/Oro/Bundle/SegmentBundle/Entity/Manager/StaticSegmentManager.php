@@ -202,7 +202,7 @@ class StaticSegmentManager
         $stmt = $connection->executeQuery($selectSql, $values, $types);
         $insertValues = [];
         $isIntegerId = $fieldToSelect === 'integer_entity_id';
-        while ($row = $stmt->fetch()) {
+        while ($row = $stmt->fetchAssociative()) {
             $entityId = reset($row);
             $insertValues[] = sprintf(
                 '(%s, %d, %s)',

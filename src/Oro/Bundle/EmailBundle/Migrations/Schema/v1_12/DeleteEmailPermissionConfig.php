@@ -47,14 +47,14 @@ class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
         ];
         $statement = $this->connection->prepare($sql);
         if (!$dryRun) {
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
         }
         $this->logQuery($logger, $sql, $parameters);
 
         // update entity config cached data
         $sql = 'SELECT data FROM oro_entity_config WHERE class_name = ? LIMIT 1';
         $parameters = [$className];
-        $data = $this->connection->fetchColumn($sql, $parameters);
+        $data = $this->connection->fetchOne($sql, $parameters);
         $this->logQuery($logger, $sql, $parameters);
 
         $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
@@ -67,7 +67,7 @@ class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
         $parameters = [$data, $className];
         $statement = $this->connection->prepare($sql);
         if (!$dryRun) {
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
         }
         $this->logQuery($logger, $sql, $parameters);
     }

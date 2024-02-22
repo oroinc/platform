@@ -55,8 +55,8 @@ class UrlHelper
         return $path;
     }
 
-    private function getBaseUrl(): ?string
+    private function getBaseUrl(): string
     {
-        return $this->requestContext?->getBaseUrl() ?: $this->requestStack->getMainRequest()?->getBaseUrl();
+        return $this->requestContext?->getBaseUrl() ?: $this->requestStack->getMainRequest()?->getBaseUrl() ?: '';
     }
 }

@@ -112,7 +112,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql);
 
         $result = [];
-        foreach ($this->connection->fetchAll($sql) as $field) {
+        foreach ($this->connection->fetchAllAssociative($sql) as $field) {
             $data = $this->connection->convertToPHPValue($field['data'], Types::ARRAY);
             $field['data'] = $data;
             $result[] = $field;

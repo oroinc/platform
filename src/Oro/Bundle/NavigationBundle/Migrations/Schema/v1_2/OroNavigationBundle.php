@@ -39,7 +39,7 @@ class OroNavigationBundle implements Migration, ConnectionAwareInterface, Contai
     {
         /** @var UrlMatcherInterface $urlMatcher */
         $urlMatcher = $this->container->get('router');
-        $navItems = $this->connection->fetchAll('SELECT id, url FROM oro_navigation_history');
+        $navItems = $this->connection->fetchAllAssociative('SELECT id, url FROM oro_navigation_history');
         foreach ($navItems as $navItem) {
             try {
                 $url = str_replace('index_dev.php/', '', $navItem['url']);

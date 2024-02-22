@@ -235,7 +235,7 @@ SQL;
             Status::STATUS_COMPLETED,
             Status::STATUS_COMPLETED
         );
-        $data = $connection->fetchAll($selectQuery);
+        $data = $connection->fetchAllAssociative($selectQuery);
         $excludes = array_map(
             function ($item) {
                 return $item['id'];

@@ -68,7 +68,7 @@ class PdoPgsqlTest extends \PHPUnit\Framework\TestCase
         $expectedSql = 'ALTER TABLE oro_test_entity ENABLE TRIGGER ALL';
 
         $this->connection->expects($this->once())
-            ->method('exec')
+            ->method('executeStatement')
             ->with($expectedSql);
 
         $this->testable->enable();
@@ -79,7 +79,7 @@ class PdoPgsqlTest extends \PHPUnit\Framework\TestCase
         $expectedSql = 'ALTER TABLE oro_test_entity DISABLE TRIGGER ALL';
 
         $this->connection->expects($this->once())
-            ->method('exec')
+            ->method('executeStatement')
             ->with($expectedSql);
 
         $this->testable->disable();

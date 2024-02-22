@@ -103,7 +103,7 @@ class InsertEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
                 'fieldName' => $this->fieldName
             ])
             ->execute()
-            ->fetch(\PDO::FETCH_ASSOC);
+            ->fetchAssociative();
 
         $sql = "INSERT INTO oro_entity_config_index_value (entity_id, field_id, scope, code, value) 
                 VALUES (NULL, ?, ?, ?, ?)";
@@ -113,7 +113,7 @@ class InsertEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
 
         if (!$dryRun) {
             $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
         }
     }
 
