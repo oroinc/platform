@@ -253,6 +253,9 @@ services:
         parent: oro_entity.entity_field_provider.abstract
         lazy: true
 
+    Oro\Bundle\EntityBundle\Provider\EntityFieldProvider:
+        alias: oro_entity.entity_field_provider
+
     oro_entity.entity_field_list_provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
         public: true

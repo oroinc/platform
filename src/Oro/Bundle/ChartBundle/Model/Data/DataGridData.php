@@ -3,7 +3,11 @@
 namespace Oro\Bundle\ChartBundle\Model\Data;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
+/**
+ * Return chart data based on the results of the data grid source.
+ */
 class DataGridData implements DataInterface
 {
     /**
@@ -26,10 +30,14 @@ class DataGridData implements DataInterface
      */
     public function toArray()
     {
-        if (null === $this->data) {
-            $resultData = $this->datagrid->getData();
-            $this->data = $resultData['data'];
+        if ($this->data) {
+            return $this->data;
         }
+
+        $this->data = array_map(
+            fn (ResultRecord $record) => $record->getDataArray(),
+            $this->datagrid->getAcceptedDatasource()->getResults()
+        );
 
         return $this->data;
     }

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ReportBundle\Controller;
 
-use Doctrine\DBAL\Types\Types;
-use Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder;
+use Oro\Bundle\ChartBundle\Model\ChartOptionsFactory;
 use Oro\Bundle\ChartBundle\Model\ChartViewBuilder;
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -24,6 +24,7 @@ use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,18 +43,19 @@ class ReportController extends AbstractController
     {
         return array_merge(parent::getSubscribedServices(), [
             'oro_report.entity_provider' => EntityProvider::class,
+            'form.factory' => FormFactoryInterface::class,
             ConfigManager::class,
             EntityNameProvider::class,
             QueryDesignerManager::class,
             Manager::class,
             ReportDatagridConfigurationProvider::class,
             ChartViewBuilder::class,
-            ChartOptionsBuilder::class,
             TranslatorInterface::class,
             ReportHandler::class,
             Router::class,
             FeatureChecker::class,
             DateHelper::class,
+            EntityFieldProvider::class
         ]);
     }
 
@@ -65,8 +67,8 @@ class ReportController extends AbstractController
      *      permission="VIEW",
      *      class="OroReportBundle:Report"
      * )
-     *
      * @param Report $entity
+     *
      * @return Response
      */
     public function viewAction(Report $entity)
@@ -94,13 +96,8 @@ class ReportController extends AbstractController
                     [PagerInterface::PAGER_ROOT_PARAM => [PagerInterface::DISABLED_PARAM => true]]
                 );
 
-                $chartOptions = $this->get(ChartOptionsBuilder::class)->buildOptions(
-                    $entity->getChartOptions(),
-                    $datagrid->getConfig()->toArray()
-                );
-
-                if (!empty($chartOptions)) {
-                    $chartOptions = $this->processChartOptions($datagrid, $chartOptions);
+                if (!empty($entity->getChartOptions())) {
+                    $chartOptions = $this->buildOptions($entity, $datagrid);
 
                     $parameters['chartView'] = $this->get(ChartViewBuilder::class)
                         ->setDataGrid($datagrid)
@@ -116,9 +113,17 @@ class ReportController extends AbstractController
         );
     }
 
+    private function buildOptions(Report $report, DatagridInterface $datagrid): array
+    {
+        $fieldProvider = $this->get(EntityFieldProvider::class);
+        $dateHelper = $this->get(DateHelper::class);
+        $chartOptionsFactory = new ChartOptionsFactory($fieldProvider, $dateHelper, $report, $datagrid);
+
+        return $chartOptionsFactory->buildChartOptions();
+    }
+
     /**
      * @Route("/view/{gridName}", name="oro_report_view_grid", requirements={"gridName"="[-\w]+"})
-     *
      * @Template
      * @Acl(
      *      id="oro_report_view",
@@ -250,48 +255,10 @@ class ReportController extends AbstractController
     }
 
     /**
-     * Method detects type of report's chart 'label' field, and in case of datetime will check dates interval and
-     * set proper type (time, day, date, month or year). Xaxis labels not taken into account - they will be rendered
-     * automatically. Also chart dot labels may overlap if dates are close to each other.
-     *
-     * Should be refactored in scope of BAP-8294.
-     *
-     * @param DatagridInterface $datagrid
-     * @param array             $chartOptions
-     *
-     * @return array
+     * @deprecated
      */
     protected function processChartOptions(DatagridInterface $datagrid, array $chartOptions)
     {
-        $labelFieldName = $chartOptions['data_schema']['label'];
-        $labelFieldType = $datagrid->getConfig()->offsetGetByPath(
-            sprintf('[columns][%s][frontend_type]', $labelFieldName)
-        );
-
-        /** @var DateHelper $dateTimeHelper */
-        $dateTimeHelper = $this->get(DateHelper::class);
-        $dateTypes      = [Types::DATETIME_MUTABLE, Types::DATE_MUTABLE, Types::DATETIMETZ_MUTABLE];
-
-        if (in_array($labelFieldType, $dateTypes)) {
-            $data  = $datagrid->getData()->offsetGet('data');
-            $dates = array_map(
-                function ($dataItem) use ($labelFieldName) {
-                    return $dataItem[$labelFieldName];
-                },
-                $data
-            );
-
-            $minDate = new \DateTime(min($dates));
-            $maxDate = new \DateTime(max($dates));
-
-            $formatStrings = $dateTimeHelper->getFormatStrings($minDate, $maxDate);
-
-            $chartOptions['data_schema']['label'] = [
-                'field_name'   => $chartOptions['data_schema']['label'],
-                'type'         => $formatStrings['viewType']
-            ];
-        }
-
         return $chartOptions;
     }
 
