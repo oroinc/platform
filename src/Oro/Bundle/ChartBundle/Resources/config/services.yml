@@ -53,12 +53,6 @@ services:
         class: Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer
         public: true
 
-    oro_chart.options_builder:
-        class: Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder
-
-    Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder:
-        alias: oro_chart.options_builder
-
     oro_chart.factory.chart_view_builder_factory:
         class: Oro\Bundle\ChartBundle\Factory\ChartViewBuilderFactory
         shared: false
