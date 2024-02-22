@@ -47,7 +47,7 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
         while (true) {
             $sql = 'SELECT object_id, REPLACE(object_class, \'OroCRM\', \'Oro\') AS object_class FROM oro_audit '.
                 'GROUP BY object_id, REPLACE(object_class, \'OroCRM\', \'Oro\'), version HAVING COUNT(*) > 1 LIMIT 100';
-            $rows = $this->connection->fetchAll($sql);
+            $rows = $this->connection->fetchAllAssociative($sql);
             if (!$rows) {
                 break;
             }
@@ -75,7 +75,7 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
 
     private function resolveVersionsPostgres()
     {
-        $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
+        $this->connection->executeStatement('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
 
         while (true) {
             $rowsFound = $this->connection->executeQuery(
@@ -84,12 +84,12 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
                             GROUP BY object_id, REPLACE(object_class, 'OroCRM', 'Oro'), version 
                             HAVING COUNT(*) > 1 LIMIT 1"
             )
-                ->fetchColumn();
+                ->fetchOne();
 
             if (!$rowsFound) {
                 break;
             }
-            $this->connection->exec(
+            $this->connection->executeStatement(
                 <<<'EOD'
                                 DO $$
                     DECLARE
@@ -125,7 +125,7 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
 EOD
             );
         }
-        $this->connection->exec('DROP SEQUENCE seq_temp_version');
+        $this->connection->executeStatement('DROP SEQUENCE seq_temp_version');
     }
 
     /**

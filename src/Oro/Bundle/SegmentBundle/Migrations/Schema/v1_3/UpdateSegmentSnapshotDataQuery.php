@@ -49,7 +49,7 @@ SQL;
 
         $this->logQuery($logger, $query);
         if (!$dryRun) {
-            $this->connection->prepare($query)->execute();
+            $this->connection->prepare($query)->executeQuery();
         }
     }
 }

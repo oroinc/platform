@@ -73,7 +73,7 @@ class UpdateConfigFieldDatagridScopeQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT id, data FROM oro_entity_config_field';
         $this->logQuery($logger, $sql);
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
         foreach ($rows as $key => $row) {
             $rows[$key]['data'] = $this->connection->convertToPHPValue($row['data'], 'array');
         }

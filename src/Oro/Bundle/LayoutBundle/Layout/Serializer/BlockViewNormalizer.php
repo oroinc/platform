@@ -189,4 +189,11 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
             $this->denormalizeVarRecursive($value, $format, $context);
         }
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            BlockView::class => false
+        ];
+    }
 }

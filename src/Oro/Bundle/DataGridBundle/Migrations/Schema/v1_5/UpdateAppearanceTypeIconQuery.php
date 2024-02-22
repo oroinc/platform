@@ -186,7 +186,7 @@ class UpdateAppearanceTypeIconQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT name, icon FROM oro_grid_appearance_type';
         $this->logQuery($logger, $sql);
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
 
         foreach ($rows as $key => $row) {
             if (isset($row['icon'])) {

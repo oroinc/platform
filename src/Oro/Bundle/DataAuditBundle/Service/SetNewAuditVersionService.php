@@ -71,7 +71,7 @@ class SetNewAuditVersionService
         do {
             $fail = false;
             try {
-                $statement->execute();
+                $statement->executeQuery();
             } catch (UniqueConstraintViolationException $e) {
                 if ($attempt > self::MAX_ATTEMPTS_LIMIT) {
                     throw $e;

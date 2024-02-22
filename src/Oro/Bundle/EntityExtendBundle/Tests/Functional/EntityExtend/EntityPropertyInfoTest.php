@@ -195,7 +195,7 @@ class EntityPropertyInfoTest extends WebTestCase
     {
         $extendedMethods = EntityPropertyInfo::getExtendedMethods($class);
         foreach ($expectedResult as $method) {
-            self::assertTrue(in_array($method, $extendedMethods));
+            self::assertTrue(in_array($method, $extendedMethods, true));
         }
     }
 

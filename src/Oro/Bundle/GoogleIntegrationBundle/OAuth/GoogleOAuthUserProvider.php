@@ -49,7 +49,7 @@ class GoogleOAuthUserProvider implements OAuthUserProviderInterface
      */
     public function findUser(UserResponseInterface $response): ?UserInterface
     {
-        $username = $response->getUsername();
+        $username = $response->getUserIdentifier();
         $user = $this->userManager->findUserBy(['googleId' => $username]);
         if (null === $user) {
             $email = $response->getEmail();

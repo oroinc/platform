@@ -8,6 +8,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Normalizer for options value
+ */
 class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     /**
@@ -158,5 +161,12 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
 
             return $element;
         }
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            OptionValueBag::class => false
+        ];
     }
 }

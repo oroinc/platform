@@ -83,7 +83,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
 
             $parameters = [$entityConfigId, $scope];
             $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
             $this->logQuery($logger, $sql, $parameters);
 
             $logger->debug($sql);
@@ -102,7 +102,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
                 $value = $this->convertEntityConfigIndexValueToDatabaseValue($value);
                 $parameters = [$value, $entityConfigId, $scope, $code];
                 $statement = $this->connection->prepare($sql);
-                $statement->execute($parameters);
+                $statement->executeQuery($parameters);
                 $this->logQuery($logger, $sql, $parameters);
 
                 $logger->debug($sql);
@@ -151,7 +151,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
         $parameters = [$entityConfigData, $entityConfigRecordData['id']];
         $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
+        $statement->executeQuery($parameters);
         $this->logQuery($logger, $sql, $parameters);
     }
 
@@ -163,7 +163,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         if (is_null($this->entityConfigRecordData)) {
             $this->entityConfigRecordData = $this
                 ->connection
-                ->fetchAssoc(
+                ->fetchAssociative(
                     'SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1',
                     [$this->entityName]
                 );

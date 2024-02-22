@@ -24,14 +24,11 @@ class OroSearchBundleUseInnoDbQuery implements MigrationQuery, ConnectionAwareIn
      */
     public function execute(LoggerInterface $logger)
     {
-        $driverName = $this->connection->getDriver()->getName();
-        if (in_array($driverName, ['pdo_mysql', 'mysqli'], true)) {
-            $version = $this->connection->fetchColumn('select version()');
-            if (version_compare($version, '5.6.0', '>=')) {
-                $query = sprintf('ALTER TABLE `%s` ENGINE = INNODB;', $this->getTableName());
-                $logger->info($query);
-                $this->connection->executeQuery($query);
-            }
+        $version = $this->connection->fetchOne('select version()');
+        if (version_compare($version, '5.6.0', '>=')) {
+            $query = sprintf('ALTER TABLE `%s` ENGINE = INNODB;', $this->getTableName());
+            $logger->info($query);
+            $this->connection->executeQuery($query);
         }
     }
 

@@ -11,7 +11,7 @@ class RegExpSyntax extends Constraint
 {
     public const INVALID_REGEXP_SYNTAX_ERROR = '933d8ad0-7599-424b-9e65-72eb7ad2b3d1';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_REGEXP_SYNTAX_ERROR => 'INVALID_REGEXP_SYNTAX_ERROR',
     ];
 

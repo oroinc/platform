@@ -17,6 +17,7 @@ class JsonAgg extends FunctionNode
 {
     private const PARAMETER_KEY = 'expression';
     private const ORDER_KEY = 'order';
+    private array $parameters = [];
 
     /**
      * {@inheritDoc}

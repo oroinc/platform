@@ -43,7 +43,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine')->getConnection();
 
-        $dbData = $connection->fetchAll('select origin_id, owner_id from oro_imap_wrong_creds_origin');
+        $dbData = $connection->fetchAllAssociative('select origin_id, owner_id from oro_imap_wrong_creds_origin');
         $this->assertEquals(
             [
                 ['origin_id' => $emailOriginId, 'owner_id' => $ownerId]
@@ -68,7 +68,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
         $this->driver->addOrigin($emailOriginId, $ownerId);
 
-        $dbData = $connection->fetchAll('select origin_id, owner_id from oro_imap_wrong_creds_origin');
+        $dbData = $connection->fetchAllAssociative('select origin_id, owner_id from oro_imap_wrong_creds_origin');
         $this->assertEquals(
             [
                 ['origin_id' => $emailOriginId, 'owner_id' => $ownerId]
@@ -164,7 +164,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
         $this->driver->deleteOrigin(52);
 
-        $dbData = $connection->fetchAll('select origin_id, owner_id from oro_imap_wrong_creds_origin');
+        $dbData = $connection->fetchAllAssociative('select origin_id, owner_id from oro_imap_wrong_creds_origin');
         $this->assertEquals(
             [
                 ['origin_id' => 45, 'owner_id' => null]
@@ -185,7 +185,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
         $this->driver->deleteAllOrigins();
 
-        $dbData = $connection->fetchAll('select origin_id, owner_id from oro_imap_wrong_creds_origin');
+        $dbData = $connection->fetchAllAssociative('select origin_id, owner_id from oro_imap_wrong_creds_origin');
         $this->assertEmpty($dbData);
     }
 }

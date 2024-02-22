@@ -11,15 +11,15 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
 
-    /** @var ArrayAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $loggerCache;
+    private ArrayAdapter|\PHPUnit\Framework\MockObject\MockObject $loggerCache;
 
     private LogLevelConfig $config;
 
     private ApplicationState $applicationState;
+
+    private ItemInterface|\PHPUnit\Framework\MockObject\MockObject  $cacheItemMock;
 
     /**
      * {@inheritdoc}

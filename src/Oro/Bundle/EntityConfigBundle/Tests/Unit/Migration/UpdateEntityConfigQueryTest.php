@@ -29,7 +29,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->connection = $this->createMock(Connection::class);
         $this->connection->expects($this->once())
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->with('SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1', [TestEntity1::class])
             ->willReturn(['id' => '42', 'data' => 'data persisted payload serialized']);
 
@@ -50,7 +50,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
         $statement->expects($this->never())
-            ->method('execute');
+            ->method('executeQuery');
 
         $this->query->setConnection($this->connection);
 
@@ -87,7 +87,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
         $statement->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(['data serialized payload to persist', '42']);
 
         $logger = new ArrayLogger();

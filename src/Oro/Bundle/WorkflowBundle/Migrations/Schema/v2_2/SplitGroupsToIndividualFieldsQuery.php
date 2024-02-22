@@ -97,6 +97,6 @@ class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $qb->getSQL());
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 }

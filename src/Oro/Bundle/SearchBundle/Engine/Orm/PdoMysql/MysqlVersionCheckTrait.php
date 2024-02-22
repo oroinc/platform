@@ -29,7 +29,7 @@ trait MysqlVersionCheckTrait
 
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine.dbal.search_connection');
-        $version = $connection->fetchColumn('select version()');
+        $version = $connection->fetchOne('select version()');
 
         return version_compare($version, '5.6.0', '>=');
     }

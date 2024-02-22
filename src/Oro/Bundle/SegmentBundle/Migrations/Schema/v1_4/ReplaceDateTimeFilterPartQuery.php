@@ -17,7 +17,7 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
             ->select('s.id, s.definition')
             ->from('oro_segment', 's')
             ->execute()
-            ->fetchAll(\PDO::FETCH_ASSOC);
+            ->fetchAllAssociative();
         $segmentsToUpdate = [];
         foreach ($segments as $segment) {
             $definition = $segment['definition'];

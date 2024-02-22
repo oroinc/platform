@@ -17,24 +17,11 @@ class EntityPaginationStorage
     const HASH         = 'hash';
     const INFO_MESSAGE = 'info_message';
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
     public function __construct(
-        DoctrineHelper $doctrineHelper,
-        EntityPaginationManager $paginationManager,
-        RequestStack $requestStack
+        protected DoctrineHelper $doctrineHelper,
+        protected EntityPaginationManager $paginationManager,
+        protected RequestStack $requestStack
     ) {
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->paginationManager = $paginationManager;
-        $this->requestStack = $requestStack;
     }
 
     /**

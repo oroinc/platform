@@ -170,7 +170,7 @@ class QueueConsumer
         $extension->onBeforeReceive($context);
 
         if ($context->isExecutionInterrupted()) {
-            throw new ConsumptionInterruptedException($context->getInterruptedReason());
+            throw new ConsumptionInterruptedException($context->getInterruptedReason() ?? '');
         }
         $logger->debug('Pre receive Message');
         $message = $messageConsumer->receive(1);
@@ -228,7 +228,7 @@ class QueueConsumer
         }
 
         if ($context->isExecutionInterrupted()) {
-            throw new ConsumptionInterruptedException($context->getInterruptedReason());
+            throw new ConsumptionInterruptedException($context->getInterruptedReason() ?? '');
         }
     }
 

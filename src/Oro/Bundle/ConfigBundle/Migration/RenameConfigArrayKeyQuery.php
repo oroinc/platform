@@ -88,8 +88,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
         $updateQueryTypes = ['array_value' => Types::ARRAY, 'id' => Types::INTEGER];
 
         $selectStatement = $this->connection->prepare($selectQuery);
-        $selectStatement->execute($selectQueryParameters);
-        while ($row = $selectStatement->fetch()) {
+        while ($row = $selectStatement->executeQuery($selectQueryParameters)->fetchAssociative()) {
             $originalValue = $this->deserialize($row['array_value']);
             $convertedValue = $this->convert($originalValue);
             if ($originalValue !== $convertedValue) {

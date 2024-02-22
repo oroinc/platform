@@ -41,7 +41,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
         $query = 'SELECT * FROM oro_integration_channel';
 
         $this->logQuery($logger, $query);
-        $result = $this->connection->fetchAll($query);
+        $result = $this->connection->fetchAllAssociative($query);
 
         $oldType = Type::getType(Types::OBJECT);
         $newType = Type::getType(ConfigObjectType::TYPE);

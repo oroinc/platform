@@ -75,7 +75,7 @@ class EntityReflectionClassTest extends WebTestCase
             $reflClass->getProperties()
         );
         foreach ($properties as $property => $typeReflection) {
-            self::assertTrue(in_array($property . $typeReflection, $reflProperties));
+            self::assertTrue(in_array($property . $typeReflection, $reflProperties, true));
         }
     }
 

@@ -10,7 +10,7 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutContextStack;
 use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
-use Symfony\Component\Templating\TemplateReference;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class LayoutTest extends LayoutTestCase
 {
@@ -248,10 +248,18 @@ class LayoutTest extends LayoutTestCase
 
     public function renderWithAbsoluteUrlBlockThemeDataProvider(): array
     {
+        $absoluteStringTemplate = new Template();
+        $absoluteStringTemplate->setTemplate('/absolute/path.html.twig');
+
+        $absoluteArrayTemplate1 = new Template();
+        $absoluteArrayTemplate1->setTemplate('/absolute/path-1.html.twig');
+        $absoluteArrayTemplate2 = new Template();
+        $absoluteArrayTemplate2->setTemplate('/absolute/path-2.html.twig');
+
         return [
             'absolute string' => [
                 'themes' => '/absolute/path.html.twig',
-                'expected' => new TemplateReference('/absolute/path.html.twig', 'twig'),
+                'expected' => $absoluteStringTemplate->getTemplate(),
             ],
             'not absolute string' => [
                 'themes' => '@AcmeBundle/not-absolute/path.html.twig',
@@ -264,8 +272,8 @@ class LayoutTest extends LayoutTestCase
                     '@AcmeBundle/not-absolute/path.html.twig',
                 ],
                 'expected' => [
-                    new TemplateReference('/absolute/path-1.html.twig', 'twig'),
-                    new TemplateReference('/absolute/path-2.html.twig', 'twig'),
+                    $absoluteArrayTemplate1->getTemplate(),
+                    $absoluteArrayTemplate2->getTemplate(),
                     '@AcmeBundle/not-absolute/path.html.twig',
                 ],
             ],

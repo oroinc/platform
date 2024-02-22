@@ -112,7 +112,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
     private function assertConnectionCalled(bool $noUpdates = false)
     {
         $this->connection->expects($this->once())
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->with($this->isType('string'))
             ->willReturn($this->getAces());
 

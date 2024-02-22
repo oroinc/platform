@@ -39,7 +39,7 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->connection->expects($this->once())
-            ->method('query')
+            ->method('executeQuery')
             ->with(PdoMysql::getPlainSql(self::TABLE_NAME, self::INDEX_NAME));
 
         $this->assertTrue($this->indexManager->createIndexes());
@@ -54,7 +54,7 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->connection->expects($this->once())
-            ->method('query')
+            ->method('executeQuery')
             ->willThrowException(new DBALException());
 
         $this->assertFalse($this->indexManager->createIndexes());
@@ -63,7 +63,7 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetQueryForUnknownDriver()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Driver "pdo_pgsql" not found');
+        $this->expectExceptionMessage('Driver "postgresql" not found');
 
         $this->connection->expects($this->once())
             ->method('getParams')

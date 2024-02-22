@@ -62,7 +62,7 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::POST_SUBMIT => 'postSubmit',
+            FormEvents::SUBMIT => 'postSubmit',
         ];
     }
 
@@ -122,7 +122,7 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
         if (!in_array($configModel->getType(), ['enum', 'multiEnum'])) {
             return;
         };
-        if (!$form->isValid()) {
+        if ($form->isSubmitted() && !$form->isValid()) {
             return;
         }
 
@@ -162,9 +162,6 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
                     }
                 }
 
-                unset($data['enum']['enum_name']);
-                unset($data['enum']['enum_options']);
-                unset($data['enum']['enum_public']);
                 $event->setData($data);
             } catch (\Exception $e) {
                 $form->addError(

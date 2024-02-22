@@ -132,4 +132,11 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
 
         return $isFileStoredExternally;
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            File::class => false
+        ];
+    }
 }

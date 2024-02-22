@@ -62,7 +62,7 @@ class RemoveUnusedContextConfigQuery extends ParametrizedMigrationQuery
 
         $result = [];
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
         foreach ($rows as $row) {
             $result[$row['id']] = $this->connection->convertToPHPValue($row['data'], 'array');
         }

@@ -3,10 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Dbal;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Statement;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
@@ -266,12 +264,8 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $oid = new ObjectIdentity('(root)', 'entity');
         $sid = new RoleSecurityIdentity('ROLE_TEST');
 
-        $stmt = $this->createMock(ResultStatement::class);
-        $stmt->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([]);
         $this->connection->expects($this->once())
-            ->method('executeQuery')
+            ->method('fetchAllAssociative')
             ->with(
                 'SELECT a.ancestor_id FROM acl_oid_table o INNER JOIN acl_class_table c ON c.id = o.class_id'
                 . ' INNER JOIN acl_oid_ancestors_table a ON a.object_identity_id = o.id'
@@ -279,7 +273,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
                 [['(root)'], 'entity'],
                 [Connection::PARAM_STR_ARRAY, ParameterType::STRING]
             )
-            ->willReturn($stmt);
+            ->willReturn([]);
 
         $exceptionCount = 0;
         try {
@@ -301,17 +295,8 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $oid = new ObjectIdentity('(root)', 'entity');
         $sid = new RoleSecurityIdentity('ROLE_TEST');
 
-        $stmtAncestors = $this->createMock(Statement::class);
-        $stmtAncestors->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([[1]]);
-
-        $stmtIdentities = $this->createMock(Statement::class);
-        $stmtIdentities->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([]);
-        $this->connection->expects($this->exactly(2))
-            ->method('executeQuery')
+        $this->connection->expects($this->exactly(1))
+            ->method('fetchAllAssociative')
             ->withConsecutive(
                 [
                     'SELECT a.ancestor_id FROM acl_oid_table o INNER JOIN acl_class_table c ON c.id = o.class_id'
@@ -334,8 +319,8 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
                 ]
             )
             ->willReturnOnConsecutiveCalls(
-                $stmtAncestors,
-                $stmtIdentities
+                [[1]],
+                []
             );
 
         $acls = $this->provider->findAcls([$oid], [$sid]);

@@ -998,7 +998,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $eventManager = $this->createMock(EventManager::class);
         $eventManager->expects(self::any())
-            ->method('getListeners')
+            ->method('getAllListeners')
             ->willReturn([[$translatableListener]]);
 
         $em->expects(self::any())

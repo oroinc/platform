@@ -63,7 +63,7 @@ class RemoveOriginOptionQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $query);
 
         $result = [];
-        $rows = $this->connection->fetchAll($query);
+        $rows = $this->connection->fetchAllAssociative($query);
         foreach ($rows as $row) {
             $result[] = [
                 $row['id'],

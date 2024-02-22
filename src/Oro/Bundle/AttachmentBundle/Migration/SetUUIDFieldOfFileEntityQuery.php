@@ -52,7 +52,7 @@ class SetUUIDFieldOfFileEntityQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $query);
 
-        $data = $this->connection->fetchAssoc($query);
+        $data = $this->connection->fetchAssociative($query);
 
         $this->executeQuery($logger, $data['start'] ?? 0, $data['end'] ?? 0, $dryRun);
     }

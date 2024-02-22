@@ -50,7 +50,7 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
         $updateQueries = [];
 
         // prepare update queries
-        $rows = $this->connection->fetchAll($query, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($query, $params, $types);
         foreach ($rows as $row) {
             if (!str_starts_with($row['class_name'], 'Extend\\Entity\\')) {
                 continue;

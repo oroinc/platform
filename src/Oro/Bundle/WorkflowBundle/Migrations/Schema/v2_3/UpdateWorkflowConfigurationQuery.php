@@ -53,7 +53,7 @@ class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
             ))
             ->setParameter('isSystem', false, Types::BOOLEAN);
 
-        $items = $qb->execute()->fetchAll();
+        $items = $qb->execute()->fetchAllAssociative();
 
         foreach ($items as $item) {
             $name = $item['name'];

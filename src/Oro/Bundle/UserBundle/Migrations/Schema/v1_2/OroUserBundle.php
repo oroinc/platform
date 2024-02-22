@@ -38,12 +38,12 @@ class OroUserBundle implements
 
         //save old avatars to new place
         $query = "SELECT id, image, createdAt FROM oro_user WHERE image != ''";
-        $userImages = $this->connection->executeQuery($query)->fetchAll(\PDO::FETCH_ASSOC);
+        $userImages = $this->connection->executeQuery($query)->fetchAllAssociative(\PDO::FETCH_ASSOC);
 
         if (!empty($userImages)) {
             $maxId = (int)$this->connection
                 ->executeQuery('SELECT MAX(id) FROM oro_attachment_file;')
-                ->fetchColumn();
+                ->fetchOne();
             foreach ($userImages as $userData) {
                 $filePath = $this->getUploadFileName($userData);
                 // file doesn't exists or not readable
