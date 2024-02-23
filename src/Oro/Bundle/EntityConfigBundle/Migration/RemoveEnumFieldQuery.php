@@ -41,7 +41,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
             AND field_name = ?
             LIMIT 1';
 
-        $fieldRow = $this->connection->fetchAssoc($sql, [$this->entityClass, $this->enumField]);
+        $fieldRow = $this->connection->fetchAssociative($sql, [$this->entityClass, $this->enumField]);
 
         if (!$fieldRow) {
             $logger->info("Enum field '{$this->enumField}' from Entity '{$this->entityClass}' is not found");
@@ -53,7 +53,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
 
         if ($enumClass) {
             $sql = 'SELECT e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1';
-            $entityRow = $this->connection->fetchAssoc($sql, [$this->entityClass]);
+            $entityRow = $this->connection->fetchAssociative($sql, [$this->entityClass]);
             if ($entityRow) {
                 $this->updateEntityData($logger, $enumClass, $entityRow['data']);
             }
@@ -74,7 +74,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
             $enumClass = $data['extend']['target_entity'];
 
             $sql = 'SELECT id FROM oro_entity_config WHERE class_name = ? LIMIT 1';
-            $enumRow = $this->connection->fetchAssoc($sql, [$enumClass]);
+            $enumRow = $this->connection->fetchAssociative($sql, [$enumClass]);
 
             if ($enumRow) {
                 $enumId = $enumRow['id'];
@@ -126,7 +126,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
     protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = []): void
     {
         $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
+        $statement->executeQuery($parameters);
         $this->logQuery($logger, $sql, $parameters);
     }
 

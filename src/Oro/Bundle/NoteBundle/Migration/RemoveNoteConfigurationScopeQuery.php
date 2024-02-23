@@ -41,7 +41,7 @@ class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT id, class_name, data FROM oro_entity_config';
         $this->logQuery($logger, $sql);
 
-        $entityConfigs = $this->connection->fetchAll($sql);
+        $entityConfigs = $this->connection->fetchAllAssociative($sql);
         $entityConfigs = array_map(function ($entityConfig) {
             $entityConfig['data'] = empty($entityConfig['data'])
                 ? []

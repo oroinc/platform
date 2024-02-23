@@ -130,6 +130,7 @@ Feature: Extended table fields
   Scenario: Create a record for Custom entity
     When I go to System/Entities/Custom Entity
     And I click "Create Custom Entity"
+    And I click on empty space
     Then I fill "CustomEntityForm" with:
       | CustomBigIntField      | 1                              |
       | CustomIntegerField     | 1                              |
@@ -152,6 +153,7 @@ Feature: Extended table fields
 
   Scenario: Edit a record for Custom entity
     When I click "Edit"
+    And I click on empty space
     And I fill "CustomEntityForm" with:
       | CustomBigIntField      | 2                              |
       | CustomIntegerField     | 2                              |

@@ -46,7 +46,7 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->connection->expects($this->once())
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->with('SELECT name FROM oro_security_permission')
             ->willReturn([['name' => 'ASSIGN']]);
 

@@ -134,7 +134,7 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
     protected function addOwnerOrganizationEventListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
+            FormEvents::SUBMIT,
             function (FormEvent $event) {
                 /** @var UserEmailOrigin $data */
                 $data = $event->getData();

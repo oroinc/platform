@@ -197,10 +197,10 @@ class MarkMassActionHandler implements MassActionHandlerInterface
     protected function process($queryBuilder, $markType, $iteration)
     {
         $result = $queryBuilder->getQuery()->iterate();
+
         foreach ($result as $entity) {
             /** @var EmailUser $entity */
             $entity = $entity[0];
-
             if ($this->authorizationChecker->isGranted('EDIT', $entity)) {
                 $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
             }

@@ -186,7 +186,7 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
 
         $result = [];
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
         foreach ($rows as $row) {
             $data = $this->connection->convertToPHPValue($row['data'], 'array');
 
@@ -229,7 +229,7 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
 
         $result = [];
 
-        $rows = $this->connection->fetchAll($sql, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($sql, $params, $types);
         foreach ($rows as $row) {
             $result[] = [
                 'id'    => $row['id'],

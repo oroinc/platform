@@ -98,7 +98,7 @@ SQL;
             ['tableName' => $tableName, 'fieldName' => $fieldName],
             ['tableName' => Types::STRING, 'fieldName' => Types::STRING]
         )
-        ->fetchColumn();
+        ->fetchOne();
 
         if (!$isColumnExists) {
             return;

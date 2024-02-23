@@ -47,4 +47,11 @@ class ParameterBagNormalizer extends AbstractObjectNormalizer
     {
         return $data instanceof ParameterBag;
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            ParameterBag::class => false
+        ];
+    }
 }

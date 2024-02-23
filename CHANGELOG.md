@@ -24,6 +24,14 @@ The current file describes significant changes in the code that may affect the u
 - [2.1.0](#210-2017-03-30)
 
 
+# UNRELEASED
+
+### Added
+
+#### LayoutBundle
+* Added the ability to specify response status code via layout context option `response_status_code`.
+
+
 ## 6.0.0-BETA (2024-01-08)
 [Show detailed list of changes](incompatibilities-6-0-beta.md)
 

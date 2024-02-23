@@ -85,7 +85,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
         $duplicateSql = 'SELECT MIN(id) FROM oro_scope GROUP BY row_hash HAVING COUNT(id) > 1';
         $this->logQuery($logger, $duplicateSql);
 
-        $minimumIds = $this->connection->executeQuery($duplicateSql)->fetchAll(\PDO::FETCH_COLUMN);
+        $minimumIds = $this->connection->executeQuery($duplicateSql)->fetchFirstColumn();
         if (!$minimumIds) {
             return [];
         }
@@ -101,7 +101,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
         $params = ['minimumIds' => $minimumIds];
         $this->logQuery($logger, $duplicateGroupSql, $params, $types);
 
-        $scopes = $this->connection->fetchAll($duplicateGroupSql, $params, $types);
+        $scopes = $this->connection->fetchAllAssociative($duplicateGroupSql, $params, $types);
 
         $newToOldScopeIdMap = [];
         foreach ($scopes as $scope) {

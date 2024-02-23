@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
     const numberFormatter = require('orolocale/js/formatter/number');
     const dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
@@ -78,6 +79,7 @@ define(function(require) {
                 case 'decimal':
                 case 'float':
                 case 'money':
+                case 'money_value':
                 case 'currency':
                 case 'percent':
                     if (data === null) {
@@ -93,9 +95,15 @@ define(function(require) {
                 case 'year':
                 case 'month':
                 case 'day':
+                    if (_.isObject(data)) {
+                        data = data.date;
+                    }
                     return dateTimeFormatter.unformatBackendDateTime(data).valueOf(); // add convert to date
                 case 'datetime':
                 case 'time':
+                    if (_.isObject(data)) {
+                        data = data.date;
+                    }
                     return dateTimeFormatter.unformatBackendDateTime(data);
                 default:
                     return null;

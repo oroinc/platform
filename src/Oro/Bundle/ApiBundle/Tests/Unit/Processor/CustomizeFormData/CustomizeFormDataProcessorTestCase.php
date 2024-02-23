@@ -66,7 +66,7 @@ class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
             ->getContainer($this);
 
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(true)
+            ->enableAttributeMapping()
             ->setDoctrineAnnotationReader(new AnnotationReader())
             ->setConstraintValidatorFactory(
                 new ContainerConstraintValidatorFactory($constraintValidatorFactoryContainer)

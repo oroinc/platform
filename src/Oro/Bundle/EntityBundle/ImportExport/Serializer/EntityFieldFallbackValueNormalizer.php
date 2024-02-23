@@ -109,4 +109,11 @@ class EntityFieldFallbackValueNormalizer implements ContextAwareNormalizerInterf
 
         return fmod($parsedValue, 1) === 0.0 ? (int)$parsedValue : $parsedValue;
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            EntityFieldFallbackValue::class => false
+        ];
+    }
 }

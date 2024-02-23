@@ -35,11 +35,11 @@ class UpdateOwnerDescription extends AbstractFixture implements ContainerAwareIn
         $connection = $doctrine->getConnection();
 
         $statement = $connection->prepare('SELECT min(id) as min FROM oro_audit');
-        $statement->execute();
-        $min = $statement->fetchColumn(0);
+        $statement->executeQuery();
+        $min = $statement->fetchOne();
         $statement = $connection->prepare('SELECT max(id) as max FROM oro_audit');
-        $statement->execute();
-        $max = $statement->fetchColumn(0);
+        $statement->executeQuery();
+        $max = $statement->fetchOne();
 
         $ownerWithQuery = <<<SQL
 UPDATE oro_audit
@@ -63,7 +63,7 @@ SQL;
             $connection->beginTransaction();
             try {
                 $next = $current + $delta;
-                $ownerWithStatement->execute(['min' => $current, 'max' => $next]);
+                $ownerWithStatement->executeQuery(['min' => $current, 'max' => $next]);
                 $current = $next;
                 $connection->commit();
             } catch (\Throwable $t) {

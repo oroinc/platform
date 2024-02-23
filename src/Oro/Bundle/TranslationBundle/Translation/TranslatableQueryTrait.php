@@ -24,7 +24,7 @@ trait TranslatableQueryTrait
 
     private function getTranslatableListener(EntityManagerInterface $entityManager): TranslatableListener
     {
-        $allListeners = $entityManager->getEventManager()->getListeners();
+        $allListeners = $entityManager->getEventManager()->getAllListeners();
         foreach ($allListeners as $eventListeners) {
             foreach ($eventListeners as $listener) {
                 if ($listener instanceof TranslatableListener) {

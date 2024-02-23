@@ -342,7 +342,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         $types = ['class_type' => Types::STRING];
         $this->logQuery($logger, $query, $params, $types);
 
-        $rows = $this->connection->fetchAll($query, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($query, $params, $types);
 
         return (int)$rows[0]['id'];
     }
@@ -381,7 +381,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         $types = ['oid' => Types::STRING];
         $this->logQuery($logger, $query, $params, $types);
 
-        $rows = $this->connection->fetchAll($query, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($query, $params, $types);
 
         $result = [];
         foreach ($rows as $row) {

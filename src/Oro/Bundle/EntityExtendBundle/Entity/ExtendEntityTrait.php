@@ -166,7 +166,7 @@ trait ExtendEntityTrait
 
     public function __clone()
     {
-        if (is_callable('parent::__clone')) {
+        if (get_parent_class(__CLASS__) && is_callable([parent::class, '__clone'])) {
             parent::__clone();
         }
         $this->cloneExtendEntityStorage();

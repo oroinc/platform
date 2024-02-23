@@ -54,7 +54,7 @@ class ClearNavigationHistoryCommandTest extends WebTestCase
                 NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_3,
                 NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_4,
                 NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_5,
-            ]));
+            ], true));
         }
     }
 }

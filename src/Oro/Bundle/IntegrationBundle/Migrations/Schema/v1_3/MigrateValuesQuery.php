@@ -86,7 +86,7 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT id, is_two_way_sync_enabled, sync_priority FROM oro_integration_channel';
         $this->logQuery($logger, $sql);
 
-        return $this->connection->fetchAll($sql);
+        return $this->connection->fetchAllAssociative($sql);
     }
 
     /**
@@ -102,7 +102,7 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
         $params = ['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION];
         $types  = ['name' => 'string'];
         $this->logQuery($logger, $sql, $params, $types);
-        $organizationId = $this->connection->fetchColumn($sql, $params);
+        $organizationId = $this->connection->fetchOne($sql, $params);
 
         if (false === $organizationId) {
             $sql = 'SELECT id FROM oro_organization';
@@ -111,7 +111,7 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
                 function ($row) {
                     return $row['id'];
                 },
-                $this->connection->fetchAll($sql)
+                $this->connection->fetchAllAssociative($sql)
             );
 
             if (!empty($organizationIds)) {

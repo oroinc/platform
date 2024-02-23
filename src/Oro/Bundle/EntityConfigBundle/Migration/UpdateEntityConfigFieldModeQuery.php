@@ -60,7 +60,7 @@ class UpdateEntityConfigFieldModeQuery extends ParametrizedMigrationQuery
     {
         $selectEntityIdSql = 'SELECT id FROM oro_entity_config WHERE class_name = ? LIMIT 1';
         $parameters = [$this->entityName];
-        $row = $this->connection->fetchAssoc($selectEntityIdSql, $parameters);
+        $row = $this->connection->fetchAssociative($selectEntityIdSql, $parameters);
         if ($row) {
             $updateModeSql = <<<EOF
 UPDATE oro_entity_config_field
@@ -72,7 +72,7 @@ EOF;
 
             if (!$dryRun) {
                 $statement = $this->connection->prepare($updateModeSql);
-                $statement->execute($parameters);
+                $statement->executeQuery($parameters);
             }
         }
     }

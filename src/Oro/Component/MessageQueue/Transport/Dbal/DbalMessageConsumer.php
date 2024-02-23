@@ -165,7 +165,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private function receiveMessage(): ?MessageInterface
     {
         $now = time();
-        $this->getUpdateStatement()->execute([
+        $this->getUpdateStatement()->executeQuery([
             'queue' => $this->queue->getQueueName(),
             'delayedUntil' => $now,
             'consumerId' => $this->consumerId
@@ -174,7 +174,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
         if (1 === $affectedRows) {
             $selectStatement = $this->getSelectStatement();
-            $selectStatement->execute(
+            $selectStatement->executeQuery(
                 [
                     'consumerId' => $this->consumerId,
                     'queue' => $this->queue->getQueueName(),
@@ -292,7 +292,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private function deleteMessage(DbalMessageInterface $message): int
     {
         $deleteStatement = $this->getDeleteStatement();
-        $deleteStatement->execute(['messageId' => $message->getId()]);
+        $deleteStatement->executeQuery(['messageId' => $message->getId()]);
 
         return $deleteStatement->rowCount();
     }

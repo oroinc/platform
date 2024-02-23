@@ -152,7 +152,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
             ->with('foo')
             ->willReturn(['data_schema' => [['name' => 'foo', 'default_type' => 'int']]]);
 
-        $options = ['name' => 'foo', 'data_schema' => ['foo' => 'bar'], 'settings' => []];
+        $options = ['name' => 'foo', 'data_schema' => ['foo' => 'bar'], 'settings' => [], 'original_data_schema' => []];
         $expectedOptions = $options;
         $expectedOptions['data_schema'] = [
             'foo' => [

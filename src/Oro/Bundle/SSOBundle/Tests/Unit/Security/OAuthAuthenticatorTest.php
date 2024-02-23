@@ -32,6 +32,12 @@ class OAuthAuthenticatorTest extends TestCase
     private OAuthAuthenticator $authenticator;
     private MockObject|HttpUtils $httpUtils;
     private MockObject|ResourceOwnerMapInterface $resourceOwnerMap;
+    private MockObject|OAuthAwareUserProviderInterface $userProvider;
+    private MockObject|AuthenticationSuccessHandlerInterface $successHandler;
+    private MockObject|AuthenticationFailureHandlerInterface $failureHandler;
+    private MockObject|HttpKernelInterface $httpKernel;
+    private MockObject|OrganizationGuesser $organizationGuesser;
+    private MockObject|OAuthTokenFactory $tokenFactory;
 
     protected function setUp(): void
     {

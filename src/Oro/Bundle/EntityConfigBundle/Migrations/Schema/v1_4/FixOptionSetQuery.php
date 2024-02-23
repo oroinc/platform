@@ -26,7 +26,7 @@ class FixOptionSetQuery extends ParametrizedMigrationQuery
         $params = ['optionSet'];
 
         $this->logQuery($logger, $query, $params);
-        $fields = $this->connection->fetchAll($query, $params);
+        $fields = $this->connection->fetchAllAssociative($query, $params);
 
         $type = Type::getType(Types::ARRAY);
         $platform = $this->connection->getDatabasePlatform();

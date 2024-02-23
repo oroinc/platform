@@ -2,9 +2,6 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\Templating\TemplateNameParser;
-use Symfony\Component\Templating\TemplateReferenceInterface;
-
 /**
  * Responsible for setting a renderer to be used to render this layout as well as blockThemes
  */
@@ -23,8 +20,6 @@ class Layout
     protected array $themes = [];
 
     protected array $formThemes = [];
-
-    private static ?TemplateNameParser $templateNameParser = null;
 
     public function __construct(
         BlockView $view,
@@ -52,52 +47,15 @@ class Layout
             $this->layoutContextStack->push($this->context);
 
             $twigLayoutRenderer = $this->rendererRegistry->getRenderer($this->rendererName);
-
             foreach ($this->themes as $theme) {
-                $twigLayoutRenderer->setBlockTheme($theme[0], $this->prepareThemes($theme[1]));
+                $twigLayoutRenderer->setBlockTheme($theme[0], $theme[1]);
             }
-            $twigLayoutRenderer->setFormTheme($this->prepareThemes($this->formThemes));
+            $twigLayoutRenderer->setFormTheme($this->formThemes);
 
             return $twigLayoutRenderer->renderBlock($this->view);
         } finally {
             $this->layoutContextStack->pop();
         }
-    }
-
-    /**
-     * @param string|string[] $themes
-     *
-     * @return TemplateReferenceInterface[]|TemplateReferenceInterface|string[]|string
-     */
-    private function prepareThemes(array|string $themes): TemplateReferenceInterface|array|string
-    {
-        if (\is_array($themes)) {
-            foreach ($themes as &$theme) {
-                if ($this->isAbsolutePath($theme)) {
-                    $theme = $this->getTemplateNameParser()->parse($theme);
-                }
-            }
-        } else {
-            if ($this->isAbsolutePath($themes)) {
-                $themes = $this->getTemplateNameParser()->parse($themes);
-            }
-        }
-
-        return $themes;
-    }
-
-    private function isAbsolutePath(string $file): bool
-    {
-        return (bool) preg_match('#^(?:/|[a-zA-Z]:)#', $file);
-    }
-
-    private function getTemplateNameParser(): TemplateNameParser
-    {
-        if (!static::$templateNameParser) {
-            static::$templateNameParser = new TemplateNameParser();
-        }
-
-        return static::$templateNameParser;
     }
 
     /**

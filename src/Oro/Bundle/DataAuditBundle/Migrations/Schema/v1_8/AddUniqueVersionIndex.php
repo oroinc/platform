@@ -35,7 +35,7 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
 
     private function resolveDuplicatesPostgres()
     {
-        $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
+        $this->connection->executeStatement('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
 
         while (true) {
             $rowsFound = $this->connection->executeQuery(
@@ -44,12 +44,12 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
                     GROUP BY object_id, object_class, version 
                     HAVING COUNT(*) > 1 LIMIT 1'
             )
-                ->fetchColumn();
+                ->fetchOne();
 
             if (!$rowsFound) {
                 break;
             }
-            $this->connection->exec(
+            $this->connection->executeStatement(
                 <<<'EOD'
                 DO $$
                     DECLARE
@@ -77,7 +77,7 @@ EOD
             );
         }
 
-        $this->connection->exec('DROP SEQUENCE seq_temp_version');
+        $this->connection->executeStatement('DROP SEQUENCE seq_temp_version');
     }
 
     private function resolveDuplicatesMysql()
@@ -85,7 +85,7 @@ EOD
         while (true) {
             $sql = 'SELECT object_id, object_class FROM oro_audit '.
                 'GROUP BY object_id, object_class, version HAVING COUNT(*) > 1 LIMIT 100';
-            $rows = $this->connection->fetchAll($sql);
+            $rows = $this->connection->fetchAllAssociative($sql);
             if (!$rows) {
                 break;
             }

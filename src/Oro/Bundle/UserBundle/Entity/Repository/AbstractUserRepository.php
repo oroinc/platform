@@ -25,7 +25,7 @@ class AbstractUserRepository extends EntityRepository
         $connection = $this->getEntityManager()
             ->getConnection();
 
-        return (bool) $connection->fetchAll(
+        return (bool) $connection->fetchAllAssociative(
             'SELECT 1
             FROM information_schema.columns
             WHERE TABLE_SCHEMA = ?

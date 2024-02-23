@@ -3,7 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
+
+use Doctrine\DBAL\Statement;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveEnumFieldQuery;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +28,7 @@ class RemoveEnumFieldQueryTest extends TestCase
         $migration->setConnection($this->connector);
 
         $this->connector->expects(self::once())
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->willReturn(null);
         $this->connector->expects(self::never())
             ->method('prepare');
@@ -44,7 +45,7 @@ class RemoveEnumFieldQueryTest extends TestCase
         $migration->setConnection($this->connector);
 
         $this->connector->expects(self::exactly(3))
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(
                 ['id' => 1, 'data' => self::encode($fieldPhpData)],
                 ['id' => 2],
@@ -71,19 +72,19 @@ class RemoveEnumFieldQueryTest extends TestCase
 
         $statement1 = $this->createMock(Statement::class);
         $statement1->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with([1]);
         $statement2 = $this->createMock(Statement::class);
         $statement2->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with([2]);
         $statement3 = $this->createMock(Statement::class);
         $statement3->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with([$enumClass]);
         $statement4 = $this->createMock(Statement::class);
         $statement4->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with([self::encode($entityPhpData), $entityClass]);
         $this->connector->expects(self::exactly(4))
             ->method('prepare')

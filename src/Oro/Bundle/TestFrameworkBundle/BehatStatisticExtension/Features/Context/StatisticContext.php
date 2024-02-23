@@ -250,7 +250,7 @@ class StatisticContext implements Context
             ->select('*')
             ->from($tableName)
         ;
-        $result = $queryBuilder->execute()->fetchAll();
+        $result = $queryBuilder->execute()->fetchAllAssociative();
 
         \PHPUnit\Framework\Assert::assertEquals($table->getHash(), $result);
     }

@@ -3,33 +3,31 @@
 namespace Oro\Bundle\ChartBundle\Model\Data;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
+/**
+ * Return chart data based on the results of the data grid source.
+ */
 class DataGridData implements DataInterface
 {
-    /**
-     * @var array
-     */
-    protected $data;
+    protected array $data = [];
+    protected DatagridInterface $grid;
 
-    /**
-     * @var DatagridInterface
-     */
-    protected $datagrid;
-
-    public function __construct(DatagridInterface $datagrid)
+    public function __construct(DatagridInterface $grid)
     {
-        $this->datagrid = $datagrid;
+        $this->grid = $grid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray()
+    public function toArray(): array
     {
-        if (null === $this->data) {
-            $resultData = $this->datagrid->getData();
-            $this->data = $resultData['data'];
+        if ($this->data) {
+            return $this->data;
         }
+
+        $this->data = array_map(
+            fn (ResultRecord $record) => $record->getDataArray(),
+            $this->grid->getAcceptedDatasource()->getResults()
+        );
 
         return $this->data;
     }

@@ -27,7 +27,7 @@ abstract class AbstractMatchingEntityHydrator extends AbstractHydrator
      */
     protected function hydrateAllData()
     {
-        $rows = $this->_stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $rows = $this->_stmt->fetchAllAssociative();
         foreach ($rows as $key => $row) {
             $id = [key($this->_rsm->aliasMap) => ''];
             $nonemptyComponents = [];

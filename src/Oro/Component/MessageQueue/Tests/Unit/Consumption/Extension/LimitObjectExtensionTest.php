@@ -10,6 +10,8 @@ use Psr\Log\Test\TestLogger;
 
 class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    private $gcEnabled;
+
     protected function setUp(): void
     {
         if (!function_exists('gc_status')) {

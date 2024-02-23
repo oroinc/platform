@@ -30,7 +30,7 @@ class ConvertApiKeyDataFormatQuery extends ParametrizedSqlMigrationQuery
             ->select('k.id, k.api_key')
             ->from('oro_user_api', 'k')
             ->execute()
-            ->fetchAll(\PDO::FETCH_ASSOC);
+            ->fetchAllAssociative();
         foreach ($keys as $key) {
             $this->addSql(
                 'UPDATE oro_user_api SET api_key = :api_key WHERE id = :id',

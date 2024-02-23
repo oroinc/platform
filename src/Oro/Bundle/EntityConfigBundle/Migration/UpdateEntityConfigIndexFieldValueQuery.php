@@ -121,7 +121,7 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
 
         if (!$dryRun) {
             $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
         }
     }
 

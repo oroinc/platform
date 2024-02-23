@@ -56,7 +56,7 @@ function getEntitiesData(\Doctrine\DBAL\Connection $connection): array
         ->select('class_name', 'data')
         ->from('oro_entity_config')
         ->execute()
-        ->fetchAll();
+        ->fetchAllAssociative();
 
     $entitiesData = [];
     foreach ($entityConfigs as $entityConfig) {
@@ -83,7 +83,7 @@ function getEntityFieldsData(\Doctrine\DBAL\Connection $connection): array
         ->from('oro_entity_config_field', 'field')
         ->join('field', 'oro_entity_config', 'entity', 'field.entity_id=entity.id')
         ->execute()
-        ->fetchAll();
+        ->fetchAllAssociative();
 
     $entityFieldsData = [];
     foreach ($entityFieldConfigs as $entityFieldConfig) {
@@ -110,7 +110,7 @@ function getEmbeddedFormsToMigrate(\Doctrine\DBAL\Connection $connection): array
         ->select('id', 'title', 'form_type')
         ->from('oro_embedded_form')
         ->execute()
-        ->fetchAll();
+        ->fetchAllAssociative();
 
     $embeddedFormsData = [];
     foreach ($embeddedForms as $embeddedForm) {

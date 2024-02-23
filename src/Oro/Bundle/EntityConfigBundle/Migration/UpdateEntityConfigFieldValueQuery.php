@@ -105,7 +105,7 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
             AND field_name = ?
             LIMIT 1';
         $parameters = [$this->entityName, $this->fieldName];
-        $row        = $this->connection->fetchAssoc($sql, $parameters);
+        $row        = $this->connection->fetchAssociative($sql, $parameters);
 
         if ($row) {
             $data = $row['data'];
@@ -130,7 +130,7 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
 
                 if (!$dryRun) {
                     $statement = $this->connection->prepare($sql);
-                    $statement->execute($parameters);
+                    $statement->executeQuery($parameters);
                 }
             }
         }

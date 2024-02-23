@@ -282,17 +282,13 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
 
     protected function addFileNameLengthRequirement(RequirementCollection $collection): void
     {
-        $addConf = new Process(['addconf', 'NAME_MAX', __DIR__]);
-
-        if (isset($_SERVER['PATH'])) {
-            $addConf->setEnv(array('PATH' => $_SERVER['PATH']));
-        }
-        $addConf->run();
+        $getConf = new Process(['getconf', 'NAME_MAX', __DIR__]);
+        $getConf->run();
 
         $collection->addRequirement(
-            $addConf->getErrorOutput() || $addConf->addOutput() >= 242,
-            'Maximum supported filename length must be greater or equal 242 characters.' .
-            ' Make sure that the cache folder is not inside the encrypted directory.',
+            !$getConf->getErrorOutput() && (int)trim($getConf->getOutput()) >= 242,
+            'Maximum supported filename length must be greater or equal 242 characters.' . \PHP_EOL .
+            'Make sure that the cache folder is not inside the encrypted directory.',
             'Move <strong>var/cache</strong> folder outside encrypted directory.',
             'Maximum supported filename length must be greater or equal 242 characters.' .
             ' Move var/cache folder outside encrypted directory.'

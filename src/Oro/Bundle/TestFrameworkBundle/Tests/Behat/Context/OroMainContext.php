@@ -1573,7 +1573,15 @@ JS;
      */
     public function clickOnEmptySpace()
     {
-        $this->getPage()->find('css', '#container')->click();
+        $overlay = $this->getPage()->find('css', '#oro-dropdown-mask');
+        if ($overlay?->isVisible()) {
+            $overlay->click();
+        } else {
+            $container = $this->getPage()->find('css', '#container');
+            if ($container?->isVisible()) {
+                $container->click();
+            }
+        }
     }
 
     /**
@@ -3340,5 +3348,20 @@ JS;
     {
         $element = $this->createElement($elementName);
         VariableStorage::storeData($alias, $element->getValue());
+    }
+
+    /**
+     * Example: And I remember route parameter "id" value as "userId"
+     *
+     * @When /^(?:|I )remember route parameter "(?P<parameterName>(?:[^"]|\\")*)" value as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function rememberRouteParameterValue(string $parameterName, string $alias): void
+    {
+        $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
+        $urlPath = preg_replace('/^.*\.php/', '', $urlPath);
+        $routeAttributes = $this->getAppContainer()->get('router')->match($urlPath);
+
+        self::assertArrayHasKey($parameterName, $routeAttributes);
+        VariableStorage::storeData($alias, $routeAttributes[$parameterName]);
     }
 }

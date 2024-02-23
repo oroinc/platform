@@ -6,17 +6,13 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 
+/**
+ * Merge handler step for removing result data
+ */
 class RemoveEntitiesStep implements DependentMergeStepInterface
 {
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    public function __construct(EntityManager $entityManager, DoctrineHelper $doctrineHelper)
+    public function __construct(private EntityManager $entityManager, private DoctrineHelper $doctrineHelper)
     {
-        $this->entityManager = $entityManager;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**

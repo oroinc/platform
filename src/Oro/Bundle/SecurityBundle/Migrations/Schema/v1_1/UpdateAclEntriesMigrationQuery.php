@@ -110,7 +110,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
 
         $this->logQuery($logger, $query, $params, $types);
 
-        $rows = $this->connection->fetchAll($query, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($query, $params, $types);
         $groupedAces = [];
 
         foreach ($rows as $row) {

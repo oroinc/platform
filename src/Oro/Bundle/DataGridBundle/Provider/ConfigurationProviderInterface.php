@@ -28,4 +28,12 @@ interface ConfigurationProviderInterface
      * @throws \RuntimeException in case when datagrid configuration not found
      */
     public function getConfiguration(string $gridName): DatagridConfiguration;
+
+    /**
+     * Checks is datagrid configuration valid
+     *
+     * @param string $gridName
+     * @return bool
+     */
+    public function isValidConfiguration(string $gridName): bool;
 }

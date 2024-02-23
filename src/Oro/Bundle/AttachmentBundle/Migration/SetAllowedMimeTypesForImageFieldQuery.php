@@ -95,7 +95,7 @@ class SetAllowedMimeTypesForImageFieldQuery extends ParametrizedMigrationQuery
         $parameters = [$this->className, $this->fieldName];
         $this->logQuery($logger, $sql);
 
-        return $this->connection->fetchAssoc($sql, $parameters);
+        return $this->connection->fetchAssociative($sql, $parameters);
     }
 
     /**
@@ -111,7 +111,7 @@ class SetAllowedMimeTypesForImageFieldQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql, $parameters);
 
         if (!$dryRun) {
-            $this->connection->prepare($sql)->execute($parameters);
+            $this->connection->prepare($sql)->executeQuery($parameters);
         }
     }
 }

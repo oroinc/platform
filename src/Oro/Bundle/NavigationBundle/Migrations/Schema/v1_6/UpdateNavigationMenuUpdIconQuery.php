@@ -186,7 +186,7 @@ class UpdateNavigationMenuUpdIconQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT id, icon FROM oro_navigation_menu_upd';
         $this->logQuery($logger, $sql);
 
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
 
         foreach ($rows as $key => $row) {
             if (isset($row['icon'])) {

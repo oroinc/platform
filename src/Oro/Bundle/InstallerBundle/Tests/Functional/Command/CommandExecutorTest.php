@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Command\TestVerbosityCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -25,7 +26,7 @@ class CommandExecutorTest extends WebTestCase
         ]));
 
         return new CommandExecutor(
-            null,
+            new ArrayInput([]),
             $output,
             $application,
             $this->createMock(OroDataCacheManager::class)

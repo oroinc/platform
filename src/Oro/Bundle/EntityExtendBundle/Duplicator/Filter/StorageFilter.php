@@ -36,8 +36,8 @@ class StorageFilter implements Filter
                 $newStorageData->getArrayCopy(),
                 \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS
             );
-        }
 
-        $reflectionProperty->setValue($object, $newStorage);
+            $reflectionProperty->setValue($object, $newStorage);
+        }
     }
 }

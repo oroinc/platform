@@ -61,7 +61,7 @@ class CheckDataLengthOfFields implements MigrationQuery, ConnectionAwareInterfac
         $logger->info($query);
         $stmt = $this->connection->executeQuery($query);
 
-        $rows = $stmt->fetchAll(\PDO::FETCH_NUM);
+        $rows = $stmt->fetchAllNumeric();
 
         $result = '';
         foreach ($rows as [$id, $value, $length]) {

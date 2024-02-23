@@ -160,7 +160,7 @@ class HtmlTagHelper implements TranslatorAwareInterface
         $encoding = mb_detect_encoding($string);
         if (mb_strlen($string, $encoding) > $maxLength) {
             $string = mb_substr($string, 0, $maxLength, $encoding);
-            $lastOccurrencePos = mb_strrpos($string, ' ', null, $encoding);
+            $lastOccurrencePos = mb_strrpos($string, ' ', 0, $encoding);
             if ($lastOccurrencePos !== false) {
                 $string = mb_substr($string, 0, $lastOccurrencePos, $encoding);
             }

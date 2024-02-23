@@ -64,14 +64,14 @@ class UniqueJobHandler
 
         $query = QueryBuilderUtil::sprintf('SELECT name FROM %s WHERE name = :name;', $this->uniqueTableName);
 
-        $isDuplicate = $connection->fetchColumn($query, ['name' => $job->getOwnerId()], 0, ['name' => 'string']);
+        $isDuplicate = $connection->fetchOne($query, ['name' => $job->getOwnerId()], ['name' => 'string']);
         $this->throwException($job, $isDuplicate);
 
         if (!$job->isUnique()) {
             return;
         }
 
-        $isDuplicate = $connection->fetchColumn($query, ['name' => $job->getName()], 0, ['name' => 'string']);
+        $isDuplicate = $connection->fetchOne($query, ['name' => $job->getName()], ['name' => 'string']);
         $this->throwException($job, $isDuplicate);
     }
 
@@ -85,7 +85,7 @@ class UniqueJobHandler
             'SELECT 1 FROM %s WHERE name = :ownerId OR name = :name',
             $this->uniqueTableName
         );
-        $select = $connection->fetchColumn($query, ['ownerId' => $job->getOwnerId(), 'name' => $job->getName()]);
+        $select = $connection->fetchOne($query, ['ownerId' => $job->getOwnerId(), 'name' => $job->getName()]);
 
         $this->throwException($job, $select);
     }

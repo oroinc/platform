@@ -71,7 +71,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(
                 self::logicalAnd(
                     self::containsEqual('test_queue'),
@@ -84,7 +84,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
 
         $selectStatement = $this->createMock(Statement::class);
         $selectStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with([
                 'consumerId' => $this->consumer->getConsumerId(),
                 'queue' => 'test_queue',
@@ -130,7 +130,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(
                 self::logicalAnd(
                     self::containsEqual('test_queue'),
@@ -143,7 +143,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
 
         $selectStatement = $this->createMock(Statement::class);
         $selectStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with([
                 'consumerId' => $this->consumer->getConsumerId(),
                 'queue' => 'test_queue',
@@ -180,7 +180,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(
                 self::logicalAnd(
                     self::containsEqual('test_queue'),
@@ -226,7 +226,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(['messageId' => 25]);
 
         $deleteStatement->expects(self::once())
@@ -250,7 +250,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects(self::exactly(2))
-            ->method('execute')
+            ->method('executeQuery')
             ->with(['messageId' => 25]);
 
         $deleteStatement->expects(self::exactly(2))
@@ -279,7 +279,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(['messageId' => 25]);
 
         $deleteStatement->expects(self::once())
@@ -317,7 +317,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(['messageId' => 25]);
         $deleteStatement->expects(self::once())
             ->method('rowCount')
@@ -340,7 +340,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects(self::exactly(2))
-            ->method('execute')
+            ->method('executeQuery')
             ->with(['messageId' => 25]);
 
         $deleteStatement->expects(self::exactly(2))
@@ -397,7 +397,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     {
         $deleteStatement = $this->createMock(Statement::class);
         $deleteStatement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(['messageId' => 25]);
         $deleteStatement->expects(self::once())
             ->method('rowCount')

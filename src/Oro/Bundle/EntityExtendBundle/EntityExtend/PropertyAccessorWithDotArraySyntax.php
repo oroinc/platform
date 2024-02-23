@@ -519,8 +519,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             }
             // customization start
             // if (isset($zval[self::REF]) && (0 === $i || isset($propertyValues[$i - 1][self::IS_REF_CHAINED]))) {
-            if (isset($zval[self::REF])
-                && $zval[self::REF] !== false
+            if (!empty($zval[self::REF])
                 && (0 === $i || isset($propertyValues[$i - 1][self::IS_REF_CHAINED]))) {
                 // customization end
                 // Set the IS_REF_CHAINED flag to true if:
@@ -561,7 +560,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         // Use an array instead of an object since performance is very crucial here
         // customization start
         // $result = self::RESULT_PROTO;
-        $result = [self::VALUE => null, self::REF => false];
+        $result = [self::VALUE => null, self::REF => []];
         // customization end
 
         if (isset($zval[self::VALUE][$index])) {

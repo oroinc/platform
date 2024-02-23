@@ -92,7 +92,7 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
         $updateQuery = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
         $updateTypes = ['data' => Types::ARRAY, 'id' => Types::INTEGER];
 
-        foreach ($this->connection->fetchAll($selectQuery, $selectParams, $selectTypes) as $row) {
+        foreach ($this->connection->fetchAllAssociative($selectQuery, $selectParams, $selectTypes) as $row) {
             $data = $this->connection->convertToPHPValue($row['data'], Types::ARRAY);
             $data['extend']['upgradeable'] = true;
 
@@ -110,7 +110,7 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql);
 
         $result = [];
-        foreach ($this->connection->fetchAll($sql) as $row) {
+        foreach ($this->connection->fetchAllAssociative($sql) as $row) {
             $data = $this->connection->convertToPHPValue($row['data'], Types::ARRAY);
             if ($this->isBrokenEnum($data)) {
                 $row['data'] = $data;

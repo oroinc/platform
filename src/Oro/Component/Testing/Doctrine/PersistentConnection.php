@@ -44,7 +44,7 @@ class PersistentConnection extends Connection
 
             if ($this->getDatabasePlatform() instanceof MySqlPlatform) {
                 // force default value
-                $this->_conn->exec('SET SESSION wait_timeout=28800');
+                $this->_conn->executeStatement('SET SESSION wait_timeout=28800');
             }
         }
 

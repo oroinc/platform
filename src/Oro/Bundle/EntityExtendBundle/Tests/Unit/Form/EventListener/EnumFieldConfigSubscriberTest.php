@@ -216,6 +216,10 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
         $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+
+        $form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
 
@@ -245,6 +249,10 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($dataType);
 
         $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
@@ -335,6 +343,10 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
         $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+
+        $form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
@@ -403,6 +415,11 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($dataType);
 
         $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
+
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
@@ -420,7 +437,11 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $expectedData  = [
-            'enum' => []
+            'enum' => [
+                'enum_name'    => $enumName,
+                'enum_public'  => $enumPublic,
+                'enum_options' => $enumOptions
+            ]
         ];
 
         $event->expects($this->once())
@@ -488,6 +509,10 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($dataType);
 
         $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);

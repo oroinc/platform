@@ -9,6 +9,9 @@ use Oro\Component\Duplicator\Duplicator;
 use Oro\Component\Duplicator\DuplicatorFactory;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * Action service to clone existing entity with its relations.
+ */
 class DuplicateEntity extends AbstractAction
 {
     const OPTION_KEY_ENTITY = 'entity';
@@ -115,7 +118,7 @@ class DuplicateEntity extends AbstractAction
      */
     protected function getSettingsWithRealValues($context, array $settings)
     {
-        array_walk_recursive($settings, 'static::getValue', $context);
+        array_walk_recursive($settings, [static::class,  'getValue'], $context);
 
         return $settings;
     }

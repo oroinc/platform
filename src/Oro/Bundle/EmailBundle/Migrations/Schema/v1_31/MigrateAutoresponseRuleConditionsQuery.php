@@ -30,7 +30,7 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
         for ($i = 0; $i < $steps; $i++) {
             $rows = $this->createAutoResponseRuleConditionQb($i * static::LIMIT)
                 ->execute()
-                ->fetchAll(\PDO::FETCH_ASSOC);
+                ->fetchAllAssociative();
 
             $grouppedRows = $this->groupRowsByRules($rows);
             foreach ($grouppedRows as $ruleId => $conditions) {
@@ -124,7 +124,7 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
             ->setFirstResult($offset)
             ->orderBy('r.id')
             ->execute()
-            ->fetchAll(\PDO::FETCH_ASSOC);
+            ->fetchAllAssociative();
 
         $qb = $this->connection->createQueryBuilder();
 
@@ -145,6 +145,6 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
             ->select('COUNT(1)')
             ->from(static::AUTO_RESPONSE_RULE_TABLE, 'r')
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 }
