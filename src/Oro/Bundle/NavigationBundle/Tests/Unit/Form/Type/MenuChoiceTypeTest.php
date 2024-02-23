@@ -65,6 +65,9 @@ class MenuChoiceTypeTest extends FormIntegrationTestCase
                     'choices' => array_combine(self::MENU_NAMES, self::MENU_NAMES),
                     'translatable_options' => false,
                     'multiple' => false,
+                    'configs' => [
+                        'allowClear' => false,
+                    ],
                 ]
             ],
             'with choices' => [
@@ -74,6 +77,61 @@ class MenuChoiceTypeTest extends FormIntegrationTestCase
                     'choices' => ['label' => 'key'],
                     'translatable_options' => false,
                     'multiple' => false,
+                    'configs' => [
+                        'allowClear' => false,
+                    ],
+                ]
+            ],
+            'empty with negative allowClear' => [
+                'options' => [
+                    'scope_type' => '',
+                    'configs' => [
+                        'allowClear' => false
+                    ]
+                ],
+                'expected' => [
+                    'scope_type' => '',
+                    'choices' => array_combine(self::MENU_NAMES, self::MENU_NAMES),
+                    'translatable_options' => false,
+                    'multiple' => false,
+                    'configs' => [
+                        'allowClear' => false,
+                    ],
+                ]
+            ],
+            'empty with positive allowClear' => [
+                'options' => [
+                    'scope_type' => '',
+                    'configs' => [
+                        'allowClear' => true,
+                    ],
+                ],
+                'expected' => [
+                    'scope_type' => '',
+                    'choices' => array_merge(array_combine(self::MENU_NAMES, self::MENU_NAMES), [0 => '']),
+                    'translatable_options' => false,
+                    'multiple' => false,
+                    'configs' => [
+                        'allowClear' => true,
+                    ],
+                ],
+            ],
+            'with choices and positive allowClear' => [
+                'options' => [
+                    'scope_type' => self::SCOPE_TYPE,
+                    'choices' => ['label' => 'key'],
+                    'configs' => [
+                        'allowClear' => true,
+                    ],
+                ],
+                'expected' => [
+                    'scope_type' => self::SCOPE_TYPE,
+                    'choices' => ['label' => 'key'],
+                    'translatable_options' => false,
+                    'multiple' => false,
+                    'configs' => [
+                        'allowClear' => true,
+                    ],
                 ]
             ],
         ];

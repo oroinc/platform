@@ -64,7 +64,7 @@ Feature: Password complexity feature
   Scenario: Check customer user creation with full password complexity
     Given I proceed as the Buyer
     And I am on the homepage
-    And click "Register"
+    And click "Sign Up"
     And I fill "Registration Form" with:
       | Company Name  | TestCompany              |
       | First Name    | Amanda                   |
@@ -106,8 +106,9 @@ Feature: Password complexity feature
     When fill form with:
       | Email Address | AmandaRCole1@example.org |
       | Password      | AAAAa1!                  |
-    And click "Sign In"
-    Then should see "Signed in as: Amanda Cole"
+    And click "Log In"
+    Then should see "Amanda Cole"
+    And I click "Account Dropdown"
     And click "Sign Out"
 
   Scenario: Uncheck all user password complexity options (dashboard user)
@@ -164,7 +165,7 @@ Feature: Password complexity feature
 
   Scenario: Uncheck all user password complexity options (Frontstore user)
     Given I proceed as the Buyer
-    And click "Register"
+    And click "Sign Up"
     And I fill "Registration Form" with:
       | Company Name  | TestCompany              |
       | First Name    | Ellen                    |
@@ -201,6 +202,7 @@ Feature: Password complexity feature
     When fill form with:
       | Email Address | EllenRRowel1@example.org |
       | Password      | 1111                     |
-    And click "Sign In"
-    Then should see "Signed in as: Ellen Rowel"
+    And click "Log In"
+    Then should see "Ellen Rowel"
+    And I click "Account Dropdown"
     And click "Sign Out"

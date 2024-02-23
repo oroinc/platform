@@ -1,6 +1,6 @@
 {% block _middle_bar_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' grid middlebar'
+        '~class': ' middlebar middlebar--' ~ searchType
     }) %}
     <div {{ block('block_attributes') }}>
         {{ block_widget(block) }}
@@ -9,7 +9,7 @@
 
 {% block _middle_bar_logo_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' grid-col middlebar__left'
+        '~class': ' middlebar__left'
     }) %}
     <div {{ block('block_attributes') }}>
         {{ block_widget(block) }}
@@ -18,7 +18,7 @@
 
 {% block _middle_bar_center_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' grid-col middlebar__center'
+        '~class': ' middlebar__center'
     }) %}
     <div {{ block('block_attributes') }}>
         {{ block_widget(block) }}
@@ -27,7 +27,16 @@
 
 {% block _middle_bar_right_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' grid-col middlebar__right'
+        '~class': ' middlebar__right'
+    }) %}
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _middle_bar_right_menus_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' middlebar__menus'
     }) %}
     <div {{ block('block_attributes') }}>
         {{ block_widget(block) }}

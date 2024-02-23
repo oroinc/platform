@@ -8,15 +8,24 @@ layout:
                     blockType: container
                     siblingId: ~
                     prepend: true
+                    options:
+                        vars:
+                            searchType: '=data["system_config_provider"].getValue("oro_frontend.search_on_smaller_screens")'
                 middle_bar_logo:
                     blockType: container
                 middle_bar_center:
                     blockType: container
                 middle_bar_right:
                     blockType: container
+                    options:
+                        vars:
+                            searchType: '=data["system_config_provider"].getValue("oro_frontend.search_on_smaller_screens")'
+                middle_bar_right_menus:
+                    blockType: container
             tree:
                 page_header:
                     middle_bar:
                         middle_bar_logo: ~
                         middle_bar_center: ~
-                        middle_bar_right: ~
+                        middle_bar_right:
+                            middle_bar_right_menus: ~

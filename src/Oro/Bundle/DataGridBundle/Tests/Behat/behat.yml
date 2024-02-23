@@ -248,6 +248,9 @@ oro_behat_extension:
     Close Fullscreen Popup:
       selector: '.fullscreen-popup .close-dialog'
 
+    Fullscreen Popup Backdrop:
+      selector: '.fullscreen-popup__backdrop.show'
+
     Grid Toolbar Action Filter Toggle:
       selector: '.toggle-filters-action'
 

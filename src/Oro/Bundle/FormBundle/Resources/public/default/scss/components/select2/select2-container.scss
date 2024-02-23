@@ -106,6 +106,12 @@
         }
     }
 
+    &.select2-chosen-slash-prefix {
+        .select2-chosen::before {
+            content: '/';
+        }
+    }
+
     // Hide select2 if its select is invisible
     &:has(~ .select.invisible) {
         display: none;
