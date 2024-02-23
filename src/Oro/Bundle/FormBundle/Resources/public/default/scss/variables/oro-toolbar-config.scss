@@ -1,17 +1,12 @@
 /* @theme: default; */
 
-$oro-toolbar-content-min-width: 45px !default;
-$oro-toolbar-toolbar-min-width: 95px !default;
 $oro-toolbar-icon-offset: 3px !default;
-$oro-toolbar-content-inner-offset: 0 spacing('sm') !default;
-$oro-toolbar-content-line-height: ($base-font-size - .1) * 2 !default;
-$oro-toolbar-content-text-align: center !default;
-$oro-toolbar-dropdown-inner-offset: 10px 15px !default;
-$oro-toolbar-dropdown-z-index: z('dropdown') + 30 !default;
 $oro-toolbar-list-item-offset: 2px !default;
-$oro-toolbar-link-color: get-color('additional-old', 'dark') !default;
-$oro-toolbar-link-hover-color: get-color('additional-old', 'dark') !default;
-
+$oro-toolbar-link-color: get-color('neutral', 'white-100') !default;
+$oro-toolbar-link-hover-color: get-color('neutral', 'white-100') !default;
 $oro-toolbar-open-content-box-shadow: inset 1px 1px 3px 0 rgba(0 0 0 / 30%) !default;
-
 $oro-toolbar-fullscreen-link-border: 1px solid get-color('additional-old', 'light') !default;
+$oro-toolbar-divider-color: rgba(get-color('neutral', 'white-100'), .55) !default;
+$oro-toolbar-icon-color: get-color('neutral', 'white-100') !default;
+$oro-toolbar-padding: 8px 0 !default;
+$oro-toolbar-gap: 12px !default;

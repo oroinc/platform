@@ -44,6 +44,11 @@ class ThemeProvider
         return $this->getTheme($themeName)->getLogo();
     }
 
+    public function getLogoSmall(string $themeName): ?string
+    {
+        return $this->getTheme($themeName)?->getLogoSmall();
+    }
+
     /**
      * @param string $themeName
      *

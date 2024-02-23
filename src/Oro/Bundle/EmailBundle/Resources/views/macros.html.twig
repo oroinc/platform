@@ -319,7 +319,11 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|e('html_attr') }}" aria-label="{{ 'oro.email.emailuser.email.aria_label'|trans({'%email%': title|oro_html_strip_tags }) }}" title="{{ title|e('html_attr') }}" class="email"><bdo dir="ltr">{{ title|oro_html_strip_tags }}</bdo></a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}"
+               aria-label="{{ 'oro.email.emailuser.email.aria_label'|trans({'%email%': title|oro_html_strip_tags }) }}"
+               title="{{ title|e('html_attr') }}" class="email">
+                <bdo dir="ltr">{{ title|oro_html_strip_tags }}</bdo>
+            </a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}
