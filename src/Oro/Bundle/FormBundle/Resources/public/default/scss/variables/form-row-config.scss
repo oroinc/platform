@@ -5,3 +5,4 @@ $form-row-label-offset-x: spacing('xs');
 $form-row-content-offset-x: 0;
 $form-row-input-button-min-height: 42px !default;
 $form-row-input-button-padding: 7px !default;
+$form-row-input-button-color: get-color('text', 'primary') !default;
