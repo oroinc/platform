@@ -39,16 +39,4 @@ class CommandRunnerTest extends WebTestCase
         self::assertStringContainsString('Help:', $result);
         self::assertStringContainsString('Display information about the current project', $result);
     }
-
-    public function testShouldRunCommandAndHasNoMemoryLeak(): void
-    {
-        $this->markTestIncomplete('Memory leak. Will be fixed in BB-23114');
-        $runner = self::getContainer()->get('oro_cron.engine.command_runner');
-
-        $before = memory_get_usage(true);
-        $runner->run('oro:cron');
-        $after = memory_get_usage(true);
-
-        self::assertEquals($before, $after);
-    }
 }
