@@ -1,6 +1,7 @@
 {% set linkTitle = params.frontendOptions.title is defined ? params.frontendOptions.title|trans : '' %}
 {% set linkLabel = params.label|trans %}
 {% set linkAriaLabel = params.frontendOptions.options.ariaLabel is defined ? params.frontendOptions.options.ariaLabel|trans : '' %}
+{% set noLinkLabel = params.frontendOptions.options.noLinkLabel|default(false) %}
 {% set isAjax = false %}
 
 {% block button %}
@@ -39,7 +40,16 @@
             {% if params.buttonOptions.icon is defined or params.buttonOptions.iCss is defined %}
                 <span class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text" aria-hidden="true"></span>
             {% endif %}
-            {{ linkLabel|trim }}
+            {% if params.frontendOptions.options.icon is defined %}
+                {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
+                {{ renderIcon.icon({
+                    name: params.frontendOptions.options.icon,
+                    extraClass: 'theme-icon--medium'
+                }) }}
+            {% endif %}
+            {% if not noLinkLabel %}
+                {{- linkLabel|trim -}}
+            {% endif %}
         </button>
     {% endblock %}
     {% if not onlyLink|default(false) %}</div>{% endif %}

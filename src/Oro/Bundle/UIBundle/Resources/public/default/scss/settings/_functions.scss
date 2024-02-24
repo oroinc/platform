@@ -7,7 +7,7 @@
 @use 'sass:map';
 
 /** @return the value from a $color-palette map associated with a given key;
-    Use: color: get-color('primary-old', 'base') => color: #000;
+    Use: color: get-color('primary', 'main') => color: #000;
 */
 @function get-color($palette, $keys...) {
     $color-key: map.get($color-palette, $palette, $keys...);

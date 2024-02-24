@@ -37,5 +37,5 @@ $base-ui-element-color-disabled-state: get-var-color('text', 'disable') !default
 
 $base-ui-popup-border-radius: $base-ui-element-border-radius !default;
 
-$base-ui-popup-background: get-color('additional-old', 'ultra') !default;
+$base-ui-popup-background: get-color('neutral', 'white-100') !default;
 $base-ui-popup-box-shadow: 1px 2px 8px rgba(0 0 0 / 40%) !default;

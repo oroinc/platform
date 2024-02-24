@@ -11,7 +11,7 @@ $select2-container-multi-search-padding: (
     (spacing('xs') - $base-ui-element-border-size) 0 (spacing('xs') - $base-ui-element-border-size)
 ) !default;
 
-$select2-container-multi-choice-close-color: get-color('additional-old', 'dark') !default;
+$select2-container-multi-choice-close-color: get-color('neutral', 'dark') !default;
 $select2-container-multi-choice-close-size: 16px !default;
 $select2-container-multi-choice-padding: (spacing('xs') - $base-ui-element-border-size) spacing('sm') !default;
 $select2-container-multi-choice-gap: spacing('xs') !default;
