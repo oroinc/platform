@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Manager;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Statement;
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
@@ -228,41 +225,6 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([1 => $localization1, 2 => $localization2]);
 
         $this->assertSame($localization1, $this->manager->getDefaultLocalization());
-    }
-
-    public function testWarmUpCache()
-    {
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepositoryForClass')
-            ->with(Localization::class)
-            ->willReturn($this->repository);
-        $entityManager = $this->createMock(EntityManager::class);
-        $connection = $this->createMock(Connection::class);
-        $result = $this->createMock(Statement::class);
-        $entityManager->expects($this->once())
-            ->method('getConnection')
-            ->willReturn($connection);
-        $connection->expects($this->once())
-            ->method('executeQuery')
-            ->willReturn($result);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
-            ->with(Localization::class)
-            ->willReturn($entityManager);
-
-        $this->cacheProvider->expects($this->any())
-            ->method('getItem')
-            ->willReturn($this->cacheItem);
-        $this->cacheItem->expects($this->exactly(2))
-            ->method('isHit')
-            ->willReturn(false);
-
-        $this->repository->expects($this->once())
-            ->method('findAllIndexedById')
-            ->willReturn($this->entities);
-
-        $this->manager->warmUpCache();
     }
 
     /**

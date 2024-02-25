@@ -312,7 +312,7 @@ services:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
     oro_security.entity_security_metadata_provider.cache.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        class: Oro\Bundle\SecurityBundle\Cache\EntitySecurityMetadataCacheWarmer
         public: false
         arguments:
             - '@oro_security.entity_security_metadata_provider'
@@ -429,7 +429,7 @@ services:
             - { name: 'cache.pool', namespace: 'oro_acl_owner_tree' }
 
     oro_security.ownership_tree.cache.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        class: Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
         public: false
         arguments:
             - '@oro_security.ownership_tree_provider.chain'
