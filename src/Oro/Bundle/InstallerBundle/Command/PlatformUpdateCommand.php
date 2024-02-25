@@ -223,7 +223,7 @@ HELP
 
     protected function checkRequirements(CommandExecutor $commandExecutor): int
     {
-        $commandExecutor->runCommand('oro:check-requirements', ['--ignore-errors' => true, '--verbose' => 1]);
+        $commandExecutor->runCommand('oro:check-requirements', ['--verbose' => 1]);
 
         return $commandExecutor->getLastCommandExitCode();
     }
