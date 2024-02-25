@@ -12,9 +12,8 @@ trait CollectionTypeTrait
 {
     /**
      * @var array
-     *
-     * @ORM\Column(name="collection_diffs", type="json_array", nullable=true)
      */
+    #[ORM\Column(name: 'collection_diffs', type: 'json_array', nullable: true)]
     protected $collectionDiffs = [];
 
     /**

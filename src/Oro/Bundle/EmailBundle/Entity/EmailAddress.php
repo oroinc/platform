@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -15,47 +16,26 @@ use Doctrine\ORM\Mapping as ORM;
  *   - Entity/Provider/EmailOwnerProviderStorage.php
  *   - DependencyInjection/Compiler/EmailOwnerConfigurationPass.php
  *   - OroEmailBundle.php
- *
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 abstract class EmailAddress
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created", type="datetime")
-     */
-    private $created;
+    #[ORM\Column(name: 'created', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $created = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated", type="datetime")
-     */
-    private $updated;
+    #[ORM\Column(name: 'updated', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $updated = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=255)
-     */
-    private $email;
+    #[ORM\Column(name: 'email', type: Types::STRING, length: 255)]
+    private ?string $email = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="has_owner", type="boolean")
-     */
-    private $hasOwner = false;
+    #[ORM\Column(name: 'has_owner', type: Types::BOOLEAN)]
+    private ?bool $hasOwner = false;
 
     /**
      * Get id

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Factory;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
-use Oro\Bundle\EntityConfigBundle\Metadata\Driver\AnnotationDriver;
+use Oro\Bundle\EntityConfigBundle\Metadata\Driver\AttributeDriver;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Factory\Fixture as Entity;
+use Oro\Component\PhpUtils\Attribute\Reader\AttributeReader;
 
 class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -17,7 +17,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->metadataFactory = new MetadataFactory(new AnnotationDriver(new AnnotationReader()));
+        $this->metadataFactory = new MetadataFactory(new AttributeDriver(new AttributeReader()));
     }
 
     private function getFieldMetadata(

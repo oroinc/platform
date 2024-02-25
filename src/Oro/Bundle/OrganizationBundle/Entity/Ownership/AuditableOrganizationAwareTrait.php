@@ -2,25 +2,21 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity\Ownership;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
+/**
+* AuditableOrganizationAware trait
+*
+*/
 trait AuditableOrganizationAwareTrait
 {
-    /**
-     * @var OrganizationInterface
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    protected ?OrganizationInterface $organization = null;
 
     /**
      * @return OrganizationInterface|null

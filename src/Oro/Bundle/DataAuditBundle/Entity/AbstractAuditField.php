@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use LogicException;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 /**
- * @ORM\MappedSuperclass()
- */
+* AbstractAuditField abstract class
+*
+*/
+#[ORM\MappedSuperclass]
 abstract class AbstractAuditField
 {
     use BitFieldTypeTrait;
@@ -19,50 +22,26 @@ abstract class AbstractAuditField
     use ObjectFieldTypeTrait;
     use CollectionTypeTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var AbstractAudit
-     *
-     * @ORM\ManyToOne(targetEntity="AbstractAudit", inversedBy="fields", cascade={"persist"})
-     * @ORM\JoinColumn(name="audit_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    protected $audit;
+    #[ORM\ManyToOne(targetEntity: AbstractAudit::class, cascade: ['persist'], inversedBy: 'fields')]
+    #[ORM\JoinColumn(name: 'audit_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?AbstractAudit $audit = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", nullable=false)
-     */
-    protected $field;
+    #[ORM\Column(type: Types::STRING, nullable: false)]
+    protected ?string $field = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean", options={"default"=true})
-     */
-    protected $visible = true;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    protected ?bool $visible = true;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="data_type", type="string", nullable=false)
-     */
-    protected $dataType;
+    #[ORM\Column(name: 'data_type', type: Types::STRING, nullable: false)]
+    protected ?string $dataType = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="translation_domain", type="string", length=100, nullable=true)
-     */
-    protected $translationDomain;
+    #[ORM\Column(name: 'translation_domain', type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $translationDomain = null;
 
     /**
      * @param string $field

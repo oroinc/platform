@@ -2,66 +2,43 @@
 
 namespace Oro\Bundle\CronBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 
 /**
  * Represents a table with CRON jobs schedules.
- * @ORM\Table(name="oro_cron_schedule", uniqueConstraints={
- *      @ORM\UniqueConstraint(name="UQ_COMMAND", columns={"command", "args_hash", "definition"})
- * })
- * @ORM\Entity()
- * @Config(
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-tasks"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          }
- *      }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_cron_schedule')]
+#[ORM\UniqueConstraint(name: 'UQ_COMMAND', columns: ['command', 'args_hash', 'definition'])]
+#[Config(
+    defaultValues: [
+        'entity' => ['icon' => 'fa-tasks'],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management']
+    ]
+)]
 class Schedule
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="command", type="string", length=255)
-     */
-    protected $command;
+    #[ORM\Column(name: 'command', type: Types::STRING, length: 255)]
+    protected ?string $command = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="args", type = "json_array")
      */
+    #[ORM\Column(name: 'args', type: 'json_array')]
     protected $arguments;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="args_hash", type="string", length=32)
-     */
-    protected $argumentsHash;
+    #[ORM\Column(name: 'args_hash', type: Types::STRING, length: 32)]
+    protected ?string $argumentsHash = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="definition", type="string", length=100, nullable=true)
-     */
-    protected $definition;
+    #[ORM\Column(name: 'definition', type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $definition = null;
 
     public function __construct()
     {

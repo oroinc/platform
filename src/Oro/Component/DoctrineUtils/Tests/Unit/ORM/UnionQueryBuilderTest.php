@@ -2,12 +2,11 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\QueryException;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
@@ -23,7 +22,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
     }
 
     public function testConstructorWithDefaultArguments(): void

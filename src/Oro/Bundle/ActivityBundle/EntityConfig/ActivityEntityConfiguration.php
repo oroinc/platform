@@ -66,11 +66,11 @@ class ActivityEntityConfiguration implements EntityConfigInterface
                     'Please note that an activity should provide both action_link_widget and action_link_widget, ' .
                     'because actions can be rendered both as a button as a dropdown menu.')
             ->end()
-            ->scalarNode('show_on_page')
-                ->info('`string` s used to change a page, which will display the “activity list” and activity ' .
-                    'buttons. Can be used as bitmask. See available index states in ActivityScope.php(https://github' .
+            ->integerNode('show_on_page')
+                ->info('`integer` is used to change a page, which will display the “activity list” and activity ' .
+                    'buttons. See available index states in ActivityScope.php(https://github' .
                     '.com/oroinc/platform/blob/master/src/Oro/Bundle/ActivityBundle/EntityConfig/ActivityScope.php)')
-                ->defaultValue(sprintf('\\%s::VIEW_PAGE', ActivityScope::class))
+                ->defaultValue(ActivityScope::VIEW_PAGE)
             ->end()
             ->scalarNode('action_link_widget')
                 ->info('`string` is the widget name of the activity action used to render a link in the dropdown ' .

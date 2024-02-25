@@ -2,34 +2,28 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Events;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\MappingException;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener;
 use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
+use Oro\Component\PhpUtils\Attribute\Reader\AttributeReader;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DoctrineListenerTest extends OrmTestCase
 {
-    /** @var ExtendMetadataBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataBuilder;
-
-    /** @var AnnotationReader */
-    private $reader;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var DoctrineListener */
-    private $listener;
+    private ExtendMetadataBuilder|MockObject $metadataBuilder;
+    private AttributeReader $reader;
+    private ConfigProvider|MockObject $extendConfigProvider;
+    private DoctrineListener $listener;
 
     protected function setUp(): void
     {
-        $this->reader = new AnnotationReader();
+        $this->reader = new AttributeReader();
         $this->metadataBuilder = $this->createMock(ExtendMetadataBuilder::class);
         $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
 
@@ -69,7 +63,7 @@ class DoctrineListenerTest extends OrmTestCase
 
         $em = $this->getTestEntityManager();
         $em->getEventManager()->addEventListener(Events::loadClassMetadata, $this->listener);
-        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver($this->reader, $path));
+        $em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([$path]));
 
         foreach (array_keys($expectedValues) as $entityName) {
             $classMetadata = $em->getClassMetadata($entityName);
@@ -103,7 +97,7 @@ class DoctrineListenerTest extends OrmTestCase
 
         $em = $this->getTestEntityManager();
         $em->getEventManager()->addEventListener(Events::loadClassMetadata, $this->listener);
-        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver($this->reader, $path));
+        $em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([$path]));
 
         foreach ($expectedValues as $entityName => $data) {
             [$value, $map] = $data;

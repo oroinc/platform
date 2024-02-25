@@ -3,9 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authorization;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -17,8 +17,8 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityClassResolver;
 
-    /** @var AclAnnotationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $annotationProvider;
+    /** @var AclAttributeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeProvider;
 
     /** @var RequestAuthorizationChecker */
     private $requestAuthorizationChecker;
@@ -27,12 +27,12 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
-        $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
+        $this->attributeProvider = $this->createMock(AclAttributeProvider::class);
 
         $this->requestAuthorizationChecker = new RequestAuthorizationChecker(
             $this->authorizationChecker,
             $this->entityClassResolver,
-            $this->annotationProvider
+            $this->attributeProvider
         );
     }
 
@@ -40,9 +40,9 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request();
         $request->attributes->add(['_controller' => 'testController::testAction']);
-        $acl = new Acl(['id' => 1, 'class' => 'AcmeTestBundle:Test', 'type' => 'entity']);
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
+        $acl = Acl::fromArray(['id' => 1, 'class' => 'AcmeTestBundle:Test', 'type' => 'entity']);
+        $this->attributeProvider->expects($this->once())
+            ->method('findAttribute')
             ->with('testController', 'testAction')
             ->willReturn($acl);
         $this->entityClassResolver->expects($this->once())
@@ -63,8 +63,8 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request();
         $request->attributes->add(['_controller' => 'testController::testAction']);
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
+        $this->attributeProvider->expects($this->once())
+            ->method('findAttribute')
             ->with('testController', 'testAction')
             ->willReturn(null);
         $this->entityClassResolver->expects($this->never())
@@ -80,9 +80,9 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request();
         $request->attributes->add(['_controller' => 'testController']);
-        $acl = new Acl(['id' => 1, 'class' => 'AcmeTestBundle:Test', 'type' => 'entity']);
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
+        $acl = Acl::fromArray(['id' => 1, 'class' => 'AcmeTestBundle:Test', 'type' => 'entity']);
+        $this->attributeProvider->expects($this->once())
+            ->method('findAttribute')
             ->with('testController', '__invoke')
             ->willReturn($acl);
         $this->entityClassResolver->expects($this->once())
@@ -103,8 +103,8 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request();
         $request->attributes->add(['_controller' => 'testController']);
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
+        $this->attributeProvider->expects($this->once())
+            ->method('findAttribute')
             ->with('testController', '__invoke')
             ->willReturn(null);
         $this->entityClassResolver->expects($this->never())
@@ -124,11 +124,11 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $object = new \stdClass();
         $request = new Request();
         $request->attributes->add(['_controller' => $requestController]);
-        $acl = new Acl(
+        $acl = Acl::fromArray(
             ['id' => 1, 'class' => 'AcmeTestBundle:Test', 'type' => 'entity', 'permission' => 'TEST_PERMISSION']
         );
-        $this->annotationProvider->expects($this->any())
-            ->method('findAnnotation')
+        $this->attributeProvider->expects($this->any())
+            ->method('findAttribute')
             ->willReturn($acl);
         $this->entityClassResolver->expects($this->any())
             ->method('isEntity')

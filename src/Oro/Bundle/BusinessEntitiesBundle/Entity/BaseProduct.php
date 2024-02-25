@@ -2,87 +2,49 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
  * Base Product Entity class.
- *
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 class BaseProduct
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sku", type="string", length=255, nullable=true)
-     */
-    protected $sku;
+    #[ORM\Column(name: 'sku', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $sku = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type", type="string", length=255, nullable=true)
-     */
-    protected $type;
+    #[ORM\Column(name: 'type', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $type = null;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="cost", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'cost', type: 'money', nullable: true)]
     protected $cost;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="price", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'price', type: 'money', nullable: true)]
     protected $price;
 
-    /**
-     * @var \DateTime $createdAt
-     *
-     * @ORM\Column(type="datetime", name="created_at")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime $updatedAt
-     *
-     * @ORM\Column(type="datetime", name="updated_at")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @param int $id

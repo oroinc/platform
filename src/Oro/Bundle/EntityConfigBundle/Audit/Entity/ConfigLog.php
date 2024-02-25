@@ -4,44 +4,35 @@ namespace Oro\Bundle\EntityConfigBundle\Audit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Holds links to the information about changes in the tracked entities.
- *
- * @ORM\Table(name="oro_entity_config_log")
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks()
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_entity_config_log')]
+#[ORM\HasLifecycleCallbacks]
 class ConfigLog
 {
-    /**
-     * @var integer
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    protected ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?UserInterface $user = null;
 
     /**
-     * @var UserInterface
-     * @ORM\ManyToOne(targetEntity="Symfony\Component\Security\Core\User\UserInterface")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var Collection<int, ConfigLogDiff>
      */
-    protected $user;
+    #[ORM\OneToMany(mappedBy: 'log', targetEntity: ConfigLogDiff::class, cascade: ['all'])]
+    protected ?Collection $diffs = null;
 
-    /**
-     * @var Collection|ConfigLogDiff[]
-     * @ORM\OneToMany(targetEntity="ConfigLogDiff", mappedBy="log", cascade={"all"})
-     */
-    protected $diffs;
-
-    /**
-     * @var \DateTime
-     * @ORM\Column(name="logged_at", type="datetime")
-     */
-    protected $loggedAt;
+    #[ORM\Column(name: 'logged_at', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $loggedAt = null;
 
     public function __construct()
     {
@@ -127,9 +118,7 @@ class ConfigLog
         return $this->diffs;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->loggedAt = new \DateTime('now', new \DateTimeZone('UTC'));

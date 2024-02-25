@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 
 class TypedAddressOwner
 {
-    private Collection $addresses;
+    private ?Collection $addresses = null;
 
     public function __construct()
     {

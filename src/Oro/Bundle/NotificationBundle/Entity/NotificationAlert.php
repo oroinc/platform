@@ -2,45 +2,43 @@
 
 namespace Oro\Bundle\NotificationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroNotificationBundle_Entity_NotificationAlert;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareTrait;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Represents a storage of a notification alerts.
  *
- * @ORM\Table(name="oro_notification_alert")
- * @ORM\Entity
- * @Config(
- *      routeName="oro_notification_notificationalert_index",
- *      defaultValues={
- *          "ownership"={
- *              "owner_type"="ORGANIZATION",
- *              "owner_field_name"="organization",
- *              "owner_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management",
- *              "permissions"="VIEW,DELETE"
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @mixin OroNotificationBundle_Entity_NotificationAlert
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_notification_alert')]
+#[Config(
+    routeName: 'oro_notification_notificationalert_index',
+    defaultValues: [
+        'ownership' => [
+            'owner_type' => 'ORGANIZATION',
+            'owner_field_name' => 'organization',
+            'owner_column_name' => 'organization_id'
+        ],
+        'security' => [
+            'type' => 'ACL',
+            'group_name' => '',
+            'category' => 'account_management',
+            'permissions' => 'VIEW,DELETE'
+        ],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class NotificationAlert implements ExtendEntityInterface
 {
     use CreatedAtAwareTrait;
@@ -49,96 +47,50 @@ class NotificationAlert implements ExtendEntityInterface
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="id", type="guid")
-     * @ORM\Id
      */
+    #[ORM\Column(name: 'id', type: Types::GUID)]
+    #[ORM\Id]
     private $id;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="alert_type", type="string", length=20, nullable=true)
-     */
-    private $alertType;
+    #[ORM\Column(name: 'alert_type', type: Types::STRING, length: 20, nullable: true)]
+    private ?string $alertType = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="source_type", type="string", length=50)
-     */
-    private $sourceType;
+    #[ORM\Column(name: 'source_type', type: Types::STRING, length: 50)]
+    private ?string $sourceType = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="resource_type", type="string", length=255)
-     */
-    private $resourceType;
+    #[ORM\Column(name: 'resource_type', type: Types::STRING, length: 255)]
+    private ?string $resourceType = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="operation", type="string", length=50, nullable=true)
-     */
-    private $operation;
+    #[ORM\Column(name: 'operation', type: Types::STRING, length: 50, nullable: true)]
+    private ?string $operation = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="step", type="string", length=50, nullable=true)
-     */
-    private $step;
+    #[ORM\Column(name: 'step', type: Types::STRING, length: 50, nullable: true)]
+    private ?string $step = null;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="item_id", type="integer", nullable=true, length=255)
-     */
-    private $itemId;
+    #[ORM\Column(name: 'item_id', type: Types::INTEGER, length: 255, nullable: true)]
+    private ?int $itemId = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="external_id", type="string", nullable=true, length=255)
-     */
-    private $externalId;
+    #[ORM\Column(name: 'external_id', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $externalId = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_resolved", type="boolean", nullable=false, options={"default"=false})
-     */
-    private $resolved = false;
+    #[ORM\Column(name: 'is_resolved', type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    private ?bool $resolved = false;
 
-    /**
-     * @var User|null
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
-     */
-    private $user;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    private ?User $user = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="message", type="text", nullable=true)
-     */
-    private $message;
+    #[ORM\Column(name: 'message', type: Types::TEXT, nullable: true)]
+    private ?string $message = null;
 
-    /**
-     * @var OrganizationInterface
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    private $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?Organization $organization = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="additional_info", type="json", nullable=true)
      */
+    #[ORM\Column(name: 'additional_info', type: Types::JSON, nullable: true)]
     private $additionalInfo = [];
 
     public function getId(): string
@@ -274,9 +226,7 @@ class NotificationAlert implements ExtendEntityInterface
         $this->additionalInfo = $additionalInfo;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
+use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -11,10 +12,9 @@ trait UpdatedByAwareTrait
 {
     /**
      * @var User|null
-     *
-     * @Doctrine\ORM\Mapping\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @Doctrine\ORM\Mapping\JoinColumn(name="updated_by_user_id", referencedColumnName="id", onDelete="SET NULL")
      */
+    #[ORM\ManyToOne(targetEntity: 'Oro\Bundle\UserBundle\Entity\User')]
+    #[ORM\JoinColumn(name: 'updated_by_user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     protected $updatedBy;
 
     /**

@@ -4,37 +4,31 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="contact_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'contact_table')]
 class Contact
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    protected ?string $name = null;
 
     /**
-     * @ORM\Column(name="name", type="string", length=50)
+     * @var Collection<int, Account>
      */
-    protected $name;
+    #[ORM\ManyToMany(targetEntity: Account::class, mappedBy: 'contacts')]
+    #[ORM\JoinTable(name: 'account_to_contact')]
+    protected ?Collection $accounts = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Account", mappedBy="contacts")
-     * @ORM\JoinTable(name="account_to_contact")
-     */
-    protected $accounts;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Group")
-     * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable=false)
-     */
-    protected $group;
+    #[ORM\ManyToOne(targetEntity: Group::class)]
+    #[ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id', nullable: false)]
+    protected ?Group $group = null;
 
     public function __construct()
     {

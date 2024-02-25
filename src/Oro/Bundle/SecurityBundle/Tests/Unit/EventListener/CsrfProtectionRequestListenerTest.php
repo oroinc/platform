@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\EventListener\CsrfProtectionRequestListener;
@@ -84,7 +84,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $request = Request::create('/');
         $request->attributes->set(
             '_' . CsrfProtection::ALIAS_NAME,
-            new CsrfProtection(['enabled' => false])
+            new CsrfProtection(enabled: false)
         );
         $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
 
@@ -107,7 +107,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $request = Request::create('/');
         $request->attributes->set(
             '_' . CsrfProtection::ALIAS_NAME,
-            new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest])
+            new CsrfProtection(enabled: true, useRequest: $useRequest)
         );
 
         $event = $this->getControllerEvent($request, HttpKernelInterface::MAIN_REQUEST);
@@ -135,7 +135,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $request = Request::create('/');
         $request->attributes->set(
             '_' . CsrfProtection::ALIAS_NAME,
-            new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest])
+            new CsrfProtection(enabled: true, useRequest: $useRequest)
         );
 
         $event = $this->getControllerEvent($request, HttpKernelInterface::MAIN_REQUEST);

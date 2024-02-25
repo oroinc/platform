@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 
@@ -10,11 +11,9 @@ class CountryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provider
      */
-    public function testSettersAndGetters(string $property)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new Country('iso2code');
-        $value = 'testValue';
-
         $obj->{'set' . ucfirst($property)}($value);
         $this->assertEquals($value, call_user_func_array([$obj, 'get' . ucfirst($property)], []));
     }
@@ -29,10 +28,10 @@ class CountryTest extends \PHPUnit\Framework\TestCase
     public function provider(): array
     {
         return [
-            ['name'],
-            ['iso3code'],
-            ['regions'],
-            ['locale'],
+            ['name', 'testValue'],
+            ['iso3code', 'testValue'],
+            ['regions', new ArrayCollection()],
+            ['locale', 'testValue'],
         ];
     }
 

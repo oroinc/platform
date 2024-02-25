@@ -8,8 +8,8 @@ use Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,27 +21,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The controller for the email templates related functionality.
- *
- * @Route("/emailtemplate")
  */
+#[Route(path: '/emailtemplate')]
 class EmailTemplateController extends AbstractController
 {
     use RequestHandlerTrait;
 
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @Acl(
-     *      id="oro_email_emailtemplate_index",
-     *      type="entity",
-     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
-     *      permission="VIEW"
-     * )
-     * @Template("@OroEmail/EmailTemplate/index.html.twig")
-     */
+    #[Route(path: '/{_format}', requirements: ['_format' => 'html|json'], defaults: ['_format' => 'html'])]
+    #[Template('@OroEmail/EmailTemplate/index.html.twig')]
+    #[Acl(id: 'oro_email_emailtemplate_index', type: 'entity', class: EmailTemplate::class, permission: 'VIEW')]
     public function indexAction()
     {
         return [
@@ -49,59 +37,38 @@ class EmailTemplateController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/update/{id}", requirements={"id"="\d+"}, defaults={"id"=0}))
-     * @Acl(
-     *      id="oro_email_emailtemplate_update",
-     *      type="entity",
-     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
-     *      permission="EDIT"
-     * )
-     * @Template("@OroEmail/EmailTemplate/update.html.twig")
-     */
+    #[Route(path: '/update/{id}', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template('@OroEmail/EmailTemplate/update.html.twig')]
+    #[Acl(id: 'oro_email_emailtemplate_update', type: 'entity', class: EmailTemplate::class, permission: 'EDIT')]
     public function updateAction(EmailTemplate $entity, Request $request)
     {
         return $this->update($entity, $request, false);
     }
 
-    /**
-     * @Route("/create")
-     * @Acl(
-     *      id="oro_email_emailtemplate_create",
-     *      type="entity",
-     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
-     *      permission="CREATE"
-     * )
-     * @Template("@OroEmail/EmailTemplate/update.html.twig")
-     */
+    #[Route(path: '/create')]
+    #[Template('@OroEmail/EmailTemplate/update.html.twig')]
+    #[Acl(id: 'oro_email_emailtemplate_create', type: 'entity', class: EmailTemplate::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new EmailTemplate(), $request);
     }
 
-    /**
-     * @Route("/clone/{id}", requirements={"id"="\d+"}, defaults={"id"=0}))
-     * @AclAncestor("oro_email_emailtemplate_create")
-     * @Template("@OroEmail/EmailTemplate/update.html.twig")
-     */
+    #[Route(path: '/clone/{id}', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template('@OroEmail/EmailTemplate/update.html.twig')]
+    #[AclAncestor('oro_email_emailtemplate_create')]
     public function cloneAction(EmailTemplate $entity, Request $request)
     {
         return $this->update(clone $entity, $request, true);
     }
 
     /**
-     * @Route("/preview/{id}", requirements={"id"="\d+"}, defaults={"id"=0}))
-     * @Acl(
-     *      id="oro_email_emailtemplate_preview",
-     *      type="entity",
-     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
-     *      permission="VIEW"
-     * )
-     * @Template("@OroEmail/EmailTemplate/preview.html.twig")
      * @param Request $request
      * @param bool|int $id
      * @return array
      */
+    #[Route(path: '/preview/{id}', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template('@OroEmail/EmailTemplate/preview.html.twig')]
+    #[Acl(id: 'oro_email_emailtemplate_preview', type: 'entity', class: EmailTemplate::class, permission: 'VIEW')]
     public function previewAction(Request $request, $id = false)
     {
         if (!$id) {

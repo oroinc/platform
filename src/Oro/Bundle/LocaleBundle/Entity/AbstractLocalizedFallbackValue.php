@@ -2,88 +2,38 @@
 
 namespace Oro\Bundle\LocaleBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 /**
  * Abstract class for all localized value entities
- *
- * @ORM\MappedSuperclass()
  */
+#[ORM\MappedSuperclass]
 abstract class AbstractLocalizedFallbackValue
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?int $id = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="fallback", type="string", length=64, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=false
-     *          }
-     *      }
-     * )
-     */
-    protected $fallback;
+    #[ORM\Column(name: 'fallback', type: Types::STRING, length: 64, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => false]])]
+    protected ?string $fallback = null;
 
-    /**
-     * @var string|null
-     *
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=false
-     *          }
-     *      }
-     * )
-     */
-    protected $string;
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => false]])]
+    protected ?string $string = null;
 
-    /**
-     * @var string|null
-     *
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=false
-     *          }
-     *      }
-     * )
-     */
-    protected $text;
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => false]])]
+    protected ?string $text = null;
 
-    /**
-     * @var Localization|null
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\LocaleBundle\Entity\Localization")
-     * @ORM\JoinColumn(name="localization_id", referencedColumnName="id", onDelete="CASCADE")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $localization;
+    #[ORM\ManyToOne(targetEntity: Localization::class)]
+    #[ORM\JoinColumn(name: 'localization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    protected ?Localization $localization = null;
 
     /**
      * @return array

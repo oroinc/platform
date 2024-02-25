@@ -12,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,19 +23,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Entity Attribute Controller
- * @Route("/attribute")
  */
+#[Route(path: '/attribute')]
 class AttributeController extends AbstractController
 {
     /**
-     * @Route("/create/{alias}", name="oro_attribute_create")
-     * @Template("@OroEntityConfig/Attribute/create.html.twig")
      *
      * @param Request $request
      * @param string $alias
      *
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
+    #[Route(path: '/create/{alias}', name: 'oro_attribute_create')]
+    #[Template('@OroEntityConfig/Attribute/create.html.twig')]
     public function createAction(Request $request, $alias)
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
@@ -54,12 +54,12 @@ class AttributeController extends AbstractController
     }
 
     /**
-     * @Route("/save/{alias}", name="oro_attribute_save")
-     * @Template("@OroEntityConfig/Attribute/update.html.twig")
      * @param Request $request
      * @param string $alias
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
+    #[Route(path: '/save/{alias}', name: 'oro_attribute_save')]
+    #[Template('@OroEntityConfig/Attribute/update.html.twig')]
     public function saveAction(Request $request, $alias)
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
@@ -93,11 +93,11 @@ class AttributeController extends AbstractController
     }
 
     /**
-     * @Route("/update/{id}", name="oro_attribute_update", requirements={"id"="\d+"})
-     * @Template("@OroEntityConfig/Attribute/update.html.twig")
      * @param FieldConfigModel $fieldConfigModel
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
+    #[Route(path: '/update/{id}', name: 'oro_attribute_update', requirements: ['id' => '\d+'])]
+    #[Template('@OroEntityConfig/Attribute/update.html.twig')]
     public function updateAction(FieldConfigModel $fieldConfigModel)
     {
         $entityConfigModel = $fieldConfigModel->getEntity();
@@ -166,11 +166,11 @@ class AttributeController extends AbstractController
     }
 
     /**
-     * @Route("/index/{alias}", name="oro_attribute_index")
-     * @Template("@OroEntityConfig/Attribute/index.html.twig")
      * @param string $alias
      * @return array
      */
+    #[Route(path: '/index/{alias}', name: 'oro_attribute_index')]
+    #[Template('@OroEntityConfig/Attribute/index.html.twig')]
     public function indexAction($alias)
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
@@ -188,17 +188,17 @@ class AttributeController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/remove/{id}",
-     *      name="oro_attribute_remove",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0},
-     *      methods={"DELETE"}
-     * )
-     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
+    #[Route(
+        path: '/remove/{id}',
+        name: 'oro_attribute_remove',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0],
+        methods: ['DELETE']
+    )]
+    #[CsrfProtection()]
     public function removeAction(FieldConfigModel $field)
     {
         $this->ensureFieldConfigSupported($field);
@@ -209,17 +209,17 @@ class AttributeController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/unremove/{id}",
-     *      name="oro_attribute_unremove",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0},
-     *      methods={"POST"}
-     * )
-     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
+    #[Route(
+        path: '/unremove/{id}',
+        name: 'oro_attribute_unremove',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0],
+        methods: ['POST']
+    )]
+    #[CsrfProtection()]
     public function unremoveAction(FieldConfigModel $field)
     {
         $this->ensureFieldConfigSupported($field);

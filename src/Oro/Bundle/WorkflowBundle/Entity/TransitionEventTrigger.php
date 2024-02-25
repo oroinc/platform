@@ -2,54 +2,37 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository;
 
 /**
  * Represents a transition that is triggered by an event,
  * e.g. when an entity is created or a field value is changed.
- *
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository")
  */
+#[ORM\Entity(repositoryClass: TransitionEventTriggerRepository::class)]
 class TransitionEventTrigger extends BaseTransitionTrigger implements EventTriggerInterface
 {
     /**
      * Entity from event
-     *
-     * @var string
-     *
-     * @ORM\Column(name="entity_class", type="string", length=255)
      */
-    protected $entityClass;
+    #[ORM\Column(name: 'entity_class', type: Types::STRING, length: 255)]
+    protected ?string $entityClass = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="event", type="string", length=255)
-     */
-    protected $event;
+    #[ORM\Column(name: 'event', type: Types::STRING, length: 255)]
+    protected ?string $event = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="field", type="string", length=150, nullable=true)
-     */
-    protected $field;
+    #[ORM\Column(name: 'field', type: Types::STRING, length: 150, nullable: true)]
+    protected ?string $field = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="`require`", type="text", length=1024, nullable=true)
-     */
-    protected $require;
+    #[ORM\Column(name: '`require`', type: Types::TEXT, length: 1024, nullable: true)]
+    protected ?string $require = null;
 
     /**
      * Expression Language condition
-     *
-     * @var string
-     *
-     * @ORM\Column(name="relation", type="text", length=1024, nullable=true)
      */
-    protected $relation;
+    #[ORM\Column(name: 'relation', type: Types::TEXT, length: 1024, nullable: true)]
+    protected ?string $relation = null;
 
     /**
      * {@inheritdoc}

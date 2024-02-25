@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -71,7 +70,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $conn = new ConnectionMock([], new DriverMock());
         $conn->setDatabasePlatform(new PostgreSQL100Platform());
         $this->em = $this->getTestEntityManager($conn);
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())

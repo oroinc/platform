@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclException;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -80,7 +80,7 @@ class ObjectIdentityFactory
      *     get('entity:AcmeBundle:SomeEntity')
      *     get('action:some_action')
      *
-     * @param mixed $val An domain object, object identity descriptor (id:type) or ACL annotation
+     * @param mixed $val An domain object, object identity descriptor (id:type) or ACL attribute
      *
      * @return ObjectIdentity
      *

@@ -2,53 +2,38 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
-/**
- * @ORM\Entity()
- * @Config(
- *      defaultValues={
- *          "ownership"={
- *              "owner_type"="BUSINESS_UNIT",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "field_acl_supported"=true
- *          }
- *      }
- * )
- */
+#[ORM\Entity]
+#[Config(
+    defaultValues: [
+        'ownership' => [
+            'owner_type' => 'BUSINESS_UNIT',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'business_unit_owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'field_acl_supported' => true]
+    ]
+)]
 class TestEmployee extends TestPerson
 {
-    /**
-     * @var BusinessUnit
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
-     * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
+    #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?BusinessUnit $owner = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="position", type="string", length=255)
-     */
-    protected $position;
+    #[ORM\Column(name: 'position', type: Types::STRING, length: 255)]
+    protected ?string $position = null;
 
     /**
      * @return BusinessUnit|null

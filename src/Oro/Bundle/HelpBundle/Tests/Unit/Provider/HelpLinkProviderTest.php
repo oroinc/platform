@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\HelpBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\HelpBundle\Annotation\Help;
+use Oro\Bundle\HelpBundle\Attribute\Help;
 use Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\TestBundle\Controller\TestController;
@@ -413,7 +413,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expectedLink'      => self::TEST_WIKI . '?v=' . self::VERSION
             ],
-            'annotation link'                           => [
+            'attribute link'                           => [
                 'configuration'     => [
                     'defaults' => [
                         'server' => self::TEST_WIKI . '/',
@@ -425,11 +425,11 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'requestAttributes' => [
                     '_route'          => 'test_route',
-                    '_' . Help::ALIAS => new Help(['link' => self::WIKI . '/'])
+                    '_' . Help::ALIAS => new Help(link: self::WIKI . '/')
                 ],
                 'expectedLink'      => self::WIKI . '/'
             ],
-            'annotation configuration'                  => [
+            'attribute configuration'                  => [
                 'configuration'     => [
                     'defaults' => [
                         'server' => self::TEST_WIKI . '/',
@@ -442,18 +442,16 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        [
-                            'actionAlias'     => 'execute',
-                            'controllerAlias' => 'Executor',
-                            'vendorAlias'     => 'Vendor',
-                            'prefix'          => 'Prefix',
-                            'server'          => self::WIKI . '/'
-                        ]
+                        vendorAlias:     'Vendor',
+                        controllerAlias: 'Executor',
+                        actionAlias:     'execute',
+                        prefix:          'Prefix',
+                        server:          self::WIKI . '/',
                     )
                 ],
                 'expectedLink'      => self::WIKI . '/Prefix/Vendor/Executor_execute?v=' . self::VERSION
             ],
-            'annotation configuration override'         => [
+            'attribute configuration override'         => [
                 'configuration'     => [
                     'defaults' => [
                         'server' => self::TEST_WIKI . '/',
@@ -467,30 +465,26 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                     '_route'          => 'test_route',
                     '_' . Help::ALIAS => [
                         new Help(
-                            [
-                                'actionAlias'     => 'executeFoo',
-                                'controllerAlias' => 'ExecutorFoo',
-                                'bundleAlias'     => 'BundleFoo',
-                                'vendorAlias'     => 'VendorFoo',
-                                'prefix'          => 'PrefixFoo',
-                                'server'          => self::WIKI . '/foo'
-                            ]
+                            vendorAlias:     'VendorFoo',
+                            bundleAlias:     'BundleFoo',
+                            controllerAlias: 'ExecutorFoo',
+                            actionAlias:     'executeFoo',
+                            prefix:          'PrefixFoo',
+                            server:          self::WIKI . '/foo',
                         ),
                         new Help(
-                            [
-                                'actionAlias'     => 'executeBar',
-                                'controllerAlias' => 'ExecutorBar',
-                                'vendorAlias'     => 'VendorBar',
-                                'prefix'          => 'PrefixBar',
-                                'server'          => self::WIKI . '/bar'
-                            ]
+                            vendorAlias:     'VendorBar',
+                            controllerAlias: 'ExecutorBar',
+                            actionAlias:     'executeBar',
+                            prefix:          'PrefixBar',
+                            server:          self::WIKI . '/bar',
                         )
                     ]
                 ],
                 'expectedLink'      => self::WIKI . '/bar/PrefixBar/VendorBar/ExecutorBar_executeBar?v='
                     . self::VERSION
             ],
-            'annotation uri'                            => [
+            'attribute uri'                            => [
                 'configuration'     => [
                     'defaults' => [
                         'server' => self::TEST_WIKI . '/',
@@ -503,15 +497,13 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        [
-                            'uri'    => 'test',
-                            'server' => self::WIKI . '/'
-                        ]
+                        server: self::WIKI . '/',
+                        uri:    'test',
                     )
                 ],
                 'expectedLink'      => self::WIKI . '/test?v=' . self::VERSION
             ],
-            'annotation uri unset with resource config' => [
+            'attribute uri unset with resource config' => [
                 'configuration'     => [
                     'defaults'  => [
                         'server' => self::TEST_WIKI . '/',
@@ -529,9 +521,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        [
-                            'uri' => 'test'
-                        ]
+                        uri: 'test',
                     )
                 ],
                 'expectedLink'      => self::TEST_WIKI . '/Third_Party/Oro/' . $testControllerRunAction
@@ -633,7 +623,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        ['actionAlias' => 'runAction/{optionOne}/{option_two}/{option_3}']
+                        actionAlias: 'runAction/{optionOne}/{option_two}/{option_3}',
                     ),
                     'optionOne'       => 'test1',
                     'option_two'      => 'test2',
@@ -654,7 +644,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        ['actionAlias' => 'runAction/{option}']
+                        actionAlias: 'runAction/{option}',
                     )
                 ],
                 'expectedLink' => self::TEST_WIKI . '/Oro/' . $testControllerName . '_runAction/?v=' . self::VERSION

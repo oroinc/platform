@@ -7,15 +7,9 @@ namespace Oro\Bundle\CronBundle\Entity;
  */
 trait ScheduleIntervalTrait
 {
-    /**
-     * @var \DateTime|null
-     */
-    protected $activeAt;
+    protected ?\DateTimeInterface $activeAt = null;
 
-    /**
-     * @var \DateTime|null
-     */
-    protected $deactivateAt;
+    protected ?\DateTimeInterface $deactivateAt = null;
 
     /**
      * @return \DateTime|null

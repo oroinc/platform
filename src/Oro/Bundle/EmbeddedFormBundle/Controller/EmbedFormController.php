@@ -27,13 +27,13 @@ class EmbedFormController extends AbstractController
     use RequestHandlerTrait;
 
     /**
-     * @Route("/submit/{id}", name="oro_embedded_form_submit", requirements={"id"="[-\d\w]+"})
      *
      * @param EmbeddedForm $formEntity
      * @param Request $request
      * @return Response
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[Route(path: '/submit/{id}', name: 'oro_embedded_form_submit', requirements: ['id' => '[-\d\w]+'])]
     public function formAction(EmbeddedForm $formEntity, Request $request)
     {
         $response = new Response();
@@ -115,12 +115,12 @@ class EmbedFormController extends AbstractController
     }
 
     /**
-     * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="[-\d\w]+"})
      *
      * @param EmbeddedForm $formEntity
      * @param Request $request
      * @return Response
      */
+    #[Route(path: '/success/{id}', name: 'oro_embedded_form_success', requirements: ['id' => '[-\d\w]+'])]
     public function formSuccessAction(EmbeddedForm $formEntity, Request $request)
     {
         $response = new Response();

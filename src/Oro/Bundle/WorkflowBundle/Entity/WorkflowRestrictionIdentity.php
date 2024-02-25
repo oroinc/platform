@@ -2,59 +2,37 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(
- *      name="oro_workflow_restriction_ident",
- *      indexes={
- *          @ORM\Index(
- *              name="oro_workflow_restr_ident_idx",
- *              columns={"entity_id"}
- *          )
- *      },
- *      uniqueConstraints={
- *          @ORM\UniqueConstraint(
- *              name="oro_workflow_restr_ident_unique_idx",
- *              columns={"workflow_restriction_id", "entity_id", "workflow_item_id"}
- *          )
- *      }
- * )
- * @ORM\Entity
- */
+* Entity that represents Workflow Restriction Identity
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_workflow_restriction_ident')]
+#[ORM\Index(columns: ['entity_id'], name: 'oro_workflow_restr_ident_idx')]
+#[ORM\UniqueConstraint(
+    name: 'oro_workflow_restr_ident_unique_idx',
+    columns: ['workflow_restriction_id', 'entity_id', 'workflow_item_id']
+)]
 class WorkflowRestrictionIdentity
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var WorkflowRestriction
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowRestriction", inversedBy="restrictionIdentities")
-     * @ORM\JoinColumn(name="workflow_restriction_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $restriction;
+    #[ORM\ManyToOne(targetEntity: WorkflowRestriction::class, inversedBy: 'restrictionIdentities')]
+    #[ORM\JoinColumn(name: 'workflow_restriction_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?WorkflowRestriction $restriction = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="entity_id", type="integer", nullable=false)
-     */
-    protected $entityId;
+    #[ORM\Column(name: 'entity_id', type: Types::INTEGER, nullable: false)]
+    protected ?int $entityId = null;
 
-    /**
-     * @var WorkflowItem
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowItem", inversedBy="restrictionIdentities")
-     * @ORM\JoinColumn(name="workflow_item_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
-    protected $workflowItem;
+    #[ORM\ManyToOne(targetEntity: WorkflowItem::class, inversedBy: 'restrictionIdentities')]
+    #[ORM\JoinColumn(name: 'workflow_item_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?WorkflowItem $workflowItem = null;
 
     /**
      * @return int

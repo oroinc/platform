@@ -2,53 +2,37 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Audit\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="oro_entity_config_log_diff")
- * @ORM\Entity
- */
+* Entity that represents Config Log Diff
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_entity_config_log_diff')]
 class ConfigLogDiff
 {
-    /**
-     * @var integer
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    protected ?int $id = null;
 
-    /**
-     * @var ConfigLog
-     *
-     * @ORM\ManyToOne(targetEntity="ConfigLog", inversedBy="diffs")
-     * @ORM\JoinColumn(name="log_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $log;
+    #[ORM\ManyToOne(targetEntity: ConfigLog::class, inversedBy: 'diffs')]
+    #[ORM\JoinColumn(name: 'log_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?ConfigLog $log = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="class_name", type="string", length=100)
-     */
-    protected $className;
+    #[ORM\Column(name: 'class_name', type: Types::STRING, length: 100)]
+    protected ?string $className = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="field_name", type="string", length=100, nullable=true)
-     */
-    protected $fieldName;
+    #[ORM\Column(name: 'field_name', type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $fieldName = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
-    protected $scope;
+    #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $scope = null;
 
-    /**
-     * @var array
-     * @ORM\Column(type="text")
-     */
-    protected $diff;
+    #[ORM\Column(type: Types::TEXT)]
+    protected ?string $diff = null;
 
     /**
      * @return int

@@ -20,37 +20,6 @@ class EmailActivitySearchController extends RestGetController
     /**
      * Searches entities associated with the email activity.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
-     * @QueryParam(
-     *     name="search",
-     *     requirements=".+",
-     *     nullable=true,
-     *     description="The search string."
-     * )
-     * @QueryParam(
-     *      name="from",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The entity alias. One or several aliases separated by comma. Defaults to all entities."
-     * )
-     * @QueryParam(
-     *      name="email",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="An email address. One or several addresses separated by comma."
-     * )
-     *
      * @ApiDoc(
      *      description="Searches entities associated with the email activity.",
      *      resource=true
@@ -58,6 +27,31 @@ class EmailActivitySearchController extends RestGetController
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
+    #[QueryParam(name: 'search', requirements: '.+', description: 'The search string.', nullable: true)]
+    #[QueryParam(
+        name: 'from',
+        requirements: '.+',
+        description: 'The entity alias. One or several aliases separated by comma. Defaults to all entities.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'email',
+        requirements: '.+',
+        description: 'An email address. One or several addresses separated by comma.',
+        nullable: true
+    )]
     public function cgetAction(Request $request)
     {
         $page  = (int)$request->get('page', 1);

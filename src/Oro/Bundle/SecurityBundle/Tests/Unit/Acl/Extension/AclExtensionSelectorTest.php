@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\NullAclExtension;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -144,36 +144,36 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->selector->select(new ObjectIdentity('wrong', 'testAction'), false));
     }
 
-    public function testSelectEntityExtensionByAclAnnotation()
+    public function testSelectEntityExtensionByAclAttribute()
     {
         $this->assertSame(
             $this->entityExtension,
-            $this->selector->select(new AclAnnotation(['type' => 'entity', 'id' => 'Test\Entity']))
+            $this->selector->select(AclAttribute::fromArray(['type' => 'entity', 'id' => 'Test\Entity']))
         );
     }
 
-    public function testSelectActionExtensionByAclAnnotation()
+    public function testSelectActionExtensionByAclAttribute()
     {
         $this->assertSame(
             $this->actionExtension,
-            $this->selector->select(new AclAnnotation(['type' => 'action', 'id' => 'testAction']))
+            $this->selector->select(AclAttribute::fromArray(['type' => 'action', 'id' => 'testAction']))
         );
     }
 
-    public function testSelectByWrongAclAnnotation()
+    public function testSelectByWrongAclAttribute()
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->expectExceptionMessage(
-            'An ACL extension was not found for: Oro\Bundle\SecurityBundle\Annotation\Acl. Type: wrong. Id: testAction.'
+            'An ACL extension was not found for: Oro\Bundle\SecurityBundle\Attribute\Acl. Type: wrong. Id: testAction.'
         );
 
-        $this->selector->select(new AclAnnotation(['id' => 'wrong', 'type' => 'testAction']));
+        $this->selector->select(AclAttribute::fromArray(['id' => 'wrong', 'type' => 'testAction']));
     }
 
-    public function testSelectByWrongAclAnnotationAndThrowExceptionIsNotRequested()
+    public function testSelectByWrongAclAttributeAndThrowExceptionIsNotRequested()
     {
         self::assertNull(
-            $this->selector->select(new AclAnnotation(['id' => 'wrong', 'type' => 'testAction']), false)
+            $this->selector->select(AclAttribute::fromArray(['id' => 'wrong', 'type' => 'testAction']), false)
         );
     }
 

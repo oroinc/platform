@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroAttachmentBundle_Entity_File;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\AttachmentBundle\Entity\Repository\FileRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
@@ -15,162 +17,91 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * File entity.
  * Contains information about uploaded file. Can be attached to any entity which requires file or image functionality.
  *
- * @ORM\Table(name="oro_attachment_file", indexes = {
- *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"}),
- *      @ORM\Index("att_file_uuid_idx", columns = {"uuid"})
- * })
- * @ORM\Entity(repositoryClass="Oro\Bundle\AttachmentBundle\Entity\Repository\FileRepository")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-file"
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @mixin OroAttachmentBundle_Entity_File
  */
+#[ORM\Entity(repositoryClass: FileRepository::class)]
+#[ORM\Table(name: 'oro_attachment_file')]
+#[ORM\Index(columns: ['original_filename'], name: 'att_file_orig_filename_idx')]
+#[ORM\Index(columns: ['uuid'], name: 'att_file_uuid_idx')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    defaultValues: [
+        'entity' => ['icon' => 'fa-file'],
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class File implements FileExtensionInterface, ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(name="uuid", type="guid", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
      */
+    #[ORM\Column(name: 'uuid', type: Types::GUID, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
     protected $uuid;
 
-    /**
-     * @var UserInterface
-     *
-     * @ORM\ManyToOne(targetEntity="Symfony\Component\Security\Core\User\UserInterface")
-     * @ORM\JoinColumn(name="owner_user_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
+    #[ORM\JoinColumn(name: 'owner_user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?UserInterface $owner = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="filename", type="string", length=255, nullable=false)
-     */
-    protected $filename;
+    #[ORM\Column(name: 'filename', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $filename = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="extension", type="string", length=10, nullable=true)
-     */
-    protected $extension;
+    #[ORM\Column(name: 'extension', type: Types::STRING, length: 10, nullable: true)]
+    protected ?string $extension = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="mime_type", type="string", length=100, nullable=true)
-     */
-    protected $mimeType;
+    #[ORM\Column(name: 'mime_type', type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $mimeType = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="original_filename", type="string", length=255, nullable=true)
-     */
-    protected $originalFilename;
+    #[ORM\Column(name: 'original_filename', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $originalFilename = null;
 
-    /**
-     * @var integer|null
-     *
-     * @ORM\Column(name="file_size", type="integer", nullable=true)
-     */
-    protected $fileSize;
+    #[ORM\Column(name: 'file_size', type: Types::INTEGER, nullable: true)]
+    protected ?int $fileSize = null;
 
     /**
      * Class name of the parent entity to which this file belongs. Needed in sake of ACL checks.
      *
      * @var string|null
-     *
-     * @ORM\Column(name="parent_entity_class", type="string", length=512, nullable=true)
      */
-    protected $parentEntityClass;
+    #[ORM\Column(name: 'parent_entity_class', type: Types::STRING, length: 512, nullable: true)]
+    protected ?string $parentEntityClass = null;
 
     /**
      * Id of the parent entity to which this file belongs. Needed in sake of ACL checks.
      *
      * @var int|null
-     *
-     * @ORM\Column(name="parent_entity_id", type="integer", nullable=true)
      */
-    protected $parentEntityId;
+    #[ORM\Column(name: 'parent_entity_id', type: Types::INTEGER, nullable: true)]
+    protected ?int $parentEntityId = null;
 
     /**
      * Field name where the file is stored in the parent entity to which it belongs. Needed in sake of ACL checks.
      *
      * @var string|null
-     *
-     * @ORM\Column(name="parent_entity_field_name", type="string", length=50, nullable=true)
      */
-    protected $parentEntityFieldName;
+    #[ORM\Column(name: 'parent_entity_field_name', type: Types::STRING, length: 50, nullable: true)]
+    protected ?string $parentEntityFieldName = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="external_url", type="string", length=1024, nullable=true)
-     */
-    protected $externalUrl;
+    #[ORM\Column(name: 'external_url', type: Types::STRING, length: 1024, nullable: true)]
+    protected ?string $externalUrl = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     protected ?\SplFileInfo $file = null;
 
@@ -394,9 +325,8 @@ class File implements FileExtensionInterface, ExtendEntityInterface
 
     /**
      * Pre persist event handler
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -409,9 +339,8 @@ class File implements FileExtensionInterface, ExtendEntityInterface
 
     /**
      * Pre update event handler
-     *
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

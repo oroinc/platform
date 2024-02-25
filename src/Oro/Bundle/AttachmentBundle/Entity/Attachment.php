@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroAttachmentBundle_Entity_Attachment;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,110 +18,61 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Attachment ORM entity.
  *
- * @ORM\Table(name="oro_attachment")
- * @ORM\Entity()
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-file"
- *          },
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "category"="account_management"
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @method bool supportTarget($targetClass)
  * @method object|null getTarget()
  * @method Attachment setTarget($target)
  * @mixin OroAttachmentBundle_Entity_Attachment
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_attachment')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    defaultValues: [
+        'entity' => ['icon' => 'fa-file'],
+        'ownership' => [
+            'owner_type' => 'USER',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'category' => 'account_management'],
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true]
+    ]
+)]
 class Attachment implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var UserInterface
-     *
-     * @ORM\ManyToOne(targetEntity="Symfony\Component\Security\Core\User\UserInterface")
-     * @ORM\JoinColumn(name="owner_user_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
+    #[ORM\JoinColumn(name: 'owner_user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?UserInterface $owner = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="businessUnits")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class, inversedBy: 'businessUnits')]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="comment", type="text", nullable=true)
-     */
-    protected $comment;
+    #[ORM\Column(name: 'comment', type: Types::TEXT, nullable: true)]
+    protected ?string $comment = null;
 
-    /**
-     * @var File
-     *
-     * @Assert\Valid()
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File", cascade={"persist"})
-     * @ORM\JoinColumn(name="file_id", referencedColumnName="id")
-     */
-    protected $file;
+    #[Assert\Valid]
+    #[ORM\ManyToOne(targetEntity: File::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'file_id', referencedColumnName: 'id')]
+    protected ?File $file = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * Get id
@@ -241,9 +194,8 @@ class Attachment implements ExtendEntityInterface
 
     /**
      * Pre persist event handler
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -252,9 +204,8 @@ class Attachment implements ExtendEntityInterface
 
     /**
      * Pre update event handler
-     *
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

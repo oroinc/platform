@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\Controller;
 
-use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
+use Oro\Bundle\NavigationBundle\Attribute\TitleTemplate;
 
 class TestController
 {
-    /**
-     * @TitleTemplate("test1 title")
-     */
+    #[TitleTemplate('test1 title')]
     public function test1Action()
     {
         return [];

@@ -2,45 +2,29 @@
 
 namespace Oro\Bundle\MigrationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Data fixture migration log entity
- *
- * @ORM\Table("oro_migrations_data")
- * @ORM\Entity()
  */
+#[ORM\Entity]
+#[ORM\Table('oro_migrations_data')]
 class DataFixture
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="class_name", type="string", length=255)
-     */
-    protected $className;
+    #[ORM\Column(name: 'class_name', type: Types::STRING, length: 255)]
+    protected ?string $className = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="version", type="string", length=255, nullable=true)
-     */
-    protected $version;
+    #[ORM\Column(name: 'version', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $version = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="loaded_at", type="datetime")
-     */
-    protected $loadedAt;
+    #[ORM\Column(name: 'loaded_at', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $loadedAt = null;
 
     /**
      * @return int

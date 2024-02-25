@@ -10,10 +10,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
  */
 abstract class AbstractRole extends Role
 {
-    /**
-     * @var string
-     */
-    protected $role;
+    protected ?string $role = null;
 
     /**
      * @return string

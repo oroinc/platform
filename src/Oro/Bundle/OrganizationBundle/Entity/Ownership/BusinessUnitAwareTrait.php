@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity\Ownership;
 
+use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 /**
@@ -11,12 +12,9 @@ trait BusinessUnitAwareTrait
 {
     use OrganizationAwareTrait;
 
-    /**
-     * @var BusinessUnit
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
-     * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
+    #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?BusinessUnit $owner = null;
 
     /**
      * @return BusinessUnit|null

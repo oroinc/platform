@@ -2,34 +2,26 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\DenormalizedPropertyAwareInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 
 /**
  * Entity for testing search engine
- *
- * @ORM\Table(name="test_search_product")
- * @ORM\Entity
- * @Config()
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_search_product')]
+#[Config]
 class Product implements TestFrameworkEntityInterface, DenormalizedPropertyAwareInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", nullable=true)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
+    protected ?string $name = null;
 
     protected $denormalizedName;
 
@@ -41,17 +33,13 @@ class Product implements TestFrameworkEntityInterface, DenormalizedPropertyAware
         $this->nameLowercase = mb_strtolower($this->name);
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->updateDenormalizedProperties();
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updateDenormalizedProperties();

@@ -2,28 +2,23 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Ownership;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\AuditableOrganizationAwareTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+* AuditableUserAware trait
+*
+*/
 trait AuditableUserAwareTrait
 {
     use AuditableOrganizationAwareTrait;
 
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    protected ?User $owner = null;
 
     /**
      * @return User|null

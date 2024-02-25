@@ -19,8 +19,8 @@ use Oro\Bundle\ReportBundle\Entity\ReportType;
 use Oro\Bundle\ReportBundle\Form\Handler\ReportHandler;
 use Oro\Bundle\ReportBundle\Form\Type\ReportType as ReportFormType;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -62,17 +62,13 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/view/{id}", name="oro_report_view", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_report_view",
-     *      type="entity",
-     *      permission="VIEW",
-     *      class="Oro\Bundle\ReportBundle\Entity\Report"
-     * )
+     *
      * @param Report $entity
      *
      * @return Response
      */
+    #[Route(path: '/view/{id}', name: 'oro_report_view', requirements: ['id' => '\d+'])]
+    #[Acl(id: 'oro_report_view', type: 'entity', class: Report::class, permission: 'VIEW')]
     public function viewAction(Report $entity)
     {
         $this->checkReport($entity);
@@ -125,19 +121,14 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/view/{gridName}", name="oro_report_view_grid", requirements={"gridName"="[-\w]+"})
-     * @Template
-     * @Acl(
-     *      id="oro_report_view",
-     *      type="entity",
-     *      permission="VIEW",
-     *      class="Oro\Bundle\ReportBundle\Entity\Report"
-     * )
      *
      * @param string $gridName
      *
      * @return array
      */
+    #[Route(path: '/view/{gridName}', name: 'oro_report_view_grid', requirements: ['gridName' => '[-\w]+'])]
+    #[Template]
+    #[Acl(id: 'oro_report_view', type: 'entity', class: Report::class, permission: 'VIEW')]
     public function viewFromGridAction($gridName)
     {
         $configuration = $this->container->get(Manager::class)->getConfigurationForGrid($gridName);
@@ -149,36 +140,24 @@ class ReportController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/create", name="oro_report_create")
-     * @Template("@OroReport/Report/update.html.twig")
-     * @Acl(
-     *      id="oro_report_create",
-     *      type="entity",
-     *      permission="CREATE",
-     *      class="Oro\Bundle\ReportBundle\Entity\Report"
-     * )
-     */
+    #[Route(path: '/create', name: 'oro_report_create')]
+    #[Template('@OroReport/Report/update.html.twig')]
+    #[Acl(id: 'oro_report_create', type: 'entity', class: Report::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new Report(), $request);
     }
 
     /**
-     * @Route("/update/{id}", name="oro_report_update", requirements={"id"="\d+"})
-     * @Template
-     * @Acl(
-     *      id="oro_report_update",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="Oro\Bundle\ReportBundle\Entity\Report"
-     * )
      *
      * @param Report $entity
      * @param Request $request
      *
      * @return array
      */
+    #[Route(path: '/update/{id}', name: 'oro_report_update', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[Acl(id: 'oro_report_update', type: 'entity', class: Report::class, permission: 'EDIT')]
     public function updateAction(Report $entity, Request $request)
     {
         $this->checkReport($entity);
@@ -187,13 +166,13 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/clone/{id}", name="oro_report_clone", requirements={"id"="\d+"})
-     * @Template("@OroReport/Report/update.html.twig")
-     * @AclAncestor("oro_report_create")
      * @param Report $entity
      *
      * @return array
      */
+    #[Route(path: '/clone/{id}', name: 'oro_report_clone', requirements: ['id' => '\d+'])]
+    #[Template('@OroReport/Report/update.html.twig')]
+    #[AclAncestor('oro_report_create')]
     public function cloneAction(Report $entity, Request $request)
     {
         $this->checkReport($entity);
@@ -211,16 +190,14 @@ class ReportController extends AbstractController
         return $this->update($clonedEntity, $request);
     }
 
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_report_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @Template
-     * @AclAncestor("oro_report_view")
-     */
+    #[Route(
+        path: '/{_format}',
+        name: 'oro_report_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template]
+    #[AclAncestor('oro_report_view')]
     public function indexAction()
     {
         return [];

@@ -4,146 +4,85 @@ namespace Oro\Bundle\TagBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use Extend\Entity\Autocomplete\OroTagBundle_Entity_Tag;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Tag entity
  *
- * @ORM\Table(
- *     name="oro_tag_tag",
- *    indexes={
- *        @ORM\Index(name="name_organization_idx", columns={"name", "organization_id"})
- *    }
- * )
- * @ORM\HasLifecycleCallbacks
- * @ORM\Entity(repositoryClass="Oro\Bundle\TagBundle\Entity\Repository\TagRepository")
- * @Config(
- *      routeName="oro_tag_index",
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-tag"
- *          },
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
- *          "grouping"={
- *              "groups"={"dictionary"}
- *          },
- *          "dictionary"={
- *              "virtual_fields"={"id"},
- *              "search_fields"={"name"},
- *              "representation_field"="name",
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          },
- *          "tag"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @mixin OroTagBundle_Entity_Tag
  */
+#[ORM\Entity(repositoryClass: TagRepository::class)]
+#[ORM\Table(name: 'oro_tag_tag')]
+#[ORM\Index(columns: ['name', 'organization_id'], name: 'name_organization_idx')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    routeName: 'oro_tag_index',
+    defaultValues: [
+        'entity' => ['icon' => 'fa-tag'],
+        'ownership' => [
+            'owner_type' => 'USER',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'user_owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ],
+        'grouping' => ['groups' => ['dictionary']],
+        'dictionary' => ['virtual_fields' => ['id'], 'search_fields' => ['name'], 'representation_field' => 'name'],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true],
+        'tag' => ['immutable' => true]
+    ]
+)]
 class Tag implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    protected ?string $name = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $created = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updated = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=50)
+     * @var Collection<int, Tagging>
      */
-    protected $name;
+    #[ORM\OneToMany(mappedBy: 'tag', targetEntity: Tagging::class, fetch: 'EXTRA_LAZY')]
+    protected ?Collection $tagging = null;
 
-    /**
-     * @var \Datetime
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $created;
+    #[ORM\ManyToOne(targetEntity: Taxonomy::class, fetch: 'LAZY', inversedBy: 'tags')]
+    #[ORM\JoinColumn(name: 'taxonomy_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?Taxonomy $taxonomy = null;
 
-    /**
-     * @var \Datetime
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updated;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $owner = null;
 
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="Tagging", mappedBy="tag", fetch="EXTRA_LAZY")
-     */
-    protected $tagging;
-
-    /**
-     * @var Taxonomy
-     *
-     * @ORM\ManyToOne(targetEntity="Taxonomy", inversedBy="tags", fetch="LAZY")
-     * @ORM\JoinColumn(name="taxonomy_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $taxonomy;
-
-    /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
-
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
     /**
      * Constructor
@@ -264,9 +203,8 @@ class Tag implements ExtendEntityInterface
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -275,8 +213,8 @@ class Tag implements ExtendEntityInterface
 
     /**
      * Pre update event handler
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function doUpdate()
     {
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));

@@ -2,129 +2,72 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 
 /**
- * @ORM\Table(
- *  "oro_process_trigger",
- *  uniqueConstraints={
- *      @ORM\UniqueConstraint(
- *          name="process_trigger_unique_idx",
- *          columns={"event", "field", "definition_name", "cron"}
- *      )
- *  }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
- */
+* Entity that represents Process Trigger
+*
+*/
+#[ORM\Entity(repositoryClass: ProcessTriggerRepository::class)]
+#[ORM\Table('oro_process_trigger')]
+#[ORM\UniqueConstraint(name: 'process_trigger_unique_idx', columns: ['event', 'field', 'definition_name', 'cron'])]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    defaultValues: [
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class ProcessTrigger implements EventTriggerInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="event", type="string", length=255, nullable=true)
-     */
-    protected $event;
+    #[ORM\Column(name: 'event', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $event = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="field", type="string", length=150, nullable=true)
-     */
-    protected $field;
+    #[ORM\Column(name: 'field', type: Types::STRING, length: 150, nullable: true)]
+    protected ?string $field = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="priority", type="smallint")
-     */
-    protected $priority = ProcessPriority::PRIORITY_DEFAULT;
+    #[ORM\Column(name: 'priority', type: Types::SMALLINT)]
+    protected ?int $priority = ProcessPriority::PRIORITY_DEFAULT;
 
     /**
      * Whether process should be queued or processed immediately
      *
      * @var boolean
-     *
-     * @ORM\Column(name="queued", type="boolean")
      */
-    protected $queued = false;
+    #[ORM\Column(name: 'queued', type: Types::BOOLEAN)]
+    protected ?bool $queued = false;
 
     /**
      * Number of seconds before process must be triggered
-     *
-     * @var integer
-     *
-     * @ORM\Column(name="time_shift", type="integer", nullable=true)
      */
-    protected $timeShift;
+    #[ORM\Column(name: 'time_shift', type: Types::INTEGER, nullable: true)]
+    protected ?int $timeShift = null;
 
-    /**
-     * @var ProcessDefinition
-     *
-     * @ORM\ManyToOne(targetEntity="ProcessDefinition")
-     * @ORM\JoinColumn(name="definition_name", referencedColumnName="name", onDelete="CASCADE")
-     */
-    protected $definition;
+    #[ORM\ManyToOne(targetEntity: ProcessDefinition::class)]
+    #[ORM\JoinColumn(name: 'definition_name', referencedColumnName: 'name', onDelete: 'CASCADE')]
+    protected ?ProcessDefinition $definition = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="cron", type="string", length=100, nullable=true)
-     */
-    protected $cron;
+    #[ORM\Column(name: 'cron', type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $cron = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * {@inheritdoc}
@@ -351,18 +294,14 @@ class ProcessTrigger implements EventTriggerInterface
         return $this->updatedAt;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->preUpdate();
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

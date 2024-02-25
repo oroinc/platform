@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
+use Attribute;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 
@@ -10,6 +11,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @Annotation
  */
+#[Attribute]
 class HasAdderAndRemover extends Constraint implements ConstraintWithStatusCodeInterface
 {
     public $message = 'oro.api.form.no_adder_and_remover';

@@ -3,155 +3,102 @@
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
  * Represents a generic sales order.
  *
  * @package Oro\Bundle\BusinessEntitiesBundle\Entity
- * @ORM\MappedSuperclass
  * @SuppressWarnings(PHPMD.TooManyFields)
  */
+#[ORM\MappedSuperclass]
 class BaseOrder
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: BasePerson::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'customer_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?BasePerson $customer = null;
 
     /**
-     * @var BasePerson
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson", cascade={"persist"})
-     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var Collection<int, AbstractAddress>
      */
-    protected $customer;
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: AbstractAddress::class, cascade: ['all'], orphanRemoval: true)]
+    #[ORM\OrderBy(['primary' => Criteria::DESC])]
+    protected ?Collection $addresses = null;
 
-    /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\AddressBundle\Entity\AbstractAddress",
-     *     mappedBy="owner", cascade={"all"}, orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"primary" = "DESC"})
-     */
-    protected $addresses;
+    #[ORM\Column(name: 'currency', type: Types::STRING, length: 10, nullable: true)]
+    protected ?string $currency = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="currency", type="string", length=10, nullable=true)
-     */
-    protected $currency;
+    #[ORM\Column(name: 'payment_method', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $paymentMethod = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="payment_method", type="string", length=255, nullable=true)
-     */
-    protected $paymentMethod;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="payment_details", type="string", length=255, nullable=true)
-     */
-    protected $paymentDetails;
+    #[ORM\Column(name: 'payment_details', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $paymentDetails = null;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="subtotal_amount", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'subtotal_amount', type: 'money', nullable: true)]
     protected $subtotalAmount;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="shipping_amount", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'shipping_amount', type: 'money', nullable: true)]
     protected $shippingAmount;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="shipping_method", type="string", nullable=true)
-     */
-    protected $shippingMethod;
+    #[ORM\Column(name: 'shipping_method', type: Types::STRING, nullable: true)]
+    protected ?string $shippingMethod = null;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="tax_amount", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'tax_amount', type: 'money', nullable: true)]
     protected $taxAmount;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="discount_amount", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'discount_amount', type: 'money', nullable: true)]
     protected $discountAmount;
 
     /**
      * @var float
-     *
-     * @ORM\Column(name="discount_percent", type="percent", nullable=true)
      */
+    #[ORM\Column(name: 'discount_percent', type: 'percent', nullable: true)]
     protected $discountPercent;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="total_amount", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'total_amount', type: 'money', nullable: true)]
     protected $totalAmount;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="status", type="string", length=255, nullable=false)
-     */
-    protected $status;
+    #[ORM\Column(name: 'status', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $status = null;
+
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
-     * @var \DateTime $createdAt
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
+     * @var Collection<int, BaseOrderItem>
      */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime $updatedAt
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
-
-    /**
-     * @var BaseOrderItem[]|ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="BaseOrderItem", mappedBy="order",cascade={"all"})
-     */
-    protected $items;
+    #[ORM\OneToMany(mappedBy: 'order', targetEntity: BaseOrderItem::class, cascade: ['all'])]
+    protected ?Collection $items = null;
 
     /**
      * init addresses with empty collection
@@ -195,7 +142,7 @@ class BaseOrder
     }
 
     /**
-     * @return \Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson
+     * @return BasePerson
      */
     public function getCustomer()
     {

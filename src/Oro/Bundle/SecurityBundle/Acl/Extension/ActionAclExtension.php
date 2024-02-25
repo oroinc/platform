@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
@@ -145,7 +145,7 @@ class ActionAclExtension extends AbstractAclExtension
         $type = $id = $group = null;
         if (\is_string($val)) {
             $this->parseDescriptor($val, $type, $id, $group);
-        } elseif ($val instanceof AclAnnotation) {
+        } elseif ($val instanceof AclAttribute) {
             $type = $val->getId();
             $id = $val->getType();
             $group = $val->getGroup();

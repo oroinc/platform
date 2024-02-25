@@ -2,43 +2,30 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
 
 /**
- * @ORM\Table(
- *     name="oro_attribute_group_rel",
- *     uniqueConstraints={
- *          @ORM\UniqueConstraint(
- *              name="oro_attribute_group_uidx",
- *              columns={"entity_config_field_id", "attribute_group_id"}
- *          )
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository")
- */
+* Entity that represents Attribute Group Relation
+*
+*/
+#[ORM\Entity(repositoryClass: AttributeGroupRelationRepository::class)]
+#[ORM\Table(name: 'oro_attribute_group_rel')]
+#[ORM\UniqueConstraint(name: 'oro_attribute_group_uidx', columns: ['entity_config_field_id', 'attribute_group_id'])]
 class AttributeGroupRelation
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var int
-     * @ORM\Column(name="entity_config_field_id", type="integer")
-     */
-    private $entityConfigFieldId;
+    #[ORM\Column(name: 'entity_config_field_id', type: Types::INTEGER)]
+    private ?int $entityConfigFieldId = null;
 
-    /**
-     * @var AttributeGroup
-     * @ORM\ManyToOne(targetEntity="AttributeGroup", inversedBy="attributeRelations")
-     * @ORM\JoinColumn(name="attribute_group_id", referencedColumnName="id")
-     */
-    private $attributeGroup;
+    #[ORM\ManyToOne(targetEntity: AttributeGroup::class, inversedBy: 'attributeRelations')]
+    #[ORM\JoinColumn(name: 'attribute_group_id', referencedColumnName: 'id')]
+    private ?AttributeGroup $attributeGroup = null;
 
     /**
      * @return int

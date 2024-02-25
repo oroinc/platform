@@ -2,34 +2,25 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Environment\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="test_api_attachment_owner")
- * @Config()
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_attachment_owner')]
+#[Config]
 class TestAttachmentOwner implements TestFrameworkEntityInterface, ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    public $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    public ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    public $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    public ?string $name = null;
 }

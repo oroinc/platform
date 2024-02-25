@@ -72,7 +72,7 @@ class OroSecurityBundle extends Bundle
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(
-                DoctrineOrmMappingsPass::createAnnotationMappingDriver(
+                DoctrineOrmMappingsPass::createAttributeMappingDriver(
                     ['Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity'],
                     [$this->getPath() . '/Tests/Functional/Environment/Entity']
                 )

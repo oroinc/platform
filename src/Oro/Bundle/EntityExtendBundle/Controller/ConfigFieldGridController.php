@@ -9,8 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,19 +23,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * The controller for FieldConfigModel entity.
  *
  * @package Oro\Bundle\EntityExtendBundle\Controller
- * @Route("/entity/extend/field")
- * @AclAncestor("oro_entityconfig_manage")
  */
+#[AclAncestor('oro_entityconfig_manage')]
+#[Route(path: '/entity/extend/field')]
 class ConfigFieldGridController extends AbstractController
 {
     /**
-     * @Route("/create/{id}", name="oro_entityextend_field_create", requirements={"id"="\d+"}, defaults={"id"=0})
      *
-     * @Template
      * @param Request $request
      * @param EntityConfigModel $entityConfigModel
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
+    #[Route(
+        path: '/create/{id}',
+        name: 'oro_entityextend_field_create',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0]
+    )]
+    #[Template]
     public function createAction(Request $request, EntityConfigModel $entityConfigModel)
     {
         if (!$this->getExtendConfigProvider()->getConfig($entityConfigModel->getClassName())->is('is_extend')) {
@@ -58,12 +63,17 @@ class ConfigFieldGridController extends AbstractController
     }
 
     /**
-     * @Route("/update/{id}", name="oro_entityextend_field_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template("@OroEntityConfig/Config/fieldUpdate.html.twig")
      * @param Request $request
      * @param EntityConfigModel $entity
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
+    #[Route(
+        path: '/update/{id}',
+        name: 'oro_entityextend_field_update',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0]
+    )]
+    #[Template('@OroEntityConfig/Config/fieldUpdate.html.twig')]
     public function updateAction(Request $request, EntityConfigModel $entity)
     {
         $redirectUrl = $this->generateUrl('oro_entityextend_field_create', ['id' => $entity->getId()]);
@@ -90,17 +100,17 @@ class ConfigFieldGridController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/remove/{id}",
-     *      name="oro_entityextend_field_remove",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0},
-     *      methods={"DELETE"}
-     * )
-     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return Response
      */
+    #[Route(
+        path: '/remove/{id}',
+        name: 'oro_entityextend_field_remove',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0],
+        methods: ['DELETE']
+    )]
+    #[CsrfProtection()]
     public function removeAction(FieldConfigModel $field)
     {
         $this->ensureFieldConfigModelIsCustom($field);
@@ -112,17 +122,17 @@ class ConfigFieldGridController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/unremove/{id}",
-     *      name="oro_entityextend_field_unremove",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0},
-     *      methods={"POST"}
-     * )
-     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return Response
      */
+    #[Route(
+        path: '/unremove/{id}',
+        name: 'oro_entityextend_field_unremove',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0],
+        methods: ['POST']
+    )]
+    #[CsrfProtection()]
     public function unremoveAction(FieldConfigModel $field)
     {
         $this->ensureFieldConfigModelIsCustom($field);

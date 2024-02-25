@@ -2,43 +2,33 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="group_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'group_table')]
 class Group
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=50)
-     */
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
     private ?string $name = null;
 
-    /**
-     * @ORM\Column(name="label", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255, nullable: true)]
     private ?string $label = null;
 
-    /**
-     * @ORM\Column(name="public", type="boolean")
-     */
-    private bool $public = false;
+    #[ORM\Column(name: 'public', type: Types::BOOLEAN)]
+    private ?bool $public = false;
 
     /**
      * This field has getter and setter which not match the field name
      * and it is used to test that such fields are serialized using direct property access
-     *
-     * @ORM\Column(name="is_exception", type="boolean")
      */
-    private bool $isException = false;
+    #[ORM\Column(name: 'is_exception', type: Types::BOOLEAN)]
+    private ?bool $isException = false;
 
     public function __construct(int $id = null)
     {

@@ -62,7 +62,7 @@ class EmailApiEntityManager extends ApiEntityManager
      */
     public function getEmailAttachmentRepository()
     {
-        return $this->getObjectManager()->getRepository('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
+        return $this->getObjectManager()->getRepository(EmailAttachment::class);
     }
 
     /**

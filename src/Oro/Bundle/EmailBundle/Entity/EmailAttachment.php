@@ -2,72 +2,49 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository;
 
 /**
  * Email Attachment
- *
- * @ORM\Table(name="oro_email_attachment")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository")
  */
+#[ORM\Entity(repositoryClass: EmailAttachmentRepository::class)]
+#[ORM\Table(name: 'oro_email_attachment')]
 class EmailAttachment implements FileExtensionInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="file_name", type="string", length=255)
-     */
-    protected $fileName;
+    #[ORM\Column(name: 'file_name', type: Types::STRING, length: 255)]
+    protected ?string $fileName = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content_type", type="string", length=100)
-     */
-    protected $contentType;
+    #[ORM\Column(name: 'content_type', type: Types::STRING, length: 100)]
+    protected ?string $contentType = null;
 
-    /**
-     * @var EmailAttachmentContent
-     *
-     * @ORM\OneToOne(targetEntity="EmailAttachmentContent", mappedBy="emailAttachment",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
-     */
-    protected $attachmentContent;
+    #[ORM\OneToOne(
+        mappedBy: 'emailAttachment',
+        targetEntity: EmailAttachmentContent::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?EmailAttachmentContent $attachmentContent = null;
 
-    /**
-     * @var EmailBody
-     *
-     * @ORM\ManyToOne(targetEntity="EmailBody", inversedBy="attachments")
-     * @ORM\JoinColumn(name="body_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $emailBody;
+    #[ORM\ManyToOne(targetEntity: EmailBody::class, inversedBy: 'attachments')]
+    #[ORM\JoinColumn(name: 'body_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?EmailBody $emailBody = null;
 
-    /**
-     * @var File
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
-     * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     */
-    protected $file;
+    #[ORM\ManyToOne(targetEntity: File::class)]
+    #[ORM\JoinColumn(name: 'file_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    protected ?File $file = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="embedded_content_id", type="string", length=255, nullable=true)
-     */
-    protected $embeddedContentId;
+    #[ORM\Column(name: 'embedded_content_id', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $embeddedContentId = null;
 
     /**
      * Get id

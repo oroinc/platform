@@ -2,56 +2,40 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="oro_entity_config_index_value", indexes={
- *  @ORM\Index(name="idx_entity_config_index_entity", columns={"scope", "code", "value", "entity_id"}),
- *  @ORM\Index(name="idx_entity_config_index_field", columns={"scope", "code", "value", "field_id"})
- * })
- * @ORM\Entity
- */
+* Entity that represents Config Model Index Value
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_entity_config_index_value')]
+#[ORM\Index(columns: ['scope', 'code', 'value', 'entity_id'], name: 'idx_entity_config_index_entity')]
+#[ORM\Index(columns: ['scope', 'code', 'value', 'field_id'], name: 'idx_entity_config_index_field')]
 class ConfigModelIndexValue
 {
-    /**
-     * @var integer
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    protected ?int $id = null;
 
-    /**
-     * @var EntityConfigModel
-     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="indexedValues")
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $entity;
+    #[ORM\ManyToOne(targetEntity: EntityConfigModel::class, inversedBy: 'indexedValues')]
+    #[ORM\JoinColumn(name: 'entity_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?EntityConfigModel $entity = null;
 
-    /**
-     * @var FieldConfigModel
-     * @ORM\ManyToOne(targetEntity="FieldConfigModel", inversedBy="indexedValues")
-     * @ORM\JoinColumn(name="field_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $field;
+    #[ORM\ManyToOne(targetEntity: FieldConfigModel::class, inversedBy: 'indexedValues')]
+    #[ORM\JoinColumn(name: 'field_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?FieldConfigModel $field = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="code", type="string", length=255)
-     */
-    protected $code;
+    #[ORM\Column(name: 'code', type: Types::STRING, length: 255)]
+    protected ?string $code = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="scope", type="string", length=255)
-     */
-    protected $scope;
+    #[ORM\Column(name: 'scope', type: Types::STRING, length: 255)]
+    protected ?string $scope = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    protected $value;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $value = null;
 
     /**
      * @param string|null $scope

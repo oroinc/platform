@@ -16,9 +16,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Autocomplete search controller for Activities.
- *
- * @Route("/activities")
  */
+#[Route(path: '/activities')]
 class AutocompleteController extends AbstractController
 {
     /**
@@ -27,9 +26,8 @@ class AutocompleteController extends AbstractController
      *
      * @return JsonResponse
      * @throws HttpException|AccessDeniedHttpException
-     *
-     * @Route("/{activity}/search/autocomplete", name="oro_activity_form_autocomplete_search")
      */
+    #[Route(path: '/{activity}/search/autocomplete', name: 'oro_activity_form_autocomplete_search')]
     public function autocompleteAction(Request $request, $activity)
     {
         $autocompleteRequest = new AutocompleteRequest($request);

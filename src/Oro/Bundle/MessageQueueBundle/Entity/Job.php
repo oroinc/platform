@@ -3,123 +3,78 @@
 namespace Oro\Bundle\MessageQueueBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Job\Job as BaseJob;
 
 /**
 * Message Queue Job entity class.
- *
- * @ORM\Entity(repositoryClass="Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository")
- * @ORM\Table(
- *     name="oro_message_queue_job",
- *     indexes={
- *          @Index(name="idx_status", columns={"status"})
- *     }
- * )
- */
+*/
+#[ORM\Entity(repositoryClass: JobRepository::class)]
+#[ORM\Table(name: 'oro_message_queue_job')]
+#[Index(columns: ['status'], name: 'idx_status')]
 class Job extends BaseJob
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'owner_id', type: Types::STRING, nullable: true)]
+    protected ?string $ownerId = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: false)]
+    protected ?string $name = null;
+
+    #[ORM\Column(name: 'status', type: Types::STRING, nullable: false)]
+    protected ?string $status = null;
+
+    #[ORM\Column(name: 'interrupted', type: Types::BOOLEAN)]
+    protected ?bool $interrupted = null;
+
+    #[ORM\Column(name: '`unique`', type: Types::BOOLEAN)]
+    protected ?bool $unique = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="owner_id", type="string", nullable=true)
+     * @var Job|null
      */
-    protected $ownerId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", nullable=false)
-     */
-    protected $name;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="status", type="string", nullable=false)
-     */
-    protected $status;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="interrupted", type="boolean")
-     */
-    protected $interrupted;
-
-    /**
-     * @var bool;
-     *
-     * @ORM\Column(name="`unique`", type="boolean")
-     */
-    protected $unique;
-
-    /**
-     * @var Job
-     *
-     * @ORM\ManyToOne(targetEntity="Job", inversedBy="childJobs")
-     * @ORM\JoinColumn(name="root_job_id", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: Job::class, inversedBy: 'childJobs')]
+    #[ORM\JoinColumn(name: 'root_job_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     protected $rootJob;
 
     /**
-     * @var Job[]
-     *
-     * @ORM\OneToMany(targetEntity="Job", mappedBy="rootJob", cascade={"persist"})
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, Job>
      */
+    #[ORM\OneToMany(mappedBy: 'rootJob', targetEntity: Job::class, cascade: ['persist'])]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
     protected $childJobs;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: false)]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="started_at", type="datetime", nullable=true)
-     */
-    protected $startedAt;
+    #[ORM\Column(name: 'started_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $startedAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="last_active_at", type="datetime", nullable=true)
-     */
-    protected $lastActiveAt;
+    #[ORM\Column(name: 'last_active_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $lastActiveAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="stopped_at", type="datetime", nullable=true)
-     */
-    protected $stoppedAt;
+    #[ORM\Column(name: 'stopped_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $stoppedAt = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="data", type="json_array", nullable=true, options={"jsonb"=true})
      */
+    #[ORM\Column(name: 'data', type: 'json_array', nullable: true, options: ['jsonb' => true])]
     protected $data;
 
     /**
      * @var float
-     *
-     * @ORM\Column(name="job_progress", type="percent", nullable=true)
      */
+    #[ORM\Column(name: 'job_progress', type: 'percent', nullable: true)]
     protected $jobProgress;
 
     public function __construct()

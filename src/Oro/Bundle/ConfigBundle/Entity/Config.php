@@ -4,47 +4,35 @@ namespace Oro\Bundle\ConfigBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
 
 /**
- * @ORM\Table(
- *  name="oro_config",
- *  uniqueConstraints={@ORM\UniqueConstraint(name="CONFIG_UQ_ENTITY", columns={"entity", "record_id"})}
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository")
- */
+* Entity that represents Config
+*
+*/
+#[ORM\Entity(repositoryClass: ConfigRepository::class)]
+#[ORM\Table(name: 'oro_config')]
+#[ORM\UniqueConstraint(name: 'CONFIG_UQ_ENTITY', columns: ['entity', 'record_id'])]
 class Config
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'entity', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $scopedEntity = null;
+
+    #[ORM\Column(name: 'record_id', type: Types::INTEGER, nullable: true)]
+    protected ?int $recordId = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="entity", type="string", length=255, nullable=true)
+     * @var Collection<int, ConfigValue>
      */
-    protected $scopedEntity;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="record_id", type="integer", nullable=true)
-     */
-    protected $recordId;
-
-    /**
-     * @var ConfigValue[]
-     *
-     * @ORM\OneToMany(targetEntity="ConfigValue", mappedBy="config",
-     *      cascade={"ALL"}, orphanRemoval=true)
-     */
-    protected $values;
+    #[ORM\OneToMany(mappedBy: 'config', targetEntity: ConfigValue::class, cascade: ['ALL'], orphanRemoval: true)]
+    protected ?Collection $values = null;
 
     public function __construct()
     {

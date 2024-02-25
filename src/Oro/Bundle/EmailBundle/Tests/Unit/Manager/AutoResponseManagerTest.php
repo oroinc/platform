@@ -125,7 +125,9 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     {
         $mailbox = new Mailbox();
         $origin = new UserEmailOrigin();
-        $origin->setUser(new User());
+        $user = new User();
+        $user->setUserIdentifier('test_user');
+        $origin->setUser($user);
         $mailbox->setOrigin($origin);
         $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule($definition)]));
 

@@ -3,12 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEmailBundle_Entity_Email;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Symfony\Component\HttpFoundation\AcceptHeader;
@@ -16,43 +19,32 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
 /**
  * Represents an email.
  *
- * @ORM\Table(
- *      name="oro_email",
- *      indexes={
- *          @ORM\Index(name="IDX_email_message_id", columns={"message_id"}),
- *          @ORM\Index(name="oro_email_is_head", columns={"is_head"}),
- *          @ORM\Index(name="IDX_sent", columns={"sent"}),
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository")
- * @ORM\HasLifecycleCallbacks
  *
- * @Config(
- *      routeView="oro_email_thread_view",
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-envelope"
- *          },
- *          "grouping"={
- *              "groups"={"activity"}
- *          },
- *          "activity"={
- *              "route"="oro_email_activity_view",
- *              "acl"="oro_email_email_view",
- *              "action_button_widget"="oro_send_email_button",
- *              "action_link_widget"="oro_send_email_link"
- *          },
- *          "grid"={
- *              "default"="email-grid",
- *              "context"="email-for-context-grid"
- *          }
- *      }
- * )
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @mixin OroEmailBundle_Entity_Email
  */
+#[ORM\Entity(repositoryClass: EmailRepository::class)]
+#[ORM\Table(name: 'oro_email')]
+#[ORM\Index(columns: ['message_id'], name: 'IDX_email_message_id')]
+#[ORM\Index(columns: ['is_head'], name: 'oro_email_is_head')]
+#[ORM\Index(columns: ['sent'], name: 'IDX_sent')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    routeView: 'oro_email_thread_view',
+    defaultValues: [
+        'entity' => ['icon' => 'fa-envelope'],
+        'grouping' => ['groups' => ['activity']],
+        'activity' => [
+            'route' => 'oro_email_activity_view',
+            'acl' => 'oro_email_email_view',
+            'action_button_widget' => 'oro_send_email_button',
+            'action_link_widget' => 'oro_send_email_link'
+        ],
+        'grid' => ['default' => 'email-grid', 'context' => 'email-for-context-grid']
+    ]
+)]
 class Email implements ActivityInterface, ExtendEntityInterface
 {
     use ExtendActivity;
@@ -62,159 +54,85 @@ class Email implements ActivityInterface, ExtendEntityInterface
     const NORMAL_IMPORTANCE = 0;
     const HIGH_IMPORTANCE   = 1;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'created', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $created = null;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $created;
-
-    /**
-     * @var string
-     *
      * Max length is 998 see RFC 2822, section 2.1.1 (https://tools.ietf.org/html/rfc2822#section-2.1.1)
-     *
-     * @ORM\Column(name="subject", type="string", length=998)
      */
-    protected $subject;
+    #[ORM\Column(name: 'subject', type: Types::STRING, length: 998)]
+    protected ?string $subject = null;
+
+    #[ORM\Column(name: 'from_name', type: Types::STRING, length: 320)]
+    protected ?string $fromName = null;
+
+    #[ORM\ManyToOne(targetEntity: EmailAddress::class, cascade: ['persist'], fetch: 'EAGER')]
+    #[ORM\JoinColumn(name: 'from_email_address_id', referencedColumnName: 'id', nullable: false)]
+    protected ?EmailAddress $fromEmailAddress = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="from_name", type="string", length=320)
+     * @var Collection<int, EmailRecipient>
      */
-    protected $fromName;
+    #[ORM\OneToMany(
+        mappedBy: 'email',
+        targetEntity: EmailRecipient::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $recipients = null;
+
+    #[ORM\Column(name: 'sent', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $sentAt = null;
+
+    #[ORM\Column(name: 'importance', type: Types::INTEGER)]
+    protected ?int $importance = null;
+
+    #[ORM\Column(name: 'internaldate', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $internalDate = null;
+
+    #[ORM\Column(name: 'is_head', type: Types::BOOLEAN, options: ['default' => true])]
+    protected ?bool $head = true;
+
+    #[ORM\Column(name: 'message_id', type: Types::STRING, length: 512)]
+    protected ?string $messageId = null;
+
+    #[ORM\Column(name: 'multi_message_id', type: Types::TEXT, nullable: true)]
+    protected ?string $multiMessageId = null;
+
+    #[ORM\Column(name: 'x_message_id', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $xMessageId = null;
+
+    #[ORM\ManyToOne(targetEntity: EmailThread::class, fetch: 'EAGER', inversedBy: 'emails')]
+    #[ORM\JoinColumn(name: 'thread_id', referencedColumnName: 'id', nullable: true)]
+    protected ?EmailThread $thread = null;
+
+    #[ORM\Column(name: 'x_thread_id', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $xThreadId = null;
+
+    #[ORM\Column(name: 'refs', type: Types::TEXT, nullable: true)]
+    protected ?string $refs = null;
+
+    #[ORM\OneToOne(inversedBy: 'email', targetEntity: EmailBody::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'email_body_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?EmailBody $emailBody = null;
 
     /**
-     * @var EmailAddress
-     *
-     * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER", cascade={"persist"})
-     * @ORM\JoinColumn(name="from_email_address_id", referencedColumnName="id", nullable=false)
+     * @var Collection<int, EmailUser>
      */
-    protected $fromEmailAddress;
+    #[ORM\OneToMany(mappedBy: 'email', targetEntity: EmailUser::class, cascade: ['remove'], orphanRemoval: true)]
+    protected ?Collection $emailUsers = null;
 
-    /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="EmailRecipient", mappedBy="email",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
-     */
-    protected $recipients;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    protected ?string $acceptLanguageHeader = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="sent", type="datetime")
-     */
-    protected $sentAt;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="importance", type="integer")
-     */
-    protected $importance;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="internaldate", type="datetime")
-     */
-    protected $internalDate;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
-     */
-    protected $head = true;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="message_id", type="string", length=512)
-     */
-    protected $messageId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="multi_message_id", type="text", nullable=true)
-     */
-    protected $multiMessageId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="x_message_id", type="string", length=255, nullable=true)
-     */
-    protected $xMessageId;
-
-    /**
-     * @var EmailThread
-     *
-     * @ORM\ManyToOne(targetEntity="EmailThread", inversedBy="emails", fetch="EAGER")
-     * @ORM\JoinColumn(name="thread_id", referencedColumnName="id", nullable=true)
-     */
-    protected $thread;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="x_thread_id", type="string", length=255, nullable=true)
-     */
-    protected $xThreadId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="refs", type="text", nullable=true)
-     */
-    protected $refs;
-
-    /**
-     * @var EmailBody
-     *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailBody", inversedBy="email", cascade={"persist"})
-     * @ORM\JoinColumn(name="email_body_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $emailBody;
-
-    /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
-     *      cascade={"remove"}, orphanRemoval=true)
-     */
-    protected $emailUsers;
-
-    /**
-     * @var string
-     * @ORM\Column(type="text", nullable=true)
-     */
-    protected $acceptLanguageHeader;
-
-    /**
-     * @var boolean
-     * @ORM\Column(name="body_synced", type="boolean", nullable=true, options={"default"=false})
-     */
-    protected $bodySynced;
+    #[ORM\Column(name: 'body_synced', type: Types::BOOLEAN, nullable: true, options: ['default' => false])]
+    protected ?bool $bodySynced = null;
 
     public function __construct()
     {
@@ -637,9 +555,8 @@ class Email implements ActivityInterface, ExtendEntityInterface
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->created = $this->created ?: new \DateTime('now', new \DateTimeZone('UTC'));

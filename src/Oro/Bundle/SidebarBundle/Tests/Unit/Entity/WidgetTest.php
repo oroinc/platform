@@ -5,7 +5,7 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SidebarBundle\Entity\Widget;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class WidgetTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,7 +24,7 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
     public function propertiesDataProvider(): array
     {
         return [
-            ['user', $this->createMock(UserInterface::class)],
+            ['user', $this->createMock(AbstractUser::class)],
             ['widgetName', 'test'],
             ['placement', 'left'],
             ['position', 1],

@@ -2,34 +2,28 @@
 
 namespace Oro\Bundle\SearchBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\MappedSuperclass
- */
+* AbstractIndexDecimal abstract class
+*
+*/
+#[ORM\MappedSuperclass]
 abstract class AbstractIndexDecimal implements ItemFieldInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="field", type="string", length=250, nullable=false)
-     */
-    protected $field;
+    #[ORM\Column(name: 'field', type: Types::STRING, length: 250, nullable: false)]
+    protected ?string $field = null;
 
     /**
      * @var float
-     *
-     * @ORM\Column(name="value", type="decimal", precision=21, scale=6, nullable=false))
      */
+    #[ORM\Column(name: 'value', type: Types::DECIMAL, precision: 21, scale: 6, nullable: false)]
     protected $value;
 
     /**

@@ -4,6 +4,7 @@ namespace Oro\Component\Testing\Unit\ORM;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
@@ -56,7 +57,7 @@ abstract class OrmTestCase extends TestCase
     ): EntityManagerMock {
         $config = new \Doctrine\ORM\Configuration();
         $config->setMetadataCache($this->getMetadataCacheImpl($withSharedMetadata));
-        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver([], true));
+        $config->setMetadataDriverImpl(new AttributeDriver([]));
         $config->setQueryCache($this->getQueryCacheImpl());
         $config->setProxyDir($this->getProxyDir());
         $config->setProxyNamespace('Doctrine\Tests\Proxies');

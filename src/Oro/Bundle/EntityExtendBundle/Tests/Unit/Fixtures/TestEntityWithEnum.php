@@ -6,46 +6,37 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="test_table")
- * @ORM\Entity()
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_table')]
 class TestEntityWithEnum
 {
     /**
      * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
      */
+    #[ORM\Column(name: 'name', type: 'string', length: 255)]
     private $name;
 
     /**
      * @var TestEnumValue|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestEnumValue")
-     * @ORM\JoinColumn(name="singleEnumField_id", referencedColumnName="code")
      */
+    #[ORM\ManyToOne(targetEntity: TestEnumValue::class)]
+    #[ORM\JoinColumn(name: 'singleEnumField_id', referencedColumnName: 'code')]
     private $singleEnumField;
 
     /**
      * @var Collection|TestEnumValue[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestEnumValue")
-     * @ORM\JoinTable(name="oro_ref_enum_test",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="multipleEnumField_id", referencedColumnName="code")
-     *      }
-     * )
      */
+    #[ORM\ManyToMany(targetEntity: TestEnumValue::class)]
+    #[ORM\JoinTable(name: 'oro_ref_enum_test')]
+    #[ORM\JoinColumn(name: 'multipleEnumField_id', referencedColumnName: 'code')]
     private $multipleEnumField;
 
     /** @var string */

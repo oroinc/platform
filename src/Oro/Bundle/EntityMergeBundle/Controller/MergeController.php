@@ -11,8 +11,8 @@ use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Oro\Bundle\EntityMergeBundle\Form\Type\MergeType;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMergerInterface;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,20 +24,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides action for simple and multiple merge.
- *
- * @Route("/merge")
  */
+#[Route(path: '/merge')]
 class MergeController extends AbstractController
 {
     /**
-     * @Route("/{gridName}/massAction/{actionName}", name="oro_entity_merge_massaction")
-     * @AclAncestor("oro_entity_merge")
-     * @Template("@OroEntityMerge/Merge/merge.html.twig")
      * @param Request $request
      * @param string $gridName
      * @param string $actionName
      * @return array|RedirectResponse
      */
+    #[Route(path: '/{gridName}/massAction/{actionName}', name: 'oro_entity_merge_massaction')]
+    #[Template('@OroEntityMerge/Merge/merge.html.twig')]
+    #[AclAncestor('oro_entity_merge')]
     public function mergeMassActionAction(Request $request, $gridName, $actionName)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
@@ -54,18 +53,13 @@ class MergeController extends AbstractController
     }
 
     /**
-     * @Route(name="oro_entity_merge")
-     * @Acl(
-     *      id="oro_entity_merge",
-     *      label="oro.entity_merge.acl.merge",
-     *      type="action",
-     *      category="entity"
-     * )
-     * @Template()
      * @param Request $request
      * @param EntityData|null $entityData
      * @return array|RedirectResponse
      */
+    #[Route(name: 'oro_entity_merge')]
+    #[Template]
+    #[Acl(id: 'oro_entity_merge', label: 'oro.entity_merge.acl.merge', type: 'action', category: 'entity')]
     public function mergeAction(Request $request, EntityData $entityData = null)
     {
         if (!$entityData) {

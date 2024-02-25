@@ -3,27 +3,20 @@
 namespace Oro\Bundle\CommentBundle\Controller;
 
 use Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Serves comment actions.
- * @Route("/comments")
  */
+#[Route(path: '/comments')]
 class CommentController extends AbstractController
 {
-    /**
-     * @Route(
-     *      "/form",
-     *      name="oro_comment_form"
-     * )
-     *
-     * @AclAncestor("oro_comment_view")
-     *
-     * @Template("@OroComment/Comment/form.html.twig")
-     */
+    #[Route(path: '/form', name: 'oro_comment_form')]
+    #[Template('@OroComment/Comment/form.html.twig')]
+    #[AclAncestor('oro_comment_view')]
     public function getFormAction()
     {
         $form = $this->container->get(CommentTypeApi::class);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
+use Attribute;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -18,6 +19,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  */
+#[Attribute(Attribute::TARGET_PROPERTY|Attribute::TARGET_METHOD)]
 class PercentRange extends Constraint
 {
     public const FRACTIONAL     = 'fractional';

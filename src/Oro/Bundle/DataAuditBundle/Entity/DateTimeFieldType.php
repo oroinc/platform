@@ -2,63 +2,42 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+* DateTimeFieldType trait
+*
+*/
 trait DateTimeFieldType
 {
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="old_date", type="date", nullable=true)
-     */
-    protected $oldDate;
+    #[ORM\Column(name: 'old_date', type: Types::DATE_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $oldDate = null;
+
+    #[ORM\Column(name: 'old_time', type: Types::TIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $oldTime = null;
+
+    #[ORM\Column(name: 'old_datetime', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $oldDatetime = null;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="old_time", type="time", nullable=true)
+     * @var \DateTimeInterface
      */
-    protected $oldTime;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="old_datetime", type="datetime", nullable=true)
-     */
-    protected $oldDatetime;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="old_datetimetz", type="datetimetz", nullable=true)
-     */
+    #[ORM\Column(name: 'old_datetimetz', type: Types::DATETIMETZ_MUTABLE, nullable: true)]
     protected $oldDatetimetz;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="new_date", type="date", nullable=true)
-     */
-    protected $newDate;
+    #[ORM\Column(name: 'new_date', type: Types::DATE_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $newDate = null;
+
+    #[ORM\Column(name: 'new_time', type: Types::TIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $newTime = null;
+
+    #[ORM\Column(name: 'new_datetime', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $newDatetime = null;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="new_time", type="time", nullable=true)
+     * @var \DateTimeInterface
      */
-    protected $newTime;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="new_datetime", type="datetime", nullable=true)
-     */
-    protected $newDatetime;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="new_datetimetz", type="datetimetz", nullable=true)
-     */
+    #[ORM\Column(name: 'new_datetimetz', type: Types::DATETIMETZ_MUTABLE, nullable: true)]
     protected $newDatetimetz;
 }

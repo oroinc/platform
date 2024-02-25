@@ -2,9 +2,8 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
@@ -16,7 +15,7 @@ class DqlUtilTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
     }
 
     /**

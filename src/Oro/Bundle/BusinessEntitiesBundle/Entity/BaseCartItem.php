@@ -2,106 +2,69 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
- * @ORM\MappedSuperclass
- */
+* BaseCartItem class
+*
+*/
+#[ORM\MappedSuperclass]
 class BaseCartItem
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: BaseCart::class, cascade: ['persist'], inversedBy: 'cartItems')]
+    #[ORM\JoinColumn(name: 'cart_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?BaseCart $cart = null;
+
+    #[ORM\Column(name: 'sku', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $sku = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="BaseCart", inversedBy="cartItems",cascade={"persist"})
-     * @ORM\JoinColumn(name="cart_id", referencedColumnName="id", onDelete="CASCADE")
+     * @return float|null
      */
-    protected $cart;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sku", type="string", length=255, nullable=true)
-     */
-    protected $sku;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    protected $name;
-
-    /**
-     * Qty
-     * @var float
-     *
-     * @ORM\Column(name="qty", type="float")
-     */
+    #[ORM\Column(name: 'qty', type: Types::FLOAT)]
     protected $qty;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="price", type="money")
      */
+    #[ORM\Column(name: 'price', type: 'money')]
     protected $price;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="discount_amount", type="money")
      */
+    #[ORM\Column(name: 'discount_amount', type: 'money')]
     protected $discountAmount = 0;
 
     /**
      * @var float
-     *
-     * @ORM\Column(name="tax_percent", type="percent")
      */
+    #[ORM\Column(name: 'tax_percent', type: 'percent')]
     protected $taxPercent = 0;
 
     /**
-     * @var float
-     *
-     * @ORM\Column(name="weight", type="float", nullable=true)
+     * @return float|null
      */
+    #[ORM\Column(name: 'weight', type: Types::FLOAT, nullable: true)]
     protected $weight;
 
-    /**
-     * @var \DateTime $createdAt
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime $updatedAt
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @return int

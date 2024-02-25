@@ -2,140 +2,105 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Entity for testing search engine
- *
- * @ORM\Table(name="test_search_item")
- * @ORM\Entity
- * @Config(
- *      routeName="oro_test_item_index",
- *      routeView="oro_test_item_view",
- *      routeCreate="oro_test_item_create",
- *      routeUpdate="oro_test_item_update",
- *      defaultValues={
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          }
- *      }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_search_item')]
+#[Config(
+    routeName: 'oro_test_item_index',
+    routeView: 'oro_test_item_view',
+    routeCreate: 'oro_test_item_create',
+    routeUpdate: 'oro_test_item_update',
+    defaultValues: [
+        'ownership' => [
+            'owner_type' => 'USER',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ]
+    ]
+)]
 class Item implements TestFrameworkEntityInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'stringValue', type: Types::STRING, nullable: true)]
+    protected ?string $stringValue = null;
+
+    #[ORM\Column(name: 'integerValue', type: Types::INTEGER, nullable: true)]
+    protected ?int $integerValue = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="stringValue", type="string", nullable=true)
+     * @var float|null
      */
-    protected $stringValue;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="integerValue", type="integer", nullable=true)
-     */
-    protected $integerValue;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="decimalValue", type="decimal", scale=2, nullable=true)
-     */
+    #[ORM\Column(name: 'decimalValue', type: Types::DECIMAL, scale: 2, nullable: true)]
     protected $decimalValue;
 
     /**
-     * @var float
-     *
-     * @ORM\Column(name="floatValue", type="float", nullable=true)
+     * @return float|null
      */
+    #[ORM\Column(name: 'floatValue', type: Types::FLOAT, nullable: true)]
     protected $floatValue;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="booleanValue", type="boolean", nullable=true)
-     */
-    protected $booleanValue;
+    #[ORM\Column(name: 'booleanValue', type: Types::BOOLEAN, nullable: true)]
+    protected ?bool $booleanValue = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="blobValue", type="blob", nullable=true)
+     * @var string|resource|null
      */
+    #[ORM\Column(name: 'blobValue', type: Types::BLOB, nullable: true)]
     protected $blobValue;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="arrayValue", type="array", nullable=true)
      */
+    #[ORM\Column(name: 'arrayValue', type: Types::ARRAY, nullable: true)]
     protected $arrayValue;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="datetimeValue", type="datetime", nullable=true)
-     */
-    protected $datetimeValue;
+    #[ORM\Column(name: 'datetimeValue', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $datetimeValue = null;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="guidValue", type="guid", nullable=true)
      */
+    #[ORM\Column(name: 'guidValue', type: Types::GUID, nullable: true)]
     protected $guidValue;
 
     /**
      * @var object
-     *
-     * @ORM\Column(name="objectValue", type="object", nullable=true)
      */
+    #[ORM\Column(name: 'objectValue', type: Types::OBJECT, nullable: true)]
     protected $objectValue;
 
     /**
-     * @var ItemValue[]
-     *
-     * @ORM\OneToMany(targetEntity="ItemValue", mappedBy="entity", cascade={"persist", "remove"})
+     * @var Collection<int, ItemValue>
      */
-    protected $values;
+    #[ORM\OneToMany(mappedBy: 'entity', targetEntity: ItemValue::class, cascade: ['persist', 'remove'])]
+    protected ?Collection $values = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="phone1", type="string", nullable=true)
-     */
-    protected $phone;
+    #[ORM\Column(name: 'phone1', type: Types::STRING, nullable: true)]
+    protected ?string $phone = null;
 
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $owner = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
     /**
      * @return int

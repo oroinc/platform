@@ -13,13 +13,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class AjaxApplicationUrlController extends AbstractController
 {
     /**
-     * @Route(
-     *      "/view-switcher/get-application-url",
-     *      name="oro_view_switcher_frontend_get_application_url"
-     * )
-     *
      * @return JsonResponse
      */
+    #[Route(path: '/view-switcher/get-application-url', name: 'oro_view_switcher_frontend_get_application_url')]
     public function getApplicationUrl()
     {
         $applicationUrl = $this->getConfigManager()->get('oro_ui.application_url');

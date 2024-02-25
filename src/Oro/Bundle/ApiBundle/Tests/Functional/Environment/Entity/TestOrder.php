@@ -4,50 +4,35 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="test_api_order")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_order')]
 class TestOrder implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'po_number', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $poNumber = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="po_number", type="string", length=255, nullable=true)
+     * @var Collection<int, TestOrderLineItem>
      */
-    protected $poNumber;
+    #[ORM\OneToMany(mappedBy: 'order', targetEntity: TestOrderLineItem::class, cascade: ['ALL'], orphanRemoval: true)]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    protected ?Collection $lineItems = null;
 
-    /**
-     * @var Collection|TestOrderLineItem[]
-     *
-     * @ORM\OneToMany(targetEntity="TestOrderLineItem",
-     *      mappedBy="order", cascade={"ALL"}, orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
-     */
-    protected $lineItems;
-
-    /**
-     * @var TestTarget|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestTarget")
-     * @ORM\JoinColumn(name="target_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $target;
+    #[ORM\ManyToOne(targetEntity: TestTarget::class)]
+    #[ORM\JoinColumn(name: 'target_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?TestTarget $target = null;
 
     public function __construct()
     {
@@ -125,9 +110,7 @@ class TestOrder implements TestFrameworkEntityInterface
         $this->target = $target;
     }
 
-    /**
-     * @Assert\Callback
-     */
+    #[Assert\Callback]
     public function validate(ExecutionContextInterface $context)
     {
         if (null !== $this->target && null !== $this->target->name) {

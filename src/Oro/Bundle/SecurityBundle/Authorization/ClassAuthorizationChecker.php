@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Authorization;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
+use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -15,18 +15,18 @@ class ClassAuthorizationChecker
 {
     private AuthorizationCheckerInterface $authorizationChecker;
     private ObjectIdentityFactory $objectIdentityFactory;
-    private AclAnnotationProvider $aclAnnotationProvider;
+    private AclAttributeProvider $aclAttributeProvider;
     private LoggerInterface $logger;
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ObjectIdentityFactory $objectIdentityFactory,
-        AclAnnotationProvider $aclAnnotationProvider,
+        AclAttributeProvider $aclAttributeProvider,
         LoggerInterface $logger
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->objectIdentityFactory = $objectIdentityFactory;
-        $this->aclAnnotationProvider = $aclAnnotationProvider;
+        $this->aclAttributeProvider = $aclAttributeProvider;
         $this->logger = $logger;
     }
 
@@ -38,27 +38,27 @@ class ClassAuthorizationChecker
         $isGranted = true;
 
         // check method level ACL
-        $annotation = $this->aclAnnotationProvider->findAnnotation($class, $method);
-        if (null !== $annotation) {
+        $attribute = $this->aclAttributeProvider->findAttribute($class, $method);
+        if (null !== $attribute) {
             $this->logger->debug(
-                sprintf('Check an access using "%s" ACL annotation.', $annotation->getId())
+                sprintf('Check an access using "%s" ACL attribute.', $attribute->getId())
             );
             $isGranted = $this->authorizationChecker->isGranted(
-                $annotation->getPermission(),
-                $this->objectIdentityFactory->get($annotation)
+                $attribute->getPermission(),
+                $this->objectIdentityFactory->get($attribute)
             );
         }
 
         // check class level ACL
-        if ($isGranted && (null === $annotation || !$annotation->getIgnoreClassAcl())) {
-            $annotation = $this->aclAnnotationProvider->findAnnotation($class);
-            if (null !== $annotation) {
+        if ($isGranted && (null === $attribute || !$attribute->getIgnoreClassAcl())) {
+            $attribute = $this->aclAttributeProvider->findAttribute($class);
+            if (null !== $attribute) {
                 $this->logger->debug(
-                    sprintf('Check an access using "%s" ACL annotation.', $annotation->getId())
+                    sprintf('Check an access using "%s" ACL attribute.', $attribute->getId())
                 );
                 $isGranted = $this->authorizationChecker->isGranted(
-                    $annotation->getPermission(),
-                    $this->objectIdentityFactory->get($annotation)
+                    $attribute->getPermission(),
+                    $this->objectIdentityFactory->get($attribute)
                 );
             }
         }
@@ -67,10 +67,10 @@ class ClassAuthorizationChecker
     }
 
     /**
-     * Gets ACL annotation that is bound to the given method of the given class.
+     * Gets ACL attribute that is bound to the given method of the given class.
      */
-    public function getClassMethodAnnotation(string $class, string $method): ?AclAnnotation
+    public function getClassMethodAttribute(string $class, string $method): ?AclAttribute
     {
-        return $this->aclAnnotationProvider->findAnnotation($class, $method);
+        return $this->aclAttributeProvider->findAttribute($class, $method);
     }
 }

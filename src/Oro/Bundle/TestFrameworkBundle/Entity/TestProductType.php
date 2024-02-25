@@ -2,28 +2,23 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="test_product_type")
- * @ORM\Entity
- */
+* Entity that represents Test Product Type
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'test_product_type')]
 class TestProductType implements TestFrameworkEntityInterface
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=50)
-     * @ORM\Id
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    #[ORM\Id]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", nullable=true)
-     */
-    protected $label;
+    #[ORM\Column(name: 'label', type: Types::STRING, nullable: true)]
+    protected ?string $label = null;
 
     /**
      * @return string

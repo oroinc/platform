@@ -4,40 +4,29 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="test_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_table')]
 class Test
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', name: 'id')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=50)
-     */
+    #[ORM\Column(name: 'name', type: 'string', length: 50)]
     protected $name;
 
-    /**
-     * @ORM\Column(name="label", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'label', type: 'string', length: 255, nullable: true)]
     protected $label;
 
-    /**
-     * @ORM\Column(name="public", type="boolean")
-     */
+    #[ORM\Column(name: 'public', type: 'boolean')]
     protected $public = false;
 
     /**
      * This field has getter and setter which not match the field name
      * and it is used to test that such fields are serialized using direct property access
-     *
-     * @ORM\Column(name="is_exception", type="boolean")
      */
+    #[ORM\Column(name: 'is_exception', type: 'boolean')]
     protected $isException;
 
     /**

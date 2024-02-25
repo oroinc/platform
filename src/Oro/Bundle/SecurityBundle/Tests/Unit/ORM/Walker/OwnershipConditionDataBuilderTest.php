@@ -30,6 +30,29 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
     private const USER = User::class;
     private const TEST_ENTITY = TestEntity::class;
 
+    private const USER_1 = 101;
+    private const USER_2 = 102;
+    private const USER_3 = 103;
+    private const USER_31 = 1031;
+    private const USER_4 = 104;
+    private const USER_41 = 1041;
+    private const USER_411 = 10411;
+    private const USER_411_1 = 1041101;
+    private const USER_411_2 = 1041102;
+    private const BU_1 = 201;
+    private const BU_2 = 202;
+    private const BU_3 = 203;
+    private const BU_31 = 2031;
+    private const BU_3_A = 2030;
+    private const BU_3_A_1 = 20301;
+    private const BU_4 = 204;
+    private const BU_41 = 2041;
+    private const BU_411 = 20411;
+    private const ORG_1 = 301;
+    private const ORG_2 = 302;
+    private const ORG_3 = 303;
+    private const ORG_4 = 304;
+
     /** @var OwnershipConditionDataBuilder */
     private $builder;
 
@@ -100,85 +123,85 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
     {
         /**
          * owners structure:
-         * org1  org2     org3         org4
-         *                |            |
-         *  bu1   bu2     +-bu3        +-bu4
-         *        |       | |            |
-         *        |       | +-bu31       |
-         *        |       | | |          +-bu41-->--+
-         *        |       | | +-user31   |          | bu41 have bu411 as subordinate business unit
-         *        |       | |            |          V (looped owners between bu4, bu411 and bu41)
-         *  user1 +-user2 | +-user3      +-bu411--<-+
-         *                |              |  |
-         *                +-bu3a         |  +-user411
-         *                  |            |  +-user411_1
-         *                  +-bu3a1      |  +-user411_2
-         *                               +-user4
+         * ORG_1  ORG_2     ORG_3         ORG_4
+         *                  |             |
+         *  BU_1   BU_2     +-BU_3        +-BU_4
+         *         |        | |             |
+         *         |        | +-BU_31       |
+         *         |        | | |           +-BU_41-->--+
+         *         |        | | +-USER_31   |           | BU_41 have BU_411 as subordinate BU_siness unit
+         *         |        | |             |           V (looped owners between BU_4, BU_411 and BU_41)
+         *  USER_1 +-USER_2 | +-USER_3      +-BU_411--<-+
+         *                  |               |  |
+         *                  +-BU_3_A        |  +-USER_411
+         *                    |             |  +-USER_411_1
+         *                    +-BU_3_A_1    |  +-USER_411_2
+         *                                  +-USER_4
          * user access:
-         *                      +-------+-------+-------+--------+-------+---------+-----------+-----------+
-         * users                | user1 | user2 | user3 | user31 | user4 | user411 | user411_1 | user411_2 |
-         *                      +-------+-------+-------+--------+-------+---------+-----------+-----------+
-         * user organizations   | org1  | org2  | org3  | org3   | org4  | org4    | org4      | org4      |
-         *                      | org2  |       | org2  |        |       |         |           |           |
-         *                      |       |       |       |        |       |         |           |           |
-         * user business units  | bu1   | bu2   | bu3   | bu31   | bu4   | bu411   | bu411     | bu411     |
-         *                      | bu2   |       | bu2   |        |       |         |           |           |
-         *                      +-------+-------+-------+--------+-------+---------+-----------+-----------+
+         *                      +--------+--------+--------+---------+--------+----------+------------+------------+
+         * users                | USER_1 | USER_2 | USER_3 | USER_31 | USER_4 | USER_411 | USER_411_1 | USER_411_2 |
+         *                      +--------+--------+--------+---------+--------+----------+------------+------------+
+         * user organizations   | ORG_1  | ORG_2  | ORG_3  | ORG_3   | ORG_4  | ORG_4    | ORG_4      | ORG_4      |
+         *                      | ORG_2  |        | ORG_2  |         |        |          |            |            |
+         *                      |        |        |        |         |        |          |            |            |
+         * user business units  | BU_1   | BU_2   | BU_3   | BU_31   | BU_4   | BU_411   | BU_411     | BU_411     |
+         *                      | BU_2   |        | BU_2   |         |        |          |            |            |
+         *                      +--------+--------+--------+---------+--------+----------+------------+------------+
          */
-        $this->tree->addBusinessUnit('bu1', null);
-        $this->tree->addBusinessUnit('bu2', null);
-        $this->tree->addBusinessUnit('bu3', 'org3');
-        $this->tree->addBusinessUnit('bu31', 'org3');
-        $this->tree->addBusinessUnit('bu3a', 'org3');
-        $this->tree->addBusinessUnit('bu3a1', 'org3');
-        $this->tree->addBusinessUnit('bu4', 'org4');
-        $this->tree->addBusinessUnit('bu41', 'org4');
-        $this->tree->addBusinessUnit('bu411', 'org4');
+        $this->tree->addBusinessUnit(self::BU_1, null);
+        $this->tree->addBusinessUnit(self::BU_2, null);
+        $this->tree->addBusinessUnit(self::BU_3, self::ORG_3);
+        $this->tree->addBusinessUnit(self::BU_31, self::ORG_3);
+        $this->tree->addBusinessUnit(self::BU_3_A, self::ORG_3);
+        $this->tree->addBusinessUnit(self::BU_3_A_1, self::ORG_3);
+        $this->tree->addBusinessUnit(self::BU_4, self::ORG_4);
+        $this->tree->addBusinessUnit(self::BU_41, self::ORG_4);
+        $this->tree->addBusinessUnit(self::BU_411, self::ORG_4);
 
-        $this->tree->setSubordinateBusinessUnitIds('bu3', ['bu31']);
-        $this->tree->setSubordinateBusinessUnitIds('bu3a', ['bu3a1']);
-        $this->tree->setSubordinateBusinessUnitIds('bu41', ['bu411']);
-        $this->tree->setSubordinateBusinessUnitIds('bu4', ['bu41', 'bu411']);
+        $this->tree->setSubordinateBusinessUnitIds(self::BU_3, [self::BU_31]);
+        $this->tree->setSubordinateBusinessUnitIds(self::BU_3_A, [self::BU_3_A_1]);
+        $this->tree->setSubordinateBusinessUnitIds(self::BU_41, [self::BU_411]);
+        $this->tree->setSubordinateBusinessUnitIds(self::BU_4, [self::BU_41, self::BU_411]);
 
-        $this->tree->addUser('user1', null);
-        $this->tree->addUser('user2', 'bu2');
-        $this->tree->addUser('user3', 'bu3');
-        $this->tree->addUser('user31', 'bu31');
-        $this->tree->addUser('user4', 'bu4');
-        $this->tree->addUser('user41', 'bu41');
-        $this->tree->addUser('user411', 'bu411');
-        $this->tree->addUser('user411_1', 'bu411');
-        $this->tree->addUser('user411_2', 'bu411');
+        $this->tree->addUser(self::USER_1, null);
+        $this->tree->addUser(self::USER_2, self::BU_2);
+        $this->tree->addUser(self::USER_3, self::BU_3);
+        $this->tree->addUser(self::USER_31, self::BU_31);
+        $this->tree->addUser(self::USER_4, self::BU_4);
+        $this->tree->addUser(self::USER_41, self::BU_41);
+        $this->tree->addUser(self::USER_411, self::BU_411);
+        $this->tree->addUser(self::USER_411_1, self::BU_411);
+        $this->tree->addUser(self::USER_411_2, self::BU_411);
 
-        $this->tree->addUserOrganization('user1', 'org1');
-        $this->tree->addUserOrganization('user1', 'org2');
-        $this->tree->addUserOrganization('user2', 'org2');
-        $this->tree->addUserOrganization('user3', 'org2');
-        $this->tree->addUserOrganization('user3', 'org3');
-        $this->tree->addUserOrganization('user31', 'org3');
-        $this->tree->addUserOrganization('user4', 'org4');
-        $this->tree->addUserOrganization('user411', 'org4');
-        $this->tree->addUserOrganization('user411_1', 'org4');
-        $this->tree->addUserOrganization('user411_2', 'org4');
+        $this->tree->addUserOrganization(self::USER_1, self::ORG_1);
+        $this->tree->addUserOrganization(self::USER_1, self::ORG_2);
+        $this->tree->addUserOrganization(self::USER_2, self::ORG_2);
+        $this->tree->addUserOrganization(self::USER_3, self::ORG_2);
+        $this->tree->addUserOrganization(self::USER_3, self::ORG_3);
+        $this->tree->addUserOrganization(self::USER_31, self::ORG_3);
+        $this->tree->addUserOrganization(self::USER_4, self::ORG_4);
+        $this->tree->addUserOrganization(self::USER_411, self::ORG_4);
+        $this->tree->addUserOrganization(self::USER_411_1, self::ORG_4);
+        $this->tree->addUserOrganization(self::USER_411_2, self::ORG_4);
 
-        $this->tree->addUserBusinessUnit('user1', 'org1', 'bu1');
-        $this->tree->addUserBusinessUnit('user1', 'org2', 'bu2');
-        $this->tree->addUserBusinessUnit('user2', 'org2', 'bu2');
-        $this->tree->addUserBusinessUnit('user3', 'org3', 'bu3');
-        $this->tree->addUserBusinessUnit('user3', 'org2', 'bu2');
-        $this->tree->addUserBusinessUnit('user31', 'org3', 'bu31');
-        $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
-        $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
-        $this->tree->addUserBusinessUnit('user411_1', 'org4', 'bu411');
-        $this->tree->addUserBusinessUnit('user411_2', 'org4', 'bu411');
+        $this->tree->addUserBusinessUnit(self::USER_1, self::ORG_1, self::BU_1);
+        $this->tree->addUserBusinessUnit(self::USER_1, self::ORG_2, self::BU_2);
+        $this->tree->addUserBusinessUnit(self::USER_2, self::ORG_2, self::BU_2);
+        $this->tree->addUserBusinessUnit(self::USER_3, self::ORG_3, self::BU_3);
+        $this->tree->addUserBusinessUnit(self::USER_3, self::ORG_2, self::BU_2);
+        $this->tree->addUserBusinessUnit(self::USER_31, self::ORG_3, self::BU_31);
+        $this->tree->addUserBusinessUnit(self::USER_4, self::ORG_4, self::BU_4);
+        $this->tree->addUserBusinessUnit(self::USER_411, self::ORG_4, self::BU_411);
+        $this->tree->addUserBusinessUnit(self::USER_411_1, self::ORG_4, self::BU_411);
+        $this->tree->addUserBusinessUnit(self::USER_411_2, self::ORG_4, self::BU_411);
     }
 
     /**
      * @dataProvider buildFilterConstraintProvider
      */
     public function testGetAclConditionData(
-        string $userId,
-        string $organizationId,
+        int|null $userId,
+        int|null $organizationId,
         bool $isGranted,
         ?int $accessLevel,
         ?string $ownerType,
@@ -252,34 +275,34 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'for the TEST entity without userId, grant, ownerType; with NONE ACL' => [
-                '', '', false, AccessLevel::NONE_LEVEL, null, self::TEST_ENTITY, []
+                null, null, false, AccessLevel::NONE_LEVEL, null, self::TEST_ENTITY, []
             ],
             'for the stdClass entity without userId, grant, ownerType; with NONE ACL' => [
-                '', '', false, AccessLevel::NONE_LEVEL, null,
+                null, null, false, AccessLevel::NONE_LEVEL, null,
                 \stdClass::class, []
             ],
             'for the stdClass entity without userId, ownerType; with grant and NONE ACL' => [
-                '', '', true, AccessLevel::NONE_LEVEL, null,
+                null, null, true, AccessLevel::NONE_LEVEL, null,
                 \stdClass::class, []
             ],
             'for the TEST entity without ownerType; with SYSTEM ACL, userId, grant' => [
-                'user4', '', true, AccessLevel::SYSTEM_LEVEL, null, self::TEST_ENTITY, []
+                self::USER_4, null, true, AccessLevel::SYSTEM_LEVEL, null, self::TEST_ENTITY, []
             ],
             'for the TEST entity with SYSTEM ACL, userId, grant and ORGANIZATION ownerType' => [
-                'user4', '', true, AccessLevel::SYSTEM_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, []
+                self::USER_4, null, true, AccessLevel::SYSTEM_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, []
             ],
             'for the TEST entity with SYSTEM ACL, userId, grant and BUSINESS_UNIT ownerType' => [
-                'user4', '', true, AccessLevel::SYSTEM_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, []
+                self::USER_4, null, true, AccessLevel::SYSTEM_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, []
             ],
             'for the TEST entity with SYSTEM ACL, userId, grant and USER ownerType' => [
-                'user4', '', true, AccessLevel::SYSTEM_LEVEL, 'USER', self::TEST_ENTITY, []
+                self::USER_4, null, true, AccessLevel::SYSTEM_LEVEL, 'USER', self::TEST_ENTITY, []
             ],
             'for the TEST entity without ownerType; with GLOBAL ACL, userId, grant' => [
-                'user4', '', true, AccessLevel::GLOBAL_LEVEL, null, self::TEST_ENTITY, []
+                self::USER_4, null, true, AccessLevel::GLOBAL_LEVEL, null, self::TEST_ENTITY, []
             ],
             'for the TEST entity with GLOBAL ACL, userId, grant and ORGANIZATION ownerType' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::GLOBAL_LEVEL,
                 'ORGANIZATION',
@@ -288,262 +311,271 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
                     null,
                     null,
                     'organization',
-                    'org4',
+                    self::ORG_4,
                     true
                 ]
             ],
             'for the TEST entity with GLOBAL ACL, userId, grant and BUSINESS_UNIT ownerType' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::GLOBAL_LEVEL,
                 'BUSINESS_UNIT',
                 self::TEST_ENTITY,
-                [null, null, 'organization', 'org4', true]
+                [null, null, 'organization', self::ORG_4, true]
             ],
             'for the TEST entity with GLOBAL ACL, userId, grant and USER ownerType' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::GLOBAL_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
-                [null, null, 'organization', 'org4', true]
+                [null, null, 'organization', self::ORG_4, true]
             ],
             'for the ORGANIZATION entity without ownerType; with GLOBAL ACL, userId, grant' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::GLOBAL_LEVEL,
                 null,
                 self::ORGANIZATION,
                 [
                     'id',
-                    ['org4'],
+                    [self::ORG_4],
                     null,
                     null,
                     false
                 ]
             ],
             'for the TEST entity without ownerType; with DEEP ACL, userId, grant' => [
-                'user4', '', true, AccessLevel::DEEP_LEVEL, null, self::TEST_ENTITY, []
+                self::USER_4, null, true, AccessLevel::DEEP_LEVEL, null, self::TEST_ENTITY, []
             ],
             'for the TEST entity with DEEP ACL, userId, grant and ORGANIZATION ownerType' => [
-                'user4', '', true, AccessLevel::DEEP_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
+                self::USER_4, null, true, AccessLevel::DEEP_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
             ],
             'for the TEST entity with DEEP ACL, userId, grant and BUSINESS_UNIT ownerType' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::DEEP_LEVEL,
                 'BUSINESS_UNIT',
                 self::TEST_ENTITY,
                 [
                     'owner',
-                    ['bu4', 'bu41', 'bu411'],
+                    [self::BU_4, self::BU_41, self::BU_411],
                     'organization',
-                    'org4',
+                    self::ORG_4,
                     false
                 ]
             ],
             'for the TEST entity with DEEP ACL, userId, grant and USER ownerType' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::DEEP_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
                 [
                     'owner',
-                    ['user4', 'user411', 'user411_1', 'user411_2'],
+                    [self::USER_4, self::USER_411, self::USER_411_1, self::USER_411_2],
                     'organization',
-                    'org4',
+                    self::ORG_4,
                     false
                 ]
             ],
             'for the TEST entity with LOCAL ACL for user411_1 user, grant and USER ownerType' => [
-                'user411_1',
-                'org4',
+                self::USER_411_1,
+                self::ORG_4,
                 true,
                 AccessLevel::LOCAL_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
                 [
                     'owner',
-                    [0 => 'user411_1', 1 => 'user411', 2 => 'user411_2'],
+                    [0 => self::USER_411_1, 1 => self::USER_411, 2 => self::USER_411_2],
                     'organization',
-                    'org4',
+                    self::ORG_4,
                     false
                 ]
             ],
             'for the TEST entity with DEEP ACL for user411_1 user, grant and USER ownerType' => [
-                'user411_1',
-                'org4',
+                self::USER_411_1,
+                self::ORG_4,
                 true,
                 AccessLevel::DEEP_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
                 [
                     'owner',
-                    [0 => 'user411_1', 1 => 'user411', 2 => 'user411_2'],
+                    [0 => self::USER_411_1, 1 => self::USER_411, 2 => self::USER_411_2],
                     'organization',
-                    'org4',
+                    self::ORG_4,
                     false
                 ]
             ],
             'for the BUSINESS entity without ownerType; with DEEP ACL, userId, grant' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::DEEP_LEVEL,
                 null,
                 self::BUSINESS_UNIT,
                 [
                     'id',
-                    ['bu4', 'bu41', 'bu411'],
+                    [self::BU_4, self::BU_41, self::BU_411],
                     null,
                     null,
                     false
                 ]
             ],
             'for the TEST entity without ownerType; with LOCAL ACL, userId, grant' => [
-                'user4', '', true, AccessLevel::LOCAL_LEVEL, null, self::TEST_ENTITY, []
+                self::USER_4, null, true, AccessLevel::LOCAL_LEVEL, null, self::TEST_ENTITY, []
             ],
             'for the TEST entity with LOCAL ACL, userId, grant and ORGANIZATION ownerType' => [
-                'user4', '', true, AccessLevel::LOCAL_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
+                self::USER_4, null, true, AccessLevel::LOCAL_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
             ],
             'for the TEST entity with LOCAL ACL, userId, grant and BUSINESS_UNIT ownerType' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::LOCAL_LEVEL,
                 'BUSINESS_UNIT',
                 self::TEST_ENTITY,
                 [
                     'owner',
-                    ['bu4'],
+                    [self::BU_4],
                     'organization',
-                    'org4',
+                    self::ORG_4,
                     false
                 ]
             ],
             'for the TEST entity with LOCAL ACL, userId, grant and USER ownerType' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::LOCAL_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
                 [
                     'owner',
-                    ['user4'],
+                    [self::USER_4],
                     'organization',
-                    'org4',
+                    self::ORG_4,
                     false
                 ]
             ],
             'for the BUSINESS entity without ownerType; with LOCAL ACL, userId, grant' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::LOCAL_LEVEL,
                 null,
                 self::BUSINESS_UNIT,
                 [
                     'id',
-                    ['bu4'],
+                    [self::BU_4],
                     null,
                     null,
                     false
                 ]
             ],
             'for the TEST entity without ownerType; with BASIC ACL, userId, grant' => [
-                'user4', '', true, AccessLevel::BASIC_LEVEL, null, self::TEST_ENTITY, []
+                self::USER_4, null, true, AccessLevel::BASIC_LEVEL, null, self::TEST_ENTITY, []
             ],
             'for the TEST entity with BASIC ACL, userId, grant and ORGANIZATION ownerType' => [
-                'user4', '', true, AccessLevel::BASIC_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
+                self::USER_4, null, true, AccessLevel::BASIC_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
             ],
             'for the TEST entity with BASIC ACL, userId, grant and BUSINESS_UNIT ownerType' => [
-                'user4', '', true, AccessLevel::BASIC_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+                self::USER_4, null, true, AccessLevel::BASIC_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
             ],
             'for the TEST entity with BASIC ACL, userId, grant and USER ownerType' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::BASIC_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
                 [
                     'owner',
-                    'user4',
+                    self::USER_4,
                     'organization',
-                    'org4',
+                    self::ORG_4,
                     false
                 ]
             ],
             'for the USER entity without ownerType; with BASIC ACL, userId, grant' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 true,
                 AccessLevel::BASIC_LEVEL,
                 null,
                 self::USER,
                 [
                     'id',
-                    'user4',
+                    self::USER_4,
                     null,
                     null,
                     false
                 ]
             ],
             'TEST entity with BASIC ACL, user1, grant and BUSINESS_UNIT ownerType' => [
-                'user1', '', true, AccessLevel::BASIC_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+                self::USER_1, null, true, AccessLevel::BASIC_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
             ],
             'TEST entity with LOCAL ACL, user1, grant and BUSINESS_UNIT ownerType' => [
-                'user1', '', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, [
+                self::USER_1, null, true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, [
                     'owner',
-                    ['bu1', 'bu2'],
+                    [self::BU_1, self::BU_2],
                     null,
                     null,
                     false
                 ]
             ],
             'BUSINESS entity with LOCAL ACL, user1, grant, BUSINESS_UNIT ownerType' => [
-                'user1', 'org1', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::BUSINESS_UNIT, [
+                self::USER_1,
+                self::ORG_1, true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::BUSINESS_UNIT, [
                     'id',
-                    ['bu1'],
+                    [self::BU_1],
                     null,
                     null,
                     false
                 ]
             ],
             'USER entity with LOCAL ACL, user1, grant, BUSINESS_UNIT ownerType' => [
-                'user1', '', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::USER, [
+                self::USER_1, null, true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::USER, [
                     'owner',
-                    ['bu1', 'bu2'],
+                    [self::BU_1, self::BU_2],
                     null,
                     null,
                     false
                 ]
             ],
             'TEST entity with DEEP ACL, user1, grant and BUSINESS_UNIT ownerType' => [
-                'user1', 'org2', true, AccessLevel::DEEP_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, [
+                self::USER_1,
+                self::ORG_2, true, AccessLevel::DEEP_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, [
                     'owner',
-                    ['bu2'],
+                    [self::BU_2],
                     'organization',
-                    'org2',
+                    self::ORG_2,
                     false
                 ]
             ],
             'TEST entity with GLOBAL ACL, user1, grant and BUSINESS_UNIT ownerType' => [
-                'user1', '', true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+                self::USER_1, null, true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
             ],
             'TEST entity with GLOBAL ACL, user1, grant and BUSINESS_UNIT ownerType WITH custom group' => [
-                'user1', '', true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null, 'custom_group'
+                self::USER_1,
+                null,
+                true,
+                AccessLevel::GLOBAL_LEVEL,
+                'BUSINESS_UNIT',
+                self::TEST_ENTITY,
+                null,
+                'custom_group'
             ],
             'access denied' => [
-                'user4',
-                'org4',
+                self::USER_4,
+                self::ORG_4,
                 false,
                 null,
                 null,

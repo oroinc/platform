@@ -2,9 +2,8 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\Walker\PreciseOrderByWalker;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
@@ -16,7 +15,7 @@ class PreciseOrderByWalkerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
         $this->em->getConfiguration()->setEntityNamespaces([
             'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
         ]);

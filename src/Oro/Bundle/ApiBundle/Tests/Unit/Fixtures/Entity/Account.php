@@ -4,40 +4,36 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="account_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'account_table')]
 class Account
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    protected ?string $name = null;
 
     /**
-     * @ORM\Column(name="name", type="string", length=50)
+     * @var Collection<int, Role>
      */
-    protected $name;
+    #[ORM\ManyToMany(targetEntity: Role::class)]
+    #[ORM\JoinTable(name: 'account_to_role_table')]
+    #[ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $roles = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Role")
-     * @ORM\JoinTable(name="account_to_role_table",
-     *      joinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, Contact>
      */
-    protected $roles;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Contact", inversedBy="accounts")
-     * @ORM\JoinTable(name="account_to_contact")
-     */
-    protected $contacts;
+    #[ORM\ManyToMany(targetEntity: Contact::class, inversedBy: 'accounts')]
+    #[ORM\JoinTable(name: 'account_to_contact')]
+    protected ?Collection $contacts = null;
 
     public function __construct()
     {

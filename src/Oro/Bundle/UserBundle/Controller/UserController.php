@@ -5,8 +5,8 @@ namespace Oro\Bundle\UserBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Route\Router;
@@ -34,27 +34,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UserController extends AbstractController
 {
     /**
-     * @Route("/view/{id}", name="oro_user_view", requirements={"id"="\d+"})
-     * @Template("@OroUser/User/view.html.twig")
-     * @Acl(
-     *      id="oro_user_user_view",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\User",
-     *      permission="VIEW"
-     * )
-     *
      * @param User $user
      * @return array
      */
+    #[Route(path: '/view/{id}', name: 'oro_user_view', requirements: ['id' => '\d+'])]
+    #[Template('@OroUser/User/view.html.twig')]
+    #[Acl(id: 'oro_user_user_view', type: 'entity', class: User::class, permission: 'VIEW')]
     public function viewAction(User $user)
     {
         return $this->view($user, $user === $this->getUser());
     }
 
-    /**
-     * @Route("/profile/view", name="oro_user_profile_view")
-     * @Template("@OroUser/User/view.html.twig")
-     */
+    #[Route(path: '/profile/view', name: 'oro_user_profile_view')]
+    #[Template('@OroUser/User/view.html.twig')]
     public function viewProfileAction()
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -62,22 +54,20 @@ class UserController extends AbstractController
         return $this->view($this->getUser(), true);
     }
 
-    /**
-     * @Route("/profile/edit", name="oro_user_profile_update")
-     * @Template("@OroUser/User/Profile/update.html.twig")
-     * @AclAncestor("update_own_profile")
-     */
+    #[Route(path: '/profile/edit', name: 'oro_user_profile_update')]
+    #[Template('@OroUser/User/Profile/update.html.twig')]
+    #[AclAncestor('update_own_profile')]
     public function updateProfileAction(Request $request)
     {
         return $this->update($this->getUser(), $request);
     }
 
     /**
-     * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"}, methods={"GET", "POST"})
      *
      * @param User $user
      * @return JsonResponse|Response
      */
+    #[Route(path: '/apigen/{id}', name: 'oro_user_apigen', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function apigenAction(User $user)
     {
         if (!$this->isUserApiGenAllowed($user)) {
@@ -114,16 +104,10 @@ class UserController extends AbstractController
 
     /**
      * Create user form
-     *
-     * @Route("/create", name="oro_user_create")
-     * @Template("@OroUser/User/update.html.twig")
-     * @Acl(
-     *      id="oro_user_user_create",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\User",
-     *      permission="CREATE"
-     * )
      */
+    #[Route(path: '/create', name: 'oro_user_create')]
+    #[Template('@OroUser/User/update.html.twig')]
+    #[Acl(id: 'oro_user_user_create', type: 'entity', class: User::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         $user = $this->container->get(UserManager::class)->createUser();
@@ -134,34 +118,27 @@ class UserController extends AbstractController
     /**
      * Edit user form
      *
-     * @Route("/update/{id}", name="oro_user_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template("@OroUser/User/update.html.twig")
-     * @Acl(
-     *      id="oro_user_user_update",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\User",
-     *      permission="EDIT"
-     * )
      *
      * @param User $entity
      * @param Request $request
      * @return array|RedirectResponse
      */
+    #[Route(path: '/update/{id}', name: 'oro_user_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template('@OroUser/User/update.html.twig')]
+    #[Acl(id: 'oro_user_user_update', type: 'entity', class: User::class, permission: 'EDIT')]
     public function updateAction(User $entity, Request $request)
     {
         return $this->update($entity, $request);
     }
 
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_user_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @Template("@OroUser/User/index.html.twig")
-     * @AclAncestor("oro_user_user_view")
-     */
+    #[Route(
+        path: '/{_format}',
+        name: 'oro_user_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template('@OroUser/User/index.html.twig')]
+    #[AclAncestor('oro_user_user_view')]
     public function indexAction()
     {
         return [
@@ -208,12 +185,12 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
-     * @Template("@OroUser/User/widget/info.html.twig")
      * @param Request $request
      * @param User $user
      * @return array
      */
+    #[Route(path: '/widget/info/{id}', name: 'oro_user_widget_info', requirements: ['id' => '\d+'])]
+    #[Template('@OroUser/User/widget/info.html.twig')]
     public function infoAction(Request $request, User $user)
     {
         $isViewProfile = (bool)$request->query->get('viewProfile', false);
@@ -231,11 +208,9 @@ class UserController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/login-attempts", name="oro_user_login_attempts")
-     * @Template("@OroUser/User/loginAttempts.html.twig")
-     * @AclAncestor("oro_view_user_login_attempt")
-     */
+    #[Route(path: '/login-attempts', name: 'oro_user_login_attempts')]
+    #[Template('@OroUser/User/loginAttempts.html.twig')]
+    #[AclAncestor('oro_view_user_login_attempt')]
     public function loginAttemptsAction()
     {
         return [];

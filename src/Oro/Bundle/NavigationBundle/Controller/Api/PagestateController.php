@@ -147,13 +147,12 @@ class PagestateController extends AbstractFOSRestController
     /**
      * Check if page id already exists
      *
-     * @QueryParam(name="pageId", nullable=false, description="Unique page id")
-     *
      * @ApiDoc(
      *  description="Check if page id already exists",
      *  resource=true
      * )
      */
+    #[QueryParam(name: 'pageId', description: 'Unique page id', nullable: false)]
     public function getCheckidAction()
     {
         $hash = AbstractPageState::generateHash(

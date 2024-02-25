@@ -4,65 +4,40 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Table(name="test_api_composite_id")
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_composite_id')]
 class TestCompositeIdentifier implements TestFrameworkEntityInterface
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="key1", type="string", nullable=false)
-     * @ORM\Id
-     */
-    public $key1;
+    #[ORM\Column(name: 'key1', type: Types::STRING, nullable: false)]
+    #[ORM\Id]
+    public ?string $key1 = null;
+
+    #[ORM\Column(name: 'key2', type: Types::INTEGER, nullable: false)]
+    #[ORM\Id]
+    public ?int $key2 = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
+    public ?string $name = null;
+
+    #[ORM\JoinColumn(name: 'parent_key1', referencedColumnName: 'key1')]
+    #[ORM\JoinColumn(name: 'parent_key2', referencedColumnName: 'key2')]
+    #[ORM\ManyToOne(targetEntity: TestCompositeIdentifier::class)]
+    protected ?TestCompositeIdentifier $parent = null;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="key2", type="integer", nullable=false)
-     * @ORM\Id
+     * @var Collection<int, TestCompositeIdentifier>
      */
-    public $key2;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", nullable=true)
-     */
-    public $name;
-
-    /**
-     * @var TestCompositeIdentifier|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestCompositeIdentifier")
-     * @ORM\JoinColumns({
-     *      @ORM\JoinColumn(name="parent_key1", referencedColumnName="key1"),
-     *      @ORM\JoinColumn(name="parent_key2", referencedColumnName="key2")
-     * })
-     */
-    protected $parent;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\ManyToMany(targetEntity="TestCompositeIdentifier")
-     * @ORM\JoinTable(name="test_api_composite_id_children",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="parent_key1", referencedColumnName="key1"),
-     *          @ORM\JoinColumn(name="parent_key2", referencedColumnName="key2")
-     *      },
-     *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="child_key1", referencedColumnName="key1"),
-     *          @ORM\JoinColumn(name="child_key2", referencedColumnName="key2")
-     *      }
-     * )
-     */
-    protected $children;
+    #[ORM\ManyToMany(targetEntity: TestCompositeIdentifier::class)]
+    #[ORM\JoinTable(name: 'test_api_composite_id_children')]
+    #[ORM\JoinColumn(name: 'parent_key1', referencedColumnName: 'key1')]
+    #[ORM\JoinColumn(name: 'parent_key2', referencedColumnName: 'key2')]
+    #[ORM\InverseJoinColumn(name: 'child_key1', referencedColumnName: 'key1')]
+    #[ORM\InverseJoinColumn(name: 'child_key2', referencedColumnName: 'key2')]
+    protected ?Collection $children = null;
 
     public function __construct()
     {

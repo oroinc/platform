@@ -10,7 +10,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     public function testProcessConfiguration(): void
     {
         $expected = [
-            'view' => ['annotations' => true],
+            'view' => ['attributes' => true],
             'templating' => [
                 'default' => 'twig',
                 'twig' => [

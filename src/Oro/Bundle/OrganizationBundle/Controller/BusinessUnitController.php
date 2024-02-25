@@ -6,8 +6,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,37 +19,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This controller covers CRUD functionality for Business Unit entity.
- * @Route("/business_unit")
  */
+#[Route(path: '/business_unit')]
 class BusinessUnitController extends AbstractController
 {
     /**
      * Create business_unit form
-     *
-     * @Route("/create", name="oro_business_unit_create")
-     * @Template("@OroOrganization/BusinessUnit/update.html.twig")
-     * @Acl(
-     *      id="oro_business_unit_create",
-     *      type="entity",
-     *      class="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
-     *      permission="CREATE"
-     * )
      */
+    #[Route(path: '/create', name: 'oro_business_unit_create')]
+    #[Template('@OroOrganization/BusinessUnit/update.html.twig')]
+    #[Acl(id: 'oro_business_unit_create', type: 'entity', class: BusinessUnit::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new BusinessUnit(), $request);
     }
 
-    /**
-     * @Route("/view/{id}", name="oro_business_unit_view", requirements={"id"="\d+"})
-     * @Template
-     * @Acl(
-     *      id="oro_business_unit_view",
-     *      type="entity",
-     *      class="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
-     *      permission="VIEW"
-     * )
-     */
+    #[Route(path: '/view/{id}', name: 'oro_business_unit_view', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[Acl(id: 'oro_business_unit_view', type: 'entity', class: BusinessUnit::class, permission: 'VIEW')]
     public function viewAction(BusinessUnit $entity)
     {
         return [
@@ -58,13 +45,11 @@ class BusinessUnitController extends AbstractController
         ];
     }
 
-    /**
-     * @Route(
-     *      "/search/{organizationId}",
-     *      name="oro_business_unit_search",
-     *      requirements={"organizationId"="\d+"}
-     * )
-     */
+    #[Route(
+        path: '/search/{organizationId}',
+        name: 'oro_business_unit_search',
+        requirements: ['organizationId' => '\d+']
+    )]
     public function searchAction($organizationId)
     {
         $businessUnits = [];
@@ -79,31 +64,28 @@ class BusinessUnitController extends AbstractController
 
     /**
      * Edit business_unit form
-     *
-     * @Route("/update/{id}", name="oro_business_unit_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template
-     * @Acl(
-     *      id="oro_business_unit_update",
-     *      type="entity",
-     *      class="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
-     *      permission="EDIT"
-     * )
      */
+    #[Route(
+        path: '/update/{id}',
+        name: 'oro_business_unit_update',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0]
+    )]
+    #[Template]
+    #[Acl(id: 'oro_business_unit_update', type: 'entity', class: BusinessUnit::class, permission: 'EDIT')]
     public function updateAction(BusinessUnit $entity, Request $request)
     {
         return $this->update($entity, $request);
     }
 
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_business_unit_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @AclAncestor("oro_business_unit_view")
-     * @Template()
-     */
+    #[Route(
+        path: '/{_format}',
+        name: 'oro_business_unit_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template]
+    #[AclAncestor('oro_business_unit_view')]
     public function indexAction()
     {
         return ['entity_class' => BusinessUnit::class];
@@ -132,21 +114,17 @@ class BusinessUnitController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/widget/info/{id}", name="oro_business_unit_widget_info", requirements={"id"="\d+"})
-     * @Template
-     * @AclAncestor("oro_business_unit_view")
-     */
+    #[Route(path: '/widget/info/{id}', name: 'oro_business_unit_widget_info', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[AclAncestor('oro_business_unit_view')]
     public function infoAction(BusinessUnit $entity)
     {
         return ['entity' => $entity];
     }
 
-    /**
-     * @Route("/widget/users/{id}", name="oro_business_unit_widget_users", requirements={"id"="\d+"})
-     * @Template
-     * @AclAncestor("oro_user_user_view")
-     */
+    #[Route(path: '/widget/users/{id}', name: 'oro_business_unit_widget_users', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[AclAncestor('oro_user_user_view')]
     public function usersAction(BusinessUnit $entity)
     {
         return ['entity' => $entity];

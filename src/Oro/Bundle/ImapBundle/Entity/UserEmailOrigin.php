@@ -2,115 +2,72 @@
 
 namespace Oro\Bundle\ImapBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository;
 
 /**
  * User Email Origin
- *
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks()
- * @ORM\Entity(repositoryClass="Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository")
  */
+#[ORM\Entity(repositoryClass: UserEmailOriginRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class UserEmailOrigin extends EmailOrigin
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="imap_host", type="string", length=255, nullable=true)
-     */
-    protected $imapHost;
+    #[ORM\Column(name: 'imap_host', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $imapHost = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="imap_port", type="integer", length=10, nullable=true)
-     */
-    protected $imapPort;
+    #[ORM\Column(name: 'imap_port', type: Types::INTEGER, length: 10, nullable: true)]
+    protected ?int $imapPort = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="smtp_host", type="string", length=255, nullable=true)
-     */
-    protected $smtpHost;
+    #[ORM\Column(name: 'smtp_host', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $smtpHost = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="smtp_port", type="integer", length=10, nullable=true)
-     */
-    protected $smtpPort;
+    #[ORM\Column(name: 'smtp_port', type: Types::INTEGER, length: 10, nullable: true)]
+    protected ?int $smtpPort = null;
 
     /**
      * The SSL type to be used to connect to IMAP server. Can be empty string, 'ssl' or 'tls'
-     *
-     * @var string
-     *
-     * @ORM\Column(name="imap_ssl", type="string", length=3, nullable=true)
      */
-    protected $imapEncryption;
+    #[ORM\Column(name: 'imap_ssl', type: Types::STRING, length: 3, nullable: true)]
+    protected ?string $imapEncryption = null;
 
     /**
      * The SSL type to be used to connect to SMTP server. Can be empty string, 'ssl' or 'tls'
-     *
-     * @var string
-     *
-     * @ORM\Column(name="smtp_encryption", type="string", length=3, nullable=true)
      */
-    protected $smtpEncryption;
+    #[ORM\Column(name: 'smtp_encryption', type: Types::STRING, length: 3, nullable: true)]
+    protected ?string $smtpEncryption = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="imap_user", type="string", length=100, nullable=true)
-     */
-    protected $user;
+    #[ORM\Column(name: 'imap_user', type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $user = null;
 
     /**
      * Encrypted password. Must be persisted.
-     *
-     * @var string
-     *
-     * @ORM\Column(name="imap_password", type="text", length=16777216, nullable=true)
      */
-    protected $password;
+    #[ORM\Column(name: 'imap_password', type: Types::TEXT, length: 16777216, nullable: true)]
+    protected ?string $password = null;
 
-    /**
-     * @var Mailbox
-     *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Mailbox", mappedBy="origin")
-     */
-    protected $mailbox;
+    #[ORM\OneToOne(mappedBy: 'origin', targetEntity: Mailbox::class)]
+    protected ?Mailbox $mailbox = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="access_token", type="text", length=8192, nullable=true)
-     */
-    protected $accessToken;
+    #[ORM\Column(name: 'access_token', type: Types::TEXT, length: 8192, nullable: true)]
+    protected ?string $accessToken = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="refresh_token", type="text", length=8192, nullable=true)
-     */
-    protected $refreshToken;
+    #[ORM\Column(name: 'refresh_token', type: Types::TEXT, length: 8192, nullable: true)]
+    protected ?string $refreshToken = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="access_token_expires_at", type="datetime", nullable=true)
-     */
-    protected $accessTokenExpiresAt;
+    #[ORM\Column(name: 'access_token_expires_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $accessTokenExpiresAt = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="account_type", type="string", length=255, nullable=true, options={"default" = "other"})
-     */
-    protected $accountType = 'other';
+    #[ORM\Column(
+        name: 'account_type',
+        type: Types::STRING,
+        length: 255,
+        nullable: true,
+        options: ['default' => 'other']
+    )]
+    protected ?string $accountType = 'other';
 
     /**
      * @var string
@@ -384,9 +341,7 @@ class UserEmailOrigin extends EmailOrigin
         return sprintf('%s (%s)', $this->user, $host);
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         if ($this->mailboxName === null) {

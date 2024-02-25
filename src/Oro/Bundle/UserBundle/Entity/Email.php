@@ -2,49 +2,33 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
  * Represents an additional user email address.
- * @ORM\Entity()
- * @ORM\Table("oro_user_email", indexes={
- *      @ORM\Index(name="idx_user_email", columns={"email"})
- * })
- * @Config()
  */
+#[ORM\Entity]
+#[ORM\Table('oro_user_email')]
+#[ORM\Index(columns: ['email'], name: 'idx_user_email')]
+#[Config]
 class Email implements EmailInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="emails")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     */
-    protected $user;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'emails')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    protected ?User $user = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @ConfigField(
-     *  defaultValues={
-     *    "importexport"={
-     *       "identity"=true
-     *    },
-     *    "dataaudit"={
-     *       "auditable"=true
-     *    }
-     *   }
-     * )
-     */
-    protected $email;
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['importexport' => ['identity' => true], 'dataaudit' => ['auditable' => true]])]
+    protected ?string $email = null;
 
     /**
      * {@inheritdoc}

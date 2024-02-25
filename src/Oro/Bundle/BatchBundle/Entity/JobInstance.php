@@ -4,17 +4,17 @@ namespace Oro\Bundle\BatchBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\BatchBundle\Job\Job;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Represents a batch job instance.
- *
- * @ORM\Table(name="akeneo_batch_job_instance")
- * @ORM\Entity()
- * @UniqueEntity(fields="code", message="This code is already taken")
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'akeneo_batch_job_instance')]
+#[UniqueEntity(fields: 'code', message: 'This code is already taken')]
 class JobInstance
 {
     public const STATUS_READY = 0;
@@ -24,58 +24,44 @@ class JobInstance
     public const TYPE_IMPORT = 'import';
     public const TYPE_EXPORT = 'export';
 
-    /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected ?int $id = null;
 
-    /**
-     * @ORM\Column(name="code", type="string", length=100, unique=true)
-     */
+    #[ORM\Column(name: 'code', type: Types::STRING, length: 100, unique: true)]
     protected ?string $code = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     protected ?string $label = null;
 
-    /**
-     * @ORM\Column(name="alias", type="string", length=50)
-     */
+    #[ORM\Column(name: 'alias', type: Types::STRING, length: 50)]
     protected ?string $alias;
 
-    /**
-     * @ORM\Column(name="status", type="integer")
-     */
+    #[ORM\Column(name: 'status', type: Types::INTEGER)]
     protected int $status = self::STATUS_READY;
 
-    /**
-     * @ORM\Column(name="connector", type="string")
-     */
+    #[ORM\Column(name: 'connector', type: Types::STRING)]
     protected ?string $connector;
 
     /**
      * JobInstance type export or import
-     *
-     * @ORM\Column(name="type", type="string")
      */
+    #[ORM\Column(name: 'type', type: Types::STRING)]
     protected ?string $type;
 
-    /**
-     * @ORM\Column(type="array")
-     */
+    #[ORM\Column(type: Types::ARRAY)]
     protected array $rawConfiguration = [];
 
     /**
-     * @ORM\OneToMany(
-     *      targetEntity="JobExecution",
-     *      mappedBy="jobInstance",
-     *      cascade={"remove"},
-     *      orphanRemoval=true
-     * )
+     * @var Collection<int, JobExecution>
      */
+    #[ORM\OneToMany(
+        mappedBy: 'jobInstance',
+        targetEntity: JobExecution::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
     protected Collection $jobExecutions;
 
     protected ?Job $job = null;

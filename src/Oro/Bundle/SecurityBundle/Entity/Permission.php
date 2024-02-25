@@ -4,38 +4,27 @@ namespace Oro\Bundle\SecurityBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 
 /**
  * Permission entity
- *
- * @ORM\Table("oro_security_permission")
- * @ORM\Entity(repositoryClass="Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository")
  */
+#[ORM\Entity(repositoryClass: PermissionRepository::class)]
+#[ORM\Table('oro_security_permission')]
 class Permission
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, unique=true)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255, unique: true)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", length=255)
-     */
-    protected $label;
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255)]
+    protected ?string $label = null;
 
     /**
      * If true permission will be applied for all entities in application except entities,
@@ -44,62 +33,42 @@ class Permission
      * If false permission will be applied for entities that specified in $this->applyToEntities.
      *
      * @var boolean
-     *
-     * @ORM\Column(name="is_apply_to_all", type="boolean")
      */
-    protected $applyToAll = true;
+    #[ORM\Column(name: 'is_apply_to_all', type: Types::BOOLEAN)]
+    protected ?bool $applyToAll = true;
 
     /**
      * Array of entity class names. You need to specify entity classes for which you want apply current permission.
      * This property is used only in the case when $this->applyToAll is false.
      *
-     * @var Collection|PermissionEntity[]
-     *
-     * @ORM\ManyToMany(targetEntity="PermissionEntity", cascade={"persist"})
-     * @ORM\JoinTable(
-     *      name="oro_security_perm_apply_entity",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="permission_id", referencedColumnName="id", onDelete="CASCADE")
-     *      },
-     *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="permission_entity_id", referencedColumnName="id", onDelete="CASCADE")
-     *      }
-     * )
+     * @var Collection<int, PermissionEntity>
      **/
-    protected $applyToEntities;
+    #[ORM\ManyToMany(targetEntity: PermissionEntity::class, cascade: ['persist'])]
+    #[ORM\JoinTable(name: 'oro_security_perm_apply_entity')]
+    #[ORM\JoinColumn(name: 'permission_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'permission_entity_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $applyToEntities = null;
 
     /**
      * Array of entity class names. You need to specify entity classes for which you want not apply current permission.
      * This property is used only in the case when $this->applyToAll is true.
      *
-     * @var Collection|PermissionEntity[]
-     *
-     * @ORM\ManyToMany(targetEntity="PermissionEntity", cascade={"persist"})
-     * @ORM\JoinTable(
-     *      name="oro_security_perm_excl_entity",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="permission_id", referencedColumnName="id", onDelete="CASCADE")
-     *      },
-     *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="permission_entity_id", referencedColumnName="id", onDelete="CASCADE")
-     *      }
-     * )
+     * @var Collection<int, PermissionEntity>
      **/
-    protected $excludeEntities;
+    #[ORM\ManyToMany(targetEntity: PermissionEntity::class, cascade: ['persist'])]
+    #[ORM\JoinTable(name: 'oro_security_perm_excl_entity')]
+    #[ORM\JoinColumn(name: 'permission_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'permission_entity_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $excludeEntities = null;
 
     /**
      * @var Collection
-     *
-     * @ORM\Column(name="group_names", type="array")
      */
+    #[ORM\Column(name: 'group_names', type: Types::ARRAY)]
     protected $groupNames;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="string", length=255, nullable=true)
-     */
-    protected $description;
+    #[ORM\Column(name: 'description', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $description = null;
 
     /**
      * Constructor

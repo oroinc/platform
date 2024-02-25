@@ -4,39 +4,30 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
- * @ORM\Table(name="test_department")
- */
+* Entity that represents Test Department
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'test_department')]
 class TestDepartment implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @var Collection<int, TestEmployee>
      */
-    protected $name;
-
-    /**
-     * @var TestDepartment|null
-     *
-     * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee",
-     *     mappedBy="department"
-     * )
-     */
-    protected $employees;
+    #[ORM\OneToMany(mappedBy: 'department', targetEntity: TestEmployee::class)]
+    protected ?Collection $employees = null;
 
     public function __construct()
     {

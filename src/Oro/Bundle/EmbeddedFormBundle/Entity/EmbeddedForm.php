@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEmbeddedFormBundle_Entity_EmbeddedForm;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -15,115 +16,60 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * The embedded form configuration.
  *
- * @ORM\Entity
- * @ORM\Table(name="oro_embedded_form")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      routeName="oro_embedded_form_list",
- *      defaultValues={
- *          "ownership"={
- *              "owner_type"="ORGANIZATION",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="owner_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "activity"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @mixin OroEmbeddedFormBundle_Entity_EmbeddedForm
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_embedded_form')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    routeName: 'oro_embedded_form_list',
+    defaultValues: [
+        'ownership' => [
+            'owner_type' => 'ORGANIZATION',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'owner_id'
+        ],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'activity' => ['immutable' => true]
+    ]
+)]
 class EmbeddedForm implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Id
-     * @ORM\Column(type="string", name="id")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::STRING)]
+    protected ?string $id = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="title", type="text")
-     *
-     * @Assert\NotBlank()
-     */
-    protected $title;
+    #[ORM\Column(name: 'title', type: Types::TEXT)]
+    #[Assert\NotBlank]
+    protected ?string $title = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="css", type="text")
-     *
-     * @Assert\NotBlank()
-     */
-    protected $css;
+    #[ORM\Column(name: 'css', type: Types::TEXT)]
+    #[Assert\NotBlank]
+    protected ?string $css = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="form_type", type="string", length=255)
-     *
-     * @Assert\NotBlank()
-     */
-    protected $formType;
+    #[ORM\Column(name: 'form_type', type: Types::STRING, length: 255)]
+    #[Assert\NotBlank]
+    protected ?string $formType = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="success_message", type="text")
-     */
-    protected $successMessage;
+    #[ORM\Column(name: 'success_message', type: Types::TEXT)]
+    protected ?string $successMessage = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="allowed_domains", type="text", nullable=true)
-     */
-    protected $allowedDomains;
+    #[ORM\Column(name: 'allowed_domains', type: Types::TEXT, nullable: true)]
+    protected ?string $allowedDomains = null;
 
-    /**
-     * @var \DateTime $created
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime $updated
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?Organization $owner = null;
 
     /**
      * @return int
@@ -239,17 +185,13 @@ class EmbeddedForm implements ExtendEntityInterface
         return $this->updatedAt;
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));

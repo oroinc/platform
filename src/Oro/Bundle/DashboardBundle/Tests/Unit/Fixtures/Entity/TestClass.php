@@ -2,23 +2,18 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class TestClass
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    protected ?int $id = null;
 
-    /**
-     * @ORM\Column(type="text")
-     */
-    protected $existing;
+    #[ORM\Column(type: Types::TEXT)]
+    protected ?string $existing = null;
 
     public function getExisting()
     {

@@ -8,7 +8,7 @@ services:
         arguments:
             - '@.inner'
             - '@oro_security.acl.object_identity_factory'
-            - '@oro_security.acl.annotation_provider'
+            - '@oro_security.acl.attribute_provider'
             - '@oro_security.acl.group_provider.chain'
             - '@logger'
         tags:
@@ -19,14 +19,14 @@ services:
         arguments:
             - '@security.authorization_checker'
             - '@oro_entity.orm.entity_class_resolver'
-            - '@oro_security.acl.annotation_provider'
+            - '@oro_security.acl.attribute_provider'
 
     oro_security.class_authorization_checker:
         class: Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker
         arguments:
             - '@security.authorization_checker'
             - '@oro_security.acl.object_identity_factory'
-            - '@oro_security.acl.annotation_provider'
+            - '@oro_security.acl.attribute_provider'
             - '@logger'
         tags:
             - { name: monolog.logger, channel: security }
@@ -277,30 +277,30 @@ services:
         class: Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider
         public: false
         arguments:
-            - '@oro_security.acl.annotation_provider'
+            - '@oro_security.acl.attribute_provider'
 
-    oro_security.acl.annotation_provider:
-        class: Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider
+    oro_security.acl.attribute_provider:
+        class: Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider
         public: false
         parent: oro.static_config_provider.abstract
         arguments:
-            - '%kernel.cache_dir%/oro/acl_annotations.php'
+            - '%kernel.cache_dir%/oro/acl_attributes.php'
             - '%kernel.debug%'
             - '@oro_entity.orm.entity_class_resolver'
             - !tagged_iterator oro_security.acl.config_loader
 
     oro_security.acl.config_loader:
-        class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader
+        class: Oro\Bundle\SecurityBundle\Attribute\Loader\AclConfigLoader
         public: false
         tags:
             - { name: oro_security.acl.config_loader }
 
-    oro_security.acl.annotation_loader:
-        class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader
+    oro_security.acl.attribute_loader:
+        class: Oro\Bundle\SecurityBundle\Attribute\Loader\AclAttributeLoader
         public: false
         arguments:
             - '@oro_ui.controller_class_provider'
-            - '@annotation_reader'
+            - '@oro_platform.attribute_reader'
         tags:
             - { name: oro_security.acl.config_loader, priority: -10 }
 

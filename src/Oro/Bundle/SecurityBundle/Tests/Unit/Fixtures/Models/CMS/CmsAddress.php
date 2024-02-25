@@ -4,31 +4,21 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="cms_addresses")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'cms_addresses')]
 class CmsAddress
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id @ORM\GeneratedValue
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
     public $id;
 
-    /**
-     * @ORM\Column(length=50)
-     */
+    #[ORM\Column(length: 50)]
     public $country;
 
-    /**
-     * @ORM\Column(length=50)
-     */
+    #[ORM\Column(length: 50)]
     public $zip;
 
-    /**
-     * @ORM\Column(length=50)
-     */
+    #[ORM\Column(length: 50)]
     public $city;
 
     /**
@@ -36,16 +26,12 @@ class CmsAddress
      */
     public $street;
 
-    /**
-     * @ORM\OneToOne(targetEntity="CmsUser", inversedBy="address")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(inversedBy: 'address', targetEntity: CmsUser::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
     public $user;
 
-    /**
-     * @ORM\OneToOne(targetEntity="CmsOrganization", inversedBy="address")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(inversedBy: 'address', targetEntity: CmsOrganization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id')]
     public $organization;
 
     public function getId()

@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEmailBundle_Entity_EmailTemplateTranslation;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -12,66 +13,39 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 /**
  * Represents translations for email templates.
  *
- * @ORM\Entity()
- * @ORM\Table(name="oro_email_template_localized")
- * @Config()
  * @mixin OroEmailBundle_Entity_EmailTemplateTranslation
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_email_template_localized')]
+#[Config]
 class EmailTemplateTranslation implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var EmailTemplate|null
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailTemplate", inversedBy="translations")
-     * @ORM\JoinColumn(name="template_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
-    private $template;
+    #[ORM\ManyToOne(targetEntity: EmailTemplate::class, inversedBy: 'translations')]
+    #[ORM\JoinColumn(name: 'template_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?EmailTemplate $template = null;
 
-    /**
-     * @var Localization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\LocaleBundle\Entity\Localization")
-     * @ORM\JoinColumn(name="localization_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
-    private $localization;
+    #[ORM\ManyToOne(targetEntity: Localization::class)]
+    #[ORM\JoinColumn(name: 'localization_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?Localization $localization = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="subject", type="string", length=255, nullable=true)
-     */
-    private $subject;
+    #[ORM\Column(name: 'subject', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $subject = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="subject_fallback", type="boolean", options={"default"=true})
-     */
-    private $subjectFallback = true;
+    #[ORM\Column(name: 'subject_fallback', type: Types::BOOLEAN, options: ['default' => true])]
+    private ?bool $subjectFallback = true;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="content", type="text", nullable=true)
-     */
-    private $content;
+    #[ORM\Column(name: 'content', type: Types::TEXT, nullable: true)]
+    private ?string $content = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="content_fallback", type="boolean", options={"default"=true})
-     */
-    private $contentFallback = true;
+    #[ORM\Column(name: 'content_fallback', type: Types::BOOLEAN, options: ['default' => true])]
+    private ?bool $contentFallback = true;
 
     public function getId(): ?int
     {

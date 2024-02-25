@@ -2,20 +2,15 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="test_another")
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_another')]
 class Another
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 }

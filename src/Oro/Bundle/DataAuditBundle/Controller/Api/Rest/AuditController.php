@@ -8,7 +8,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
@@ -26,52 +26,52 @@ class AuditController extends RestGetController
     /**
      * Get list of audit logs
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. defaults to 10."
-     * )
-     * @QueryParam(
-     *     name="loggedAt",
-     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
-     *     nullable=true,
-     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
-     * )
-     * @QueryParam(
-     *     name="action",
-     *     requirements="create|update|remove",
-     *     nullable=true,
-     *     description="Logged action name"
-     * )
-     * @QueryParam(
-     *     name="user",
-     *     requirements="\d+",
-     *     nullable=true,
-     *     description="ID of User who has performed action"
-     * )
-     * @QueryParam(
-     *     name="objectClass",
-     *     requirements="\w+",
-     *     nullable=true,
-     *     description="Entity full class name; backslashes (\) should be replaced with underscore (_)."
-     * )
      *
      * @ApiDoc(
      *  description="Get list of all logged entities",
      *  resource=true
      * )
      *
-     * @AclAncestor("oro_dataaudit_view")
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. defaults to 10.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'loggedAt',
+        requirements: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?',
+        description: 'Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'action',
+        requirements: 'create|update|remove',
+        description: 'Logged action name',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'user',
+        requirements: '\d+',
+        description: 'ID of User who has performed action',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'objectClass',
+        requirements: '\w+',
+        description: 'Entity full class name; backslashes (\) should be replaced with underscore (_).',
+        nullable: true
+    )]
+    #[AclAncestor('oro_dataaudit_view')]
     public function cgetAction(Request $request)
     {
         $page = (int)$request->get('page', 1);
@@ -102,9 +102,8 @@ class AuditController extends RestGetController
      *      {"name"="id", "dataType"="integer"},
      *  }
      * )
-     *
-     * @AclAncestor("oro_dataaudit_view")
      */
+    #[AclAncestor('oro_dataaudit_view')]
     public function getAction($id)
     {
         return $this->handleGetRequest($id);
@@ -113,24 +112,23 @@ class AuditController extends RestGetController
     /**
      * Get auditable entities with auditable fields
      *
-     * @QueryParam(
-     *      name="with-relations",
-     *      nullable=true,
-     *      requirements="true|false",
-     *      default="true",
-     *      strict=true,
-     *      description="Indicates whether association fields should be returned as well."
-     * )
-     *
      * @ApiDoc(
      *      description="Get auditable entities with auditable fields",
      *      resource=true
      * )
      *
-     * @AclAncestor("oro_dataaudit_view")
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'with-relations',
+        requirements: 'true|false',
+        default: true,
+        description: 'Indicates whether association fields should be returned as well.',
+        strict: true,
+        nullable: true
+    )]
+    #[AclAncestor('oro_dataaudit_view')]
     public function getFieldsAction(Request $request)
     {
         /* @var $provider EntityWithFieldsProvider */

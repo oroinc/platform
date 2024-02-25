@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+* BitFieldType trait
+*
+*/
 trait BitFieldTypeTrait
 {
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="old_boolean", type="boolean", nullable=true)
-     */
-    protected $oldBoolean;
+    #[ORM\Column(name: 'old_boolean', type: Types::BOOLEAN, nullable: true)]
+    protected ?bool $oldBoolean = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="new_boolean", type="boolean", nullable=true)
-     */
-    protected $newBoolean;
+    #[ORM\Column(name: 'new_boolean', type: Types::BOOLEAN, nullable: true)]
+    protected ?bool $newBoolean = null;
 }

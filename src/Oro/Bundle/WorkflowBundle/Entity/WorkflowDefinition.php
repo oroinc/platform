@@ -4,42 +4,20 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 /**
  * Doctrine ORM Entity WorkflowDefinition.
  *
- * @ORM\Table(name="oro_workflow_definition")
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
- * @Config(
- *      mode="hidden",
- *      routeName="oro_workflow_definition_index",
- *      routeView="oro_workflow_definition_view",
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-exchange"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
- * @ORM\HasLifecycleCallbacks()
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -47,182 +25,122 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
+#[ORM\Entity(repositoryClass: WorkflowDefinitionRepository::class)]
+#[ORM\Table(name: 'oro_workflow_definition')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    mode: 'hidden',
+    routeName: 'oro_workflow_definition_index',
+    routeView: 'oro_workflow_definition_view',
+    defaultValues: [
+        'entity' => ['icon' => 'fa-exchange'],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class WorkflowDefinition implements DomainObjectInterface
 {
     const CONFIG_SCOPES = 'scopes';
     const CONFIG_DATAGRIDS = 'datagrids';
     const CONFIG_FORCE_AUTOSTART = 'force_autostart';
 
-    /**
-     * @var string
-     *
-     * @ORM\Id
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $name;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $label;
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    protected ?string $label = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="related_entity", type="string", length=255)
-     */
-    protected $relatedEntity;
+    #[ORM\Column(name: 'related_entity', type: Types::STRING, length: 255)]
+    protected ?string $relatedEntity = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_attribute_name", type="string", length=255)
-     */
-    protected $entityAttributeName;
+    #[ORM\Column(name: 'entity_attribute_name', type: Types::STRING, length: 255)]
+    protected ?string $entityAttributeName = null;
 
-    /**
-     * @var bool
-     * @ORM\Column(name="steps_display_ordered", type="boolean")
-     */
-    protected $stepsDisplayOrdered = false;
+    #[ORM\Column(name: 'steps_display_ordered', type: Types::BOOLEAN)]
+    protected ?bool $stepsDisplayOrdered = false;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="`system`", type="boolean")
-     */
-    protected $system = false;
+    #[ORM\Column(name: '`system`', type: Types::BOOLEAN)]
+    protected ?bool $system = false;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="active", type="boolean", options={"default"=false})
-     */
-    protected $active = false;
+    #[ORM\Column(name: 'active', type: Types::BOOLEAN, options: ['default' => false])]
+    protected ?bool $active = false;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="priority", type="integer", options={"default"=0})
-     */
-    protected $priority = 0;
+    #[ORM\Column(name: 'priority', type: Types::INTEGER, options: ['default' => 0])]
+    protected ?int $priority = 0;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="configuration", type="array")
      */
+    #[ORM\Column(name: 'configuration', type: Types::ARRAY)]
     protected $configuration = [];
 
     /**
-     * @var Scope[]|Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\ScopeBundle\Entity\Scope")
-     * @ORM\JoinTable(
-     *      name="oro_workflow_scopes",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="workflow_name", referencedColumnName="name", onDelete="CASCADE")
-     *      },
-     *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="scope_id", referencedColumnName="id", onDelete="CASCADE")
-     *      }
-     * )
+     * @var Collection<int, Scope>
      */
-    protected $scopes;
+    #[ORM\ManyToMany(targetEntity: Scope::class)]
+    #[ORM\JoinTable(name: 'oro_workflow_scopes')]
+    #[ORM\JoinColumn(name: 'workflow_name', referencedColumnName: 'name', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'scope_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $scopes = null;
 
     /**
-     * @var WorkflowStep[]|Collection
-     *
-     * @ORM\OneToMany(
-     *      targetEntity="WorkflowStep",
-     *      mappedBy="definition",
-     *      orphanRemoval=true,
-     *      cascade={"all"}
-     * )
+     * @var Collection<int, WorkflowStep>
      */
-    protected $steps;
+    #[ORM\OneToMany(mappedBy: 'definition', targetEntity: WorkflowStep::class, cascade: ['all'], orphanRemoval: true)]
+    protected ?Collection $steps = null;
+
+    #[ORM\ManyToOne(targetEntity: WorkflowStep::class)]
+    #[ORM\JoinColumn(name: 'start_step_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?WorkflowStep $startStep = null;
 
     /**
-     * @var WorkflowStep
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="start_step_id", referencedColumnName="id", onDelete="SET NULL")
+     * @var Collection<int, WorkflowEntityAcl>
      */
-    protected $startStep;
+    #[ORM\OneToMany(
+        mappedBy: 'definition',
+        targetEntity: WorkflowEntityAcl::class,
+        cascade: ['all'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $entityAcls = null;
 
     /**
-     * @var WorkflowEntityAcl[]|Collection
-     *
-     * @ORM\OneToMany(
-     *      targetEntity="WorkflowEntityAcl",
-     *      mappedBy="definition",
-     *      orphanRemoval=true,
-     *      cascade={"all"}
-     * )
+     * @var Collection<int, WorkflowRestriction>
      */
-    protected $entityAcls;
-
-    /**
-     * @var WorkflowRestriction[]|Collection
-     *
-     * @ORM\OneToMany(
-     *      targetEntity="WorkflowRestriction",
-     *      mappedBy="definition",
-     *      orphanRemoval=true,
-     *      cascade={"all"}
-     * )
-     */
-    protected $restrictions;
+    #[ORM\OneToMany(
+        mappedBy: 'definition',
+        targetEntity: WorkflowRestriction::class,
+        cascade: ['all'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $restrictions = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="exclusive_active_groups", type="simple_array", nullable=true)
      */
+    #[ORM\Column(name: 'exclusive_active_groups', type: Types::SIMPLE_ARRAY, nullable: true)]
     protected $exclusiveActiveGroups = [];
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="exclusive_record_groups", type="simple_array", nullable=true)
      */
+    #[ORM\Column(name: 'exclusive_record_groups', type: Types::SIMPLE_ARRAY, nullable: true)]
     protected $exclusiveRecordGroups = [];
 
-    /**
-     * @var \DateTime $created
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime $updated
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="applications", type="simple_array", nullable=false)
      */
+    #[ORM\Column(name: 'applications', type: Types::SIMPLE_ARRAY, nullable: false)]
     protected $applications = [CurrentApplicationProviderInterface::DEFAULT_APPLICATION];
 
     /**
@@ -817,9 +735,8 @@ class WorkflowDefinition implements DomainObjectInterface
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -828,8 +745,8 @@ class WorkflowDefinition implements DomainObjectInterface
 
     /**
      * Pre update event handler
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function beforeUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

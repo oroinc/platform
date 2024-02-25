@@ -2,77 +2,44 @@
 
 namespace Oro\Bundle\AddressBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
  * Address region entity
- *
- * @ORM\Table("oro_dictionary_region", indexes={
- *      @ORM\Index(name="region_name_idx", columns={"name"})
- * })
- * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository")
- * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
- * @Config(
- *      defaultValues={
- *          "grouping"={
- *              "groups"={"dictionary"}
- *          },
- *          "dictionary"={
- *              "search_fields"={"name"}
- *          }
- *      }
- * )
  */
+#[ORM\Entity(repositoryClass: RegionRepository::class)]
+#[ORM\Table('oro_dictionary_region')]
+#[ORM\Index(columns: ['name'], name: 'region_name_idx')]
+#[Gedmo\TranslationEntity(class: RegionTranslation::class)]
+#[Config(defaultValues: ['grouping' => ['groups' => ['dictionary']], 'dictionary' => ['search_fields' => ['name']]])]
 class Region implements Translatable
 {
     const SEPARATOR = '-';
 
-    /**
-     * @var string
-     *
-     * @ORM\Id
-     * @ORM\Column(name="combined_code", type="string", length=16)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $combinedCode;
+    #[ORM\Id]
+    #[ORM\Column(name: 'combined_code', type: Types::STRING, length: 16)]
+    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    protected ?string $combinedCode = null;
 
-    /**
-     * @var Country
-     *
-     * @ORM\ManyToOne(targetEntity="Country", inversedBy="regions", cascade={"persist"})
-     * @ORM\JoinColumn(name="country_code", referencedColumnName="iso2_code")
-     */
-    protected $country;
+    #[ORM\ManyToOne(targetEntity: Country::class, cascade: ['persist'], inversedBy: 'regions')]
+    #[ORM\JoinColumn(name: 'country_code', referencedColumnName: 'iso2_code')]
+    protected ?Country $country = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="code", type="string", length=32)
-     */
-    protected $code;
+    #[ORM\Column(name: 'code', type: Types::STRING, length: 32)]
+    protected ?string $code = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     * @Gedmo\Translatable
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    #[Gedmo\Translatable]
+    protected ?string $name = null;
 
-    /**
-     * @Gedmo\Locale
-     */
-    protected $locale;
+    #[Gedmo\Locale]
+    protected ?string $locale = null;
 
     /**
      * @param string $combinedCode

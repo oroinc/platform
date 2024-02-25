@@ -60,19 +60,6 @@ class ActivityTargetController extends RestGetController
      * @param string $entity The type of the target entity.
      * @param mixed  $id     The id of the target entity.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
-     *
      * @ApiDoc(
      *      description="Get activities for the specified entity",
      *      resource=true
@@ -80,6 +67,18 @@ class ActivityTargetController extends RestGetController
      *
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
     public function getActivitiesAction(Request $request, $entity, $id)
     {
         $manager = $this->getManager();

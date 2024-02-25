@@ -2,33 +2,30 @@
 
 namespace Oro\Bundle\PlatformBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\PlatformBundle\Entity\Repository\MaterializedViewEntityRepository;
 
 /**
  * Represents a materialized view.
  * This is just a technical entity to keep track of created materialized views.
- *
- * @ORM\Table(name="oro_materialized_view")
- * @ORM\Entity(repositoryClass="Oro\Bundle\PlatformBundle\Entity\Repository\MaterializedViewEntityRepository")
- * @Config(mode="hidden")
  */
+#[ORM\Entity(repositoryClass: MaterializedViewEntityRepository::class)]
+#[ORM\Table(name: 'oro_materialized_view')]
+#[Config(mode: 'hidden')]
 class MaterializedView implements DatesAwareInterface
 {
     use DatesAwareTrait;
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="string", length=63)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: 63)]
     protected ?string $name = null;
 
-    /**
-     * @ORM\Column(type="boolean", name="with_data", options={"default"=false})
-     */
-    protected bool $withData = false;
+    #[ORM\Column(name: 'with_data', type: Types::BOOLEAN, options: ['default' => false])]
+    protected ?bool $withData = false;
 
     public function getName(): ?string
     {

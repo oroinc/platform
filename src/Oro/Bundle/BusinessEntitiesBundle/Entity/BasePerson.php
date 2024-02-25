@@ -4,121 +4,63 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 
 /**
  * Basic business entity
- *
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 class BasePerson implements FullNameInterface, EmailHolderInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name_prefix', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $namePrefix = null;
+
+    #[ORM\Column(name: 'first_name', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $firstName = null;
+
+    #[ORM\Column(name: 'middle_name', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $middleName = null;
+
+    #[ORM\Column(name: 'last_name', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $lastName = null;
+
+    #[ORM\Column(name: 'name_suffix', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $nameSuffix = null;
+
+    #[ORM\Column(name: 'gender', type: Types::STRING, length: 8, nullable: true)]
+    protected ?string $gender = null;
+
+    #[ORM\Column(name: 'birthday', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $birthday = null;
+
+    #[ORM\Column(name: 'email', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $email = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name_prefix", type="string", length=255, nullable=true)
+     * @var Collection<int, AbstractAddress>
      */
-    protected $namePrefix;
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: AbstractAddress::class, cascade: ['all'], orphanRemoval: true)]
+    #[ORM\OrderBy(['primary' => Criteria::DESC])]
+    protected ?Collection $addresses = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
-     */
-    protected $firstName;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="middle_name", type="string", length=255, nullable=true)
-     */
-    protected $middleName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
-     */
-    protected $lastName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name_suffix", type="string", length=255, nullable=true)
-     */
-    protected $nameSuffix;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="gender", type="string", length=8, nullable=true)
-     */
-    protected $gender;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="birthday", type="datetime", nullable=true)
-     */
-    protected $birthday;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=255, nullable=true)
-     */
-    protected $email;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\AddressBundle\Entity\AbstractAddress",
-     *     mappedBy="owner", cascade={"all"}, orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"primary" = "DESC"})
-     */
-    protected $addresses;
-
-    /**
-     * @var \DateTime $createdAt
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime $updatedAt
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * init addresses with empty collection

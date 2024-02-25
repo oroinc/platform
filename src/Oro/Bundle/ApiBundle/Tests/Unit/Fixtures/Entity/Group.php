@@ -2,25 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="group_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'group_table')]
 class Group
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=50)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    protected ?string $name = null;
 
     /**
      * @return int

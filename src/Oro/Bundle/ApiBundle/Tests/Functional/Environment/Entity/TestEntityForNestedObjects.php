@@ -4,118 +4,70 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Table(name="test_api_nested_objects")
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_nested_objects')]
 class TestEntityForNestedObjects implements TestFrameworkEntityInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
      * @var TestNestedName
      */
     protected $name;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="first_name", type="string", nullable=true)
-     */
-    protected $firstName;
+    #[ORM\Column(name: 'first_name', type: Types::STRING, nullable: true)]
+    protected ?string $firstName = null;
+
+    #[ORM\Column(name: 'last_name', type: Types::STRING, nullable: true)]
+    protected ?string $lastName = null;
+
+    #[ORM\Column(name: 'middle_name', type: Types::STRING, nullable: true)]
+    protected ?string $middleName = null;
+
+    #[ORM\Column(name: 'name_prefix', type: Types::STRING, nullable: true)]
+    protected ?string $namePrefix = null;
+
+    #[ORM\Column(name: 'name_suffix', type: Types::STRING, nullable: true)]
+    protected ?string $nameSuffix = null;
+
+    #[ORM\Column(name: 'contacted_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $contactedAt = null;
+
+    #[ORM\Column(name: 'related_class', type: Types::STRING, nullable: true)]
+    protected ?string $relatedClass = null;
+
+    #[ORM\Column(name: 'related_id', type: Types::INTEGER, nullable: true)]
+    protected ?int $relatedId = null;
+
+    #[ORM\ManyToOne(targetEntity: TestEntityForNestedObjects::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
+    protected ?TestEntityForNestedObjects $parent = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="last_name", type="string", nullable=true)
+     * @var Collection<int, TestEntityForNestedObjects>
      */
-    protected $lastName;
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: TestEntityForNestedObjects::class)]
+    protected ?Collection $children = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="middle_name", type="string", nullable=true)
+     * @var Collection<int, TestCustomIdentifier>
      */
-    protected $middleName;
+    #[ORM\ManyToMany(targetEntity: TestCustomIdentifier::class, cascade: ['all'])]
+    #[ORM\JoinTable(name: 'test_api_nested_objects_links')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'link_id', referencedColumnName: 'id')]
+    protected ?Collection $links = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name_prefix", type="string", nullable=true)
-     */
-    protected $namePrefix;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name_suffix", type="string", nullable=true)
-     */
-    protected $nameSuffix;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="contacted_at", type="datetime", nullable=true)
-     */
-    protected $contactedAt;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="related_class", type="string", nullable=true)
-     */
-    protected $relatedClass;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="related_id", type="integer", nullable=true)
-     */
-    protected $relatedId;
-
-    /**
-     * @var TestEntityForNestedObjects|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestEntityForNestedObjects", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
-     */
-    protected $parent;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="TestEntityForNestedObjects", mappedBy="parent")
-     */
-    protected $children;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\ManyToMany(targetEntity="TestCustomIdentifier", cascade={"all"})
-     * @ORM\JoinTable(name="test_api_nested_objects_links",
-     *      joinColumns={@ORM\JoinColumn(name="owner_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="link_id", referencedColumnName="id")}
-     * )
-     */
-    protected $links;
-
-    /**
-     * @var TestCustomIdentifier|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestCustomIdentifier")
-     * @ORM\JoinColumn(name="linked_id", referencedColumnName="id")
-     */
-    protected $linked;
+    #[ORM\ManyToOne(targetEntity: TestCustomIdentifier::class)]
+    #[ORM\JoinColumn(name: 'linked_id', referencedColumnName: 'id')]
+    protected ?TestCustomIdentifier $linked = null;
 
     public function __construct()
     {
