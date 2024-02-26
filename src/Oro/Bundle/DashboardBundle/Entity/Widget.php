@@ -2,52 +2,38 @@
 
 namespace Oro\Bundle\DashboardBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Dashboard widget
- *
- * @ORM\Entity
- * @ORM\Table(name="oro_dashboard_widget")
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_dashboard_widget')]
 class Widget
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="layout_position", type="simple_array")
      */
+    #[ORM\Column(name: 'layout_position', type: Types::SIMPLE_ARRAY)]
     protected $layoutPosition;
 
-    /**
-     * @var Dashboard
-     *
-     * @ORM\ManyToOne(targetEntity="Dashboard", inversedBy="widgets", cascade={"persist"})
-     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $dashboard;
+    #[ORM\ManyToOne(targetEntity: Dashboard::class, cascade: ['persist'], inversedBy: 'widgets')]
+    #[ORM\JoinColumn(name: 'dashboard_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Dashboard $dashboard = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="options", type="array", nullable=true)
      */
+    #[ORM\Column(name: 'options', type: Types::ARRAY, nullable: true)]
     protected $options = [];
 
     /**

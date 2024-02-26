@@ -2,17 +2,18 @@
 
 namespace Oro\Bundle\EntityBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
  * Represents a field that value can be a scalar, an array
  * or it can retrieved from another source if it does not have own value.
- * @ORM\Table(name="oro_entity_fallback_value")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValueRepository")
- * @Config()
  */
+#[ORM\Entity(repositoryClass: EntityFieldFallbackValueRepository::class)]
+#[ORM\Table(name: 'oro_entity_fallback_value')]
+#[Config]
 class EntityFieldFallbackValue
 {
     const FALLBACK_TYPE = 'fallbackType';
@@ -21,62 +22,28 @@ class EntityFieldFallbackValue
     const FALLBACK_ARRAY_FIELD = 'arrayValue';
     const FALLBACK_PARENT_FIELD = 'fallback';
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="fallback", type="string", length=64, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $fallback;
+    #[ORM\Column(name: 'fallback', type: Types::STRING, length: 64, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?string $fallback = null;
 
     /**
      * @var mixed
-     *
-     * @ORM\Column(name="scalar_value", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
      */
+    #[ORM\Column(name: 'scalar_value', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
     protected $scalarValue;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="array_value", type="array", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
      */
+    #[ORM\Column(name: 'array_value', type: Types::ARRAY, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
     protected $arrayValue;
 
     /**

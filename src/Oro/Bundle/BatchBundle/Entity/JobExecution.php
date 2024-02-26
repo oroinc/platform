@@ -4,6 +4,7 @@ namespace Oro\Bundle\BatchBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\BatchBundle\Exception\RuntimeErrorException;
 use Oro\Bundle\BatchBundle\Item\ExecutionContext;
@@ -13,93 +14,70 @@ use Oro\Bundle\BatchBundle\Job\ExitStatus;
 /**
  * Represents a batch job execution.
  *
- * @ORM\Table(name="akeneo_batch_job_execution")
- * @ORM\Entity()
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'akeneo_batch_job_execution')]
 class JobExecution
 {
-    /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
     /**
-     * @ORM\OneToMany(
-     *      targetEntity="StepExecution",
-     *      mappedBy="jobExecution",
-     *      cascade={"persist", "remove"},
-     *      orphanRemoval=true
-     * )
+     * @var Collection<int, StepExecution>
      */
+    #[ORM\OneToMany(
+        mappedBy: 'jobExecution',
+        targetEntity: StepExecution::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
     private Collection $stepExecutions;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="JobInstance", inversedBy="jobExecutions")
-     * @ORM\JoinColumn(name="job_instance_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: JobInstance::class, inversedBy: 'jobExecutions')]
+    #[ORM\JoinColumn(name: 'job_instance_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?JobInstance $jobInstance = null;
 
     /**
      * @var int|null Process Identifier
-     *
-     * @ORM\Column(name="pid", type="integer", nullable=true)
      */
+    #[ORM\Column(name: 'pid', type: Types::INTEGER, nullable: true)]
     private ?int $pid = null;
 
     /**
      * @var string|null The user who launched the job
-     *
-     * @ORM\Column(name="`user`", type="string", nullable=true)
      */
+    #[ORM\Column(name: '`user`', type: Types::STRING, nullable: true)]
     private ?string $user = null;
 
-    /**
-     * @ORM\Column(name="status", type="integer")
-     */
-    private int $status = BatchStatus::UNKNOWN;
+    #[ORM\Column(name: 'status', type: Types::INTEGER)]
+    private ?int $status = BatchStatus::UNKNOWN;
 
-    /**
-     * @ORM\Column(name="create_time", type="datetime", nullable=true)
-     */
-    private \DateTime $createTime;
+    #[ORM\Column(name: 'create_time', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $createTime = null;
 
-    /**
-     * @ORM\Column(name="updated_time", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'updated_time', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $updatedTime = null;
 
-    /**
-     * @ORM\Column(name="start_time", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'start_time', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $startTime = null;
 
-    /**
-     * @ORM\Column(name="end_time", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'end_time', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $endTime = null;
 
-    /**
-     * @ORM\Column(name="exit_code", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'exit_code', type: Types::STRING, length: 255, nullable: true)]
     private ?string $exitCode = null;
 
-    /**
-     * @ORM\Column(name="exit_description", type="text", nullable=true)
-     */
+    #[ORM\Column(name: 'exit_description', type: Types::TEXT, nullable: true)]
     private ?string $exitDescription = null;
 
-    /**
-     * @ORM\Column(name="failure_exceptions", type="array", nullable=true)
-     */
+    #[ORM\Column(name: 'failure_exceptions', type: Types::ARRAY, nullable: true)]
     private ?array $failureExceptions;
 
-    /**
-     * @ORM\Column(name="log_file", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'log_file', type: Types::STRING, length: 255, nullable: true)]
     private ?string $logFile = null;
 
     private ExecutionContext $executionContext;

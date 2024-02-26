@@ -4,257 +4,94 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
  * ORM Entity TestEntityFields.
  *
- * @ORM\Entity()
- * @ORM\Table(
- *     name="oro_test_framework_test_entity_fields"
- * )
- * @Config()
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_test_framework_test_entity_fields')]
+#[Config]
 class TestEntityFields implements ExtendEntityInterface, TestFrameworkEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
+
+    #[ORM\Column(name: 'integer_field', type: Types::INTEGER, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?int $integerField = null;
 
     /**
-     * @ORM\Column(
-     *     name="integer_field",
-     *     type="integer",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
+     * @var float|null
      */
-    private $integerField;
-
-    /**
-     * @ORM\Column(
-     *     name="float_field",
-     *     type="float",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
+    #[ORM\Column(name: 'float_field', type: Types::FLOAT, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
     private $floatField;
 
-    /**
-     * @ORM\Column(
-     *     name="decimal_field",
-     *     type="decimal",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
-    private $decimalField;
+    #[ORM\Column(name: 'decimal_field', type: Types::DECIMAL, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?string $decimalField = null;
+
+    #[ORM\Column(name: 'smallint_field', type: Types::SMALLINT, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?int $smallintField = null;
+
+    #[ORM\Column(name: 'bigint_field', type: Types::BIGINT, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?string $bigintField = null;
+
+    #[ORM\Column(name: 'text_field', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    private ?string $textField = null;
+
+    #[ORM\Column(name: 'date_field', type: Types::DATE_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?\DateTimeInterface $dateField = null;
+
+    #[ORM\Column(name: 'datetime_field', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?\DateTimeInterface $datetimeField = null;
+
+    #[ORM\Column(name: 'boolean_field', type: Types::BOOLEAN, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?bool $booleanField = null;
+
+    #[ORM\Column(name: 'html_field', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?string $htmlField = null;
+
+    #[ORM\ManyToOne(targetEntity: TestExtendedEntity::class)]
+    #[ORM\JoinColumn(name: 'many_to_one_relation_id', nullable: true, onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?TestExtendedEntity $manyToOneRelation = null;
 
     /**
-     * @ORM\Column(
-     *     name="smallint_field",
-     *     type="smallint",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
+     * @var Collection<int, TestExtendedEntity>
      */
-    private $smallintField;
+    #[ORM\ManyToMany(targetEntity: TestExtendedEntity::class)]
+    #[ORM\JoinTable(name: 'oro_test_framework_many_to_many_relation_to_test_entity_fields')]
+    #[ORM\JoinColumn(name: 'test_entity_fields_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'oro_product_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['excluded' => true]])]
+    private ?Collection $manyToManyRelation = null;
 
-    /**
-     * @ORM\Column(
-     *     name="bigint_field",
-     *     type="bigint",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
-    private $bigintField;
-
-    /**
-     * @ORM\Column(
-     *     name="text_field",
-     *     type="text",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "importexport"={
-     *             "excluded"=true
-     *         }
-     *     }
-     * )
-     */
-    private $textField;
-
-    /**
-     * @ORM\Column(
-     *     name="date_field",
-     *     type="date",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
-    private $dateField;
-
-    /**
-     * @ORM\Column(
-     *     name="datetime_field",
-     *     type="datetime",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
-    private $datetimeField;
-
-    /**
-     * @ORM\Column(
-     *     name="boolean_field",
-     *     type="boolean",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
-    private $booleanField;
-
-    /**
-     * @ORM\Column(
-     *     name="html_field",
-     *     type="text",
-     *     nullable=true
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
-    private $htmlField;
-
-    /**
-     * @ORM\ManyToOne(
-     *     targetEntity="TestExtendedEntity"
-     * )
-     * @ORM\JoinColumn(
-     *     name="many_to_one_relation_id",
-     *     nullable=true,
-     *     onDelete="SET NULL"
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
-    private $manyToOneRelation;
-
-    /**
-     * @ORM\ManyToMany(
-     *     targetEntity="TestExtendedEntity"
-     * )
-     * @ORM\JoinTable(
-     *     name="oro_test_framework_many_to_many_relation_to_test_entity_fields",
-     *     joinColumns={
-     *         @ORM\JoinColumn(name="test_entity_fields_id", referencedColumnName="id", onDelete="CASCADE")
-     *     },
-     *     inverseJoinColumns={
-     *         @ORM\JoinColumn(name="oro_product_id", referencedColumnName="id", onDelete="CASCADE")
-     *     }
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         },
-     *         "importexport"={
-     *             "excluded"=true
-     *         }
-     *     }
-     * )
-     */
-    private $manyToManyRelation;
-
-    /**
-     * @ORM\Column(
-     *     name="string_field",
-     *     type="string",
-     *     length=10,
-     *     nullable=false
-     * )
-     * @ConfigField(
-     *     defaultValues={
-     *         "dataaudit"={
-     *             "auditable"=true
-     *         }
-     *     }
-     * )
-     */
-    private $stringField;
+    #[ORM\Column(name: 'string_field', type: Types::STRING, length: 10, nullable: false)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?string $stringField = null;
 
     public function __construct()
     {

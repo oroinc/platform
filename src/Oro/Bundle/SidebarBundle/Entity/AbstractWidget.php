@@ -2,72 +2,46 @@
 
 namespace Oro\Bundle\SidebarBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
  * The base class for sidebar widgets.
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 class AbstractWidget
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'placement', type: Types::STRING, length: 50, nullable: false)]
+    protected ?string $placement = null;
+
+    #[ORM\Column(name: 'position', type: Types::SMALLINT, nullable: false)]
+    protected ?int $position = null;
+
+    #[ORM\Column(name: 'widget_name', type: Types::STRING, length: 50, nullable: false)]
+    protected ?string $widgetName = null;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="placement", type="string", nullable=false, length=50)
      */
-    protected $placement;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="position", nullable=false, type="smallint")
-     */
-    protected $position;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="widget_name", type="string", nullable=false, length=50)
-     */
-    protected $widgetName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="settings", nullable=true, type="array")
-     */
+    #[ORM\Column(name: 'settings', type: Types::ARRAY, nullable: true)]
     protected $settings;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="state", type="string", nullable=false, length=22)
-     */
-    protected $state;
+    #[ORM\Column(name: 'state', type: Types::STRING, length: 22, nullable: false)]
+    protected ?string $state = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
-    /**
-     * @var AbstractUser
-     */
-    protected $user;
+    protected ?AbstractUser $user = null;
 
     /**
      * Get id

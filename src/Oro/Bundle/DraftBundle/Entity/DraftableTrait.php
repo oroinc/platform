@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DraftBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -12,31 +13,22 @@ trait DraftableTrait
 {
     /**
      * @var string|null
-     *
-     * @ORM\Column(name="draft_uuid", type="guid", nullable=true)
      */
+    #[ORM\Column(name: 'draft_uuid', type: Types::GUID, nullable: true)]
     protected $draftUuid;
 
-    /**
-     * @var DraftProject|null
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\DraftBundle\Entity\DraftProject")
-     * @ORM\JoinColumn(name="draft_project_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
-     */
-    protected $draftProject;
+    #[ORM\ManyToOne(targetEntity: DraftProject::class)]
+    #[ORM\JoinColumn(name: 'draft_project_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    protected ?DraftProject $draftProject = null;
 
     /**
      * @var DraftableInterface|null
      */
     protected $draftSource;
 
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="draft_owner_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
-     */
-    protected $draftOwner;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'draft_owner_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    protected ?User $draftOwner = null;
 
     public function getDraftUuid(): ?string
     {

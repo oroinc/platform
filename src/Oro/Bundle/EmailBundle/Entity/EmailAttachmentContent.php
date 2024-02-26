@@ -2,46 +2,30 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Email Attachment
- *
- * @ORM\Table(name="oro_email_attachment_content")
- * @ORM\Entity
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_email_attachment_content')]
 class EmailAttachmentContent
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var EmailAttachment
-     *
-     * @ORM\OneToOne(targetEntity="EmailAttachment", inversedBy="attachmentContent")
-     * @ORM\JoinColumn(name="attachment_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    protected $emailAttachment;
+    #[ORM\OneToOne(inversedBy: 'attachmentContent', targetEntity: EmailAttachment::class)]
+    #[ORM\JoinColumn(name: 'attachment_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?EmailAttachment $emailAttachment = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="text", nullable=false)
-     */
-    protected $content;
+    #[ORM\Column(name: 'content', type: Types::TEXT, nullable: false)]
+    protected ?string $content = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content_transfer_encoding", type="string", length=20, nullable=false)
-     */
-    protected $contentTransferEncoding;
+    #[ORM\Column(name: 'content_transfer_encoding', type: Types::STRING, length: 20, nullable: false)]
+    protected ?string $contentTransferEncoding = null;
 
     /**
      * Get id

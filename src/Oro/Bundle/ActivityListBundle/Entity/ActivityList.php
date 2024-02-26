@@ -4,53 +4,24 @@ namespace Oro\Bundle\ActivityListBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroActivityListBundle_Entity_ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * The entity that is used to store a relation between an entity record and an activity entity record
  * to be able to retrieve activities in the chronological order.
  *
- * @ORM\Table(name="oro_activity_list", indexes={
- *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
- *     @ORM\Index(name="al_related_activity_class", columns={"related_activity_class"}),
- *     @ORM\Index(name="al_related_activity_id", columns={"related_activity_id"}),
- * })
- * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
- * @Config(
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-align-justify"
- *          },
- *          "ownership"={
- *              "owner_type"="ORGANIZATION",
- *              "owner_field_name"="organization",
- *              "owner_column_name"="organization_id"
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          }
- *      }
- * )
  * @method ActivityList supportActivityListTarget($targetClass)
  * @method ActivityList removeActivityListTarget($target)
  * @method ActivityList hasActivityListTarget($target)
@@ -58,6 +29,25 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @method ActivityList addActivityListTarget($target)
  * @mixin OroActivityListBundle_Entity_ActivityList
  */
+#[ORM\Entity(repositoryClass: ActivityListRepository::class)]
+#[ORM\Table(name: 'oro_activity_list')]
+#[ORM\Index(columns: ['updated_at'], name: 'oro_activity_list_updated_idx')]
+#[ORM\Index(columns: ['related_activity_class'], name: 'al_related_activity_class')]
+#[ORM\Index(columns: ['related_activity_id'], name: 'al_related_activity_id')]
+#[Config(
+    defaultValues: [
+        'entity' => ['icon' => 'fa-align-justify'],
+        'ownership' => [
+            'owner_type' => 'ORGANIZATION',
+            'owner_field_name' => 'organization',
+            'owner_column_name' => 'organization_id'
+        ],
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management']
+    ]
+)]
 class ActivityList implements
     DatesAwareInterface,
     UpdatedByAwareInterface,
@@ -68,111 +58,59 @@ class ActivityList implements
     const VERB_CREATE = 'create';
     const VERB_UPDATE = 'update';
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $owner = null;
 
     /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
-
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
-     *
      * This field should be renamed to updatedBy as a part of BAP-9004
      */
-    protected $editor;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_editor_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $editor = null;
+
+    #[ORM\Column(name: 'verb', type: Types::STRING, length: 32)]
+    protected ?string $verb = null;
+
+    #[ORM\Column(name: 'subject', type: Types::STRING, length: 255)]
+    protected ?string $subject = null;
+
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    protected ?string $description = null;
+
+    #[ORM\Column(name: 'related_activity_class', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $relatedActivityClass = null;
+
+    #[ORM\Column(name: 'related_activity_id', type: Types::INTEGER, nullable: false)]
+    protected ?int $relatedActivityId = null;
+
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="verb", type="string", length=32)
+     * @var Collection<int, ActivityOwner>
      */
-    protected $verb;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="subject", type="string", length=255)
-     */
-    protected $subject;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="text", nullable=true)
-     */
-    protected $description;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="related_activity_class", type="string", length=255, nullable=false)
-     */
-    protected $relatedActivityClass;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="related_activity_id", type="integer", nullable=false)
-     */
-    protected $relatedActivityId;
-
-    /**
-     * @var \DateTimeInterface
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTimeInterface
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
-
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="ActivityOwner", mappedBy="activity",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
-     */
-    protected $activityOwners;
+    #[ORM\OneToMany(
+        mappedBy: 'activity',
+        targetEntity: ActivityOwner::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $activityOwners = null;
 
     /**
      * @var bool

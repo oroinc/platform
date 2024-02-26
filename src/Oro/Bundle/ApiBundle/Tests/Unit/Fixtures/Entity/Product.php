@@ -2,55 +2,40 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="product_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'product_table')]
 class Product
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=50)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    protected ?string $name = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Category")
-     * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
-     */
-    protected $category;
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\JoinColumn(name: 'category_name', referencedColumnName: 'name')]
+    protected ?Category $category = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'products')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
+    protected ?User $owner = null;
 
-    /**
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /** @var ProductPrice */
     protected $price;
 
-    /**
-     * @ORM\Column(name="price_value", type="string")
-     */
-    protected $priceValue;
+    #[ORM\Column(name: 'price_value', type: Types::STRING)]
+    protected ?string $priceValue = null;
 
-    /**
-     * @ORM\Column(name="price_currency", type="string")
-     */
-    protected $priceCurrency;
+    #[ORM\Column(name: 'price_currency', type: Types::STRING)]
+    protected ?string $priceCurrency = null;
 
     /**
      * @return int

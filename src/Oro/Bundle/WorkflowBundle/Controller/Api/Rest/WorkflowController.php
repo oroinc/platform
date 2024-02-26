@@ -155,13 +155,13 @@ class WorkflowController extends AbstractFOSRestController
      * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
-     * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Perform transition for workflow item", resource=true)
      *
      * @param WorkflowItem $workflowItem
      * @param string $transitionName
      * @return Response
      */
+    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
     public function transitAction(WorkflowItem $workflowItem, $transitionName)
     {
         $errors = new ArrayCollection();
@@ -191,12 +191,12 @@ class WorkflowController extends AbstractFOSRestController
      * Returns
      * - HTTP_OK (200) response: array('workflowItem' => array('id' => int, 'result' => array(...), ...))
      *
-     * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Get workflow item", resource=true)
      *
      * @param WorkflowItem $workflowItem
      * @return Response
      */
+    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
     public function getAction(WorkflowItem $workflowItem)
     {
         return $this->handleView(
@@ -210,12 +210,12 @@ class WorkflowController extends AbstractFOSRestController
      * Returns
      * - HTTP_NO_CONTENT (204)
      *
-     * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Delete workflow item", resource=true)
      *
      * @param WorkflowItem $workflowItem
      * @return Response
      */
+    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
     public function deleteAction(WorkflowItem $workflowItem)
     {
         $this->container->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);

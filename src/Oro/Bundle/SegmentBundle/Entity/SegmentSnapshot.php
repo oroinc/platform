@@ -2,67 +2,45 @@
 
 namespace Oro\Bundle\SegmentBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 
 /**
  * Snapshot of static segment
- *
- * @ORM\Table(
- *      name="oro_segment_snapshot",
- *      uniqueConstraints={
- *          @ORM\UniqueConstraint(columns={"segment_id", "entity_id"}),
- *          @ORM\UniqueConstraint(columns={"segment_id", "integer_entity_id"})
- *      },
- *      indexes={
- *          @ORM\Index(name="sgmnt_snpsht_int_entity_idx", columns={"integer_entity_id"}),
- *          @ORM\Index(name="sgmnt_snpsht_str_entity_idx", columns={"entity_id"})
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository")
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Entity(repositoryClass: SegmentSnapshotRepository::class)]
+#[ORM\Table(name: 'oro_segment_snapshot')]
+#[ORM\Index(columns: ['integer_entity_id'], name: 'sgmnt_snpsht_int_entity_idx')]
+#[ORM\Index(columns: ['entity_id'], name: 'sgmnt_snpsht_str_entity_idx')]
+#[ORM\UniqueConstraint(columns: ['segment_id', 'entity_id'])]
+#[ORM\UniqueConstraint(columns: ['segment_id', 'integer_entity_id'])]
+#[ORM\HasLifecycleCallbacks]
 class SegmentSnapshot
 {
     const ENTITY_REF_FIELD         = 'entityId';
     const ENTITY_REF_INTEGER_FIELD = 'integerEntityId';
 
     /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="bigint", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int|null
      */
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::BIGINT)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_id", type="string", nullable=true)
-     */
-    protected $entityId;
+    #[ORM\Column(name: 'entity_id', type: Types::STRING, nullable: true)]
+    protected ?string $entityId = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="integer_entity_id", type="integer", nullable=true)
-     */
-    protected $integerEntityId;
+    #[ORM\Column(name: 'integer_entity_id', type: Types::INTEGER, nullable: true)]
+    protected ?int $integerEntityId = null;
 
-    /**
-     * @var Segment
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\SegmentBundle\Entity\Segment")
-     * @ORM\JoinColumn(name="segment_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
-    protected $segment;
+    #[ORM\ManyToOne(targetEntity: Segment::class)]
+    #[ORM\JoinColumn(name: 'segment_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?Segment $segment = null;
 
-    /**
-     * @var \Datetime $created
-     *
-     * @ORM\Column(type="datetime")
-     */
-    protected $createdAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $createdAt = null;
 
     /**
      * Constructor
@@ -119,9 +97,8 @@ class SegmentSnapshot
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));

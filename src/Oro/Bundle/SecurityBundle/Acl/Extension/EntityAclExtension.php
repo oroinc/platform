@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
@@ -196,7 +196,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         if (\is_string($val)) {
             return $this->fromDescriptor($val);
         }
-        if ($val instanceof AclAnnotation) {
+        if ($val instanceof AclAttribute) {
             $class = $this->entityClassResolver->getEntityClass($val->getClass());
             $group = $val->getGroup();
 

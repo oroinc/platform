@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -64,7 +65,7 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
      */
     protected function getNavigationItemClassName()
     {
-        return 'Oro\Bundle\NavigationBundle\Entity\NavigationItem';
+        return NavigationItem::class;
     }
 
     /**

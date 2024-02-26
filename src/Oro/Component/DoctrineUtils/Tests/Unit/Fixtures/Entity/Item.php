@@ -2,37 +2,26 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Item
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    protected ?int $id = null;
+
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    protected ?string $name = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string", nullable=true)
+     * @var Collection<int, Person>
      */
-    protected $name;
+    #[ORM\ManyToMany(targetEntity: Person::class)]
+    protected ?Collection $persons = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Person")
-     */
-    protected $persons;
-
-    /**
-     * @var Person
-     *
-     * @ORM\OneToOne(targetEntity="Person")
-     */
-    protected $owner;
+    #[ORM\OneToOne(targetEntity: Person::class)]
+    protected ?Person $owner = null;
 }

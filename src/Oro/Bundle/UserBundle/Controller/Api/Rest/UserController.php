@@ -5,8 +5,8 @@ namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
@@ -26,24 +26,6 @@ class UserController extends RestController
     /**
      * Get the list of users
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. defaults to 10."
-     * )
-     * @QueryParam(
-     *     name="phone",
-     *     requirements=".+",
-     *     nullable=true,
-     *     description="Phone number."
-     * )
      *
      * @param Request $request
      * @return Response
@@ -51,8 +33,21 @@ class UserController extends RestController
      *      description="Get the list of users",
      *      resource=true
      * )
-     * @AclAncestor("oro_user_user_view")
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. defaults to 10.',
+        nullable: true
+    )]
+    #[QueryParam(name: 'phone', requirements: '.+', description: 'Phone number.', nullable: true)]
+    #[AclAncestor('oro_user_user_view')]
     public function cgetAction(Request $request)
     {
         $page  = (int) $request->get('page', 1);
@@ -75,10 +70,10 @@ class UserController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @AclAncestor("oro_user_user_view")
      *
      * @return Response
      */
+    #[AclAncestor('oro_user_user_view')]
     public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
@@ -92,8 +87,8 @@ class UserController extends RestController
      *      description="Create new user",
      *      resource=true
      * )
-     * @AclAncestor("oro_user_user_create")
      */
+    #[AclAncestor('oro_user_user_create')]
     public function postAction()
     {
         return $this->handleCreateRequest();
@@ -111,10 +106,10 @@ class UserController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @AclAncestor("oro_user_user_update")
      *
      * @return Response
      */
+    #[AclAncestor('oro_user_user_update')]
     public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
@@ -132,15 +127,10 @@ class UserController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @Acl(
-     *      id="oro_user_user_delete",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\User",
-     *      permission="DELETE"
-     * )
      *
      * @return Response
      */
+    #[Acl(id: 'oro_user_user_delete', type: 'entity', class: User::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
@@ -158,10 +148,10 @@ class UserController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @AclAncestor("oro_user_role_view")
      *
      * @return Response
      */
+    #[AclAncestor('oro_user_role_view')]
     public function getRolesAction(int $id)
     {
         /** @var User|null $entity */
@@ -191,10 +181,10 @@ class UserController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @AclAncestor("oro_user_group_view")
      *
      * @return Response
      */
+    #[AclAncestor('oro_user_group_view')]
     public function getGroupsAction(int $id)
     {
         /** @var User|null $entity */
@@ -215,19 +205,6 @@ class UserController extends RestController
     /**
      * Filter user by username or email
      *
-     * @QueryParam(
-     *      name="email",
-     *      requirements="[a-zA-Z0-9\-_\.@]+",
-     *      nullable=true,
-     *      description="Email to filter"
-     * )
-     * @QueryParam(
-     *      name="username",
-     *      requirements="[a-zA-Z0-9\-_\.]+",
-     *      nullable=true,
-     *      description="Username to filter"
-     * )
-     *
      * @param Request $request
      * @return Response
      *
@@ -235,8 +212,20 @@ class UserController extends RestController
      *      description="Get user by username or email",
      *      resource=true
      * )
-     * @AclAncestor("oro_user_user_view")
      */
+    #[QueryParam(
+        name: 'email',
+        requirements: '[a-zA-Z0-9\-_\.@]+',
+        description: 'Email to filter',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'username',
+        requirements: '[a-zA-Z0-9\-_\.]+',
+        description: 'Username to filter',
+        nullable: true
+    )]
+    #[AclAncestor('oro_user_user_view')]
     public function getFilterAction(Request $request)
     {
         $params = array_intersect_key(

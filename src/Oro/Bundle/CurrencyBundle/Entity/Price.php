@@ -6,8 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Represents entity which stores value and currency as price item
- * @ORM\Embeddable()
  */
+#[ORM\Embeddable]
 class Price implements CurrencyAwareInterface, \JsonSerializable
 {
     use CurrencyAwareTrait;
@@ -15,9 +15,8 @@ class Price implements CurrencyAwareInterface, \JsonSerializable
 
     /**
      * @var float
-     *
-     * @ORM\Column(name="value", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'value', type: 'money', nullable: true)]
     protected $value;
 
     /**

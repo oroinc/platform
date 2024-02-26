@@ -2,31 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="mailbox_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'mailbox_table')]
 class Mailbox
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=50)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    protected ?string $name = null;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Origin", inversedBy="mailbox")
-     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
-     */
-    protected $origin;
+    #[ORM\OneToOne(inversedBy: 'mailbox', targetEntity: Origin::class)]
+    #[ORM\JoinColumn(name: 'origin_id', referencedColumnName: 'id', nullable: true)]
+    protected ?Origin $origin = null;
 
     /**
      * @return int

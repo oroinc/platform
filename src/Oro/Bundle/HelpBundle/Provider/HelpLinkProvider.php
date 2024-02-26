@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\HelpBundle\Provider;
 
-use Oro\Bundle\HelpBundle\Annotation\Help;
+use Oro\Bundle\HelpBundle\Attribute\Help;
 use Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
@@ -43,7 +43,7 @@ class HelpLinkProvider
     private $request;
 
     /** @var Help[]|null */
-    private $helpAnnotation;
+    private $helpAttributes;
 
     /** @var CacheInterface */
     private $cache;
@@ -88,7 +88,7 @@ class HelpLinkProvider
             $request = $this->requestStack->getMainRequest();
             if (null !== $request) {
                 $this->requestRoute = $request->get('_route');
-                $this->helpAnnotation = null;
+                $this->helpAttributes = null;
                 $this->request = $request;
             }
         }
@@ -167,7 +167,7 @@ class HelpLinkProvider
         if ($controllerData) {
             $this->mergeRequestControllerConfig($result, $controllerData);
         }
-        $this->mergeAnnotationConfig($result);
+        $this->mergeAttributeConfig($result);
         $this->mergeRoutesConfig($result);
         if ($controllerData) {
             $this->mergeVendorsAndResourcesConfig($result, $controllerData);
@@ -177,24 +177,24 @@ class HelpLinkProvider
     }
 
     /**
-     * Apply configuration from annotations
+     * Apply configuration from attributes
      */
-    private function mergeAnnotationConfig(array &$resultConfig)
+    private function mergeAttributeConfig(array &$resultConfig)
     {
-        if (null === $this->helpAnnotation && null !== $this->request) {
-            $helpAnnotation = $this->request->get('_' . Help::ALIAS);
-            if (!$helpAnnotation) {
-                $helpAnnotation = [];
-            } elseif (!is_array($helpAnnotation)) {
-                $helpAnnotation = [$helpAnnotation];
+        if (null === $this->helpAttributes && null !== $this->request) {
+            $helpAttributes = $this->request->get('_' . Help::ALIAS);
+            if (!$helpAttributes) {
+                $helpAttributes = [];
+            } elseif (!is_array($helpAttributes)) {
+                $helpAttributes = [$helpAttributes];
             }
-            $this->helpAnnotation = $helpAnnotation;
+            $this->helpAttributes = $helpAttributes;
         }
-        if (!$this->helpAnnotation) {
+        if (!$this->helpAttributes) {
             return;
         }
 
-        foreach ($this->helpAnnotation as $help) {
+        foreach ($this->helpAttributes as $help) {
             if ($help instanceof Help) {
                 $resultConfig = array_merge($resultConfig, $help->getConfigurationArray());
             }

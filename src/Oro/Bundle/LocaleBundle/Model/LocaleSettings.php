@@ -27,8 +27,7 @@ class LocaleSettings
     /** @var string[] */
     private static $locales;
 
-    /** @var string */
-    protected $locale;
+    protected ?string $locale = null;
 
     /** @var string */
     protected $language;

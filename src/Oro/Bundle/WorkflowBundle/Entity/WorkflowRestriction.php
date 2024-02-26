@@ -3,96 +3,64 @@
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
 
 /**
  * Represents an entity restriction used in workflows.
  *
- * @ORM\Table(
- *      name="oro_workflow_restriction",
- *      uniqueConstraints={
- *          @ORM\UniqueConstraint(
- *              name="oro_workflow_restriction_idx",
- *              columns={"workflow_name", "workflow_step_id", "field", "entity_class", "mode"}
- *          )
- *      }
- * )
  *
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository")
  */
+#[ORM\Entity(repositoryClass: WorkflowRestrictionRepository::class)]
+#[ORM\Table(name: 'oro_workflow_restriction')]
+#[ORM\UniqueConstraint(
+    name: 'oro_workflow_restriction_idx',
+    columns: ['workflow_name', 'workflow_step_id', 'field', 'entity_class', 'mode']
+)]
 class WorkflowRestriction
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var WorkflowDefinition
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowDefinition", inversedBy="restrictions")
-     * @ORM\JoinColumn(name="workflow_name", referencedColumnName="name", onDelete="CASCADE", nullable=false)
-     */
-    protected $definition;
+    #[ORM\ManyToOne(targetEntity: WorkflowDefinition::class, inversedBy: 'restrictions')]
+    #[ORM\JoinColumn(name: 'workflow_name', referencedColumnName: 'name', nullable: false, onDelete: 'CASCADE')]
+    protected ?WorkflowDefinition $definition = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="field", type="string", length=150, nullable=false)
-     */
-    protected $field;
+    #[ORM\Column(name: 'field', type: Types::STRING, length: 150, nullable: false)]
+    protected ?string $field = null;
 
-    /**
-     * @var WorkflowStep
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="workflow_step_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $step;
+    #[ORM\ManyToOne(targetEntity: WorkflowStep::class)]
+    #[ORM\JoinColumn(name: 'workflow_step_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?WorkflowStep $step = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="attribute", type="string", length=255, nullable=false)
-     */
-    protected $attribute;
+    #[ORM\Column(name: 'attribute', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $attribute = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_class", type="string", length=255, nullable=false)
-     */
-    protected $entityClass;
+    #[ORM\Column(name: 'entity_class', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $entityClass = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="mode", type="string", length=8)
-     */
-    protected $mode;
+    #[ORM\Column(name: 'mode', type: Types::STRING, length: 8)]
+    protected ?string $mode = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="mode_values", type="json_array", nullable=true)
      */
+    #[ORM\Column(name: 'mode_values', type: 'json_array', nullable: true)]
     protected $values = [];
 
     /**
-     * @var Collection|WorkflowRestrictionIdentity[]
-     *
-     * @ORM\OneToMany(
-     *  targetEntity="WorkflowRestrictionIdentity",
-     *  mappedBy="restriction",
-     *  cascade={"all"},
-     *  orphanRemoval=true
-     * )
+     * @var Collection<int, WorkflowRestrictionIdentity>
      */
-    protected $restrictionIdentities;
+    #[ORM\OneToMany(
+        mappedBy: 'restriction',
+        targetEntity: WorkflowRestrictionIdentity::class,
+        cascade: ['all'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $restrictionIdentities = null;
 
     /**
      * @return int

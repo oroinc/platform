@@ -48,9 +48,9 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
     public function testData()
     {
         $item = new PageState();
-        $data = [
+        $data = \json_encode([
             ['key' => 'val', 'key2' => 'val2'],
-        ];
+        ]);
 
         $item->setData($data);
 

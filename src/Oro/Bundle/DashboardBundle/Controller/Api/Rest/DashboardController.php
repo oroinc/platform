@@ -7,7 +7,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -22,14 +22,9 @@ class DashboardController extends AbstractFOSRestController
      *      description="Delete dashboard",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_dashboard_delete",
-     *      type="entity",
-     *      permission="DELETE",
-     *      class="Oro\Bundle\DashboardBundle\Entity\Dashboard"
-     * )
      * @return Response
      */
+    #[Acl(id: 'oro_dashboard_delete', type: 'entity', class: Dashboard::class, permission: 'DELETE')]
     public function deleteAction(Dashboard $id)
     {
         $dashboard = $id;

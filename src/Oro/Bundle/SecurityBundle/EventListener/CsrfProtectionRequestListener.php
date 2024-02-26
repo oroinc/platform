@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -12,7 +12,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * Implementation of double submit cookie approach to protect application against CSRF attacks
- * On kernel.controller if it controller or action is marked for CsrfProtection with annotation
+ * On kernel.controller if it controller or action is marked for CsrfProtection with attribute
  * listeners checks that value in cookie and value in request match. Otherwise access to controller is prohibited.
  */
 class CsrfProtectionRequestListener
@@ -41,22 +41,22 @@ class CsrfProtectionRequestListener
 
         $this->csrfTokenManager->getToken(CsrfRequestManager::CSRF_TOKEN_ID);
 
-        // check CSRF Protection annotation and validate token. Refresh used token after check
-        $csrProtectionAttribute = '_' . CsrfProtection::ALIAS_NAME;
-        if ($request->attributes->has($csrProtectionAttribute)) {
-            /** @var CsrfProtection $csrProtectionAnnotation */
-            $csrProtectionAnnotation = $request->attributes->get($csrProtectionAttribute);
-            if ($csrProtectionAnnotation->isEnabled()) {
-                $isTokenValid = $this->csrfRequestManager->isRequestTokenValid(
-                    $request,
-                    $csrProtectionAnnotation->isUseRequest()
-                );
-                if (!$isTokenValid) {
-                    throw new AccessDeniedHttpException('Invalid CSRF token');
-                }
+        // check CSRF Protection attribute and validate token. Refresh used token after check
 
-                $this->csrfRequestManager->refreshRequestToken();
+        /** @var CsrfProtection|null $csrProtectionAttribute */
+        $csrProtectionAttribute = $request->attributes->get('_' . CsrfProtection::ALIAS_NAME);
+
+        if ($csrProtectionAttribute?->isEnabled()) {
+            $isTokenValid = $this->csrfRequestManager->isRequestTokenValid(
+                $request,
+                $csrProtectionAttribute->isUseRequest()
+            );
+
+            if (!$isTokenValid) {
+                throw new AccessDeniedHttpException('Invalid CSRF token');
             }
+
+            $this->csrfRequestManager->refreshRequestToken();
         }
     }
 

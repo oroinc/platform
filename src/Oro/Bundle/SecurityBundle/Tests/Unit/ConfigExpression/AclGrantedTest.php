@@ -45,7 +45,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
-    public function testEvaluateByAclAnnotationId(): void
+    public function testEvaluateByAclAttributeId(): void
     {
         $options = ['acme_product_view'];
         $context = [];

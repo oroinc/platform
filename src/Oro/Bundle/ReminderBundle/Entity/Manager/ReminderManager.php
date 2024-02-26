@@ -114,7 +114,7 @@ class ReminderManager
     public function applyReminders(array &$items, $entityClassName)
     {
         if (empty($items)
-            || !is_subclass_of($entityClassName, 'Oro\Bundle\ReminderBundle\Entity\RemindableInterface')
+            || !is_subclass_of($entityClassName, RemindableInterface::class)
         ) {
             return;
         }

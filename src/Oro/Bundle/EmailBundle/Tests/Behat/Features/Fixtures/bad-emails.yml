@@ -39,7 +39,7 @@ Oro\Bundle\EmailBundle\Entity\Email:
     fromEmailAddress: '@adminEmailAddress'
     internalDate: '<dateTimeBetween("-1 day", "now")>'
     messageId: 'fsdfasdf'
-    emailUsers: ['@adminEmailUser']
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser ]))>'
     head: true
 
 Oro\Bundle\EmailBundle\Entity\EmailUser:
@@ -58,7 +58,7 @@ Oro\Bundle\EmailBundle\Entity\EmailFolder:
     fullName: 'sent'
     type: 'sent'
     origin: '@adminEmailOrigin'
-    emailUsers: ['@adminEmailUser']
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser ]))>'
 
 Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin:
   adminEmailOrigin:
@@ -66,6 +66,6 @@ Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin:
     name: 'internalemailorigin'
     internalName: 'BAP_User_1'
     mailboxName: 'Local'
-    emailUsers: ['@adminEmailUser']
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser ]))>'
     owner: '@admin'
     organization: '@organization'

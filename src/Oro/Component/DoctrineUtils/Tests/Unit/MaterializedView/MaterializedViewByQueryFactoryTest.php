@@ -2,10 +2,9 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\MaterializedView;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Oro\Component\DoctrineUtils\MaterializedView\MaterializedViewByQueryFactory;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item;
@@ -19,7 +18,7 @@ class MaterializedViewByQueryFactoryTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
 
         $this->factory = new MaterializedViewByQueryFactory();
     }

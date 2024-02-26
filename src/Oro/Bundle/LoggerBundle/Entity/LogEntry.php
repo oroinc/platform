@@ -2,65 +2,43 @@
 
 namespace Oro\Bundle\LoggerBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class that represents a log entry
- *
- * @ORM\Entity()
- * @ORM\Table(name="oro_logger_log_entry")
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_logger_log_entry')]
 class LogEntry
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="message", type="text")
-     */
-    protected $message;
+    #[ORM\Column(name: 'message', type: Types::TEXT)]
+    protected ?string $message = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="context", type="json_array")
      */
+    #[ORM\Column(name: 'context', type: 'json_array')]
     protected $context;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="level", type="smallint")
-     */
-    protected $level;
+    #[ORM\Column(name: 'level', type: Types::SMALLINT)]
+    protected ?int $level = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="channel", type="string")
-     */
-    protected $channel;
+    #[ORM\Column(name: 'channel', type: Types::STRING)]
+    protected ?string $channel = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="datetime", type="datetime")
-     */
-    protected $datetime;
+    #[ORM\Column(name: 'datetime', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $datetime = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="extra", type="json_array")
      */
+    #[ORM\Column(name: 'extra', type: 'json_array')]
     protected $extra;
 
     /**

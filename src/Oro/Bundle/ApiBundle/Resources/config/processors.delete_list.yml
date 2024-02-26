@@ -49,7 +49,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_security.acl_helper'
-            - '@oro_security.acl.annotation_provider'
+            - '@oro_security.acl.attribute_provider'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -250 }

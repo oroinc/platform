@@ -5,8 +5,8 @@ namespace Oro\Bundle\SecurityBundle\Authorization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
+use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -19,20 +19,20 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 {
     private AuthorizationCheckerInterface $authorizationChecker;
     private ObjectIdentityFactory $objectIdentityFactory;
-    private AclAnnotationProvider $annotationProvider;
+    private AclAttributeProvider $attributeProvider;
     private AclGroupProviderInterface $groupProvider;
     private LoggerInterface $logger;
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ObjectIdentityFactory $objectIdentityFactory,
-        AclAnnotationProvider $annotationProvider,
+        AclAttributeProvider $attributeProvider,
         AclGroupProviderInterface $groupProvider,
         LoggerInterface $logger
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->objectIdentityFactory = $objectIdentityFactory;
-        $this->annotationProvider = $annotationProvider;
+        $this->attributeProvider = $attributeProvider;
         $this->groupProvider = $groupProvider;
         $this->logger = $logger;
     }
@@ -40,7 +40,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     /**
      * Checks if an access to a resource is granted for the current authentication token.
      *
-     * @param mixed $attribute  Can be a role name, permission name, an ACL annotation id,
+     * @param mixed $attribute  Can be a role name, permission name, an ACL attribute id,
      *                          string in format "permission;descriptor"
      *                          (VIEW;entity:Acme\DemoBundle\Entity\AcmeEntity, EXECUTE;action:acme_action)
      *                          or something else depending on registered security voters
@@ -55,21 +55,21 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      */
     public function isGranted($attribute, $subject = null): bool
     {
-        if (\is_string($attribute) && !empty($attribute) && $annotation = $this->getAnnotation($attribute)) {
+        if (\is_string($attribute) && !empty($attribute) && $aclAttribute = $this->getAttribute($attribute)) {
             if (null === $subject) {
                 $this->logger->debug(
-                    sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
+                    sprintf('Check class based an access using "%s" ACL attribute.', $aclAttribute->getId())
                 );
                 $isGranted = $this->authorizationChecker->isGranted(
-                    $annotation->getPermission(),
-                    $this->objectIdentityFactory->get($annotation)
+                    $aclAttribute->getPermission(),
+                    $this->objectIdentityFactory->get($aclAttribute)
                 );
             } else {
                 $this->logger->debug(
-                    sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
+                    sprintf('Check object based an access using "%s" ACL attribute.', $aclAttribute->getId())
                 );
                 $isGranted = $this->authorizationChecker->isGranted(
-                    $annotation->getPermission(),
+                    $aclAttribute->getPermission(),
                     $subject
                 );
             }
@@ -94,9 +94,9 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         return $isGranted;
     }
 
-    private function getAnnotation(string $annotationId): ?AclAnnotation
+    private function getAttribute(string $attributeId): ?AclAttribute
     {
-        return $this->annotationProvider->findAnnotationById($annotationId);
+        return $this->attributeProvider->findAttributeById($attributeId);
     }
 
     private function tryGetObjectIdentity(mixed $val): ?ObjectIdentity

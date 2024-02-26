@@ -2,32 +2,24 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS;
 
-/**
- * @Entity
- * @Table(name="cms_addresses")
- */
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'cms_addresses')]
 class CmsAddress
 {
-    /**
-     * @Column(type="integer")
-     * @Id
-     * @GeneratedValue
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
     public $id;
 
-    /**
-     * @Column(length=50)
-     */
+    #[ORM\Column(length: 50)]
     public $country;
 
-    /**
-     * @Column(length=50)
-     */
+    #[ORM\Column(length: 50)]
     public $zip;
 
-    /**
-     * @Column(length=50)
-     */
+    #[ORM\Column(length: 50)]
     public $city;
 
     /**
@@ -35,20 +27,12 @@ class CmsAddress
      */
     public $street;
 
-    /**
-     * @OneToOne(targetEntity="CmsUser", inversedBy="address")
-     * @JoinColumn(referencedColumnName="id")
-     */
+    #[ORM\OneToOne(inversedBy: 'address', targetEntity: CmsUser::class)]
+    #[ORM\JoinColumn(referencedColumnName: 'id')]
     public $user;
 
-    /**
-     * @ManyToOne(
-     *      targetEntity="CmsUser",
-     *      inversedBy="shippingAddresses",
-     *      cascade={"persist"}
-     * )
-     * @JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: CmsUser::class, cascade: ['persist'], inversedBy: 'shippingAddresses')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     protected $ownerUser;
 
     public function getId()

@@ -22,8 +22,8 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -52,14 +52,13 @@ class ImportExportController extends AbstractController
     /**
      * Take uploaded file and move it to temp dir
      *
-     * @Route("/import", name="oro_importexport_import_form")
-     * @AclAncestor("oro_importexport_import")
-     * @Template("@OroImportExport/ImportExport/importForm.html.twig")
      *
      * @param Request $request
-     *
      * @return array|Response
      */
+    #[Route(path: '/import', name: 'oro_importexport_import_form')]
+    #[Template('@OroImportExport/ImportExport/importForm.html.twig')]
+    #[AclAncestor('oro_importexport_import')]
     public function importFormAction(Request $request)
     {
         $entityName = $request->get('entity');
@@ -93,14 +92,12 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @Route("/import_validate_export", name="oro_importexport_import_validate_export_template_form")
-     * @AclAncestor("oro_importexport_import")
-     * @Template("@OroImportExport/ImportExport/widget/importValidateExportTemplate.html.twig")
-     *
      * @param Request $request
-     *
      * @return array|Response
      */
+    #[Route(path: '/import_validate_export', name: 'oro_importexport_import_validate_export_template_form')]
+    #[Template('@OroImportExport/ImportExport/widget/importValidateExportTemplate.html.twig')]
+    #[AclAncestor('oro_importexport_import')]
     public function importValidateExportTemplateFormAction(Request $request)
     {
         $configAlias = $request->get('alias');
@@ -179,14 +176,13 @@ class ImportExportController extends AbstractController
     /**
      * Take uploaded file and move it to temp dir
      *
-     * @Route("/import-validate", name="oro_importexport_import_validation_form")
-     * @AclAncestor("oro_importexport_import")
-     * @Template("@OroImportExport/ImportExport/importValidationForm.html.twig")
      *
      * @param Request $request
-     *
      * @return array|Response
      */
+    #[Route(path: '/import-validate', name: 'oro_importexport_import_validation_form')]
+    #[Template('@OroImportExport/ImportExport/importValidationForm.html.twig')]
+    #[AclAncestor('oro_importexport_import')]
     public function importValidateFormAction(Request $request)
     {
         $entityName = $request->get('entity');
@@ -236,15 +232,14 @@ class ImportExportController extends AbstractController
      * Validate import data
      * Called by importValidateExportTemplateFormAction with forward
      *
-     * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate", methods={"POST"})
-     * @AclAncestor("oro_importexport_import")
-     * @CsrfProtection()
      *
      * @param Request $request
      * @param string $processorAlias
-     *
      * @return JsonResponse
      */
+    #[Route(path: '/import/validate/{processorAlias}', name: 'oro_importexport_import_validate', methods: ['POST'])]
+    #[AclAncestor('oro_importexport_import')]
+    #[CsrfProtection()]
     public function importValidateAction(Request $request, $processorAlias)
     {
         $jobName = $request->get('importValidateJob', JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV);
@@ -276,15 +271,14 @@ class ImportExportController extends AbstractController
      * Execute import process
      * Called by importValidateExportTemplateFormAction with forward
      *
-     * @Route("/import/process/{processorAlias}", name="oro_importexport_import_process", methods={"POST"})
-     * @AclAncestor("oro_importexport_export")
-     * @CsrfProtection()
      *
      * @param string $processorAlias
      * @param Request $request
-     *
      * @return JsonResponse
      */
+    #[Route(path: '/import/process/{processorAlias}', name: 'oro_importexport_import_process', methods: ['POST'])]
+    #[AclAncestor('oro_importexport_export')]
+    #[CsrfProtection()]
     public function importProcessAction(Request $request, $processorAlias)
     {
         $jobName = $request->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
@@ -313,14 +307,14 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @Route("/export/instant/{processorAlias}", name="oro_importexport_export_instant", methods={"POST"})
-     * @AclAncestor("oro_importexport_export")
-     * @CsrfProtection()
      *
      * @param string $processorAlias
      * @param Request $request
      * @return Response
      */
+    #[Route(path: '/export/instant/{processorAlias}', name: 'oro_importexport_export_instant', methods: ['POST'])]
+    #[AclAncestor('oro_importexport_export')]
+    #[CsrfProtection()]
     public function instantExportAction($processorAlias, Request $request)
     {
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
@@ -341,14 +335,12 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @Route("/export/config", name="oro_importexport_export_config")
-     * @AclAncestor("oro_importexport_export")
-     * @Template("@OroImportExport/ImportExport/configurableExport.html.twig")
-     *
      * @param Request $request
-     *
      * @return array|Response
      */
+    #[Route(path: '/export/config', name: 'oro_importexport_export_config')]
+    #[Template('@OroImportExport/ImportExport/configurableExport.html.twig')]
+    #[AclAncestor('oro_importexport_export')]
     public function configurableExportAction(Request $request)
     {
         $entityName = $request->get('entity');
@@ -380,13 +372,12 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @Route("/export/template/config", name="oro_importexport_export_template_config")
-     * @AclAncestor("oro_importexport_export")
-     * @Template("@OroImportExport/ImportExport/configurableTemplateExport.html.twig")
-     *
      * @param Request $request
      * @return array|Response
      */
+    #[Route(path: '/export/template/config', name: 'oro_importexport_export_template_config')]
+    #[Template('@OroImportExport/ImportExport/configurableTemplateExport.html.twig')]
+    #[AclAncestor('oro_importexport_export')]
     public function configurableTemplateExportAction(Request $request)
     {
         $entityName = $request->get('entity');
@@ -412,14 +403,13 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @Route("/export/template/{processorAlias}", name="oro_importexport_export_template")
-     * @AclAncestor("oro_importexport_import")
      *
      * @param string $processorAlias
      * @param Request $request
-     *
      * @return Response
      */
+    #[Route(path: '/export/template/{processorAlias}', name: 'oro_importexport_export_template')]
+    #[AclAncestor('oro_importexport_import')]
     public function templateExportAction($processorAlias, Request $request)
     {
         $jobName = $request->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
@@ -436,13 +426,17 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @Route("/export/download/{jobId}", name="oro_importexport_export_download", requirements={"jobId"="\d+"})
-     * @ParamConverter("result", options={"mapping": {"jobId": "jobId"}})
      *
      * @param ImportExportResult $result
      *
      * @return Response
      */
+    #[Route(
+        path: '/export/download/{jobId}',
+        name: 'oro_importexport_export_download',
+        requirements: ['jobId' => '\d+']
+    )]
+    #[ParamConverter('result', options: ['mapping' => ['jobId' => 'jobId']])]
     public function downloadExportResultAction(ImportExportResult $result)
     {
         if (!$this->isGranted('VIEW', $result)) {
@@ -457,16 +451,15 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/import_export/job-error-log/{jobId}.log",
-     *     name="oro_importexport_job_error_log",
-     *     requirements={"jobId"="\d+"}
-     * )
-     * @ParamConverter("result", options={"mapping": {"jobId": "jobId"}})
-     *
      * @param ImportExportResult $result
      * @return Response
      */
+    #[Route(
+        path: '/import_export/job-error-log/{jobId}.log',
+        name: 'oro_importexport_job_error_log',
+        requirements: ['jobId' => '\d+']
+    )]
+    #[ParamConverter('result', options: ['mapping' => ['jobId' => 'jobId']])]
     public function importExportJobErrorLogAction(ImportExportResult $result)
     {
         if (!$this->isGranted('VIEW', $result)) {

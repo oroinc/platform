@@ -2,45 +2,33 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(
- *      name="oro_integration_fields_changes",
- *      indexes={
- *          @ORM\Index(name="oro_integration_fields_changes_idx", columns={"entity_id", "entity_class"})
- *      }
- * )
- * @ORM\Entity()
- */
+* Entity that represents Fields Changes
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_integration_fields_changes')]
+#[ORM\Index(columns: ['entity_id', 'entity_class'], name: 'oro_integration_fields_changes_idx')]
 class FieldsChanges
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @ORM\Column(name="entity_class", type="string", length=255)
-     */
-    protected $entityClass;
+    #[ORM\Column(name: 'entity_class', type: Types::STRING, length: 255)]
+    protected ?string $entityClass = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_id", type="integer")
-     */
-    protected $entityId;
+    #[ORM\Column(name: 'entity_id', type: Types::INTEGER)]
+    protected ?int $entityId = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="changed_fields", type="array")
      */
+    #[ORM\Column(name: 'changed_fields', type: Types::ARRAY)]
     protected $changedFields = [];
 
     public function __construct(array $changedFields)

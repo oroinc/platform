@@ -30,7 +30,7 @@ Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin:
     name: 'internalemailorigin'
     internalName: 'BAP_User_1'
     mailboxName: 'Local'
-    emailUsers: ['@adminEmailUser1']
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser1 ]))>'
     owner: '@admin'
     organization: '@organization'
 
@@ -40,7 +40,7 @@ Oro\Bundle\EmailBundle\Entity\EmailFolder:
     fullName: 'sent'
     type: 'sent'
     origin: '@adminEmailOrigin'
-    emailUsers: ['@adminEmailUser1']
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser1 ]))>'
 
 Oro\Bundle\EmailBundle\Entity\Email:
   email1:
@@ -51,7 +51,7 @@ Oro\Bundle\EmailBundle\Entity\Email:
     fromEmailAddress: '@charlieAddress'
     internalDate: '<(new DateTime("2010-10-31"))>'
     messageId: fsdfasdf
-    emailUsers: ['@adminEmailUser1']
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser1 ]))>'
   email2:
     subject: 'Re: There is no spoon'
     emailBody: '@emailBody2'
@@ -60,7 +60,7 @@ Oro\Bundle\EmailBundle\Entity\Email:
     fromEmailAddress: '@adminEmailAddress'
     internalDate: '<(new DateTime("2010-11-01"))>'
     messageId: fsdfasdf
-    emailUsers: ['@adminEmailUser2']
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser2 ]))>'
 
 Oro\Bundle\EmailBundle\Entity\EmailUser:
   adminEmailUser1:

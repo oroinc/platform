@@ -3,35 +3,30 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="composite_key_entity")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'composite_key_entity')]
 class CompositeKeyEntity
 {
-    /**
-     * @var integer
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING)]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
+    protected ?string $title = null;
 
     /**
-     * @var string
-     * @ORM\Id
-     * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @var Collection<int, CompositeKeyEntity>
      */
-    protected $title;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="CompositeKeyEntity")
-     * @ORM\JoinTable(name="composite_key_entity_children")
-     */
-    protected $children;
+    #[ORM\ManyToMany(targetEntity: CompositeKeyEntity::class)]
+    #[ORM\JoinTable(name: 'composite_key_entity_children')]
+    protected ?Collection $children = null;
 
     public function __construct()
     {

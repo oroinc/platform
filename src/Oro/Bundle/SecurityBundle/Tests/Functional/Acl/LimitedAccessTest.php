@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -113,15 +113,15 @@ class LimitedAccessTest extends WebTestCase
         );
     }
 
-    public function testActionByAclAnnotation()
+    public function testActionByAclAttribute()
     {
-        $aclAnnotation = new Acl(['id' => 'test_action', 'type' => 'action']);
+        $aclAttribute = Acl::fromArray(['id' => 'test_action', 'type' => 'action']);
         self::assertFalse(
-            $this->getAuthorizationChecker()->isGranted('EXECUTE', $aclAnnotation)
+            $this->getAuthorizationChecker()->isGranted('EXECUTE', $aclAttribute)
         );
     }
 
-    public function testActionByAclAnnotationId()
+    public function testActionByAclAttributeId()
     {
         self::assertFalse(
             $this->getAuthorizationChecker()->isGranted('test_action')
@@ -149,20 +149,20 @@ class LimitedAccessTest extends WebTestCase
         );
     }
 
-    public function testEntityByAclAnnotation()
+    public function testEntityByAclAttribute()
     {
-        $aclAnnotation = new Acl([
+        $aclAttribute = Acl::fromArray([
             'id'         => 'test_entity_delete',
             'type'       => 'entity',
             'permission' => 'DELETE',
             'class'      => TestEntity::class
         ]);
         self::assertFalse(
-            $this->getAuthorizationChecker()->isGranted('DELETE', $aclAnnotation)
+            $this->getAuthorizationChecker()->isGranted('DELETE', $aclAttribute)
         );
     }
 
-    public function testEntityByAclAnnotationId()
+    public function testEntityByAclAttributeId()
     {
         self::assertFalse(
             $this->getAuthorizationChecker()->isGranted('test_entity_delete')

@@ -2,41 +2,29 @@
 
 namespace Oro\Bundle\SidebarBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
- * @ORM\MappedSuperclass
- */
+* AbstractSidebarState class
+*
+*/
+#[ORM\MappedSuperclass]
 class AbstractSidebarState
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="position", type="string", length=13, nullable=false)
-     */
-    protected $position;
+    #[ORM\Column(name: 'position', type: Types::STRING, length: 13, nullable: false)]
+    protected ?string $position = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="state", type="string", nullable=false, length=17)
-     */
-    protected $state;
+    #[ORM\Column(name: 'state', type: Types::STRING, length: 17, nullable: false)]
+    protected ?string $state = null;
 
-    /**
-     * @var AbstractUser
-     */
-    protected $user;
+    protected ?AbstractUser $user = null;
 
     /**
      * Get id

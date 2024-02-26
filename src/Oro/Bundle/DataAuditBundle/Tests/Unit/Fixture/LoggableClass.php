@@ -4,38 +4,31 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table
- */
+#[ORM\Entity]
+#[ORM\Table]
 class LoggableClass
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=255, unique=true)
      */
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
     protected $name;
 
     /**
      * @var LoggableCollectionClass[]
-     *
-     * @ORM\ManyToMany(targetEntity="LoggableCollectionClass")
      */
+    #[ORM\ManyToMany(targetEntity: LoggableCollectionClass::class)]
     protected $collection;
 
     /**
      * @var LoggableCollectionClass[]
-     *
-     * @ORM\ManyToMany(targetEntity="LoggableCollectionClass")
      */
+    #[ORM\ManyToMany(targetEntity: LoggableCollectionClass::class)]
     protected $collectionWithMethodName;
 
     /**

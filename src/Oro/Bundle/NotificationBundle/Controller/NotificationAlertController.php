@@ -4,30 +4,27 @@ namespace Oro\Bundle\NotificationBundle\Controller;
 
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Controller for notification alerts
- *
- * @Route("/notification-alert")
  */
+#[Route(path: '/notification-alert')]
 class NotificationAlertController extends AbstractController
 {
     use RequestHandlerTrait;
 
-    /**
-     * @Route("/", name="oro_notification_notificationalert_index")
-     * @Acl(
-     *      id="oro_notification_notificationalert_view",
-     *      type="entity",
-     *      permission="VIEW",
-     *      class="Oro\Bundle\NotificationBundle\Entity\NotificationAlert"
-     * )
-     * @Template()
-     */
+    #[Route(path: '/', name: 'oro_notification_notificationalert_index')]
+    #[Template]
+    #[Acl(
+        id: 'oro_notification_notificationalert_view',
+        type: 'entity',
+        class: NotificationAlert::class,
+        permission: 'VIEW'
+    )]
     public function indexAction()
     {
         return [

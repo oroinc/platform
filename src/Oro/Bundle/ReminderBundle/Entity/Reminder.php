@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\ReminderBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroReminderBundle_Entity_Reminder;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\ReminderBundle\Model\SenderAwareReminderDataInterface;
@@ -16,30 +18,21 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * A reminder that can be tied up to some event (e.g. a calendar event).
  *
- * @ORM\Table(name="oro_reminder", indexes={
- *     @ORM\Index(name="reminder_state_idx", columns={"state"})
- * })
- * @ORM\Entity(repositoryClass="Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-bell-o"
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @mixin OroReminderBundle_Entity_Reminder
  */
+#[ORM\Entity(repositoryClass: ReminderRepository::class)]
+#[ORM\Table(name: 'oro_reminder')]
+#[ORM\Index(columns: ['state'], name: 'reminder_state_idx')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    defaultValues: [
+        'entity' => ['icon' => 'fa-bell-o'],
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class Reminder implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
@@ -49,137 +42,69 @@ class Reminder implements ExtendEntityInterface
     const STATE_FAIL = 'fail';
     const STATE_REQUESTED = 'requested';
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="subject", type="string", length=255, nullable=false)
-     */
-    protected $subject;
+    #[ORM\Column(name: 'subject', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $subject = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="start_at", type="datetime", nullable=false)
-     */
-    protected $startAt;
+    #[ORM\Column(name: 'start_at', type: Types::DATETIME_MUTABLE, nullable: false)]
+    protected ?\DateTimeInterface $startAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="expire_at", type="datetime", nullable=false)
-     */
-    protected $expireAt;
+    #[ORM\Column(name: 'expire_at', type: Types::DATETIME_MUTABLE, nullable: false)]
+    protected ?\DateTimeInterface $expireAt = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="method", type="string", length=255, nullable=false)
-     */
-    protected $method;
+    #[ORM\Column(name: 'method', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $method = null;
 
     /**
      * @var ReminderInterval
      */
     protected $interval;
 
-    /**
-     * @var integer $intervalNumber
-     *
-     * @ORM\Column(name="interval_number", type="integer", nullable=false)
-     */
-    protected $intervalNumber;
+    #[ORM\Column(name: 'interval_number', type: Types::INTEGER, nullable: false)]
+    protected ?int $intervalNumber = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="interval_unit", type="string", length=1, nullable=false)
-     */
-    protected $intervalUnit;
+    #[ORM\Column(name: 'interval_unit', type: Types::STRING, length: 1, nullable: false)]
+    protected ?string $intervalUnit = null;
 
-    /**
-     * @var string $state
-     *
-     * @ORM\Column(name="state", type="string", length=32, nullable=false)
-     */
-    protected $state;
+    #[ORM\Column(name: 'state', type: Types::STRING, length: 32, nullable: false)]
+    protected ?string $state = null;
+
+    #[ORM\Column(name: 'related_entity_id', type: Types::INTEGER, nullable: false)]
+    protected ?int $relatedEntityId = null;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="related_entity_id", type="integer", nullable=false)
      */
-    protected $relatedEntityId;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="related_entity_classname", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: 'related_entity_classname', type: Types::STRING, length: 255, nullable: false)]
     protected $relatedEntityClassName;
 
-    /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="recipient_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $recipient;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'recipient_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?User $recipient = null;
 
-    /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="sender_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $sender;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $sender = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: false)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="sent_at", type="datetime", nullable=true)
-     */
-    protected $sentAt;
+    #[ORM\Column(name: 'sent_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $sentAt = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="failure_exception", type="array", nullable=true)
      */
+    #[ORM\Column(name: 'failure_exception', type: Types::ARRAY, nullable: true)]
     protected $failureException;
 
     public function __construct()
@@ -554,17 +479,13 @@ class Reminder implements ExtendEntityInterface
         return $this;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime();
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime();
@@ -578,9 +499,7 @@ class Reminder implements ExtendEntityInterface
         return (string)$this->subject;
     }
 
-    /**
-     * @ORM\PostLoad()
-     */
+    #[ORM\PostLoad]
     public function postLoad()
     {
         $this->syncStartAtAndInterval();

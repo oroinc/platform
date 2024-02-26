@@ -13,8 +13,8 @@ class TestObject
 
     /**
      * @var string
-     * @Assert\NotBlank()
      */
+    #[Assert\NotBlank]
     private $title;
 
     /**

@@ -5,8 +5,8 @@ namespace Oro\Bundle\UserBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -36,10 +36,10 @@ class ResetController extends AbstractController
      * Request reset user password
      *
      * @param Request $request
-     * @Route("/send-email", name="oro_user_reset_send_email", methods={"POST"})
      *
      * @return RedirectResponse
      */
+    #[Route(path: '/send-email', name: 'oro_user_reset_send_email', methods: ['POST'])]
     public function sendEmailAction(Request $request)
     {
         if (!$this->isCsrfTokenValid('oro-user-password-reset-request', $request->get('_csrf_token'))) {
@@ -98,10 +98,8 @@ class ResetController extends AbstractController
         return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
     }
 
-    /**
-     * @Route("/reset-request", name="oro_user_reset_request", methods={"GET"})
-     * @Template
-     */
+    #[Route(path: '/reset-request', name: 'oro_user_reset_request', methods: ['GET'])]
+    #[Template]
     public function requestAction()
     {
         return array();
@@ -110,16 +108,15 @@ class ResetController extends AbstractController
     /**
      * @param Request $request
      * @param User $user
-     * @Route(
-     *     "/send-forced-password-reset-email/{id}",
-     *     name="oro_user_send_forced_password_reset_email",
-     *     requirements={"id"="\d+"}
-     * )
-     * @AclAncestor("password_management")
-     * @Template("@OroUser/Reset/dialog/forcePasswordResetConfirmation.html.twig")
-     *
      * @return array
      */
+    #[Route(
+        path: '/send-forced-password-reset-email/{id}',
+        name: 'oro_user_send_forced_password_reset_email',
+        requirements: ['id' => '\d+']
+    )]
+    #[Template('@OroUser/Reset/dialog/forcePasswordResetConfirmation.html.twig')]
+    #[AclAncestor('password_management')]
     public function sendForcedResetEmailAction(Request $request, User $user)
     {
         $params = [
@@ -164,14 +161,9 @@ class ResetController extends AbstractController
         return $params;
     }
 
-    /**
-     * @Route(
-     *     "/mass-password-reset/",
-     *     name="oro_user_mass_password_reset"
-     * )
-     * @AclAncestor("password_management")
-     * @CsrfProtection()
-     */
+    #[Route(path: '/mass-password-reset/', name: 'oro_user_mass_password_reset')]
+    #[AclAncestor('password_management')]
+    #[CsrfProtection()]
     public function massPasswordResetAction(Request $request)
     {
         $gridName = $request->get('gridName');
@@ -192,10 +184,9 @@ class ResetController extends AbstractController
 
     /**
      * Tell the user to check his email provider
-     *
-     * @Route("/check-email", name="oro_user_reset_check_email", methods={"GET"})
-     * @Template
      */
+    #[Route(path: '/check-email', name: 'oro_user_reset_check_email', methods: ['GET'])]
+    #[Template]
     public function checkEmailAction(Request $request)
     {
         $session = $request->getSession();
@@ -215,10 +206,14 @@ class ResetController extends AbstractController
 
     /**
      * Reset user password
-     *
-     * @Route("/reset/{token}", name="oro_user_reset_reset", requirements={"token"="\w+"}, methods={"GET", "POST"})
-     * @Template
      */
+    #[Route(
+        path: '/reset/{token}',
+        name: 'oro_user_reset_reset',
+        requirements: ['token' => '\w+'],
+        methods: ['GET', 'POST']
+    )]
+    #[Template]
     public function resetAction(string $token, Request $request)
     {
         $user = $this->getUserManager()->findUserByConfirmationToken($token);
@@ -260,18 +255,18 @@ class ResetController extends AbstractController
 
     /**
      * Sets user password
-     * @AclAncestor("password_management")
-     * @Route(
-     *     "/set-password/{id}",
-     *     name="oro_user_reset_set_password",
-     *     requirements={"id"="\d+"},
-     *     methods={"GET", "POST"}
-     * )
-     * @Template("@OroUser/Reset/dialog/update.html.twig")
      * @param Request $request
      * @param User $entity
      * @return array
      */
+    #[Route(
+        path: '/set-password/{id}',
+        name: 'oro_user_reset_set_password',
+        requirements: ['id' => '\d+'],
+        methods: ['GET', 'POST']
+    )]
+    #[Template('@OroUser/Reset/dialog/update.html.twig')]
+    #[AclAncestor('password_management')]
     public function setPasswordAction(Request $request, User $entity)
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();

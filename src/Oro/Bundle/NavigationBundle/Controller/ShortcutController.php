@@ -13,16 +13,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Serves shortcut actions.
- * @Route("/shortcut")
  */
+#[Route(path: '/shortcut')]
 class ShortcutController extends AbstractController
 {
     protected $uris = [];
 
-    /**
-     * @Route("actionslist", name="oro_shortcut_actionslist")
-     * @Template
-     */
+    #[Route(path: 'actionslist', name: 'oro_shortcut_actionslist')]
+    #[Template]
     public function actionslistAction()
     {
         $provider = $this->container->get(BuilderChainProvider::class);

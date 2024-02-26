@@ -13,15 +13,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provide functionality to manage activity conditions
- *
- * @Route("/activity-list/segment")
  */
+#[Route(path: '/activity-list/segment')]
 class SegmentController extends AbstractController
 {
-    /**
-     * @Route("/activity-condition")
-     * @Template
-     */
+    #[Route(path: '/activity-condition')]
+    #[Template]
     public function activityConditionAction(Request $request)
     {
         $params = $request->attributes->get('params', []);

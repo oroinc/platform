@@ -6,9 +6,9 @@ use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\UIBundle\Route\Router;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -22,23 +22,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Controller for Integrations config page
- *
- * @Route("/integration")
  */
+#[Route(path: '/integration')]
 class IntegrationController extends AbstractController
 {
     use RequestHandlerTrait;
 
-    /**
-     * @Route("/", name="oro_integration_index")
-     * @Acl(
-     *      id="oro_integration_view",
-     *      type="entity",
-     *      permission="VIEW",
-     *      class="Oro\Bundle\IntegrationBundle\Entity\Channel"
-     * )
-     * @Template()
-     */
+    #[Route(path: '/', name: 'oro_integration_index')]
+    #[Template]
+    #[Acl(id: 'oro_integration_view', type: 'entity', class: Integration::class, permission: 'VIEW')]
     public function indexAction()
     {
         return [
@@ -46,41 +38,30 @@ class IntegrationController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/create", name="oro_integration_create")
-     * @Acl(
-     *      id="oro_integration_create",
-     *      type="entity",
-     *      permission="CREATE",
-     *      class="Oro\Bundle\IntegrationBundle\Entity\Channel"
-     * )
-     * @Template("@OroIntegration/Integration/update.html.twig")
-     */
+    #[Route(path: '/create', name: 'oro_integration_create')]
+    #[Template('@OroIntegration/Integration/update.html.twig')]
+    #[Acl(id: 'oro_integration_create', type: 'entity', class: Integration::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new Integration(), $request);
     }
 
-    /**
-     * @Route("/update/{id}", requirements={"id"="\d+"}, name="oro_integration_update")
-     * @Acl(
-     *      id="oro_integration_update",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="Oro\Bundle\IntegrationBundle\Entity\Channel"
-     * )
-     * @Template()
-     */
+    #[Route(path: '/update/{id}', name: 'oro_integration_update', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[Acl(id: 'oro_integration_update', type: 'entity', class: Integration::class, permission: 'EDIT')]
     public function updateAction(Request $request, Integration $integration)
     {
         return $this->update($integration, $request);
     }
 
-    /**
-     * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule", methods={"POST"})
-     * @AclAncestor("oro_integration_update")
-     * @CsrfProtection()
-     */
+    #[Route(
+        path: '/schedule/{id}',
+        name: 'oro_integration_schedule',
+        requirements: ['id' => '\d+'],
+        methods: ['POST']
+    )]
+    #[AclAncestor('oro_integration_update')]
+    #[CsrfProtection()]
     public function scheduleAction(Integration $integration, Request $request)
     {
         if ($integration->isEnabled()) {

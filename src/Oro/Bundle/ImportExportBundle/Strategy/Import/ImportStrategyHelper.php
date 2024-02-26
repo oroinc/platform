@@ -184,7 +184,7 @@ class ImportStrategyHelper
     /**
      * Checks if an access to a resource is granted to the caller
      *
-     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
+     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL attribute id,
      *                                    string in format "permission;descriptor"
      *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                                    or something else, it depends on registered security voters

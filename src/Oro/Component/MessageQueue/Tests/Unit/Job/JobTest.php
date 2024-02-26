@@ -107,8 +107,8 @@ class JobTest extends \PHPUnit\Framework\TestCase
     {
         $job = new Job();
 
-        $job->setOwnerId(123);
-        self::assertSame(123, $job->getOwnerId());
+        $job->setOwnerId('123');
+        self::assertSame('123', $job->getOwnerId());
     }
 
     public function testShouldBePossibleToSetName()

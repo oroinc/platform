@@ -9,8 +9,8 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -29,17 +29,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class GridController extends AbstractController
 {
     /**
-     * @Route(
-     *      "/widget/{gridName}",
-     *      name="oro_datagrid_widget",
-     *      requirements={"gridName"="[\w\:-]+"}
-     * )
-     * @Template
      * @param Request $request
      * @param string $gridName
      *
      * @return array
      */
+    #[Route(path: '/widget/{gridName}', name: 'oro_datagrid_widget', requirements: ['gridName' => '[\w\:-]+'])]
+    #[Template]
     public function widgetAction(Request $request, $gridName)
     {
         return [
@@ -51,17 +47,13 @@ class GridController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/{gridName}",
-     *      name="oro_datagrid_index",
-     *      requirements={"gridName"="[\w\:-]+"}
-     * )
      *
      * @param string $gridName
      *
      * @return Response
      * @throws \Exception
      */
+    #[Route(path: '/{gridName}', name: 'oro_datagrid_index', requirements: ['gridName' => '[\w\:-]+'])]
     public function getAction($gridName)
     {
         $gridManager = $this->container->get(Manager::class);
@@ -93,9 +85,7 @@ class GridController extends AbstractController
         return new JsonResponse($result->toArray());
     }
 
-    /**
-     * @Route("/{gridName}/filter-metadata", name="oro_datagrid_filter_metadata", options={"expose"=true})
-     */
+    #[Route(path: '/{gridName}/filter-metadata', name: 'oro_datagrid_filter_metadata', options: ['expose' => true])]
     public function filterMetadataAction(Request $request, $gridName)
     {
         $filterNames = $request->query->get('filterNames', []);
@@ -124,19 +114,14 @@ class GridController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/{gridName}/export/",
-     *      name="oro_datagrid_export_action",
-     *      requirements={"gridName"="[\w\:-]+"}
-     * )
      *
-     * @AclAncestor("oro_datagrid_gridview_export")
      *
      * @param Request $request
      * @param string $gridName
-     *
      * @return JsonResponse
      */
+    #[Route(path: '/{gridName}/export/', name: 'oro_datagrid_export_action', requirements: ['gridName' => '[\w\:-]+'])]
+    #[AclAncestor('oro_datagrid_gridview_export')]
     public function exportAction(Request $request, $gridName)
     {
         $format = $request->query->get('format');
@@ -162,12 +147,6 @@ class GridController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/{gridName}/massAction/{actionName}",
-     *      name="oro_datagrid_mass_action",
-     *      requirements={"gridName"="[\w\:\-]+", "actionName"="[\w\-]+"}
-     * )
-     * @CsrfProtection()
      *
      * @param Request $request
      * @param string $gridName
@@ -176,6 +155,12 @@ class GridController extends AbstractController
      * @return Response
      * @throws \LogicException
      */
+    #[Route(
+        path: '/{gridName}/massAction/{actionName}',
+        name: 'oro_datagrid_mass_action',
+        requirements: ['gridName' => '[\w\:\-]+', 'actionName' => '[\w\-]+']
+    )]
+    #[CsrfProtection()]
     public function massActionAction(Request $request, $gridName, $actionName)
     {
         $massActionDispatcher = $this->container->get(MassActionDispatcher::class);

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Filter;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -343,7 +342,7 @@ class SegmentFilterTest extends OrmTestCase
     private function getEntityManager(): EntityManagerInterface
     {
         $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
 
         return $em;
     }

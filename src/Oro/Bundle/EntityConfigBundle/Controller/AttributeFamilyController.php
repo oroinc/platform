@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,14 +24,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Entity Attribute Family Controller
- * @Route("/attribute/family")
  */
+#[Route(path: '/attribute/family')]
 class AttributeFamilyController extends AbstractController
 {
-    /**
-     * @Route("/create/{alias}", name="oro_attribute_family_create")
-     * @Template("@OroEntityConfig/AttributeFamily/update.html.twig")
-     */
+    #[Route(path: '/create/{alias}', name: 'oro_attribute_family_create')]
+    #[Template('@OroEntityConfig/AttributeFamily/update.html.twig')]
     public function createAction(string $alias): array|RedirectResponse
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
@@ -71,10 +69,8 @@ class AttributeFamilyController extends AbstractController
         return $response;
     }
 
-    /**
-     * @Route("/update/{id}", name="oro_attribute_family_update")
-     * @Template("@OroEntityConfig/AttributeFamily/update.html.twig")
-     */
+    #[Route(path: '/update/{id}', name: 'oro_attribute_family_update')]
+    #[Template('@OroEntityConfig/AttributeFamily/update.html.twig')]
     public function updateAction(AttributeFamily $attributeFamily): array|RedirectResponse
     {
         $translator = $this->getTranslator();
@@ -98,10 +94,8 @@ class AttributeFamilyController extends AbstractController
             ->update($attributeFamily, $form, $message);
     }
 
-    /**
-     * @Route("/index/{alias}", name="oro_attribute_family_index")
-     * @Template()
-     */
+    #[Route(path: '/index/{alias}', name: 'oro_attribute_family_index')]
+    #[Template]
     public function indexAction(string $alias): array|RedirectResponse
     {
         $entityClass = $this->container->get(EntityAliasResolver::class)->getClassByAlias($alias);
@@ -116,10 +110,8 @@ class AttributeFamilyController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/delete/{id}", name="oro_attribute_family_delete", methods={"DELETE"})
-     * @CsrfProtection()
-     */
+    #[Route(path: '/delete/{id}', name: 'oro_attribute_family_delete', methods: ['DELETE'])]
+    #[CsrfProtection()]
     public function deleteAction(AttributeFamily $attributeFamily): JsonResponse
     {
         $translator = $this->getTranslator();
@@ -138,10 +130,8 @@ class AttributeFamilyController extends AbstractController
         return new JsonResponse(['message' => $message, 'successful' => $successful]);
     }
 
-    /**
-     * @Route("/view/{id}", name="oro_attribute_family_view", requirements={"id"="\d+"})
-     * @Template()
-     */
+    #[Route(path: '/view/{id}', name: 'oro_attribute_family_view', requirements: ['id' => '\d+'])]
+    #[Template]
     public function viewAction(AttributeFamily $attributeFamily): array
     {
         $aliasResolver = $this->container->get(EntityAliasResolver::class);

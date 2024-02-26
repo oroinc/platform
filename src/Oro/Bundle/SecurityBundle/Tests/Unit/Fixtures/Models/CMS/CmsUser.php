@@ -5,47 +5,32 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="cms_users")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'cms_users')]
 class CmsUser
 {
-    /**
-     * @ORM\Id @ORM\Column(type="integer")
-     * @ORM\GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     public $id;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     public $status;
 
-    /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
     public $username;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     public $name;
 
-    /**
-     * @ORM\OneToMany(targetEntity="CmsArticle", mappedBy="user", cascade={"detach"})
-     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: CmsArticle::class, cascade: ['detach'])]
     public $articles;
 
-    /**
-     * @ORM\OneToOne(targetEntity="CmsAddress", mappedBy="user", cascade={"persist"}, orphanRemoval=true)
-     */
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: CmsAddress::class, cascade: ['persist'], orphanRemoval: true)]
     public $address;
 
-    /**
-     * @ORM\OneToOne(targetEntity="CmsOrganization", inversedBy="address")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(inversedBy: 'address', targetEntity: CmsOrganization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id')]
     public $organization;
 
     public function __construct()

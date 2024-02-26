@@ -23,19 +23,6 @@ class ActivityEntityController extends RestController
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
-     *
      * @ApiDoc(
      *      description="Get entities associated with the specified activity",
      *      resource=true
@@ -43,6 +30,18 @@ class ActivityEntityController extends RestController
      *
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
     public function cgetAction(Request $request, $activity, int $id)
     {
         $manager = $this->getManager();

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation as GedmoAbstractTranslation;
 
@@ -11,16 +12,14 @@ use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation as GedmoAbstr
 abstract class AbstractTranslation extends GedmoAbstractTranslation
 {
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=16)
+     * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 16)]
     protected $locale;
 
     /**
-     * @var string $content
-     *
-     * @ORM\Column(type="string", length=255)
+     * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 255)]
     protected $content;
 }

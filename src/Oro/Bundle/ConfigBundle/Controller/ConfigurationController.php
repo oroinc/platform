@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler;
 use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Psr\Container\ContainerInterface;
@@ -28,21 +28,19 @@ class ConfigurationController implements ServiceSubscriberInterface
         $this->container = $container;
     }
 
-    /**
-     * @Route(
-     *      "/system/{activeGroup}/{activeSubGroup}",
-     *      name="oro_config_configuration_system",
-     *      defaults={"activeGroup" = null, "activeSubGroup" = null}
-     * )
-     * @Template()
-     * @Acl(
-     *      id="oro_config_system",
-     *      type="action",
-     *      label="oro.config.acl.action.general.label",
-     *      group_name="",
-     *      category="application"
-     * )
-     */
+    #[Route(
+        path: '/system/{activeGroup}/{activeSubGroup}',
+        name: 'oro_config_configuration_system',
+        defaults: ['activeGroup' => null, 'activeSubGroup' => null]
+    )]
+    #[Template]
+    #[Acl(
+        id: 'oro_config_system',
+        type: 'action',
+        label: 'oro.config.acl.action.general.label',
+        groupName: '',
+        category: 'application'
+    )]
     public function systemAction(Request $request, ?string $activeGroup = null, ?string $activeSubGroup = null): array
     {
         $provider = $this->getConfigFormProvider();

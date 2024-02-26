@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Form\Handler\GroupHandler;
@@ -15,25 +15,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CRUD for user groups.
- *
- * @Route("/group")
  */
+#[Route(path: '/group')]
 class GroupController extends AbstractController
 {
     /**
      * Create group form
      *
-     * @Route("/create", name="oro_user_group_create")
-     * @Template("@OroUser/Group/update.html.twig")
-     * @Acl(
-     *      id="oro_user_group_create",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\Group",
-     *      permission="CREATE"
-     * )
      * @param Request $request
      * @return array
      */
+    #[Route(path: '/create', name: 'oro_user_group_create')]
+    #[Template('@OroUser/Group/update.html.twig')]
+    #[Acl(id: 'oro_user_group_create', type: 'entity', class: Group::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update($request, new Group());
@@ -42,37 +36,25 @@ class GroupController extends AbstractController
     /**
      * Edit group form
      *
-     * @Route("/update/{id}", name="oro_user_group_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template
-     * @Acl(
-     *      id="oro_user_group_update",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\Group",
-     *      permission="EDIT"
-     * )
      * @param Request $request
      * @return array
      */
+    #[Route(path: '/update/{id}', name: 'oro_user_group_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template]
+    #[Acl(id: 'oro_user_group_update', type: 'entity', class: Group::class, permission: 'EDIT')]
     public function updateAction(Request $request, Group $entity)
     {
         return $this->update($request, $entity);
     }
 
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_user_group_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @Acl(
-     *      id="oro_user_group_view",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\Group",
-     *      permission="VIEW"
-     * )
-     * @Template
-     */
+    #[Route(
+        path: '/{_format}',
+        name: 'oro_user_group_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template]
+    #[Acl(id: 'oro_user_group_view', type: 'entity', class: Group::class, permission: 'VIEW')]
     public function indexAction(Request $request)
     {
         return [

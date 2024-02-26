@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionMaskBuilder;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
@@ -80,12 +80,12 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function getObjectIdentityDataProvider(): array
     {
-        $annotation = new AclAnnotation([
+        $attribute = AclAttribute::fromArray([
             'id' => 'action_id',
             'type' => 'action'
         ]);
 
-        $annotation2 = new AclAnnotation([
+        $attribute2 = AclAttribute::fromArray([
             'id' => 'action_id',
             'type' => 'action',
             'group_name' => 'group'
@@ -105,11 +105,11 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
                 'expected' => new ObjectIdentity('action', 'action_id')
             ],
             [
-                'val' => $annotation,
+                'val' => $attribute,
                 'expected' => new ObjectIdentity('action', 'action_id')
             ],
             [
-                'val' => $annotation2,
+                'val' => $attribute2,
                 'expected' => new ObjectIdentity('action', 'group@action_id')
             ]
         ];

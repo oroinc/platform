@@ -9,8 +9,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Entities controller.
- * @Route("/dictionary")
  */
+#[Route(path: '/dictionary')]
 class DictionaryController extends AbstractController
 {
     /**
@@ -18,13 +18,10 @@ class DictionaryController extends AbstractController
      *
      * @param string $dictionary - Class Name Entity that was configured as Dictionary
      *
-     * @Route(
-     *      "/{dictionary}/search",
-     *      name="oro_dictionary_search"
-     * )
      *
      * @return JsonResponse
      */
+    #[Route(path: '/{dictionary}/search', name: 'oro_dictionary_search')]
     public function searchAction($dictionary)
     {
         $searchQuery = $this->container->get('request_stack')->getCurrentRequest()->get('q');
@@ -41,13 +38,10 @@ class DictionaryController extends AbstractController
      *
      * @param string $dictionary - Class Name Entity that was configured as Dictionary
      *
-     * @Route(
-     *      "/{dictionary}/values",
-     *      name="oro_dictionary_value"
-     * )
      *
      * @return JsonResponse
      */
+    #[Route(path: '/{dictionary}/values', name: 'oro_dictionary_value')]
     public function valuesAction($dictionary)
     {
         $keys = $this->container->get('request_stack')->getCurrentRequest()->get('keys');

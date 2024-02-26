@@ -19,19 +19,6 @@ class EmailActivityEntityController extends RestGetController
      *
      * @param int $id The id of the email entity.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
-     *
      * @ApiDoc(
      *      description="Get entities associated with the email activity",
      *      resource=true
@@ -39,6 +26,18 @@ class EmailActivityEntityController extends RestGetController
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
     public function cgetAction(Request $request, $id)
     {
         $page  = (int)$request->get('page', 1);

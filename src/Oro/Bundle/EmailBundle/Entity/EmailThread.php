@@ -3,57 +3,43 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailThreadRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
  * Entity that represents a chain(thread) of emails
- *
- * @ORM\Table(
- *      name="oro_email_thread"
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailThreadRepository")
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Entity(repositoryClass: EmailThreadRepository::class)]
+#[ORM\Table(name: 'oro_email_thread')]
+#[ORM\HasLifecycleCallbacks]
 class EmailThread
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
-     * @var ArrayCollection|Email[] $emails
-     *
-     * @ORM\OneToMany(targetEntity="Email", mappedBy="thread", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @var Collection<int, Email> $emails
      */
-    protected $emails;
+    #[ORM\OneToMany(
+        mappedBy: 'thread',
+        targetEntity: Email::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $emails = null;
 
-    /**
-     * @var Email
-     *
-     * @ORM\ManyToOne(targetEntity="Email")
-     * @ORM\JoinColumn(name="last_unseen_email_id", referencedColumnName="id", nullable=true)
-     */
-    protected $lastUnseenEmail;
+    #[ORM\ManyToOne(targetEntity: Email::class)]
+    #[ORM\JoinColumn(name: 'last_unseen_email_id', referencedColumnName: 'id', nullable: true)]
+    protected ?Email $lastUnseenEmail = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $created;
+    #[ORM\Column(name: 'created', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $created = null;
 
     public function __construct()
     {
@@ -132,9 +118,8 @@ class EmailThread
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));

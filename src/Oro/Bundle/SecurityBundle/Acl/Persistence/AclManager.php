@@ -240,7 +240,7 @@ class AclManager extends AbstractAclManager
      *     getOid('entity:AcmeBundle:SomeEntity')
      *     getOid('action:some_action')
      *
-     * @param mixed $val An domain object, object identity descriptor (id:type) or ACL annotation
+     * @param mixed $val An domain object, object identity descriptor (id:type) or ACL attribute
      * @return OID
      * @throws InvalidDomainObjectException
      */

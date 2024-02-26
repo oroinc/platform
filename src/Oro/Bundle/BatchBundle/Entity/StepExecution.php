@@ -4,7 +4,9 @@ namespace Oro\Bundle\BatchBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\BatchBundle\Exception\RuntimeErrorException;
 use Oro\Bundle\BatchBundle\Item\ExecutionContext;
@@ -14,96 +16,69 @@ use Oro\Bundle\BatchBundle\Job\ExitStatus;
 /**
  * Represents a batch job step execution.
  *
- * @ORM\Table(name="akeneo_batch_step_execution")
- * @ORM\Entity()
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'akeneo_batch_step_execution')]
 class StepExecution
 {
-    /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="JobExecution", inversedBy="stepExecutions")
-     * @ORM\JoinColumn(name="job_execution_id", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: JobExecution::class, inversedBy: 'stepExecutions')]
+    #[ORM\JoinColumn(name: 'job_execution_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?JobExecution $jobExecution;
 
-    /**
-     * @ORM\Column(name="step_name", type="string", length=100, nullable=true)
-     */
+    #[ORM\Column(name: 'step_name', type: Types::STRING, length: 100, nullable: true)]
     private ?string $stepName;
 
-    /**
-     * @ORM\Column(name="status", type="integer")
-     */
+    #[ORM\Column(name: 'status', type: Types::INTEGER)]
     private int $status;
 
-    /**
-     * @ORM\Column(name="read_count", type="integer")
-     */
+    #[ORM\Column(name: 'read_count', type: Types::INTEGER)]
     private int $readCount = 0;
 
-    /**
-     * @orm\column(name="write_count", type="integer")
-     */
+    #[ORM\Column(name: 'write_count', type: Types::INTEGER)]
     private int $writeCount = 0;
 
-    /**
-     * @ORM\Column(name="start_time", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'start_time', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $startTime;
 
-    /**
-     * @ORM\Column(name="end_time", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'end_time', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $endTime = null;
 
-    /**
-     * @ORM\Column(name="exit_code", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'exit_code', type: Types::STRING, length: 255, nullable: true)]
     private ?string $exitCode;
 
-    /**
-     * @ORM\Column(name="exit_description", type="text", nullable=true)
-     */
+    #[ORM\Column(name: 'exit_description', type: Types::TEXT, nullable: true)]
     private ?string $exitDescription = null;
 
-    /**
-     * @ORM\Column(name="terminate_only", type="boolean", nullable=true)
-     */
+    #[ORM\Column(name: 'terminate_only', type: Types::BOOLEAN, nullable: true)]
     private bool $terminateOnly = false;
 
-    /**
-     * @ORM\Column(name="failure_exceptions", type="array", nullable=true)
-     */
+    #[ORM\Column(name: 'failure_exceptions', type: Types::ARRAY, nullable: true)]
     private ?array $failureExceptions;
 
-    /**
-     * @ORM\Column(name="errors", type="array")
-     */
+    #[ORM\Column(name: 'errors', type: Types::ARRAY)]
     private array $errors;
 
     /**
-     * @ORM\OneToMany(
-     *      targetEntity="Warning",
-     *      mappedBy="stepExecution",
-     *      cascade={"persist", "remove"},
-     *      fetch="EXTRA_LAZY",
-     *      orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, Warning>
      */
+    #[ORM\OneToMany(
+        mappedBy: 'stepExecution',
+        targetEntity: Warning::class,
+        cascade: ['persist', 'remove'],
+        fetch: 'EXTRA_LAZY',
+        orphanRemoval: true
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
     private Collection $warnings;
 
-    /**
-     * @ORM\Column(name="summary", type="array")
-     */
+    #[ORM\Column(name: 'summary', type: Types::ARRAY)]
     private array $summary = [];
 
     private ExecutionContext $executionContext;

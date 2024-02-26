@@ -31,7 +31,7 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedByAclAnnotationId(): void
+    public function testIsGrantedByAclAttributeId(): void
     {
         $attributes = 'acme_product_view';
         $expectedResult = true;

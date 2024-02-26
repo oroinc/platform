@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
@@ -10,8 +9,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Annotation\ORM\DiscriminatorValue;
+use Oro\Bundle\EntityExtendBundle\Attribute\ORM\DiscriminatorValue;
 use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
+use Oro\Component\PhpUtils\Attribute\Reader\AttributeReader;
 
 /**
  * Enriches discriminator mapping and field defaults in class metadata.
@@ -19,18 +19,18 @@ use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
 class DoctrineListener
 {
     private ExtendMetadataBuilder $metadataBuilder;
-    private Reader $annotationReader;
+    private AttributeReader $attributeReader;
     private ConfigProvider $extendConfigProvider;
     private array $collectedMaps = [];
     private array $collectedValues = [];
 
     public function __construct(
         ExtendMetadataBuilder $metadataBuilder,
-        Reader $reader,
+        AttributeReader $reader,
         ConfigProvider $extendConfigProvider
     ) {
         $this->metadataBuilder = $metadataBuilder;
-        $this->annotationReader = $reader;
+        $this->attributeReader = $reader;
         $this->extendConfigProvider = $extendConfigProvider;
     }
 
@@ -104,12 +104,12 @@ class DoctrineListener
                 $metadata = $factory->getMetadataFor($entityClass);
                 $value = $metadata->discriminatorValue;
             } else {
-                $annotation = $this->annotationReader->getClassAnnotation(
+                $attribute = $this->attributeReader->getClassAttribute(
                     new \ReflectionClass($entityClass),
                     DiscriminatorValue::class
                 );
-                if ($annotation instanceof DiscriminatorValue) {
-                    $value = $annotation->getValue();
+                if ($attribute instanceof DiscriminatorValue) {
+                    $value = $attribute->getValue();
                 }
             }
 

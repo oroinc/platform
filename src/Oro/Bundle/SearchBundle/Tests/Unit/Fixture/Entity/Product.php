@@ -4,73 +4,45 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Attribute;
 
-/**
- * @ORM\Table()
- * @ORM\Entity()
- */
+#[ORM\Entity]
 class Product
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    private $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    private ?string $name = null;
 
     /**
      * @var float|null
-     *
-     * @ORM\Column(name="price", type="decimal")
      */
+    #[ORM\Column(name: 'price', type: Types::DECIMAL)]
     private $price;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="count", type="integer")
-     */
-    private $count;
+    #[ORM\Column(name: 'count', type: Types::INTEGER)]
+    private ?int $count = null;
+
+    #[ORM\Column(name: 'create_date', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createDate = null;
+
+    #[ORM\Column(name: 'description', type: Types::TEXT)]
+    private ?string $description = null;
+
+    #[ORM\ManyToOne(targetEntity: Manufacturer::class, inversedBy: 'products')]
+    #[ORM\JoinColumn(name: 'manufacturer_id', referencedColumnName: 'id')]
+    private ?Manufacturer $manufacturer = null;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="create_date", type="datetime")
+     * @var Collection<int, Category>
      */
-    private $createDate;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="description", type="text")
-     */
-    private $description;
-
-    /**
-     * @var Manufacturer|null
-     *
-     * @ORM\ManyToOne(targetEntity="Manufacturer", inversedBy="products")
-     * @ORM\JoinColumn(name="manufacturer_id", referencedColumnName="id")
-     */
-    private $manufacturer;
-
-    /**
-     * @var Collection|Category[]
-     *
-     * @ORM\MayToMany(targetEntity="Category", inversedBy="products")
-     */
-    private $categories;
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
+    private ?Collection $categories = null;
 
     public function __construct()
     {

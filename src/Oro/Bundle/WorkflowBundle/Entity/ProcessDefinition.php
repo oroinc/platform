@@ -2,124 +2,73 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 /**
  * A process entity
- * @ORM\Table("oro_process_definition")
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      mode="hidden",
- *      routeName="oro_process_definition_index",
- *      routeView="oro_process_definition_view",
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-inbox"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  */
+#[ORM\Entity(repositoryClass: ProcessDefinitionRepository::class)]
+#[ORM\Table('oro_process_definition')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    mode: 'hidden',
+    routeName: 'oro_process_definition_index',
+    routeView: 'oro_process_definition_view',
+    defaultValues: [
+        'entity' => ['icon' => 'fa-inbox'],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class ProcessDefinition implements DomainObjectInterface
 {
-    /**
-     * @var string
-     *
-     * @ORM\Id
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    protected $name;
+    #[ORM\Id]
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", length=255)
-     */
-    protected $label;
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255)]
+    protected ?string $label = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="enabled", type="boolean")
-     */
-    protected $enabled = true;
+    #[ORM\Column(name: 'enabled', type: Types::BOOLEAN)]
+    protected ?bool $enabled = true;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="related_entity", type="string", length=255)
-     */
-    protected $relatedEntity;
+    #[ORM\Column(name: 'related_entity', type: Types::STRING, length: 255)]
+    protected ?string $relatedEntity = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="execution_order", type="smallint")
-     */
-    protected $executionOrder = 0;
+    #[ORM\Column(name: 'execution_order', type: Types::SMALLINT)]
+    protected ?int $executionOrder = 0;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="exclude_definitions", type="simple_array", nullable=true)
      */
+    #[ORM\Column(name: 'exclude_definitions', type: Types::SIMPLE_ARRAY, nullable: true)]
     protected $excludeDefinitions = [];
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="pre_conditions_configuration", type="array", nullable=true)
      */
+    #[ORM\Column(name: 'pre_conditions_configuration', type: Types::ARRAY, nullable: true)]
     protected $preConditionsConfiguration;
 
     /**
      * @var array
-     *
-     * @ORM\Column(name="actions_configuration", type="array")
      */
+    #[ORM\Column(name: 'actions_configuration', type: Types::ARRAY)]
     protected $actionsConfiguration;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @param string $name
@@ -311,18 +260,14 @@ class ProcessDefinition implements DomainObjectInterface
         return $this->updatedAt;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->preUpdate();
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

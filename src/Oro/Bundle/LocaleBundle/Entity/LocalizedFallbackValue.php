@@ -2,68 +2,34 @@
 
 namespace Oro\Bundle\LocaleBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroLocaleBundle_Entity_LocalizedFallbackValue;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizedFallbackValueRepository;
 
 /**
  * Standard entity to store string data related to the some localization.
  *
- * @ORM\Table(
- *      name="oro_fallback_localization_val",
- *      indexes={
- *          @ORM\Index(name="idx_fallback", columns={"fallback"}),
- *          @ORM\Index(name="idx_string", columns={"string"})
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizedFallbackValueRepository")
- * @Config(
- *      defaultValues={
- *          "dataaudit"={
- *              "auditable"=true
- *          }
- *      }
- * )
  * @mixin OroLocaleBundle_Entity_LocalizedFallbackValue
  */
+#[ORM\Entity(repositoryClass: LocalizedFallbackValueRepository::class)]
+#[ORM\Table(name: 'oro_fallback_localization_val')]
+#[ORM\Index(columns: ['fallback'], name: 'idx_fallback')]
+#[ORM\Index(columns: ['string'], name: 'idx_string')]
+#[Config(defaultValues: ['dataaudit' => ['auditable' => true]])]
 class LocalizedFallbackValue extends AbstractLocalizedFallbackValue implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="string", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          },
-     *          "importexport"={
-     *              "excluded"=false
-     *          }
-     *      }
-     * )
-     */
-    protected $string;
+    #[ORM\Column(name: 'string', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['excluded' => false]])]
+    protected ?string $string = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="text", type="text", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          },
-     *          "importexport"={
-     *              "excluded"=false
-     *          }
-     *      }
-     * )
-     */
-    protected $text;
+    #[ORM\Column(name: 'text', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['excluded' => false]])]
+    protected ?string $text = null;
 }

@@ -2,68 +2,41 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository;
 
 /**
  * AutoResponseRule ORM entity.
- *
- * @ORM\Table(name="oro_email_auto_response_rule")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository")
  */
+#[ORM\Entity(repositoryClass: AutoResponseRuleRepository::class)]
+#[ORM\Table(name: 'oro_email_auto_response_rule')]
 class AutoResponseRule
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    protected $name;
+    #[ORM\Column(type: Types::STRING)]
+    protected ?string $name = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean")
-     */
-    protected $active = true;
+    #[ORM\Column(type: Types::BOOLEAN)]
+    protected ?bool $active = true;
 
-    /**
-     * @var EmailTemplate
-     *
-     * @ORM\ManyToOne(targetEntity="EmailTemplate", cascade={"persist"})
-     * @ORM\JoinColumn(name="template_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $template;
+    #[ORM\ManyToOne(targetEntity: EmailTemplate::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'template_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?EmailTemplate $template = null;
 
-    /**
-     * @var Mailbox
-     *
-     * @ORM\ManyToOne(targetEntity="Mailbox", inversedBy="autoResponseRules")
-     * @ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $mailbox;
+    #[ORM\ManyToOne(targetEntity: Mailbox::class, inversedBy: 'autoResponseRules')]
+    #[ORM\JoinColumn(name: 'mailbox_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Mailbox $mailbox = null;
 
-    /**
-     * @var \Datetime
-     *
-     * @ORM\Column(type="datetime")
-     */
-    protected $createdAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="text", nullable=true)
-     */
-    protected $definition;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    protected ?string $definition = null;
 
     public function __construct()
     {

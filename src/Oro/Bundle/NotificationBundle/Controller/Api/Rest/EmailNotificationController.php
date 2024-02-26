@@ -3,7 +3,8 @@
 namespace Oro\Bundle\NotificationBundle\Controller\Api\Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,14 +23,14 @@ class EmailNotificationController extends RestController
      *      description="Delete email notification",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_notification_emailnotification_delete",
-     *      type="entity",
-     *      class="Oro\Bundle\NotificationBundle\Entity\EmailNotification",
-     *      permission="DELETE"
-     * )
      * @return Response
      */
+    #[Acl(
+        id: 'oro_notification_emailnotification_delete',
+        type: 'entity',
+        class: EmailNotification::class,
+        permission: 'DELETE'
+    )]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);

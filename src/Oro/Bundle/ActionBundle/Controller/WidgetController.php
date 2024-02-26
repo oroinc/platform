@@ -21,11 +21,11 @@ class WidgetController extends AbstractController
     const DEFAULT_PAGE_TEMPLATE = '@OroAction/Operation/page.html.twig';
 
     /**
-     * @Route("/buttons", name="oro_action_widget_buttons")
-     * @Template()
      *
      * @return array
      */
+    #[Route(path: '/buttons', name: 'oro_action_widget_buttons')]
+    #[Template]
     public function buttonsAction()
     {
         $buttonSearchContext = $this->container->get(ButtonSearchContextProvider::class)->getButtonSearchContext();
@@ -36,13 +36,12 @@ class WidgetController extends AbstractController
     }
 
     /**
-     * @Route("/form/{operationName}", name="oro_action_widget_form")
      *
      * @param Request $request
      * @param string $operationName
-     *
      * @return Response
      */
+    #[Route(path: '/form/{operationName}', name: 'oro_action_widget_form')]
     public function formAction(Request $request, $operationName)
     {
         $handler = $this->container->get(OperationFormHandler::class);

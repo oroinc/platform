@@ -47,7 +47,7 @@ interface AclExtensionInterface
     /**
      * Constructs an ObjectIdentity for the given object.
      *
-     * @param mixed $val A domain object, object identity descriptor (id:type) or ACL annotation
+     * @param mixed $val A domain object, object identity descriptor (id:type) or ACL attribute
      *
      * @return ObjectIdentity
      */

@@ -4,45 +4,39 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroLocaleBundle_Entity_Localization;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectType;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 
 /**
  * Localization entity class.
  *
- * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
- * @ORM\Table(name="oro_localization")
- * @Config(
- *      routeName="oro_locale_localization_index",
- *      routeView="oro_locale_localization_view",
- *      routeUpdate="oro_locale_localization_update",
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-list"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "form"={
- *              "form_type"="Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectType",
- *              "grid_name"="oro-locale-localizations-select-grid",
- *          },
- *      }
- * )
  * @method LocalizedFallbackValue getTitle(Localization $localization = null)
  * @method LocalizedFallbackValue getDefaultTitle()
  * @method LocalizedFallbackValue setDefaultTitle($string)
  * @mixin OroLocaleBundle_Entity_Localization
  */
+#[ORM\Entity(repositoryClass: LocalizationRepository::class)]
+#[ORM\Table(name: 'oro_localization')]
+#[Config(
+    routeName: 'oro_locale_localization_index',
+    routeView: 'oro_locale_localization_view',
+    routeUpdate: 'oro_locale_localization_update',
+    defaultValues: [
+        'entity' => ['icon' => 'fa-list'],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'form' => ['form_type' => LocalizationSelectType::class, 'grid_name' => 'oro-locale-localizations-select-grid']
+    ]
+)]
 class Localization implements DatesAwareInterface, ExtendEntityInterface
 {
     use DatesAwareTrait;
@@ -50,85 +44,43 @@ class Localization implements DatesAwareInterface, ExtendEntityInterface
 
     const DEFAULT_LOCALIZATION = 'default';
 
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true, nullable: false)]
+    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    protected ?string $name = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=255, unique=true, nullable=false)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
+     * @var Collection<int, LocalizedFallbackValue>
      */
-    protected $name;
+    #[ORM\ManyToMany(targetEntity: LocalizedFallbackValue::class, cascade: ['ALL'], orphanRemoval: true)]
+    #[ORM\JoinTable(name: 'oro_localization_title')]
+    #[ORM\JoinColumn(name: 'localization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'localized_value_id', referencedColumnName: 'id', unique: true, onDelete: 'CASCADE')]
+    protected ?Collection $titles = null;
+
+    #[ORM\ManyToOne(targetEntity: Language::class)]
+    #[ORM\JoinColumn(name: 'language_id', referencedColumnName: 'id', nullable: false, onDelete: 'RESTRICT')]
+    protected ?Language $language = null;
+
+    #[ORM\Column(name: 'formatting_code', type: Types::STRING, length: 16, nullable: false)]
+    protected ?string $formattingCode = null;
+
+    #[ORM\Column(name: 'rtl_mode', type: Types::BOOLEAN, options: ['default' => false])]
+    protected ?bool $rtlMode = false;
+
+    #[ORM\ManyToOne(targetEntity: Localization::class, inversedBy: 'childLocalizations')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    protected ?Localization $parentLocalization = null;
 
     /**
-     * @var Collection|LocalizedFallbackValue[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
-     *      cascade={"ALL"},
-     *      orphanRemoval=true
-     * )
-     * @ORM\JoinTable(
-     *      name="oro_localization_title",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="localization_id", referencedColumnName="id", onDelete="CASCADE")
-     *      },
-     *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="localized_value_id", referencedColumnName="id", onDelete="CASCADE", unique=true)
-     *      }
-     * )
+     * @var Collection<int, Localization>
      */
-    protected $titles;
-
-    /**
-     * @var Language
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\Language")
-     * @ORM\JoinColumn(name="language_id", referencedColumnName="id", nullable=false, onDelete="RESTRICT")
-     */
-    protected $language;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="formatting_code", type="string", length=16, nullable=false)
-     */
-    protected $formattingCode;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="rtl_mode", type="boolean", options={"default"=false})
-     */
-    protected $rtlMode = false;
-
-    /**
-     * @var Localization
-     *
-     * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childLocalizations")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     */
-    protected $parentLocalization;
-
-    /**
-     * @var Collection|Localization[]
-     *
-     * @ORM\OneToMany(targetEntity="Localization", mappedBy="parentLocalization")
-     */
-    protected $childLocalizations;
+    #[ORM\OneToMany(mappedBy: 'parentLocalization', targetEntity: Localization::class)]
+    protected ?Collection $childLocalizations = null;
 
     /**
      * {@inheritdoc}

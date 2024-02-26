@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\QueryBuilder;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
@@ -40,7 +39,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
         $this->em->getConfiguration()->addCustomDatetimeFunction('date', Functions\SimpleFunction::class);
         $this->em->getConfiguration()->addCustomDatetimeFunction('convert_tz', Functions\DateTime\ConvertTz::class);
 

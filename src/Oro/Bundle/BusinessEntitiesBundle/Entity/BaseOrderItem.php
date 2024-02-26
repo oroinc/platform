@@ -2,108 +2,84 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class BaseOrderItem
+ * Base entity for order items
  *
  * @package Oro\Bundle\BusinessEntitiesBundle\Entity
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 class BaseOrderItem
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sku", type="string", length=255, nullable=true)
-     */
-    protected $sku;
+    #[ORM\Column(name: 'sku', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $sku = null;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="qty", type="float", nullable=false)
      */
+    #[ORM\Column(name: 'qty', type: Types::FLOAT, nullable: false)]
     protected $qty;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="cost", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'cost', type: 'money', nullable: true)]
     protected $cost;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="price", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'price', type: 'money', nullable: true)]
     protected $price;
 
     /**
-     * @var float
-     *
-     * @ORM\Column(name="weight", type="float", nullable=true)
+     * @return float|null
      */
+    #[ORM\Column(name: 'weight', type: Types::FLOAT, nullable: true)]
     protected $weight;
 
     /**
      * @var float
-     *
-     * @ORM\Column(name="tax_percent", type="percent", nullable=true)
      */
+    #[ORM\Column(name: 'tax_percent', type: 'percent', nullable: true)]
     protected $taxPercent;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="tax_amount", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'tax_amount', type: 'money', nullable: true)]
     protected $taxAmount;
 
     /**
      * @var float
-     *
-     * @ORM\Column(name="discount_percent", type="percent", nullable=true)
      */
+    #[ORM\Column(name: 'discount_percent', type: 'percent', nullable: true)]
     protected $discountPercent;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="discount_amount", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'discount_amount', type: 'money', nullable: true)]
     protected $discountAmount;
 
     /**
      * @var double
-     *
-     * @ORM\Column(name="row_total", type="money", nullable=true)
      */
+    #[ORM\Column(name: 'row_total', type: 'money', nullable: true)]
     protected $rowTotal;
 
-    /**
-     * @var BaseOrder
-     *
-     * @ORM\ManyToOne(targetEntity="BaseOrder", inversedBy="items",cascade={"persist"})
-     */
-    protected $order;
+    #[ORM\ManyToOne(targetEntity: BaseOrder::class, cascade: ['persist'], inversedBy: 'items')]
+    protected ?BaseOrder $order = null;
 
     /**
      * @param int $id

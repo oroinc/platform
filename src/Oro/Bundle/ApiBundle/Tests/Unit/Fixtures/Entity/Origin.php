@@ -3,42 +3,35 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="origin_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'origin_table')]
 class Origin
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    protected ?string $name = null;
+
+    #[ORM\OneToOne(mappedBy: 'origin', targetEntity: Mailbox::class)]
+    protected ?Mailbox $mailbox = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    protected ?User $user = null;
 
     /**
-     * @ORM\Column(name="name", type="string", length=50)
+     * @var Collection<int, User>
      */
-    protected $name;
-
-    /**
-     * @ORM\OneToOne(targetEntity="Mailbox", mappedBy="origin")
-     */
-    protected $mailbox;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     */
-    protected $user;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="User")
-     * @ORM\JoinTable(name="origin_to_user")
-     */
-    protected $users;
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'origin_to_user')]
+    protected ?Collection $users = null;
 
     public function __construct()
     {

@@ -26,7 +26,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener
         arguments:
             - '@oro_entity_extend.entity_metadata_builder'
-            - '@annotation_reader'
+            - '@oro_platform.attribute_reader'
             - '@oro_entity_config.provider.extend'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }

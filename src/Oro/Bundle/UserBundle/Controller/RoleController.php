@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClient;
 use Oro\Bundle\UIBundle\Route\Router;
@@ -20,39 +20,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This controller covers CRUD functionality for Role entity.
- * @Route("/role")
  */
+#[Route(path: '/role')]
 class RoleController extends AbstractController
 {
-    /**
-     * @Acl(
-     *      id="oro_user_role_create",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\Role",
-     *      permission="CREATE"
-     * )
-     * @Route("/create", name="oro_user_role_create")
-     * @Template("@OroUser/Role/update.html.twig")
-     */
+    #[Route(path: '/create', name: 'oro_user_role_create')]
+    #[Template('@OroUser/Role/update.html.twig')]
+    #[Acl(id: 'oro_user_role_create', type: 'entity', class: Role::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new Role(), $request);
     }
 
     /**
-     * @Route("/view/{id}", name="oro_user_role_view", requirements={"id"="\d+"})
-     * @Template
-     * @Acl(
-     *      id="oro_user_role_view",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\Role",
-     *      permission="VIEW"
-     * )
-     *
      * @param Role $role
-     *
      * @return array
      */
+    #[Route(path: '/view/{id}', name: 'oro_user_role_view', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[Acl(id: 'oro_user_role_view', type: 'entity', class: Role::class, permission: 'VIEW')]
     public function viewAction(Role $role)
     {
         return [
@@ -71,39 +57,25 @@ class RoleController extends AbstractController
     }
 
     /**
-     * @Acl(
-     *      id="oro_user_role_update",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\Role",
-     *      permission="EDIT"
-     * )
-     * @Route("/update/{id}", name="oro_user_role_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template
-     *
      * @param Role $entity
-     *
      * @return array
      */
+    #[Route(path: '/update/{id}', name: 'oro_user_role_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template]
+    #[Acl(id: 'oro_user_role_update', type: 'entity', class: Role::class, permission: 'EDIT')]
     public function updateAction(Role $entity, Request $request)
     {
         return $this->update($entity, $request);
     }
 
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_user_role_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @Acl(
-     *      id="oro_user_role_view",
-     *      type="entity",
-     *      class="Oro\Bundle\UserBundle\Entity\Role",
-     *      permission="VIEW"
-     * )
-     * @Template
-     */
+    #[Route(
+        path: '/{_format}',
+        name: 'oro_user_role_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template]
+    #[Acl(id: 'oro_user_role_view', type: 'entity', class: Role::class, permission: 'VIEW')]
     public function indexAction()
     {
         return [

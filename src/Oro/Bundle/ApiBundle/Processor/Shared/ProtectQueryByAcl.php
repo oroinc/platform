@@ -6,7 +6,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -18,18 +18,18 @@ class ProtectQueryByAcl implements ProcessorInterface
 {
     private DoctrineHelper $doctrineHelper;
     private AclHelper $aclHelper;
-    private AclAnnotationProvider $aclAnnotationProvider;
+    private AclAttributeProvider $AclAttributeProvider;
     private string $permission;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AclHelper $aclHelper,
-        AclAnnotationProvider $aclAnnotationProvider,
+        AclAttributeProvider $AclAttributeProvider,
         string $permission
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->aclHelper = $aclHelper;
-        $this->aclAnnotationProvider = $aclAnnotationProvider;
+        $this->AclAttributeProvider = $AclAttributeProvider;
         $this->permission = $permission;
     }
 
@@ -71,12 +71,12 @@ class ProtectQueryByAcl implements ProcessorInterface
     {
         $permission = null;
 
-        $aclAnnotation = $this->aclAnnotationProvider->findAnnotationById($aclResource);
-        if ($aclAnnotation
-            && $aclAnnotation->getType() === 'entity'
-            && $aclAnnotation->getClass() === $entityClass
+        $aclAttribute = $this->AclAttributeProvider->findAttributeById($aclResource);
+        if ($aclAttribute
+            && $aclAttribute->getType() === 'entity'
+            && $aclAttribute->getClass() === $entityClass
         ) {
-            $permission = $aclAnnotation->getPermission();
+            $permission = $aclAttribute->getPermission();
         }
 
         return $permission;

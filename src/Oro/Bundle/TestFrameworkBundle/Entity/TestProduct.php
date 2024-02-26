@@ -2,37 +2,28 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="test_product")
- * @ORM\Entity
- */
+* Entity that represents Test Product
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'test_product')]
 class TestProduct implements TestFrameworkEntityInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", nullable=true)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
+    protected ?string $name = null;
 
-    /**
-     * @var Product
-     *
-     * @ORM\ManyToOne(targetEntity="TestProductType")
-     * @ORM\JoinColumn(name="product_type", referencedColumnName="name", onDelete="SET NULL")
-     */
-    protected $productType;
+    #[ORM\ManyToOne(targetEntity: TestProductType::class)]
+    #[ORM\JoinColumn(name: 'product_type', referencedColumnName: 'name', onDelete: 'SET NULL')]
+    protected ?TestProductType $productType = null;
 
     /**
      * @return int

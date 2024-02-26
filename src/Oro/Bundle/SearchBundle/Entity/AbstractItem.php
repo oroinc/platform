@@ -4,94 +4,78 @@ namespace Oro\Bundle\SearchBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 /**
  * Abstract class for an item at ORM search index
  *
- * @ORM\MappedSuperclass
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
+#[ORM\MappedSuperclass]
 abstract class AbstractItem
 {
-    /**
-     * @var integer $id
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string $entity
-     *
-     * @ORM\Column(name="entity", type="string", length=255)
-     */
-    protected $entity;
+    #[ORM\Column(name: 'entity', type: Types::STRING, length: 255)]
+    protected ?string $entity = null;
 
-    /**
-     * @var string $alias
-     *
-     * @ORM\Column(name="alias", type="string", length=255)
-     */
-    protected $alias;
+    #[ORM\Column(name: 'alias', type: Types::STRING, length: 255)]
+    protected ?string $alias = null;
 
-    /**
-     * @var integer $record_id
-     *
-     * @ORM\Column(name="record_id", type="integer", nullable=true)
-     */
-    protected $recordId;
+    #[ORM\Column(name: 'record_id', type: Types::INTEGER, nullable: true)]
+    protected ?int $recordId = null;
 
     /**
      * @var float
-     * @ORM\Column(name="weight", type="decimal", precision=8, scale=4, nullable=false, options={"default"=1.0}))
      */
+    #[ORM\Column(
+        name: 'weight',
+        type: Types::DECIMAL,
+        precision: 8,
+        scale: 4,
+        nullable: false,
+        options: ['default' => '1.0']
+    )]
     protected $weight = 1.0;
 
-    /**
-     * @var bool $changed
-     *
-     * @ORM\Column(name="changed", type="boolean")
-     */
-    protected $changed = false;
+    #[ORM\Column(name: 'changed', type: Types::BOOLEAN)]
+    protected ?bool $changed = false;
+
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
+     * @var Collection<int, IndexText>
      */
-    protected $createdAt;
+    #[ORM\OneToMany(mappedBy: 'item', targetEntity: 'IndexText', cascade: ['all'], orphanRemoval: true)]
+    protected ?Collection $textFields = null;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
+     * @var Collection<int, IndexInteger>
      */
-    protected $updatedAt;
+    #[ORM\OneToMany(mappedBy: 'item', targetEntity: 'IndexInteger', cascade: ['all'], orphanRemoval: true)]
+    protected ?Collection $integerFields = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="IndexText", mappedBy="item", cascade={"all"}, orphanRemoval=true)
+     * @var Collection<int, IndexDecimal>
      */
-    protected $textFields;
+    #[ORM\OneToMany(mappedBy: 'item', targetEntity: 'IndexDecimal', cascade: ['all'], orphanRemoval: true)]
+    protected ?Collection $decimalFields = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="IndexInteger", mappedBy="item", cascade={"all"}, orphanRemoval=true)
+     * @var Collection<int, IndexDatetime>
      */
-    protected $integerFields;
-
-    /**
-     * @ORM\OneToMany(targetEntity="IndexDecimal", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $decimalFields;
-
-    /**
-     * @ORM\OneToMany(targetEntity="IndexDatetime", mappedBy="item", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $datetimeFields;
+    #[ORM\OneToMany(mappedBy: 'item', targetEntity: 'IndexDatetime', cascade: ['all'], orphanRemoval: true)]
+    protected ?Collection $datetimeFields = null;
 
     /**
      * Constructor
@@ -300,8 +284,8 @@ abstract class AbstractItem
 
     /**
      * Pre persist event listener
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -310,8 +294,8 @@ abstract class AbstractItem
 
     /**
      * Pre update event listener
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function beforeUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

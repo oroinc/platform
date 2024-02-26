@@ -4,74 +4,53 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Table(name="test_api_override_owner")
- * @ORM\Entity
- * @Config
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_override_owner')]
+#[Config]
 class TestOverrideClassOwner implements TestFrameworkEntityInterface, ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    public $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    public ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
+    public ?string $name = null;
+
+    #[ORM\ManyToOne(targetEntity: TestOverrideClassTarget::class)]
+    #[ORM\JoinColumn(name: 'target_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?TestOverrideClassTarget $target = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", nullable=true)
+     * @var Collection<int, TestOverrideClassTarget>
      */
-    public $name;
+    #[ORM\ManyToMany(targetEntity: TestOverrideClassTarget::class, inversedBy: 'owners')]
+    #[ORM\JoinTable(name: 'test_api_override_rel_targets')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'target_id', referencedColumnName: 'id')]
+    private ?Collection $targets = null;
+
+    #[ORM\ManyToOne(targetEntity: TestOverrideClassTargetA::class)]
+    #[ORM\JoinColumn(name: 'another_target_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?TestOverrideClassTargetA $anotherTarget = null;
 
     /**
-     * @var TestOverrideClassTarget|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestOverrideClassTarget")
-     * @ORM\JoinColumn(name="target_id", referencedColumnName="id", onDelete="SET NULL")
+     * @var Collection<int, TestOverrideClassTargetA>
      */
-    private $target;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\ManyToMany(targetEntity="TestOverrideClassTarget", inversedBy="owners")
-     * @ORM\JoinTable(name="test_api_override_rel_targets",
-     *     joinColumns={@ORM\JoinColumn(name="owner_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="target_id", referencedColumnName="id")}
-     * )
-     */
-    private $targets;
-
-    /**
-     * @var TestOverrideClassTargetA|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestOverrideClassTargetA")
-     * @ORM\JoinColumn(name="another_target_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    private $anotherTarget;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\ManyToMany(targetEntity="TestOverrideClassTargetA", inversedBy="owners")
-     * @ORM\JoinTable(name="test_api_override_a_rel_ts",
-     *     joinColumns={@ORM\JoinColumn(name="owner_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="target_id", referencedColumnName="id")}
-     * )
-     */
-    private $anotherTargets;
+    #[ORM\ManyToMany(targetEntity: TestOverrideClassTargetA::class, inversedBy: 'owners')]
+    #[ORM\JoinTable(name: 'test_api_override_a_rel_ts')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'target_id', referencedColumnName: 'id')]
+    private ?Collection $anotherTargets = null;
 
     public function __construct()
     {

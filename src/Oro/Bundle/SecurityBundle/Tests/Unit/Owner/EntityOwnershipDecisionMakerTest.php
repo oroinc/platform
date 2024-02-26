@@ -27,6 +27,8 @@ use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
  */
 class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDecisionMakerTest
 {
+    protected const USER_ID = 505;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     private $tokenAccessor;
 
@@ -112,7 +114,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     public function testIsAssociatedWithOrganizationNullObject()
     {
         $this->expectException(InvalidDomainObjectException::class);
-        $user = new User('user');
+        $user = new User(self::USER_ID);
         $this->decisionMaker->isAssociatedWithOrganization($user, null);
     }
 
@@ -125,7 +127,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     public function testIsAssociatedWithBusinessUnitNullObject()
     {
         $this->expectException(InvalidDomainObjectException::class);
-        $user = new User('user');
+        $user = new User(self::USER_ID);
         $this->decisionMaker->isAssociatedWithBusinessUnit($user, null);
     }
 
@@ -138,25 +140,25 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     public function testIsAssociatedWithUserNullObject()
     {
         $this->expectException(InvalidDomainObjectException::class);
-        $user = new User('user');
+        $user = new User(self::USER_ID);
         $this->decisionMaker->isAssociatedWithUser($user, null);
     }
 
     public function testIsAssociatedWithOrganizationForSystemObject()
     {
-        $user = new User('user');
+        $user = new User(self::USER_ID);
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($user, new \stdClass()));
     }
 
     public function testIsAssociatedWithBusinessUnitForSystemObject()
     {
-        $user = new User('user');
+        $user = new User(self::USER_ID);
         $this->assertFalse($this->decisionMaker->isAssociatedWithBusinessUnit($user, new \stdClass()));
     }
 
     public function testIsAssociatedWithUserForSystemObject()
     {
-        $user = new User('user');
+        $user = new User(self::USER_ID);
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($user, new \stdClass()));
     }
 
@@ -552,15 +554,15 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     {
         return [
             'without user' => [
-                'user' => null,
+                self::USER_ID => null,
                 'expectedResult' => false,
             ],
             'unsupported user' => [
-                'user' => new \stdClass(),
+                self::USER_ID => new \stdClass(),
                 'expectedResult' => false,
             ],
             'supported user' => [
-                'user' => new User(),
+                self::USER_ID => new User(),
                 'expectedResult' => true,
             ],
         ];

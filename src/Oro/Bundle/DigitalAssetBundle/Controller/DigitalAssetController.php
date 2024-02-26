@@ -11,7 +11,7 @@ use Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetType;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,11 +27,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DigitalAssetController extends AbstractController
 {
-    /**
-     * @Route("/", name="oro_digital_asset_index")
-     * @Template("@OroDigitalAsset/DigitalAsset/index.html.twig")
-     * @AclAncestor("oro_digital_asset_view")
-     */
+    #[Route(path: '/', name: 'oro_digital_asset_index')]
+    #[Template('@OroDigitalAsset/DigitalAsset/index.html.twig')]
+    #[AclAncestor('oro_digital_asset_view')]
     public function indexAction(): array
     {
         return [
@@ -40,26 +38,24 @@ class DigitalAssetController extends AbstractController
     }
 
     /**
-     * @Route("/create", name="oro_digital_asset_create")
-     * @Template("@OroDigitalAsset/DigitalAsset/update.html.twig")
-     * @AclAncestor("oro_digital_asset_create")
      *
      * @return array|RedirectResponse
      */
+    #[Route(path: '/create', name: 'oro_digital_asset_create')]
+    #[Template('@OroDigitalAsset/DigitalAsset/update.html.twig')]
+    #[AclAncestor('oro_digital_asset_create')]
     public function createAction()
     {
         return $this->update(new DigitalAsset());
     }
 
     /**
-     * @Route("/update/{id}", name="oro_digital_asset_update", requirements={"id"="\d+"})
-     * @Template("@OroDigitalAsset/DigitalAsset/update.html.twig")
-     * @AclAncestor("oro_digital_asset_update")
-     *
      * @param DigitalAsset $digitalAsset
-     *
      * @return array|RedirectResponse
      */
+    #[Route(path: '/update/{id}', name: 'oro_digital_asset_update', requirements: ['id' => '\d+'])]
+    #[Template('@OroDigitalAsset/DigitalAsset/update.html.twig')]
+    #[AclAncestor('oro_digital_asset_update')]
     public function updateAction(DigitalAsset $digitalAsset)
     {
         return $this->update($digitalAsset);
@@ -81,15 +77,17 @@ class DigitalAssetController extends AbstractController
     }
 
     /**
-     * @Route("/widget/choose/{parentEntityClass}/{parentEntityFieldName}", name="oro_digital_asset_widget_choose")
-     * @Template("@OroDigitalAsset/DigitalAsset/widget/choose.html.twig")
-     * @AclAncestor("oro_digital_asset_create")
      *
      * @param string $parentEntityClass
      * @param string $parentEntityFieldName
-     *
      * @return array|RedirectResponse
      */
+    #[Route(
+        path: '/widget/choose/{parentEntityClass}/{parentEntityFieldName}',
+        name: 'oro_digital_asset_widget_choose'
+    )]
+    #[Template('@OroDigitalAsset/DigitalAsset/widget/choose.html.twig')]
+    #[AclAncestor('oro_digital_asset_create')]
     public function chooseAction(string $parentEntityClass, string $parentEntityFieldName)
     {
         try {
@@ -160,12 +158,12 @@ class DigitalAssetController extends AbstractController
     }
 
     /**
-     * @Route("/widget/choose-image", name="oro_digital_asset_widget_choose_image")
-     * @Template("@OroDigitalAsset/DigitalAsset/widget/choose.html.twig")
-     * @AclAncestor("oro_digital_asset_create")
      *
      * @return array|RedirectResponse
      */
+    #[Route(path: '/widget/choose-image', name: 'oro_digital_asset_widget_choose_image')]
+    #[Template('@OroDigitalAsset/DigitalAsset/widget/choose.html.twig')]
+    #[AclAncestor('oro_digital_asset_create')]
     public function chooseImageAction()
     {
         $mimeTypes = $this->container->get(FileConstraintsProvider::class)->getImageMimeTypes();
@@ -175,12 +173,12 @@ class DigitalAssetController extends AbstractController
     }
 
     /**
-     * @Route("/widget/choose-file", name="oro_digital_asset_widget_choose_file")
-     * @Template("@OroDigitalAsset/DigitalAsset/widget/choose.html.twig")
-     * @AclAncestor("oro_digital_asset_create")
      *
      * @return array|RedirectResponse
      */
+    #[Route(path: '/widget/choose-file', name: 'oro_digital_asset_widget_choose_file')]
+    #[Template('@OroDigitalAsset/DigitalAsset/widget/choose.html.twig')]
+    #[AclAncestor('oro_digital_asset_create')]
     public function chooseFileAction()
     {
         $mimeTypes = $this->container->get(FileConstraintsProvider::class)->getFileMimeTypes();

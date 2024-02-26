@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
@@ -28,9 +28,9 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      *      description="Get workflow definition",
      *      resource=true
      * )
-     * @AclAncestor("oro_workflow_definition_view")
      * @return Response
      */
+    #[AclAncestor('oro_workflow_definition_view')]
     public function getAction(WorkflowDefinition $workflowDefinition)
     {
         $config = $this->getWorkflowDefinitionSerializationConfig();
@@ -56,8 +56,8 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      *      description="Update workflow definition",
      *      resource=true
      * )
-     * @AclAncestor("oro_workflow_definition_update")
      */
+    #[AclAncestor('oro_workflow_definition_update')]
     public function putAction(WorkflowDefinition $workflowDefinition, Request $request)
     {
         try {
@@ -95,8 +95,8 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      *      description="Create new workflow definition",
      *      resource=true
      * )
-     * @AclAncestor("oro_workflow_definition_create")
      */
+    #[AclAncestor('oro_workflow_definition_create')]
     public function postAction(Request $request, WorkflowDefinition $workflowDefinition = null)
     {
         try {
@@ -136,16 +136,16 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      * - HTTP_FORBIDDEN (403)
      *
      * @ApiDoc(description="Delete workflow definition")
-     * @Acl(
-     *      id="oro_workflow_definition_delete",
-     *      type="entity",
-     *      class="Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition",
-     *      permission="DELETE"
-     * )
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return Response
      */
+    #[Acl(
+        id: 'oro_workflow_definition_delete',
+        type: 'entity',
+        class: WorkflowDefinition::class,
+        permission: 'DELETE'
+    )]
     public function deleteAction(WorkflowDefinition $workflowDefinition)
     {
         if ($workflowDefinition->isSystem()) {

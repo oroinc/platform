@@ -2,34 +2,28 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 
 /**
  * "utf8_bin" required for mysql to support case-sensitive values for "key" column
- *
- * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository")
- * @ORM\Table(name="oro_translation_key", options={"collate"="utf8_bin", "charset"="utf8"}, uniqueConstraints={
- *      @ORM\UniqueConstraint(name="oro_translation_key_uidx", columns={"domain", "key"})
- * })
  */
+#[ORM\Entity(repositoryClass: TranslationKeyRepository::class)]
+#[ORM\Table(name: 'oro_translation_key', options: ['collate' => 'utf8_bin', 'charset' => 'utf8'])]
+#[ORM\UniqueConstraint(name: 'oro_translation_key_uidx', columns: ['domain', 'key'])]
 class TranslationKey
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @ORM\Column(name="`key`", type="string", length=255, nullable=false)
-     */
-    protected $key;
+    #[ORM\Column(name: '`key`', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $key = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=false, options={"default"="messages"})
-     */
-    protected $domain;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false, options: ['default' => 'messages'])]
+    protected ?string $domain = null;
 
     /**
      * @return mixed

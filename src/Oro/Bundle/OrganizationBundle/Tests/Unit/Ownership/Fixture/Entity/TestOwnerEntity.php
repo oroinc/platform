@@ -4,17 +4,14 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class TestOwnerEntity
 {
     /**
      * @var int
-     *
-     * @ORM\Column
-     * @ORM\Id
      */
+    #[ORM\Column]
+    #[ORM\Id]
     protected $id;
 
     /**

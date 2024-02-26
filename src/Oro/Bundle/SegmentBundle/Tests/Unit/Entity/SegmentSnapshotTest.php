@@ -27,7 +27,7 @@ class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getIntegerEntityId());
         $this->assertNotNull($this->entity->getSegment());
 
-        $testEntityId = 12;
+        $testEntityId = '12';
         $testIntegerEntityId = 13;
         $testCreatedAt = new \DateTime('now - 1 day', new \DateTimeZone('UTC'));
         $this->entity->setEntityId($testEntityId);

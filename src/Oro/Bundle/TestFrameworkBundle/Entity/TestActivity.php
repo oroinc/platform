@@ -2,46 +2,37 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * The entity for test purposes.
- * @ORM\Table(
- *     name="test_activity",
- *     indexes={@ORM\Index(name="idx_test_activity_owner_id", columns={"owner_id"})}
- * )
- * @ORM\Entity
- * @Config(
- *      defaultValues={
- *          "grouping"={
- *              "groups"={"activity"}
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "field_acl_supported"=true,
- *              "field_acl_enabled"=true
- *          },
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
- *          "tag"={
- *              "enabled"=true
- *          }
- *      }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_activity')]
+#[ORM\Index(columns: ['owner_id'], name: 'idx_test_activity_owner_id')]
+#[Config(
+    defaultValues: [
+        'grouping' => ['groups' => ['activity']],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'field_acl_supported' => true, 'field_acl_enabled' => true],
+        'ownership' => [
+            'owner_type' => 'USER',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ],
+        'tag' => ['enabled' => true]
+    ]
+)]
 class TestActivity implements
     TestFrameworkEntityInterface,
     ActivityInterface,
@@ -50,44 +41,24 @@ class TestActivity implements
     use ExtendActivity;
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="message", type="text")
-     */
-    protected $message;
+    #[ORM\Column(name: 'message', type: Types::TEXT)]
+    protected ?string $message = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="text", nullable=true)
-     */
-    protected $description;
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    protected ?string $description = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $owner = null;
 
     /**
      * @return int

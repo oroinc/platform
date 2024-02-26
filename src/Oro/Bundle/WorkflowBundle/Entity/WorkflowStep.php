@@ -2,81 +2,47 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowStepRepository;
 
 /**
  * Represents a workflow step entity.
- * @ORM\Table(
- *      name="oro_workflow_step",
- *      uniqueConstraints={
- *          @ORM\UniqueConstraint(name="oro_workflow_step_unique_idx", columns={"workflow_name", "name"})
- *      },
- *      indexes={
- *          @ORM\Index(name="oro_workflow_step_name_idx", columns={"name"})
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowStepRepository")
- * @Config(
- *      defaultValues={
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  */
+#[ORM\Entity(repositoryClass: WorkflowStepRepository::class)]
+#[ORM\Table(name: 'oro_workflow_step')]
+#[ORM\Index(columns: ['name'], name: 'oro_workflow_step_name_idx')]
+#[ORM\UniqueConstraint(name: 'oro_workflow_step_unique_idx', columns: ['workflow_name', 'name'])]
+#[Config(
+    defaultValues: [
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class WorkflowStep
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", length=255)
-     */
-    protected $label;
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255)]
+    protected ?string $label = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="step_order", type="integer")
-     */
-    protected $stepOrder = 0;
+    #[ORM\Column(name: 'step_order', type: Types::INTEGER)]
+    protected ?int $stepOrder = 0;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="is_final", type="boolean")
-     */
-    protected $final = false;
+    #[ORM\Column(name: 'is_final', type: Types::BOOLEAN)]
+    protected ?bool $final = false;
 
-    /**
-     * @var WorkflowDefinition
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowDefinition", inversedBy="steps")
-     * @ORM\JoinColumn(name="workflow_name", referencedColumnName="name", onDelete="CASCADE")
-     */
-    protected $definition;
+    #[ORM\ManyToOne(targetEntity: WorkflowDefinition::class, inversedBy: 'steps')]
+    #[ORM\JoinColumn(name: 'workflow_name', referencedColumnName: 'name', onDelete: 'CASCADE')]
+    protected ?WorkflowDefinition $definition = null;
 
     /**
      * @return integer

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Authorization;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
+use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -15,16 +15,16 @@ class RequestAuthorizationChecker
 {
     private AuthorizationCheckerInterface $authorizationChecker;
     private EntityClassResolver $entityClassResolver;
-    private AclAnnotationProvider $annotationProvider;
+    private AclAttributeProvider $attributeProvider;
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         EntityClassResolver $entityClassResolver,
-        AclAnnotationProvider $annotationProvider
+        AclAttributeProvider $attributeProvider
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->entityClassResolver = $entityClassResolver;
-        $this->annotationProvider = $annotationProvider;
+        $this->attributeProvider = $attributeProvider;
     }
 
     /**
@@ -38,10 +38,10 @@ class RequestAuthorizationChecker
      */
     public function isRequestObjectIsGranted(Request $request, mixed $object): int
     {
-        $aclAnnotation = $this->getRequestAcl($request, true);
-        if ($aclAnnotation) {
-            $class = $aclAnnotation->getClass();
-            $permission = $aclAnnotation->getPermission();
+        $aclAttribute = $this->getRequestAcl($request, true);
+        if ($aclAttribute) {
+            $class = $aclAttribute->getClass();
+            $permission = $aclAttribute->getPermission();
             if ($permission && $class && is_a($object, $class)) {
                 return $this->authorizationChecker->isGranted($permission, $object) ? 1 : -1;
             }
@@ -51,9 +51,9 @@ class RequestAuthorizationChecker
     }
 
     /**
-     * Gets ACL annotation for a controller action which was taken from the given request object.
+     * Gets ACL attribute for a controller action which was taken from the given request object.
      */
-    public function getRequestAcl(Request $request, bool $convertClassName = false): ?AclAnnotation
+    public function getRequestAcl(Request $request, bool $convertClassName = false): ?AclAttribute
     {
         $controller = $request->attributes->get('_controller');
         if (str_contains($controller, '::')) {
@@ -63,14 +63,14 @@ class RequestAuthorizationChecker
             $controllerMethod = '__invoke';
         }
 
-        $annotation = $this->annotationProvider->findAnnotation($controllerClass, $controllerMethod);
-        if ($convertClassName && null !== $annotation) {
-            $entityClass = $annotation->getClass();
+        $attribute = $this->attributeProvider->findAttribute($controllerClass, $controllerMethod);
+        if ($convertClassName && null !== $attribute) {
+            $entityClass = $attribute->getClass();
             if ($entityClass && $this->entityClassResolver->isEntity($entityClass)) {
-                $annotation->setClass($this->entityClassResolver->getEntityClass($entityClass));
+                $attribute->setClass($this->entityClassResolver->getEntityClass($entityClass));
             }
         }
 
-        return $annotation;
+        return $attribute;
     }
 }
