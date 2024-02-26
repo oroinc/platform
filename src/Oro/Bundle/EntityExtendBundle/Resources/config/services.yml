@@ -271,11 +271,11 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandler
         arguments:
             - '@oro_entity_extend.extend.update_processor'
+            - '@oro_maintenance.maintenance'
 
     oro_entity_extend.extend.update_processor:
         class: Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessor
         arguments:
-            - '@oro_maintenance.maintenance'
             - '@oro_entity_config.tools.command_executor'
             - '@logger'
             - '@event_dispatcher'
