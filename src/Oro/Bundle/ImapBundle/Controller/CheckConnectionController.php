@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Controller;
 
 use Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,9 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CheckConnectionController extends AbstractController
 {
-    /**
-     * @CsrfProtection()
-     */
+    #[CsrfProtection()]
     public function checkAction(Request $request): JsonResponse
     {
         $formParentName = $request->get('formParentName');

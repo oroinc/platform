@@ -16,20 +16,16 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Serves activity actions.
- * @Route("/activities")
  */
+#[Route(path: '/activities')]
 class ActivityController extends AbstractController
 {
     /**
      * @param object $entity The entity object which activities should be rendered
      *
      * @return Response
-     *
-     * @Route(
-     *      "/view/{entity}",
-     *      name="oro_activity_view_activities"
-     * )
      */
+    #[Route(path: '/view/{entity}', name: 'oro_activity_view_activities')]
     public function activitiesAction($entity)
     {
         $widgetProvider = $this->container->get(ChainWidgetProvider::class);
@@ -47,9 +43,7 @@ class ActivityController extends AbstractController
     }
 
     /**
-     * @Route("/{activity}/{id}/context", name="oro_activity_context")
      *
-     * @Template("@OroDataGrid/Grid/dialog/multi.html.twig")
      *
      * @param string $activity
      * @param string $id
@@ -58,6 +52,8 @@ class ActivityController extends AbstractController
      *
      * @throws AccessDeniedException
      */
+    #[Route(path: '/{activity}/{id}/context', name: 'oro_activity_context')]
+    #[Template('@OroDataGrid/Grid/dialog/multi.html.twig')]
     public function contextAction($activity, $id)
     {
         $routingHelper = $this->container->get(EntityRoutingHelper::class);

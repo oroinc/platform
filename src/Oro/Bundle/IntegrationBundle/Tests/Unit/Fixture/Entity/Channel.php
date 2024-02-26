@@ -2,34 +2,22 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
-/**
- * @ORM\Table(name="oro_integration_channel")
- * @ORM\Entity(repositoryClass="Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository")
- */
+#[ORM\Entity(repositoryClass: ChannelRepository::class)]
+#[ORM\Table(name: 'oro_integration_channel')]
 class Channel
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::SMALLINT)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type", type="string", length=255)
-     */
-    protected $type;
+    #[ORM\Column(name: 'type', type: Types::STRING, length: 255)]
+    protected ?string $type = null;
 }

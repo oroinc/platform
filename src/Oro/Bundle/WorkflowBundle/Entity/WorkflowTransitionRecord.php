@@ -2,59 +2,40 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="oro_workflow_transition_log")
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks()
- */
+* Entity that represents Workflow Transition Record
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_workflow_transition_log')]
+#[ORM\HasLifecycleCallbacks]
 class WorkflowTransitionRecord
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="WorkflowItem", inversedBy="transitionRecords")
-     * @ORM\JoinColumn(name="workflow_item_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $workflowItem;
+    #[ORM\ManyToOne(targetEntity: WorkflowItem::class, inversedBy: 'transitionRecords')]
+    #[ORM\JoinColumn(name: 'workflow_item_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?WorkflowItem $workflowItem = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="transition", type="string", length=255, nullable=true)
-     */
-    protected $transitionName;
+    #[ORM\Column(name: 'transition', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $transitionName = null;
 
-    /**
-     * @var WorkflowStep
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="step_from_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $stepFrom;
+    #[ORM\ManyToOne(targetEntity: WorkflowStep::class)]
+    #[ORM\JoinColumn(name: 'step_from_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?WorkflowStep $stepFrom = null;
 
-    /**
-     * @var WorkflowStep
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="step_to_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $stepTo;
+    #[ORM\ManyToOne(targetEntity: WorkflowStep::class)]
+    #[ORM\JoinColumn(name: 'step_to_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?WorkflowStep $stepTo = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="transition_date", type="datetime")
-     */
-    protected $transitionDate;
+    #[ORM\Column(name: 'transition_date', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $transitionDate = null;
 
     /**
      * @return integer
@@ -144,9 +125,7 @@ class WorkflowTransitionRecord
         return $this->transitionDate;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->transitionDate = new \DateTime('now', new \DateTimeZone('UTC'));

@@ -2,33 +2,30 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 
 /**
- * @ORM\Table(name="test_search_item_value")
- * @ORM\Entity
- * @Config(
- *      routeName="oro_test_item_value_index",
- *      routeView="oro_test_item_value_view",
- *      routeUpdate="oro_test_item_value_update"
- * )
- */
+* Entity that represents Item Value
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'test_search_item_value')]
+#[Config(
+    routeName: 'oro_test_item_value_index',
+    routeView: 'oro_test_item_value_view',
+    routeUpdate: 'oro_test_item_value_update'
+)]
 class ItemValue implements TestFrameworkEntityInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var Item
-     *
-     * @ORM\ManyToOne(targetEntity="Item", inversedBy="values")
-     */
-    protected $entity;
+    #[ORM\ManyToOne(targetEntity: Item::class, inversedBy: 'values')]
+    protected ?Item $entity = null;
 
     /**
      * @return int

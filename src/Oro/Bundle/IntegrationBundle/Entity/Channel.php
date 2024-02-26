@@ -3,8 +3,12 @@
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
@@ -14,36 +18,23 @@ use Oro\Component\Config\Common\ConfigObject;
 
 /**
  * Responsibility of channel is to split on groups transport/connectors by third party application type.
- *
- * @ORM\Table(
- *      name="oro_integration_channel",
- *      indexes={
- *          @ORM\Index(name="oro_integration_channel_name_idx",columns={"name"})
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository")
- * @Config(
- *      routeName="oro_integration_index",
- *      defaultValues={
- *          "ownership"={
- *              "owner_type"="ORGANIZATION",
- *              "owner_field_name"="organization",
- *              "owner_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  */
+#[ORM\Entity(repositoryClass: ChannelRepository::class)]
+#[ORM\Table(name: 'oro_integration_channel')]
+#[ORM\Index(columns: ['name'], name: 'oro_integration_channel_name_idx')]
+#[Config(
+    routeName: 'oro_integration_index',
+    defaultValues: [
+        'ownership' => [
+            'owner_type' => 'ORGANIZATION',
+            'owner_field_name' => 'organization',
+            'owner_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class Channel implements OrganizationAwareInterface
 {
     /** This mode allow to do any changes(including removing) with channel */
@@ -55,64 +46,40 @@ class Channel implements OrganizationAwareInterface
     /** This mode do not allow to edit, remove and activate/deactivate channel */
     const EDIT_MODE_DISALLOW = 1;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type", type="string", length=255)
-     */
-    protected $type;
+    #[ORM\Column(name: 'type', type: Types::STRING, length: 255)]
+    protected ?string $type = null;
 
-    /**
-     * @var Transport
-     *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport",
-     *     cascade={"all"}, orphanRemoval=true, inversedBy="channel"
-     * )
-     */
-    protected $transport;
+    #[ORM\OneToOne(inversedBy: 'channel', targetEntity: Transport::class, cascade: ['all'], orphanRemoval: true)]
+    protected ?Transport $transport = null;
 
     /**
      * @var []
-     * @ORM\Column(name="connectors", type="array")
      */
+    #[ORM\Column(name: 'connectors', type: Types::ARRAY)]
     protected $connectors = [];
 
     /**
      * @var ConfigObject
-     *
-     * @ORM\Column(name="synchronization_settings", type="config_object", nullable=false)
      */
+    #[ORM\Column(name: 'synchronization_settings', type: 'config_object', nullable: false)]
     protected $synchronizationSettings;
 
     /**
      * @var ConfigObject
-     *
-     * @ORM\Column(name="mapping_settings", type="config_object", nullable=false)
      */
+    #[ORM\Column(name: 'mapping_settings', type: 'config_object', nullable: false)]
     protected $mappingSettings;
 
-    /**
-     * @var boolean
-    *
-    * @ORM\Column(name="enabled", type="boolean", nullable=true)
-    */
-    protected $enabled;
+    #[ORM\Column(name: 'enabled', type: Types::BOOLEAN, nullable: true)]
+    protected ?bool $enabled = null;
 
     /**
      * If the status is changed by a user the previous status has to be set.
@@ -120,64 +87,48 @@ class Channel implements OrganizationAwareInterface
      * For example in the listener when a channel status is changed
      *
      * @var boolean
-     *
-     * @ORM\Column(name="previously_enabled", type="boolean", nullable=true)
      */
-    protected $previouslyEnabled;
+    #[ORM\Column(name: 'previously_enabled', type: Types::BOOLEAN, nullable: true)]
+    protected ?bool $previouslyEnabled = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'default_user_owner_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    protected ?User $defaultUserOwner = null;
+
+    #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
+    #[ORM\JoinColumn(
+        name: 'default_business_unit_owner_id',
+        referencedColumnName: 'id',
+        nullable: true,
+        onDelete: 'SET NULL'
+    )]
+    protected ?BusinessUnit $defaultBusinessUnitOwner = null;
+
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
     /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(
-     *      name="default_user_owner_id",
-     *      referencedColumnName="id",
-     *      onDelete="SET NULL",
-     *      nullable=true
-     * )
-     */
-    protected $defaultUserOwner;
-
-    /**
-     * @var BusinessUnit
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
-     * @ORM\JoinColumn(
-     *      name="default_business_unit_owner_id",
-     *      referencedColumnName="id",
-     *      onDelete="SET NULL",
-     *      nullable=true
-     * )
-     */
-    protected $defaultBusinessUnitOwner;
-
-    /**
-     * @var Organization
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
-
-    /**
-     * @var Status[]|ArrayCollection
-     *
+     * @var Collection<int, Status> *
      * Cascade persisting is not used due to lots of detach/merge
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Status",
-     *     cascade={"merge"}, orphanRemoval=true, mappedBy="channel", fetch="EXTRA_LAZY"
-     * )
-     * @ORM\OrderBy({"date" = "DESC"})
      */
-    protected $statuses;
+    #[ORM\OneToMany(
+        mappedBy: 'channel',
+        targetEntity: Status::class,
+        cascade: ['merge'],
+        fetch: 'EXTRA_LAZY',
+        orphanRemoval: true
+    )]
+    #[ORM\OrderBy(['date' => Criteria::DESC])]
+    protected ?Collection $statuses = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(
-     *     name="edit_mode",
-     *     type="integer",
-     *     nullable=false,
-     *     options={"default"=\Oro\Bundle\IntegrationBundle\Entity\Channel::EDIT_MODE_ALLOW})
-     * )
-     */
-    protected $editMode;
+    #[ORM\Column(
+        name: 'edit_mode',
+        type: Types::INTEGER,
+        nullable: false,
+        options: ['default' => Channel::EDIT_MODE_ALLOW]
+    )]
+    protected int $editMode;
 
     public function __construct()
     {

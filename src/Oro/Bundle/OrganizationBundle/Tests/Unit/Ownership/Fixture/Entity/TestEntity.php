@@ -4,25 +4,19 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class TestEntity
 {
     /**
      * @var int
-     *
-     * @ORM\Column
-     * @ORM\Id
      */
+    #[ORM\Column]
+    #[ORM\Id]
     protected $id;
 
-    /**
-     * @var TestOwnerEntity
-     * @ORM\ManyToOne(targetEntity="TestOwnerEntity")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: TestOwnerEntity::class)]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
+    protected ?TestOwnerEntity $owner = null;
 
     /**
      * @param int $id

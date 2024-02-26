@@ -2,75 +2,47 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
- * @ORM\Table(
- *      name="oro_workflow_entity_acl",
- *      uniqueConstraints={
- *          @ORM\UniqueConstraint(
- *              name="oro_workflow_acl_unique_idx",
- *              columns={"workflow_name", "attribute", "workflow_step_id"}
- *          )
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclRepository")
- */
+* Entity that represents Workflow Entity Acl
+*
+*/
+#[ORM\Entity(repositoryClass: WorkflowEntityAclRepository::class)]
+#[ORM\Table(name: 'oro_workflow_entity_acl')]
+#[ORM\UniqueConstraint(
+    name: 'oro_workflow_acl_unique_idx',
+    columns: ['workflow_name', 'attribute', 'workflow_step_id']
+)]
 class WorkflowEntityAcl
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var WorkflowDefinition
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowDefinition", inversedBy="entityAcls")
-     * @ORM\JoinColumn(name="workflow_name", referencedColumnName="name", onDelete="CASCADE")
-     */
-    protected $definition;
+    #[ORM\ManyToOne(targetEntity: WorkflowDefinition::class, inversedBy: 'entityAcls')]
+    #[ORM\JoinColumn(name: 'workflow_name', referencedColumnName: 'name', onDelete: 'CASCADE')]
+    protected ?WorkflowDefinition $definition = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="attribute", type="string", length=255, nullable=false)
-     */
-    protected $attribute;
+    #[ORM\Column(name: 'attribute', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $attribute = null;
 
-    /**
-     * @var WorkflowStep
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="workflow_step_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $step;
+    #[ORM\ManyToOne(targetEntity: WorkflowStep::class)]
+    #[ORM\JoinColumn(name: 'workflow_step_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?WorkflowStep $step = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_class", type="string", length=255, nullable=false)
-     */
-    protected $entityClass;
+    #[ORM\Column(name: 'entity_class', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $entityClass = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="updatable", type="boolean")
-     */
-    protected $updatable = true;
+    #[ORM\Column(name: 'updatable', type: Types::BOOLEAN)]
+    protected ?bool $updatable = true;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="deletable", type="boolean")
-     */
-    protected $deletable = true;
+    #[ORM\Column(name: 'deletable', type: Types::BOOLEAN)]
+    protected ?bool $deletable = true;
 
     /**
      * @return integer

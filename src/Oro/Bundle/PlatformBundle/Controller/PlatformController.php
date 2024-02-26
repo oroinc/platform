@@ -4,15 +4,14 @@ namespace Oro\Bundle\PlatformBundle\Controller;
 
 use Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Controller provide information about installed packages
- *
- * @Route("/platform")
  */
+#[Route(path: '/platform')]
 class PlatformController
 {
     private PackageProvider $packageProvider;
@@ -27,17 +26,14 @@ class PlatformController
         $this->deploymentVariableProvider = $deploymentVariableProvider;
     }
 
-    /**
-     * @Route("/information", name="oro_platform_system_info")
-     * @Template()
-     *
-     * @Acl(
-     *     id="oro_platform_system_info",
-     *     label="oro.platform.acl.action.system_info.label",
-     *     type="action",
-     *     category="platform"
-     * )
-     */
+    #[Route(path: '/information', name: 'oro_platform_system_info')]
+    #[Template]
+    #[Acl(
+        id: 'oro_platform_system_info',
+        label: 'oro.platform.acl.action.system_info.label',
+        type: 'action',
+        category: 'platform'
+    )]
     public function systemInfoAction()
     {
         return [

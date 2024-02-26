@@ -9,9 +9,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 /**
  * Stub entity for behat testing switching between transport types
  * It can't be put inside behat folder since entities have to be in the Entity namespace
- *
- * @ORM\Entity
  */
+#[ORM\Entity]
 class TestTransport2Settings extends Transport
 {
     /**

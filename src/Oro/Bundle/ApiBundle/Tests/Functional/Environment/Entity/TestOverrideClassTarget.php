@@ -4,47 +4,33 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Table(name="test_api_override_target",
- *      indexes={
- *          @ORM\Index(name="test_api_override_t_name_idx", columns={"name"})
- *     }
- * )
- * @ORM\Entity
- * @Config
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_override_target')]
+#[ORM\Index(columns: ['name'], name: 'test_api_override_t_name_idx')]
+#[Config]
 class TestOverrideClassTarget implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    public $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    public ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
+    public ?string $name = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", nullable=true)
+     * @var Collection<int, TestOverrideClassOwner>
      */
-    public $name;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\ManyToMany(targetEntity="TestOverrideClassOwner", mappedBy="targets")
-     * @ORM\JoinTable(name="test_api_override_rel_targets",
-     *     joinColumns={@ORM\JoinColumn(name="owner_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="target_id", referencedColumnName="id")}
-     * )
-     */
-    protected $owners;
+    #[ORM\ManyToMany(targetEntity: TestOverrideClassOwner::class, mappedBy: 'targets')]
+    #[ORM\JoinTable(name: 'test_api_override_rel_targets')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'target_id', referencedColumnName: 'id')]
+    protected ?Collection $owners = null;
 
     public function __construct()
     {

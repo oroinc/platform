@@ -3,28 +3,26 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Factory\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
-/**
- * @ORM\Entity
- * @Config
- */
+#[ORM\Entity]
+#[Config]
 class ConfigurableEntityWithEmptyConfig
 {
     /**
      * @var int
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ConfigField
      */
+    #[ConfigField]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
     private $id;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255)
-     * @ConfigField
      */
+    #[ConfigField]
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
     /**

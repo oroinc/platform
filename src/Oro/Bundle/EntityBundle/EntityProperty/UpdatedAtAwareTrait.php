@@ -2,24 +2,18 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
+
 /**
  * Add update date support to entities
  */
 trait UpdatedAtAwareTrait
 {
-    /**
-     * @var \DateTime
-     *
-     * @Doctrine\ORM\Mapping\Column(name="updated_at", type="datetime")
-     * @Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var bool

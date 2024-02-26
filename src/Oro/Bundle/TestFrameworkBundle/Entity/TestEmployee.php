@@ -2,47 +2,31 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
- * @ORM\Table(name="test_employee")
- */
+* Entity that represents Test Employee
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'test_employee')]
 class TestEmployee implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
-    /**
-     * @var TestDepartment|null
-     *
-     * @ORM\ManyToOne(
-     *     targetEntity="Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment",
-     *     inversedBy="employees"
-     * )
-     * @ORM\JoinColumn(name="department_id", referencedColumnName="id"),
-     */
-    protected $department;
+    #[ORM\ManyToOne(targetEntity: TestDepartment::class, inversedBy: 'employees')]
+    #[ORM\JoinColumn(name: 'department_id', referencedColumnName: 'id')]
+    protected ?TestDepartment $department = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="position", type="string", length=255, nullable=true)
-     */
-    protected $position;
+    #[ORM\Column(name: 'position', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $position = null;
 
     /**
      * @return int

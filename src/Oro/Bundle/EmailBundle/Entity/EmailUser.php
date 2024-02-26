@@ -3,153 +3,93 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Entity that represents a emails that are accessible to a certain user
  *
- * @ORM\Table(
- *      name="oro_email_user",
- *      indexes={
- *        @ORM\Index(name="seen_idx", columns={"is_seen", "mailbox_owner_id"}),
- *        @ORM\Index(name="received_idx", columns={"received", "is_seen", "mailbox_owner_id"}),
- *        @ORM\Index(
- *          name="user_owner_id_mailbox_owner_id_organization_id",
- *          columns={"user_owner_id", "mailbox_owner_id", "organization_id"}
- *        )
- *     }
- * )
- * @ORM\HasLifecycleCallbacks
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository")
  *
- * @Config(
- *      defaultValues={
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          }
- *      }
- * )
  */
+#[ORM\Entity(repositoryClass: EmailUserRepository::class)]
+#[ORM\Table(name: 'oro_email_user')]
+#[ORM\Index(columns: ['is_seen', 'mailbox_owner_id'], name: 'seen_idx')]
+#[ORM\Index(columns: ['received', 'is_seen', 'mailbox_owner_id'], name: 'received_idx')]
+#[ORM\Index(
+    columns: ['user_owner_id', 'mailbox_owner_id', 'organization_id'],
+    name: 'user_owner_id_mailbox_owner_id_organization_id'
+)]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    defaultValues: [
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'ownership' => [
+            'owner_type' => 'USER',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'user_owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ]
+    ]
+)]
 class EmailUser
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?OrganizationInterface $organization = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $owner = null;
+
+    #[ORM\ManyToOne(targetEntity: Mailbox::class, inversedBy: 'emailUsers')]
+    #[ORM\JoinColumn(name: 'mailbox_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?Mailbox $mailboxOwner = null;
+
+    #[ORM\Column(name: 'received', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $receivedAt = null;
+
+    #[ORM\Column(name: 'is_seen', type: Types::BOOLEAN, options: ['default' => true])]
+    protected ?bool $seen = false;
+
+    #[ORM\ManyToOne(targetEntity: EmailOrigin::class, inversedBy: 'emailUsers')]
+    #[ORM\JoinColumn(name: 'origin_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    protected ?EmailOrigin $origin = null;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
+     * @var Collection<int, EmailFolder>
      */
-    protected $createdAt;
+    #[ORM\ManyToMany(targetEntity: EmailFolder::class, inversedBy: 'emailUsers', cascade: ['persist'])]
+    #[ORM\JoinTable(name: 'oro_email_user_folders')]
+    #[ORM\JoinColumn(name: 'email_user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'folder_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $folders = null;
 
-    /**
-     * @var OrganizationInterface
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Email::class, cascade: ['persist'], inversedBy: 'emailUsers')]
+    #[ORM\JoinColumn(name: 'email_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?Email $email = null;
 
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
+    protected ?int $unsyncedFlagCount = 0;
 
-    /**
-     * @var Mailbox
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Mailbox", inversedBy="emailUsers")
-     * @ORM\JoinColumn(name="mailbox_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $mailboxOwner;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="received", type="datetime")
-     */
-    protected $receivedAt;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_seen", type="boolean", options={"default"=true})
-     */
-    protected $seen = false;
-
-    /**
-     * @var EmailOrigin|null
-     *
-     * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="emailUsers")
-     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="SET NULL", nullable=true)
-     */
-    protected $origin;
-
-    /**
-     * @var ArrayCollection|EmailFolder[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="EmailFolder",
-     *      inversedBy="emailUsers",
-     *      cascade={"persist"}
-     * )
-     * @ORM\JoinTable(name="oro_email_user_folders",
-     *     joinColumns={@ORM\JoinColumn(name="email_user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="folder_id", referencedColumnName="id", onDelete="CASCADE")},
-     * )
-     */
-    protected $folders;
-
-    /**
-     * @var Email
-     *
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist"})
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    protected $email;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer", options={"default"=0})
-     */
-    protected $unsyncedFlagCount = 0;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_private", type="boolean", nullable=true)
-     */
-    private $isEmailPrivate = false;
+    #[ORM\Column(name: 'is_private', type: Types::BOOLEAN, nullable: true)]
+    private ?bool $isEmailPrivate = false;
 
     public function __construct()
     {
@@ -329,9 +269,8 @@ class EmailUser
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));

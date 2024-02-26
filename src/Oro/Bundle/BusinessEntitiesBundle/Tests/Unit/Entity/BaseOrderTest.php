@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseOrder;
+use Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson;
 
 class BaseOrderTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,12 +35,13 @@ class BaseOrderTest extends \PHPUnit\Framework\TestCase
     {
         $created = new \DateTime('now');
         $updated = new \DateTime('now');
+        $person = $this->createMock(BasePerson::class);
 
         return [
             'id' => ['id', self::TEST_ID, self::TEST_ID],
             'createdAt' => ['createdAt', $created, $created],
             'updatedAt' => ['updatedAt', $updated, $updated],
-            'customer' => ['customer', self::TEST_STRING, self::TEST_STRING],
+            'customer' => ['customer', $person, $person],
             'paymentDetails' => ['paymentDetails', self::TEST_STRING, self::TEST_STRING],
             'paymentMethod' => ['paymentMethod', self::TEST_STRING, self::TEST_STRING],
             'discountAmount' => ['discountAmount', self::TEST_FLOAT, self::TEST_FLOAT],
@@ -50,7 +53,7 @@ class BaseOrderTest extends \PHPUnit\Framework\TestCase
             'subtotalAmount' => ['subtotalAmount', self::TEST_FLOAT, self::TEST_FLOAT],
             'taxAmount' => ['taxAmount', self::TEST_FLOAT, self::TEST_FLOAT],
             'totalAmount' => ['totalAmount', self::TEST_FLOAT, self::TEST_FLOAT],
-            'items' => ['items', self::TEST_STRING, self::TEST_STRING],
+            'items' => ['items', new ArrayCollection(), new ArrayCollection()],
         ];
     }
 }

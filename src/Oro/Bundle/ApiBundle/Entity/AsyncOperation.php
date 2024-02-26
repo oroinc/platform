@@ -2,35 +2,30 @@
 
 namespace Oro\Bundle\ApiBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * An entity to store details of asynchronous operations.
- *
- * @ORM\Table(name="oro_api_async_operation")
- * @ORM\Entity()
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="",
- *              "permissions"="VIEW;CREATE"
- *          }
- *      }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_api_async_operation')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    defaultValues: [
+        'ownership' => [
+            'owner_type' => 'USER',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'user_owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => '', 'permissions' => 'VIEW;CREATE']
+    ]
+)]
 class AsyncOperation
 {
     public const STATUS_NEW       = 'new';
@@ -39,106 +34,56 @@ class AsyncOperation
     public const STATUS_FAILED    = 'failed';
     public const STATUS_CANCELLED = 'cancelled';
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="status", type="string", length=10)
-     */
-    private $status;
+    #[ORM\Column(name: 'status', type: Types::STRING, length: 10)]
+    private ?string $status = null;
 
     /**
      * @var float|null
-     *
-     * @ORM\Column(name="progress", type="percent", nullable=true)
      */
+    #[ORM\Column(name: 'progress', type: 'percent', nullable: true)]
     private $progress;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="job_id", type="integer", nullable=true)
-     */
-    private $jobId;
+    #[ORM\Column(name: 'job_id', type: Types::INTEGER, nullable: true)]
+    private ?int $jobId = null;
 
-    /**
-     * @var User|null
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    private $owner;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $owner = null;
 
-    /**
-     * @var Organization|null
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    private $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?Organization $organization = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     */
-    private $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
-    private $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $updatedAt = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="elapsed_time", type="integer")
-     */
-    private $elapsedTime;
+    #[ORM\Column(name: 'elapsed_time', type: Types::INTEGER)]
+    private ?int $elapsedTime = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="data_file_name", type="string", length=50)
-     */
-    private $dataFileName;
+    #[ORM\Column(name: 'data_file_name', type: Types::STRING, length: 50)]
+    private ?string $dataFileName = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_class", type="string", length=255)
-     */
-    private $entityClass;
+    #[ORM\Column(name: 'entity_class', type: Types::STRING, length: 255)]
+    private ?string $entityClass = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="action_name", type="string", length=20)
-     */
-    private $actionName;
+    #[ORM\Column(name: 'action_name', type: Types::STRING, length: 20)]
+    private ?string $actionName = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="has_errors", type="boolean", options={"default"=false})
-     */
-    private $hasErrors = false;
+    #[ORM\Column(name: 'has_errors', type: Types::BOOLEAN, options: ['default' => false])]
+    private ?bool $hasErrors = false;
 
     /**
      * @var array|null
-     *
-     * @ORM\Column(name="summary", type="json_array", nullable=true)
      */
+    #[ORM\Column(name: 'summary', type: 'json_array', nullable: true)]
     private $summary;
 
     /**
@@ -413,9 +358,7 @@ class AsyncOperation
         $this->summary = $summary;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -423,9 +366,7 @@ class AsyncOperation
         $this->elapsedTime = 0;
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

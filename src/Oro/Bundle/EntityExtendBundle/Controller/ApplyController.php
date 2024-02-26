@@ -9,9 +9,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Updates the database schema and all related caches to reflect changes made in extended entities.
- *
- * @Route("/entity/extend")
  */
+#[Route(path: '/entity/extend')]
 class ApplyController
 {
     /** @var EntityExtendUpdateHandlerInterface */
@@ -22,13 +21,7 @@ class ApplyController
         $this->entityExtendUpdateHandler = $entityExtendUpdateHandler;
     }
 
-    /**
-     * @Route(
-     *      "/update/{id}",
-     *      name="oro_entityextend_update",
-     *      defaults={"id"=0}
-     * )
-     */
+    #[Route(path: '/update/{id}', name: 'oro_entityextend_update', defaults: ['id' => 0])]
     public function updateAction(): JsonResponse
     {
         $result = $this->entityExtendUpdateHandler->update();

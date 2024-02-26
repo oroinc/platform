@@ -17,52 +17,52 @@ use Symfony\Component\Routing\Annotation\Route;
 class EntityPaginationController extends AbstractController
 {
     /**
-     * @Route("/first/{_entityName}/{_scope}/{_routeName}", name="oro_entity_pagination_first")
      *
      * @param $_entityName
      * @param $_scope
      * @param $_routeName
      * @return JsonResponse
      */
+    #[Route(path: '/first/{_entityName}/{_scope}/{_routeName}', name: 'oro_entity_pagination_first')]
     public function firstAction($_entityName, $_scope, $_routeName)
     {
         return $this->getLink($_entityName, $_scope, $_routeName, EntityPaginationNavigation::FIRST);
     }
 
     /**
-     * @Route("/previous/{_entityName}/{_scope}/{_routeName}", name="oro_entity_pagination_previous")
      *
      * @param $_entityName
      * @param $_scope
      * @param $_routeName
      * @return JsonResponse
      */
+    #[Route(path: '/previous/{_entityName}/{_scope}/{_routeName}', name: 'oro_entity_pagination_previous')]
     public function previousAction($_entityName, $_scope, $_routeName)
     {
         return $this->getLink($_entityName, $_scope, $_routeName, EntityPaginationNavigation::PREVIOUS);
     }
 
     /**
-     * @Route("/next/{_entityName}/{_scope}/{_routeName}", name="oro_entity_pagination_next")
      *
      * @param $_entityName
      * @param $_scope
      * @param $_routeName
      * @return JsonResponse
      */
+    #[Route(path: '/next/{_entityName}/{_scope}/{_routeName}', name: 'oro_entity_pagination_next')]
     public function nextAction($_entityName, $_scope, $_routeName)
     {
         return $this->getLink($_entityName, $_scope, $_routeName, EntityPaginationNavigation::NEXT);
     }
 
     /**
-     * @Route("/last/{_entityName}/{_scope}/{_routeName}", name="oro_entity_pagination_last")
      *
      * @param $_entityName
      * @param $_scope
      * @param $_routeName
      * @return JsonResponse
      */
+    #[Route(path: '/last/{_entityName}/{_scope}/{_routeName}', name: 'oro_entity_pagination_last')]
     public function lastAction($_entityName, $_scope, $_routeName)
     {
         return $this->getLink($_entityName, $_scope, $_routeName, EntityPaginationNavigation::LAST);

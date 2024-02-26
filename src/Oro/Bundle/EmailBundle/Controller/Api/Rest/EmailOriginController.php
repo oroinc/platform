@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,26 +17,26 @@ class EmailOriginController extends RestGetController
     /**
      * Get user's email origins.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
      * @ApiDoc(
      *      description="Get user's email origins",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_view")
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
+    #[AclAncestor('oro_email_email_view')]
     public function cgetAction(Request $request)
     {
         $page  = (int)$request->get('page', 1);
@@ -54,9 +54,9 @@ class EmailOriginController extends RestGetController
      *      description="Get user's email origin",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
+    #[AclAncestor('oro_email_email_view')]
     public function getAction($id)
     {
         return $this->handleGetRequest($id);

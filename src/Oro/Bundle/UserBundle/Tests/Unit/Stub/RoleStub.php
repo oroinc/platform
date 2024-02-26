@@ -3,11 +3,12 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Stub;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
 
 class RoleStub extends Role
 {
-    protected ?Organization $organization = null;
+    protected ?OrganizationInterface $organization = null;
 
     public function setId(int $id): self
     {

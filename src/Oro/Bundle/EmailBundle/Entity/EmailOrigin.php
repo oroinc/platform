@@ -4,118 +4,81 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Email Origin
- *
- * @ORM\Table(name="oro_email_origin",
- *      indexes={
- *          @ORM\Index(name="IDX_mailbox_name", columns={"mailbox_name"}),
- *          @ORM\Index(name="isActive_name_idx", columns={"isActive", "name"})
- *      }
- * )
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="name", type="string", length=30)
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_email_origin')]
+#[ORM\Index(columns: ['mailbox_name'], name: 'IDX_mailbox_name')]
+#[ORM\Index(columns: ['isActive', 'name'], name: 'isActive_name_idx')]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'name', type: 'string', length: 30)]
 abstract class EmailOrigin
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="mailbox_name", type="string", length=64, nullable=false, options={"default" = ""})
-     */
-    protected $mailboxName;
+    #[ORM\Column(name: 'mailbox_name', type: Types::STRING, length: 64, nullable: false, options: ['default' => ''])]
+    protected ?string $mailboxName = null;
 
     /**
      * @var Collection<int, EmailFolder>
-     *
-     * @ORM\OneToMany(targetEntity="EmailFolder", mappedBy="origin", cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    protected $folders;
+    #[ORM\OneToMany(
+        mappedBy: 'origin',
+        targetEntity: EmailFolder::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $folders = null;
 
     /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="origin", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @var Collection<int, EmailUser>
      */
-    protected $emailUsers;
+    #[ORM\OneToMany(
+        mappedBy: 'origin',
+        targetEntity: EmailUser::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $emailUsers = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="isActive", type="boolean")
-     */
-    protected $isActive = true;
+    #[ORM\Column(name: 'isActive', type: Types::BOOLEAN)]
+    protected ?bool $isActive = true;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="is_sync_enabled", type="boolean", nullable=true)
-     */
-    protected $isSyncEnabled = true;
+    #[ORM\Column(name: 'is_sync_enabled', type: Types::BOOLEAN, nullable: true)]
+    protected ?bool $isSyncEnabled = true;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="sync_code_updated", type="datetime", nullable=true)
-     */
-    protected $syncCodeUpdatedAt;
+    #[ORM\Column(name: 'sync_code_updated', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $syncCodeUpdatedAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="synchronized", type="datetime", nullable=true)
-     */
-    protected $synchronizedAt;
+    #[ORM\Column(name: 'synchronized', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $synchronizedAt = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="sync_code", type="integer", nullable=true)
-     */
-    protected $syncCode;
+    #[ORM\Column(name: 'sync_code', type: Types::INTEGER, nullable: true)]
+    protected ?int $syncCode = null;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="sync_count", type="integer", nullable=true)
-     */
-    protected $syncCount;
+    #[ORM\Column(name: 'sync_count', type: Types::INTEGER, nullable: true)]
+    protected ?int $syncCount = null;
 
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="emailOrigins")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'emailOrigins')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    protected ?User $owner = null;
 
-    /**
-     * @var OrganizationInterface
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?OrganizationInterface $organization = null;
 
-    /**
-     * @var Mailbox
-     * @ORM\OneToOne(targetEntity="Mailbox", mappedBy="origin")
-     */
-    protected $mailbox;
+    #[ORM\OneToOne(mappedBy: 'origin', targetEntity: Mailbox::class)]
+    protected ?Mailbox $mailbox = null;
 
     public function __construct()
     {

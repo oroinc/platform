@@ -18,15 +18,6 @@ class ActivityListController extends RestController
     /**
      * Get filtered activity lists for given entity
      *
-     * @QueryParam(
-     *     name="pageFilter", nullable=true,
-     *     description="Array with pager filters, e.g. [first|last item date, array of ids with same date, action type]"
-     * )
-     * @QueryParam(
-     *      name="filter", nullable=true,
-     *      description="Array with Activity type and Date range filters values"
-     * )
-     *
      * @ApiDoc(
      *      description="Returns an array with collection of ActivityList objects and count of all records",
      *      resource=true,
@@ -39,6 +30,16 @@ class ActivityListController extends RestController
      * @param integer $entityId    Entity id
      * @return JsonResponse
      */
+    #[QueryParam(
+        name: 'pageFilter',
+        description: 'Array with pager filters, e.g. [first|last item date, array of ids with same date, action type]',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'filter',
+        description: 'Array with Activity type and Date range filters values',
+        nullable: true
+    )]
     public function cgetAction(Request $request, $entityClass, $entityId)
     {
         $entityClass = $this->container->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);

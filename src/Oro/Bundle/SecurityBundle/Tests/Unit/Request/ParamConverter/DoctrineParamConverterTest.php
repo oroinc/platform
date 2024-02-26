@@ -6,7 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
@@ -65,7 +65,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
                 'options' => ['id' => 'id']
             ]
         );
-        $annotation = new Acl(
+        $attribute = Acl::fromArray(
             [
                 'id'         => 1,
                 'type'       => 'entity',
@@ -82,7 +82,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
             $this->expectExceptionMessage('You do not get EDIT permission for this object');
             $this->requestAuthorizationChecker->expects($this->any())
                 ->method('getRequestAcl')
-                ->willReturn($annotation);
+                ->willReturn($attribute);
         }
 
         $this->converter->apply($request, $config);

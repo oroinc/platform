@@ -4,13 +4,16 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEntityConfigBundle_Attribute_Entity_AttributeFamily;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -22,36 +25,26 @@ use Oro\Component\Layout\ContextItemInterface;
  * An attribute family is a set of the attributes that are enough to store complete information
  * about the entities of a similar type
  *
- * @ORM\Table(
- *     name="oro_attribute_family",
- *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="oro_attribute_family_code_org_uidx", columns={"code", "organization_id"})
- *     }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository")
- * @Config(
- *      defaultValues={
- *          "dataaudit"={
- *              "auditable"=true
- *          },
- *          "ownership"={
- *              "owner_type"="ORGANIZATION",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="catalog"
- *          }
- *      }
- * )
  * @method File getImage()
  * @method AttributeFamily setImage(File $image)
  * @method LocalizedFallbackValue getLabel(Localization $localization = null)
  * @method LocalizedFallbackValue getDefaultLabel()
  * @mixin OroEntityConfigBundle_Attribute_Entity_AttributeFamily
  */
+#[ORM\Entity(repositoryClass: AttributeFamilyRepository::class)]
+#[ORM\Table(name: 'oro_attribute_family')]
+#[ORM\UniqueConstraint(name: 'oro_attribute_family_code_org_uidx', columns: ['code', 'organization_id'])]
+#[Config(
+    defaultValues: [
+        'dataaudit' => ['auditable' => true],
+        'ownership' => [
+            'owner_type' => 'ORGANIZATION',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'catalog']
+    ]
+)]
 class AttributeFamily implements
     DatesAwareInterface,
     ContextItemInterface,
@@ -60,91 +53,55 @@ class AttributeFamily implements
     use DatesAwareTrait;
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
-     * @var ArrayCollection|LocalizedFallbackValue[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
-     *      cascade={"ALL"},
-     *      orphanRemoval=true
-     * )
-     * @ORM\JoinTable(
-     *      name="oro_attribute_family_label",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="attribute_family_id", referencedColumnName="id", onDelete="CASCADE")
-     *      },
-     *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="localized_value_id", referencedColumnName="id", onDelete="CASCADE", unique=true)
-     *      }
-     * )
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          },
-     *          "importexport"={
-     *              "order"=40,
-     *              "full"=true,
-     *              "fallback_field"="string"
-     *          }
-     *      }
-     * )
+     * @var Collection<int, LocalizedFallbackValue>
      */
-    protected $labels;
+    #[ORM\ManyToMany(targetEntity: LocalizedFallbackValue::class, cascade: ['ALL'], orphanRemoval: true)]
+    #[ORM\JoinTable(name: 'oro_attribute_family_label')]
+    #[ORM\JoinColumn(name: 'attribute_family_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'localized_value_id', referencedColumnName: 'id', unique: true, onDelete: 'CASCADE')]
+    #[ConfigField(
+        defaultValues: [
+            'dataaudit' => ['auditable' => true],
+            'importexport' => ['order' => 40, 'full' => true, 'fallback_field' => 'string']
+        ]
+    )]
+    protected ?Collection $labels = null;
+
+    #[ORM\Column(name: 'code', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    private ?string $code = null;
+
+    #[ORM\Column(name: 'entity_class', type: Types::STRING, length: 255)]
+    private ?string $entityClass = null;
 
     /**
-     * @var string
-     * @ORM\Column(name="code", type="string", length=255)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     *  )
+     * @var Collection<int, AttributeGroup>
      */
-    private $code;
+    #[ORM\OneToMany(
+        mappedBy: 'attributeFamily',
+        targetEntity: AttributeGroup::class,
+        cascade: ['ALL'],
+        orphanRemoval: true,
+        indexBy: 'code'
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $attributeGroups = null;
 
     /**
-     * @var string
-     * @ORM\Column(name="entity_class", type="string", length=255)
+     * @var bool|null
      */
-    private $entityClass;
+    #[ORM\Column(name: 'is_enabled', type: Types::BOOLEAN, length: 255)]
+    private $isEnabled;
 
-    /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup",
-     *     mappedBy="attributeFamily",
-     *     cascade={"ALL"},
-     *     orphanRemoval=true,
-     *     indexBy="code"
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
-     */
-    private $attributeGroups;
-
-    /**
-     * @var bool
-     * @ORM\Column(name="is_enabled", type="boolean", length=255)
-     */
-    private $isEnabled = true;
-
-    /**
-     * @var Organization
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?Organization $owner = null;
 
     /**
      * {@inheritdoc}
@@ -184,7 +141,7 @@ class AttributeFamily implements
     }
 
     /**
-     * @return ArrayCollection|\Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue[]
+     * @return ArrayCollection|LocalizedFallbackValue[]
      */
     public function getLabels()
     {

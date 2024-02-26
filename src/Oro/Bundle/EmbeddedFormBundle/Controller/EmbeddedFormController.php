@@ -6,9 +6,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,41 +24,30 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmbeddedFormController extends AbstractController
 {
-    /**
-     * @Route(name="oro_embedded_form_list")
-     * @Template()
-     * @AclAncestor("oro_embedded_form_view")
-     */
+    #[Route(name: 'oro_embedded_form_list')]
+    #[Template]
+    #[AclAncestor('oro_embedded_form_view')]
     public function indexAction()
     {
         return [];
     }
 
-    /**
-     * @Route("create", name="oro_embedded_form_create")
-     * @Template("@OroEmbeddedForm/EmbeddedForm/update.html.twig")
-     * @Acl(
-     *      id="oro_embedded_form_create",
-     *      type="entity",
-     *      permission="CREATE",
-     *      class="Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm"
-     * )
-     */
+    #[Route(path: 'create', name: 'oro_embedded_form_create')]
+    #[Template('@OroEmbeddedForm/EmbeddedForm/update.html.twig')]
+    #[Acl(id: 'oro_embedded_form_create', type: 'entity', class: EmbeddedForm::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new EmbeddedForm(), $request);
     }
 
-    /**
-     * @Route("delete/{id}", name="oro_embedded_form_delete", requirements={"id"="[-\d\w]+"}, methods={"DELETE"})
-     * @Acl(
-     *      id="oro_embedded_form_delete",
-     *      type="entity",
-     *      permission="DELETE",
-     *      class="Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm"
-     * )
-     * @CsrfProtection()
-     */
+    #[Route(
+        path: 'delete/{id}',
+        name: 'oro_embedded_form_delete',
+        requirements: ['id' => '[-\d\w]+'],
+        methods: ['DELETE']
+    )]
+    #[Acl(id: 'oro_embedded_form_delete', type: 'entity', class: EmbeddedForm::class, permission: 'DELETE')]
+    #[CsrfProtection()]
     public function deleteAction(EmbeddedForm $entity)
     {
         $em = $this->container->get('doctrine')->getManagerForClass(EmbeddedForm::class);
@@ -68,10 +57,8 @@ class EmbeddedFormController extends AbstractController
         return new JsonResponse('', Response::HTTP_OK);
     }
 
-    /**
-     * @Route("default-data/{formType}", name="oro_embedded_form_default_data", methods={"GET"})
-     * @AclAncestor("oro_embedded_form_create")
-     */
+    #[Route(path: 'default-data/{formType}', name: 'oro_embedded_form_default_data', methods: ['GET'])]
+    #[AclAncestor('oro_embedded_form_create')]
     public function defaultDataAction(string $formType)
     {
         $formType = str_replace('_', '\\', $formType);
@@ -88,31 +75,17 @@ class EmbeddedFormController extends AbstractController
         );
     }
 
-    /**
-     * @Route("update/{id}", name="oro_embedded_form_update", requirements={"id"="[-\d\w]+"})
-     * @Template()
-     * @Acl(
-     *      id="oro_embedded_form_update",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm"
-     * )
-     */
+    #[Route(path: 'update/{id}', name: 'oro_embedded_form_update', requirements: ['id' => '[-\d\w]+'])]
+    #[Template]
+    #[Acl(id: 'oro_embedded_form_update', type: 'entity', class: EmbeddedForm::class, permission: 'EDIT')]
     public function updateAction(EmbeddedForm $entity, Request $request)
     {
         return $this->update($entity, $request);
     }
 
-    /**
-     * @Route("view/{id}", name="oro_embedded_form_view", requirements={"id"="[-\d\w]+"})
-     * @Template()
-     * @Acl(
-     *      id="oro_embedded_form_view",
-     *      type="entity",
-     *      permission="VIEW",
-     *      class="Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm"
-     * )
-     */
+    #[Route(path: 'view/{id}', name: 'oro_embedded_form_view', requirements: ['id' => '[-\d\w]+'])]
+    #[Template]
+    #[Acl(id: 'oro_embedded_form_view', type: 'entity', class: EmbeddedForm::class, permission: 'VIEW')]
     public function viewAction(EmbeddedForm $entity)
     {
         return [
@@ -121,11 +94,9 @@ class EmbeddedFormController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("info/{id}", name="oro_embedded_form_info", requirements={"id"="[-\d\w]+"})
-     * @AclAncestor("oro_embedded_form_view")
-     * @Template()
-     */
+    #[Route(path: 'info/{id}', name: 'oro_embedded_form_info', requirements: ['id' => '[-\d\w]+'])]
+    #[Template]
+    #[AclAncestor('oro_embedded_form_view')]
     public function infoAction(EmbeddedForm $entity)
     {
         return [

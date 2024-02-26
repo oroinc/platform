@@ -2,80 +2,48 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Integration Status ORM entity.
  *
  * @package Oro\Bundle\IntegrationBundle\Entity
- * @ORM\Entity
- * @ORM\Table(
- *      name="oro_integration_channel_status",
- *      indexes={
- *          @ORM\Index(name="oro_intch_con_state_idx", columns={"connector", "code"}),
- *          @ORM\Index(name="oro_intch_date_idx", columns={"date"})
- *      }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_integration_channel_status')]
+#[ORM\Index(columns: ['connector', 'code'], name: 'oro_intch_con_state_idx')]
+#[ORM\Index(columns: ['date'], name: 'oro_intch_date_idx')]
 class Status
 {
     public const STATUS_COMPLETED = '1';
     public const STATUS_FAILED    = '2';
 
-    /**
-     * @var integer
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var Channel
-     *
-     * @ORM\ManyToOne(
-     *     targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel",
-     *     cascade={"ALL"},
-     *     inversedBy="statuses"
-     * )
-     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
-    protected $channel;
+    #[ORM\ManyToOne(targetEntity: Channel::class, cascade: ['ALL'], inversedBy: 'statuses')]
+    #[ORM\JoinColumn(name: 'channel_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?Channel $channel = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="code", type="string", length=255)
-     */
-    protected $code;
+    #[ORM\Column(name: 'code', type: Types::STRING, length: 255)]
+    protected ?string $code = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="connector", type="string", length=255)
-     */
-    protected $connector;
+    #[ORM\Column(name: 'connector', type: Types::STRING, length: 255)]
+    protected ?string $connector = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="message", type="text")
-     */
-    protected $message;
+    #[ORM\Column(name: 'message', type: Types::TEXT)]
+    protected ?string $message = null;
 
-    /**
-     * @var \DateTime $createdAt
-     *
-     * @ORM\Column(name="date", type="datetime")
-     */
-    protected $date;
+    #[ORM\Column(name: 'date', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $date = null;
 
     /**
      * @var array $data
-     *
-     * @ORM\Column(name="data", type="json_array", nullable=true)
      */
+    #[ORM\Column(name: 'data', type: 'json_array', nullable: true)]
     protected $data;
 
     public function __construct()

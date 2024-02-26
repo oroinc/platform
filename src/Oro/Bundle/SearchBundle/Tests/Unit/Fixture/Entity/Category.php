@@ -2,36 +2,30 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Oro\Bundle\DataBundle\Entity\Category
- *
- * @ORM\Table()
- * @ORM\Entity()
  */
+#[ORM\Entity]
 class Category
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    private ?string $name = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @var Collection<int, Product>
      */
-    private $name;
-
-    /**
-     * @ORM\MayToMany(targetEntity="Product", mappedBy="categories")
-     */
-    private $products;
+    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'categories')]
+    private ?Collection $products = null;
 
     public $parent = [];
 
@@ -85,7 +79,7 @@ class Category
      */
     public function __construct()
     {
-        $this->products = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     /**
@@ -112,7 +106,7 @@ class Category
     /**
      * Get products
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getProducts()
     {

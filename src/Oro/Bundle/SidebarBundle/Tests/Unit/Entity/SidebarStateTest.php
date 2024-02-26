@@ -4,7 +4,7 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SidebarBundle\Entity\SidebarState;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class SidebarStateTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,7 +23,7 @@ class SidebarStateTest extends \PHPUnit\Framework\TestCase
     public function propertiesDataProvider(): array
     {
         return [
-            ['user', $this->createMock(UserInterface::class)],
+            ['user', $this->createMock(AbstractUser::class)],
             ['position', 'SIDEBAR_RIGHT'],
             ['state', 'SIDEBAR_MINIMIZED'],
         ];

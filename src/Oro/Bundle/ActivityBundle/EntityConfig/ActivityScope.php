@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ActivityBundle\EntityConfig;
 
+/**
+ * ActivityScope entity config
+ *
+ */
 class ActivityScope
 {
     const GROUP_ACTIVITY   = 'activity';
@@ -18,25 +22,9 @@ class ActivityScope
 
     /**
      * Checks whether activities can be displayed on a given page type.
-     *
-     * @param int    $pageType
-     * @param string $configValue
-     *
-     * @return bool
      */
-    public static function isAllowedOnPage($pageType, $configValue)
+    public static function isAllowedOnPage(int $pageType, int $configValue): bool
     {
-        if (null === $configValue) {
-            return false;
-        }
-
-        if (!defined($configValue)) {
-            throw new \InvalidArgumentException(sprintf('Constant %s is not defined', $configValue));
-        }
-
-        $configValue = constant($configValue);
-        $pageType    = (int)$pageType;
-
         return
             $configValue !== ActivityScope::NONE_PAGE
             && ($configValue & $pageType) === $pageType;

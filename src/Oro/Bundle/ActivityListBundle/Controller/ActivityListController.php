@@ -12,20 +12,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Provide functionality to manage activity lists
- *
- * @Route("/activity-list")
  */
+#[Route(path: '/activity-list')]
 class ActivityListController extends AbstractController
 {
     /**
-     * @Route("/view/widget/{entityClass}/{entityId}", name="oro_activity_list_widget_activities")
-     * @Template("@OroActivityList/ActivityList/activities.html.twig")
      *
      * @param string $entityClass The entity class which activities should be rendered
      * @param int    $entityId    The entity object id which activities should be rendered
      *
      * @return array
      */
+    #[Route(path: '/view/widget/{entityClass}/{entityId}', name: 'oro_activity_list_widget_activities')]
+    #[Template('@OroActivityList/ActivityList/activities.html.twig')]
     public function widgetAction($entityClass, $entityId)
     {
         return [

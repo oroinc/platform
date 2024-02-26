@@ -8,6 +8,7 @@
 
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
+use Attribute;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Composite;
 
@@ -20,6 +21,7 @@ use Symfony\Component\Validator\Constraints\Composite;
  *
  * @Annotation
  */
+#[Attribute]
 class All extends Composite
 {
     /** @var Constraint|Constraint[] */

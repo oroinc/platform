@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -16,117 +17,65 @@ trait MenuUpdateTrait
 {
     use FallbackTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: '`key`', type: Types::STRING, length: 100)]
+    protected ?string $key = null;
+
+    #[ORM\Column(name: 'parent_key', type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $parentKey = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="`key`", type="string", length=100)
+     * @var Collection<int, LocalizedFallbackValue>
      */
-    protected $key;
+    #[ORM\ManyToMany(targetEntity: LocalizedFallbackValue::class, cascade: ['ALL'], orphanRemoval: true)]
+    protected ?Collection $titles = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="parent_key", type="string", length=100, nullable=true)
+     * @var Collection<int, LocalizedFallbackValue>
      */
-    protected $parentKey;
+    #[ORM\ManyToMany(targetEntity: LocalizedFallbackValue::class, cascade: ['ALL'], orphanRemoval: true)]
+    protected ?Collection $descriptions = null;
 
-    /**
-     * @var Collection|LocalizedFallbackValue[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
-     *      cascade={"ALL"},
-     *      orphanRemoval=true
-     * )
-     */
-    protected $titles;
+    #[ORM\Column(name: 'uri', type: Types::STRING, length: 8190, nullable: true)]
+    protected ?string $uri = null;
 
-    /**
-     * @var Collection|LocalizedFallbackValue[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
-     *      cascade={"ALL"},
-     *      orphanRemoval=true
-     * )
-     */
-    protected $descriptions;
+    #[ORM\Column(name: 'menu', type: Types::STRING, length: 100)]
+    protected ?string $menu = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="uri", type="string", length=8190, nullable=true)
-     */
-    protected $uri;
+    #[ORM\ManyToOne(targetEntity: Scope::class)]
+    #[ORM\JoinColumn(name: 'scope_id', referencedColumnName: 'id', nullable: false)]
+    protected ?Scope $scope = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="menu", type="string", length=100)
-     */
-    protected $menu;
+    #[ORM\Column(name: 'icon', type: Types::STRING, length: 150, nullable: true)]
+    protected ?string $icon = null;
 
-    /**
-     * @var Scope
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\ScopeBundle\Entity\Scope")
-     * @ORM\JoinColumn(name="scope_id", referencedColumnName="id", nullable=false)
-     */
-    protected $scope;
+    #[ORM\Column(name: 'is_active', type: Types::BOOLEAN)]
+    protected ?bool $active = true;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="icon", type="string", length=150, nullable=true)
-     */
-    protected $icon;
+    #[ORM\Column(name: 'priority', type: Types::INTEGER, nullable: true)]
+    protected ?int $priority = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_active", type="boolean")
-     */
-    protected $active = true;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="priority", type="integer", nullable=true)
-     */
-    protected $priority;
-
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="is_divider", type="boolean")
-     */
-    protected $divider = false;
+    #[ORM\Column(name: 'is_divider', type: Types::BOOLEAN)]
+    protected ?bool $divider = false;
 
     /**
      * Marks menu item as custom.
      * Custom is a menu item initially created by a menu update and which exists owing to a menu update.
-     *
-     * @ORM\Column(name="is_custom", type="boolean")
      */
-    protected $custom = false;
+    #[ORM\Column(name: 'is_custom', type: Types::BOOLEAN)]
+    protected ?bool $custom = false;
 
     /**
      * Marks menu item as synthetic.
      * Synthetic is a menu item that initially created not by a menu update (i.e. non-custom), but should not be lost
      * even if initial menu item does not exist anymore.
-     *
-     * @ORM\Column(name="is_synthetic", type="boolean", options={"default"=false})
      */
-    protected bool $synthetic = false;
+    #[ORM\Column(name: 'is_synthetic', type: Types::BOOLEAN, options: ['default' => false])]
+    protected ?bool $synthetic = false;
 
     public function __construct()
     {
@@ -395,9 +344,7 @@ trait MenuUpdateTrait
         return $this;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->generateKey();

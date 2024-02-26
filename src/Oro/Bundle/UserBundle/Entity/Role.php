@@ -4,75 +4,56 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroUserBundle_Entity_Role;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 
 /**
  * Role Entity
  *
- * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\RoleRepository")
- * @ORM\Table(name="oro_access_role")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      routeName="oro_user_role_index",
- *      routeView="oro_user_role_update",
- *      defaultValues={
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @property OrganizationInterface $organization
  * @mixin OroUserBundle_Entity_Role
  */
+#[ORM\Entity(repositoryClass: RoleRepository::class)]
+#[ORM\Table(name: 'oro_access_role')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    routeName: 'oro_user_role_index',
+    routeView: 'oro_user_role_update',
+    defaultValues: [
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class Role extends AbstractRole implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
     public const PREFIX_ROLE = 'ROLE_';
 
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(type: Types::STRING, length: 30, unique: true, nullable: false)]
+    protected ?string $role = null;
+
+    #[ORM\Column(type: Types::STRING, length: 30)]
+    protected ?string $label = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string", unique=true, length=30, nullable=false)
+     * @var Collection<int, User>
      */
-    protected $role;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=30)
-     */
-    protected $label;
-
-    /**
-     * @var User[]|Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="userRoles")
-     */
-    protected $users;
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'userRoles')]
+    protected ?Collection $users = null;
 
     /**
      * Populate the role field

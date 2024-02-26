@@ -2,46 +2,32 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="test_api_order_line_item")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_order_line_item')]
 class TestOrderLineItem implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: TestOrder::class, inversedBy: 'lineItems')]
+    #[ORM\JoinColumn(name: 'order_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?TestOrder $order = null;
+
+    #[ORM\ManyToOne(targetEntity: TestProduct::class)]
+    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?TestProduct $product = null;
 
     /**
-     * @var TestOrder
-     *
-     * @ORM\ManyToOne(targetEntity="TestOrder", inversedBy="lineItems")
-     * @ORM\JoinColumn(name="order_id", referencedColumnName="id", onDelete="CASCADE")
+     * @return float|null
      */
-    protected $order;
-
-    /**
-     * @var TestProduct
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TestFrameworkBundle\Entity\TestProduct")
-     * @ORM\JoinColumn(name="product_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $product;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="quantity", type="float", nullable=true)
-     */
+    #[ORM\Column(name: 'quantity', type: Types::FLOAT, nullable: true)]
     protected $quantity;
 
     /**

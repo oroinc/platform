@@ -17,7 +17,7 @@ class NavigationItemTest extends \PHPUnit\Framework\TestCase
         $values = [
             'title' => 'Some Title',
             'url' => 'Some Url',
-            'position' => 'Some position',
+            'position' => 15,
             'user' => $user,
             'organization' => $organization
         ];

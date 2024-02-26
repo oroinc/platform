@@ -12,6 +12,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class OriginTransformerTest extends \PHPUnit\Framework\TestCase
 {
+    private const TEST_ID = 101;
+
     /** @var OriginTransformer */
     private $transformer;
     /** @var EntityManager */
@@ -36,8 +38,8 @@ class OriginTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testTransform()
     {
-        $testOrigin = new TestEmailOrigin('test_id');
-        $this->assertEquals('test_id', $this->transformer->transform($testOrigin));
+        $testOrigin = new TestEmailOrigin(self::TEST_ID);
+        $this->assertEquals(self::TEST_ID, $this->transformer->transform($testOrigin));
     }
 
     public function testTransformFail()

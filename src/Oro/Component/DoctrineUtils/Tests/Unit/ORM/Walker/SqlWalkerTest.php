@@ -2,11 +2,10 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM\Walker;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\Walker\MaterializedViewOutputResultModifier;
 use Oro\Component\DoctrineUtils\ORM\Walker\MySqlUseIndexOutputResultModifier;
@@ -25,7 +24,7 @@ class SqlWalkerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
         $this->em->getConfiguration()->setEntityNamespaces([
             'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity',
         ]);

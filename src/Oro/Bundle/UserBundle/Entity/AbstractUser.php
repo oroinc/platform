@@ -4,8 +4,9 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -18,9 +19,8 @@ use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
- *
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 abstract class AbstractUser implements
     UserInterface,
     LoginInfoInterface,
@@ -31,48 +31,23 @@ abstract class AbstractUser implements
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=255, unique=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          },
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $username;
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['identity' => true]])]
+    protected ?string $username = null;
 
     /**
      * Encrypted password. Must be persisted.
-     *
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          },
-     *          "email"={
-     *              "available_in_template"=false
-     *          }
-     *      }
-     * )
      */
-    protected $password;
+    #[ORM\Column(type: Types::STRING)]
+    #[ConfigField(
+        defaultValues: ['importexport' => ['excluded' => true], 'email' => ['available_in_template' => false]]
+    )]
+    protected ?string $password = null;
 
     /**
      * Plain password. Used for model validation. Must not be persisted.
@@ -83,132 +58,58 @@ abstract class AbstractUser implements
 
     /**
      * The salt to use for hashing
-     *
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          },
-     *          "email"={
-     *              "available_in_template"=false
-     *          }
-     *      }
-     * )
      */
-    protected $salt;
+    #[ORM\Column(type: Types::STRING)]
+    #[ConfigField(
+        defaultValues: ['importexport' => ['excluded' => true], 'email' => ['available_in_template' => false]]
+    )]
+    protected ?string $salt = null;
+
+    #[ORM\Column(name: 'last_login', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?\DateTimeInterface $lastLogin = null;
+
+    #[ORM\Column(name: 'login_count', type: Types::INTEGER, options: ['default' => 0, 'unsigned' => true])]
+    protected ?int $loginCount = null;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    protected ?bool $enabled = true;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="last_login", type="datetime", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
+     * @var Collection<int, \Oro\Bundle\UserBundle\Entity\Role>
      */
-    protected $lastLogin;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="login_count", type="integer", options={"default"=0, "unsigned"=true})
-     */
-    protected $loginCount;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean")
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $enabled = true;
-
-    /**
-     * @var Role[]|Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Role", inversedBy="users")
-     * @ORM\JoinTable(name="oro_user_access_role",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.user.roles.label",
-     *              "description"="oro.user.roles.description"
-     *          },
-     *          "dataaudit"={"auditable"=true},
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $userRoles;
+    #[ORM\ManyToMany(targetEntity: \Oro\Bundle\UserBundle\Entity\Role::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'oro_user_access_role')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(
+        defaultValues: [
+            'entity' => ['label' => 'oro.user.roles.label', 'description' => 'oro.user.roles.description'],
+            'dataaudit' => ['auditable' => true],
+            'importexport' => ['excluded' => true]
+        ]
+    )]
+    protected ?Collection $userRoles = null;
 
     /**
      * Random string sent to the user email address in order to verify it
-     *
-     * @var string
-     *
-     * @ORM\Column(name="confirmation_token", type="string", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
      */
-    protected $confirmationToken;
+    #[ORM\Column(name: 'confirmation_token', type: Types::STRING, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?string $confirmationToken = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="password_requested", type="datetime", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $passwordRequestedAt;
+    #[ORM\Column(name: 'password_requested', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?\DateTimeInterface $passwordRequestedAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="password_changed", type="datetime", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $passwordChangedAt;
+    #[ORM\Column(name: 'password_changed', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?\DateTimeInterface $passwordChangedAt = null;
 
     /**
      * {@inheritdoc}

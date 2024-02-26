@@ -15,7 +15,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,26 +28,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CRUD controller for the Dashboard entity.
- * @Route("/dashboard")
  */
+#[Route(path: '/dashboard')]
 class DashboardController extends AbstractController
 {
-    /**
-     * @Route(
-     *      ".{_format}",
-     *      name="oro_dashboard_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     *
-     * @Acl(
-     *      id="oro_dashboard_view",
-     *      type="entity",
-     *      class="Oro\Bundle\DashboardBundle\Entity\Dashboard",
-     *      permission="VIEW"
-     * )
-     * @Template
-     */
+    #[Route(
+        path: '.{_format}',
+        name: 'oro_dashboard_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template]
+    #[Acl(id: 'oro_dashboard_view', type: 'entity', class: Dashboard::class, permission: 'VIEW')]
     public function indexAction()
     {
         return [
@@ -59,14 +51,9 @@ class DashboardController extends AbstractController
      * @param Request $request
      * @param Dashboard|null $dashboard
      *
-     * @Route(
-     *      "/view/{id}",
-     *      name="oro_dashboard_view",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id" = "0"}
-     * )
      * @return Response
      */
+    #[Route(path: '/view/{id}', name: 'oro_dashboard_view', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
     public function viewAction(Request $request, Dashboard $dashboard = null)
     {
         $currentDashboard = $this->findAllowedDashboard($dashboard);
@@ -99,13 +86,18 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route("/configure/{id}", name="oro_dashboard_configure", requirements={"id"="\d+"}, methods={"GET", "POST"})
-     * @Template("@OroDashboard/Dashboard/dialog/configure.html.twig")
      *
      * @param Request $request
      * @param Widget $widget
      * @return array
      */
+    #[Route(
+        path: '/configure/{id}',
+        name: 'oro_dashboard_configure',
+        requirements: ['id' => '\d+'],
+        methods: ['GET', 'POST']
+    )]
+    #[Template('@OroDashboard/Dashboard/dialog/configure.html.twig')]
     public function configureAction(Request $request, Widget $widget)
     {
         if (!$this->isGranted('EDIT', $widget->getDashboard())) {
@@ -132,19 +124,14 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route("/update/{id}", name="oro_dashboard_update", requirements={"id"="\d+"},  defaults={"id"=0})
-     * @Acl(
-     *      id="oro_dashboard_update",
-     *      type="entity",
-     *      class="Oro\Bundle\DashboardBundle\Entity\Dashboard",
-     *      permission="EDIT"
-     * )
      *
-     * @Template()
      * @param Request $request
      * @param Dashboard $dashboard
      * @return array
      */
+    #[Route(path: '/update/{id}', name: 'oro_dashboard_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template]
+    #[Acl(id: 'oro_dashboard_update', type: 'entity', class: Dashboard::class, permission: 'EDIT')]
     public function updateAction(Request $request, Dashboard $dashboard)
     {
         $dashboardModel = $this->getDashboardManager()->getDashboardModel($dashboard);
@@ -153,17 +140,12 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route("/create", name="oro_dashboard_create")
-     * @Acl(
-     *      id="oro_dashboard_create",
-     *      type="entity",
-     *      class="Oro\Bundle\DashboardBundle\Entity\Dashboard",
-     *      permission="CREATE"
-     * )
-     * @Template("@OroDashboard/Dashboard/update.html.twig")
      * @param Request $request
      * @return array|RedirectResponse
      */
+    #[Route(path: '/create', name: 'oro_dashboard_create')]
+    #[Template('@OroDashboard/Dashboard/update.html.twig')]
+    #[Acl(id: 'oro_dashboard_create', type: 'entity', class: Dashboard::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         $dashboardModel = $this->getDashboardManager()->createDashboardModel();
@@ -203,18 +185,18 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/widget/{widget}/{name}/{bundle}",
-     *      name="oro_dashboard_widget",
-     *      requirements={"widget"="[\w\-]+", "bundle"="^$|\w+", "name"="[\w\-]+"},
-     *      defaults={"bundle"= ""}
-     * )
      *
      * @param string $widget
      * @param string $bundle
      * @param string $name
      * @return Response
      */
+    #[Route(
+        path: '/widget/{widget}/{name}/{bundle}',
+        name: 'oro_dashboard_widget',
+        requirements: ['widget' => '[\w\-]+', 'bundle' => '^$|\w+', 'name' => '[\w\-]+'],
+        defaults: ['bundle' => '']
+    )]
     public function widgetAction($widget, $bundle, $name)
     {
         $view = !empty($bundle)
@@ -228,17 +210,17 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/itemized_widget/{widget}/{bundle}/{name}",
-     *      name="oro_dashboard_itemized_widget",
-     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
-     * )
      *
      * @param string $widget
      * @param string $bundle
      * @param string $name
      * @return Response
      */
+    #[Route(
+        path: '/itemized_widget/{widget}/{bundle}/{name}',
+        name: 'oro_dashboard_itemized_widget',
+        requirements: ['widget' => '[\w\-]+', 'bundle' => '\w+', 'name' => '[\w\-]+']
+    )]
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
         /** @var WidgetConfigs $manager */
@@ -258,17 +240,17 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/itemized_data_widget/{widget}/{bundle}/{name}",
-     *      name="oro_dashboard_itemized_data_widget",
-     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
-     * )
      * @param Request $request
      * @param string $widget
      * @param string $bundle
      * @param string $name
      * @return Response
      */
+    #[Route(
+        path: '/itemized_data_widget/{widget}/{bundle}/{name}',
+        name: 'oro_dashboard_itemized_data_widget',
+        requirements: ['widget' => '[\w\-]+', 'bundle' => '\w+', 'name' => '[\w\-]+']
+    )]
     public function itemizedDataWidgetAction(Request $request, $widget, $bundle, $name)
     {
         /** @var WidgetConfigs $manager */
@@ -287,12 +269,7 @@ class DashboardController extends AbstractController
         );
     }
 
-    /**
-     * @Route(
-     *      "/launchpad",
-     *      name="oro_dashboard_quick_launchpad"
-     * )
-     */
+    #[Route(path: '/launchpad', name: 'oro_dashboard_quick_launchpad')]
     public function quickLaunchpadAction()
     {
         return $this->render(
@@ -325,12 +302,6 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/grid/{widget}/{gridName}",
-     *      name="oro_dashboard_grid",
-     *      requirements={"gridName"="[\w\:-]+"}
-     * )
-     * @Template("@OroDashboard/Dashboard/grid.html.twig")
      *
      * @param string  $widget
      * @param string  $gridName
@@ -338,6 +309,8 @@ class DashboardController extends AbstractController
      *
      * @return array
      */
+    #[Route(path: '/grid/{widget}/{gridName}', name: 'oro_dashboard_grid', requirements: ['gridName' => '[\w\:-]+'])]
+    #[Template('@OroDashboard/Dashboard/grid.html.twig')]
     public function gridAction($widget, $gridName, Request $request)
     {
         $params       = $request->get('params', []);

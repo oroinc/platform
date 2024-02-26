@@ -138,7 +138,7 @@ class OroApiBundle extends Bundle
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(new Compiler\MakeTestLoggerServicePersistentPass());
             $container->addCompilerPass(
-                DoctrineOrmMappingsPass::createAnnotationMappingDriver(
+                DoctrineOrmMappingsPass::createAttributeMappingDriver(
                     ['Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity'],
                     [$this->getPath() . '/Tests/Functional/Environment/Entity']
                 )

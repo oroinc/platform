@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SearchBundle\Controller;
 
 use Oro\Bundle\SearchBundle\Provider\SearchResultProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,11 +23,9 @@ class SearchController
         $this->searchResultProvider = $searchResultProvider;
     }
 
-    /**
-     * @Route("/search-bar", name="oro_search_bar")
-     * @Template("@OroSearch/Search/searchBar.html.twig")
-     * @AclAncestor("oro_search")
-     */
+    #[Route(path: '/search-bar', name: 'oro_search_bar')]
+    #[Template('@OroSearch/Search/searchBar.html.twig')]
+    #[AclAncestor('oro_search')]
     public function searchBarAction(Request $request): array
     {
         return [
@@ -37,10 +35,8 @@ class SearchController
         ];
     }
 
-    /**
-     * @Route("/suggestion", name="oro_search_suggestion")
-     * @AclAncestor("oro_search")
-     */
+    #[Route(path: '/suggestion', name: 'oro_search_suggestion')]
+    #[AclAncestor('oro_search')]
     public function searchSuggestionAction(Request $request): Response
     {
         $searchString = trim($request->get('search'));
@@ -58,17 +54,9 @@ class SearchController
         return new JsonResponse($suggestions);
     }
 
-    /**
-     * @Route("/", name="oro_search_results")
-     * @Template("@OroSearch/Search/searchResults.html.twig")
-     * @Acl(
-     *      id="oro_search",
-     *      type="action",
-     *      label="oro.search.module_name",
-     *      group_name="",
-     *      category="entity"
-     * )
-     */
+    #[Route(path: '/', name: 'oro_search_results')]
+    #[Template('@OroSearch/Search/searchResults.html.twig')]
+    #[Acl(id: 'oro_search', type: 'action', label: 'oro.search.module_name', groupName: '', category: 'entity')]
     public function searchResultsAction(Request $request): array
     {
         $string = trim($request->get('search'));

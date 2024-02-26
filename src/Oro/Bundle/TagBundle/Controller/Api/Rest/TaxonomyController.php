@@ -3,8 +3,9 @@
 namespace Oro\Bundle\TagBundle\Controller\Api\Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\TagBundle\Entity\Taxonomy;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -21,14 +22,9 @@ class TaxonomyController extends RestController
      *      description="Delete taxonomy",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_taxonomy_delete",
-     *      type="entity",
-     *      class="Oro\Bundle\TagBundle\Entity\Taxonomy",
-     *      permission="DELETE"
-     * )
      * @return Response
      */
+    #[Acl(id: 'oro_taxonomy_delete', type: 'entity', class: Taxonomy::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);

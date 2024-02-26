@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -44,9 +43,8 @@ class EmailAssociationsDemoDataFixturesListenerTest extends OrmTestCase
         $this->emailAddressVisibilityManager = $this->createMock(EmailAddressVisibilityManager::class);
 
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            dirname((new \ReflectionClass(Email::class))->getFileName())
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver(
+            [dirname((new \ReflectionClass(Email::class))->getFileName())]
         ));
 
         $doctrine = $this->createMock(ManagerRegistry::class);

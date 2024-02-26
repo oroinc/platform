@@ -7,8 +7,8 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,15 +31,10 @@ class EmailTemplateController extends RestController
      *      description="Delete email template",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_email_emailtemplate_delete",
-     *      type="entity",
-     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
-     *      permission="DELETE"
-     * )
      *
      * @return Response
      */
+    #[Acl(id: 'oro_email_emailtemplate_delete', type: 'entity', class: EmailTemplate::class, permission: 'DELETE')]
     public function deleteAction($id)
     {
         /** @var EmailTemplate $entity */
@@ -73,10 +68,10 @@ class EmailTemplateController extends RestController
      *     description="Get templates by entity name",
      *     resource=true
      * )
-     * @AclAncestor("oro_email_emailtemplate_index")
      *
      * @return Response
      */
+    #[AclAncestor('oro_email_emailtemplate_index')]
     public function cgetAction($entityName = null, $includeNonEntity = false, $includeSystemTemplates = true)
     {
         if (!$entityName) {
@@ -112,10 +107,10 @@ class EmailTemplateController extends RestController
      *     description="Get available variables",
      *     resource=true
      * )
-     * @AclAncestor("oro_email_emailtemplate_view")
      *
      * @return Response
      */
+    #[AclAncestor('oro_email_emailtemplate_view')]
     public function getVariablesAction()
     {
         /** @var VariablesProvider $provider */
@@ -140,11 +135,10 @@ class EmailTemplateController extends RestController
      *     description="Get email template subject, type and content",
      *     resource=true
      * )
-     * @AclAncestor("oro_email_emailtemplate_view")
-     * @ParamConverter("emailTemplate", class="Oro\Bundle\EmailBundle\Entity\EmailTemplate")
-     *
      * @return Response
      */
+    #[ParamConverter('emailTemplate', class: EmailTemplate::class)]
+    #[AclAncestor('oro_email_emailtemplate_view')]
     public function getCompiledAction(EmailTemplate $emailTemplate, $entityId = null)
     {
         $templateParams = [];

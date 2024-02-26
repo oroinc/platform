@@ -3,49 +3,40 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
 
 /**
  * Represents all(extended included) fields and relations for each Entity
- * @ORM\Table(name="oro_entity_config_field")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository")
  */
+#[ORM\Entity(repositoryClass: FieldConfigModelRepository::class)]
+#[ORM\Table(name: 'oro_entity_config_field')]
 class FieldConfigModel extends ConfigModel
 {
-    /**
-     * @var integer
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    protected ?int $id = null;
 
-    /**
-     * @var EntityConfigModel
-     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="fields")
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $entity;
+    #[ORM\ManyToOne(targetEntity: EntityConfigModel::class, inversedBy: 'fields')]
+    #[ORM\JoinColumn(name: 'entity_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?EntityConfigModel $entity = null;
 
     /**
      * IMPORTANT: do not modify this collection manually. addToIndex and removeFromIndex should be used
      *
-     * @var ArrayCollection|ConfigModelIndexValue[]
-     * @ORM\OneToMany(targetEntity="ConfigModelIndexValue", mappedBy="field", cascade={"all"})
+     * @var Collection<int, ConfigModelIndexValue>
      */
-    protected $indexedValues;
+    #[ORM\OneToMany(mappedBy: 'field', targetEntity: ConfigModelIndexValue::class, cascade: ['all'])]
+    protected ?Collection $indexedValues = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="field_name", type="string", length=255)
-     */
-    protected $fieldName;
+    #[ORM\Column(name: 'field_name', type: Types::STRING, length: 255)]
+    protected ?string $fieldName = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=60, nullable=false)
-     */
-    protected $type;
+    #[ORM\Column(type: Types::STRING, length: 60, nullable: false)]
+    protected ?string $type = null;
 
     protected $options;
 

@@ -2,23 +2,23 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Metadata\Factory;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Driver\AnnotationDriver;
+use Oro\Bundle\EntityConfigBundle\Metadata\Driver\AttributeDriver;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 /**
  * The factory to create EntityMetadata objects that contain all the metadata information
- * configured via {@see \Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config}
- * and {@see \Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField} annotations.
+ * configured via {@see \Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config}
+ * and {@see \Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField} annotations.
  */
 class MetadataFactory
 {
-    private AnnotationDriver $driver;
+    private AttributeDriver $driver;
     /** @var EntityMetadata[] */
     private array $loadedMetadata = [];
     /** @var EntityMetadata[] */
     private array $loadedClassMetadata = [];
 
-    public function __construct(AnnotationDriver $driver)
+    public function __construct(AttributeDriver $driver)
     {
         $this->driver = $driver;
     }

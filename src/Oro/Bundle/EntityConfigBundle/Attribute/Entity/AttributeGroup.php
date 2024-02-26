@@ -4,12 +4,14 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEntityConfigBundle_Attribute_Entity_AttributeGroup;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -18,89 +20,54 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 /**
  * Represents group of attributes.
  *
- * @ORM\Table(name="oro_attribute_group")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository")
- * @ORM\HasLifecycleCallbacks
- * @Config(
- *      mode="hidden"
- * )
  * @method LocalizedFallbackValue getLabel(Localization $localization = null)
  * @method LocalizedFallbackValue getDefaultLabel()
  * @mixin OroEntityConfigBundle_Attribute_Entity_AttributeGroup
  */
+#[ORM\Entity(repositoryClass: AttributeGroupRepository::class)]
+#[ORM\Table(name: 'oro_attribute_group')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(mode: 'hidden')]
 class AttributeGroup implements DatesAwareInterface, ExtendEntityInterface
 {
     use DatesAwareTrait;
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
-     * @var ArrayCollection|LocalizedFallbackValue[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
-     *      cascade={"ALL"},
-     *      orphanRemoval=true
-     * )
-     * @ORM\JoinTable(
-     *      name="oro_attribute_group_label",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="attribute_group_id", referencedColumnName="id", onDelete="CASCADE")
-     *      },
-     *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="localized_value_id", referencedColumnName="id", onDelete="CASCADE", unique=true)
-     *      }
-     * )
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
-     * )
+     * @var Collection<int, LocalizedFallbackValue>
      */
-    protected $labels;
+    #[ORM\ManyToMany(targetEntity: LocalizedFallbackValue::class, cascade: ['ALL'], orphanRemoval: true)]
+    #[ORM\JoinTable(name: 'oro_attribute_group_label')]
+    #[ORM\JoinColumn(name: 'attribute_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'localized_value_id', referencedColumnName: 'id', unique: true, onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    protected ?Collection $labels = null;
+
+    #[ORM\Column(name: 'code', type: Types::STRING, length: 255, unique: false)]
+    private ?string $code = null;
+
+    #[ORM\ManyToOne(targetEntity: AttributeFamily::class, inversedBy: 'attributeGroups')]
+    #[ORM\JoinColumn(name: 'attribute_family_id', referencedColumnName: 'id')]
+    private ?AttributeFamily $attributeFamily = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="code", type="string", length=255, unique=false)
+     * @var Collection<int, AttributeGroupRelation>
      */
-    private $code;
+    #[ORM\OneToMany(
+        mappedBy: 'attributeGroup',
+        targetEntity: AttributeGroupRelation::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private ?Collection $attributeRelations = null;
 
-    /**
-     * @var AttributeFamily
-     * @ORM\ManyToOne(
-     *     targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups"
-     * )
-     * @ORM\JoinColumn(name="attribute_family_id", referencedColumnName="id")
-     */
-    private $attributeFamily;
-
-    /**
-     * @var Collection|AttributeGroupRelation[]
-     * @ORM\OneToMany(
-     *     targetEntity="AttributeGroupRelation",
-     *     mappedBy="attributeGroup",
-     *     cascade={"persist", "remove"},
-     *     orphanRemoval=true
-     * )
-     */
-    private $attributeRelations;
-
-    /**
-     * @var bool
-     * @ORM\Column(name="is_visible", type="boolean", nullable=false, options={"default"=true})
-     */
-    private $isVisible = true;
+    #[ORM\Column(name: 'is_visible', type: Types::BOOLEAN, nullable: false, options: ['default' => true])]
+    private ?bool $isVisible = true;
 
     /**
      * {@inheritdoc}
@@ -185,7 +152,7 @@ class AttributeGroup implements DatesAwareInterface, ExtendEntityInterface
     }
 
     /**
-     * @return ArrayCollection|\Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue[]
+     * @return ArrayCollection|LocalizedFallbackValue[]
      */
     public function getLabels()
     {

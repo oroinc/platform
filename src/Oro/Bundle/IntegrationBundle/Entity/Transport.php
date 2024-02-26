@@ -2,38 +2,29 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * Class Transport
+ * Integration Transport Entity
  *
  * @package Oro\Bundle\IntegrationBundle\Entity
- * @ORM\Table(
- *      name="oro_integration_transport",
- *      indexes={
- *          @ORM\Index(name="oro_int_trans_type_idx", columns={"type"})
- *      }
- * )
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string", length=30)
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_integration_transport')]
+#[ORM\Index(columns: ['type'], name: 'oro_int_trans_type_idx')]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string', length: 30)]
 abstract class Transport
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var Channel
-     *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel", mappedBy="transport")
-     */
-    protected $channel;
+    #[ORM\OneToOne(mappedBy: 'transport', targetEntity: Channel::class)]
+    protected ?Channel $channel = null;
 
     /**
      * @return mixed

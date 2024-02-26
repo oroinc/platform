@@ -7,15 +7,15 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
  */
 class ActionSecurityMetadataProvider
 {
-    /** @var AclAnnotationProvider */
-    private $annotationProvider;
+    /** @var AclAttributeProvider */
+    private $attributeProvider;
 
     /** @var ActionSecurityMetadata[] */
     private $localCache;
 
-    public function __construct(AclAnnotationProvider $annotationProvider)
+    public function __construct(AclAttributeProvider $attributeProvider)
     {
-        $this->annotationProvider = $annotationProvider;
+        $this->attributeProvider = $attributeProvider;
     }
 
     /**
@@ -26,9 +26,9 @@ class ActionSecurityMetadataProvider
      */
     public function isKnownAction($actionName)
     {
-        $annotation = $this->annotationProvider->findAnnotationById($actionName);
+        $attribute = $this->attributeProvider->findAttributeById($actionName);
 
-        return null !== $annotation && 'action' === $annotation->getType();
+        return null !== $attribute && 'action' === $attribute->getType();
     }
 
     /**
@@ -59,19 +59,19 @@ class ActionSecurityMetadataProvider
     private function loadMetadata()
     {
         $data = [];
-        $annotations = $this->annotationProvider->getAnnotations('action');
-        foreach ($annotations as $annotation) {
-            $description = $annotation->getDescription();
+        $attributes = $this->attributeProvider->getAttributes('action');
+        foreach ($attributes as $attribute) {
+            $description = $attribute->getDescription();
             if ($description) {
                 $description = new Label($description);
             }
 
             $data[] = new ActionSecurityMetadata(
-                $annotation->getId(),
-                $annotation->getGroup(),
-                new Label($annotation->getLabel()),
+                $attribute->getId(),
+                $attribute->getGroup(),
+                new Label($attribute->getLabel()),
                 $description,
-                $annotation->getCategory()
+                $attribute->getCategory()
             );
         }
 

@@ -28,8 +28,8 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
         $loader->load('commands.yml');
         $loader->load('image_placeholder.yml');
 
-        if ($config['view']['annotations']) {
-            $loader->load('view_annotations.yml');
+        if ($config['view']['attributes']) {
+            $loader->load('view_attributes.yml');
         }
 
         $container->setParameter(

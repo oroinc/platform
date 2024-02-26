@@ -2,51 +2,34 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
- * @ORM\Entity()
- * @ORM\Table(
- *     name="oro_grid_view_user_rel",
- *     indexes={
- *         @ORM\Index(name="idx_oro_grid_view_user_rel_type", columns={"type"})
- *     }
- * )
- *
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({"grid_view_user" = "Oro\Bundle\DataGridBundle\Entity\GridViewUser"})
- */
+* Entity that represents Abstract Grid View User
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_grid_view_user_rel')]
+#[ORM\Index(columns: ['type'], name: 'idx_oro_grid_view_user_rel_type')]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\DiscriminatorMap(['grid_view_user' => GridViewUser::class])]
 abstract class AbstractGridViewUser
 {
-    /**
-     * @var int $id
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="alias", type="string")
-     */
-    protected $alias;
+    #[ORM\Column(name: 'alias', type: Types::STRING)]
+    protected ?string $alias = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="grid_name", type="string")
-     */
-    protected $gridName;
+    #[ORM\Column(name: 'grid_name', type: Types::STRING)]
+    protected ?string $gridName = null;
 
-    /**
-     * @var AbstractGridView
-     */
-    protected $gridView;
+    protected ?AbstractGridView $gridView = null;
 
     /**
      * @return int

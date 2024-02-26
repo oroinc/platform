@@ -35,17 +35,9 @@ class MailboxController extends AbstractController
     private const ACTIVE_GROUP = 'platform';
     private const ACTIVE_SUBGROUP = 'email_configuration';
 
-    /**
-     * @Route(
-     *      "/mailbox/update/{id}",
-     *      name="oro_email_mailbox_update"
-     * )
-     * @ParamConverter(
-     *      "mailbox",
-     *      class="Oro\Bundle\EmailBundle\Entity\Mailbox"
-     * )
-     * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
-     */
+    #[Route(path: '/mailbox/update/{id}', name: 'oro_email_mailbox_update')]
+    #[ParamConverter('mailbox', class: Mailbox::class)]
+    #[Template('@OroEmail/Configuration/Mailbox/update.html.twig')]
     public function updateAction(Mailbox $mailbox, Request $request): array|RedirectResponse
     {
         return $this->update($mailbox, $request);
@@ -85,22 +77,15 @@ class MailboxController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/mailbox/create", name="oro_email_mailbox_create")
-     * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
-     */
+    #[Route(path: '/mailbox/create', name: 'oro_email_mailbox_create')]
+    #[Template('@OroEmail/Configuration/Mailbox/update.html.twig')]
     public function createAction(Request $request): array|RedirectResponse
     {
         return $this->update(new Mailbox(), $request);
     }
 
-    /**
-     * @Route("/mailbox/delete/{id}", name="oro_email_mailbox_delete", methods={"DELETE"})
-     * @ParamConverter(
-     *      "mailbox",
-     *      class="Oro\Bundle\EmailBundle\Entity\Mailbox"
-     * )
-     */
+    #[Route(path: '/mailbox/delete/{id}', name: 'oro_email_mailbox_delete', methods: ['DELETE'])]
+    #[ParamConverter('mailbox', class: Mailbox::class)]
     public function deleteAction(Mailbox $mailbox): Response
     {
         $mailboxManager = $this->container->get('doctrine')->getManagerForClass(Mailbox::class);
@@ -112,12 +97,8 @@ class MailboxController extends AbstractController
 
     /**
      * This is a separate route for user searing within mailbox organization.
-     *
-     * @Route(
-     *      "/mailbox/users/search/{organizationId}",
-     *      name="oro_email_mailbox_users_search"
-     * )
      */
+    #[Route(path: '/mailbox/users/search/{organizationId}', name: 'oro_email_mailbox_users_search')]
     public function searchUsersAction(Request $request, int $organizationId): JsonResponse
     {
         $autocompleteRequest = new AutocompleteRequest($request);

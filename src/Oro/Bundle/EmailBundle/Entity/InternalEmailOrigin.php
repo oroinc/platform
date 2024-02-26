@@ -2,26 +2,22 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * An Email Origin which can be used for emails sent by BAP
- *
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks()
  */
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class InternalEmailOrigin extends EmailOrigin
 {
     const BAP = 'BAP';
 
     const MAILBOX_NAME = 'Local';
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="internal_name", type="string", length=30)
-     */
-    protected $internalName;
+    #[ORM\Column(name: 'internal_name', type: Types::STRING, length: 30)]
+    protected ?string $internalName = null;
 
     /**
      * Get an internal email origin name.
@@ -56,9 +52,7 @@ class InternalEmailOrigin extends EmailOrigin
         return sprintf('Internal - %s', $this->internalName);
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         if ($this->mailboxName === null) {

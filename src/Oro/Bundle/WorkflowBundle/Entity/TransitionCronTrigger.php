@@ -2,26 +2,21 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
- */
+* Entity that represents Transition Cron Trigger
+*
+*/
+#[ORM\Entity]
 class TransitionCronTrigger extends BaseTransitionTrigger
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="cron", type="string", length=100)
-     */
-    protected $cron;
+    #[ORM\Column(name: 'cron', type: Types::STRING, length: 100)]
+    protected ?string $cron = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="filter", type="text", length=1024, nullable=true)
-     */
-    protected $filter;
+    #[ORM\Column(name: 'filter', type: Types::TEXT, length: 1024, nullable: true)]
+    protected ?string $filter = null;
 
     /**
      * @return string

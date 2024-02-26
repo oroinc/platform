@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,8 +24,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Entities controller.
- * @Route("/entities")
  */
+#[Route(path: '/entities')]
 class EntitiesController extends AbstractController
 {
     /**
@@ -34,13 +34,9 @@ class EntitiesController extends AbstractController
      * @param string $entityName
      *
      * @return array
-     *
-     * @Route(
-     *      "/{entityName}",
-     *      name="oro_entity_index"
-     * )
-     * @Template()
      */
+    #[Route(path: '/{entityName}', name: 'oro_entity_index')]
+    #[Template]
     public function indexAction($entityName)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -74,14 +70,13 @@ class EntitiesController extends AbstractController
      * @param string $fieldName
      *
      * @return array
-     *
-     * @Route(
-     *      "/detailed/{id}/{entityName}/{fieldName}",
-     *      name="oro_entity_detailed",
-     *      defaults={"id"=0, "fieldName"=""}
-     * )
-     * @Template
      */
+    #[Route(
+        path: '/detailed/{id}/{entityName}/{fieldName}',
+        name: 'oro_entity_detailed',
+        defaults: ['id' => 0, 'fieldName' => '']
+    )]
+    #[Template]
     public function detailedAction($id, $entityName, $fieldName)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -143,14 +138,13 @@ class EntitiesController extends AbstractController
      * @param string $fieldName
      *
      * @return array
-     *
-     * @Route(
-     *      "/relation/{id}/{entityName}/{fieldName}",
-     *      name="oro_entity_relation",
-     *      defaults={"id"=0, "className"="", "fieldName"=""}
-     * )
-     * @Template()
      */
+    #[Route(
+        path: '/relation/{id}/{entityName}/{fieldName}',
+        name: 'oro_entity_relation',
+        defaults: ['id' => 0, 'className' => '', 'fieldName' => '']
+    )]
+    #[Template]
     public function relationAction($id, $entityName, $fieldName)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -191,13 +185,9 @@ class EntitiesController extends AbstractController
      * @param string $id
      *
      * @return array
-     *
-     * @Route(
-     *      "/view/{entityName}/item/{id}",
-     *      name="oro_entity_view"
-     * )
-     * @Template()
      */
+    #[Route(path: '/view/{entityName}/item/{id}', name: 'oro_entity_view')]
+    #[Template]
     public function viewAction($entityName, $id)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -233,14 +223,9 @@ class EntitiesController extends AbstractController
      * @param string $id
      *
      * @return array
-     *
-     * @Route(
-     *      "/update/{entityName}/item/{id}",
-     *      name="oro_entity_update",
-     *      defaults={"id"=0}
-     * )
-     * @Template()
      */
+    #[Route(path: '/update/{entityName}/item/{id}', name: 'oro_entity_update', defaults: ['id' => 0])]
+    #[Template]
     public function updateAction(Request $request, $entityName, $id)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -307,14 +292,9 @@ class EntitiesController extends AbstractController
      * @param string $id
      *
      * @return JsonResponse
-     *
-     * @Route(
-     *      "/delete/{entityName}/item/{id}",
-     *      name="oro_entity_delete",
-     *      methods={"DELETE"}
-     * )
-     * @CsrfProtection()
      */
+    #[Route(path: '/delete/{entityName}/item/{id}', name: 'oro_entity_delete', methods: ['DELETE'])]
+    #[CsrfProtection()]
     public function deleteAction($entityName, $id)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);

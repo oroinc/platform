@@ -28,10 +28,8 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/login", name="oro_user_security_login")
-     * @Template("@OroUser/Security/login.html.twig")
-     */
+    #[Route(path: '/login', name: 'oro_user_security_login')]
+    #[Template('@OroUser/Security/login.html.twig')]
     public function loginAction()
     {
         if ($this->getUser() instanceof AbstractUser) {
@@ -54,9 +52,7 @@ class SecurityController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/login-check", name="oro_user_security_check")
-     */
+    #[Route(path: '/login-check', name: 'oro_user_security_check')]
     public function checkAction()
     {
         if ($this->getUser() instanceof AbstractUser) {
@@ -69,9 +65,7 @@ class SecurityController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/logout", name="oro_user_security_logout")
-     */
+    #[Route(path: '/logout', name: 'oro_user_security_logout')]
     public function logoutAction()
     {
         throw new \RuntimeException('You must activate the logout in your security firewall configuration.');

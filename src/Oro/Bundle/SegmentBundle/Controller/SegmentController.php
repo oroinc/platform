@@ -6,8 +6,8 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler;
@@ -29,35 +29,28 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SegmentController extends AbstractController
 {
     /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_segment_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     *
-     * @Template
-     * @AclAncestor("oro_segment_view")
      * @return array
      */
+    #[Route(
+        path: '/{_format}',
+        name: 'oro_segment_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template]
+    #[AclAncestor('oro_segment_view')]
     public function indexAction()
     {
         return [];
     }
 
     /**
-     * @Route("/view/{id}", name="oro_segment_view", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_segment_view",
-     *      type="entity",
-     *      permission="VIEW",
-     *      class="Oro\Bundle\SegmentBundle\Entity\Segment"
-     * )
-     * @Template
-     *
      * @param Segment $entity
      * @return array
      */
+    #[Route(path: '/view/{id}', name: 'oro_segment_view', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[Acl(id: 'oro_segment_view', type: 'entity', class: Segment::class, permission: 'VIEW')]
     public function viewAction(Segment $entity)
     {
         $this->checkSegment($entity);
@@ -81,36 +74,24 @@ class SegmentController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/create", name="oro_segment_create")
-     * @Template("@OroSegment/Segment/update.html.twig")
-     * @Acl(
-     *      id="oro_segment_create",
-     *      type="entity",
-     *      permission="CREATE",
-     *      class="Oro\Bundle\SegmentBundle\Entity\Segment"
-     * )
-     */
+    #[Route(path: '/create', name: 'oro_segment_create')]
+    #[Template('@OroSegment/Segment/update.html.twig')]
+    #[Acl(id: 'oro_segment_create', type: 'entity', class: Segment::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new Segment(), $request);
     }
 
     /**
-     * @Route("/update/{id}", name="oro_segment_update", requirements={"id"="\d+"})
      *
-     * @Template
-     * @Acl(
-     *      id="oro_segment_update",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="Oro\Bundle\SegmentBundle\Entity\Segment"
-     * )
      *
      * @param Segment $entity
      * @param Request $request
      * @return array
      */
+    #[Route(path: '/update/{id}', name: 'oro_segment_update', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[Acl(id: 'oro_segment_update', type: 'entity', class: Segment::class, permission: 'EDIT')]
     public function updateAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);
@@ -119,14 +100,14 @@ class SegmentController extends AbstractController
     }
 
     /**
-     * @Route("/clone/{id}", name="oro_segment_clone", requirements={"id"="\d+"})
-     * @Template("@OroSegment/Segment/update.html.twig")
-     * @AclAncestor("oro_segment_create")
      *
      * @param Segment $entity
      * @param Request $request
      * @return array
      */
+    #[Route(path: '/clone/{id}', name: 'oro_segment_clone', requirements: ['id' => '\d+'])]
+    #[Template('@OroSegment/Segment/update.html.twig')]
+    #[AclAncestor('oro_segment_create')]
     public function cloneAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);
@@ -145,13 +126,13 @@ class SegmentController extends AbstractController
     }
 
     /**
-     * @Route("/refresh/{id}", name="oro_segment_refresh", requirements={"id"="\d+"})
-     * @AclAncestor("oro_segment_update")
      *
      * @param Segment $entity
      * @param Request $request
      * @return RedirectResponse
      */
+    #[Route(path: '/refresh/{id}', name: 'oro_segment_refresh', requirements: ['id' => '\d+'])]
+    #[AclAncestor('oro_segment_update')]
     public function refreshAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);

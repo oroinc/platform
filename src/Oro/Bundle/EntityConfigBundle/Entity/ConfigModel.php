@@ -3,34 +3,28 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\MappedSuperclass
- */
+* ConfigModel abstract class
+*
+*/
+#[ORM\MappedSuperclass]
 abstract class ConfigModel
 {
     const MODE_DEFAULT = 'default';
     const MODE_HIDDEN = 'hidden';
     const MODE_READONLY = 'readonly';
 
-    /**
-     * @var \DateTime
-     * @ORM\Column(type="datetime")
-     */
-    protected $created;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $created = null;
 
-    /**
-     * @var \DateTime
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    protected $updated;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $updated = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=8)
-     */
-    protected $mode;
+    #[ORM\Column(type: Types::STRING, length: 8)]
+    protected ?string $mode = null;
 
     /**
      * @var array
@@ -41,8 +35,8 @@ abstract class ConfigModel
      *      ],
      *      ...
      *  ]
-     * @ORM\Column(name="data", type="array", nullable=true)
      */
+    #[ORM\Column(name: 'data', type: Types::ARRAY, nullable: true)]
     protected $data;
 
     /**

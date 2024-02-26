@@ -82,7 +82,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
         );
-        $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
+        $config->set(ActivityScope::SHOW_ON_PAGE, ActivityScope::VIEW_PAGE);
         $config->set('activities', [$activityClass]);
 
         $this->configManager->expects($this->once())
@@ -111,7 +111,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
         );
-        $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
+        $config->set(ActivityScope::SHOW_ON_PAGE, ActivityScope::VIEW_PAGE);
         $config->set('activities', [$activityClass]);
 
         $this->configManager->expects($this->once())
@@ -151,7 +151,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
         );
-        $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE');
+        $config->set(ActivityScope::SHOW_ON_PAGE, ActivityScope::UPDATE_PAGE);
         $config->set('activities', [$activityClass]);
 
         $this->configManager->expects($this->once())
@@ -176,7 +176,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
         );
-        $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
+        $config->set(ActivityScope::SHOW_ON_PAGE, ActivityScope::VIEW_PAGE);
         $config->set('activities', [$activityClass]);
 
         $this->configManager->expects($this->once())
@@ -215,7 +215,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
         );
-        $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
+        $config->set(ActivityScope::SHOW_ON_PAGE, ActivityScope::VIEW_PAGE);
         $config->set('activities', [$activityClass]);
 
         $this->configManager->expects($this->once())
@@ -254,7 +254,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $config = new Config(
             new EntityConfigId('activity', $entityClass)
         );
-        $config->set(ActivityScope::SHOW_ON_PAGE, '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
+        $config->set(ActivityScope::SHOW_ON_PAGE, ActivityScope::VIEW_PAGE);
         $config->set('activities', [$activityClass]);
 
         $this->configManager->expects($this->once())
@@ -278,29 +278,6 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
     }
 
-    public function testIsAllowedButtonWithUnknownPageConstant()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $entity = new TestTarget(1);
-
-        $config = new Config(
-            new EntityConfigId('activity', get_class($entity))
-        );
-        $config->set(ActivityScope::SHOW_ON_PAGE, 'UNKNOWN_ORO_CONSTANT');
-
-        $this->configManager->expects($this->once())
-            ->method('hasConfig')
-            ->with(get_class($entity))
-            ->willReturn(true);
-        $this->configManager->expects($this->once())
-            ->method('getEntityConfig')
-            ->with('activity', get_class($entity))
-            ->willReturn($config);
-
-        $event = new BeforeGroupingChainWidgetEvent(ActivityScope::SHOW_ON_PAGE, [], $entity);
-        $this->filter->isAllowedButton($event);
-    }
-
     /**
      * @dataProvider isAllowedButtonProvider
      */
@@ -308,7 +285,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         int $pageType,
         array $widgets,
         object $entity,
-        ?string $configProviderSetting,
+        ?int $configProviderSetting,
         array $expected
     ) {
         $this->configManager->expects($this->once())
@@ -341,28 +318,28 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
                 'groupType'             => ActivityScope::VIEW_PAGE,
                 'widgets'               => $widgets,
                 'entity'                => $entity,
-                'configProviderSetting' => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE',
+                'configProviderSetting' => ActivityScope::UPDATE_PAGE,
                 'expected'              => []
             ],
             'new entity with "update" activity' => [
                 'groupType'             => ActivityScope::UPDATE_PAGE,
                 'widgets'               => $widgets,
                 'entity'                => new TestTarget(null),
-                'configProviderSetting' => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE',
+                'configProviderSetting' => ActivityScope::UPDATE_PAGE,
                 'expected'              => []
             ],
             'entity with "view/update" activity entity config and "view" event' => [
                 'groupType'             => ActivityScope::VIEW_PAGE,
                 'widgets'               => $widgets,
                 'entity'                => $entity,
-                'configProviderSetting' => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_UPDATE_PAGES',
+                'configProviderSetting' => ActivityScope::VIEW_UPDATE_PAGES,
                 'expected'              => $widgets
             ],
             'entity with "view/update" activity entity config and "update" event' => [
                 'groupType'             => ActivityScope::UPDATE_PAGE,
                 'widgets'               => $widgets,
                 'entity'                => $entity,
-                'configProviderSetting' => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_UPDATE_PAGES',
+                'configProviderSetting' => ActivityScope::VIEW_UPDATE_PAGES,
                 'expected'              => $widgets
             ],
         ];

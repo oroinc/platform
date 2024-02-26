@@ -14,11 +14,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class ItemController extends AbstractController
 {
     /**
-     * @Route("/", name="oro_test_item_index")
-     * @Template
      *
      * @return array
      */
+    #[Route(path: '/', name: 'oro_test_item_index')]
+    #[Template]
     public function indexAction()
     {
         return [
@@ -27,32 +27,28 @@ class ItemController extends AbstractController
     }
 
     /**
-     * @Route("/view/{id}", name="oro_test_item_view", requirements={"id"="\d+"})
-     * @Template
-     *
      * @param Item $item
      * @return array
      */
+    #[Route(path: '/view/{id}', name: 'oro_test_item_view', requirements: ['id' => '\d+'])]
+    #[Template]
     public function viewAction(Item $item)
     {
         return ['entity' => $item];
     }
 
-    /**
-     * @Route("/create", name="oro_test_item_create")
-     */
+    #[Route(path: '/create', name: 'oro_test_item_create')]
     public function createAction()
     {
         return new Response();
     }
 
     /**
-     * @Route("/update/{id}", name="oro_test_item_update", requirements={"id"="\d+"})
-     * @Template
-     *
      * @param Item $item
      * @return array
      */
+    #[Route(path: '/update/{id}', name: 'oro_test_item_update', requirements: ['id' => '\d+'])]
+    #[Template]
     public function updateAction(Item $item)
     {
         return $this->update($item);

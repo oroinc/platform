@@ -4,49 +4,44 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEmailBundle_Entity_EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Represents localizable email template which is used for template email notifications sending.
  *
- * @ORM\Table(name="oro_email_template",
- *      uniqueConstraints={@ORM\UniqueConstraint(name="UQ_NAME", columns={"name", "entityName"})},
- *      indexes={@ORM\Index(name="email_name_idx", columns={"name"}),
- * @ORM\Index(name="email_is_system_idx", columns={"isSystem"}),
- * @ORM\Index(name="email_entity_name_idx", columns={"entityName"})})
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository")
- * @Config(
- *      routeName="oro_email_emailtemplate_index",
- *      defaultValues={
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @mixin OroEmailBundle_Entity_EmailTemplate
  */
+#[ORM\Entity(repositoryClass: EmailTemplateRepository::class)]
+#[ORM\Table(name: 'oro_email_template')]
+#[ORM\Index(columns: ['name'], name: 'email_name_idx')]
+#[ORM\Index(columns: ['isSystem'], name: 'email_is_system_idx')]
+#[ORM\Index(columns: ['entityName'], name: 'email_entity_name_idx')]
+#[ORM\UniqueConstraint(name: 'UQ_NAME', columns: ['name', 'entityName'])]
+#[Config(
+    routeName: 'oro_email_emailtemplate_index',
+    defaultValues: [
+        'ownership' => [
+            'owner_type' => 'USER',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'user_owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
 {
     use ExtendEntityTrait;
@@ -54,106 +49,61 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     public const TYPE_HTML = 'html';
     public const TYPE_TEXT = 'txt';
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="isSystem", type="boolean")
-     */
-    protected $isSystem;
+    #[ORM\Column(name: 'isSystem', type: Types::BOOLEAN)]
+    protected ?bool $isSystem = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="isEditable", type="boolean")
-     */
-    protected $isEditable;
+    #[ORM\Column(name: 'isEditable', type: Types::BOOLEAN)]
+    protected ?bool $isEditable = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $owner = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="parent", type="integer", nullable=true)
-     */
-    protected $parent;
+    #[ORM\Column(name: 'parent', type: Types::INTEGER, nullable: true)]
+    protected ?int $parent = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="subject", type="string", length=255, nullable=true)
-     */
-    protected $subject;
+    #[ORM\Column(name: 'subject', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $subject = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="text", nullable=true)
-     */
-    protected $content;
+    #[ORM\Column(name: 'content', type: Types::TEXT, nullable: true)]
+    protected ?string $content = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entityName", type="string", length=255, nullable=true)
-     */
-    protected $entityName;
+    #[ORM\Column(name: 'entityName', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $entityName = null;
 
     /**
      * Template type:
      *  - html
      *  - text
-     *
-     * @var string
-     *
-     * @ORM\Column(name="type", type="string", length=20)
      */
-    protected $type = 'html';
+    #[ORM\Column(name: 'type', type: Types::STRING, length: 20)]
+    protected ?string $type = 'html';
 
     /**
-     * @ORM\OneToMany(
-     *     targetEntity="EmailTemplateTranslation",
-     *     mappedBy="template",
-     *     cascade={"persist", "remove"},
-     *     fetch="EXTRA_LAZY"
-     * )
+     * @var Collection<int, EmailTemplateTranslation>
      */
-    protected $translations;
+    #[ORM\OneToMany(
+        mappedBy: 'template',
+        targetEntity: EmailTemplateTranslation::class,
+        cascade: ['persist', 'remove'],
+        fetch: 'EXTRA_LAZY'
+    )]
+    protected ?Collection $translations = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
-    /**
-     * @ORM\Column(type="boolean", options={"default"=true})
-     * @var bool
-     */
-    protected $visible = true;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    protected ?bool $visible = true;
 
     /**
      * @param        $name
@@ -427,10 +377,6 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
         return $this->translations;
     }
 
-    /**
-     * @param EmailTemplateTranslation $translation
-     * @return EmailTemplate
-     */
     public function addTranslation(EmailTemplateTranslation $translation): self
     {
         if (!$this->translations->contains($translation)) {
@@ -441,10 +387,6 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
         return $this;
     }
 
-    /**
-     * @param EmailTemplateTranslation $translation
-     * @return EmailTemplate
-     */
     public function removeTranslation(EmailTemplateTranslation $translation): self
     {
         if ($this->translations->contains($translation)) {

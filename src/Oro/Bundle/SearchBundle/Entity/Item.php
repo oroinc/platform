@@ -3,19 +3,18 @@
 namespace Oro\Bundle\SearchBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
 /**
  * Search index items that correspond to specific entity record
- *
- * @ORM\Table(
- *  name="oro_search_item",
- *  uniqueConstraints={@ORM\UniqueConstraint(name="IDX_ENTITY", columns={"entity", "record_id"})},
- *  indexes={@ORM\Index(name="IDX_ALIAS", columns={"alias"}), @ORM\Index(name="IDX_ENTITIES", columns={"entity"})}
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository")
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Entity(repositoryClass: SearchIndexRepository::class)]
+#[ORM\Table(name: 'oro_search_item')]
+#[ORM\Index(columns: ['alias'], name: 'IDX_ALIAS')]
+#[ORM\Index(columns: ['entity'], name: 'IDX_ENTITIES')]
+#[ORM\UniqueConstraint(name: 'IDX_ENTITY', columns: ['entity', 'record_id'])]
+#[ORM\HasLifecycleCallbacks]
 class Item extends AbstractItem
 {
     /**

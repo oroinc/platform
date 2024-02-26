@@ -3,10 +3,11 @@
 namespace Oro\Bundle\TagBundle\Entity;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroTagBundle_Entity_Tagging;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
@@ -15,83 +16,46 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * The entity that is used to store tags associated to an entity.
  *
- * @ORM\Table(
- *     name="oro_tag_tagging",
- *     uniqueConstraints={
- *        @ORM\UniqueConstraint(name="tagging_idx", columns={"tag_id", "entity_name", "record_id", "user_owner_id"})
- *    },
- *    indexes={
- *        @ORM\Index(name="entity_name_idx", columns={"entity_name", "record_id"})
- *    }
- * )
- * @ORM\Entity
- * @Config(
- *      mode="hidden",
- *      defaultValues={
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @mixin OroTagBundle_Entity_Tagging
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_tag_tagging')]
+#[ORM\Index(columns: ['entity_name', 'record_id'], name: 'entity_name_idx')]
+#[ORM\UniqueConstraint(name: 'tagging_idx', columns: ['tag_id', 'entity_name', 'record_id', 'user_owner_id'])]
+#[Config(
+    mode: 'hidden',
+    defaultValues: [
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class Tagging implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var integer $id
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Tag", inversedBy="tagging", cascade={"ALL"})
-     * @ORM\JoinColumn(name="tag_id", referencedColumnName="id", onDelete="CASCADE")
-     **/
-    protected $tag;
+    #[ORM\ManyToOne(targetEntity: Tag::class, cascade: ['ALL'], inversedBy: 'tagging')]
+    #[ORM\JoinColumn(name: 'tag_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Tag $tag = null;
 
-    /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?User $owner = null;
 
-    /**
-     * @var \Datetime $created
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $created;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $created = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="entity_name", type="string", length=100)
-     */
-    protected $entityName;
+    #[ORM\Column(name: 'entity_name', type: Types::STRING, length: 100)]
+    protected ?string $entityName = null;
 
-    /**
-     * @var int
-     * @ORM\Column(name="record_id", type="integer")
-     */
-    protected $recordId;
+    #[ORM\Column(name: 'record_id', type: Types::INTEGER)]
+    protected ?int $recordId = null;
 
     /**
      * @param Tag|null    $tag

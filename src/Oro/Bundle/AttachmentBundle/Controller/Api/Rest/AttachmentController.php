@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Controller\Api\Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,10 +25,10 @@ class AttachmentController extends RestController
      *      resource=true
      * )
      *
-     * @AclAncestor("oro_attachment_view")
      *
      * @return Response
      */
+    #[AclAncestor('oro_attachment_view')]
     public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
@@ -43,15 +44,10 @@ class AttachmentController extends RestController
      *      resource=true
      * )
      *
-     * @Acl(
-     *      id="oro_attachment_delete",
-     *      type="entity",
-     *      permission="DELETE",
-     *      class="Oro\Bundle\AttachmentBundle\Entity\Attachment"
-     * )
      *
      * @return Response
      */
+    #[Acl(id: 'oro_attachment_delete', type: 'entity', class: Attachment::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);

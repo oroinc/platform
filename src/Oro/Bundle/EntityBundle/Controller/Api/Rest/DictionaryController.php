@@ -18,25 +18,6 @@ class DictionaryController extends RestGetController
      *
      * @param string $dictionary The URL safe name or plural alias of a dictionary entity.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10. Set -1 to get all items."
-     * )
-     * @QueryParam(
-     *      name="locale",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The preferred locale for dictionary values. Falls back to the default locale."
-     * )
-     *
      * @ApiDoc(
      *      description="Get values of a dictionary entity",
      *      resource=true
@@ -44,6 +25,24 @@ class DictionaryController extends RestGetController
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10. Set -1 to get all items.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'locale',
+        requirements: '.+',
+        description: 'The preferred locale for dictionary values. Falls back to the default locale.',
+        nullable: true
+    )]
     public function cgetAction(Request $request, $dictionary)
     {
         $manager = $this->getManager();

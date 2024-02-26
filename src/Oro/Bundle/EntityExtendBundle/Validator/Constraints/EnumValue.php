@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
+use Attribute;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * EnumValue constraint
+ *
  * @Annotation
  */
+#[Attribute]
 class EnumValue extends Constraint
 {
     /**

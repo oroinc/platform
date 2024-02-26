@@ -2,98 +2,53 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Table(name="test_api_default_and_null")
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_default_and_null')]
 class TestDefaultAndNull implements TestFrameworkEntityInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    public $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    public ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="with_default_value_string", type="string", nullable=true)
-     */
-    public $withDefaultValueString;
+    #[ORM\Column(name: 'with_default_value_string', type: Types::STRING, nullable: true)]
+    public ?string $withDefaultValueString = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="without_default_value_string", type="string", nullable=true)
-     */
-    public $withoutDefaultValueString;
+    #[ORM\Column(name: 'without_default_value_string', type: Types::STRING, nullable: true)]
+    public ?string $withoutDefaultValueString = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="with_default_value_boolean", type="boolean", nullable=true)
-     */
-    public $withDefaultValueBoolean;
+    #[ORM\Column(name: 'with_default_value_boolean', type: Types::BOOLEAN, nullable: true)]
+    public ?bool $withDefaultValueBoolean = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="without_default_value_boolean", type="boolean", nullable=true)
-     */
-    public $withoutDefaultValueBoolean;
+    #[ORM\Column(name: 'without_default_value_boolean', type: Types::BOOLEAN, nullable: true)]
+    public ?bool $withoutDefaultValueBoolean = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="with_default_value_integer", type="integer", nullable=true)
-     */
-    public $withDefaultValueInteger;
+    #[ORM\Column(name: 'with_default_value_integer', type: Types::INTEGER, nullable: true)]
+    public ?int $withDefaultValueInteger = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="without_default_value_integer", type="integer", nullable=true)
-     */
-    public $withoutDefaultValueInteger;
+    #[ORM\Column(name: 'without_default_value_integer', type: Types::INTEGER, nullable: true)]
+    public ?int $withoutDefaultValueInteger = null;
 
-    /**
-     * @var string
-     *
-     * @Assert\NotBlank
-     * @ORM\Column(name="with_df_not_blank", type="string", nullable=true)
-     */
-    public $withDefaultValueAndNotBlank;
+    #[Assert\NotBlank]
+    #[ORM\Column(name: 'with_df_not_blank', type: Types::STRING, nullable: true)]
+    public ?string $withDefaultValueAndNotBlank = null;
 
-    /**
-     * @var string
-     *
-     * @Assert\NotNull
-     * @ORM\Column(name="with_df_not_null", type="string", nullable=true)
-     */
-    public $withDefaultValueAndNotNull;
+    #[Assert\NotNull]
+    #[ORM\Column(name: 'with_df_not_null', type: Types::STRING, nullable: true)]
+    public ?string $withDefaultValueAndNotNull = null;
 
-    /**
-     * @var string
-     *
-     * @Assert\NotBlank
-     * @ORM\Column(name="with_not_blank", type="string", nullable=true)
-     */
-    public $withNotBlank;
+    #[Assert\NotBlank]
+    #[ORM\Column(name: 'with_not_blank', type: Types::STRING, nullable: true)]
+    public ?string $withNotBlank = null;
 
-    /**
-     * @var string
-     *
-     * @Assert\NotNull
-     * @ORM\Column(name="with_not_null", type="string", nullable=true)
-     */
-    public $withNotNull;
+    #[Assert\NotNull]
+    #[ORM\Column(name: 'with_not_null', type: Types::STRING, nullable: true)]
+    public ?string $withNotNull = null;
 
     public function __construct()
     {

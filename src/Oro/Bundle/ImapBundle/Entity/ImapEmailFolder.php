@@ -2,47 +2,32 @@
 
 namespace Oro\Bundle\ImapBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 
 /**
  * IMAP Email
- *
- * @ORM\Table(name="oro_email_folder_imap")
- * @ORM\Entity(repositoryClass="Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository")
  */
+#[ORM\Entity(repositoryClass: ImapEmailFolderRepository::class)]
+#[ORM\Table(name: 'oro_email_folder_imap')]
 class ImapEmailFolder
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var EmailFolder
-     *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailFolder", cascade={"persist"})
-     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    protected $folder;
+    #[ORM\OneToOne(targetEntity: EmailFolder::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'folder_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?EmailFolder $folder = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="uid_validity", type="integer")
-     */
-    protected $uidValidity;
+    #[ORM\Column(name: 'uid_validity', type: Types::INTEGER)]
+    protected ?int $uidValidity = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="last_uid", type="integer", nullable=true)
-     */
-    private $lastUid;
+    #[ORM\Column(name: 'last_uid', type: Types::INTEGER, nullable: true)]
+    private ?int $lastUid = null;
 
     /**
      * Get id

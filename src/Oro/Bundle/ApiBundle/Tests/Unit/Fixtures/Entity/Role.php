@@ -4,46 +4,36 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="role_table", indexes={
- *     @ORM\Index(name="idx_description", columns={"description"}),
- * })
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'role_table')]
+#[ORM\Index(columns: ['description'], name: 'idx_description')]
 class Role
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50, unique: true)]
+    protected ?string $name = null;
+
+    #[ORM\Column(name: 'description', type: Types::STRING, length: 255)]
+    protected ?string $description = null;
+
+    #[ORM\Column(name: 'enabled', type: Types::BOOLEAN)]
+    protected ?bool $enabled = null;
 
     /**
-     * @ORM\Column(name="name", type="string", length=50, unique=true)
+     * @var Collection<int, User>
      */
-    protected $name;
-
-    /**
-     * @ORM\Column(name="description", type="string", length=255)
-     */
-    protected $description;
-
-    /**
-     * @ORM\Column(name="enabled", type="boolean")
-     */
-    protected $enabled;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="User")
-     * @ORM\JoinTable(name="role_to_user_table",
-     *      joinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_role_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     */
-    protected $users;
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'role_to_user_table')]
+    #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'user_role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $users = null;
 
     public function __construct()
     {

@@ -5,31 +5,31 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * EntityBundle controller.
- * @Route("/entity/config")
  */
+#[Route(path: '/entity/config')]
 class AuditController extends AbstractController
 {
     /**
-     * @Route(
-     *      "/audit/{entity}/{id}/{_format}",
-     *      name="oro_entityconfig_audit",
-     *      requirements={"entity"="[a-zA-Z0-9_]+", "id"="\d+"},
-     *      defaults={"entity"="entity", "id"=0, "_format" = "html"}
-     * )
-     * @Template("@OroDataAudit/Audit/widget/history.html.twig")
-     * @AclAncestor("oro_dataaudit_view")
      *
      * @param $entity
      * @param $id
      * @return array
      */
+    #[Route(
+        path: '/audit/{entity}/{id}/{_format}',
+        name: 'oro_entityconfig_audit',
+        requirements: ['entity' => '[a-zA-Z0-9_]+', 'id' => '\d+'],
+        defaults: ['entity' => 'entity', 'id' => 0, '_format' => 'html']
+    )]
+    #[Template('@OroDataAudit/Audit/widget/history.html.twig')]
+    #[AclAncestor('oro_dataaudit_view')]
     public function auditAction($entity, $id)
     {
         return [
@@ -40,19 +40,19 @@ class AuditController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/audit_field/{entity}/{id}/{_format}",
-     *      name="oro_entityconfig_audit_field",
-     *      requirements={"entity"="[a-zA-Z0-9_]+", "id"="\d+"},
-     *      defaults={"entity"="entity", "id"=0, "_format" = "html"}
-     * )
-     * @Template("@OroDataAudit/Audit/widget/history.html.twig")
-     * @AclAncestor("oro_dataaudit_view")
      *
      * @param $entity
      * @param $id
      * @return array
      */
+    #[Route(
+        path: '/audit_field/{entity}/{id}/{_format}',
+        name: 'oro_entityconfig_audit_field',
+        requirements: ['entity' => '[a-zA-Z0-9_]+', 'id' => '\d+'],
+        defaults: ['entity' => 'entity', 'id' => 0, '_format' => 'html']
+    )]
+    #[Template('@OroDataAudit/Audit/widget/history.html.twig')]
+    #[AclAncestor('oro_dataaudit_view')]
     public function auditFieldAction($entity, $id)
     {
         /** @var FieldConfigModel $fieldName */

@@ -3,56 +3,45 @@
 namespace Oro\Bundle\OrganizationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroOrganizationBundle_Entity_BusinessUnit;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Business unit entity
  *
- * @ORM\Table("oro_business_unit")
- * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      routeName="oro_business_unit_index",
- *      routeView="oro_business_unit_view",
- *      routeCreate="oro_business_unit_create",
- *      defaultValues={
- *          "grouping"={
- *              "groups"={"dictionary"}
- *          },
- *          "dictionary"={
- *              "search_fields"={"name"},
- *              "virtual_fields"={"id"},
- *              "activity_support"=true
- *          },
- *          "entity"={
- *              "icon"="fa-building-o"
- *          },
- *          "ownership"={
- *              "owner_type"="BUSINESS_UNIT",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "grid"={
- *              "default"="business-unit-grid"
- *          }
- *      }
- * )
  * @mixin OroOrganizationBundle_Entity_BusinessUnit
  */
+#[ORM\Entity(repositoryClass: BusinessUnitRepository::class)]
+#[ORM\Table('oro_business_unit')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    routeName: 'oro_business_unit_index',
+    routeView: 'oro_business_unit_view',
+    routeCreate: 'oro_business_unit_create',
+    defaultValues: [
+        'grouping' => ['groups' => ['dictionary']],
+        'dictionary' => ['search_fields' => ['name'], 'virtual_fields' => ['id'], 'activity_support' => true],
+        'entity' => ['icon' => 'fa-building-o'],
+        'ownership' => [
+            'owner_type' => 'BUSINESS_UNIT',
+            'owner_field_name' => 'owner',
+            'owner_column_name' => 'business_unit_owner_id',
+            'organization_field_name' => 'organization',
+            'organization_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'grid' => ['default' => 'business-unit-grid']
+    ]
+)]
 class BusinessUnit implements
     EmailHolderInterface,
     BusinessUnitInterface,
@@ -60,104 +49,48 @@ class BusinessUnit implements
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    protected ?string $name = null;
+
+    #[ORM\ManyToOne(targetEntity: Organization::class, inversedBy: 'businessUnits')]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?OrganizationInterface $organization = null;
+
+    #[ORM\Column(name: 'phone', type: Types::STRING, length: 100, nullable: true)]
+    protected ?string $phone = null;
+
+    #[ORM\Column(name: 'website', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $website = null;
+
+    #[ORM\Column(name: 'email', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $email = null;
+
+    #[ORM\Column(name: 'fax', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $fax = null;
+
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     * @ConfigField(
-     *  defaultValues={
-     *    "importexport"={
-     *       "identity"=true
-     *    }
-     *   }
-     * )
+     * @var Collection<int, User>
      */
-    protected $name;
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'businessUnits')]
+    protected ?Collection $users = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Organization", inversedBy="businessUnits")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    protected $organization;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="phone", type="string", length=100, nullable=true)
-     */
-    protected $phone;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="website", type="string", length=255, nullable=true)
-     */
-    protected $website;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=255, nullable=true)
-     */
-    protected $email;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="fax", type="string", length=255, nullable=true)
-     */
-    protected $fax;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="businessUnits")
-     */
-    protected $users;
-
-    /**
-     * @var BusinessUnit
-     * @ORM\ManyToOne(targetEntity="BusinessUnit")
-     * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
+    #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?BusinessUnit $owner = null;
 
     /**
      * Get id
@@ -335,9 +268,8 @@ class BusinessUnit implements
 
     /**
      * Pre persist event handler
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -346,9 +278,8 @@ class BusinessUnit implements
 
     /**
      * Pre update event handler
-     *
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

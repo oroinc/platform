@@ -4,12 +4,15 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -18,155 +21,95 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * Represents system mailbox.
  *
- * @ORM\Table(name="oro_email_mailbox")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
- * @UniqueEntity(fields={"email"})
- * @UniqueEntity(fields={"label"})
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-envelope"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"=""
- *          },
- *          "ownership"={
- *              "owner_type"="ORGANIZATION",
- *              "owner_field_name"="organization",
- *              "owner_column_name"="organization_id"
- *          }
- *      }
- * )
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
+#[ORM\Entity(repositoryClass: MailboxRepository::class)]
+#[ORM\Table(name: 'oro_email_mailbox')]
+#[UniqueEntity(fields: ['email'])]
+#[UniqueEntity(fields: ['label'])]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    defaultValues: [
+        'entity' => ['icon' => 'fa-envelope'],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => ''],
+        'ownership' => [
+            'owner_type' => 'ORGANIZATION',
+            'owner_field_name' => 'organization',
+            'owner_column_name' => 'organization_id'
+        ]
+    ]
+)]
 class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'email', type: Types::STRING, unique: true)]
+    protected ?string $email = null;
+
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255, unique: true)]
+    protected ?string $label = null;
+
+    #[ORM\OneToOne(
+        inversedBy: 'mailbox',
+        targetEntity: MailboxProcessSettings::class,
+        cascade: ['all'],
+        orphanRemoval: true
+    )]
+    #[ORM\JoinColumn(name: 'process_settings_id', referencedColumnName: 'id', nullable: true)]
+    protected ?MailboxProcessSettings $processSettings = null;
+
+    #[ORM\OneToOne(inversedBy: 'mailbox', targetEntity: EmailOrigin::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'origin_id', referencedColumnName: 'id', nullable: true)]
+    protected ?EmailOrigin $origin = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", unique=true)
+     * @var Collection<int, EmailUser>
      */
-    protected $email;
+    #[ORM\OneToMany(mappedBy: 'mailboxOwner', targetEntity: EmailUser::class)]
+    protected ?Collection $emailUsers = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", length=255, unique=true)
-     */
-    protected $label;
-
-    /**
-     * @var MailboxProcessSettings
-     *
-     * @ORM\OneToOne(targetEntity="MailboxProcessSettings", inversedBy="mailbox",
-     *     cascade={"all"}, orphanRemoval=true
-     * )
-     * @ORM\JoinColumn(name="process_settings_id", referencedColumnName="id", nullable=true)
-     */
-    protected $processSettings;
-
-    /**
-     * @var EmailOrigin
-     *
-     * @ORM\OneToOne(
-     *     targetEntity="EmailOrigin",
-     *     cascade={"persist"}, inversedBy="mailbox"
-     * )
-     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
-     */
-    protected $origin;
-
-    /**
-     * @var EmailUser[]
-     *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailUser", mappedBy="mailboxOwner")
-     */
-    protected $emailUsers;
-
-    /**
-     * @var OrganizationInterface
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
     /**
      * Collection of users authorized to view mailbox emails.
      *
-     * @var Collection|User[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\UserBundle\Entity\User"
-     * )
-     * @ORM\JoinTable(name="oro_email_mailbox_users",
-     *     joinColumns={@ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     * )
+     * @var Collection<int, User>
      */
-    protected $authorizedUsers;
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'oro_email_mailbox_users')]
+    #[ORM\JoinColumn(name: 'mailbox_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $authorizedUsers = null;
 
     /**
      * Collection of roles authorised to view mailbox emails.
      *
-     * @var Collection|Role[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\UserBundle\Entity\Role"
-     * )
-     * @ORM\JoinTable(name="oro_email_mailbox_roles",
-     *     joinColumns={@ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, Role>
      */
-    protected $authorizedRoles;
+    #[ORM\ManyToMany(targetEntity: Role::class)]
+    #[ORM\JoinTable(name: 'oro_email_mailbox_roles')]
+    #[ORM\JoinColumn(name: 'mailbox_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $authorizedRoles = null;
 
     /**
-     * @var AutoResponseRule[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="AutoResponseRule", mappedBy="mailbox")
+     * @var Collection<int, AutoResponseRule>
      */
-    protected $autoResponseRules;
+    #[ORM\OneToMany(mappedBy: 'mailbox', targetEntity: AutoResponseRule::class)]
+    protected ?Collection $autoResponseRules = null;
 
-    /**
-     * @var \Datetime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \Datetime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var AccountTypeModel
@@ -178,6 +121,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function __construct()
     {
+        $this->emailUsers = new ArrayCollection();
         $this->authorizedUsers = new ArrayCollection();
         $this->authorizedRoles = new ArrayCollection();
         $this->autoResponseRules = new ArrayCollection();
@@ -523,18 +467,14 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         return $this->imapAccountType;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -542,9 +482,8 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 
     /**
      * Deactivate email origin if mailbox is deleted.
-     *
-     * @ORM\PreRemove
      */
+    #[ORM\PreRemove]
     public function preRemove()
     {
         if ($this->origin !== null) {

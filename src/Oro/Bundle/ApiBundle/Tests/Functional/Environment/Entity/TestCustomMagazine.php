@@ -4,49 +4,34 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="test_api_custom_magazine")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_custom_magazine')]
 class TestCustomMagazine implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    private ?string $name = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @var Collection<int, TestCustomArticle>
      */
-    private $name;
+    #[ORM\ManyToMany(targetEntity: TestCustomArticle::class)]
+    #[ORM\JoinTable(name: 'test_api_custom_magazine_articles')]
+    #[ORM\JoinColumn(name: 'magazine_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'article_id', referencedColumnName: 'id')]
+    private ?Collection $articles = null;
 
-    /**
-     * @var Collection|TestCustomArticle[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCustomArticle")
-     * @ORM\JoinTable(name="test_api_custom_magazine_articles",
-     *      joinColumns={@ORM\JoinColumn(name="magazine_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="article_id", referencedColumnName="id")}
-     * )
-     */
-    private $articles;
-
-    /**
-     * @var TestCustomArticle|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestCustomArticle")
-     * @ORM\JoinColumn(name="best_article_id", referencedColumnName="id")
-     */
-    private $bestArticle;
+    #[ORM\ManyToOne(targetEntity: TestCustomArticle::class)]
+    #[ORM\JoinColumn(name: 'best_article_id', referencedColumnName: 'id')]
+    private ?TestCustomArticle $bestArticle = null;
 
     public function __construct()
     {

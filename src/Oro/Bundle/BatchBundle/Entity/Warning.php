@@ -2,47 +2,35 @@
 
 namespace Oro\Bundle\BatchBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Represents a Warning raised during step execution
- *
- * @ORM\Table(name="akeneo_batch_warning")
- * @ORM\Entity()
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'akeneo_batch_warning')]
 class Warning
 {
-    /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="StepExecution", inversedBy="warnings")
-     * @ORM\JoinColumn(name="step_execution_id", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: StepExecution::class, inversedBy: 'warnings')]
+    #[ORM\JoinColumn(name: 'step_execution_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private StepExecution $stepExecution;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=100, nullable=true)
-     */
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 100, nullable: true)]
     private string $name;
 
-    /**
-     * @ORM\Column(name="reason", type="text", nullable=true)
-     */
+    #[ORM\Column(name: 'reason', type: Types::TEXT, nullable: true)]
     private string $reason;
 
-    /**
-     * @ORM\Column(name="reason_parameters", type="array", nullable=false)
-     */
+    #[ORM\Column(name: 'reason_parameters', type: Types::ARRAY, nullable: false)]
     private array $reasonParameters;
 
-    /**
-     * @ORM\Column(name="item", type="array", nullable=false)
-     */
+    #[ORM\Column(name: 'item', type: Types::ARRAY, nullable: false)]
     private array $item;
 
     public function __construct(

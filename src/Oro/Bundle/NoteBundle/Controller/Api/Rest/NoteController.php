@@ -4,9 +4,10 @@ namespace Oro\Bundle\NoteBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
@@ -26,25 +27,25 @@ class NoteController extends RestController
      * @param string  $entityClass Entity class name
      * @param integer $entityId    Entity id
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. defaults to 10."
-     * )
      * @ApiDoc(
      *      description="Get note items",
      *      resource=true
      * )
-     * @AclAncestor("oro_note_view")
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. defaults to 10.',
+        nullable: true
+    )]
+    #[AclAncestor('oro_note_view')]
     public function cgetAction(Request $request, $entityClass, $entityId)
     {
         $entityClass = $this->container->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
@@ -76,9 +77,9 @@ class NoteController extends RestController
      *      description="Get note item",
      *      resource=true
      * )
-     * @AclAncestor("oro_note_view")
      * @return Response
      */
+    #[AclAncestor('oro_note_view')]
     public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
@@ -93,9 +94,9 @@ class NoteController extends RestController
      *      description="Update note",
      *      resource=true
      * )
-     * @AclAncestor("oro_note_update")
      * @return Response
      */
+    #[AclAncestor('oro_note_update')]
     public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
@@ -108,8 +109,8 @@ class NoteController extends RestController
      *      description="Create new note",
      *      resource=true
      * )
-     * @AclAncestor("oro_note_create")
      */
+    #[AclAncestor('oro_note_create')]
     public function postAction()
     {
         return $this->handleCreateRequest();
@@ -124,14 +125,9 @@ class NoteController extends RestController
      *      description="Delete Note",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_note_delete",
-     *      type="entity",
-     *      permission="DELETE",
-     *      class="Oro\Bundle\NoteBundle\Entity\Note"
-     * )
      * @return Response
      */
+    #[Acl(id: 'oro_note_delete', type: 'entity', class: Note::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);

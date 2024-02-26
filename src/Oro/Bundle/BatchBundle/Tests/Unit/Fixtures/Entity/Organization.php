@@ -2,33 +2,31 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- */
+#[ORM\Entity]
 class Organization
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
 
     /**
-     * @ORM\Column(name="name", type="string", length=255)
+     * @var Collection<int, BusinessUnit>
      */
-    protected $name;
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: BusinessUnit::class, cascade: ['ALL'])]
+    protected ?Collection $businessUnits = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="BusinessUnit", mappedBy="organization", cascade={"ALL"})
+     * @var Collection<int, User>
      */
-    protected $businessUnits;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="organizations")
-     * @ORM\JoinTable(name="oro_user_organization")
-     */
-    protected $users;
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'organizations')]
+    #[ORM\JoinTable(name: 'oro_user_organization')]
+    protected ?Collection $users = null;
 }

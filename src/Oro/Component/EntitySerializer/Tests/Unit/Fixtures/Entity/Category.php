@@ -2,23 +2,18 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="category_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'category_table')]
 class Category
 {
-    /**
-     * @ORM\Column(name="name", type="string", length=50)
-     * @ORM\Id
-     */
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
+    #[ORM\Id]
     private ?string $name;
 
-    /**
-     * @ORM\Column(name="label", type="string", length=255, unique=true)
-     */
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255, unique: true)]
     private ?string $label;
 
     public function __construct(string $name = null, string $label = null)

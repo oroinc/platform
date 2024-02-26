@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EmailBundle\Entity\Email;
 
 /**
  * Repository for EmailRecipient entity.
@@ -16,7 +17,7 @@ class EmailRecipientRepository extends EntityRepository
         array $excludedEmails = [],
         ?string $query = null
     ): QueryBuilder {
-        $emailQb = $this->_em->getRepository('Oro\Bundle\EmailBundle\Entity\Email')->createQueryBuilder('e');
+        $emailQb = $this->_em->getRepository(Email::class)->createQueryBuilder('e');
         $emailQb
             ->select('r.id')
             ->join('e.fromEmailAddress', 'fe')

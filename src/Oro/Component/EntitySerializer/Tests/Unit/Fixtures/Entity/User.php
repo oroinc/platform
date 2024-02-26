@@ -4,50 +4,45 @@ namespace Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="user_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'user_table')]
 class User
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private int $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=50)
-     */
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
     private ?string $name = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Category")
-     * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
-     */
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\JoinColumn(name: 'category_name', referencedColumnName: 'name')]
     private ?Category $category = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Group")
-     * @ORM\JoinTable(name="rel_user_to_group_table",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_group_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, Group>
      */
-    private Collection $groups;
+    #[ORM\ManyToMany(targetEntity: Group::class)]
+    #[ORM\JoinTable(name: 'rel_user_to_group_table')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'user_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?Collection $groups = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="Product", mappedBy="owner")
+     * @var Collection<int, Product>
      */
-    private Collection $products;
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Product::class)]
+    private ?Collection $products = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="Department", mappedBy="owner")
+     * @var Collection<int, Department>
      */
-    private Collection $departments;
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Department::class)]
+    private ?Collection $departments = null;
 
     public function __construct(int $id = null)
     {

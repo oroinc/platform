@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Model;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * Provides basic implementation for entities which implement UrlAwareInterface.
  */
@@ -9,9 +11,8 @@ trait UrlAwareTrait
 {
     /**
      * @var string $url
-     *
-     * @ORM\Column(name="url", type="string", length=8190)
      */
+    #[ORM\Column(name: 'url', type: 'string', length: 8190)]
     protected $url;
 
     /**

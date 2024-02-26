@@ -5,7 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Controller;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -23,16 +23,10 @@ class OrganizationController extends AbstractController
 {
     /**
      * Edit organization form
-     *
-     * @Route("/update_current", name="oro_organization_update_current")
-     * @Template("@OroOrganization/Organization/update.html.twig")
-     * @Acl(
-     *      id="oro_organization_update",
-     *      type="entity",
-     *      class="Oro\Bundle\OrganizationBundle\Entity\Organization",
-     *      permission="EDIT"
-     * )
      */
+    #[Route(path: '/update_current', name: 'oro_organization_update_current')]
+    #[Template('@OroOrganization/Organization/update.html.twig')]
+    #[Acl(id: 'oro_organization_update', type: 'entity', class: Organization::class, permission: 'EDIT')]
     public function updateCurrentAction(Request $request)
     {
         /** @var UsernamePasswordOrganizationToken $token */

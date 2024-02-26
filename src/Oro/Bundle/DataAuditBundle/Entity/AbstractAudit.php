@@ -4,56 +4,45 @@ namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 
 /**
  * Abstract class for audit entities
  *
- * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository")
- * @ORM\Table(
- *     name="oro_audit",
- *     indexes={
- *         @ORM\Index(name="idx_oro_audit_logged_at", columns={"logged_at"}),
- *         @ORM\Index(name="idx_oro_audit_type", columns={"type"}),
- *         @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"}),
- *         @ORM\Index(name="idx_oro_audit_obj_by_type", columns={"object_id", "object_class", "type"}),
- *         @ORM\Index(name="idx_oro_audit_owner_descr", columns={"owner_description"})
- *     },
- *     uniqueConstraints={
- *         @ORM\UniqueConstraint(
- *              name="idx_oro_audit_version",
- *              columns={"object_id", "object_class", "version", "type"}
- *         ),
- *         @ORM\UniqueConstraint(
- *              name="idx_oro_audit_transaction",
- *              columns={"object_id", "object_class", "transaction_id", "type"}
- *         )
- *     }
- * )
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string", length=30)
- * @ORM\DiscriminatorMap({"audit" = "Oro\Bundle\DataAuditBundle\Entity\Audit"})
  *
- * @Config(
- *      defaultValues={
- *          "ownership"={
- *              "owner_type"="ORGANIZATION",
- *              "owner_field_name"="organization",
- *              "owner_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management",
- *              "permissions"="VIEW"
- *          }
- *     }
- * )
  */
+#[ORM\Entity(repositoryClass: AuditRepository::class)]
+#[ORM\Table(name: 'oro_audit')]
+#[ORM\Index(columns: ['logged_at'], name: 'idx_oro_audit_logged_at')]
+#[ORM\Index(columns: ['type'], name: 'idx_oro_audit_type')]
+#[ORM\Index(columns: ['object_class'], name: 'idx_oro_audit_object_class')]
+#[ORM\Index(columns: ['object_id', 'object_class', 'type'], name: 'idx_oro_audit_obj_by_type')]
+#[ORM\Index(columns: ['owner_description'], name: 'idx_oro_audit_owner_descr')]
+#[ORM\UniqueConstraint(name: 'idx_oro_audit_version', columns: ['object_id', 'object_class', 'version', 'type'])]
+#[ORM\UniqueConstraint(
+    name: 'idx_oro_audit_transaction',
+    columns: ['object_id', 'object_class', 'transaction_id', 'type']
+)]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string', length: 30)]
+#[ORM\DiscriminatorMap(['audit' => Audit::class])]
+#[Config(
+    defaultValues: [
+        'ownership' => [
+            'owner_type' => 'ORGANIZATION',
+            'owner_field_name' => 'organization',
+            'owner_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management', 'permissions' => 'VIEW']
+    ]
+)]
 abstract class AbstractAudit
 {
     const ACTION_CREATE = 'create';
@@ -62,104 +51,53 @@ abstract class AbstractAudit
 
     const OBJECT_NAME_MAX_LENGTH = 255;
 
-    /**
-     * @var integer $id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
+
+    #[ORM\Column(type: Types::STRING, length: 8, nullable: true)]
+    protected ?string $action = null;
+
+    #[ORM\Column(name: 'logged_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $loggedAt = null;
+
+    #[ORM\Column(name: 'object_id', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $objectId = null;
+
+    #[ORM\Column(name: 'object_class', type: Types::STRING, length: 255)]
+    protected ?string $objectClass = null;
+
+    #[ORM\Column(name: 'object_name', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $objectName = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    protected ?int $version = null;
 
     /**
-     * @var string $action
-     *
-     * @ORM\Column(type="string", length=8, nullable=true)
+     * @var Collection<int, AuditField>
      */
-    protected $action;
+    #[ORM\OneToMany(mappedBy: 'audit', targetEntity: AuditField::class, cascade: ['persist'], orphanRemoval: true)]
+    protected ?Collection $fields = null;
 
-    /**
-     * @var string $loggedAt
-     *
-     * @ORM\Column(name="logged_at", type="datetime", nullable=true)
-     */
-    protected $loggedAt;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
-    /**
-     * @var string $objectId
-     *
-     * @ORM\Column(name="object_id", type="string", length=255, nullable=true)
-     */
-    protected $objectId;
+    #[ORM\ManyToOne(targetEntity: Impersonation::class)]
+    #[ORM\JoinColumn(name: 'impersonation_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?Impersonation $impersonation = null;
 
-    /**
-     * @var string $objectClass
-     *
-     * @ORM\Column(name="object_class", type="string", length=255)
-     */
-    protected $objectClass;
+    #[ORM\Column(name: 'transaction_id', type: Types::STRING, length: 36)]
+    protected ?string $transactionId = null;
 
-    /**
-     * @var string $objectName
-     *
-     * @ORM\Column(name="object_name", type="string", length=255, nullable=true)
-     */
-    protected $objectName;
-
-    /**
-     * @var integer $version
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    protected $version;
-
-    /**
-     * @var AbstractAuditField[]|Collection
-     *
-     * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\DataAuditBundle\Entity\AuditField",
-     *     mappedBy="audit",
-     *     orphanRemoval=true,
-     *     cascade={"persist"}
-     * )
-     */
-    protected $fields;
-
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
-
-    /**
-     * @var Impersonation $impersonation
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\Impersonation")
-     * @ORM\JoinColumn(name="impersonation_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $impersonation;
-
-    /**
-     * @var string $transactionId
-     *
-     * @ORM\Column(name="transaction_id", type="string", length=36)
-     */
-    protected $transactionId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="owner_description", type="string", length=255, nullable=true)
-     */
-    protected $ownerDescription;
+    #[ORM\Column(name: 'owner_description', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $ownerDescription = null;
 
     /**
      * @var array $additionalFields
-     *
-     * @ORM\Column(name="additional_fields", type="array", nullable=true)
      */
+    #[ORM\Column(name: 'additional_fields', type: Types::ARRAY, nullable: true)]
     protected $additionalFields = [];
 
     /**

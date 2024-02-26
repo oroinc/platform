@@ -2,58 +2,37 @@
 
 namespace Oro\Bundle\AddressBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
- * AddressType
- *
- * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeRepository")
- * @ORM\Table(name="oro_address_type")
- * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\AddressTypeTranslation")
- * @Config(
- *      defaultValues={
- *          "grouping"={
- *              "groups"={"dictionary"}
- *          }
- *      }
- * )
+ * Address type entity
  */
+#[ORM\Entity(repositoryClass: AddressTypeRepository::class)]
+#[ORM\Table(name: 'oro_address_type')]
+#[Gedmo\TranslationEntity(class: AddressTypeTranslation::class)]
+#[Config(defaultValues: ['grouping' => ['groups' => ['dictionary']]])]
 class AddressType implements Translatable
 {
     const TYPE_BILLING  = 'billing';
     const TYPE_SHIPPING = 'shipping';
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=16)
-     * @ORM\Id
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 16)]
+    #[ORM\Id]
+    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", length=255, unique=true)
-     * @Gedmo\Translatable
-     */
-    protected $label;
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255, unique: true)]
+    #[Gedmo\Translatable]
+    protected ?string $label = null;
 
-    /**
-     * @Gedmo\Locale
-     */
-    protected $locale;
+    #[Gedmo\Locale]
+    protected ?string $locale = null;
 
     /**
      * @param string $name

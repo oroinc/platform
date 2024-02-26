@@ -32,9 +32,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConnectionController extends AbstractController
 {
-    /**
-     * @Route("/connection/check", name="oro_imap_connection_check", methods={"POST"})
-     */
+    #[Route(path: '/connection/check', name: 'oro_imap_connection_check', methods: ['POST'])]
     public function checkAction(Request $request): JsonResponse
     {
         $data = null;
@@ -69,9 +67,7 @@ class ConnectionController extends AbstractController
         );
     }
 
-    /**
-     * @Route("imap/connection/account/change", name="oro_imap_change_account_type", methods={"POST"})
-     */
+    #[Route(path: 'imap/connection/account/change', name: 'oro_imap_change_account_type', methods: ['POST'])]
     public function getFormAction(Request $request): JsonResponse
     {
         $type = $request->get('type');

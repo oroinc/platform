@@ -8,7 +8,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
-use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -17,7 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
  * if you like to persist, delete, or assign Localization objects.
  * Cache should be enabled, only if you want to read from the Localization
  */
-class LocalizationManager implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
+class LocalizationManager implements ClearableConfigCacheInterface
 {
     private const ENTITIES_CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
     private const SIMPLE_CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA_SIMPLE';
@@ -151,13 +150,6 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
     public function clearCache(): void
     {
         $this->cacheProvider->clear();
-    }
-
-    public function warmUpCache(): void
-    {
-        $this->clearCache();
-        $this->getLocalizations();
-        $this->getLocalizationData(0);
     }
 
     protected static function getCacheKey(?int $localizationId = null): string

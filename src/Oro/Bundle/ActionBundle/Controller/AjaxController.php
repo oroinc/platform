@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Handler\ExecuteOperationHandler;
 use Oro\Bundle\ActionBundle\Handler\ExecuteOperationResult;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,14 +24,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AjaxController extends AbstractController
 {
     /**
-     * @Route("/operation/execute/{operationName}", name="oro_action_operation_execute", methods={"POST"})
-     * @AclAncestor("oro_action")
      *
      * @param Request $request
      * @param string  $operationName
-     *
      * @return Response
      */
+    #[Route(path: '/operation/execute/{operationName}', name: 'oro_action_operation_execute', methods: ['POST'])]
+    #[AclAncestor('oro_action')]
     public function executeAction(Request $request, $operationName): Response
     {
         $operation = $this->container->get(OperationRegistry::class)->findByName($operationName);

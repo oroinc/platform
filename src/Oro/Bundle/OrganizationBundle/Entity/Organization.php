@@ -3,146 +3,76 @@
 namespace Oro\Bundle\OrganizationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroOrganizationBundle_Entity_Organization;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
+use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Organization represents a real enterprise, business, firm, company or another organization, to which the users belong
  *
- * @ORM\Table(name="oro_organization")
- * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository")
- * @ORM\HasLifecycleCallbacks()
- * @UniqueEntity(
- *     fields={"name"}
- * )
- * @Config(
- *      defaultValues={
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "form"={
- *              "form_type"="Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType"
- *          },
- *          "dataaudit"={
- *              "auditable"=true
- *          },
- *      }
- * )
  * @mixin OroOrganizationBundle_Entity_Organization
  */
+#[ORM\Entity(repositoryClass: OrganizationRepository::class)]
+#[ORM\Table(name: 'oro_organization')]
+#[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields: ['name'])]
+#[Config(
+    defaultValues: [
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'form' => ['form_type' => OrganizationSelectType::class],
+        'dataaudit' => ['auditable' => true]
+    ]
+)]
 class Organization implements OrganizationInterface, ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255, unique: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['identity' => true]])]
+    protected ?string $name = null;
+
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    protected ?string $description = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, unique=true)
-     * @ConfigField(
-     *  defaultValues={
-     *    "dataaudit"={
-     *       "auditable"=true
-     *    },
-     *    "importexport"={
-     *       "identity"=true
-     *    }
-     *   }
-     * )
+     * @var Collection<int, BusinessUnit>
      */
-    protected $name;
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: BusinessUnit::class, cascade: ['ALL'], fetch: 'EXTRA_LAZY')]
+    protected ?Collection $businessUnits = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="text", nullable=true)
-     * @ConfigField(
-     *  defaultValues={
-     *    "dataaudit"={
-     *       "auditable"=true
-     *    }
-     *   }
-     * )
+     * @var Collection<int, User>
      */
-    protected $description;
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'organizations')]
+    #[ORM\JoinTable(name: 'oro_user_organization')]
+    protected ?Collection $users = null;
 
-    /**
-     * @var ArrayCollection|BusinessUnit[]
-     *
-     * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
-     *     mappedBy="organization",
-     *     cascade={"ALL"},
-     *     fetch="EXTRA_LAZY"
-     * )
-     */
-    protected $businessUnits;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var ArrayCollection|User[]
-     *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="organizations")
-     * @ORM\JoinTable(name="oro_user_organization")
-     */
-    protected $users;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    protected ?\DateTimeInterface $updatedAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="enabled", type="boolean", options={"default"="1"})
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $enabled = true;
+    #[ORM\Column(name: 'enabled', type: Types::BOOLEAN, options: ['default' => 1])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    protected ?bool $enabled = true;
 
     public function __construct()
     {
@@ -334,9 +264,8 @@ class Organization implements OrganizationInterface, ExtendEntityInterface
 
     /**
      * Pre persist event handler
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -345,9 +274,8 @@ class Organization implements OrganizationInterface, ExtendEntityInterface
 
     /**
      * Pre update event handler
-     *
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

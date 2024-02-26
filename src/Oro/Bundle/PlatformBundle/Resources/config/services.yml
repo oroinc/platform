@@ -193,3 +193,7 @@ services:
             - '@oro_config.manager'
             - '@logger'
         abstract: true
+
+    oro_platform.attribute_reader:
+        class: 'Oro\Component\PhpUtils\Attribute\Reader\AttributeReader'
+        public: true

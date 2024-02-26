@@ -185,6 +185,7 @@ class EmailTypeTest extends TypeTestCase
         $body = $formData['body'] ?? '';
 
         $user = new User();
+        $user->setUserIdentifier('test_user');
         $origin = new TestUserEmailOrigin(1);
         $origin->setUser($user);
 
