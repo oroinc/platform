@@ -259,8 +259,12 @@ HELP
             };
         } else {
             $this->dataFixturesExecutor->setLogger(
-                function ($message) use ($output) {
-                    $output->write(\sprintf('  <comment>></comment> <info>%s</info>', $message));
+                function ($message, bool $useProgressCallback = false) use ($output) {
+                    if ($useProgressCallback) {
+                        $output->write(\sprintf('  <comment>></comment> <info>%s</info>', $message));
+                    } else {
+                        $output->writeln(\sprintf('  <comment>></comment> <info>%s</info>', $message));
+                    }
                 }
             );
 
