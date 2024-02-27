@@ -66,6 +66,12 @@ class DataFixturesORMExecutor extends ORMExecutor implements LocalizationOptions
         }
     }
 
+    public function log($message)
+    {
+        $logger = $this->logger;
+        $logger($message, null !== $this->progressCallback);
+    }
+
     /**
      * @param ?callable $progressCallback
      *
