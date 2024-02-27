@@ -28,7 +28,7 @@
     const renderLauncherIcon = data => {
         return oroui.renderIcon({
             name: data.iconClassName ? iconClassName : icon,
-            extraClass: 'theme-icon--medium' + (data.icon ? ' theme-icon-' + icon : '')
+            extraClass: (data.icon ? ' theme-icon-' + icon : '')
         })
     };
 %>

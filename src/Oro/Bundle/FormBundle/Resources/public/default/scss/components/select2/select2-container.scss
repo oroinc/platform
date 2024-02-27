@@ -5,7 +5,7 @@
     width: 100%;
     padding: 0;
 
-    background: $select2-container-background;
+    background: $select2-container-background $select-arrow-bg-color;
 
     font-size: $base-font-size;
     font-weight: $base-font-weight;
@@ -209,6 +209,12 @@
     line-height: $base-ui-element-line-height;
 
     white-space: nowrap;
+
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .select2-drop-undermask,

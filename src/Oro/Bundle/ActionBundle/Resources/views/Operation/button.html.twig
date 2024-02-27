@@ -43,8 +43,7 @@
             {% if params.frontendOptions.options.icon is defined %}
                 {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
                 {{ renderIcon.icon({
-                    name: params.frontendOptions.options.icon,
-                    extraClass: 'theme-icon--medium'
+                    name: params.frontendOptions.options.icon
                 }) }}
             {% endif %}
             {% if not noLinkLabel %}

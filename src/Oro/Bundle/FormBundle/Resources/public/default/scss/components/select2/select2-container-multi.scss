@@ -3,7 +3,7 @@
 .select2-container-multi {
     --select-arrow-position: #{$select2-container-multi-arrow-position};
 
-    background: $select-bg;
+    background: $select-bg $select-arrow-bg-color;
 
     .select2-choices {
         position: relative;
@@ -76,6 +76,6 @@
     }
 
     &.select2-dropdown-open {
-        background: $select-bg-open;
+        background: $select-bg-open $select-arrow-bg-color;
     }
 }
