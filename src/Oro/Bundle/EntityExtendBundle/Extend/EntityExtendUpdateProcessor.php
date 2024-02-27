@@ -6,7 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\BackupManager\EntityConfigBackupManagerInterface;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
-use Oro\Bundle\MaintenanceBundle\Maintenance\Mode as MaintenanceMode;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -17,7 +16,6 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 class EntityExtendUpdateProcessor
 {
     public function __construct(
-        private MaintenanceMode $maintenance,
         private CommandExecutor $commandExecutor,
         private LoggerInterface $logger,
         private EventDispatcherInterface $dispatcher,
@@ -41,7 +39,6 @@ class EntityExtendUpdateProcessor
         }
 
         try {
-            $this->maintenance->activate();
             if ($this->entityConfigBackupManager->isEnabled()) {
                 $this->entityConfigBackupManager->makeBackup();
                 try {
@@ -97,17 +94,24 @@ class EntityExtendUpdateProcessor
         return new EntityExtendUpdateProcessorResult(true);
     }
 
+    /**
+     * @return void
+     */
     protected function applyChangesToDatabase(): void
     {
         // Before running oro:entity-extend:update-config, the model cache must be cleared.
         $this->configManager->clearModelCache();
         $this->executeCommand('oro:entity-extend:update-config', ['--update-custom' => true, '--force' => true]);
         $this->executeCommand('oro:entity-extend:cache:warmup');
-        $this->executeCommand('oro:entity-extend:update-schema', [
-            '--skip-enum-sync' => true
-        ]);
+        $this->executeCommand('oro:entity-extend:update-schema', ['--skip-enum-sync' => true]);
     }
 
+    /**
+     * @param string $command
+     * @param array  $options
+     *
+     * @return void
+     */
     private function executeCommand(string $command, array $options = []): void
     {
         try {
@@ -117,6 +121,9 @@ class EntityExtendUpdateProcessor
         }
     }
 
+    /**
+     * @return void
+     */
     private function dispatchUpdateSchemaEvent(): void
     {
         try {
