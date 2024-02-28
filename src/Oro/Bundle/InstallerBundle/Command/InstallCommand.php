@@ -539,6 +539,7 @@ HELP
                     '--timeout'           => $commandExecutor->getDefaultOption('process-timeout'),
                 ]
             )
+            ->runCommand('oro:entity-config:cache:clear')
             ->runCommand(LoadPermissionConfigurationCommand::getDefaultName(), ['--process-isolation' => true])
             ->runCommand('oro:cron:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])

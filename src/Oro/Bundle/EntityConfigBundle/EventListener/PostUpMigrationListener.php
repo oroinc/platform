@@ -5,8 +5,12 @@ namespace Oro\Bundle\EntityConfigBundle\EventListener;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
 use Oro\Bundle\EntityConfigBundle\Migration\WarmUpEntityConfigCacheMigration;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
+use Oro\Bundle\InstallerBundle\CommandExecutor as InstallerCommandExecutor;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
+/**
+ * Entity config update preUp, postUp migrations setup.
+ */
 class PostUpMigrationListener
 {
     /**
@@ -34,8 +38,12 @@ class PostUpMigrationListener
      */
     public function warmUpCache(PostMigrationEvent $event)
     {
-        $event->addMigration(
-            new WarmUpEntityConfigCacheMigration($this->commandExecutor)
-        );
+        if (!InstallerCommandExecutor::isCommandRunning('oro:install')
+            && !InstallerCommandExecutor::isCommandRunning('oro:platform:update')
+        ) {
+            $event->addMigration(
+                new WarmUpEntityConfigCacheMigration($this->commandExecutor)
+            );
+        }
     }
 }

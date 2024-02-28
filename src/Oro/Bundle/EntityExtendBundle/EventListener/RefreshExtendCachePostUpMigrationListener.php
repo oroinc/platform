@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Migration\LoadEntityConfigStateMigration;
-use Oro\Bundle\EntityExtendBundle\Migration\RefreshExtendCacheMigration;
-use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 
+/**
+ * Fulfills gaps of extend entity configuration recieved from schema updates and refreshes corresponding cache.
+ */
 class RefreshExtendCachePostUpMigrationListener
 {
     /** @var CommandExecutor */
@@ -42,20 +43,6 @@ class RefreshExtendCachePostUpMigrationListener
     {
         $event->addMigration(
             new LoadEntityConfigStateMigration()
-        );
-    }
-
-    /**
-     * POST UP event handler
-     */
-    public function onPostUp(PostMigrationEvent $event)
-    {
-        $event->addMigration(
-            new RefreshExtendCacheMigration(
-                $this->commandExecutor,
-                $this->configManager,
-                $this->initialEntityConfigStatePath
-            )
         );
     }
 }
