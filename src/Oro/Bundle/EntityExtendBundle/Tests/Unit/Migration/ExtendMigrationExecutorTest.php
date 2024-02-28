@@ -33,7 +33,9 @@ class ExtendMigrationExecutorTest extends MigrationExecutorTestCase
             ->with('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');
 
         $executor->executeUp($migrations);
-        $messages = $this->logger->getMessages();
+        $messages = array_values(array_filter($this->logger->getMessages(), function ($message) {
+            return !preg_match("/\<comment\>.*MiB/", $message);
+        }));
         self::assertEquals(
             [
                 '> ' . \get_class($migration),

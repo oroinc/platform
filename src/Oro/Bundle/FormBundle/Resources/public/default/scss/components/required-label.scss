@@ -1,7 +1,7 @@
 /* @theme: default; */
 
 .required-label {
-    margin: $offset-x 0;
+    margin: spacing('base') 0;
 
     sup {
         color: $label-required-color;

@@ -1,0 +1,20 @@
+<% const oroui = _.macros('oroui'); %>
+<div class="more-bar-holder">
+    <a class="btn btn--outlined btn--text dropdown-toggle"
+       href="#"
+       role="button"
+       id="<%- togglerId %>"
+       data-toggle="dropdown"
+       data-placement="bottom-end"
+       aria-haspopup="true"
+       aria-expanded="false"
+       aria-label="<%- label %>"
+    >
+        <%= oroui.renderIcon({
+            name: 'more-horizontal',
+            extraClass: 'theme-icon--medium icon'
+        }) %>
+    </a>
+    <ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu"
+        aria-labelledby="<%- togglerId %>"></ul>
+</div>

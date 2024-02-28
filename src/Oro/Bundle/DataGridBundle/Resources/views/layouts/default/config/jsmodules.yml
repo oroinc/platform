@@ -121,5 +121,8 @@ dynamic-imports:
         - orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin
 map:
     '*':
+        orodatagrid/templates/datagrid/action-cell-base-markup.html: orodatagrid/default/templates/datagrid/action-cell-base-markup.html
+        orodatagrid/templates/datagrid/action-component-dropdown-launcher.html: orodatagrid/default/templates/datagrid/action-component-dropdown-launcher.html
+        orodatagrid/templates/datagrid/action-launcher.html: orodatagrid/default/templates/datagrid/action-launcher.html
         orodatagrid/templates/datagrid/grid.html: orodatagrid/default/templates/datagrid/grid.html
         orodatagrid/templates/datagrid/no-data.html: orodatagrid/default/templates/datagrid/no-data.html

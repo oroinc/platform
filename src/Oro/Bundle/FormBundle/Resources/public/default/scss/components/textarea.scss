@@ -26,42 +26,22 @@
 
     @include element-state('focus') {
         border-color: $textarea-border-color-focus-state;
-        box-shadow: $textarea-box-shadow-focus-state;
-    }
-
-    &.focus-visible {
-        border-color: $textarea-border-color-focus-state;
     }
 
     @include element-state('error') {
         border-color: $textarea-border-color-error-state;
+        background-color: $textarea-bg-color-error-state;
     }
 
     @include element-state('disabled') {
-        background: $textarea-border-color-disabled-background;
+        background-color: $textarea-bg-color-disabled;
+        border-color: $textarea-border-color-disabled;
+        color: $textarea-color-disabled;
 
         @include base-disabled-style();
 
         @include element-state('hover') {
-            border-color: $textarea-border-color-disabled-hover-border-color;
+            border-color: $textarea-border-color-disabled;
         }
-    }
-
-    @include element-state('error') {
-        box-shadow: $textarea-box-shadow-error-state;
-    }
-
-    @include element-state('disabled') {
-        background: $textarea-background-color-disabled-state;
-        box-shadow: none;
-        border: $textarea-border;
-    }
-
-    &--size-m {
-        padding: $textarea-padding--m;
-    }
-
-    &--size-s {
-        padding: $textarea-padding--s;
     }
 }

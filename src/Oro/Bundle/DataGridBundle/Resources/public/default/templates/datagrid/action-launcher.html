@@ -1,0 +1,101 @@
+<% let oroui = _.macros('oroui') %>
+<% obj.attributesTemplate = function(attributes) {
+    _.each(attributes, function(attribute, name) { %>
+        <%- name %><% if (!_.isNull(attribute)) { %>="<%- attribute %>"<% } %>
+    <% });
+} %>
+
+<%
+    if (obj.iconClassName) {
+        obj.iconClassName = obj.iconClassName.replace(/^fa-/, '');
+    }
+    if (obj.icon) {
+        obj.icon = obj.icon.replace(/^fa-/, '');
+    }
+    const actionClassNames = [];
+    actionClassNames.push('action');
+    if (className) {
+        actionClassNames.push(className);
+    }
+    if (!enabled) {
+        actionClassNames.push('disabled');
+    }
+    if (launcherMode != '') {
+        actionClassNames.push('mode-' +  launcherMode);
+    }
+    if (obj.withinDropdown) {
+        actionClassNames.push('dropdown-item');
+    }
+    if (links) {
+        actionClassNames.push('dropdown-toggle');
+    }
+    const togglerId = _.uniqueId('dropdown-');
+    const renderLauncherIcon = data => {
+        return oroui.renderIcon({
+            name: data.iconClassName ? iconClassName : icon,
+            extraClass: (data.icon ? ' theme-icon-' + icon : '')
+        })
+    };
+%>
+
+<% if (links) { %><div class="btn-group"><% } %>
+<<%- tagName %>
+    <% if (tagName === "a") { %> href="<%- link %>" role="button"<% } %>
+    class="<%- actionClassNames.join(' ') %>"
+    title="<%- title %>"
+    <% if (obj.ariaLabel) { %>
+        aria-label="<%- ariaLabel %>"
+    <% } %>
+    <% attributesTemplate(attributes) %>
+    <% if (links) { %> data-toggle="dropdown" data-inherit-parent-width="loosely" role="button" id="<%- togglerId %>"
+        aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"<% } %>>
+    <% if (launcherMode == 'icon-text') { %>
+        <%= renderLauncherIcon(obj) %>
+        <% if (obj.entityName) { %>
+            <span class="action-label">
+                <%- label %>
+                <span class="entity-name"><%- obj.entityName %></span>
+            </span>
+        <% } else { %>
+            <%- label %>
+        <% } %>
+    <% } else if (launcherMode == 'icon-only') { %>
+        <%= renderLauncherIcon(obj) %>
+    <% } else if (launcherMode == 'text-only') { %>
+        <%= renderLauncherIcon(obj) %>
+        <% if (obj.entityName) { %>
+            <span class="action-label">
+                <%- label %>
+                <span class="entity-name"><%- obj.entityName %></span>
+            </span>
+        <% } else { %>
+            <%- label %>
+        <% } %>
+    <% } %>
+</<%- tagName %>>
+
+<% if (links) { %>
+    <ul class="dropdown-menu" aria-labelledby="<%- togglerId %>">
+    <% _.each(links, function(item, index) { %>
+        <li>
+            <a href="<%- link %>" class="dropdown-item" data-index="<%- index %>" title="<%- item.label %>"
+            <% if (item.attributes) { attributesTemplate(item.attributes); } %>
+            <% if (item.ariaLabel) { %> aria-label="<%- item.ariaLabel %>" <% } %>
+            data-key="<%- item.key %>">
+                <% if (launcherMode == 'icon-text') { %>
+                    <%= renderLauncherIcon(obj) %>
+                    <%- item.label %>
+                <% } else if (launcherMode == 'icon-only') { %>
+                    <%= renderLauncherIcon(obj) %>
+                <% } else if (launcherMode == 'text-only') { %>
+                    <% if (iconClassName) { %>
+                        <%= renderLauncherIcon(obj) %>
+                    <% } %>
+                    <%- item.label %>
+                <% } %>
+            </a>
+        </li>
+    <% }) %>
+    </ul>
+</div>
+<% } %>

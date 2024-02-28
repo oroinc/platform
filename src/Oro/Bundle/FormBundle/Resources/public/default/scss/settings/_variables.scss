@@ -4,28 +4,38 @@
 
 $base-ui-element-offset: 11px 16px !default;
 $base-ui-element-cursor: null !default;
+$base-ui-element-icon-size: 40px !default;
 
 $base-ui-element-font-size: $base-font-size !default;
 $base-ui-element-font-family: $base-font !default;
-$base-ui-element-line-height: 1.5 !default;
+$base-ui-element-line-height: 1.429 !default;
 
 $base-ui-element-border-size: 1px !default;
-$base-ui-element-border: $base-ui-element-border-size solid get-color('additional', 'light') !default;
-$base-ui-element-border-radius: 5px !default;
-$base-ui-element-bg-color: get-color('additional', 'ultra') !default;
-$base-ui-element-color: get-color('additional', 'darker') !default;
-$base-ui-element-placeholder-color: get-color('additional', 'middle');
+$base-ui-element-border: $base-ui-element-border-size solid get-var-color('neutral', 'grey3') !default;
+$base-ui-element-border-radius: 4px !default;
+$base-ui-element-bg-color: get-var-color('neutral', 'white-100') !default;
+$base-ui-element-color: get-var-color('text', 'primary') !default;
+$base-ui-element-placeholder-color: get-var-color('text', 'secondary') !default;
 $base-ui-element-height-size-m: 38px !default;
 
-$base-ui-element-arrow-color: get-color('additional', 'dark') !default;
+$base-ui-element-arrow-color: var(--base-ui-element-arrow-color, get-color('text', 'secondary')) !default;
 
-$base-ui-element-border-color-focus: transparent !default;
-$base-ui-element-focus-style: 0 0 0 2px get-color('ui', 'focus'),
-                              0 0 6px color.adjust(get-color('ui', 'normal'), $lightness: 1%) !default;
-$base-ui-bth-focus-style: 0 0 0 1px get-color('additional', 'ultra'),
-                          0 0 0 3px get-color('ui', 'focus'),
-                          0 0 6px color.adjust(get-color('ui', 'normal'), $lightness: 1%) !default;
+$base-ui-element-border-color-hover: get-var-color('primary', 'hover') !default;
+$base-ui-element-border-color-focus: $base-ui-element-border-color-hover !default;
+
+$base-ui-element-focus-visible-outline: 2px solid get-color('neutral', 'focus') !default;
+$base-ui-element-focus-visible-outline-offset: 1px !default;
+$base-ui-element-focus-visible-style: 0 0 0 1px get-color('neutral', 'white-100'),
+                              0 0 0 3px get-color('neutral', 'focus') !default;
+
+$base-ui-element-bg-color-error-state: get-var-color('destructive', 'light') !default;
+$base-ui-element-border-color-error-state: get-var-color('destructive', 'main') !default;
+
+$base-ui-element-bg-color-disabled-state: get-var-color('neutral', 'grey1') !default;
+$base-ui-element-border-color-disabled-state: get-var-color('neutral', 'grea2') !default;
+$base-ui-element-color-disabled-state: get-var-color('text', 'disable') !default;
+
 $base-ui-popup-border-radius: $base-ui-element-border-radius !default;
 
-$base-ui-popup-background: get-color('additional', 'ultra') !default;
+$base-ui-popup-background: get-color('neutral', 'white-100') !default;
 $base-ui-popup-box-shadow: 1px 2px 8px rgba(0 0 0 / 40%) !default;

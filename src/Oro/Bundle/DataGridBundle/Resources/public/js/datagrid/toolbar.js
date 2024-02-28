@@ -5,9 +5,20 @@ define([
     './pagination-input',
     './visible-items-counter',
     './page-size',
+    './pagination-info',
     './actions-panel',
     './sorting/dropdown'
-], function(_, Backbone, __, PaginationInput, VisibleItemsCounter, PageSize, ActionsPanel, SortingDropdown) {
+], function(
+    _,
+    Backbone,
+    __,
+    PaginationInput,
+    VisibleItemsCounter,
+    PageSize,
+    PaginationInfo,
+    ActionsPanel,
+    SortingDropdown
+) {
     'use strict';
 
     const $ = Backbone.$;
@@ -33,6 +44,9 @@ define([
         pageSize: PageSize,
 
         /** @property */
+        paginationInfo: PaginationInfo.default,
+
+        /** @property */
         sortingDropdown: SortingDropdown,
 
         /** @property */
@@ -48,7 +62,8 @@ define([
             pagesize: '[data-grid-pagesize]',
             actionsPanel: '[data-grid-actions-panel]',
             extraActionsPanel: '[data-grid-extra-actions-panel]',
-            sortingDropdown: '[data-grid-sorting]'
+            sortingDropdown: '[data-grid-sorting]',
+            paginationInfo: '[data-grid-pagination-info]'
         },
 
         /** @property */
@@ -83,14 +98,18 @@ define([
 
             this.collection = options.collection;
 
-            const optionsiIemsCounter = _.defaults({collection: this.collection}, options.itemsCounter);
-            options.columns.trigger('configureInitializeOptions', this.itemsCounter, optionsiIemsCounter);
+            const optionsItemsCounter = _.defaults({collection: this.collection}, options.itemsCounter);
+            options.columns.trigger('configureInitializeOptions', this.itemsCounter, optionsItemsCounter);
 
             this.subviews = {
                 pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination)),
-                itemsCounter: new this.itemsCounter(optionsiIemsCounter),
+                itemsCounter: new this.itemsCounter(optionsItemsCounter),
                 actionsPanel: new this.actionsPanel(_.extend({className: ''}, options.actionsPanel)),
-                extraActionsPanel: new this.extraActionsPanel()
+                extraActionsPanel: new this.extraActionsPanel(),
+                paginationInfo: new this.paginationInfo({
+                    collection: this.collection,
+                    container: this.$(this.selector.paginationInfo)
+                })
             };
 
             if (_.result(options.pageSize, 'hide') !== true) {
@@ -188,6 +207,10 @@ define([
 
             if (this.subviews.sortingDropdown) {
                 this.$(this.selector.sortingDropdown).append(this.subviews.sortingDropdown.render().$el);
+            }
+
+            if (this.subviews.paginationInfo) {
+                this.$(this.selector.paginationInfo).append(this.subviews.paginationInfo.render().$el);
             }
 
             if (this.subviews.extraActionsPanel.haveActions()) {

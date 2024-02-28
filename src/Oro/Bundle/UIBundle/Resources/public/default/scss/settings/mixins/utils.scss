@@ -1,0 +1,77 @@
+/* @theme: default; */
+
+@use 'sass:map';
+
+/** Render map of css properties as key: value;
+*/
+@mixin render-properties($properties) {
+    @if $properties and type-of($properties) == 'map' {
+        @each $key, $value in $properties {
+            #{$key}: #{$value};
+        }
+    }
+}
+
+/** Render map of css properties as key: value; where value has generated css-property
+*/
+@mixin render-var-properties($properties, $var-prefix: null) {
+    @if $properties and type-of($properties) == 'map' {
+        @each $key, $value in $properties {
+            #{$key}:
+            var(
+                #{get-var-key($var-prefix, $key)},
+                #{$value}
+            );
+        }
+    }
+}
+
+/** Render states of component from a map
+*/
+@mixin render-states($states, $var-prefix: null, $theme-key: null) {
+    @if $states and type-of($states) == 'map' {
+        @if map.has-key($states, 'default') {
+            @include render-var-properties(
+                map.get($states, 'default'),
+                '#{$var-prefix}-#{$theme-key}'
+            );
+        }
+
+        @if map.has-key($states, 'hover') {
+            &:hover {
+                @include render-var-properties(
+                    map.get($states, 'hover'),
+                    '#{$var-prefix}-#{$theme-key}-hover'
+                );
+            }
+        }
+
+        @if map.has-key($states, 'focus') {
+            &:focus {
+                @include render-var-properties(
+                    map.get($states, 'focus'),
+                    '#{$var-prefix}-#{$theme-key}-focus'
+                );
+            }
+        }
+
+        @if map.has-key($states, 'active') {
+            &:active {
+                @include render-var-properties(
+                    map.get($states, 'active'),
+                    '#{$var-prefix}-#{$theme-key}-active'
+                );
+            }
+        }
+
+        @if map.has-key($states, 'disabled') {
+            &:disabled,
+            &.disabled {
+                @include render-var-properties(
+                    map.get($states, 'disabled'),
+                    '#{$var-prefix}-#{$theme-key}-disabled'
+                );
+            }
+        }
+    }
+}

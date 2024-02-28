@@ -215,6 +215,15 @@ This means that storefront datagrids can now differ between themes. Any storefro
 #### DataGridBundle
 * Added postponed delete entities logic to `\Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionHandler`.
 
+### Changed
+
+#### UIBundle
+* Removed `$offset-*` scss variables
+* Added `spacing` scss function.
+`$offset-x\$offset-y` => `spacing('base')`
+`$offset-x-m\$offset-y-m` => `spacing('sm')`
+`$offset-x-s\$offset-y-s` => `spacing('xs')`
+
 ## 5.1.0 (2023-03-31)
 
 [Show detailed list of changes](incompatibilities-5-1.md)

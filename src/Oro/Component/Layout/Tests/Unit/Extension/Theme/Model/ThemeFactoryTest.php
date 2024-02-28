@@ -42,6 +42,7 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
         $fullDefinition = new Theme('oro-black', 'base');
         $fullDefinition->setIcon('oro-black-icon.ico');
         $fullDefinition->setLogo('oro-black-logo.png');
+        $fullDefinition->setLogoSmall('oro-black-logo-small.png');
         $fullDefinition->setImagePlaceholders(['no_image' => 'some/test/route.png']);
         $fullDefinition->setRtlSupport(true);
         $fullDefinition->setScreenshot('oro-black-screenshot.png');
@@ -102,6 +103,7 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
                     'screenshot' => 'oro-black-screenshot.png',
                     'icon'       => 'oro-black-icon.ico',
                     'logo'       => 'oro-black-logo.png',
+                    'logo_small' => 'oro-black-logo-small.png',
                     'image_placeholders' => ['no_image'   => 'some/test/route.png'],
                     'rtl_support' => true,
                     'directory'  => 'OroBlack',

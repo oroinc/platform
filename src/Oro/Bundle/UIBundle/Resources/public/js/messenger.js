@@ -47,6 +47,7 @@ define(function(require) {
         const $el = $(opt.template({
             type,
             message,
+            description: null,
             style: opt.style,
             dismissible: opt.dismissible,
             showIcon: opt.showIcon,

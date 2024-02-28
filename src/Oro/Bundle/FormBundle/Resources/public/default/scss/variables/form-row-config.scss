@@ -1,5 +1,8 @@
 /* @theme: default; */
 
-$form-row-offset-x: $offset-x;
-$form-row-label-offset-x: $offset-x-s;
+$form-row-offset-x: spacing('base');
+$form-row-label-offset-x: spacing('xs');
 $form-row-content-offset-x: 0;
+$form-row-input-button-min-height: 42px !default;
+$form-row-input-button-padding: 7px !default;
+$form-row-input-button-color: get-color('text', 'primary') !default;

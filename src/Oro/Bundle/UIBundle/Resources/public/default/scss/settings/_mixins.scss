@@ -14,7 +14,6 @@
 @import './mixins/aspect-ratio';
 @import './mixins/element-state';
 @import './mixins/safe-area-offset';
-@import './mixins/link';
 @import './mixins/fa-icon';
 @import './mixins/caret';
 @import './mixins/border';
@@ -35,3 +34,4 @@
 @import './mixins/direct-link';
 @import './mixins/loading-blur';
 @import './mixins/loading-blur-overlay';
+@import './mixins/utils';

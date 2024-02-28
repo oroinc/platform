@@ -1,12 +1,13 @@
 /* @theme: default; */
 
 @use 'sass:color';
+@use 'sass:string';
 
 $use-base-style-for-input: true !default;
 
 // Default
 $input-width-short: 64px !default;
-$input-padding: 9px $input-padding-y 8px !default;
+$input-padding: $input-padding-y $input-padding-x !default;
 $input-padding--m: 8px 9px 7px !default;
 $input-padding--s: 5px 9px 4px !default;
 $input-padding--x-s: 4px 9px 3px !default;
@@ -21,30 +22,27 @@ $input-border: $base-ui-element-border !default;
 $input-border-radius: $base-ui-element-border-radius !default;
 $input-background-color: $base-ui-element-bg-color !default;
 $input-color: $base-ui-element-color !default;
+$input-btn-size: 44px !default;
 
-$input-time-placeholder-color: get-color('additional', 'middle') !default;
+$input-time-placeholder-color: $base-ui-element-placeholder-color !default;
+
+$input-search-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"><path fill="#{str-replace(string.unquote('#{$base-ui-element-arrow-color}'), '#', '%23')}" fill-rule="evenodd" d="M13.848 15.027a7.5 7.5 0 1 1 1.179-1.178l3.062 3.062a.833.833 0 1 1-1.178 1.178l-3.063-3.062ZM3.333 9.166a5.833 5.833 0 1 1 10.034 4.047.848.848 0 0 0-.153.154 5.833 5.833 0 0 1-9.88-4.201Z" clip-rule="evenodd"/></svg>') no-repeat var(--base-ui-element-search-icon-position, (left spacing('md') center)) #{get-var-color('text', 'inverse')} !default;
 
 // Hover
-$input-border-color-hover-state: get-color('additional', 'dark') !default;
-$input-box-shadow-hover-state:
-    inset 0 1px 1px color.scale(get-color('additional', 'ultra'), $alpha: -75%),
-    0 0 8px color.scale(get-color('ui', 'focus'), $alpha: -60%);
+$input-border-color-hover-state: $base-ui-element-border-color-hover !default;
 
 // Focus
 $input-border-color-focus-state: $base-ui-element-border-color-focus !default;
-$input-box-shadow-focus-state: $base-ui-element-focus-style !default;
 
 // Error
-$input-border-color-error-state: get-color('ui', 'error-dark') !default;
-$input-box-shadow-error-state: 0 1px 7px 0 color.scale(get-color('ui', 'error-dark'), $alpha: -60%);
+$input-border-color-error-state: $base-ui-element-border-color-error-state !default;
+$input-bg-color-error-state: $base-ui-element-bg-color-error-state !default;
 
 // Disabled
-$input-border-color-disabled-background: get-color('additional', 'base') !default;
-$input-border-color-disabled-hover-border-color: get-color('additional', 'light') !default;
+$input-bg-color-disabled: $base-ui-element-bg-color-disabled-state !default;
+$input-border-color-disabled: $base-ui-element-border-color-disabled-state !default;
+$input-color-disabled: $base-ui-element-color-disabled-state !default;
 
 // Read only
-$input-border-color-readonly-background: $input-border-color-disabled-background !default;
-$input-border-color-readonly-hover-border-color: $input-border-color-disabled-hover-border-color !default;
-
-// Error
-$input-border-color-error-state: get-color('ui', 'error-dark');
+$input-border-color-readonly-background: $input-border-color-disabled !default;
+$input-border-color-readonly-hover-border-color: $base-ui-element-border-color-disabled-state !default;

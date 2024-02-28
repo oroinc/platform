@@ -1,10 +1,11 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
     const $ = require('jquery');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const stickyElementMixin = require('oroui/js/app/views/sticky-element/sticky-element-mixin');
+    const config = require('module-config').default(module.id);
     require('jquery-ui/widget');
 
     /**
@@ -23,6 +24,7 @@ define(function(require) {
             groupContainer: '<div class="dropdown btn-group"></div>',
             minItemQuantity: 1,
             moreButtonAttrs: {},
+            moreButtonIcon: config.moreButtonIcon || null,
             decoreClass: null
         },
 
@@ -144,9 +146,16 @@ define(function(require) {
                     'data-placement': 'bottom-end',
                     'data-inherit-parent-width': 'loosely'
                 }, this.options.moreButtonAttrs))
-                .addClass('btn dropdown-toggle btn-more-actions')
+                .addClass('btn btn--icon dropdown-toggle btn-more-actions')
                 .addClass(this.options.decoreClass || '')
                 .append(this.options.moreLabel);
+
+            if (this.options.moreButtonIcon) {
+                $button.append(_.macros('oroui::renderIcon')({
+                    'name': this.options.moreButtonIcon,
+                    'class': 'theme-icon'
+                }));
+            }
 
             return $button;
         },

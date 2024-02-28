@@ -1,0 +1,30 @@
+<% var spriteUrl = _.getThemeSpriteUrl(); %>
+<% if (spriteUrl && obj.name) { %>
+    <% let titleId = _.uniqueId(obj.name);
+       let roleAttr = obj.role ?? 'img';
+       let ariaHidden = obj.ariaHidden ?? 'true';
+       let className = obj.class ?? 'theme-icon';
+
+        if (obj.title) {
+            ariaHidden = void 0;
+        }
+        if (ariaHidden) {
+            roleAttr = 'none';
+        }
+        if (obj.extraClass) {
+            className = `${className.trim()} ${obj.extraClass.trim()}`;
+        }
+    %>
+    <svg class="<%- className %>"
+        role="<%- roleAttr %>"
+        <% if (obj.id) { %>id="<%- obj.id %>"<% } %>
+        <% if (obj.width) { %>width="<%- obj.width %>"<% } %>
+        <% if (obj.height) { %>height="<%- obj.height %>"<% } %>
+        <% if (obj.fill) { %>fill="<%- obj.fill %>"<% } %>
+        <% if (obj.title) { %>aria-labelledby="<%- titleId %>"<% } %>
+        <% if (ariaHidden !== void 0) { %>aria-hidden="<%- ariaHidden %>"<% } %>
+    >
+        <% if (obj.title) { %><title id="<%- titleId %>"><%- obj.title %></title><% } %>
+        <use href="<%- spriteUrl %>#<%- obj.name %>"/>
+    </svg>
+<% } %>

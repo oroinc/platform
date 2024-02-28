@@ -43,7 +43,6 @@ aliases:
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/component-shortcuts-module
-    - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/ignore-tabbable
     - oroui/js/app/modules/init-layout
     - oroui/js/app/modules/input-widgets
@@ -61,10 +60,16 @@ configs:
     oroui/js/app/components/base/component-container-mixin: {}
     oroui/js/app/components/tabs-component: {}
     oroui/js/app/plugins/styled-scroll-bar: {}
+    oroui/js/app/views/input-widget/uniform-file: {
+        fileButtonClass: 'action btn'
+    }
     oroui/js/app/views/page/messages-view: {}
     oroui/js/app/views/tab-collection-view: {}
     oroui/js/app/views/tab-item-view: {}
     oroui/js/component-shortcuts-manager: {}
+    oroui/js/content-processor/dropdown-button: {
+        moreButtonIcon: 'chevron-down'
+    }
     oroui/js/delete-confirmation: {}
     oroui/js/error: {}
     oroui/js/extend/bootstrap/bootstrap-dropdown: {}
@@ -137,6 +142,7 @@ map:
         tooltip.js: bootstrap-tooltip
         underscore: oroui/js/extend/underscore
         util.js: bootstrap-util
+        oroui/templates/clear_button.html: oroui/default/templates/clear_button.html
     chaplin:
         backbone: backbone
     extend-popper:

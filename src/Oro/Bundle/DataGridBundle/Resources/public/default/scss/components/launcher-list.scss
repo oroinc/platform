@@ -1,9 +1,14 @@
 /* @theme: default; */
 
 .launchers-list {
-    display: block;
+    display: flex;
 
-    text-align: left;
+    &.nav {
+        display: flex;
+        flex-wrap: nowrap;
+    }
 
-    white-space: nowrap;
+    &:has(.mode-icon-text) {
+        column-gap: spacing('base');
+    }
 }

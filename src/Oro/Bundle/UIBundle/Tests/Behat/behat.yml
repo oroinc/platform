@@ -95,10 +95,10 @@ oro_behat_extension:
       selector: 'div.modal-body, div.modal-dialog__body'
 
     UiWindow okButton:
-      selector: 'div.modal-footer .ok, div.buttons-equal button.ok'
+      selector: 'div.modal-footer .ok'
 
     UiWindow cancelButton:
-      selector: 'div.modal-footer .cancel, div.buttons-equal button.cancel'
+      selector: 'div.modal-footer .cancel'
 
     UiWindow ActionPanel:
       selector: 'div.modal .modal-footer'

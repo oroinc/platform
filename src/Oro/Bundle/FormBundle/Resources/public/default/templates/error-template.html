@@ -1,0 +1,7 @@
+<% var showIcon = obj.showIcon !== void 0 ? showIcon : true %>
+<span class="validation-failed__content" role="alert" >
+    <%if (showIcon) { %>
+        <span class="validation-failed__icon" aria-hidden="true"></span>
+    <% } %>
+    <span><%- message %></span>
+</span>

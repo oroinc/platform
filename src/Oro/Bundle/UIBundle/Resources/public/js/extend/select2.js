@@ -580,6 +580,13 @@ define(function(require) {
         };
 
         prototype.init = function(opts) {
+            this._templateData = {extraLabelClass: ''};
+            if (opts.element.attr('data-label')) {
+                this._templateData.extraLabel = opts.element.attr('data-label');
+            }
+            if (opts.element.attr('data-label-class')) {
+                this._templateData.extraLabelClass = opts.element.attr('data-label-class');
+            }
             init.call(this, opts);
             this.breadcrumbs = $('<ul class="select2-breadcrumbs"></ul>');
             this.breadcrumbs.on('click.select2', '.select2-breadcrumb-item', function(e) {
@@ -771,7 +778,7 @@ define(function(require) {
         };
 
         prototype.createContainer = function() {
-            return $(singleChoiceTpl());
+            return $(singleChoiceTpl(this._templateData));
         };
 
         prototype.postprocessResults = _.wrap(prototype.postprocessResults, function(original, data, ...rest) {
@@ -1040,7 +1047,7 @@ define(function(require) {
         prototype.onSelect = overrideMethods.onSelect;
 
         prototype.createContainer = function() {
-            return $(multipleChoiceTpl());
+            return $(multipleChoiceTpl(this._templateData));
         };
 
         prototype.initContainer = _.wrap(prototype.initContainer, function(original, ...rest) {

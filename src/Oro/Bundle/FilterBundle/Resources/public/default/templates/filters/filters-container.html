@@ -1,3 +1,4 @@
+<% let oroui = _.macros('oroui') %>
 <% if (!_.isEmpty(filters)) { %>
     <% if (renderMode === 'toggle-mode') { %>
         <div class="filter-box toggle-mode" <%= attributes %>>
@@ -6,9 +7,9 @@
                     <% if (!obj.outerHintContainer) { %>
                     <div class="filter-items-hint">
                         <button type="button"
-                                class="btn btn--size-s btn--link reset-filter-button"
+                                class="btn btn--outlined btn--no-padding btn--text reset-filter-button"
                         >
-                            <span class="fa-close" aria-hidden="true"></span>
+                            <%= oroui.renderIcon({name: 'close'}) %>
                             <%- _.__('oro.filter.reset.label') %>
                         </button>
                     </div>
@@ -48,9 +49,9 @@
                 </div>
                 <div class="filter-items-hint">
                     <button type="button"
-                            class="btn btn--size-s btn--link reset-filter-button"
+                            class="btn btn--outlined btn--no-padding btn--text reset-filter-button"
                     >
-                        <span class="fa-close" aria-hidden="true"></span>
+                        <%= oroui.renderIcon({name: 'close'}) %>
                         <%- _.__('oro.filter.reset.label') %>
                     </button>
                 </div>

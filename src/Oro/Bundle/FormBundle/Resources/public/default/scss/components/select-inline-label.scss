@@ -1,0 +1,31 @@
+/* @theme: default; */
+
+.select-inline-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: $select-inline-label-gap;
+    border: $select-border;
+    background-color: $select-background-color;
+    border-radius: $base-ui-element-border-radius;
+
+    .select {
+        border: 0;
+        padding-inline-start: 0;
+    }
+
+    &__label {
+        order: -1;
+        padding-left: $select-padding-start;
+
+        color: $select-inline-label-color;
+    }
+
+    &:has(.select2-container) {
+        border: 0;
+    }
+
+    .select2-container ~ &__label {
+        display: none;
+    }
+}

@@ -31,6 +31,9 @@ class Theme
     protected $logo;
 
     /** @var string */
+    protected $logoSmall;
+
+    /** @var string */
     protected $screenshot;
 
     /** @var string */
@@ -152,6 +155,16 @@ class Theme
     public function setLogo($logo)
     {
         $this->logo = $logo;
+    }
+
+    public function getLogoSmall(): ?string
+    {
+        return $this->logoSmall;
+    }
+
+    public function setLogoSmall(string $logoSmall): void
+    {
+        $this->logoSmall = $logoSmall;
     }
 
     /**

@@ -1,19 +1,21 @@
 /* @theme: default; */
 
-$select2-container-multi-search-choice-border: 1px solid get-color('additional', 'middle') !default;
-$select2-container-multi-search-choice-background-image: linear-gradient(
-    to bottom, get-color('additional', 'base') 30%,
-    get-color('additional', 'light') 50%,
-    get-color('additional', 'middle') 100%
+@use 'sass:string';
+
+$select2-container-multi-size-l: spacing('sm') 40px spacing('sm') spacing('md') !default;
+$select2-container-multi-arrow-position: right spacing('sm') center !default;
+
+$select2-container-multi-search-choice-bg-color: get-var-color('neutral', 'grey1') !default;
+
+$select2-container-multi-search-padding: (
+    (spacing('xs') - $base-ui-element-border-size) 0 (spacing('xs') - $base-ui-element-border-size)
 ) !default;
-$select2-container-multi-search-choice-color: get-color('additional', 'dark') !default;
 
-$select2-container-multi-input-color: get-color('additional', 'middle') !default;
-$select2-container-multi-input-radius: $base-ui-popup-border-radius !default;
+$select2-container-multi-choice-close-color: get-color('neutral', 'dark') !default;
+$select2-container-multi-choice-close-size: 16px !default;
+$select2-container-multi-choice-padding: (spacing('xs') - $base-ui-element-border-size) spacing('sm') !default;
+$select2-container-multi-choice-gap: spacing('xs') !default;
+$select2-container-multi-choice-border-radius: 24px !default;
 
-$select2-container-multi-disabled-choices-background: get-color('additional', 'middle') !default;
-
-$select2-container-multi-choice-close-color: get-color('additional', 'dark') !default;
-
-$select2-container-multi-disabled-choice-border: 1px solid get-color('additional', 'middle') !default;
-$select2-container-multi-disabled-choice-background: get-color('additional', 'light') !default;
+// X svg icon uses here
+$select2-container-multi-choice-close-background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path fill="#{str-replace(string.unquote('#{$select2-container-color}'), '#', '%23')}" d="M12.472 4.471a.667.667 0 0 0-.943-.942L8 7.057 4.472 3.53a.667.667 0 1 0-.943.942L7.057 8 3.53 11.529a.667.667 0 1 0 .943.942L8 8.943l3.529 3.528a.667.667 0 1 0 .943-.942L8.943 8l3.529-3.529Z"/></svg>') no-repeat center center transparent !default;

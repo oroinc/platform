@@ -163,6 +163,7 @@ services:
             - ['setAttribute', ['div', 'data-delay', 'Number']]
             - ['setAttribute', ['div', 'data-autohide', 'Bool']]
             - ['setAttribute', ['div', 'tabindex', 'Text']]
+            - ['setAttribute', ['div', 'style', 'Text']]
              # span attributes
             - ['setAttribute', ['span', 'title', 'CDATA']]
             - ['setAttribute', ['span', 'role', 'Text']]
@@ -195,6 +196,7 @@ services:
             # img attributes
             - ['setAttribute', ['img', 'usemap', 'CDATA']]
             - ['setAttribute', ['img', 'ismap', 'Bool']]
+            - ['setAttribute', ['img', 'loading', 'Enum#eager,lazy']]
             # nav attributes
             - ['setAttribute', ['nav', 'aria-label', 'Text']]
             # map attributes

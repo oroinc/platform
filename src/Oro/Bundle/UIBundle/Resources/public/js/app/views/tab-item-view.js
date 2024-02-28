@@ -41,6 +41,14 @@ define(function(require, exports, module) {
             this.updateStates();
         },
 
+        getTemplateData: function() {
+            const data = TabItemView.__super__.getTemplateData.call(this);
+
+            data.templateClassName = config.templateClassName;
+
+            return data;
+        },
+
         updateStates: function() {
             this.$el.toggleClass('changed', !!this.model.get('changed'));
             const $tab = this.$('[role="tab"]');

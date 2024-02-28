@@ -43,6 +43,7 @@ dynamic-imports:
 map:
     '*':
         jquery.validate: oroform/js/extend/validate
+        oroform/templates/error-template.html: oroform/default/templates/error-template.html
         oroform/templates/floating-error-message.html: oroform/default/templates/floating-error-message.html
     oroform/js/extend/validate:
         jquery.validate: jquery.validate

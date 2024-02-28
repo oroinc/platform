@@ -24,7 +24,7 @@ services:
 
     Oro\Bundle\EntityConfigBundle\Command\UpdateCommand:
         arguments:
-            - '@oro_entity_config.config_loader'
+            - '@Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader'
         tags:
             - { name: console.command }
 

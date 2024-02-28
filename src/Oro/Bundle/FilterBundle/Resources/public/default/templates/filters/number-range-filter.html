@@ -1,6 +1,6 @@
 <div class="choice-filter number-range-filter" data-number-range-filter-template>
     <div class="filter-select-oro-wrapper">
-        <select name="<%- name %>" class="select select--size-s select--full oro-select2 oro-select2--size-s" data-choice-value-select
+        <select name="<%- name %>" class="select select--full oro-select2" data-choice-value-select
             <% if (_.isMobile()) { %>
                 data-skip-input-widgets
             <% } %>
@@ -45,7 +45,7 @@
         <% if (renderMode !== 'toggle-mode') { %>
             <div class="filter-action-row">
                 <button type="button"
-                    class="btn btn--action btn--size-s filter-update"
+                    class="btn btn--outlined btn--size-small filter-update"
                     aria-label="<%- updateButtonAriaLabel %>"
                 ><%- _.__("oro.filter.updateButton.text") %></button>
             </div>

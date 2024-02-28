@@ -17,6 +17,7 @@ export default [
     },
     function(param) {
         param = Object.assign({}, defaultParam, param);
-        return __(param.message);
+        const placeholders = param.placeholders ?? {};
+        return __(param.message, placeholders);
     }
 ];

@@ -33,7 +33,7 @@
 
 <<%- tagName %>
     <% if (tagName === "a") { %> href="<%- link %>" role="button"<% } %>
-    class="<%- actionClassNames.join(' ') %>"
+    class="<%- actionClassNames.join(' ') %> no-decoration"
     title="<%- title %>"
     <% if (obj.ariaLabel) { %>
     aria-label="<%- ariaLabel %>"
@@ -57,7 +57,7 @@
     <ul class="dropdown-menu" aria-labelledby="<%- togglerId %>">
     <% _.each(links, function(item, index) { %>
         <li>
-            <a href="<%- link %>" class="dropdown-item" data-index="<%- index %>" title="<%- item.label %>"
+            <a href="<%- link %>" class="dropdown-item no-decoration" data-index="<%- index %>" title="<%- item.label %>"
             <% if (item.attributes) { attributesTemplate(item.attributes); } %>
             <% if (item.ariaLabel) { %> aria-label="<%- item.ariaLabel %>" <% } %>
             data-key="<%- item.key %>">

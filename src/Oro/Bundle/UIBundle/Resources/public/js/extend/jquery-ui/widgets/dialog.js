@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import {macros} from 'underscore';
 import 'jquery-ui/widgets/dialog';
 
 $.widget('ui.dialog', $.ui.dialog, {
@@ -22,7 +23,7 @@ $.widget('ui.dialog', $.ui.dialog, {
         }
 
         title.append(
-            this._renderBadge(),
+            this._renderIcon(),
             $('<span/>', {'class': 'ui-dialog-title__inner'}).text(titleText)
         );
 
@@ -36,17 +37,13 @@ $.widget('ui.dialog', $.ui.dialog, {
         }
     },
 
-    _renderBadge() {
-        const {dialogTitleIcon, dialogTitleBadge} = this.options;
+    _renderIcon() {
+        const {dialogTitleIcon} = this.options;
 
         if (dialogTitleIcon) {
-            let $icon = $('<span />', {'class': dialogTitleIcon, 'aria-hidden': 'true'});
-
-            if (dialogTitleBadge) {
-                $icon.wrap($('<span />', {'class': 'dialog-badge', 'aria-hidden': 'true'}));
-                $icon = $icon.parent();
-            }
-            return $icon;
+            return $(`<span class="dialog-icon" aria-hidden="true">
+                ${macros('oroui::renderIcon')({name: dialogTitleIcon})}
+            </span>`);
         }
 
         return $();

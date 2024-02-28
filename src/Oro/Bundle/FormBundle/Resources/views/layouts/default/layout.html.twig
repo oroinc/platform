@@ -23,9 +23,9 @@
 {% block button_widget %}
     {% if style|default('') == 'auto' %}
         {% if action == 'submit' %}
-            {% set style = 'btn--info' %}
+            {% set style = 'btn--outlined' %}
         {% else %}
-            {% set style = action == 'reset' ? 'btn--action' : '' %}
+            {% set style = action == 'reset' ? 'btn--outlined' : '' %}
         {% endif %}
     {% endif %}
     {% if style is not defined %}

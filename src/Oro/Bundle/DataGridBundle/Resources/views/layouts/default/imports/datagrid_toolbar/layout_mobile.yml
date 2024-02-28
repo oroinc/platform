@@ -23,4 +23,3 @@ layout:
             siblingId: __datagrid_toolbar_pagination
 
     conditions: 'context["is_mobile"]==true'
-

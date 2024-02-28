@@ -87,7 +87,7 @@ operations:
                 message_parameters:
                     entityLabel: $.entityLabel
         button_options:
-            icon: fa-trash-o
+            icon: trash
         actions:
             - '@run_action_group':
                 action_group: DELETE

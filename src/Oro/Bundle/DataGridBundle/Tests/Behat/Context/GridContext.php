@@ -1631,6 +1631,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )check all visible on page in grid$/
+     * @When /^(?:|I )check all visible on page in "(?P<gridName>[^"]+)"$/
+     * @When /^(?:|I )check all visible on page in "(?P<gridName>[^"]+)" grid$/
+     *
+     * @param string $gridName
+     */
+    public function iCheckAllVisibleOnPageInGrid($gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $grid->massVisibleOnPageCheck();
+    }
+
+    /**
      * @When /^(?:|I )check all records in grid$/
      * @When /^(?:|I )check all records in "(?P<gridName>[^"]+)"$/
      * @When /^(?:|I )check all records in "(?P<gridName>[^"]+)" grid$/
