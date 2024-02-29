@@ -51,9 +51,10 @@ class EntityPropertyInfo
             return [];
         }
 
-        $schema = $entityMetadata->get('schema', false, []);
-
-        return array_merge(array_keys($schema['property'] ?? []), array_keys($schema['relation'] ?? []));
+        return array_merge(
+            array_keys($entityMetadata->get('schema')['property']),
+            array_keys($entityMetadata->get('schema')['relation']),
+        );
     }
 
     public static function methodExists(string|object $objectOrClass, string $method): bool

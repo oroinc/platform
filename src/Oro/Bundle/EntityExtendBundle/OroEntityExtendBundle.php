@@ -74,6 +74,7 @@ class OroEntityExtendBundle extends Bundle
         $this->ensureInitialized();
 
         $container->addCompilerPass(new Compiler\EntityExtendValidationLoaderPass());
+        $container->addCompilerPass(new Compiler\ConfigLoaderPass());
         $container->addCompilerPass(new Compiler\EntityManagerPass());
         $container->addCompilerPass(new Compiler\MigrationConfigPass());
         $container->addCompilerPass(new Compiler\ExtendDuplicatorPass());

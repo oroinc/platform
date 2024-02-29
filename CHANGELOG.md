@@ -4,7 +4,7 @@ The current file describes significant changes in the code that may affect the u
 
 ## Changes in the Platform package versions
 
-- [6.0.0-BETA](#600-beta-2024-01-08)
+- [6.0.0-RC](#600-rc-2024-02-29)
 - [5.1.0](#510-2023-03-31)
 - [5.0.0](#500-2022-01-26)
 - [4.2.10](#4210)
@@ -24,16 +24,8 @@ The current file describes significant changes in the code that may affect the u
 - [2.1.0](#210-2017-03-30)
 
 
-# UNRELEASED
-
-### Added
-
-#### LayoutBundle
-* Added the ability to specify response status code via layout context option `response_status_code`.
-
-
-## 6.0.0-BETA (2024-01-08)
-[Show detailed list of changes](incompatibilities-6-0-beta.md)
+## 6.0.0-RC (2024-02-29)
+[Show detailed list of changes](incompatibilities-6-0-rc.md)
 
 ### Security Changes
 
@@ -506,6 +498,7 @@ use ExtendEntityTrait;
 
 #### LayoutBundle
 * Added `\Oro\Component\Layout\Extension\Theme\Model\ThemeManager::getThemesHierarchy` to easily get the theme hierarchy for the specified theme.
+* Added the ability to specify response status code via layout context option `response_status_code`.
 
 #### Layout Component
 * Added `\Oro\Component\Layout\ContextInterface` and `\Oro\Component\Layout\LayoutContextStack` to `\Oro\Component\Layout\Layout` so now it is aware of own context and can push/pop the current context in the layout context stack.

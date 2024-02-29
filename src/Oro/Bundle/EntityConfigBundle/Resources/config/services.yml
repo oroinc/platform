@@ -108,13 +108,11 @@ services:
             - '@.inner'
             - '@oro_cache.oro_data_cache_manager'
 
-    Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader:
+    oro_entity_config.config_loader:
+        class: Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
         arguments:
+            - '@oro_entity_config.config_manager'
             - '@oro_entity_config.entity_manager_bag'
-            - '@oro_entity_config.metadata.annotation_metadata_factory'
-            - '@oro_entity_config.configuration_handler'
-            - '@oro_entity_config.provider_bag'
-            - '@oro_entity_config.config_cache_impl'
 
     oro_entity_config.cache:
         public: false
