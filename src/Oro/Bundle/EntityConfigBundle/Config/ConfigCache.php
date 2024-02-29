@@ -565,9 +565,7 @@ class ConfigCache
         if (isset($this->fields[$scope][$className])) {
             $entry = $this->fields[$scope][$className];
         } else {
-            $entry = !$localCacheOnly
-                ? $this->cacheFetch($this->getFieldConfigsCacheKey($className, $scope))
-                : false;
+            $entry = $this->cacheFetch($this->getFieldConfigsCacheKey($className, $scope));
             if (false === $entry) {
                 $entry = [];
             }

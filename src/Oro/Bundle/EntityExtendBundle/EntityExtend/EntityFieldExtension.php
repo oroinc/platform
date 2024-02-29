@@ -37,10 +37,8 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
 
             return true;
         }
-
         $entityMetadata = $transport->getEntityMetadata();
-        $schema = $entityMetadata->get('schema', false, []);
-        $isCustom = !$entityMetadata->get('inherit') && isset($schema['type']) && $schema['type'] === 'Custom';
+        $isCustom = !$entityMetadata->get('inherit') && $entityMetadata->get('schema')['type'] === 'Custom';
 
         if ($transport->getName() === 'id' && $isCustom) {
             $this->setBoolCacheItem($transport, $this, true);
@@ -96,11 +94,8 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
             return $cachedValue;
         }
         $result = [];
-
         $entityMetadata = $transport->getEntityMetadata();
-        $schema = $entityMetadata->get('schema', false, []);
-        $isCustom = !$entityMetadata->get('inherit') && isset($schema['type']) && $schema['type'] === 'Custom';
-
+        $isCustom = !$entityMetadata->get('inherit') && $entityMetadata->get('schema')['type'] === 'Custom';
         if ($isCustom) {
             $result['getId'] = 'id';
         }

@@ -2,19 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
-/**
- * Clears security metadata in case if security entity config is updated.
- */
 class EntitySecurityMetadataConfigListener
 {
     /** @var EntitySecurityMetadataProvider */
     protected $provider;
-
-    protected $hasPreflushChanges = false;
 
     public function __construct(EntitySecurityMetadataProvider $provider)
     {
@@ -30,15 +24,7 @@ class EntitySecurityMetadataConfigListener
         $className      = $event->getClassName();
         $configProvider = $event->getConfigManager()->getProvider('security');
         if ($configProvider->hasConfig($className)) {
-            $this->hasPreflushChanges = true;
+            $this->provider->clearCache($configProvider->getConfig($className)->get('type'));
         }
-    }
-
-    public function postFlush(PostFlushConfigEvent $event)
-    {
-        if ($this->hasPreflushChanges) {
-            $this->provider->clearCache();
-        }
-        $this->hasPreflushChanges = false;
     }
 }

@@ -116,7 +116,7 @@ HELP
 
             try {
                 $eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION);
-                $this->loadDataStep($commandExecutor, $output, $input);
+                $this->loadDataStep($commandExecutor, $output);
                 $eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION);
 
                 $this->finalStep($commandExecutor, $output, $input);
@@ -147,11 +147,8 @@ HELP
     }
 
     /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
-    protected function loadDataStep(
-        CommandExecutor $commandExecutor,
-        OutputInterface $output,
-        InputInterface $input
-    ): self {
+    protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output): self
+    {
         ['formatting_code' => $formattingCode, 'language_code' => $languageCode] =
             $this->getDefaultFormattingCodeAndLanguageCode();
 
@@ -163,9 +160,7 @@ HELP
                     '--force'             => true,
                     '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                 ]
-            );
-        $this->clearCache($commandExecutor, $input);
-        $commandExecutor
+            )
             ->runCommand(LoadPermissionConfigurationCommand::getDefaultName(), ['--process-isolation' => true])
             ->runCommand('oro:cron:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
@@ -272,18 +267,6 @@ HELP
             $commandExecutor
                 ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
         }
-    }
-
-    protected function clearCache(CommandExecutor $commandExecutor, InputInterface $input): void
-    {
-        $cacheClearOptions = ['--process-isolation' => true];
-        if ($commandExecutor->getDefaultOption('no-debug')) {
-            $cacheClearOptions['--no-debug'] = true;
-        }
-        if ($input->getOption('env')) {
-            $cacheClearOptions['--env'] = $input->getOption('env');
-        }
-        $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
     }
 
     private function getEventDispatcher(): EventDispatcherInterface

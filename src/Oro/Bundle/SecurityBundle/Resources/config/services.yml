@@ -310,7 +310,6 @@ services:
             - '@oro_security.entity_security_metadata_provider'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
-            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlush }
 
     oro_security.entity_security_metadata_provider.cache.warmer:
         class: Oro\Bundle\SecurityBundle\Cache\EntitySecurityMetadataCacheWarmer

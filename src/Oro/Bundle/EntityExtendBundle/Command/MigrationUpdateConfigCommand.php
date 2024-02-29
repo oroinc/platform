@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
@@ -16,7 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Updates extended entities configuration during the DB structure migration.
- * Entity config manager is set to utilizes only local cache.
  */
 class MigrationUpdateConfigCommand extends Command
 {
@@ -25,19 +23,16 @@ class MigrationUpdateConfigCommand extends Command
 
     private ExtendOptionsParser $extendOptionsParser;
     private ExtendConfigProcessor $extendConfigProcessor;
-    private ConfigManager $configManager;
 
     private string $optionsPath;
 
     public function __construct(
         ExtendOptionsParser $extendOptionsParser,
         ExtendConfigProcessor $extendConfigProcessor,
-        ConfigManager $configManager,
         string $optionsPath
     ) {
         $this->extendOptionsParser = $extendOptionsParser;
         $this->extendConfigProcessor = $extendConfigProcessor;
-        $this->configManager = $configManager;
         $this->optionsPath = $optionsPath;
 
         parent::__construct();
@@ -80,8 +75,6 @@ HELP
         $output->writeln('Update extended entities configuration');
 
         if (is_file($this->optionsPath)) {
-            $this->configManager->useLocalCacheOnly();
-
             $options = unserialize(file_get_contents($this->optionsPath));
 
             $dryRun = $input->getOption('dry-run');
