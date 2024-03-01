@@ -66,6 +66,7 @@ class PriceType extends AbstractType
                     'required' => $isRequiredPrice,
                     'scale' => Price::MAX_VALUE_SCALE,
                     'attr' => [
+                        'readonly' => $options['readonly'],
                         'data-match-price-on-null' =>  $options['match_price_on_null'] ? 1 : 0
                     ]
                 ]
@@ -90,7 +91,8 @@ class PriceType extends AbstractType
             'currency_empty_value' => 'oro.currency.currency.form.choose',
             'compact' => false,
             'validation_groups'=> ['Default'],
-            'match_price_on_null' => true
+            'match_price_on_null' => true,
+            'readonly' => false,
         ]);
     }
 
