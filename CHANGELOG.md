@@ -2,6 +2,11 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+# UNRELEASED
+
+#### CurrencyBundle
+* Added supporting of the `readonly` attribute in `\Oro\Bundle\CurrencyBundle\Form\Type\PriceType`.
+
 ## Changes in the Platform package versions
 
 - [6.0.0-RC](#600-rc-2024-02-29)
@@ -22,7 +27,6 @@ The current file describes significant changes in the code that may affect the u
 - [2.5.0](#250-2017-11-30)
 - [2.2.0](#220-2017-05-31)
 - [2.1.0](#210-2017-03-30)
-
 
 ## 6.0.0-RC (2024-02-29)
 [Show detailed list of changes](incompatibilities-6-0-rc.md)
