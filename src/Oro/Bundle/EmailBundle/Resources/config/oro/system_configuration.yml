@@ -258,6 +258,22 @@ system_configuration:
                     oro.email.system_configuration.email_threads.use_threads.choices.non_threaded.label: 0
                     oro.email.system_configuration.email_threads.use_threads.choices.threaded.label: 1
 
+        oro_email.default_email_owner:
+            ui_only: true
+            data_type: string
+            type: Oro\Bundle\UserBundle\Form\Type\UserSelectType
+            options:
+                label: oro.email.system_configuration.default_email_user_owner.title
+                tooltip: oro.email.system_configuration.default_email_user_owner.tooltip
+                required: true
+                configs:
+                    allowClear: false
+                    placeholder: 'oro.user.form.choose_user'
+                    result_template_twig: '@OroUser/User/Autocomplete/result.html.twig'
+                    selection_template_twig: '@OroUser/User/Autocomplete/selection.html.twig'
+                constraints:
+                    - NotBlank: ~
+
     tree:
         system_configuration:
             platform:
@@ -274,6 +290,7 @@ system_configuration:
                                     email_settings:
                                         children:
                                             - oro_email.feature_enabled
+                                            - oro_email.default_email_owner
                                     email_autocomplete_configuration:
                                         children:
                                             - oro_email.minimum_input_length

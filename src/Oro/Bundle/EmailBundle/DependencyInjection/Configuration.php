@@ -70,6 +70,7 @@ class Configuration implements ConfigurationInterface
                 self::KEY_SMTP_SETTINGS_ENC => ['value' => ''],
                 self::KEY_SMTP_SETTINGS_USER => ['value' => ''],
                 self::KEY_SMTP_SETTINGS_PASS => ['value' => ''],
+                'default_email_owner' => ['type' => 'integer', 'value' => null],
             ]
         );
 
