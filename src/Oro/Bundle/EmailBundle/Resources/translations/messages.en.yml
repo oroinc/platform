@@ -139,6 +139,10 @@ oro:
                 label: Enable HTML purifier
                 tooltip: Disable HTML Purifier to enable users to paste any HTML code into a template or an email body editor without tag stripping.
 
+            default_email_user_owner:
+                title: Default email owner
+                tooltip: Select the default owner of all emails.
+
         emailtemplate:
             entity_label:        Email Template
             entity_plural_label: Email Templates
