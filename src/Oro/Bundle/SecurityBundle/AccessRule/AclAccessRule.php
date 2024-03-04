@@ -31,6 +31,12 @@ class AclAccessRule implements AccessRuleInterface
      */
     public const PARENT_FIELD = 'aclParentField';
 
+    /**
+     * Additional options that will add to {@see \Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder}
+     * to make additional checks during getting the ACL condition data.
+     */
+    public const CONDITION_DATA_BUILDER_CONTEXT = 'conditionDataBuilderContext';
+
     private AclConditionDataBuilderInterface $builder;
     private OwnershipMetadataProviderInterface $ownershipMetadataProvider;
 
@@ -69,7 +75,11 @@ class AclAccessRule implements AccessRuleInterface
     {
         $entityClass = $criteria->getEntityClass();
 
-        $conditionData = $this->builder->getAclConditionData($entityClass, $criteria->getPermission());
+        $conditionData = $this->builder->getAclConditionData(
+            $entityClass,
+            $criteria->getPermission(),
+            $criteria->getOption(self::CONDITION_DATA_BUILDER_CONTEXT, [])
+        );
         if (empty($conditionData)) {
             return;
         }

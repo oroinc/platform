@@ -58,8 +58,8 @@ class SearchAclHelperConditionTest extends \PHPUnit\Framework\TestCase
         $this->aclConditionDataBuilder->expects(self::exactly(2))
             ->method('getAclConditionData')
             ->willReturnMap([
-                [EmailUser::class, 'VIEW', $publicCondition],
-                [EmailUser::class, 'VIEW_PRIVATE', $privateCondition]
+                [EmailUser::class, 'VIEW', [], $publicCondition],
+                [EmailUser::class, 'VIEW_PRIVATE', [], $privateCondition]
             ]);
 
         $expression = $this->searchAclHelperCondition->addRestriction($query, 'em', null);
@@ -110,8 +110,8 @@ class SearchAclHelperConditionTest extends \PHPUnit\Framework\TestCase
         $this->aclConditionDataBuilder->expects(self::exactly(2))
             ->method('getAclConditionData')
             ->willReturnMap([
-                [EmailUser::class, 'VIEW', [null, null, null, null]],
-                [EmailUser::class, 'VIEW_PRIVATE', [null, null, null, null]]
+                [EmailUser::class, 'VIEW', [], [null, null, null, null]],
+                [EmailUser::class, 'VIEW_PRIVATE', [], [null, null, null, null]]
             ]);
 
         $expression = $this->searchAclHelperCondition->addRestriction(
@@ -133,8 +133,8 @@ class SearchAclHelperConditionTest extends \PHPUnit\Framework\TestCase
         $this->aclConditionDataBuilder->expects(self::exactly(2))
             ->method('getAclConditionData')
             ->willReturnMap([
-                [EmailUser::class, 'VIEW', ['owner', [3, 5, 4, 6]]],
-                [EmailUser::class, 'VIEW_PRIVATE', ['owner', [1, 2, 3]]]
+                [EmailUser::class, 'VIEW', [], ['owner', [3, 5, 4, 6]]],
+                [EmailUser::class, 'VIEW_PRIVATE', [], ['owner', [1, 2, 3]]]
             ]);
 
         $expression = $this->searchAclHelperCondition->addRestriction(

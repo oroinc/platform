@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener;
+use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class OrmDatasourceAclListenerTest extends \PHPUnit\Framework\TestCase
@@ -53,9 +54,14 @@ class OrmDatasourceAclListenerTest extends \PHPUnit\Framework\TestCase
         $datagridConfig->expects(self::once())
             ->method('getDatasourceAclApplyPermission')
             ->willReturn('EDIT');
+        $datagridConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(DatagridConfiguration::ACL_CONDITION_DATA_BUILDER_CONTEXT)
+            ->willReturn(['test' => 23]);
         $aclHelper->expects(self::once())
             ->method('apply')
-            ->with($query, 'EDIT');
+            ->with($query, 'EDIT', [AclAccessRule::CONDITION_DATA_BUILDER_CONTEXT => ['test' => 23]])
+            ->willReturn($query);
 
         $event = new OrmResultBefore($datagrid, $query);
         $listener = new OrmDatasourceAclListener($aclHelper);

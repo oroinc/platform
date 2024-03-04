@@ -76,6 +76,9 @@ oro:
         feature:
             label: Reports
             description: Enables building custom reports on any metric and entity available in the system to suit the exact needs of the organization.
+            manage:
+                label: Manage Reports
+                description: Enables building custom reports on any metric and entity available in the system to suit the exact needs of the organization.
 
         form:
             designer:               Designer

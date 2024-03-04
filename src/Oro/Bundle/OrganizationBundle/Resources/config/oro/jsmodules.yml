@@ -5,3 +5,4 @@ dynamic-imports:
     commons:
         - oro/select2-bu-tree-autocomplete-component
         - oro/select2-parent-business-units-autocomplete-component
+        - oroorganization/js/app/tools/system-access-mode-organization-provider
