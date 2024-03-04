@@ -107,6 +107,10 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
             $options['to'] = [];
         }
 
+        if ($options['to'] instanceof PropertyPathInterface) {
+            return;
+        }
+
         if (!is_array($options['to'])
             || array_key_exists('name', $options['to'])
             || array_key_exists('email', $options['to'])
@@ -122,6 +126,9 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
     protected function getRecipients(object|array $context, array $options): array
     {
         $recipients = [];
+        if ($options['to'] instanceof PropertyPathInterface) {
+            $options['to'] = $this->contextAccessor->getValue($context, $options['to']);
+        }
         foreach ($options['to'] as $email) {
             if ($email) {
                 $address = $this->getEmailAddress($context, $email);

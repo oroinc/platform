@@ -10,19 +10,26 @@ use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
 {
+    private ServiceProviderInterface|MockObject $actionGroupServiceLocator;
+
     /** @var ActionGroupAssembler */
     private $assembler;
 
     protected function setUp(): void
     {
+        $this->actionGroupServiceLocator = $this->createMock(ServiceProviderInterface::class);
+
         $this->assembler = new ActionGroupAssembler(
             $this->createMock(ActionFactoryInterface::class),
             $this->createMock(ConditionFactory::class),
             new ParameterAssembler(),
-            $this->createMock(ParametersResolver::class)
+            $this->createMock(ParametersResolver::class),
+            $this->actionGroupServiceLocator
         );
     }
 

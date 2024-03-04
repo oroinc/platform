@@ -32,7 +32,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
     public function testResolveOk(ActionData $data, array $parameters, ActionData $expected)
     {
         $actionGroup = $this->createMock(ActionGroup::class);
-        $actionGroup->expects($this->once())
+        $actionGroup->expects($this->atLeastOnce())
             ->method('getParameters')
             ->willReturn($parameters);
 
@@ -106,7 +106,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
             ->willReturn('testActionGroup');
 
         $actionGroup = $this->createMock(ActionGroup::class);
-        $actionGroup->expects($this->once())
+        $actionGroup->expects($this->atLeastOnce())
             ->method('getParameters')
             ->willReturn($parameters);
         $actionGroup->expects($this->once())

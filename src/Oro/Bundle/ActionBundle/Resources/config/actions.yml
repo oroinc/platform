@@ -13,6 +13,12 @@ services:
             - '@oro_action.action_locator'
             - []
 
+    oro_action.action_executor:
+        class: Oro\Bundle\ActionBundle\Model\ActionExecutor
+        arguments:
+            - '@oro_action.action_factory'
+            - '@oro_action.action_group_registry'
+
     oro_action.action_assembler:
         class: 'Oro\Component\Action\Action\ActionAssembler'
         arguments:

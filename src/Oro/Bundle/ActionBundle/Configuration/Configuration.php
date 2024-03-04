@@ -40,6 +40,8 @@ class Configuration implements ConfigurationInterface
 
         $children
             ->variableNode('acl_resource')->end()
+            ->variableNode('service')->end()
+            ->variableNode('method')->end()
             ->arrayNode('parameters')
                 ->useAttributeAsKey('name')
                 ->prototype('array')
