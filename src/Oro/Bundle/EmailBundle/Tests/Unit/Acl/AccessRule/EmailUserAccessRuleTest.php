@@ -52,8 +52,8 @@ class EmailUserAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->aclConditionDataBuilder->expects(self::exactly(2))
             ->method('getAclConditionData')
             ->willReturnMap([
-                [EmailUser::class, 'VIEW', $publicCondition],
-                [EmailUser::class, 'VIEW_PRIVATE', $privateCondition]
+                [EmailUser::class, 'VIEW', [], $publicCondition],
+                [EmailUser::class, 'VIEW_PRIVATE', [], $privateCondition]
             ]);
 
         $this->accessRule->process($criteria);

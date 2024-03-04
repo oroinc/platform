@@ -10,6 +10,7 @@ interface AclConditionDataBuilderInterface
     /**
      * @param string       $entityClassName
      * @param string|array $permissions
+     * @param array $context Additional context that can be checked during build condition data
      * @return array|null  Returns empty array if entity has full access,
      *                     array with null values if user doesn't have access to the entity
      *                     and array with entity field and field values which user has access to.
@@ -21,5 +22,9 @@ interface AclConditionDataBuilderInterface
      *                     4 - should owners be checked
      *                        (for example, in case of Organization ownership type, owners should not be checked)
      */
-    public function getAclConditionData(string $entityClassName, string|array $permissions = 'VIEW'): ?array;
+    public function getAclConditionData(
+        string $entityClassName,
+        string|array $permissions = 'VIEW',
+        array $context = []
+    ): ?array;
 }

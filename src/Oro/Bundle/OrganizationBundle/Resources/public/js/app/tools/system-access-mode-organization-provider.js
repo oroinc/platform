@@ -4,7 +4,17 @@ define([
     'use strict';
 
     return {
+        organizationId: null,
+
+        setOrganizationId: function(organizationId) {
+            this.organizationId = organizationId;
+        },
+
         getOrganizationId: function() {
+            if (null !== this.organizationId) {
+                return this.organizationId;
+            }
+
             const urlParts = this._getCurrentUrl().split('?');
             if (urlParts.length !== 2) {
                 return;

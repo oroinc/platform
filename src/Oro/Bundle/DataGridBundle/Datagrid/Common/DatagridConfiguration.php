@@ -44,6 +44,13 @@ class DatagridConfiguration extends ConfigObject
     const DATASOURCE_SKIP_ACL_APPLY_PATH = '[source][skip_acl_apply]';
 
     /**
+     * This option allow to pass additional context to
+     * {@see \Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder} to make additional checks
+     * during getting the ACL condition data.
+     */
+    const ACL_CONDITION_DATA_BUILDER_CONTEXT = '[source][acl_condition_data_builder_context]';
+
+    /**
      * This option sets what ACL permission will be applied to datasource if value is DATASOURCE_SKIP_ACL_APPLY_PATH
      * is set to false. Default value of this setting is VIEW.
      */

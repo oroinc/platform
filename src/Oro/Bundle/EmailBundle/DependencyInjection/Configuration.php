@@ -62,6 +62,7 @@ class Configuration implements ConfigurationInterface
                 'smtp_settings_encryption' => ['value' => ''],
                 'smtp_settings_username' => ['value' => ''],
                 'smtp_settings_password' => ['value' => ''],
+                'default_email_owner' => ['type' => 'integer', 'value' => null],
             ]
         );
 

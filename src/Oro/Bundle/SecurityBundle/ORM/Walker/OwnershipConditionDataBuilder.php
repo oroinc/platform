@@ -61,8 +61,11 @@ class OwnershipConditionDataBuilder implements AclConditionDataBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function getAclConditionData(string $entityClassName, string|array $permissions = 'VIEW'): ?array
-    {
+    public function getAclConditionData(
+        string $entityClassName,
+        string|array $permissions = 'VIEW',
+        array $context = []
+    ): ?array {
         if (!$this->getUserId() || !$this->entityMetadataProvider->isProtectedEntity($entityClassName)) {
             // return full access to the entity
             return [];
@@ -87,7 +90,8 @@ class OwnershipConditionDataBuilder implements AclConditionDataBuilderInterface
                 $entityClassName,
                 $observer->getAccessLevel(),
                 $this->metadataProvider->getMetadata($entityClassName),
-                $permissions
+                $permissions,
+                $context
             );
         } else {
             $condition = $this->getAccessDeniedCondition();
@@ -105,7 +109,8 @@ class OwnershipConditionDataBuilder implements AclConditionDataBuilderInterface
         string $targetEntityClassName,
         int $accessLevel,
         OwnershipMetadataInterface $metadata,
-        array|string $permissions
+        array|string $permissions,
+        array $context = []
     ): ?array {
         $tree       = $this->getTree();
         $constraint = null;
