@@ -1,0 +1,34 @@
+{% import _self as segmentCondition %}
+
+{% set segment_selection_template_id = 'segment-template' %}
+
+{% set segmentConditionOptions = {
+    filters: params.metadata.filters|default([]),
+    segmentChoice: {
+        select2: {
+            placeholder: 'oro.segment.condition_builder.choose_entity_segment'|trans,
+            formatSelectionTemplateSelector: '#' ~ segment_selection_template_id,
+            ajax: {
+                url: 'oro_api_get_segment_items',
+                quietMillis: 100
+            },
+            pageLimit: params.page_limit|default(10)
+        },
+        currentSegment: params.currentSegmentId|default(null)
+    }
+}|merge_recursive(params.segmentConditionOptions|default({})) %}
+
+{{ segmentCondition.query_designer_segment_template(segment_selection_template_id) }}
+
+<li class="option" data-criteria="condition-segment"
+    data-module="orosegment/js/app/views/segment-condition-view"
+    data-options="{{ segmentConditionOptions|json_encode }}">
+    {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
+</li>
+
+{% macro query_designer_segment_template(id) %}
+    <script type="text/html" id="{{ id }}">
+        {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
+        <%= obj.text %>
+    </script>
+{% endmacro %}

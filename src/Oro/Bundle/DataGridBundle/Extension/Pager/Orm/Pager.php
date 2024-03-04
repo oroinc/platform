@@ -6,9 +6,11 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\AbstractPager;
+use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 
@@ -128,7 +130,16 @@ class Pager extends AbstractPager
         $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($countQb);
         $query = $countQb->getQuery();
         if (!$this->skipAclCheck) {
-            $query = $this->aclHelper->apply($query, $this->aclPermission);
+            $query = $this->aclHelper->apply(
+                $query,
+                $this->aclPermission,
+                [
+                    AclAccessRule::CONDITION_DATA_BUILDER_CONTEXT =>
+                        $this->datagrid
+                            ->getConfig()
+                            ->offsetGetByPath(DatagridConfiguration::ACL_CONDITION_DATA_BUILDER_CONTEXT, [])
+                ]
+            );
         }
         $this->queryHintResolver->resolveHints($query, $this->countQueryHints);
 
