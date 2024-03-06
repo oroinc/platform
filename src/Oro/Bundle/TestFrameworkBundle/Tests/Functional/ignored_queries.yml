@@ -14,3 +14,4 @@ ignored_queries:
     postgresql:
         - 'ALTER TABLE oro_email_origin DROP ews_server'
         - 'ALTER TABLE oro_email_origin DROP ews_user_email'
+        - 'DROP INDEX oro_redirect_slug_uidx'
