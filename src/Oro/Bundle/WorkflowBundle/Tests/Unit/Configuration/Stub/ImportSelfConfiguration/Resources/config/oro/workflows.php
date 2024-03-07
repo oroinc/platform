@@ -32,6 +32,7 @@ return [
         'transitions' => [
             'transition_two' => [
                 'step_to' => 'step_b',
+                'conditional_steps_to' => [],
                 'frontend_options' => ['icon' => 'foo'],
                 'is_start' => false,
                 'is_hidden' => false,
@@ -98,6 +99,7 @@ return [
         'transitions' => [
             'transition_two' => [
                 'step_to' => 'step_b',
+                'conditional_steps_to' => [],
                 'frontend_options' => ['icon' => 'foo'],
                 'is_start' => false,
                 'is_hidden' => false,
@@ -157,6 +159,7 @@ return [
             'transition_one' => [
                 'is_start' => true,
                 'step_to' => 'step_a',
+                'conditional_steps_to' => [],
                 'frontend_options' => ['icon' => 'foo'],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,

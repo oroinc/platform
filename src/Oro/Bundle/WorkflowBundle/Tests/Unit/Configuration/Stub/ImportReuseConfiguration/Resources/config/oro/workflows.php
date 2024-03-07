@@ -41,6 +41,7 @@ return [
         'transitions' => [
             'transition_one' => [
                 'step_to' => 'step_b',
+                'conditional_steps_to' => [],
                 'is_start' => false,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,

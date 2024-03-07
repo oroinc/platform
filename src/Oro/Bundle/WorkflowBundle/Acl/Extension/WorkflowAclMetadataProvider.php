@@ -15,14 +15,15 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
  */
 class WorkflowAclMetadataProvider
 {
-    private const STEPS               = 'steps';
-    private const TRANSITIONS         = 'transitions';
+    private const STEPS = 'steps';
+    private const TRANSITIONS = 'transitions';
     private const ALLOWED_TRANSITIONS = 'allowed_transitions';
-    private const LABEL               = 'label';
-    private const ORDER               = 'order';
-    private const STEP_TO             = 'step_to';
-    private const IS_START            = 'is_start';
-    private const IS_START_STEP       = '_is_start';
+    private const LABEL = 'label';
+    private const ORDER = 'order';
+    private const STEP_TO = 'step_to';
+    private const CONDITIONAL_STEPS_TO = 'conditional_steps_to';
+    private const IS_START = 'is_start';
+    private const IS_START_STEP = '_is_start';
 
     /** @var ManagerRegistry */
     private $doctrine;
@@ -102,15 +103,27 @@ class WorkflowAclMetadataProvider
                 foreach ($stepConfig[self::ALLOWED_TRANSITIONS] as $transitionName) {
                     if (isset($transitions[$transitionName])) {
                         $transitionConfig = $transitions[$transitionName];
-                        $toStep = $this->getAttribute($transitionConfig, self::STEP_TO);
+
+                        $toSteps = array_keys(
+                            $this->getAttribute($transitionConfig, self::CONDITIONAL_STEPS_TO, [])
+                        );
+                        $toSteps[] = $this->getAttribute($transitionConfig, self::STEP_TO);
+
                         $isStartStep = $this->getAttribute($stepConfig, self::IS_START_STEP, false);
                         if ($isStartStep) {
                             $addedStartTransitions[$transitionName] = true;
                         }
-                        $result[$order][] = new FieldSecurityMetadata(
-                            $this->getTransitionIdentifier($transitionName, $isStartStep ? null : $stepName, $toStep),
-                            $this->getTransitionLabel($workflowConfig, $transitionName, $stepName, $toStep)
-                        );
+
+                        foreach ($toSteps as $toStep) {
+                            $result[$order][] = new FieldSecurityMetadata(
+                                $this->getTransitionIdentifier(
+                                    $transitionName,
+                                    $isStartStep ? null : $stepName,
+                                    $toStep
+                                ),
+                                $this->getTransitionLabel($workflowConfig, $transitionName, $stepName, $toStep)
+                            );
+                        }
                     }
                 }
             }
@@ -150,7 +163,7 @@ class WorkflowAclMetadataProvider
     }
 
     /**
-     * @param array  $workflowConfig
+     * @param array $workflowConfig
      * @param string $transitionName
      * @param string $fromStep
      * @param string $toStep
@@ -167,7 +180,7 @@ class WorkflowAclMetadataProvider
     }
 
     /**
-     * @param array  $workflowConfig
+     * @param array $workflowConfig
      * @param string $transitionName
      * @param string $toStep
      *
@@ -182,9 +195,9 @@ class WorkflowAclMetadataProvider
     }
 
     /**
-     * @param array  $data
+     * @param array $data
      * @param string $attributeName
-     * @param mixed  $defaultValue
+     * @param mixed $defaultValue
      *
      * @return mixed
      */
@@ -227,7 +240,7 @@ class WorkflowAclMetadataProvider
     }
 
     /**
-     * @param array  $workflowConfig
+     * @param array $workflowConfig
      * @param string $transitionName
      *
      * @return string
@@ -238,7 +251,7 @@ class WorkflowAclMetadataProvider
     }
 
     /**
-     * @param array  $workflowConfig
+     * @param array $workflowConfig
      * @param string $stepName
      *
      * @return string|null

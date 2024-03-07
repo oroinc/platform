@@ -180,6 +180,22 @@ class TransitionAssembler extends BaseAbstractAssembler
         if (!empty($options['form_options'][WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION])) {
             $this->formOptionsConfigurationAssembler->assemble($options);
         }
+
+        if (!empty($options['conditional_steps_to'])) {
+            $stepsTo = $options['conditional_steps_to'];
+            // Add default step_to to a list of conditional steps to correctly check step ACL.
+            $stepsTo[$stepToName] = [];
+
+            foreach ($options['conditional_steps_to'] as $stepName => $conditionConfig) {
+                $conditionConfig = $this->addCondition(
+                    $conditionConfig,
+                    $this->getStepAclCheckCondition($transition->getName(), $stepName)
+                );
+
+                $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $conditionConfig);
+                $transition->addConditionalStepTo($steps[$stepName], $condition);
+            }
+        }
         return $transition;
     }
 
@@ -239,43 +255,49 @@ class TransitionAssembler extends BaseAbstractAssembler
             /**
              * @see AclGranted
              */
-            $aclPreCondition = ['@acl_granted' => $aclPreConditionDefinition];
+            $definition['preconditions'] = $this->addCondition(
+                $definition['preconditions'],
+                ['@acl_granted' => $aclPreConditionDefinition]
+            );
+        }
 
-            if (empty($definition['preconditions'])) {
-                $definition['preconditions'] = $aclPreCondition;
-            } else {
-                $definition['preconditions'] = [
-                    '@and' => [
-                        $aclPreCondition,
-                        $definition['preconditions']
-                    ]
-                ];
+        $definition['preconditions'] = $this->addCondition(
+            $definition['preconditions'],
+            $this->getStepsAclCheckCondition($options, $transitionName)
+        );
+
+        return !empty($definition['preconditions']) ? $definition['preconditions'] : [];
+    }
+
+    private function getStepsAclCheckCondition(array $options, string $transitionName): array
+    {
+        $conditionDefinition = $this->getStepAclCheckCondition($transitionName, $this->getOption($options, 'step_to'));
+
+        $conditionalSteps = $this->getOption($options, 'conditional_steps_to', []);
+        if ($conditionalSteps) {
+            $conditionDefinition = ['@or' => [$conditionDefinition]];
+
+            foreach (array_keys($conditionalSteps) as $stepName) {
+                $conditionDefinition['@or'][] = $this->getStepAclCheckCondition($transitionName, $stepName);
             }
         }
 
-        /**
-         * @see IsGrantedWorkflowTransition
-         */
-        $precondition = [
-            '@is_granted_workflow_transition' => [
-                'parameters' => [
-                    $transitionName,
-                    $this->getOption($options, 'step_to')
-                ]
-            ]
-        ];
-        if (empty($definition['preconditions'])) {
-            $definition['preconditions'] = $precondition;
-        } else {
-            $definition['preconditions'] = [
-                '@and' => [
-                    $precondition,
-                    $definition['preconditions']
-                ]
-            ];
-        }
+        return $conditionDefinition;
+    }
 
-        return !empty($definition['preconditions']) ? $definition['preconditions'] : [];
+    /**
+     * @see IsGrantedWorkflowTransition
+     */
+    private function getStepAclCheckCondition(string $transitionName, string $stepName): array
+    {
+        return [
+            '@is_granted_workflow_transition' => ['parameters' => [$transitionName, $stepName]]
+        ];
+    }
+
+    private function addCondition(array $conditions, array $newCondition): array
+    {
+        return empty($conditions) ? $newCondition : ['@and' => [$newCondition, $conditions]];
     }
 
     /**

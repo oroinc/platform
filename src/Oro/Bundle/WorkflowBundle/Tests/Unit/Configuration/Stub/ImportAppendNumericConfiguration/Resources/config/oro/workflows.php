@@ -39,6 +39,7 @@ return [
             'transitions' => [
                 'transition_one' => [
                     'step_to' => 'step_c',
+                    'conditional_steps_to' => [],
                     'transition_definition' => 'transition_one_definition',
                     'frontend_options' => [
                         'icon' => 'bar',

@@ -28,6 +28,7 @@ return [
         'transitions' => [
             'transition_two' => [
                 'step_to' => 'step_b',
+                'conditional_steps_to' => [],
                 'frontend_options' => ['icon' => 'foo'],
                 'is_start' => false,
                 'is_hidden' => false,

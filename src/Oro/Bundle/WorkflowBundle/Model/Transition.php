@@ -25,6 +25,9 @@ class Transition
     /** @var Step */
     protected $stepTo;
 
+    /** @var array */
+    protected $conditionalStepsTo = [];
+
     /** @var string */
     protected $label;
 
@@ -120,6 +123,7 @@ class Transition
     public function setLabel($label)
     {
         $this->label = $label;
+
         return $this;
     }
 
@@ -141,6 +145,7 @@ class Transition
     public function setButtonLabel($buttonLabel)
     {
         $this->buttonLabel = $buttonLabel;
+
         return $this;
     }
 
@@ -160,6 +165,7 @@ class Transition
     public function setButtonTitle($buttonTitle)
     {
         $this->buttonTitle = $buttonTitle;
+
         return $this;
     }
 
@@ -180,6 +186,7 @@ class Transition
     public function setCondition(ExpressionInterface $condition = null)
     {
         $this->condition = $condition;
+
         return $this;
     }
 
@@ -202,6 +209,7 @@ class Transition
     public function setPreCondition($condition)
     {
         $this->preCondition = $condition;
+
         return $this;
     }
 
@@ -224,6 +232,7 @@ class Transition
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -244,6 +253,7 @@ class Transition
     public function setPreAction(ActionInterface $preAction = null)
     {
         $this->preAction = $preAction;
+
         return $this;
     }
 
@@ -262,6 +272,7 @@ class Transition
     public function setAction(ActionInterface $action = null)
     {
         $this->action = $action;
+
         return $this;
     }
 
@@ -282,6 +293,7 @@ class Transition
     public function setStepTo(Step $stepTo)
     {
         $this->stepTo = $stepTo;
+
         return $this;
     }
 
@@ -293,6 +305,44 @@ class Transition
     public function getStepTo()
     {
         return $this->stepTo;
+    }
+
+    /**
+     * Get resolved step to.
+     *
+     * If any matches of conditional steps to matches its condition then conditional step to will be returned.
+     * If none of conditional steps is resolved then the default step to will be returned if allowed.
+     */
+    public function getResolvedStepTo(WorkflowItem $workflowItem): Step
+    {
+        foreach ($this->conditionalStepsTo as $conditionalStepConfig) {
+            if ($conditionalStepConfig['condition']->evaluate($workflowItem)) {
+                return $conditionalStepConfig['step'];
+            }
+        }
+
+        if (!$this->conditionalStepsTo) {
+            return $this->getStepTo();
+        }
+
+        throw new ForbiddenTransitionException(
+            sprintf('Transition "%s" is not allowed.', $this->getName())
+        );
+    }
+
+    public function addConditionalStepTo(Step $stepTo, ExpressionInterface $condition)
+    {
+        $this->conditionalStepsTo[$stepTo->getName()] = [
+            'step' => $stepTo,
+            'condition' => $condition
+        ];
+
+        return $this;
+    }
+
+    public function getConditionalStepsTo(): array
+    {
+        return $this->conditionalStepsTo;
     }
 
     /**
@@ -383,7 +433,7 @@ class Transition
      */
     public function transitUnconditionally(WorkflowItem $workflowItem): void
     {
-        $stepTo = $this->getStepTo();
+        $stepTo = $this->getResolvedStepTo($workflowItem);
         $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
 
         if ($this->action) {
@@ -400,6 +450,7 @@ class Transition
     public function setStart($start)
     {
         $this->start = $start;
+
         return $this;
     }
 
@@ -420,6 +471,7 @@ class Transition
     public function setFrontendOptions(array $frontendOptions)
     {
         $this->frontendOptions = $frontendOptions;
+
         return $this;
     }
 
@@ -449,6 +501,7 @@ class Transition
     public function setFormType($formType)
     {
         $this->formType = $formType;
+
         return $this;
     }
 
@@ -467,6 +520,7 @@ class Transition
     public function setFormOptions(array $formOptions)
     {
         $this->formOptions = $formOptions;
+
         return $this;
     }
 
@@ -493,6 +547,7 @@ class Transition
     public function setHidden($hidden)
     {
         $this->hidden = $hidden;
+
         return $this;
     }
 
@@ -511,6 +566,7 @@ class Transition
     public function setMessage($message)
     {
         $this->message = $message;
+
         return $this;
     }
 
@@ -529,6 +585,7 @@ class Transition
     public function setUnavailableHidden($unavailableHidden)
     {
         $this->unavailableHidden = $unavailableHidden;
+
         return $this;
     }
 
@@ -614,7 +671,7 @@ class Transition
      */
     public function setScheduleCron($cron)
     {
-        $this->scheduleCron = (string) $cron;
+        $this->scheduleCron = (string)$cron;
 
         return $this;
     }
@@ -633,7 +690,7 @@ class Transition
      */
     public function setScheduleFilter($dqlFilter)
     {
-        $this->scheduleFilter = (string) $dqlFilter;
+        $this->scheduleFilter = (string)$dqlFilter;
 
         return $this;
     }
