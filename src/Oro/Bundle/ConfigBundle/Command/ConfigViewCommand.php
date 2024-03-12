@@ -64,7 +64,8 @@ HELP
      * @param string $fieldName
      * @return ?FieldNodeDefinition null if no matching node was found
      */
-    protected function findFieldNode(GroupNodeDefinition $node, string $fieldName): ?FieldNodeDefinition {
+    protected function findFieldNode(GroupNodeDefinition $node, string $fieldName): ?FieldNodeDefinition
+    {
         foreach ($node as $child) {
             if ($child instanceof GroupNodeDefinition) {
                 $result = $this->findFieldNode($child, $fieldName);
