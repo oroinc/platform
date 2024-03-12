@@ -23,7 +23,7 @@ class UniqueKeyTypeTest extends TypeTestCase
     protected function setUp(): void
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(true)
+            ->enableAttributeMapping()
             ->setDoctrineAnnotationReader(new AnnotationReader())
             ->getValidator();
 

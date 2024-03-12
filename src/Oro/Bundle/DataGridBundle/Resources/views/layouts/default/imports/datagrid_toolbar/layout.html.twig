@@ -50,9 +50,9 @@
     }) %}
     {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
 
-    {% if toolbarPosition != 'bottom' %}
+    <% if (toolbarPosition != 'bottom') { %>
         <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
-    {% endif %}
+    <% } %>
 {% endblock %}
 
 {% block __datagrid_toolbar__datagrid_toolbar_pagination_widget %}

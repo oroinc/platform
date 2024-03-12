@@ -196,7 +196,7 @@ class NoteTest extends RestJsonApiTestCase
 
     public function testGetSubresourceForUpdatedBy(): void
     {
-        $noteUpdatedByUserName = $this->getReference('note1')->getUpdatedBy()->getUsername();
+        $noteUpdatedByUserName = $this->getReference('note1')->getUpdatedBy()->getUserIdentifier();
         $response = $this->getSubresource(
             ['entity' => 'notes', 'id' => '<toString(@note1->id)>', 'association' => 'updatedBy']
         );

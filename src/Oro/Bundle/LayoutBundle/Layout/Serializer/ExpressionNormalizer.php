@@ -108,4 +108,11 @@ class ExpressionNormalizer implements
 
         return $this->expressionLanguageCache->getClosure($data[self::DATA_EXPRESSION]);
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            ParsedExpression::class => false
+        ];
+    }
 }

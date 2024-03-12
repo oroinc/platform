@@ -4,19 +4,18 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Table(name="oro_test_dataaudit_child")
- * @ORM\Entity
- * @Config(defaultValues={"dataaudit"={"auditable"=true}})
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_test_dataaudit_child')]
+#[Config(defaultValues: ['dataaudit' => ['auditable' => true]])]
 class TestAuditDataChild implements
     TestFrameworkEntityInterface,
     AuditAdditionalFieldsInterface,
@@ -24,68 +23,41 @@ class TestAuditDataChild implements
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+
+    #[ORM\Column(name: 'string_property', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    private ?string $stringProperty = null;
+
+    #[ORM\Column(name: 'not_auditable_property', type: Types::TEXT, nullable: true)]
+    private ?string $notAuditableProperty = null;
+
+    #[ORM\OneToOne(mappedBy: 'child', targetEntity: TestAuditDataOwner::class)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true, 'propagate' => true]])]
+    private ?TestAuditDataOwner $owner = null;
+
+    #[ORM\OneToOne(mappedBy: 'childCascade', targetEntity: TestAuditDataOwner::class, cascade: ['remove'])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true, 'propagate' => true]])]
+    private ?TestAuditDataOwner $ownerCascade = null;
+
+    #[ORM\OneToOne(mappedBy: 'childOrphanRemoval', targetEntity: TestAuditDataOwner::class, orphanRemoval: true)]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true, 'propagate' => true]])]
+    private ?TestAuditDataOwner $ownerOrphanRemoval = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="string_property", type="text", nullable=true)
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @var Collection<int, TestAuditDataOwner>
      */
-    private $stringProperty;
+    #[ORM\ManyToMany(targetEntity: TestAuditDataOwner::class, mappedBy: 'childrenManyToMany')]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true, 'propagate' => true]])]
+    private ?Collection $owners = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="not_auditable_property", type="text", nullable=true)
-     */
-    private $notAuditableProperty;
-
-    /**
-     * @var TestAuditDataOwner
-     *
-     * @ORM\OneToOne(targetEntity="TestAuditDataOwner", mappedBy="child")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true, "propagate"=true}})
-     */
-    private $owner;
-
-    /**
-     * @var TestAuditDataOwner
-     *
-     * @ORM\OneToOne(targetEntity="TestAuditDataOwner", mappedBy="childCascade", cascade={"remove"})
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true, "propagate"=true}})
-     */
-    private $ownerCascade;
-
-    /**
-     * @var TestAuditDataOwner
-     *
-     * @ORM\OneToOne(targetEntity="TestAuditDataOwner", mappedBy="childOrphanRemoval", orphanRemoval=true)
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true, "propagate"=true}})
-     */
-    private $ownerOrphanRemoval;
-
-    /**
-     * @var TestAuditDataOwner[]|Collection
-     *
-     * @ORM\ManyToMany(targetEntity="TestAuditDataOwner", mappedBy="childrenManyToMany")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true, "propagate"=true}})
-     */
-    private $owners;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="TestAuditDataOwner", inversedBy="childrenOneToMany")
-     * @ORM\JoinColumn(name="owner_one_to_many_id", referencedColumnName="id")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true, "propagate"=true}})
-     */
-    private $ownerManyToOne;
+    #[ORM\ManyToOne(targetEntity: TestAuditDataOwner::class, inversedBy: 'childrenOneToMany')]
+    #[ORM\JoinColumn(name: 'owner_one_to_many_id', referencedColumnName: 'id')]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true, 'propagate' => true]])]
+    private ?TestAuditDataOwner $ownerManyToOne = null;
 
     /**
      * @var array

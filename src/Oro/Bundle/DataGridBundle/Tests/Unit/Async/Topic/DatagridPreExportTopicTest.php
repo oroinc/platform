@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Topic;
 
 use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -14,28 +15,49 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class DatagridPreExportTopicTest extends AbstractTopicTestCase
 {
+    private const VALID_GRID_NAME = 'grid-name';
+    private const INVALID_GRID_NAME = 'invalid-grid-name';
+
+    protected function setUp(): void
+    {
+        $this->chainConfigurationProvider = $this->createMock(ConfigurationProviderInterface::class);
+        $this->chainConfigurationProvider
+            ->expects(self::any())
+            ->method('isValidConfiguration')
+            ->willReturnMap([
+                [self::VALID_GRID_NAME, true],
+                [self::INVALID_GRID_NAME, false]
+            ]);
+
+        parent::setUp();
+    }
+
+
     protected function getTopic(): TopicInterface
     {
-        return new DatagridPreExportTopic(4242, $this->createMock(TokenAccessorInterface::class));
+        return new DatagridPreExportTopic(
+            4242,
+            $this->createMock(TokenAccessorInterface::class),
+            $this->chainConfigurationProvider
+        );
     }
 
     public function validBodyDataProvider(): array
     {
         $format = 'csv';
-        $gridName = 'grid-name';
 
         return [
             'required only' => [
                 'body' => [
                     'outputFormat' => $format,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                     ],
                 ],
                 'expectedBody' => [
                     'outputFormat' => $format,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'gridParameters' => [
                             ParameterBag::DATAGRID_MODES_PARAMETER => [
                                 DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE,
@@ -51,7 +73,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
                 'body' => [
                     'outputFormat' => $format,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'gridParameters' => [
                             ParameterBag::DATAGRID_MODES_PARAMETER => [
                                 'sample-mode',
@@ -67,7 +89,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
                 'expectedBody' => [
                     'outputFormat' => $format,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         'gridParameters' => [
                             ParameterBag::DATAGRID_MODES_PARAMETER => [
                                 'sample-mode',
@@ -88,13 +110,22 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
     public function invalidBodyDataProvider(): array
     {
         $format = 'csv';
-        $gridName = 'grid-name';
 
         return [
             'empty' => [
                 'body' => [],
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' => '/The required option "outputFormat" is missing./',
+            ],
+            'invalid grid configuration' => [
+                'body' => [
+                    'outputFormat' => $format,
+                    'contextParameters' => [
+                        'gridName' => self::INVALID_GRID_NAME,
+                    ],
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' => '/Grid invalid-grid-name configuration is not valid/',
             ],
             'required context parameters are missing' => [
                 'body' => [
@@ -108,7 +139,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
                 'body' => [
                     'outputFormat' => [],
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                     ],
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
@@ -120,7 +151,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
                     'outputFormat' => $format,
                     'batchSize' => 'sample-string',
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                     ],
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
@@ -131,7 +162,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
                 'body' => [
                     'outputFormat' => $format,
                     'contextParameters' => [
-                        'gridName' => $gridName,
+                        'gridName' => self::VALID_GRID_NAME,
                         FormatterProvider::FORMAT_TYPE => [],
                     ],
                 ],

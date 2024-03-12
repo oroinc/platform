@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
@@ -12,269 +13,96 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 /**
  * The base class for address entities.
  *
- * @ORM\MappedSuperclass
- * @ORM\HasLifecycleCallbacks
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyFields)
  */
+#[ORM\MappedSuperclass]
+#[ORM\HasLifecycleCallbacks]
 abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 10]])]
+    protected ?string $label = null;
+
+    #[ORM\Column(name: 'street', type: Types::STRING, length: 500, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 80, 'identity' => true]])]
+    protected ?string $street = null;
+
+    #[ORM\Column(name: 'street2', type: Types::STRING, length: 500, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 90]])]
+    protected ?string $street2 = null;
+
+    #[ORM\Column(name: 'city', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 110, 'identity' => true]])]
+    protected ?string $city = null;
+
+    #[ORM\Column(name: 'postal_code', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 100, 'identity' => true]])]
+    protected ?string $postalCode = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=10
-     *          }
-     *      }
-     * )
+     * @var Country|null
      */
-    protected $label;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="street", type="string", length=500, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=80,
-     *              "identity"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $street;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="street2", type="string", length=500, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=90
-     *          }
-     *      }
-     * )
-     */
-    protected $street2;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="city", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=110,
-     *              "identity"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $city;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="postal_code", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=100,
-     *              "identity"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $postalCode;
-
-    /**
-     * @var Country
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Country")
-     * @ORM\JoinColumn(name="country_code", referencedColumnName="iso2_code")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=140,
-     *              "short"=true,
-     *              "identity"=true
-     *          }
-     *      }
-     * )
-     */
+    #[ORM\ManyToOne(targetEntity: Country::class)]
+    #[ORM\JoinColumn(name: 'country_code', referencedColumnName: 'iso2_code')]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 140, 'short' => true, 'identity' => true]])]
     protected $country;
 
     /**
-     * @var Region
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Region")
-     * @ORM\JoinColumn(name="region_code", referencedColumnName="combined_code")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=130,
-     *              "short"=true,
-     *              "identity"=true
-     *          }
-     *      }
-     * )
+     * @var Region|null
      */
+    #[ORM\ManyToOne(targetEntity: Region::class)]
+    #[ORM\JoinColumn(name: 'region_code', referencedColumnName: 'combined_code')]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 130, 'short' => true, 'identity' => true]])]
     protected $region;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="organization", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=20
-     *          }
-     *      }
-     * )
-     */
-    protected $organization;
+    #[ORM\Column(name: 'organization', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 20]])]
+    protected ?string $organization = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="region_text", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=120
-     *          }
-     *      }
-     * )
-     */
-    protected $regionText;
+    #[ORM\Column(name: 'region_text', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 120]])]
+    protected ?string $regionText = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name_prefix", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=30
-     *          }
-     *      }
-     * )
-     */
-    protected $namePrefix;
+    #[ORM\Column(name: 'name_prefix', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 30]])]
+    protected ?string $namePrefix = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=40
-     *          }
-     *      }
-     * )
-     */
-    protected $firstName;
+    #[ORM\Column(name: 'first_name', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 40]])]
+    protected ?string $firstName = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="middle_name", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=50
-     *          }
-     *      }
-     * )
-     */
-    protected $middleName;
+    #[ORM\Column(name: 'middle_name', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 50]])]
+    protected ?string $middleName = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=60
-     *          }
-     *      }
-     * )
-     */
-    protected $lastName;
+    #[ORM\Column(name: 'last_name', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 60]])]
+    protected ?string $lastName = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name_suffix", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "order"=70
-     *          }
-     *      }
-     * )
-     */
-    protected $nameSuffix;
+    #[ORM\Column(name: 'name_suffix', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 70]])]
+    protected ?string $nameSuffix = null;
 
-    /**
-     * @var \DateTime $created
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          },
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $created;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(
+        defaultValues: ['entity' => ['label' => 'oro.ui.created_at'], 'importexport' => ['excluded' => true]]
+    )]
+    protected ?\DateTimeInterface $created = null;
 
-    /**
-     * @var \DateTime $updated
-     *
-     * @ORM\Column(type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          },
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $updated;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(
+        defaultValues: ['entity' => ['label' => 'oro.ui.updated_at'], 'importexport' => ['excluded' => true]]
+    )]
+    protected ?\DateTimeInterface $updated = null;
 
     /**
      * Get id
@@ -719,9 +547,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -730,9 +557,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
 
     /**
      * Pre update event listener
-     *
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function beforeUpdate()
     {
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));

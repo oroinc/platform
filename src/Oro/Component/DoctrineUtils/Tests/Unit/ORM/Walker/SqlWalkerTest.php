@@ -2,11 +2,10 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM\Walker;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\Walker\MaterializedViewOutputResultModifier;
 use Oro\Component\DoctrineUtils\ORM\Walker\MySqlUseIndexOutputResultModifier;
@@ -14,6 +13,8 @@ use Oro\Component\DoctrineUtils\ORM\Walker\OutputResultModifierInterface;
 use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier;
 use Oro\Component\DoctrineUtils\ORM\Walker\SqlWalker;
 use Oro\Component\DoctrineUtils\ORM\Walker\UnionOutputResultModifier;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class SqlWalkerTest extends OrmTestCase
@@ -23,7 +24,7 @@ class SqlWalkerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
         $this->em->getConfiguration()->setEntityNamespaces([
             'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity',
         ]);
@@ -214,7 +215,7 @@ class SqlWalkerTest extends OrmTestCase
 
     public function testWalkSubselectWithoutHooks(): void
     {
-        $query = $this->em->getRepository('Test:Group')->createQueryBuilder('g1_')
+        $query = $this->em->getRepository(Group::class)->createQueryBuilder('g1_')
             ->select('g1_.id')
             ->getQuery();
 
@@ -223,7 +224,7 @@ class SqlWalkerTest extends OrmTestCase
 
     public function testWalkSubselectWithoutUnionHookInRawSQL(): void
     {
-        $query = $this->em->getRepository('Test:Group')->createQueryBuilder('g1_')
+        $query = $this->em->getRepository(Group::class)->createQueryBuilder('g1_')
             ->select('g1_.id')
             ->getQuery();
 
@@ -237,7 +238,7 @@ class SqlWalkerTest extends OrmTestCase
 
     public function testWalkSubselectWithUnionHook(): void
     {
-        $repository = $this->em->getRepository('Test:Group');
+        $repository = $this->em->getRepository(Group::class);
         $subSelect = $repository->createQueryBuilder('g0_')
             ->select('g0_.id')
             ->where('g0_.id = 1');
@@ -263,8 +264,8 @@ class SqlWalkerTest extends OrmTestCase
 
     public function testWalkSubselectWithExprAfterUnionHook(): void
     {
-        $groupRepository = $this->em->getRepository('Test:Group');
-        $personRepository = $this->em->getRepository('Test:Person');
+        $groupRepository = $this->em->getRepository(Group::class);
+        $personRepository = $this->em->getRepository(Person::class);
         $subSelect = $groupRepository->createQueryBuilder('g1_')
             ->select('g1_.id')
             ->where('g1_.id = 1');

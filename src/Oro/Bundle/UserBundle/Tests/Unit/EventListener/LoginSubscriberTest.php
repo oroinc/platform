@@ -44,7 +44,7 @@ class LoginSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with($user);
 
         $this->subscriber->onLogin(
-            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'user', 'key'))
+            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'key'))
         );
 
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -56,7 +56,7 @@ class LoginSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($user->getPasswordRequestedAt());
 
         $this->subscriber->onLogin(
-            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'user', 'key'))
+            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'key'))
         );
 
         $this->assertGreaterThan($date, $user->getLastLogin());
@@ -77,7 +77,7 @@ class LoginSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with($user);
 
         $this->subscriber->onLogin(
-            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'user', 'key'))
+            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'key'))
         );
 
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -101,7 +101,7 @@ class LoginSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with($user);
 
         $this->subscriber->onLogin(
-            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'user', 'key'))
+            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'key'))
         );
 
         $this->assertNull($user->getConfirmationToken());
@@ -121,7 +121,7 @@ class LoginSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('updateUser');
 
         $this->subscriber->onLogin(
-            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'user', 'key'))
+            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'key'))
         );
 
         $this->assertNull($user->getConfirmationToken());
@@ -136,7 +136,7 @@ class LoginSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('updateUser');
 
         $this->subscriber->onLogin(
-            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'user', 'key'))
+            new InteractiveLoginEvent(new Request(), new UsernamePasswordToken($user, 'key'))
         );
     }
 }

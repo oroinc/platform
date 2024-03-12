@@ -183,7 +183,6 @@ services:
             - '@oro_user.manager'
             - '@oro_email.manager.template_email'
             - '@oro_config.user'
-            - '@session.flash_bag'
             - '@translator'
             - '@logger'
 
@@ -237,6 +236,7 @@ services:
         arguments:
             - '@form.factory'
             - '@security.acl.cache.doctrine'
+            - '@oro_security.acl_query.cache_provider'
             - '%oro_user.privileges%'
         calls:
             - [setAclManager, ["@oro_security.acl.manager"]]
@@ -250,7 +250,7 @@ services:
         public: true
         shared: false
         calls:
-            - [setRequest, ["@=service('request_stack').getCurrentRequest()"]]
+            - [setRequestStack, ['@request_stack']]
             - [addExtensionFilter, ['action', '']]    # only default group actions are allowed
 
     Oro\Bundle\UserBundle\Form\Handler\SetPasswordHandler:

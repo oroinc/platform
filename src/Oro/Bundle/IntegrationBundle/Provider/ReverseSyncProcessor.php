@@ -175,7 +175,7 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
     protected function addConnectorStatusAndFlush(Integration $integration, Status $status)
     {
         $this->doctrineRegistry
-            ->getRepository('OroIntegrationBundle:Channel')
+            ->getRepository(Integration::class)
             ->addStatusAndFlush($integration, $status);
     }
 }

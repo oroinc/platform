@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Async;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Configuration as DbalConfiguration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Logging\SQLLogger;
@@ -328,15 +327,12 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         self::assertObjectHasAttribute('listeners', $eventManager);
         self::assertObjectHasAttribute('initialized', $eventManager);
 
-        ReflectionUtil::setPropertyValue($eventManager, 'listeners', new ArrayCollection());
+        ReflectionUtil::setPropertyValue($eventManager, 'listeners', []);
         ReflectionUtil::setPropertyValue($eventManager, 'initialized', []);
 
         $logger->expects(self::once())
             ->method('info')
             ->with('Disconnect ORM metadata factory');
-        $logger->expects(self::once())
-            ->method('warning')
-            ->with('The EventManager "listeners" and "initialized" properties should be an array');
 
         $this->container->expects(self::once())
             ->method('initialized')
@@ -390,14 +386,11 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         self::assertObjectHasAttribute('initialized', $eventManager);
 
         ReflectionUtil::setPropertyValue($eventManager, 'listeners', []);
-        ReflectionUtil::setPropertyValue($eventManager, 'initialized', new ArrayCollection());
+        ReflectionUtil::setPropertyValue($eventManager, 'initialized', []);
 
         $logger->expects(self::once())
             ->method('info')
             ->with('Disconnect ORM metadata factory');
-        $logger->expects(self::once())
-            ->method('warning')
-            ->with('The EventManager "listeners" and "initialized" properties should be an array');
 
         $this->container->expects(self::once())
             ->method('initialized')

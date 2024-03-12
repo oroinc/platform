@@ -4,16 +4,15 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendNameGeneratorAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class OroUserBundle implements
     Migration,
@@ -21,73 +20,26 @@ class OroUserBundle implements
     ExtendExtensionAwareInterface,
     ActivityExtensionAwareInterface
 {
-    /** @var ActivityExtension */
-    protected $activityExtension;
+    use ExtendNameGeneratorAwareTrait;
+    use ExtendExtensionAwareTrait;
+    use ActivityExtensionAwareTrait;
 
     /**
-     * @var ExtendDbIdentifierNameGenerator
+     * {@inheritDoc}
      */
-    protected $nameGenerator;
-
-    /**
-     * @var ExtendExtension
-     */
-    protected $extendExtension;
-
-    /**
-     * @inheritdoc
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        $this->extendExtension = $extendExtension;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
-    {
-        $this->nameGenerator = $nameGenerator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setActivityExtension(ActivityExtension $activityExtension)
-    {
-        $this->activityExtension = $activityExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::addActivityAssociations($schema, $this->activityExtension);
+        $this->activityExtension->addActivityAssociation($schema, 'oro_email', 'oro_user', true);
 
         $this->assignActivities('oro_email', 'oro_user', 'owner_user_id', $queries);
     }
 
-    /**
-     * Enables Email activity for User entity
-     */
-    public static function addActivityAssociations(Schema $schema, ActivityExtension $activityExtension)
-    {
-        $activityExtension->addActivityAssociation($schema, 'oro_email', 'oro_user', true);
-    }
-
-    /**
-     * @param string   $sourceTableName
-     * @param string   $targetTableName
-     * @param string   $ownerColumnName
-     * @param QueryBag $queries
-     */
-    public function assignActivities(
-        $sourceTableName,
-        $targetTableName,
-        $ownerColumnName,
+    private function assignActivities(
+        string $sourceTableName,
+        string $targetTableName,
+        string $ownerColumnName,
         QueryBag $queries
-    ) {
+    ): void {
         // prepare select email_id:contact_id sql
         $fromAndRecipients = '
             SELECT DISTINCT email_id, owner_id FROM (

@@ -2,36 +2,26 @@
 
 namespace Oro\Bundle\CommentBundle\Migration\Extension;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides an ability to create comment related associations.
+ */
 class CommentExtension implements ExtendExtensionAwareInterface
 {
+    use ExtendExtensionAwareTrait;
+
     const COMMENT_TABLE_NAME = 'oro_comment';
-
-    /** @var ExtendExtension */
-    protected $extendExtension;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
 
     /**
      * @param Schema      $schema
      * @param string      $targetTableName
      * @param string|null $targetColumnName
-     *
-     * @throws DBALException
-     * @throws SchemaException
      */
     public function addCommentAssociation(Schema $schema, $targetTableName, $targetColumnName = null)
     {
@@ -65,8 +55,6 @@ class CommentExtension implements ExtendExtensionAwareInterface
      * @param string $targetTableName
      *
      * @return bool
-     *
-     * @throws SchemaException if valid primary key does not exist
      */
     public function hasCommentAssociation(Schema $schema, $targetTableName)
     {

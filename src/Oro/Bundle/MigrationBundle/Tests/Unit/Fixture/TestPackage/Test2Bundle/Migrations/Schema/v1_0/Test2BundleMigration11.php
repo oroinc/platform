@@ -7,12 +7,11 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class Test2BundleMigration11 implements Migration, ContainerAwareInterface, OrderedMigrationInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    use ContainerAwareTrait;
 
     public function getOrder()
     {
@@ -25,10 +24,5 @@ class Test2BundleMigration11 implements Migration, ContainerAwareInterface, Orde
         foreach ($sqls as $sql) {
             $queries->addQuery($sql);
         }
-    }
-
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 }

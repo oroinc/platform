@@ -10,6 +10,8 @@ use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler as IntegrationHandl
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -17,7 +19,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
+class IntegrationHandlerTest extends TestCase
 {
     private const FORM_NAME = 'form_name';
     private const FORM_DATA = ['field' => 'data'];
@@ -25,16 +27,16 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var Request */
     private $request;
 
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormInterface|MockObject */
     private $form;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|MockObject */
     private $em;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|MockObject */
     private $eventDispatcher;
 
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormFactoryInterface|MockObject */
     private $formFactory;
 
     /** @var IntegrationHandler */
@@ -146,14 +148,17 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
 
-        $this->form->expects($this->any())
+        $form = $this->form;
+        $form->expects($this->any())
             ->method('getName')
             ->willReturn(self::FORM_NAME);
         $this->form->expects($this->once())
             ->method('setData')
             ->with($entity)
-            ->willReturnCallback(function ($entity) use ($newOwner) {
+            ->willReturnCallback(function ($entity) use ($newOwner, $form) {
                 $entity->setDefaultUserOwner($newOwner);
+
+                return $form;
             });
         $this->form->expects($this->once())
             ->method('submit')
@@ -171,7 +176,7 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         if ($entity->getId()) {
             $this->em->expects($this->once())
                 ->method('find')
-                ->with('OroIntegrationBundle:Channel', $entity->getId())
+                ->with(Integration::class, $entity->getId())
                 ->willReturn($existingIntegration);
         }
 

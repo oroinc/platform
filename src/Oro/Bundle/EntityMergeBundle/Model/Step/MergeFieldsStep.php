@@ -8,17 +8,13 @@ use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Merge handler step for merging result data
+ */
 class MergeFieldsStep implements DependentMergeStepInterface
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    public function __construct(StrategyInterface $strategy, EventDispatcherInterface $eventDispatcher)
+    public function __construct(private StrategyInterface $strategy, private EventDispatcherInterface $eventDispatcher)
     {
-        $this->strategy = $strategy;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**

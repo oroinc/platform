@@ -4,9 +4,10 @@ namespace Oro\Bundle\OrganizationBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,26 +20,26 @@ class BusinessUnitController extends RestController
     /**
      * REST GET list
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. defaults to 10."
-     * )
      * @ApiDoc(
      *      description="Get all business units items",
      *      resource=true
      * )
-     * @AclAncestor("oro_business_unit_view")
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. defaults to 10.',
+        nullable: true
+    )]
+    #[AclAncestor('oro_business_unit_view')]
     public function cgetAction(Request $request)
     {
         $page = (int)$request->get('page', 1);
@@ -54,8 +55,8 @@ class BusinessUnitController extends RestController
      *      description="Create new business unit",
      *      resource=true
      * )
-     * @AclAncestor("oro_business_unit_create")
      */
+    #[AclAncestor('oro_business_unit_create')]
     public function postAction()
     {
         return $this->handleCreateRequest();
@@ -70,9 +71,9 @@ class BusinessUnitController extends RestController
      *      description="Update business unit",
      *      resource=true
      * )
-     * @AclAncestor("oro_business_unit_update")
      * @return Response
      */
+    #[AclAncestor('oro_business_unit_update')]
     public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
@@ -87,9 +88,9 @@ class BusinessUnitController extends RestController
      *      description="Get business unit item",
      *      resource=true
      * )
-     * @AclAncestor("oro_business_unit_view")
      * @return Response
      */
+    #[AclAncestor('oro_business_unit_view')]
     public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
@@ -144,14 +145,9 @@ class BusinessUnitController extends RestController
      *      description="Delete business unit",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_business_unit_delete",
-     *      type="entity",
-     *      class="OroOrganizationBundle:BusinessUnit",
-     *      permission="DELETE"
-     * )
      * @return Response
      */
+    #[Acl(id: 'oro_business_unit_delete', type: 'entity', class: BusinessUnit::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
@@ -162,7 +158,7 @@ class BusinessUnitController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_organization.business_unit.manager.api');
+        return $this->container->get('oro_organization.business_unit.manager.api');
     }
 
     /**
@@ -170,7 +166,7 @@ class BusinessUnitController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_organization.form.business_unit.api');
+        return $this->container->get('oro_organization.form.business_unit.api');
     }
 
     /**
@@ -178,6 +174,6 @@ class BusinessUnitController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_organization.form.handler.business_unit.api');
+        return $this->container->get('oro_organization.form.handler.business_unit.api');
     }
 }

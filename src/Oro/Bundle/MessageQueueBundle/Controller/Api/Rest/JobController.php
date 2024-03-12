@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -20,12 +20,11 @@ class JobController extends AbstractFOSRestController
      * - HTTP_OK (200)
      *
      * @ApiDoc(description="Interrupt Root Job", resource=true)
-     * @AclAncestor("oro_message_queue_job")
      *
      * @param Job $job
-     *
      * @return Response
      */
+    #[AclAncestor('oro_message_queue_job')]
     public function interruptRootJobAction(Job $job)
     {
         $this->getJobProcessor()->interruptRootJob($job);
@@ -33,7 +32,7 @@ class JobController extends AbstractFOSRestController
         return $this->handleView($this->view(
             [
                 'successful' => true,
-                'message' => $this->get('translator')->trans('oro.message_queue_job.rest.job_interrupted'),
+                'message' => $this->container->get('translator')->trans('oro.message_queue_job.rest.job_interrupted'),
             ],
             Response::HTTP_OK
         ));
@@ -44,6 +43,6 @@ class JobController extends AbstractFOSRestController
      */
     private function getJobProcessor()
     {
-        return $this->get('oro_message_queue.job.processor');
+        return $this->container->get('oro_message_queue.job.processor');
     }
 }

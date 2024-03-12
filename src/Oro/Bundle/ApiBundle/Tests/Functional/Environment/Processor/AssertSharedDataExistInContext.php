@@ -16,7 +16,7 @@ class AssertSharedDataExistInContext implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if ($context->isMasterRequest()) {
+        if ($context->isMainRequest()) {
             return;
         }
 

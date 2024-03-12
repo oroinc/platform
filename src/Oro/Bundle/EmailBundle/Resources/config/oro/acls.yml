@@ -1,42 +1,42 @@
 acls:
     oro_email_email_view:
         type: entity
-        class: OroEmailBundle:Email
+        class: Oro\Bundle\EmailBundle\Entity\Email
         permission: VIEW
         group_name: ""
 
     oro_email_email_user_view:
         type: entity
-        class: OroEmailBundle:EmailUser
+        class: Oro\Bundle\EmailBundle\Entity\EmailUser
         permission: VIEW
         group_name: ""
 
     oro_email_email_body_view:
         type: entity
-        class: OroEmailBundle:EmailBody
+        class: Oro\Bundle\EmailBundle\Entity\EmailBody
         permission: VIEW
         group_name: ""
 
     oro_email_email_attachment_view:
         type: entity
-        class: OroEmailBundle:EmailAttachment
+        class: Oro\Bundle\EmailBundle\Entity\EmailAttachment
         permission: VIEW
         group_name: ""
 
     oro_email_email_create:
         type: entity
-        class: OroEmailBundle:EmailUser
+        class: Oro\Bundle\EmailBundle\Entity\EmailUser
         permission: CREATE
         group_name: ""
 
     oro_email_email_user_edit:
         type: entity
-        class: OroEmailBundle:EmailUser
+        class: Oro\Bundle\EmailBundle\Entity\EmailUser
         permission: EDIT
         group_name: ""
 
     oro_email_autoresponserule_view:
         type: entity
-        class: OroEmailBundle:AutoResponseRule
+        class: Oro\Bundle\EmailBundle\Entity\AutoResponseRule
         permission: VIEW
         group_name: ""

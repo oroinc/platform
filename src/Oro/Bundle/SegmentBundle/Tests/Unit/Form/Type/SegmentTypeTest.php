@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -14,7 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SegmentTypeTest extends \PHPUnit\Framework\TestCase
+class SegmentTypeTest extends TestCase
 {
     /** @var SegmentType */
     private $type;
@@ -37,7 +38,7 @@ class SegmentTypeTest extends \PHPUnit\Framework\TestCase
                     'type',
                     EntityType::class,
                     [
-                        'class'        => 'OroSegmentBundle:SegmentType',
+                        'class'        => \Oro\Bundle\SegmentBundle\Entity\SegmentType::class,
                         'choice_label' => 'label',
                         'required'     => true,
                         'placeholder'  => 'oro.segment.form.choose_segment_type',

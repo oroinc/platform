@@ -19,7 +19,7 @@ class UsernamePasswordOrganizationTokenTest extends \PHPUnit\Framework\TestCase
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
-        $token = new UsernamePasswordOrganizationToken($user, 'pass', 'user_provider', $organization);
+        $token = new UsernamePasswordOrganizationToken($user, 'main', $organization);
 
         self::assertSame($organization, $token->getOrganization());
     }
@@ -28,25 +28,20 @@ class UsernamePasswordOrganizationTokenTest extends \PHPUnit\Framework\TestCase
     {
         /** @var User $user */
         $user = $this->getEntity(User::class, ['id' => 1]);
-        $credentials = 'pass';
-        $providerKey = 'user_provider';
+        $firewall = 'main';
         /** @var Role $role */
         $role = $this->getEntity(Role::class, ['id' => 2]);
         $user->addUserRole($role);
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
-        $token = new UsernamePasswordOrganizationToken($user, $credentials, $providerKey, $organization, [$role]);
+        $token = new UsernamePasswordOrganizationToken($user, $firewall, $organization, [$role]);
 
         /** @var UsernamePasswordOrganizationToken $newToken */
         $newToken = unserialize(serialize($token));
 
         self::assertNotSame($token->getUser(), $newToken->getUser());
         self::assertEquals($token->getUser()->getId(), $newToken->getUser()->getId());
-
-        self::assertEquals($token->getCredentials(), $newToken->getCredentials());
-
-        self::assertEquals($token->getProviderKey(), $newToken->getProviderKey());
 
         self::assertNotSame($token->getRoles()[0], $newToken->getRoles()[0]);
         self::assertEquals($token->getRoles()[0]->getId(), $newToken->getRoles()[0]->getId());

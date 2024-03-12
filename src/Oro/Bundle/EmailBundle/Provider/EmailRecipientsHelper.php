@@ -62,6 +62,9 @@ class EmailRecipientsHelper
     /** @var EmailAddressHelper */
     protected $addressHelper;
 
+    /** @var Indexer */
+    protected $search;
+
     public function __construct(
         AclHelper $aclHelper,
         DQLNameFormatter $dqlNameFormatter,

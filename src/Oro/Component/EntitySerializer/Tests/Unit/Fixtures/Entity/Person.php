@@ -2,42 +2,30 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="person_table")
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({
- *     "employee" = "Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Employee",
- *     "buyer" = "Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Buyer"
- * })
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'person_table')]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\DiscriminatorMap(['employee' => Employee::class, 'buyer' => Buyer::class])]
 abstract class Person
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=255)
-     */
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
     private ?string $name = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Department", inversedBy="staff")
-     * @ORM\JoinColumn(name="department_id", referencedColumnName="id"),
-     */
+    #[ORM\ManyToOne(targetEntity: Department::class, inversedBy: 'staff')]
+    #[ORM\JoinColumn(name: 'department_id', referencedColumnName: 'id')]
     private ?Department $department = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'products')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
     private ?User $owner = null;
 
     public function getId(): ?int

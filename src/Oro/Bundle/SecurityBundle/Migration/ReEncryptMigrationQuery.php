@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Psr\Log\LoggerInterface;
@@ -15,8 +15,7 @@ use Psr\Log\LoggerInterface;
  */
 class ReEncryptMigrationQuery implements MigrationQuery, ConnectionAwareInterface
 {
-    /** @var Connection */
-    private $connection;
+    use ConnectionAwareTrait;
 
     /** @var SymmetricCrypterInterface */
     private $originalCrypter;
@@ -45,14 +44,6 @@ class ReEncryptMigrationQuery implements MigrationQuery, ConnectionAwareInterfac
     /**
      * {@inheritDoc}
      */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getDescription()
     {
         return 'Re-encrypt database fields using new encrypter';
@@ -69,7 +60,7 @@ class ReEncryptMigrationQuery implements MigrationQuery, ConnectionAwareInterfac
             ->select($select)
             ->from($this->table);
 
-        foreach ($selectIntegrationsQB->execute()->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+        foreach ($selectIntegrationsQB->execute()->fetchAllAssociative() as $row) {
             $updateData = [];
             foreach ($this->fields as $field) {
                 if (isset($row[$field])) {

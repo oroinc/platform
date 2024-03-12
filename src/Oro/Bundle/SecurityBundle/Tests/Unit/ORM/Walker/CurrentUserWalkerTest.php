@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Query;
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class CurrentUserWalkerTest extends OrmTestCase
@@ -16,7 +16,7 @@ class CurrentUserWalkerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
         $this->em->getConfiguration()->setEntityNamespaces([
             'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
         ]);
@@ -24,7 +24,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
     public function testWalkerWithoutParameters()
     {
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
@@ -42,7 +42,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
     public function testWalkerNoWhere()
     {
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
@@ -65,7 +65,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
     public function testWalkerWithOneWhereCondition()
     {
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.id = 1')
             ->getQuery();
@@ -89,7 +89,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
     public function testWalkerWithComplexWhereCondition()
     {
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.id = 1 OR address.country = \'us\'')
             ->getQuery();
@@ -114,7 +114,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
     public function testWalkerWithSeveralAndWhereCondition()
     {
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.id = 1 AND address.country = \'us\'')
             ->getQuery();

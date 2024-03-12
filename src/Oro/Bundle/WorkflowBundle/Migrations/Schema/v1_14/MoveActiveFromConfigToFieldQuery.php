@@ -82,7 +82,7 @@ class MoveActiveFromConfigToFieldQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $query);
 
-        return $this->connection->fetchAll($query);
+        return $this->connection->fetchAllAssociative($query);
     }
 
     /**

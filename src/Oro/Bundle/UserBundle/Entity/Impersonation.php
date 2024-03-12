@@ -2,70 +2,49 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 
 /**
  * Store user impersonations
- *
- * @Config()
- * @ORM\Entity()
- * @ORM\Table(name="oro_user_impersonation")
- * @ORM\Table(name="oro_user_impersonation", indexes = {
- *      @ORM\Index("token_idx", columns = {"token"}),
- *      @ORM\Index("oro_user_imp_ip", columns = {"ip_address"}),
- * })
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_user_impersonation')]
+#[ORM\Index(columns: ['token'], name: 'token_idx')]
+#[ORM\Index(columns: ['ip_address'], name: 'oro_user_imp_ip')]
+#[Config]
 class Impersonation
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
-    protected $user;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?User $user = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $token;
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    protected ?string $token = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean", nullable=false, options={"default": false})
-     */
-    protected $notify;
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    protected ?bool $notify = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="expire_at", type="datetime")
-     */
-    protected $expireAt;
+    #[ORM\Column(name: 'expire_at', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $expireAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="login_at", type="datetime", nullable=true)
-     */
-    protected $loginAt;
+    #[ORM\Column(name: 'login_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $loginAt = null;
 
-    /**
-     * @var string $ipAddress
-     *
-     * @ORM\Column(name="ip_address", type="string", length=255, nullable=false, options={"default": "127.0.0.1"})
-     */
-    protected $ipAddress;
+    #[ORM\Column(
+        name: 'ip_address',
+        type: Types::STRING,
+        length: 255,
+        nullable: false,
+        options: ['default' => '127.0.0.1']
+    )]
+    protected string $ipAddress;
 
     public function __construct()
     {

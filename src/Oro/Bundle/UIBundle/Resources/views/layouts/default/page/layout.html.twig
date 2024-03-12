@@ -36,6 +36,23 @@
     </body>
 {% endblock %}
 
+{% block _service_worker_widget %}
+    {% set layoutContext = get_layout_context() %}
+    {% set url = asset('/sw.js') ~ '&theme=' ~ layoutContext.theme %}
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker
+                    .register('{{ url|raw }}', {scope: '/'})
+                    .catch(error => {console.error(error)});
+            });
+            window.addEventListener('beforeinstallprompt', e => {
+                e.preventDefault()
+            })
+        }
+    </script>
+{% endblock %}
+
 {% block _wrapper_widget %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' wrapper'
@@ -141,7 +158,7 @@
 
 {% block _skip_to_content_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': 'btn btn--info skip-to-content__btn',
+        '~class': 'btn btn--outlined skip-to-content__btn',
         'data-page-component-proxy-focus': '[data-role="page-main-container"]',
         'type': 'button'
     }) %}

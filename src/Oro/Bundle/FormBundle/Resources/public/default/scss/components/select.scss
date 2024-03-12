@@ -21,40 +21,33 @@
     }
 
     @include element-state('hover') {
-        text-decoration: none;
         border-color: $select-border-color-hover-state;
     }
 
     @include element-state('focus') {
         border-color: $select-border-color-focus-state;
-        box-shadow: $select-box-shadow-focus-state;
     }
 
-    &.focus-visible {
+    &:focus-visible {
         border-color: $select-border-color-focus-state;
     }
 
     @include element-state('error') {
+        background-color: $select-bg-color-error-state;
         border-color: $select-border-color-error-state;
     }
 
-    @include element-state('error') {
-        box-shadow: $select-box-shadow-error-state;
-    }
-
     @include element-state('disabled') {
+        border-color: $select-disabled-border-color;
         background-color: $select-disabled-background-color;
-        pointer-events: none;
-    }
+        color: $select-disabled-color;
 
-    &--size-m {
-        height: $base-ui-element-height-size-m;
-        padding: $select-padding--m;
-    }
+        // Overriding user agent stylesheet (opacity: 0.7)
+        @include base-disabled-style($opacity: 1);
 
-    &--size-s {
-        height: $select-height--s;
-        padding: $select-padding--s;
+        @include element-state('hover') {
+            border-color: $select-disabled-border-color;
+        }
     }
 }
 
@@ -64,5 +57,23 @@
         line-height: $select-firefox-line-height;
         padding-top: $select-firefox-inner-offset-top;
         padding-bottom: $select-firefox-inner-offset-bottom;
+    }
+}
+
+.select-plain {
+    --select-arrow-position: #{$select-plain-arrow-position};
+
+    display: inline-flex;
+    padding-left: $select-plain-padding-start;
+    padding-right: $select-plain-padding-end;
+
+    border-width: 0;
+    background: $select-bg-dark;
+    font-size: $select-plain-font-size;
+    line-height: $select-plain-line-height;
+    font-weight: $select-plain-font-weight;
+
+    @include element-state('hover') {
+        background-color: $select-plain-background-color-hover;
     }
 }

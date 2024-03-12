@@ -13,7 +13,8 @@ data:
             messageIds: null
             xMessageId: null
             xThreadId: null
-            references: []
+            references:
+                - '<other@email-api.func-test>'
             acceptLanguage: null
             bodySynced: true
             from:

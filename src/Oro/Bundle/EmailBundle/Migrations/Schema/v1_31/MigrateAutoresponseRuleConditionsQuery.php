@@ -6,14 +6,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Log\LoggerInterface;
 
 class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, ConnectionAwareInterface
 {
-    /** @var Connection */
-    protected $connection;
+    use ConnectionAwareTrait;
 
     const LIMIT = 100;
 
@@ -30,7 +30,7 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
         for ($i = 0; $i < $steps; $i++) {
             $rows = $this->createAutoResponseRuleConditionQb($i * static::LIMIT)
                 ->execute()
-                ->fetchAll(\PDO::FETCH_ASSOC);
+                ->fetchAllAssociative();
 
             $grouppedRows = $this->groupRowsByRules($rows);
             foreach ($grouppedRows as $ruleId => $conditions) {
@@ -45,11 +45,6 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
     public function getDescription()
     {
         return 'Migrates data from table "oro_email_response_rule_cond" into "oro_email_auto_response_rule"';
-    }
-
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
     }
 
     /**
@@ -129,7 +124,7 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
             ->setFirstResult($offset)
             ->orderBy('r.id')
             ->execute()
-            ->fetchAll(\PDO::FETCH_ASSOC);
+            ->fetchAllAssociative();
 
         $qb = $this->connection->createQueryBuilder();
 
@@ -150,6 +145,6 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
             ->select('COUNT(1)')
             ->from(static::AUTO_RESPONSE_RULE_TABLE, 'r')
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 }

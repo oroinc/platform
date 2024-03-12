@@ -46,7 +46,7 @@ class OrganizationRememberMeTokenTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($token->getUser(), $newToken->getUser());
         self::assertEquals($token->getUser()->getId(), $newToken->getUser()->getId());
 
-        self::assertEquals($token->getProviderKey(), $newToken->getProviderKey());
+        self::assertEquals($token->getFirewallName(), $newToken->getFirewallName());
 
         self::assertEquals($token->getSecret(), $newToken->getSecret());
 

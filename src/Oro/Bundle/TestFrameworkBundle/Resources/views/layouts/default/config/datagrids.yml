@@ -1,0 +1,19 @@
+datagrids:
+    items-grid:
+        options:
+            noDataMessages:
+                emptyGrid: translation.trans1
+                emptyFilteredGrid: translation.trans2
+        source:
+            type: orm
+            query:
+                select:
+                    - item.id
+                    - item.stringValue
+                from:
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\Item, alias: item }
+        columns:
+            id:
+                label: id
+            stringValue:
+                label: stringValue

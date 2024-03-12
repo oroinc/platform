@@ -22,31 +22,6 @@ class ActivitySearchController extends RestGetController
      * @param Request $request
      * @param string $activity The type of the activity entity.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
-     * @QueryParam(
-     *     name="search",
-     *     requirements=".+",
-     *     nullable=true,
-     *     description="The search string."
-     * )
-     * @QueryParam(
-     *      name="from",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The entity alias. One or several aliases separated by comma. Defaults to all entities"
-     * )
-     *
      * @ApiDoc(
      *      description="Searches entities associated with the specified type of activity",
      *      resource=true
@@ -54,6 +29,25 @@ class ActivitySearchController extends RestGetController
      *
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
+    #[QueryParam(name: 'search', requirements: '.+', description: 'The search string.', nullable: true)]
+    #[QueryParam(
+        name: 'from',
+        requirements: '.+',
+        description: 'The entity alias. One or several aliases separated by comma. Defaults to all entities',
+        nullable: true
+    )]
     public function cgetAction(Request $request, $activity)
     {
         $manager = $this->getManager();
@@ -70,7 +64,7 @@ class ActivitySearchController extends RestGetController
             $filter          = new ChainParameterFilter(
                 [
                     new StringToArrayParameterFilter(),
-                    new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
+                    new EntityClassParameterFilter($this->container->get('oro_entity.entity_class_name_helper'))
                 ]
             );
             $filters['from'] = $filter->filter($from, null);

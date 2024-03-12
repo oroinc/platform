@@ -63,7 +63,7 @@ class PopulateLocalizedFallbackCollectionMigrationQuery extends ParametrizedMigr
     {
         $this->logQuery($logger, $this->selectQuery);
 
-        $rows  = $this->connection->fetchAll($this->selectQuery);
+        $rows  = $this->connection->fetchAllAssociative($this->selectQuery);
         foreach ($rows as $row) {
             $this->addLocalizedFallbackValue($logger, $row['id'], $row['value'], $dryRun);
         }

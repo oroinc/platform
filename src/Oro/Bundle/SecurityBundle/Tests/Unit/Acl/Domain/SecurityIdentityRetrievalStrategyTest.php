@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityRetrievalStrategy;
+use Oro\Bundle\SecurityBundle\Authentication\Token\AnonymousToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 class SecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,7 +34,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
         $sids = $this->strategy->getSecurityIdentities($token);
         self::assertEquals(
             [
-                new UserSecurityIdentity($user->getUsername(), User::class),
+                new UserSecurityIdentity($user->getUserIdentifier(), User::class),
                 new RoleSecurityIdentity($role)
             ],
             $sids
@@ -57,6 +57,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->createMock(AbstractToken::class);
         $user = new User();
+        $user->setUserIdentifier('user1');
         $token->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
@@ -66,6 +67,6 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$role]);
 
         $sids = $this->strategy->getSecurityIdentities($token);
-        self::assertEquals([new RoleSecurityIdentity($role)], $sids);
+        self::assertEquals([new UserSecurityIdentity($user, $user::class), new RoleSecurityIdentity($role)], $sids);
     }
 }

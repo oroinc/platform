@@ -3,85 +3,52 @@
 namespace Oro\Bundle\NotificationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroNotificationBundle_Entity_EmailNotification;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
  * Represents notification rule.
  *
- * @ORM\Table("oro_notification_email_notif")
- * @ORM\Entity()
- * @Config(
- *      routeName="oro_notification_emailnotification_index",
- *      defaultValues={
- *          "security"={
- *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
- *          }
- *      }
- * )
  * @mixin OroNotificationBundle_Entity_EmailNotification
  */
+#[ORM\Entity]
+#[ORM\Table('oro_notification_email_notif')]
+#[Config(
+    routeName: 'oro_notification_emailnotification_index',
+    defaultValues: [
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
+        'comment' => ['immutable' => true],
+        'activity' => ['immutable' => true],
+        'attachment' => ['immutable' => true]
+    ]
+)]
 class EmailNotification implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_name", type="string", length=255)
-     */
-    protected $entityName;
+    #[ORM\Column(name: 'entity_name', type: Types::STRING, length: 255)]
+    protected ?string $entityName = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="event_name", type="string", length=255, nullable=true)
-     */
-    protected $eventName;
+    #[ORM\Column(name: 'event_name', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $eventName = null;
 
-    /**
-     * @var EmailTemplate
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailTemplate")
-     * @ORM\JoinColumn(name="template_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $template;
+    #[ORM\ManyToOne(targetEntity: EmailTemplate::class)]
+    #[ORM\JoinColumn(name: 'template_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?EmailTemplate $template = null;
 
-    /**
-     * @var RecipientList
-     *
-     * @ORM\OneToOne(
-     *     targetEntity="Oro\Bundle\NotificationBundle\Entity\RecipientList",
-     *     cascade={"all"},
-     *     orphanRemoval=true
-     * )
-     * @ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id")
-     */
-    protected $recipientList;
+    #[ORM\OneToOne(targetEntity: RecipientList::class, cascade: ['all'], orphanRemoval: true)]
+    #[ORM\JoinColumn(name: 'recipient_list_id', referencedColumnName: 'id')]
+    protected ?RecipientList $recipientList = null;
 
     /**
      * Get id

@@ -225,7 +225,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFoldersOnOriginWithEmptyFolders(): void
     {
-        $origin = new TestEmailOrigin(['id' => 12]);
+        $origin = new TestEmailOrigin(12);
 
         $subFolder = $this->createRemoteFolder('Sub', '[Gmail]\Test\Sub');
         $remoteFolders = [
@@ -266,7 +266,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFoldersOnOriginWithTheSameFoldersAsAtRemoteServer(): void
     {
-        $origin = new TestEmailOrigin(['id' => 12]);
+        $origin = new TestEmailOrigin(12);
 
         $subFolder = $this->createRemoteFolder('Sub', '[Gmail]\Test\Sub');
         $remoteFolders = [
@@ -310,7 +310,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFoldersOnOriginWithNewFoldersAtRemoteServer(): void
     {
-        $origin = new TestEmailOrigin(['id' => 12]);
+        $origin = new TestEmailOrigin(12);
 
         $subFolder = $this->createRemoteFolder('Sub', '[Gmail]\Test\Sub');
         $remoteFolders = [
@@ -370,7 +370,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFoldersOnOriginWithNewSubFoldersAtRemoteServer(): void
     {
-        $origin = new TestEmailOrigin(['id' => 12]);
+        $origin = new TestEmailOrigin(12);
 
         $subFolder = $this->createRemoteFolder('Sub', '[Gmail]\Test\Sub');
         $newSubFolder = $this->createRemoteFolder('NewSub', '[Gmail]\Test\NewSub');
@@ -443,7 +443,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFoldersOnOriginWithRenamedFolderAtRemoteServer(): void
     {
-        $origin = new TestEmailOrigin(['id' => 12]);
+        $origin = new TestEmailOrigin(12);
 
         $subFolder = $this->createRemoteFolder('Sub', '[Gmail]\TestRenamed\Sub');
         $remoteFolders = [
@@ -530,7 +530,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testRefreshFoldersOnOriginWithEmptyFolders(): void
     {
-        $origin = new TestEmailOrigin(['id' => 15]);
+        $origin = new TestEmailOrigin(15);
 
         $this->mockEmRequestsForRefreshFolders([], []);
         $this->connector->expects(self::once())
@@ -545,7 +545,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testRefreshFoldersSetUIDValidity(): void
     {
-        $origin = new TestEmailOrigin(['id' => 16]);
+        $origin = new TestEmailOrigin(16);
 
         $inboxEmailFolder = $this->getEntity(
             EmailFolder::class,
@@ -612,7 +612,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testRefreshFoldersOnEmptyFoldersInOrigin(): void
     {
-        $origin = new TestEmailOrigin(['id' => 15]);
+        $origin = new TestEmailOrigin(15);
         $remoteFolders = [
             $this->createRemoteFolder('Inbox', '[Gmail]\Inbox', ['\Inbox']),
             $this->createRemoteFolder('Sent', '[Gmail]\Sent', ['\Sent']),

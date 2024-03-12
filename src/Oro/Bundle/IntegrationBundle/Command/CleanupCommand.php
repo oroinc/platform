@@ -125,7 +125,7 @@ HELP
         }
         $output->writeln(sprintf('<comment>Integration statuses will be deleted:</comment> %d', count($iterator)));
 
-        $this->deleteRecords($iterator, 'OroIntegrationBundle:Status');
+        $this->deleteRecords($iterator, Status::class);
 
         $output->writeln('<info>Integration statuses history cleanup completed</info>');
 
@@ -235,7 +235,7 @@ SQL;
             Status::STATUS_COMPLETED,
             Status::STATUS_COMPLETED
         );
-        $data = $connection->fetchAll($selectQuery);
+        $data = $connection->fetchAllAssociative($selectQuery);
         $excludes = array_map(
             function ($item) {
                 return $item['id'];

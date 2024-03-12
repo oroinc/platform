@@ -149,7 +149,10 @@ class ControllersResetTest extends WebTestCase
 
         $form = $crawler->selectButton('Reset')->form();
         $this->client->submit($form);
+
         $result = $this->client->getResponse();
+        $this->assertEquals(200, $result->getStatusCode());
+
         $expectedResponse = '{"widget":{"trigger":[{"eventFunction":"execute","name":"refreshPage"}],"remove":true}}';
         self::assertStringContainsString($expectedResponse, $result->getContent());
 

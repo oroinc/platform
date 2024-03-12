@@ -7,7 +7,7 @@ use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderInterface;
 trait MemoryCacheProviderAwareTestTrait
 {
     /** @var MemoryCacheProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $memoryCacheProvider;
+    private $memoryCacheProvider;
 
     /**
      * @return MemoryCacheProviderInterface|\PHPUnit\Framework\MockObject\MockObject

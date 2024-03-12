@@ -7,8 +7,9 @@ use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Exception\UserHolderExceptionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
 /**
  * The default implementation of {@see LoginAttemptsHandlerInterface} that just logs success and failed logins.
@@ -65,19 +66,21 @@ class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
+    public function onAuthenticationFailure(LoginFailureEvent $event): void
     {
-        $token = $event->getAuthenticationToken();
-        $user = $token->getUser();
+        $user = $event->getRequest()->attributes->get('user');
+        $contextInnerUser = $event->getRequest()->attributes->get(Security::LAST_USERNAME, '');
 
-        if (\is_string($user)) {
-            $user = $this->userManager->findUserByUsernameOrEmail($user);
+        if (null === $user && \is_string($contextInnerUser)) {
+            $user = $this->userManager->findUserByUsernameOrEmail($contextInnerUser);
         }
-
-        $exception = $event->getAuthenticationException();
+        $exception = $event->getException();
         $source = null;
         foreach ($this->loginSourceProvidersForFailedRequest as $loginSourceProviderByException) {
-            $source = $loginSourceProviderByException->getLoginSourceForFailedRequest($token, $exception);
+            $source = $loginSourceProviderByException->getLoginSourceForFailedRequest(
+                $event->getAuthenticator(),
+                $exception
+            );
             if (null !== $source) {
                 break;
             }
@@ -85,9 +88,8 @@ class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
         if (null === $source) {
             $source = 'general';
         }
-
-        $user = $user instanceof AbstractUser ? $user : $token->getUser();
-        if (null === $user && $exception instanceof UserHolderExceptionInterface) {
+        $user = $user instanceof AbstractUser ? $user : $contextInnerUser;
+        if (!$user instanceof AbstractUser && $exception instanceof UserHolderExceptionInterface) {
             $user = $exception->getUser();
         }
         $this->userLoginAttemptLogger->logFailedLoginAttempt($user, $source);

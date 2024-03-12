@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
@@ -28,13 +28,13 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      *      description="Get workflow definition",
      *      resource=true
      * )
-     * @AclAncestor("oro_workflow_definition_view")
      * @return Response
      */
+    #[AclAncestor('oro_workflow_definition_view')]
     public function getAction(WorkflowDefinition $workflowDefinition)
     {
         $config = $this->getWorkflowDefinitionSerializationConfig();
-        $entitySerializer = $this->get('oro_workflow.rest_api.entity_serializer');
+        $entitySerializer = $this->container->get('oro_workflow.rest_api.entity_serializer');
         $data = $entitySerializer->serializeEntities([$workflowDefinition], WorkflowDefinition::class, $config);
 
         return $this->handleView(
@@ -56,8 +56,8 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      *      description="Update workflow definition",
      *      resource=true
      * )
-     * @AclAncestor("oro_workflow_definition_update")
      */
+    #[AclAncestor('oro_workflow_definition_update')]
     public function putAction(WorkflowDefinition $workflowDefinition, Request $request)
     {
         try {
@@ -69,7 +69,7 @@ class WorkflowDefinitionController extends AbstractFOSRestController
             }
 
             /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
-            $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
+            $definitionBuilder = $this->container->get('oro_workflow.configuration.builder.workflow_definition.handle');
             $builtDefinition = $definitionBuilder->buildFromRawConfiguration($configuration);
 
             $this->getHandler()->updateWorkflowDefinition($workflowDefinition, $builtDefinition);
@@ -95,8 +95,8 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      *      description="Create new workflow definition",
      *      resource=true
      * )
-     * @AclAncestor("oro_workflow_definition_create")
      */
+    #[AclAncestor('oro_workflow_definition_create')]
     public function postAction(Request $request, WorkflowDefinition $workflowDefinition = null)
     {
         try {
@@ -108,7 +108,7 @@ class WorkflowDefinitionController extends AbstractFOSRestController
             }
 
             /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
-            $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
+            $definitionBuilder = $this->container->get('oro_workflow.configuration.builder.workflow_definition.handle');
             $builtDefinition = $definitionBuilder->buildFromRawConfiguration($configuration);
 
             if (!$workflowDefinition) {
@@ -136,16 +136,16 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      * - HTTP_FORBIDDEN (403)
      *
      * @ApiDoc(description="Delete workflow definition")
-     * @Acl(
-     *      id="oro_workflow_definition_delete",
-     *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="DELETE"
-     * )
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return Response
      */
+    #[Acl(
+        id: 'oro_workflow_definition_delete',
+        type: 'entity',
+        class: WorkflowDefinition::class,
+        permission: 'DELETE'
+    )]
     public function deleteAction(WorkflowDefinition $workflowDefinition)
     {
         if ($workflowDefinition->isSystem()) {
@@ -220,7 +220,7 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      */
     protected function getHandler()
     {
-        return $this->get('oro_workflow.handler.workflow_definition');
+        return $this->container->get('oro_workflow.handler.workflow_definition');
     }
 
     /**
@@ -229,7 +229,7 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      */
     protected function isConfigurationValid(array $configuration)
     {
-        $checker = $this->get('oro_workflow.configuration.checker');
+        $checker = $this->container->get('oro_workflow.configuration.checker');
 
         return $checker->isClean($configuration);
     }
@@ -239,6 +239,6 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      */
     protected function getTranslator()
     {
-        return $this->get('translator');
+        return $this->container->get('translator');
     }
 }

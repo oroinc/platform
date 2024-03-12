@@ -46,9 +46,6 @@ class BasicPropagator implements MenuUpdateToMenuItemPropagatorInterface
         }
 
         $menuItem->setDisplay($menuUpdate->isActive());
-
-        foreach ($menuUpdate->getLinkAttributes() as $key => $linkAttribute) {
-            $menuItem->setLinkAttribute($key, $linkAttribute);
-        }
+        $menuItem->setLinkAttributes($menuUpdate->getLinkAttributes());
     }
 }

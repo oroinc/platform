@@ -103,8 +103,6 @@ class LocalizationManagerTest extends WebTestCase
     {
         //Clear cache
         $this->getContainer()->get('oro_locale.manager.localization')->clearCache();
-        // Store localizations in cache
-        $this->getContainer()->get('oro_locale.manager.localization')->warmUpCache();
 
         return $this->getContainer()->get('oro_locale.manager.localization');
     }

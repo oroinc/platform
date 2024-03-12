@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
+use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Metadata\Label;
@@ -11,44 +11,44 @@ use Oro\Bundle\SecurityBundle\Metadata\Label;
 class ActionSecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $annotationProvider;
+    private $attributeProvider;
 
     /** @var ActionSecurityMetadataProvider */
     private $provider;
 
     protected function setUp(): void
     {
-        $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
+        $this->attributeProvider = $this->createMock(AclAttributeProvider::class);
 
         $this->provider = new ActionSecurityMetadataProvider(
-            $this->annotationProvider
+            $this->attributeProvider
         );
     }
 
     public function testIsKnownActionForKnownAction()
     {
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotationById')
+        $this->attributeProvider->expects($this->once())
+            ->method('findAttributeById')
             ->with('SomeAction')
-            ->willReturn(new AclAnnotation(['id' => 'SomeAction', 'type' => 'action']));
+            ->willReturn(AclAttribute::fromArray(['id' => 'SomeAction', 'type' => 'action']));
 
         $this->assertTrue($this->provider->isKnownAction('SomeAction'));
     }
 
-    public function testIsKnownActionForNotActionAclAnnotationId()
+    public function testIsKnownActionForNotActionAclAttributeId()
     {
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotationById')
-            ->with('SomeAclAnnotationId')
-            ->willReturn(new AclAnnotation(['id' => 'SomeAclAnnotationId', 'type' => 'entity']));
+        $this->attributeProvider->expects($this->once())
+            ->method('findAttributeById')
+            ->with('SomeAclAttributeId')
+            ->willReturn(AclAttribute::fromArray(['id' => 'SomeAclAttributeId', 'type' => 'entity']));
 
-        $this->assertFalse($this->provider->isKnownAction('SomeAclAnnotationId'));
+        $this->assertFalse($this->provider->isKnownAction('SomeAclAttributeId'));
     }
 
     public function testIsKnownActionForUnknownAction()
     {
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotationById')
+        $this->attributeProvider->expects($this->once())
+            ->method('findAttributeById')
             ->with('UnknownAction')
             ->willReturn(null);
 
@@ -57,11 +57,11 @@ class ActionSecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetActions()
     {
-        $this->annotationProvider->expects($this->once())
-            ->method('getAnnotations')
+        $this->attributeProvider->expects($this->once())
+            ->method('getAttributes')
             ->with('action')
             ->willReturn([
-                new AclAnnotation([
+                AclAttribute::fromArray([
                     'id'          => 'test',
                     'type'        => 'action',
                     'group_name'  => 'TestGroup',

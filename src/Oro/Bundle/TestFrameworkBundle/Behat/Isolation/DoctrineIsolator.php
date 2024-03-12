@@ -30,6 +30,8 @@ class DoctrineIsolator implements IsolatorInterface
     /** @var ReferenceRepositoryInitializerInterface[] */
     protected $initializers = [];
 
+    protected array $requiredListeners = [];
+
     public function __construct(
         protected KernelInterface $kernel,
         protected FixtureLoader $fixtureLoader,

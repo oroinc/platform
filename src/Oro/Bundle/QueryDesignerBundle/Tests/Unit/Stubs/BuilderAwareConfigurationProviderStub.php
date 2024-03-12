@@ -40,4 +40,9 @@ class BuilderAwareConfigurationProviderStub implements ConfigurationProviderInte
     {
         return $this->builder;
     }
+
+    public function isValidConfiguration(string $gridName): bool
+    {
+        throw new \BadMethodCallException('not implemented');
+    }
 }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,13 +21,13 @@ class ConfigurationController extends AbstractFOSRestController
      *      description="Get the list of all configuration sections",
      *      resource=true
      * )
-     * @AclAncestor("oro_config_system")
      *
      * @return Response
      */
+    #[AclAncestor('oro_config_system')]
     public function cgetAction()
     {
-        $manager = $this->get('oro_config.manager.api');
+        $manager = $this->container->get('oro_config.manager.api');
 
         $data = $manager->getSections();
 
@@ -50,13 +50,13 @@ class ConfigurationController extends AbstractFOSRestController
      *          {"name"="locale", "dataType"="string", "description"="The preferred locale for configuration values"}
      *      }
      * )
-     * @AclAncestor("oro_config_system")
      *
      * @return Response
      */
+    #[AclAncestor('oro_config_system')]
     public function getAction(Request $request, $path)
     {
-        $manager = $this->get('oro_config.manager.api');
+        $manager = $this->container->get('oro_config.manager.api');
 
         try {
             $data = $manager->getData($path, $request->get('scope', 'user'));

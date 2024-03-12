@@ -4,7 +4,8 @@ namespace Oro\Bundle\DataGridBundle\Controller\Api\Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,13 +25,8 @@ class GridViewController extends RestController
      *      description="Create grid view",
      *      resource=true,
      * )
-     * @Acl(
-     *     id="oro_datagrid_gridview_create",
-     *     type="entity",
-     *     class="OroDataGridBundle:GridView",
-     *     permission="CREATE"
-     * )
      */
+    #[Acl(id: 'oro_datagrid_gridview_create', type: 'entity', class: GridView::class, permission: 'CREATE')]
     public function postAction(Request $request)
     {
         $this->checkCreateSharedAccess($request);
@@ -51,13 +47,8 @@ class GridViewController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @Acl(
-     *     id="oro_datagrid_gridview_update",
-     *     type="entity",
-     *     class="OroDataGridBundle:GridView",
-     *     permission="EDIT"
-     * )
      */
+    #[Acl(id: 'oro_datagrid_gridview_update', type: 'entity', class: GridView::class, permission: 'EDIT')]
     public function putAction(Request $request, $id)
     {
         /** @var AbstractGridView $gridView */
@@ -78,13 +69,8 @@ class GridViewController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @Acl(
-     *     id="oro_datagrid_gridview_delete",
-     *     type="entity",
-     *     class="OroDataGridBundle:GridView",
-     *     permission="DELETE"
-     * )
      */
+    #[Acl(id: 'oro_datagrid_gridview_delete', type: 'entity', class: GridView::class, permission: 'DELETE')]
     public function deleteAction($id)
     {
         return $this->handleDeleteRequest($id);
@@ -108,13 +94,8 @@ class GridViewController extends RestController
      *      },
      *     defaults={"default"="false"}
      * )
-     * @Acl(
-     *     id="oro_datagrid_gridview_view",
-     *     type="entity",
-     *     class="OroDataGridBundle:GridView",
-     *     permission="VIEW"
-     * )
      */
+    #[Acl(id: 'oro_datagrid_gridview_view', type: 'entity', class: GridView::class, permission: 'VIEW')]
     public function defaultAction($id, $default = false, $gridName = null)
     {
         /** @var AbstractGridView $gridView */
@@ -182,7 +163,7 @@ class GridViewController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_datagrid.form.grid_view.api');
+        return $this->container->get('oro_datagrid.form.grid_view.api');
     }
 
     /**
@@ -190,7 +171,7 @@ class GridViewController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_datagrid.grid_view.form.handler.api');
+        return $this->container->get('oro_datagrid.grid_view.form.handler.api');
     }
 
     /**
@@ -198,6 +179,6 @@ class GridViewController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_datagrid.grid_view.manager.api');
+        return $this->container->get('oro_datagrid.grid_view.manager.api');
     }
 }

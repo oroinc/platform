@@ -1,64 +1,101 @@
 /* @theme: default; */
 
+@use 'sass:string';
+
 // Variables for both checkbox and radio
-$checkbox-background: get-color('additional', 'ultra') !default;
-$checkbox-size: 16px !default;
+$checkbox-background: get-var-color('neutral', 'white-100') !default;
+$checkbox-size: 20px !default;
 $checkbox-size-var: var(--checkbox-size, #{$checkbox-size}) !default;
 $checkbox-appearance: none !default;
 $checkbox-vertical-align: middle !default;
 $checkbox-margin: 0 !default;
-$checkbox-border: 1px solid get-color('additional', 'middle') !default;
-$checkbox-color: get-color('additional', 'ultra') !default;
+$checkbox-border: 2px solid get-var-color('neutral', 'grey3') !default;
+$checkbox-color: get-var-color('neutral', 'white-100') !default;
 $checkbox-display: inline-grid !default;
 $checkbox-border-radius: 3px !default;
 $checkbox-flex: none !default;
 $checkbox-outline: none !default;
 
-$checkbox-icon-size: 10px !default;
+$checkbox-icon-content: '' !default;
+$checkbox-icon-size: 16px !default;
 $checkbox-icon-line-height: 1 !default;
-$checkbox-icon-checked: $fa-var-check !default;
-$checkbox-icon-indeterminate: $fa-var-minus !default;
+$checkbox-icon-checked: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill="%23000" fill-rule="evenodd" d="M20.707 5.293a1 1 0 0 1 0 1.414l-11 11a1 1 0 0 1-1.414 0l-5-5a1 1 0 1 1 1.414-1.414L9 15.586 19.293 5.293a1 1 0 0 1 1.414 0Z"></path></svg>') !default;
+$checkbox-icon-indeterminate: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill="%23000" fill-rule="evenodd" d="M4 12a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Z"></path></svg>') !default;
 $checkbox-icon-place-self: center !default;
 $checkbox-icon-opacity: 0 !default;
 $checkbox-icon-opacity-checked: 1 !default;
 
 // Checked
-$checkbox-background-checked: get-color('ui', 'normal') !default;
-$checkbox-border-color-checked: $base-ui-element-border-color-focus !default;
+$checkbox-background-checked: get-var-color('primary', 'main') !default;
+$checkbox-border-color-checked: get-var-color('primary', 'main') !default;
 
 // Indeterminate
-$checkbox-background-indeterminate: get-color('ui', 'normal') !default;
-$checkbox-border-color-indeterminate: $base-ui-element-border-color-focus !default;
+$checkbox-background-indeterminate: get-var-color('primary', 'main') !default;
+$checkbox-border-color-indeterminate: get-var-color('primary', 'main') !default;
 
 // Hover
-$checkbox-border-color-hover: get-color('additional', 'dark') !default;
-
-// Focus
-$checkbox-border-width-focus: 2px !default;
-$checkbox-border-color-focus: get-color('ui', 'focus') !default;
-$checkbox-box-shadow-focus: 0 0 6px get-color('ui', 'normal') !default;
+$checkbox-background-hover: get-var-color('primary', 'hover') !default;
+$checkbox-border-color-hover: get-var-color('primary', 'hover') !default;
 
 // Disable
-$checkbox-background-disabled: get-color('additional', 'base') !default;
-$checkbox-border-color-disabled: get-color('additional', 'light') !default;
-$checkbox-background-checked-disabled: get-color('additional', 'base') !default;
-$checkbox-border-color-checked-disabled: get-color('additional', 'light') !default;
-$checkbox-color-disabled: #{rgba(get-color('ui', 'focus'), .5)} !default;
+$checkbox-background-disabled: get-var-color('neutral', 'grey1') !default;
+$checkbox-border-color-disabled: get-var-color('neutral', 'grey2') !default;
+$checkbox-background-checked-disabled: get-var-color('neutral', 'grey1') !default;
+$checkbox-border-color-checked-disabled: get-var-color('neutral', 'grey2') !default;
+$checkbox-color-disabled: get-var-color('text', 'disabled') !default;
 $checkbox-opacity-disabled: null !default;
 
 // Variables for radio
 $checkbox-radio-border-radius: 50% !default;
 
 $checkbox-radio-icon-content: '' !default;
-$checkbox-radio-icon-background-checked: get-color('ui', 'focus') !default;
-$checkbox-radio-icon-size: 10px !default;
+$checkbox-radio-icon-background-checked: get-var-color('primary', 'main') !default;
+$checkbox-radio-icon-background-checked-hover: get-var-color('primary', 'hover') !default;
+$checkbox-radio-icon-background-checked-disabled: get-var-color('neutral', 'grey2') !default;
+$checkbox-radio-icon-size: 12px !default;
 $checkbox-radio-icon-border-radius: 50% !default;
 
-// Focus
-$checkbox-radio-border-color-focus: transparent !default;
-$checkbox-radio-border-color-checked-focus: get-color('ui', 'focus') !default;
+$checkbox-switch-background-color: get-var-color('neutral', 'grey2') !default;
+$checkbox-switch-border-color: get-var-color('neutral', 'grey2') !default;
+$checkbox-switch-width: 44px !default;
+$checkbox-switch-height: 24px !default;
+$checkbox-switch-border-radius: 12px !default;
+$checkbox-switch-position: relative !default;
 
-// Checkbox round
-$checkbox-round-size: 24px !default;
-$checkbox-round-border-radius: 50% !default;
-$checkbox-round-icon-size: 14px !default;
+$checkbox-switch-before-background: get-var-color('neutral', 'white-100') !default;
+$checkbox-switch-before-width: 20px !default;
+$checkbox-switch-before-height: 20px !default;
+$checkbox-switch-before-mask-image: none !default;
+$checkbox-switch-before-border-radius: 50% !default;
+$checkbox-switch-before-position: absolute !default;
+$checkbox-switch-before-inset-block-start: 0 !default;
+$checkbox-switch-before-inset-inline-start: 0 !default;
+$checkbox-switch-before-opacity: initial !default;
+$checkbox-switch-before-transition: inset-inline-start .15s ease-in-out !default;
+
+$checkbox-switch-hover-background-color: get-var-color('neutral', 'grey3') !default;
+$checkbox-switch-hover-border-color: get-var-color('neutral', 'grey3') !default;
+
+$checkbox-switch-focus-background-color: get-var-color('neutral', 'grey2') !default;
+$checkbox-switch-focus-border-color: get-var-color('neutral', 'grey2') !default;
+
+$checkbox-switch-disabled-background-color: get-var-color('neutral', 'grey2') !default;
+$checkbox-switch-disabled-border-color: get-var-color('neutral', 'grey2') !default;
+
+$checkbox-switch-disabled-before-background: get-var-color('neutral', 'grey1') !default;
+
+$checkbox-switch-checked-background-color: get-var-color('primary', 'main') !default;
+$checkbox-switch-checked-border-color: get-var-color('primary', 'main') !default;
+
+$checkbox-switch-checked-before-inset-inline-start: calc(100% - 20px) !default;
+
+$checkbox-switch-checked-hover-background-color: get-var-color('primary', 'hover') !default;
+$checkbox-switch-checked-hover-border-color: get-var-color('primary', 'hover') !default;
+
+$checkbox-switch-checked-focus-background-color: get-var-color('primary', 'main') !default;
+$checkbox-switch-checked-focus-border-color: get-var-color('primary', 'main') !default;
+
+$checkbox-switch-checked-disabled-background-color: get-var-color('primary', 'disabled') !default;
+$checkbox-switch-checked-disabled-border-color: get-var-color('primary', 'disabled') !default;
+
+$checkbox-switch-checked-disabled-before-background: get-var-color('neutral', 'grey1') !default;

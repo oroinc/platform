@@ -4,39 +4,32 @@ namespace Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="role_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'role_table')]
 class Role
 {
-    /**
-     * @ORM\Column(name="code", type="string", length=50)
-     * @ORM\Id
-     */
+    #[ORM\Column(name: 'code', type: Types::STRING, length: 50)]
+    #[ORM\Id]
     private ?string $code;
 
-    /**
-     * @ORM\Column(name="label", type="string", length=255, unique=true)
-     */
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255, unique: true)]
     private ?string $label = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Category")
-     * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
-     */
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\JoinColumn(name: 'category_name', referencedColumnName: 'name')]
     private ?Category $category = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Group")
-     * @ORM\JoinTable(name="rel_role_to_group_table",
-     *      joinColumns={@ORM\JoinColumn(name="role_code", referencedColumnName="code", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="role_group_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, Group>
      */
-    private Collection $groups;
+    #[ORM\ManyToMany(targetEntity: Group::class)]
+    #[ORM\JoinTable(name: 'rel_role_to_group_table')]
+    #[ORM\JoinColumn(name: 'role_code', referencedColumnName: 'code', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'role_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?Collection $groups = null;
 
     public function __construct(string $code = null)
     {

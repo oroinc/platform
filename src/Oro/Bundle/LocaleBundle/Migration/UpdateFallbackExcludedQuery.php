@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Migration;
 
-use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Bundle\EntityConfigBundle\Migration\ConfigurationHandlerAwareInterface;
+use Oro\Bundle\EntityConfigBundle\Migration\ConfigurationHandlerAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -14,21 +14,13 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateFallbackExcludedQuery extends ParametrizedMigrationQuery implements ConfigurationHandlerAwareInterface
 {
-    protected ConfigurationHandler $configurationHandler;
+    use ConfigurationHandlerAwareTrait;
 
-    private bool $value = false;
+    private bool $value;
 
     public function __construct(bool $value = false)
     {
         $this->value = $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
-    {
-        $this->configurationHandler = $configurationHandler;
     }
 
     public function getDescription()
@@ -66,7 +58,7 @@ class UpdateFallbackExcludedQuery extends ParametrizedMigrationQuery implements 
             ->where($qb->expr()->eq('f.field_name', ':field_name'))
             ->setParameter('field_name', 'fallback')
             ->execute()
-            ->fetchAll(\PDO::FETCH_ASSOC);
+            ->fetchAllAssociative();
 
         foreach ($rows as $row) {
             $class = $row['class_name'];

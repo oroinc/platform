@@ -614,7 +614,7 @@ class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
         $this->loadParentConfig($parentResourceClass, $parentConfig);
         $this->mergeParentResourceHelper->mergeParentResourceConfig($this->context, $parentResourceClass);
 
-        self::assertSame($parentFilters, $this->context->get('filters'));
+        self::assertSame($parentFilters, $this->context->getFilters());
         self::assertEquals(
             [
                 'fields' => [
@@ -640,13 +640,13 @@ class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
         $filters->addField('filter2')->setExcluded();
         $filters->addField('filter4');
 
-        $this->context->set('filters', $filters);
+        $this->context->setFilters($filters);
         $parentConfig = new Config();
         $parentConfig->setFilters($parentFilters);
         $this->loadParentConfig($parentResourceClass, $parentConfig);
         $this->mergeParentResourceHelper->mergeParentResourceConfig($this->context, $parentResourceClass);
 
-        self::assertSame($parentFilters, $this->context->get('filters'));
+        self::assertSame($parentFilters, $this->context->getFilters());
         self::assertEquals(
             [
                 'fields' => [
@@ -678,7 +678,7 @@ class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
         $this->loadParentConfig($parentResourceClass, $parentConfig);
         $this->mergeParentResourceHelper->mergeParentResourceConfig($this->context, $parentResourceClass);
 
-        self::assertSame($parentSorters, $this->context->get('sorters'));
+        self::assertSame($parentSorters, $this->context->getSorters());
         self::assertEquals(
             [
                 'fields' => [
@@ -704,13 +704,13 @@ class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
         $sorters->addField('sorter2')->setExcluded();
         $sorters->addField('sorter4');
 
-        $this->context->set('sorters', $sorters);
+        $this->context->setSorters($sorters);
         $parentConfig = new Config();
         $parentConfig->setSorters($parentSorters);
         $this->loadParentConfig($parentResourceClass, $parentConfig);
         $this->mergeParentResourceHelper->mergeParentResourceConfig($this->context, $parentResourceClass);
 
-        self::assertSame($parentSorters, $this->context->get('sorters'));
+        self::assertSame($parentSorters, $this->context->getSorters());
         self::assertEquals(
             [
                 'fields' => [

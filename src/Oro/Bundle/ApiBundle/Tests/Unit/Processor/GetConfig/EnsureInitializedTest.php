@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EnsureInitializedTest extends ConfigProcessorTestCase
 {
-    /** @var EnsureInitialized */
-    private $processor;
+    private EnsureInitialized $processor;
 
     protected function setUp(): void
     {
@@ -34,10 +33,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         );
         $this->assertConfig(
             [],
-            $this->context->get('test_section')
+            $this->context->getConfigSection('test_section')
         );
         self::assertFalse(
-            $this->context->has('test')
+            $this->context->hasConfigSection('test')
         );
         self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
         self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());
@@ -53,7 +52,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
             ]
         ];
         $this->context->setResult($this->createConfigObject($config));
-        $this->context->set('test_section', $this->createConfigObject(['attr' => 'val']));
+        $this->context->setConfigSection('test_section', $this->createConfigObject(['attr' => 'val']));
         $this->context->setExtras([
             new TestConfigSection('test_section'),
             new TestConfigExtra('test')
@@ -68,10 +67,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
             [
                 'attr' => 'val'
             ],
-            $this->context->get('test_section')
+            $this->context->getConfigSection('test_section')
         );
         self::assertFalse(
-            $this->context->has('test')
+            $this->context->hasConfigSection('test')
         );
         self::assertEquals(ConfigUtil::EXCLUSION_POLICY_ALL, $this->context->getRequestedExclusionPolicy());
         self::assertSame(['field1', 'field2'], $this->context->getExplicitlyConfiguredFieldNames());
@@ -94,10 +93,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
             $this->context->getResult()
         );
         self::assertFalse($this->context->hasExtra(SortersConfigExtra::NAME));
-        self::assertFalse($this->context->has(SortersConfigExtra::NAME));
+        self::assertFalse($this->context->hasConfigSection(SortersConfigExtra::NAME));
         $this->assertConfig(
             [],
-            $this->context->get('test_section')
+            $this->context->getConfigSection('test_section')
         );
         self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
         self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());
@@ -120,11 +119,11 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         self::assertTrue($this->context->hasExtra(SortersConfigExtra::NAME));
         $this->assertConfig(
             [],
-            $this->context->get(SortersConfigExtra::NAME)
+            $this->context->getConfigSection(SortersConfigExtra::NAME)
         );
         $this->assertConfig(
             [],
-            $this->context->get('test_section')
+            $this->context->getConfigSection('test_section')
         );
         self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
         self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());

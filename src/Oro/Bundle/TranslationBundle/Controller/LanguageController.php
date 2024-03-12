@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,12 +14,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class LanguageController extends AbstractController
 {
     /**
-     * @Route("/", name="oro_translation_language_index")
-     * @Template
-     * @AclAncestor("oro_translation_language_view")
      *
      * @return array
      */
+    #[Route(path: '/', name: 'oro_translation_language_index')]
+    #[Template]
+    #[AclAncestor('oro_translation_language_view')]
     public function indexAction()
     {
         return [

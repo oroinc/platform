@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Handler\ExecuteOperationHandler;
 use Oro\Bundle\ActionBundle\Handler\ExecuteOperationResult;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,17 +24,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AjaxController extends AbstractController
 {
     /**
-     * @Route("/operation/execute/{operationName}", name="oro_action_operation_execute", methods={"POST"})
-     * @AclAncestor("oro_action")
      *
      * @param Request $request
      * @param string  $operationName
-     *
      * @return Response
      */
+    #[Route(path: '/operation/execute/{operationName}', name: 'oro_action_operation_execute', methods: ['POST'])]
+    #[AclAncestor('oro_action')]
     public function executeAction(Request $request, $operationName): Response
     {
-        $operation = $this->get(OperationRegistry::class)->findByName($operationName);
+        $operation = $this->container->get(OperationRegistry::class)->findByName($operationName);
         if (!$operation instanceof Operation) {
             $message = sprintf('Operation with name "%s" not found', $operationName);
 
@@ -51,7 +50,7 @@ class AjaxController extends AbstractController
                 Response::HTTP_NOT_FOUND
             );
         }
-        $executionResult = $this->get(ExecuteOperationHandler::class)->process($operation);
+        $executionResult = $this->container->get(ExecuteOperationHandler::class)->process($operation);
 
         return $this->handleExecutionResult($executionResult, $request);
     }
@@ -101,7 +100,7 @@ class AjaxController extends AbstractController
      */
     protected function prepareMessages(Collection $messages): array
     {
-        $translator = $this->get(TranslatorInterface::class);
+        $translator = $this->container->get(TranslatorInterface::class);
         $result = [];
         foreach ($messages as $message) {
             $result[] = isset($message['message'])

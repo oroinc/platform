@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type represents a multiple choice association to an entity
+ */
 class MultipleAssociationChoiceType extends AbstractAssociationType
 {
     /**
@@ -47,7 +50,9 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
             if ($existingValues === null) {
                 $existingValues = [];
             }
-            $event->setData(array_merge(array_intersect($existingValues, $immutable), $event->getData()));
+            $existingImmutableData = array_intersect($existingValues, $immutable);
+            $data = array_merge($existingImmutableData, $event->getData());
+            $event->setData($data);
         }
     }
 

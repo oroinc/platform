@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Security;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
-use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
@@ -18,90 +18,57 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
  * Authenticator guard for impersonated authentication.
  */
-class ImpersonationAuthenticator implements AuthenticatorInterface
+class ImpersonationAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {
-    const TOKEN_PARAMETER = '_impersonation_token';
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var UsernamePasswordOrganizationTokenFactoryInterface */
-    protected $tokenFactory;
-
-    /** @var OrganizationGuesserInterface */
-    protected $organizationGuesser;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var UrlGeneratorInterface */
-    protected $router;
+    public const TOKEN_PARAMETER = '_impersonation_token';
 
     public function __construct(
-        ManagerRegistry $doctrine,
-        UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,
-        OrganizationGuesserInterface $organizationGuesser,
-        EventDispatcherInterface $eventDispatcher,
-        UrlGeneratorInterface $router
+        private readonly ManagerRegistry $doctrine,
+        private UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,
+        private OrganizationGuesserInterface $organizationGuesser,
+        private EventDispatcherInterface $eventDispatcher,
+        private UrlGeneratorInterface $router
     ) {
-        $this->doctrine = $doctrine;
-        $this->tokenFactory = $tokenFactory;
-        $this->organizationGuesser = $organizationGuesser;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->router = $router;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(Request $request): bool
     {
         return $request->query->has(static::TOKEN_PARAMETER);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCredentials(Request $request)
+    public function authenticate(Request $request): Passport
     {
-        return $request->query->get(static::TOKEN_PARAMETER);
+        $impersonationToken = $this->getImpersonationToken($request);
+        if (null === $impersonationToken) {
+            throw new ImpersonationAuthenticationException('Impersonation token is not set.');
+        }
+        return new SelfValidatingPassport(
+            new UserBadge($impersonationToken, [$this, 'getUserByImpersonationToken'])
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        $impersonation = $this->getImpersonation($credentials);
-        $this->checkImpersonation($impersonation);
+        /** @var User $user */
+        $user = $passport->getUser();
+        $organization = $this->organizationGuesser->guess($user);
 
-        return $impersonation->getUser();
+        return $this->tokenFactory->create($user, $firewallName, $organization, $user->getUserRoles());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkCredentials($credentials, UserInterface $user)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $firewallName): ?Response
     {
-        // checks are already done in getImpersonation
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
-    {
-        $impersonation = $this->getImpersonation($this->getCredentials($request));
+        $impersonation = $this->getImpersonation($this->getImpersonationToken($request));
         $token->setAttribute('IMPERSONATION', $impersonation->getId());
 
         $event = new ImpersonationSuccessEvent($impersonation);
@@ -110,21 +77,25 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
         $impersonation->setLoginAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $impersonation->setIpAddress($request->getClientIp());
         $this->doctrine->getManager()->flush();
+
+        return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function getUserByImpersonationToken(string $impersonationToken): AbstractUser
+    {
+        $impersonation = $this->getImpersonation($impersonationToken);
+        $this->checkImpersonation($impersonation);
+
+        return $impersonation->getUser();
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
 
         return new RedirectResponse($this->router->generate('oro_user_security_login'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
         if ($authException) {
@@ -134,59 +105,28 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
         return new RedirectResponse($this->router->generate('oro_user_security_login'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsRememberMe()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createAuthenticatedToken(UserInterface $user, $providerKey)
-    {
-        /** @var User $user */
-        $organization = $this->organizationGuesser->guess($user);
-
-        if (!$organization) {
-            throw new BadUserOrganizationException("You don't have active organization assigned.");
-        }
-
-        return $this->tokenFactory->create($user, null, $providerKey, $organization, $user->getUserRoles());
-    }
-
-    /**
-     * Get Impersonation by token
-     *
-     * @param string $token
-     * @return Impersonation
-     */
-    protected function getImpersonation($token)
+    protected function getImpersonation(string $impersonationToken): ?Impersonation
     {
         return $this->doctrine
-            ->getRepository('OroUserBundle:Impersonation')
-            ->findOneBy(['token' => $token]);
+            ->getRepository(Impersonation::class)
+            ->findOneBy(['token' => $impersonationToken]);
     }
 
-    /**
-     * @throws AuthenticationCredentialsNotFoundException when token is not found
-     * @throws CustomUserMessageAuthenticationException when token is already used
-     * @throws CustomUserMessageAuthenticationException when token is expired
-     */
-    protected function checkImpersonation(Impersonation $impersonation = null)
+    private function getImpersonationToken(Request $request): ?string
+    {
+        return $request->query->get(static::TOKEN_PARAMETER);
+    }
+
+    private function checkImpersonation(Impersonation $impersonation = null): void
     {
         if (!$impersonation) {
             throw new AuthenticationCredentialsNotFoundException();
         }
-
         if ($impersonation->getLoginAt()) {
             $exception = new ImpersonationAuthenticationException('Impersonation token has already been used.');
             $exception->setUser($impersonation->getUser());
             throw $exception;
         }
-
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         if ($impersonation->getExpireAt() <= $now) {
             $exception = new ImpersonationAuthenticationException('Impersonation token has expired.');

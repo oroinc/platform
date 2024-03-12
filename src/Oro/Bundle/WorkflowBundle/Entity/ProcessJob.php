@@ -2,58 +2,41 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * @ORM\Table(
- *      "oro_process_job",
- *      indexes={
- *          @ORM\Index(name="process_job_entity_hash_idx", columns={"entity_hash"})
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository")
- */
+* Entity that represents Process Job
+*
+*/
+#[ORM\Entity(repositoryClass: ProcessJobRepository::class)]
+#[ORM\Table('oro_process_job')]
+#[ORM\Index(columns: ['entity_hash'], name: 'process_job_entity_hash_idx')]
 class ProcessJob
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: ProcessTrigger::class)]
+    #[ORM\JoinColumn(name: 'process_trigger_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?ProcessTrigger $processTrigger = null;
+
+    #[ORM\Column(name: 'entity_id', type: Types::INTEGER, nullable: true)]
+    protected ?int $entityId = null;
+
+    #[ORM\Column(name: 'entity_hash', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $entityHash = null;
 
     /**
-     * @var ProcessTrigger
-     *
-     * @ORM\ManyToOne(targetEntity="ProcessTrigger")
-     * @ORM\JoinColumn(name="process_trigger_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var string|null
      */
-    protected $processTrigger;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="entity_id", type="integer", nullable=true)
-     */
-    protected $entityId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_hash", type="string", length=255, nullable=true)
-     */
-    protected $entityHash;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="serialized_data", type="text", nullable=true)
-     */
+    #[ORM\Column(name: 'serialized_data', type: Types::TEXT, nullable: true)]
     protected $serializedData;
 
     /**
@@ -177,7 +160,7 @@ class ProcessJob
             } else {
                 $this->data = $this->serializer->deserialize(
                     $this->serializedData,
-                    'Oro\Bundle\WorkflowBundle\Model\ProcessData',
+                    ProcessData::class,
                     $this->serializeFormat,
                     array('processJob' => $this)
                 );

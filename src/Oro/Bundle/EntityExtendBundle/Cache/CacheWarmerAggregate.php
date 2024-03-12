@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Cache;
 use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as SymfonyCacheWarmerAggregate;
 
 /**
@@ -63,8 +64,10 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
 
     /**
      * {@inheritdoc}
+     * @param string $cacheDir
+     * @param SymfonyStyle|null $io
      */
-    public function warmUp($cacheDir): array
+    public function warmUp(string $cacheDir, string|SymfonyStyle $buildDir = null, SymfonyStyle $io = null): array
     {
         $cacheWarmerLink = $this->cacheWarmerLink;
         if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)

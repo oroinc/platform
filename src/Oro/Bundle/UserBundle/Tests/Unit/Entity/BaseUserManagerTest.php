@@ -112,6 +112,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         $salt = 'salt';
 
         $user = new User();
+        $user->setUserIdentifier('test');
         $user->setPlainPassword($password);
         $user->setSalt($salt);
 
@@ -226,7 +227,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         $username = 'test';
 
         $this->userLoader->expects(self::once())
-            ->method('loadUserByUsername')
+            ->method('loadUserByIdentifier')
             ->with($username)
             ->willReturn($user);
 

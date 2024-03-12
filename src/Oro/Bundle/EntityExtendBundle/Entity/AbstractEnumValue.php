@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
@@ -9,45 +10,26 @@ use Oro\Bundle\FormBundle\Entity\PriorityItem;
 
 /**
  * The base class for all entities represent values for a particular enum
- *
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 abstract class AbstractEnumValue implements Translatable, PriorityItem
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="id", type="string", length=32)
-     * @ORM\Id
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::STRING, length: 32)]
+    #[ORM\Id]
+    private ?string $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     * @Gedmo\Translatable
-     */
-    private $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    #[Gedmo\Translatable]
+    private ?string $name = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="priority", type="integer")
-     */
-    private $priority = 0;
+    #[ORM\Column(name: 'priority', type: Types::INTEGER)]
+    private ?int $priority = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="is_default", type="boolean")
-     */
-    private $default = false;
+    #[ORM\Column(name: 'is_default', type: Types::BOOLEAN)]
+    private ?bool $default = null;
 
-    /**
-     * @Gedmo\Locale
-     */
-    protected $locale;
+    #[Gedmo\Locale]
+    protected ?string $locale = null;
 
     /**
      * @param string  $id

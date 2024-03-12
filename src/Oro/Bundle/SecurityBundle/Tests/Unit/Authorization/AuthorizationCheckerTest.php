@@ -4,9 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authorization;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -20,8 +20,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectIdentityFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $objectIdentityFactory;
 
-    /** @var AclAnnotationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $annotationProvider;
+    /** @var AclAttributeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeProvider;
 
     /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $groupProvider;
@@ -36,39 +36,39 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $this->innerAuthorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->objectIdentityFactory = $this->createMock(ObjectIdentityFactory::class);
-        $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
+        $this->attributeProvider = $this->createMock(AclAttributeProvider::class);
         $this->groupProvider = $this->createMock(AclGroupProviderInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->authorizationChecker = new AuthorizationChecker(
             $this->innerAuthorizationChecker,
             $this->objectIdentityFactory,
-            $this->annotationProvider,
+            $this->attributeProvider,
             $this->groupProvider,
             $this->logger
         );
     }
 
-    public function testIsGrantedWithAclAnnotationIdAndNoObject(): void
+    public function testIsGrantedWithAclAttributeIdAndNoObject(): void
     {
         $oid = new ObjectIdentity('1', 'TestType');
-        $annotation = $this->createMock(Acl::class);
-        $annotation->expects(self::once())
+        $attribute = $this->createMock(Acl::class);
+        $attribute->expects(self::once())
             ->method('getId')
-            ->willReturn('method_annotation');
-        $annotation->expects(self::once())
+            ->willReturn('method_attribute');
+        $attribute->expects(self::once())
             ->method('getPermission')
             ->willReturn('TEST_PERMISSION');
         $this->groupProvider->expects(self::never())
             ->method('getGroup');
         $this->objectIdentityFactory->expects(self::once())
             ->method('get')
-            ->with($this->identicalTo($annotation))
+            ->with($this->identicalTo($attribute))
             ->willReturn($oid);
-        $this->annotationProvider->expects(self::once())
-            ->method('findAnnotationById')
-            ->with('TestAnnotation')
-            ->willReturn($annotation);
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
+            ->with('TestAttribute')
+            ->willReturn($attribute);
         $this->logger->expects(self::once())
             ->method('debug');
         $this->innerAuthorizationChecker->expects(self::once())
@@ -76,28 +76,28 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('TEST_PERMISSION', $this->identicalTo($oid))
             ->willReturn(true);
 
-        $result = $this->authorizationChecker->isGranted('TestAnnotation');
+        $result = $this->authorizationChecker->isGranted('TestAttribute');
         self::assertTrue($result);
     }
 
-    public function testIsGrantedWithAclAnnotationIdAndWithObject(): void
+    public function testIsGrantedWithAclAttributeIdAndWithObject(): void
     {
         $obj = new \stdClass();
-        $annotation = $this->createMock(Acl::class);
-        $annotation->expects(self::once())
+        $attribute = $this->createMock(Acl::class);
+        $attribute->expects(self::once())
             ->method('getId')
-            ->willReturn('method_annotation');
-        $annotation->expects(self::once())
+            ->willReturn('method_attribute');
+        $attribute->expects(self::once())
             ->method('getPermission')
             ->willReturn('TEST_PERMISSION');
         $this->groupProvider->expects(self::never())
             ->method('getGroup');
         $this->objectIdentityFactory->expects(self::never())
             ->method('get');
-        $this->annotationProvider->expects(self::once())
-            ->method('findAnnotationById')
-            ->with('TestAnnotation')
-            ->willReturn($annotation);
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
+            ->with('TestAttribute')
+            ->willReturn($attribute);
         $this->logger->expects(self::once())
             ->method('debug');
         $this->innerAuthorizationChecker->expects(self::once())
@@ -105,7 +105,7 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('TEST_PERMISSION', $this->identicalTo($obj))
             ->willReturn(true);
 
-        $result = $this->authorizationChecker->isGranted('TestAnnotation', $obj);
+        $result = $this->authorizationChecker->isGranted('TestAttribute', $obj);
         self::assertTrue($result);
     }
 
@@ -116,7 +116,7 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('getGroup');
         $this->objectIdentityFactory->expects(self::never())
             ->method(self::anything());
-        $this->annotationProvider->expects(self::never())
+        $this->attributeProvider->expects(self::never())
             ->method(self::anything());
         $this->logger->expects(self::never())
             ->method(self::anything());
@@ -132,8 +132,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsGrantedWithRoleName(): void
     {
-        $this->annotationProvider->expects(self::once())
-            ->method('findAnnotationById')
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
             ->with('TestRole')
             ->willReturn(null);
         $this->innerAuthorizationChecker->expects(self::once())
@@ -149,8 +149,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $oid = new ObjectIdentity('entity', 'SomeClass');
         $obj = 'entity:SomeClass';
-        $this->annotationProvider->expects(self::once())
-            ->method('findAnnotationById')
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
             ->with('PERMISSION')
             ->willReturn(null);
         $this->groupProvider->expects(self::once())
@@ -172,8 +172,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     public function testIsGrantedWithStringAndNotDefaultAclGroup(): void
     {
         $oid = new ObjectIdentity('entity', 'TestType');
-        $this->annotationProvider->expects(self::once())
-            ->method('findAnnotationById')
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
             ->with('PERMISSION')
             ->willReturn(null);
         $this->groupProvider->expects(self::once())
@@ -196,8 +196,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $oid = new ObjectIdentity('entity', 'SomeClass');
         $obj = 'entity:group@SomeClass';
-        $this->annotationProvider->expects(self::once())
-            ->method('findAnnotationById')
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
             ->with('PERMISSION')
             ->willReturn(null);
         $this->groupProvider->expects(self::never())
@@ -237,8 +237,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     public function testIsGrantedWithObject(): void
     {
         $obj = new \stdClass();
-        $this->annotationProvider->expects(self::once())
-            ->method('findAnnotationById')
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
             ->with('PERMISSION')
             ->willReturn(null);
         $this->innerAuthorizationChecker->expects(self::once())
@@ -253,8 +253,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     public function testIsGrantedForNotAclProtectedClass(): void
     {
         $obj = 'Test\Class';
-        $this->annotationProvider->expects(self::once())
-            ->method('findAnnotationById')
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
             ->with('PERMISSION')
             ->willReturn(null);
         $this->groupProvider->expects(self::once())

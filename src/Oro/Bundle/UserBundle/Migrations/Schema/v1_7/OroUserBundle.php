@@ -11,14 +11,13 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 class OroUserBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addOrganizationFields($schema);
-        self::oroUserOrganizationTable($schema);
-        self::oroUserOrganizationForeignKeys($schema);
-        self::removeRoleOwner($schema, $queries);
+        $this->addOrganizationFields($schema);
+        $this->createOroUserOrganizationTable($schema);
+        $this->removeRoleOwner($schema, $queries);
 
         //Add organization fields to ownership entity config
         $queries->addQuery(
@@ -30,8 +29,6 @@ class OroUserBundle implements Migration
                 ]
             )
         );
-
-        //Add organization fields to ownership entity config
         $queries->addQuery(
             new UpdateOwnershipTypeQuery(
                 'Oro\Bundle\UserBundle\Entity\User',
@@ -43,7 +40,7 @@ class OroUserBundle implements Migration
         );
     }
 
-    public static function removeRoleOwner(Schema $schema, QueryBag $queries)
+    private function removeRoleOwner(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_access_role');
         if ($table->hasColumn('business_unit_owner_id')) {
@@ -101,29 +98,14 @@ class OroUserBundle implements Migration
         }
     }
 
-    /**
-     * Generate table oro_user_organization
-     */
-    public static function oroUserOrganizationTable(Schema $schema)
+    private function createOroUserOrganizationTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_user_organization');
-
-        $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('organization_id', 'integer', []);
-
+        $table->addColumn('user_id', 'integer');
+        $table->addColumn('organization_id', 'integer');
         $table->setPrimaryKey(['user_id', 'organization_id']);
-
-        $table->addIndex(['user_id'], 'IDX_A9BB6519A76ED395', []);
-        $table->addIndex(['organization_id'], 'IDX_A9BB651932C8A3DE', []);
-    }
-
-    /**
-     * Generate foreign keys for table oro_user_organization
-     */
-    public static function oroUserOrganizationForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_user_organization');
-
+        $table->addIndex(['user_id'], 'IDX_A9BB6519A76ED395');
+        $table->addIndex(['organization_id'], 'IDX_A9BB651932C8A3DE');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
@@ -138,14 +120,11 @@ class OroUserBundle implements Migration
         );
     }
 
-    /**
-     * Adds organization_id field
-     */
-    public static function addOrganizationFields(Schema $schema)
+    private function addOrganizationFields(Schema $schema): void
     {
         $table = $schema->getTable('oro_access_group');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'IDX_FEF9EDB732C8A3DE', []);
+        $table->addIndex(['organization_id'], 'IDX_FEF9EDB732C8A3DE');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
@@ -155,7 +134,7 @@ class OroUserBundle implements Migration
 
         $table = $schema->getTable('oro_user');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'IDX_F82840BC32C8A3DE', []);
+        $table->addIndex(['organization_id'], 'IDX_F82840BC32C8A3DE');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],

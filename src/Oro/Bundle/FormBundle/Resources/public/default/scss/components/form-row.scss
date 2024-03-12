@@ -11,11 +11,37 @@
 
     &--offset {
         &-s {
-            margin-bottom: $offset-y-s;
+            margin-bottom: spacing('xs');
         }
 
         &-none {
             margin-bottom: 0;
+        }
+    }
+}
+
+.form-quantity-row {
+    position: relative;
+
+    .input {
+        padding-left: $input-btn-size;
+        padding-right: $input-btn-size;
+    }
+
+    .input-quantity-btn {
+        position: absolute;
+        top: 1px;
+        bottom: 1px;
+        min-height: $form-row-input-button-min-height;
+        padding: $form-row-input-button-padding;
+        color: $form-row-input-button-color;
+
+        &--minus {
+            left: 1px;
+        }
+
+        &--plus {
+            right: 1px;
         }
     }
 }

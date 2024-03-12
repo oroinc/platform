@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * REST API controller for Process entity.
@@ -21,16 +24,11 @@ class ProcessController extends AbstractFOSRestController
      * - HTTP_OK (200)
      *
      * @ApiDoc(description="Activate process", resource=true)
-     * @Acl(
-     *      id="oro_process_definition_update",
-     *      type="entity",
-     *      class="OroWorkflowBundle:ProcessDefinition",
-     *      permission="EDIT"
-     * )
      *
      * @param ProcessDefinition $processDefinition
      * @return Response
      */
+    #[Acl(id: 'oro_process_definition_update', type: 'entity', class: ProcessDefinition::class, permission: 'EDIT')]
     public function activateAction(ProcessDefinition $processDefinition)
     {
         $processDefinition->setEnabled(true);
@@ -42,7 +40,8 @@ class ProcessController extends AbstractFOSRestController
         return $this->handleView(
             $this->view(
                 array(
-                    'message'    => $this->get('translator')->trans('oro.workflow.notification.process.activated'),
+                    'message'    => $this->container->get('translator')
+                        ->trans('oro.workflow.notification.process.activated'),
                     'successful' => true,
                 ),
                 Response::HTTP_OK
@@ -57,11 +56,11 @@ class ProcessController extends AbstractFOSRestController
      * - HTTP_OK (204)
      *
      * @ApiDoc(description="Deactivate process", resource=true)
-     * @AclAncestor("oro_process_definition_update")
      *
      * @param ProcessDefinition $processDefinition
      * @return Response
      */
+    #[AclAncestor('oro_process_definition_update')]
     public function deactivateAction(ProcessDefinition $processDefinition)
     {
         $processDefinition->setEnabled(false);
@@ -73,7 +72,8 @@ class ProcessController extends AbstractFOSRestController
         return $this->handleView(
             $this->view(
                 array(
-                    'message'    => $this->get('translator')->trans('oro.workflow.notification.process.deactivated'),
+                    'message'    => $this->container->get('translator')
+                        ->trans('oro.workflow.notification.process.deactivated'),
                     'successful' => true,
                 ),
                 Response::HTTP_OK
@@ -84,10 +84,21 @@ class ProcessController extends AbstractFOSRestController
     /**
      * Get entity Manager
      *
-     * @return \Doctrine\Persistence\ObjectManager
+     * @return ObjectManager
      */
     protected function getManager()
     {
-        return $this->getDoctrine()->getManagerForClass('OroWorkflowBundle:ProcessDefinition');
+        return $this->container->get('doctrine')->getManagerForClass(ProcessDefinition::class);
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'doctrine' => ManagerRegistry::class,
+                'translator' => TranslatorInterface::class,
+            ]
+        );
     }
 }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Controller;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -23,20 +23,14 @@ class OrganizationController extends AbstractController
 {
     /**
      * Edit organization form
-     *
-     * @Route("/update_current", name="oro_organization_update_current")
-     * @Template("@OroOrganization/Organization/update.html.twig")
-     * @Acl(
-     *      id="oro_organization_update",
-     *      type="entity",
-     *      class="OroOrganizationBundle:Organization",
-     *      permission="EDIT"
-     * )
      */
+    #[Route(path: '/update_current', name: 'oro_organization_update_current')]
+    #[Template('@OroOrganization/Organization/update.html.twig')]
+    #[Acl(id: 'oro_organization_update', type: 'entity', class: Organization::class, permission: 'EDIT')]
     public function updateCurrentAction(Request $request)
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->get(TokenStorageInterface::class)->getToken();
+        $token = $this->container->get(TokenStorageInterface::class)->getToken();
         $organization = $token->getOrganization();
 
         return $this->update($organization, $request);
@@ -49,19 +43,19 @@ class OrganizationController extends AbstractController
      */
     protected function update(Organization $entity, Request $request)
     {
-        $organizationForm = $this->get(FormFactoryInterface::class)->createNamed(
+        $organizationForm = $this->container->get(FormFactoryInterface::class)->createNamed(
             'oro_organization_form',
             OrganizationType::class,
             $entity
         );
 
-        if ($this->get(OrganizationHandler::class)->process($entity, $organizationForm)) {
+        if ($this->container->get(OrganizationHandler::class)->process($entity, $organizationForm)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.organization.controller.message.saved')
+                $this->container->get(TranslatorInterface::class)->trans('oro.organization.controller.message.saved')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [

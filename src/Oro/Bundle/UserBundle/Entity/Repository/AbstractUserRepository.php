@@ -25,7 +25,7 @@ class AbstractUserRepository extends EntityRepository
         $connection = $this->getEntityManager()
             ->getConnection();
 
-        return (bool) $connection->fetchAll(
+        return (bool) $connection->fetchAllAssociative(
             'SELECT 1
             FROM information_schema.columns
             WHERE TABLE_SCHEMA = ?
@@ -83,7 +83,7 @@ class AbstractUserRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('u');
         $qb->select('u.emailLowercase')
-            ->groupBy('u.emailLowercase')
+            ->groupBy('u.emailLowercase', 'u.organization')
             ->having($qb->expr()->gt('COUNT(u.id)', 1))
             ->setMaxResults($limit);
 

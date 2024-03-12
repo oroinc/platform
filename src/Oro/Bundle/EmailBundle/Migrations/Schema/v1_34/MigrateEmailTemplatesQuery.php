@@ -104,7 +104,7 @@ class MigrateEmailTemplatesQuery extends ParametrizedMigrationQuery
 
             $stm = $qb->execute();
 
-            foreach ($stm->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            foreach ($stm->fetchAllAssociative() as $row) {
                 if (preg_match(self::EMPTY_REGEX, $row['content'])) {
                     $row['content'] = null;
                 }

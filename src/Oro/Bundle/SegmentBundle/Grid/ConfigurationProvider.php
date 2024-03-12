@@ -5,7 +5,6 @@ namespace Oro\Bundle\SegmentBundle\Grid;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
@@ -67,13 +66,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
      */
     public function isConfigurationValid(string $gridName): bool
     {
-        try {
-            $this->getConfiguration($gridName);
-        } catch (InvalidConfigurationException $e) {
-            return false;
-        }
-
-        return true;
+        return $this->isValidConfiguration($gridName);
     }
 
     /**
@@ -82,5 +75,16 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
     public function getBuilder(): DatagridConfigurationBuilder
     {
         return $this->builder;
+    }
+
+    public function isValidConfiguration(string $gridName): bool
+    {
+        try {
+            $this->getConfiguration($gridName);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return true;
     }
 }

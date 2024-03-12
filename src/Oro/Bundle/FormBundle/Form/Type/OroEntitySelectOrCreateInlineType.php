@@ -136,7 +136,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                             $options['new_item_property_name'],
                             $options['new_item_allow_empty_property'],
                             $options['new_item_value_path'],
-                            $this->isCreateGranted($options)
+                            $options['create_enabled'] && $this->isCreateGranted($options)
                         );
                     }
 

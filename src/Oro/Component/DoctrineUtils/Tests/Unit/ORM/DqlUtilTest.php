@@ -2,9 +2,8 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
@@ -16,7 +15,7 @@ class DqlUtilTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
     }
 
     /**
@@ -127,7 +126,7 @@ DQL
             [
                 <<<DQL
 SELECT eu.id
-FROM OroEmailBundle:EmailUser eu
+FROM Oro\Bundle\EmailBundle\Entity\EmailUser eu
 LEFT JOIN eu.email e
 LEFT JOIN eu.mailboxOwner mb
 LEFT JOIN e.recipients r_to
@@ -136,7 +135,7 @@ LEFT JOIN f.origin o
 LEFT JOIN e.emailBody eb
 WHERE (EXISTS(
     SELECT 1
-    FROM OroEmailBundle:EmailOrigin _eo
+    FROM Oro\Bundle\EmailBundle\Entity\EmailOrigin _eo
     JOIN _eo.folders _f
     JOIN _f.emailUsers _eu
     WHERE _eo.isActive = true AND _eu.id = eu.id
@@ -159,7 +158,7 @@ DQL
                 ],
                 <<<DQL
 SELECT eur.id
-FROM OroEmailBundle:EmailUser eur
+FROM Oro\Bundle\EmailBundle\Entity\EmailUser eur
 LEFT JOIN eur.email er
 LEFT JOIN eur.mailboxOwner mbr
 LEFT JOIN er.recipients r_tor
@@ -168,7 +167,7 @@ LEFT JOIN fr.origin or
 LEFT JOIN er.emailBody ebr
 WHERE (EXISTS(
     SELECT 1
-    FROM OroEmailBundle:EmailOrigin _eor
+    FROM Oro\Bundle\EmailBundle\Entity\EmailOrigin _eor
     JOIN _eor.folders _fr
     JOIN _fr.emailUsers _eur
     WHERE _eor.isActive = true AND _eur.id = eur.id

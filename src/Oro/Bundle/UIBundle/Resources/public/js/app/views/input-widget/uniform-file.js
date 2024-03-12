@@ -5,6 +5,7 @@ define(function(require) {
     const __ = require('orotranslation/js/translator');
     const $ = require('jquery');
     const clearButtonTemplate = require('tpl-loader!oroui/templates/clear_button.html');
+    const config = require('module-config').default(module.id);
     require('jquery.uniform');
 
     const UniformFileInputWidgetView = AbstractInputWidgetView.extend({
@@ -33,6 +34,8 @@ define(function(require) {
          * @inheritdoc
          */
         initializeWidget: function(options) {
+            this.initializeOptions = Object.assign({}, this.initializeOptions, config);
+
             UniformFileInputWidgetView.__super__.initializeWidget.call(this, options);
             if (this.$el.is('.error')) {
                 this.$el.removeClass('error');

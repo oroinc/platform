@@ -2,41 +2,29 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * Email addresses visibility. Collected information for each known email address.
- *
- * @ORM\Table(name="oro_email_address_visibility")
- * @ORM\Entity()
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_email_address_visibility')]
+#[ORM\HasLifecycleCallbacks]
 class EmailAddressVisibility
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=255)
-     * @ORM\Id
-     */
-    private $email;
+    #[ORM\Column(name: 'email', type: Types::STRING, length: 255)]
+    #[ORM\Id]
+    private ?string $email = null;
 
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
-     * @ORM\Id
-     */
-    private $organization;
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\Id]
+    private ?Organization $organization = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_visible", type="boolean")
-     */
-    private $isVisible;
+    #[ORM\Column(name: 'is_visible', type: Types::BOOLEAN)]
+    private ?bool $isVisible = null;
 
     public function getEmail(): string
     {

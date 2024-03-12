@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -13,11 +12,6 @@ use Psr\Log\LoggerInterface;
  */
 class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
     /**
      * {@inheritdoc}
      */
@@ -47,7 +41,7 @@ class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT id, class_name, data FROM oro_entity_config';
         $this->logQuery($logger, $sql);
 
-        $entityConfigs = $this->connection->fetchAll($sql);
+        $entityConfigs = $this->connection->fetchAllAssociative($sql);
         $entityConfigs = array_map(function ($entityConfig) {
             $entityConfig['data'] = empty($entityConfig['data'])
                 ? []

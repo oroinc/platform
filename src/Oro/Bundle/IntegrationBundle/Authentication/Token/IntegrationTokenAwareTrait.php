@@ -34,7 +34,6 @@ trait IntegrationTokenAwareTrait
 
         $token = $this->tokenStorage->getToken();
         $token->setUser($user);
-        $token->setAuthenticated(true);
 
         if ($token instanceof OrganizationAwareTokenInterface) {
             $token->setOrganization($integration->getOrganization());

@@ -2,34 +2,27 @@
 
 namespace Oro\Bundle\SearchBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\MappedSuperclass
+ * Base entity for integer index.
  */
+#[ORM\MappedSuperclass]
 abstract class AbstractIndexInteger implements ItemFieldInterface
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="field", type="string", length=250, nullable=false)
-     */
-    protected $field;
+    #[ORM\Column(name: 'field', type: Types::STRING, length: 250, nullable: false)]
+    protected ?string $field = null;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="value", type="integer", nullable=false)
      */
+    #[ORM\Column(name: 'value', type: Types::BIGINT, nullable: false)]
     protected $value;
 
     /**

@@ -256,17 +256,17 @@ services:
         arguments:
           - !tagged_iterator oro_navigation.title_reader
 
-    oro_navigation.title_annotations_reader:
-        class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
+    oro_navigation.title_attribute_reader:
+        class: Oro\Bundle\NavigationBundle\Title\TitleReader\TitleAttributeReader
         public: false
         parent: oro.static_config_provider.abstract
         arguments:
-            - '%kernel.cache_dir%/oro/title_annotations.php'
+            - '%kernel.cache_dir%/oro/title_attributes.php'
             - '%kernel.debug%'
             - '@oro_ui.controller_class_provider'
-            - '@annotation_reader'
+            - '@oro_platform.attribute_reader'
         tags:
-            - { name: oro_navigation.title_reader, priority: 10}
+            - { name: oro_navigation.title_reader, priority: 10 }
 
     oro_navigation.title_config_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader

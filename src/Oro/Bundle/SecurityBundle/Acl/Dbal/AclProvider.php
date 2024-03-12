@@ -9,7 +9,6 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Dbal;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\ParameterType;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
@@ -89,7 +88,7 @@ class AclProvider implements AclProviderInterface
         [$sql, $params, $types] = $this->getFindChildrenSql($parentOid, $directChildrenOnly);
 
         $children = [];
-        foreach ($this->connection->executeQuery($sql, $params, $types)->fetchAll() as $data) {
+        foreach ($this->connection->executeQuery($sql, $params, $types)->fetchAllAssociative() as $data) {
             $children[] = new ObjectIdentity($data['object_identifier'], $data['class_type']);
         }
 
@@ -389,7 +388,7 @@ class AclProvider implements AclProviderInterface
     {
         [$sql, $params, $types] = $this->getSelectObjectIdentityIdSql($oid);
 
-        return $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
+        return $this->connection->executeQuery($sql, $params, $types)->fetchOne();
     }
 
     /**
@@ -428,7 +427,7 @@ class AclProvider implements AclProviderInterface
         [$sql, $params, $types] = $this->getAncestorLookupSql($batch);
 
         $ancestorIds = [];
-        foreach ($this->connection->executeQuery($sql, $params, $types)->fetchAll() as $data) {
+        foreach ($this->connection->fetchAllAssociative($sql, $params, $types) as $data) {
             // FIXME: skip ancestors which are cached
             // Fix: Oracle returns keys in uppercase
             $ancestorIds[] = reset($data);
@@ -483,9 +482,9 @@ class AclProvider implements AclProviderInterface
         }
 
         [$sql, $params, $types] = $this->getLookupSqlBySids($ancestorIds, $sids);
-        $stmt = $this->connection->executeQuery($sql, $params, $types);
+        $objectIdentities = $this->connection->fetchAllNumeric($sql, $params, $types);
 
-        return $this->hydrateObjectIdentities($stmt, $oidLookup, $sids);
+        return $this->hydrateObjectIdentities($objectIdentities, $oidLookup, $sids);
     }
 
     /**
@@ -497,7 +496,7 @@ class AclProvider implements AclProviderInterface
      * Keep in mind that changes to this method might severely reduce the
      * performance of the entire ACL system.
      *
-     * @param Statement $stmt
+     * @param array $objectIdentities
      * @param array     $oidLookup
      * @param array     $sids
      *
@@ -508,7 +507,7 @@ class AclProvider implements AclProviderInterface
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    private function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids)
+    private function hydrateObjectIdentities(array $objectIdentities, array $oidLookup, array $sids)
     {
         $parentIdToFill = new \SplObjectStorage();
         $acls = $aces = $emptyArray = [];
@@ -531,7 +530,7 @@ class AclProvider implements AclProviderInterface
 
         // fetchAll() consumes more memory than consecutive calls to fetch(),
         // but it is faster
-        foreach ($stmt->fetchAll(\PDO::FETCH_NUM) as $data) {
+        foreach ($objectIdentities as $data) {
             [
                 $aclId,
                 $objectIdentifier,

@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder as MaskBuilder;
@@ -141,8 +141,8 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
 
             return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
         }
-        if ($val instanceof AclAnnotation) {
-            throw new \InvalidArgumentException('Workflow ACL Extension does not support ACL annotations.');
+        if ($val instanceof AclAttribute) {
+            throw new \InvalidArgumentException('Workflow ACL Extension does not support ACL attributes.');
         }
 
         return $this->fromDomainObject($val);

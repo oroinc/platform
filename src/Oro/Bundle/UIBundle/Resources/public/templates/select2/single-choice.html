@@ -12,6 +12,11 @@
        aria-haspopup="listbox"
        aria-expanded="false"
     >
+        <% if (obj.extraLabel) { %>
+            <span aria-hidden="true"
+                  class="select2-chosen-extra <% if (obj.extraLabelClass) { %><%- obj.extraLabelClass %><% } %>"
+            ><%- extraLabel %></span>
+        <% } %>
         <span id="<%- chosenId %>"
               class="select2-chosen"
               role="textbox"
@@ -34,7 +39,7 @@
         <div class="select2-search">
             <input type="text"
                    autocomplete="off"
-                   class="select2-input"
+                   class="select2-input select2-input-single"
                    role="searchbox"
                    aria-autocomplete="list"
                    aria-controls="<%- resultsId %>"

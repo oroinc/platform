@@ -9,17 +9,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroConfigBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_2';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroConfigTable($schema);
@@ -32,7 +32,7 @@ class OroConfigBundleInstaller implements Installation
     /**
      * Create oro_config table
      */
-    protected function createOroConfigTable(Schema $schema)
+    private function createOroConfigTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_config');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -45,7 +45,7 @@ class OroConfigBundleInstaller implements Installation
     /**
      * Create oro_config_value table
      */
-    protected function createOroConfigValueTable(Schema $schema)
+    private function createOroConfigValueTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_config_value');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -56,17 +56,17 @@ class OroConfigBundleInstaller implements Installation
         $table->addColumn('object_value', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
         $table->addColumn('array_value', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('type', 'string', ['length' => 20]);
-        $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('created_at', 'datetime');
+        $table->addColumn('updated_at', 'datetime');
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name', 'section', 'config_id'], 'CONFIG_VALUE_UQ_ENTITY');
-        $table->addIndex(['config_id'], 'IDX_DAF6DF5524DB0683', []);
+        $table->addIndex(['config_id'], 'IDX_DAF6DF5524DB0683');
     }
 
     /**
      * Add oro_config_value foreign keys.
      */
-    protected function addOroConfigValueForeignKeys(Schema $schema)
+    private function addOroConfigValueForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_config_value');
         $table->addForeignKeyConstraint(

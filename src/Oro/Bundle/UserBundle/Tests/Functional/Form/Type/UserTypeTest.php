@@ -130,9 +130,9 @@ class UserTypeTest extends WebTestCase
 
         /** @var User $expectedUser */
         $expectedUser = $this->getReference(LoadUserData::SIMPLE_USER);
-        $actualUsername = self::getContainer()->get('security.token_storage')->getToken()->getUsername();
+        $actualUsername = self::getContainer()->get('security.token_storage')->getToken()->getUserIdentifier();
 
-        self::assertEquals($expectedUser->getUsername(), $actualUsername);
+        self::assertEquals($expectedUser->getUserIdentifier(), $actualUsername);
     }
 
     private function assertMessage(RawMessage $symfonyEmail, string $email, string $plainPassword): void

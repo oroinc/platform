@@ -4,56 +4,37 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Table(name="test_api_custom_id")
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_custom_id')]
 class TestCustomIdentifier implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    public $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    public ?int $id = null;
+
+    #[ORM\Column(name: '`key`', type: Types::STRING, unique: true, nullable: false)]
+    public ?string $key = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
+    public ?string $name = null;
+
+    #[ORM\ManyToOne(targetEntity: TestCustomIdentifier::class)]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
+    protected ?TestCustomIdentifier $parent = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="`key`", type="string", nullable=false, unique=true)
+     * @var Collection<int, TestCustomIdentifier>
      */
-    public $key;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", nullable=true)
-     */
-    public $name;
-
-    /**
-     * @var TestCustomIdentifier|null
-     *
-     * @ORM\ManyToOne(targetEntity="TestCustomIdentifier")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
-     */
-    protected $parent;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\ManyToMany(targetEntity="TestCustomIdentifier")
-     * @ORM\JoinTable(name="test_api_custom_id_children",
-     *      joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="child_id", referencedColumnName="id")}
-     * )
-     */
-    protected $children;
+    #[ORM\ManyToMany(targetEntity: TestCustomIdentifier::class)]
+    #[ORM\JoinTable(name: 'test_api_custom_id_children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'child_id', referencedColumnName: 'id')]
+    protected ?Collection $children = null;
 
     public function __construct()
     {

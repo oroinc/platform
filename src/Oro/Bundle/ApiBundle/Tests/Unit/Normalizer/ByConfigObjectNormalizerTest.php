@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
@@ -64,7 +63,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
             ->willReturn($this->associationAccessExclusionProvider);
 
         $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -467,7 +466,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         ];
 
         $product = $this->createProductObject();
-        $product->getOwner()->setGroups($product->getOwner()->getGroups()->toArray());
+        $product->getOwner()->setGroups($product->getOwner()->getGroups());
 
         $this->associationAccessExclusionProvider->expects(self::any())
             ->method('isIgnoreAssociationAccessCheck')

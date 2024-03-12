@@ -90,9 +90,11 @@ abstract class AbstractScopeManager
     public function set(string $name, mixed $value, object|int|null $scopeIdentifier = null): void
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
+        [$section, $key] = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+        $settings = $this->normalizeSettings([$section => [$key => [ConfigManager::VALUE_KEY => $value]]]);
 
         $this->changedSettings[$entityId][$name] = [
-            ConfigManager::VALUE_KEY                  => $value,
+            ConfigManager::VALUE_KEY => $settings[$section][$key][ConfigManager::VALUE_KEY],
             ConfigManager::USE_PARENT_SCOPE_VALUE_KEY => false
         ];
     }
@@ -376,16 +378,12 @@ abstract class AbstractScopeManager
 
     protected function normalizeSettingValue(string $dataType, mixed $value): mixed
     {
-        switch ($dataType) {
-            case 'integer':
-                return (int) $value;
-            case 'decimal':
-                return (float) $value;
-            case 'boolean':
-                return (bool) $value;
-            default:
-                return null;
-        }
+        return match ($dataType) {
+            'integer' => (int) $value,
+            'decimal', 'float' => (float) $value,
+            'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            default => $value
+        };
     }
 
     protected function getCacheKey(string $entity, ?int $entityId): string

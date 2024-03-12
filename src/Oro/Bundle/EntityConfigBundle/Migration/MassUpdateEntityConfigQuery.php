@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
  */
 class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 {
+    use ConnectionAwareTrait;
+
     /**
      * @var string
      */
@@ -29,11 +31,6 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
     protected $valuesForUpdate;
 
     /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * @var null|array
      */
     protected $entityConfigRecordData = null;
@@ -48,14 +45,6 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         $this->entityName = $entityName;
         $this->valuesForRemove = $valuesForRemove;
         $this->valuesForUpdate = $valuesForUpdate;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
     }
 
     /**
@@ -94,7 +83,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
 
             $parameters = [$entityConfigId, $scope];
             $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
             $this->logQuery($logger, $sql, $parameters);
 
             $logger->debug($sql);
@@ -113,7 +102,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
                 $value = $this->convertEntityConfigIndexValueToDatabaseValue($value);
                 $parameters = [$value, $entityConfigId, $scope, $code];
                 $statement = $this->connection->prepare($sql);
-                $statement->execute($parameters);
+                $statement->executeQuery($parameters);
                 $this->logQuery($logger, $sql, $parameters);
 
                 $logger->debug($sql);
@@ -162,7 +151,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
         $parameters = [$entityConfigData, $entityConfigRecordData['id']];
         $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
+        $statement->executeQuery($parameters);
         $this->logQuery($logger, $sql, $parameters);
     }
 
@@ -174,7 +163,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         if (is_null($this->entityConfigRecordData)) {
             $this->entityConfigRecordData = $this
                 ->connection
-                ->fetchAssoc(
+                ->fetchAssociative(
                     'SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1',
                     [$this->entityName]
                 );

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -41,7 +42,7 @@ class WorkflowDefinitionSelectType extends AbstractType
         $resolver->setDefined(['workflow_entity_class', 'workflow_name']);
         $resolver->setDefaults(
             [
-                'class' => 'OroWorkflowBundle:WorkflowDefinition',
+                'class' => WorkflowDefinition::class,
                 'choice_label' => 'label'
             ]
         );

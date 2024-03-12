@@ -2,26 +2,15 @@
 
 namespace Oro\Bundle\DashboardBundle\Migrations\Schema\v1_7;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroDashboardBundle implements Migration, DatabasePlatformAwareInterface
 {
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDatabasePlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
-    }
+    use DatabasePlatformAwareTrait;
 
     /**
      * {@inheritdoc}

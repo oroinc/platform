@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
@@ -251,6 +252,11 @@ class AttributeManager
             ->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]);
     }
 
+    public function isSearchable(FieldConfigModel $attribute): bool
+    {
+        return $this->getConfig($attribute, 'attribute')->is('searchable');
+    }
+
     /**
      * @param FieldConfigModel $attribute
      *
@@ -321,6 +327,14 @@ class AttributeManager
         }
 
         return null;
+    }
+
+    private function getConfig(FieldConfigModel $attribute, string $scope): ConfigInterface
+    {
+        $className = $attribute->getEntity()->getClassName();
+        $fieldName = $attribute->getFieldName();
+
+        return $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
     }
 
     /**

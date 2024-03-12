@@ -103,10 +103,10 @@ class FixRestoredFieldsQuery extends ParametrizedMigrationQuery
         $fieldSql = 'SELECT entity_id, id, field_name as name, data FROM oro_entity_config_field';
 
         $this->logQuery($logger, $entitySql);
-        $entityRows = $this->connection->fetchAll($entitySql);
+        $entityRows = $this->connection->fetchAllAssociative($entitySql);
 
         $this->logQuery($logger, $fieldSql);
-        $fieldRows = $this->connection->fetchAll($fieldSql);
+        $fieldRows = $this->connection->fetchAllAssociative($fieldSql);
 
         $result = [];
         foreach ($entityRows as $row) {

@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Updates entity config index field value.
+ */
 class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, ConnectionAwareInterface
 {
+    use ConnectionAwareTrait;
+
     /**
      * @var string
      */
@@ -36,11 +41,6 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
     protected $value;
 
     /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * @var null|string
      */
     protected $replaceValue;
@@ -61,14 +61,6 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
         $this->code         = $code;
         $this->value        = $value;
         $this->replaceValue = $replaceValue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
     }
 
     /**
@@ -129,7 +121,7 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
 
         if (!$dryRun) {
             $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
         }
     }
 

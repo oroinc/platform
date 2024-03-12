@@ -2,30 +2,25 @@
 
 namespace Oro\Bundle\ReportBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="oro_report_type")
- */
+* Entity that represents Report Type
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_report_type')]
 class ReportType
 {
     const TYPE_TABLE = 'TABLE';
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=32)
-     * @ORM\Id
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 32)]
+    #[ORM\Id]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", length=255, unique=true)
-     */
-    protected $label;
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255, unique: true)]
+    protected ?string $label = null;
 
     /**
      * @param string $name

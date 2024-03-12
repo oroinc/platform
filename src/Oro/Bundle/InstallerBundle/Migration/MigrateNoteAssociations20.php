@@ -59,7 +59,7 @@ class MigrateNoteAssociations20
     {
         $result = [];
         $noteClassName = 'Oro\Bundle\NoteBundle\Entity\Note';
-        $row = $this->connection->fetchAssoc(
+        $row = $this->connection->fetchAssociative(
             'SELECT data FROM oro_entity_config WHERE class_name = :class LIMIT 1',
             ['class' => $noteClassName],
             ['class' => 'string']

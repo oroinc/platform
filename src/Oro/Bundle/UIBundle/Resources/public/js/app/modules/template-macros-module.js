@@ -38,5 +38,18 @@ macros('oroui', {
      * @param {Object|string} data.class optional
      * @param {Object|string} data.dir optional
      */
-    renderDirection: require('tpl-loader!oroui/templates/macros/direction.html')
+    renderDirection: require('tpl-loader!oroui/templates/macros/direction.html'),
+
+    /**
+     * Renders svg icon
+     *
+     * @param {Object} data
+     * @param {Object|string} data.id
+     * @param {Object|string} data.width optional
+     * @param {Object|string} data.height optional
+     * @param {Object|string} data.role optional
+     * @param {Object|string} data.fill optional
+     * @param {string?} data.ariaHidden optional
+     */
+    renderIcon: require('tpl-loader!oroui/templates/macros/svg-icon.html')
 });

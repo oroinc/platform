@@ -129,7 +129,7 @@ class BaseUserManager
      */
     public function findUserByUsername(string $username): ?UserInterface
     {
-        return $this->userLoader->loadUserByUsername($username);
+        return $this->userLoader->loadUserByIdentifier($username);
     }
 
     /**

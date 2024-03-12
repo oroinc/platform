@@ -45,7 +45,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     /**
      * {@inheritDoc}
      */
-    public function getValue($objectOrArray, $propertyPath)
+    public function getValue($objectOrArray, $propertyPath): mixed
     {
         return $this->propertyAccessor->getValue($objectOrArray, $propertyPath);
     }
@@ -53,7 +53,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     /**
      * {@inheritDoc}
      */
-    public function isWritable($objectOrArray, $propertyPath)
+    public function isWritable($objectOrArray, $propertyPath): bool
     {
         return $this->propertyAccessor->isWritable($objectOrArray, $propertyPath);
     }
@@ -61,7 +61,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     /**
      * {@inheritDoc}
      */
-    public function isReadable($objectOrArray, $propertyPath)
+    public function isReadable($objectOrArray, $propertyPath): bool
     {
         return $this->propertyAccessor->isReadable($objectOrArray, $propertyPath);
     }

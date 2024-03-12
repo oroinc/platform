@@ -8,6 +8,9 @@ use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Migrations to change class fields
+ */
 class UpdateTableFieldQuery extends ParametrizedMigrationQuery
 {
     /**
@@ -89,7 +92,7 @@ class UpdateTableFieldQuery extends ParametrizedMigrationQuery
         }
 
         $this->connection
-            ->exec("UPDATE $table SET $column = REPLACE($column, '$from', '$to') 
+            ->executeStatement("UPDATE $table SET $column = REPLACE($column, '$from', '$to') 
                     WHERE $column LIKE '%$preparedFrom%'");
     }
 

@@ -4,28 +4,32 @@ namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateUserEntitiesWithOrganization;
 
+/**
+ * Creates "main" dashboard.
+ */
 class LoadDashboardData extends AbstractDashboardFixture implements DependentFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData',
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateUserEntitiesWithOrganization'
+            LoadAdminUserData::class,
+            UpdateUserEntitiesWithOrganization::class
         ];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $mainDashboard = $this->createAdminDashboardModel($manager, 'main');
         $mainDashboard->addWidget($this->createWidgetModel('quick_launchpad', [0, 10]));
-
         $manager->flush();
     }
 }

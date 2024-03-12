@@ -6,9 +6,12 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -47,7 +50,7 @@ class EmailRepository extends EntityRepository
     /**
      * Finds messageId of the Email specified by id.
      *
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
     public function findMessageIdByEmailId(int $id): ?string
     {
@@ -111,7 +114,7 @@ class EmailRepository extends EntityRepository
     ) {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('COUNT(DISTINCT IDENTITY(eu.email))')
-            ->from('OroEmailBundle:EmailUser', 'eu')
+            ->from(EmailUser::class, 'eu')
             ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
             ->setParameter('organization', $organization)
@@ -141,7 +144,7 @@ class EmailRepository extends EntityRepository
      */
     public function getCountNewEmailsPerFolders(User $user, Organization $organization)
     {
-        $repository = $this->getEntityManager()->getRepository('OroEmailBundle:EmailUser');
+        $repository = $this->getEntityManager()->getRepository(EmailUser::class);
 
         $qb = $repository->createQueryBuilder('eu')
             ->select('COUNT(DISTINCT IDENTITY(eu.email)) num, f.id')
@@ -297,7 +300,7 @@ class EmailRepository extends EntityRepository
         ];
     }
 
-    public function getEmailUserIdsByEmailAddressQb(string $emailAddress): QueryBuilder
+    public function getEmailUserIdsByEmailAddressesQb(array $emailAddresses): QueryBuilder
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('eu.id')
@@ -307,8 +310,8 @@ class EmailRepository extends EntityRepository
             ->join('e.recipients', 'r')
             ->join('r.emailAddress', 'rea')
             ->join('e.fromEmailAddress', 'fea')
-            ->where('fea.email = :email OR rea.email = :email')
-            ->setParameter('email', $emailAddress);
+            ->where('fea.email IN (:emails) OR rea.email IN (:emails)')
+            ->setParameter('emails', $emailAddresses);
 
         return $qb;
     }
@@ -332,11 +335,11 @@ class EmailRepository extends EntityRepository
      * @param User         $user
      * @param Organization $organization
      *
-     * @return \Doctrine\ORM\Query\Expr\Orx
+     * @return Orx
      */
     protected function getAclWhereCondition(User $user, Organization $organization)
     {
-        $mailboxes = $this->getEntityManager()->getRepository('OroEmailBundle:Mailbox')
+        $mailboxes = $this->getEntityManager()->getRepository(Mailbox::class)
             ->findAvailableMailboxIds($user, $organization);
 
         $expr = $this->getEntityManager()->createQueryBuilder()->expr();
@@ -369,7 +372,7 @@ class EmailRepository extends EntityRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('eu')
-            ->from('OroEmailBundle:EmailUser', 'eu')
+            ->from(EmailUser::class, 'eu')
             ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
             ->orderBy('eu.receivedAt', 'DESC')

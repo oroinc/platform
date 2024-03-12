@@ -45,7 +45,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
     {
         return [
             ['acl', new WorkflowEntityAcl()],
-            ['entityClass', new \DateTime()],
+            ['entityClass', \DateTime::class],
             ['entityId', 123],
             ['workflowItem', new WorkflowItem()],
         ];

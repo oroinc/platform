@@ -12,21 +12,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class UrlConverter
 {
-    /** @var RouterInterface */
-    private $router;
-
-    public function __construct(RouterInterface $router)
+    public function __construct(private RouterInterface $router)
     {
-        $this->router = $router;
     }
 
-    /**
-     * @param string $datagridName
-     * @param string $url
-     *
-     * @return string
-     */
-    public function convertGridUrlToPageUrl(string $datagridName, string $url)
+    public function convertGridUrlToPageUrl(string $datagridName, string $url): string
     {
         $urlParameters = [];
 
@@ -39,8 +29,12 @@ class UrlConverter
             return $url;
         }
 
-        $originalRoute = $urlParameters[$datagridName][DefaultOperationRequestHelper::ORIGINAL_ROUTE_URL_PARAMETER_KEY];
-        $originalRouteUrl = $this->router->generate($originalRoute);
+        $datagridParams = $urlParameters[$datagridName];
+        $originalRoute = $datagridParams[DefaultOperationRequestHelper::ORIGINAL_ROUTE_URL_PARAMETER_KEY];
+        $originalRouteParameters = $datagridParams[DefaultOperationRequestHelper::ORIGINAL_ROUTE_PARAMETERS_KEY] ?? '';
+        $originalRouteParameters = json_decode(urldecode($originalRouteParameters), true) ?: [];
+
+        $originalRouteUrl = $this->router->generate($originalRoute, $originalRouteParameters);
         if ($originalRouteUrl === $baseUrl) {
             return $url;
         }

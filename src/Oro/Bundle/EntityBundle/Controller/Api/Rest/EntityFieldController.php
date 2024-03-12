@@ -21,21 +21,6 @@ class EntityFieldController extends AbstractFOSRestController
      * @param Request $request
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
      *
-     * @QueryParam(
-     *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
-     *      description="Indicates whether association fields should be returned as well.")
-     * @QueryParam(
-     *      name="with-virtual-fields", requirements="(1)|(0)", nullable=true, strict=true, default="0",
-     *      description="Indicates whether virtual fields should be returned as well.")
-     * @QueryParam(
-     *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
-     *      description="Indicates whether details of related entity should be returned as well.")
-     * @QueryParam(
-     *      name="with-unidirectional", requirements="(1)|(0)", nullable=true, strict=true, default="0",
-     *      description="Indicates whether Unidirectional association fields should be returned.")
-     * @QueryParam(
-     *      name="apply-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
-     *      description="Indicates whether exclusion logic should be applied.")
      * @ApiDoc(
      *      description="Get entity fields",
      *      resource=true
@@ -43,9 +28,49 @@ class EntityFieldController extends AbstractFOSRestController
      *
      * @return Response
      */
+    #[QueryParam(
+        name: 'with-relations',
+        requirements: '(1)|(0)',
+        default: 0,
+        description: 'Indicates whether association fields should be returned as well.',
+        strict: true,
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'with-virtual-fields',
+        requirements: '(1)|(0)',
+        default: 0,
+        description: 'Indicates whether virtual fields should be returned as well.',
+        strict: true,
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'with-entity-details',
+        requirements: '(1)|(0)',
+        default: 0,
+        description: 'Indicates whether details of related entity should be returned as well.',
+        strict: true,
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'with-unidirectional',
+        requirements: '(1)|(0)',
+        default: 0,
+        description: 'Indicates whether Unidirectional association fields should be returned.',
+        strict: true,
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'apply-exclusions',
+        requirements: '(1)|(0)',
+        default: 1,
+        description: 'Indicates whether exclusion logic should be applied.',
+        strict: true,
+        nullable: true
+    )]
     public function getFieldsAction(Request $request, $entityName)
     {
-        $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
+        $entityName = $this->container->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
         $withRelations = filter_var($request->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
         $withEntityDetails = filter_var($request->get('with-entity-details'), FILTER_VALIDATE_BOOLEAN);
         $withUnidirectional = filter_var($request->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
@@ -53,7 +78,7 @@ class EntityFieldController extends AbstractFOSRestController
         $applyExclusions = filter_var($request->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityFieldProvider $provider */
-        $provider = $this->get('oro_entity.entity_field_provider');
+        $provider = $this->container->get('oro_entity.entity_field_provider');
 
         $statusCode = Response::HTTP_OK;
         $options = EntityFieldProvider::OPTION_TRANSLATE;

@@ -2,37 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="test_api_custom_article")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_custom_article')]
 class TestCustomArticle implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="headline", type="string", length=255)
-     */
-    private $headline;
+    #[ORM\Column(name: 'headline', type: Types::STRING, length: 255)]
+    private ?string $headline = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="body", type="text", nullable=true)
-     */
-    private $body;
+    #[ORM\Column(name: 'body', type: Types::TEXT, nullable: true)]
+    private ?string $body = null;
 
     /**
      * @return int

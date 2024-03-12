@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Form\Handler\TagHandler;
 use Oro\Bundle\TagBundle\Provider\StatisticProvider;
@@ -21,21 +21,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TagController extends AbstractController
 {
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_tag_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @Acl(
-     *      id="oro_tag_view",
-     *      type="entity",
-     *      class="OroTagBundle:Tag",
-     *      permission="VIEW"
-     * )
-     * @Template
-     */
+    #[Route(
+        path: '/{_format}',
+        name: 'oro_tag_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template]
+    #[Acl(id: 'oro_tag_view', type: 'entity', class: Tag::class, permission: 'VIEW')]
     public function indexAction()
     {
         return [
@@ -43,47 +36,31 @@ class TagController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/create", name="oro_tag_create")
-     * @Acl(
-     *      id="oro_tag_create",
-     *      type="entity",
-     *      class="OroTagBundle:Tag",
-     *      permission="CREATE"
-     * )
-     * @Template("@OroTag/Tag/update.html.twig")
-     */
+    #[Route(path: '/create', name: 'oro_tag_create')]
+    #[Template('@OroTag/Tag/update.html.twig')]
+    #[Acl(id: 'oro_tag_create', type: 'entity', class: Tag::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new Tag(), $request);
     }
 
-    /**
-     * @Route("/update/{id}", name="oro_tag_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Acl(
-     *      id="oro_tag_update",
-     *      type="entity",
-     *      class="OroTagBundle:Tag",
-     *      permission="EDIT"
-     * )
-     * @Template
-     */
+    #[Route(path: '/update/{id}', name: 'oro_tag_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template]
+    #[Acl(id: 'oro_tag_update', type: 'entity', class: Tag::class, permission: 'EDIT')]
     public function updateAction(Tag $entity, Request $request)
     {
         return $this->update($entity, $request);
     }
 
-    /**
-     * @Route("/search/{id}", name="oro_tag_search", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template
-     * @AclAncestor("oro_tag_view")
-     */
+    #[Route(path: '/search/{id}', name: 'oro_tag_search', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template]
+    #[AclAncestor('oro_tag_view')]
     public function searchAction(Tag $entity, Request $request)
     {
         // path to datagrid subrequest
         $from = $request->get('from');
 
-        $provider       = $this->get(StatisticProvider::class);
+        $provider       = $this->container->get(StatisticProvider::class);
         $groupedResults = $provider->getTagEntitiesStatistic($entity);
         $selectedResult = null;
 
@@ -109,18 +86,18 @@ class TagController extends AbstractController
      */
     protected function update(Tag $entity, Request $request)
     {
-        if ($this->get(TagHandler::class)->process($entity)) {
+        if ($this->container->get(TagHandler::class)->process($entity)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.tag.controller.tag.saved.message')
+                $this->container->get(TranslatorInterface::class)->trans('oro.tag.controller.tag.saved.message')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity' => $entity,
-            'form' => $this->get('oro_tag.form.tag')->createView(),
+            'form' => $this->container->get('oro_tag.form.tag')->createView(),
         ];
     }
 

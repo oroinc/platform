@@ -33,6 +33,31 @@ class EmailThreadProvider
     }
 
     /**
+     * Gets all emails that are referred to the given email.
+     *
+     * @return Email[]
+     */
+    public function getReferredEmails(EntityManagerInterface $entityManager, Email $entity): array
+    {
+        if ($entity->getRefs()) {
+            return [];
+        }
+
+        $messageId = $entity->getMessageId();
+        if (!$messageId) {
+            return [];
+        }
+
+        return $entityManager->createQueryBuilder()
+            ->select('e')
+            ->from(Email::class, 'e')
+            ->where('e.refs LIKE :messagesId')
+            ->setParameter('messagesId', '%' . $messageId . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Gets the head email in a thread.
      */
     public function getHeadEmail(EntityManagerInterface $entityManager, Email $entity): Email

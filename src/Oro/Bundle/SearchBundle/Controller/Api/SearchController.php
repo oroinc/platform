@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Controller\Api;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,20 +26,20 @@ class SearchController extends AbstractFOSRestController
      *  }
      * )
      *
-     * @AclAncestor("oro_search")
      * @param Request $request
      * @return Response
      */
+    #[AclAncestor('oro_search')]
     public function getAction(Request $request)
     {
-        $searchResults = $this->get('oro_search.index')->simpleSearch(
+        $searchResults = $this->container->get('oro_search.index')->simpleSearch(
             $request->get('search'),
             (int) $request->get('offset'),
             (int) $request->get('max_results'),
             $request->get('from')
         );
 
-        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher = $this->container->get('event_dispatcher');
         foreach ($searchResults->getElements() as $item) {
             $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
         }

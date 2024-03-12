@@ -26,10 +26,10 @@ class RecalculateEmailVisibilityTopic extends AbstractTopic implements JobAwareT
     {
         $resolver
             ->setRequired(['email'])
-            ->addAllowedTypes('email', 'string')
+            ->addAllowedTypes('email', ['string[]', 'string'])
             ->addAllowedValues('email', static function ($value) {
                 if (!$value) {
-                    throw new InvalidOptionsException('The "email" was expected to be not empty.');
+                    throw new InvalidOptionsException('At least one email should be provided.');
                 }
 
                 return true;
@@ -39,7 +39,10 @@ class RecalculateEmailVisibilityTopic extends AbstractTopic implements JobAwareT
     public function createJobName($messageBody): string
     {
         $emailAddress = $messageBody['email'];
+        if (!\is_array($emailAddress)) {
+            $emailAddress = [$emailAddress];
+        }
 
-        return sprintf('%s:%s', self::getName(), md5($emailAddress));
+        return sprintf('%s:%s', self::getName(), md5(implode(',', $emailAddress)));
     }
 }

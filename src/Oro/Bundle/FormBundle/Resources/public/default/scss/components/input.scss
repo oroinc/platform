@@ -81,37 +81,27 @@
 
     @include element-state('focus') {
         border-color: $input-border-color-focus-state;
-        box-shadow: $input-box-shadow-focus-state;
-    }
-
-    &.focus-visible:focus {
-        border-color: $input-border-color-focus-state;
     }
 
     @include element-state('error') {
         border-color: $input-border-color-error-state;
-        box-shadow: $input-box-shadow-error-state;
-
-        @include element-state('focus') {
-            border-color: $input-border-color-error-state;
-        }
+        background-color: $input-bg-color-error-state;
     }
 
     @include element-state('disabled') {
-        background: $input-border-color-disabled-background;
-        box-shadow: none;
-        border: $input-border;
+        background-color: $input-bg-color-disabled;
+        border-color: $input-border-color-disabled;
+        color: $input-color-disabled;
 
         @include base-disabled-style();
 
         @include element-state('hover') {
-            border-color: $input-border-color-disabled-hover-border-color;
+            border-color: $input-border-color-disabled;
         }
     }
 
     @include element-state('readonly') {
         background: $input-border-color-readonly-background;
-        box-shadow: none;
         border: $input-border;
 
         @include base-disabled-style();

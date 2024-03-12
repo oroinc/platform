@@ -61,6 +61,6 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
         $sql = 'SELECT name FROM oro_security_permission';
         $this->logQuery($logger, $sql);
 
-        return array_column((array)$this->connection->fetchAll($sql), 'name');
+        return array_column($this->connection->fetchAllAssociative($sql), 'name');
     }
 }

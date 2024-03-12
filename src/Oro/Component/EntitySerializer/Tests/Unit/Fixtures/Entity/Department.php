@@ -4,41 +4,33 @@ namespace Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="department_table")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'department_table')]
 class Department
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(name="name", type="string", length=255, unique=true)
-     */
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255, unique: true)]
     private ?string $name = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Person")
-     * @ORM\JoinColumn(name="manager_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: Person::class)]
+    #[ORM\JoinColumn(name: 'manager_id', referencedColumnName: 'id')]
     private ?Person $manager = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="Person", mappedBy="department")
+     * @var Collection<int, Person>
      */
-    private Collection $staff;
+    #[ORM\OneToMany(mappedBy: 'department', targetEntity: Person::class)]
+    private ?Collection $staff = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="departments")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'departments')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
     private ?User $owner = null;
 
     public function __construct()

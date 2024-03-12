@@ -3,82 +3,55 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailBodyRepository;
 
 /**
  * Email Body
- *
- * @ORM\Table(name="oro_email_body")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailBodyRepository")
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Entity(repositoryClass: EmailBodyRepository::class)]
+#[ORM\Table(name: 'oro_email_body')]
+#[ORM\HasLifecycleCallbacks]
 class EmailBody
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'created', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $created = null;
+
+    #[ORM\Column(name: 'body', type: Types::TEXT)]
+    protected ?string $bodyContent = null;
+
+    #[ORM\Column(name: 'body_is_text', type: Types::BOOLEAN)]
+    protected ?bool $bodyIsText = null;
+
+    #[ORM\Column(name: 'text_body', type: Types::TEXT, nullable: true)]
+    protected ?string $textBody = null;
+
+    #[ORM\Column(name: 'has_attachments', type: Types::BOOLEAN)]
+    protected ?bool $hasAttachments = null;
+
+    #[ORM\Column(name: 'persistent', type: Types::BOOLEAN)]
+    protected ?bool $persistent = null;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created", type="datetime")
+     * @var Collection<int, EmailAttachment>
      */
-    protected $created;
+    #[ORM\OneToMany(
+        mappedBy: 'emailBody',
+        targetEntity: EmailAttachment::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $attachments = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="body", type="text")
-     */
-    protected $bodyContent;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="body_is_text", type="boolean")
-     */
-    protected $bodyIsText;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="text_body", type="text", nullable=true)
-     */
-    protected $textBody;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="has_attachments", type="boolean")
-     */
-    protected $hasAttachments;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="persistent", type="boolean")
-     */
-    protected $persistent;
-
-    /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="EmailAttachment", mappedBy="emailBody",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
-     */
-    protected $attachments;
-
-    /**
-     * @var Email
-     *
-     * @ORM\OneToOne(targetEntity="Email", mappedBy="emailBody")
-     */
-    protected $email;
+    #[ORM\OneToOne(mappedBy: 'emailBody', targetEntity: Email::class)]
+    protected ?Email $email = null;
 
     public function __construct()
     {
@@ -248,9 +221,8 @@ class EmailBody
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));

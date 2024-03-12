@@ -27,7 +27,7 @@ class DBLogsHandler extends AbstractProcessingHandler
     {
         $formatted = $record['formatted'];
 
-        $this->getPreparedStatement()->execute([
+        $this->getPreparedStatement()->executeQuery([
             'message' => $formatted['message'],
             'context' => \json_encode($formatted['context']),
             'level' => $record['level'],

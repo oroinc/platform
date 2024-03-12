@@ -50,7 +50,7 @@
     $nav-tabs-link-active-color: null,
 
     // tabs link highlighted by keyboard
-    $nav-tabs-link-active-color-focus-visible: $base-ui-bth-focus-style
+    $nav-tabs-link-active-color-focus-visible: $base-ui-element-focus-visible-style
 ) {
     #{$nav-tabs} {
         margin: $nav-tabs-offset;
@@ -106,7 +106,7 @@
         }
 
         @if $nav-tabs-link-active-color-focus-visible {
-            .focus-visible {
+            :focus-visible {
                 box-shadow: $nav-tabs-link-active-color-focus-visible;
             }
         }

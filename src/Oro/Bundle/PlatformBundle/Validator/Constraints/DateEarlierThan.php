@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\PlatformBundle\Validator\Constraints;
 
+use Attribute;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * DateEarlierThan constraint
+ *
  * @Annotation
  */
+#[Attribute]
 class DateEarlierThan extends Constraint
 {
     public $field;

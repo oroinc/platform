@@ -69,7 +69,7 @@ class DbPrivilegesProvider
             if (str_contains($hostStr, '.')) {
                 [$db, $host] = explode('.', $grants[2][0]);
             }
-            $db = trim($db, '`');
+            $db = null === $db ? '' : trim($db, '`');
 
             // MySQL wildcard support for DB name
             $dbRegExp = str_replace(['*', '%'], '.*?', $db);

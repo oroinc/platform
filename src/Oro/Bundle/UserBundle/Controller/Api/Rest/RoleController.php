@@ -4,9 +4,10 @@ namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,25 +20,25 @@ class RoleController extends RestController
      * Get the list of roles
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Get the list of roles",
      *      resource=true
      * )
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. defaults to 10."
-     * )
-     * @AclAncestor("oro_user_role_view")
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. defaults to 10.',
+        nullable: true
+    )]
+    #[AclAncestor('oro_user_role_view')]
     public function cgetAction(Request $request)
     {
         $page = (int) $request->get('page', 1);
@@ -58,10 +59,10 @@ class RoleController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @AclAncestor("oro_user_role_view")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
+    #[AclAncestor('oro_user_role_view')]
     public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
@@ -70,13 +71,13 @@ class RoleController extends RestController
     /**
      * Create new role
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Create new role",
      *      resource=true
      * )
-     * @AclAncestor("oro_user_role_create")
      */
+    #[AclAncestor('oro_user_role_create')]
     public function postAction()
     {
         return $this->handleCreateRequest();
@@ -94,10 +95,10 @@ class RoleController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @AclAncestor("oro_user_role_update")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
+    #[AclAncestor('oro_user_role_update')]
     public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
@@ -115,15 +116,10 @@ class RoleController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @Acl(
-     *      id="oro_user_role_delete",
-     *      type="entity",
-     *      class="OroUserBundle:Role",
-     *      permission="DELETE"
-     * )
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
+    #[Acl(id: 'oro_user_role_delete', type: 'entity', class: Role::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
@@ -134,7 +130,7 @@ class RoleController extends RestController
      *
      * @param string $name Role name
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Get role by name",
      *      resource=true,
@@ -142,8 +138,8 @@ class RoleController extends RestController
      *          {"name"="name", "dataType"="string"},
      *      }
      * )
-     * @AclAncestor("oro_user_role_view")
      */
+    #[AclAncestor('oro_user_role_view')]
     public function getBynameAction($name)
     {
         $entity = $this->getManager()->getRepository()->findOneBy(['label' => $name]);
@@ -180,7 +176,7 @@ class RoleController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_user.role_manager.api');
+        return $this->container->get('oro_user.role_manager.api');
     }
 
     /**
@@ -188,7 +184,7 @@ class RoleController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_user.form.role.api');
+        return $this->container->get('oro_user.form.role.api');
     }
 
     /**
@@ -196,6 +192,6 @@ class RoleController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_user.form.handler.role.api');
+        return $this->container->get('oro_user.form.handler.role.api');
     }
 }

@@ -117,12 +117,6 @@ class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
             'false as organization' => [
                 (new Address())->setOrganization(false)
             ],
-            'array as names' => [
-                (new Address())->setFirstName([])->setLastName([])
-            ],
-            'array as organization' => [
-                (new Address())->setOrganization([])
-            ],
             'empty string as names' => [
                 (new Address())->setFirstName('')->setLastName('')
             ],

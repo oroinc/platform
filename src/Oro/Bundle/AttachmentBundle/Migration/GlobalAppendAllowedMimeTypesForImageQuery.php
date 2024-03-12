@@ -74,7 +74,7 @@ class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQue
         $parameters = [self::IMAGE_CONFIG_NAME, self::CONFIG_SECTION];
         $this->logQuery($logger, $sql, $parameters);
 
-        return $this->connection->fetchAll($sql, $parameters);
+        return $this->connection->fetchAllAssociative($sql, $parameters);
     }
 
     /**
@@ -90,7 +90,7 @@ class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQue
         $this->logQuery($logger, $sql, $parameters);
 
         if (!$dryRun) {
-            $this->connection->prepare($sql)->execute($parameters);
+            $this->connection->prepare($sql)->executeQuery($parameters);
         }
     }
 }

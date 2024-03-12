@@ -163,7 +163,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->connection->expects($this->exactly(3))
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->willReturnOnConsecutiveCalls(
                 [['id' => $rootClassId]],
                 $aces,
@@ -242,7 +242,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->connection->expects($this->exactly(2))
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->willReturnOnConsecutiveCalls(
                 [['id' => $rootClassId]],
                 $aces

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
-use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
+use Oro\Bundle\LayoutBundle\Attribute\Layout as LayoutAttribute;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\BlockViewNotFoundException;
@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Checks whether a web request should be processed by the layout engine
- * (the Request object has the @Layout annotation in the "_layout" attribute),
+ * (the Request object has the #[Layout] attribute in the "_layout" attribute),
  * and if so, renders the layout.
  */
 class LayoutListener implements ServiceSubscriberInterface
@@ -43,21 +43,21 @@ class LayoutListener implements ServiceSubscriberInterface
     }
 
     /**
-     * @throws LogicException if @Layout annotation is used in incorrect way
+     * @throws LogicException if #[Layout] attribute is used in incorrect way
      */
     public function onKernelView(ViewEvent $event): void
     {
         $request = $event->getRequest();
 
-        /** @var LayoutAnnotation|null $layoutAnnotation */
-        $layoutAnnotation = $request->attributes->get('_layout');
-        if (null === $layoutAnnotation) {
+        /** @var LayoutAttribute|null $layoutAttribute */
+        $layoutAttribute = $request->attributes->get('_layout');
+        if (null === $layoutAttribute) {
             return;
         }
 
         if ($request->attributes->get('_template')) {
             throw new LogicException(
-                'The @Template() annotation cannot be used together with the @Layout() annotation.'
+                'The #[Template] attribute cannot be used together with the #[Layout] attribute.'
             );
         }
 
@@ -65,17 +65,17 @@ class LayoutListener implements ServiceSubscriberInterface
         $context = null;
         $parameters = $event->getControllerResult();
         if (\is_array($parameters)) {
-            $context = new LayoutContext($parameters, (array) $layoutAnnotation->getVars());
+            $context = new LayoutContext($parameters, (array) $layoutAttribute->getVars());
         } elseif ($parameters instanceof ContextInterface) {
             $context = $parameters;
-            $vars = $layoutAnnotation->getVars();
+            $vars = $layoutAttribute->getVars();
             if (!empty($vars)) {
                 $context->getResolver()->setRequired($vars);
             }
         } elseif ($parameters instanceof Layout) {
-            if (!$layoutAnnotation->isEmpty()) {
+            if (!$layoutAttribute->isEmpty()) {
                 throw new LogicException(
-                    'The empty @Layout() annotation must be used when '
+                    'The empty #[Layout] attribute must be used when '
                     . 'the controller returns an instance of "Oro\Component\Layout\Layout".'
                 );
             }
@@ -87,18 +87,20 @@ class LayoutListener implements ServiceSubscriberInterface
         if ($layout) {
             $response = new Response($layout->render());
         } else {
-            $this->configureContext($context, $layoutAnnotation);
+            $this->configureContext($context, $layoutAttribute);
             $layoutManager = $this->container->get(LayoutManager::class);
-            $layoutManager->getLayoutBuilder()->setBlockTheme($layoutAnnotation->getBlockThemes());
+            $layoutManager->getLayoutBuilder()->setBlockTheme($layoutAttribute->getBlockThemes());
             $response = $this->getLayoutResponse($context, $request, $layoutManager);
         }
+
+        $response->setStatusCode($context->getOr('response_status_code', 200));
 
         $event->setResponse($response);
     }
 
-    private function configureContext(ContextInterface $context, LayoutAnnotation $layoutAnnotation): void
+    private function configureContext(ContextInterface $context, LayoutAttribute $layoutAttribute): void
     {
-        $action = $layoutAnnotation->getAction();
+        $action = $layoutAttribute->getAction();
         if ($action) {
             $currentAction = $context->getOr('action');
             if (empty($currentAction)) {
@@ -106,7 +108,7 @@ class LayoutListener implements ServiceSubscriberInterface
             }
         }
 
-        $theme = $layoutAnnotation->getTheme();
+        $theme = $layoutAttribute->getTheme();
         if ($theme) {
             $currentTheme = $context->getOr('theme');
             if (empty($currentTheme)) {

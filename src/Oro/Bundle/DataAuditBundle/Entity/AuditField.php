@@ -4,33 +4,26 @@ namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroDataAuditBundle_Entity_AuditField;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditFieldRepository;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
  * AuditField entity
  *
- * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditFieldRepository")
- * @ORM\Table(name="oro_audit_field")
- * @Config(mode="hidden")
  * @mixin OroDataAuditBundle_Entity_AuditField
  */
+#[ORM\Entity(repositoryClass: AuditFieldRepository::class)]
+#[ORM\Table(name: 'oro_audit_field')]
+#[Config(mode: 'hidden')]
 class AuditField extends AbstractAuditField implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var Audit
-     *
-     * @ORM\ManyToOne(
-     *      targetEntity="Oro\Bundle\DataAuditBundle\Entity\AbstractAudit",
-     *      inversedBy="fields",
-     *      cascade={"persist"}
-     * )
-     * @ORM\JoinColumn(name="audit_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    protected $audit;
+    #[ORM\ManyToOne(targetEntity: AbstractAudit::class, cascade: ['persist'], inversedBy: 'fields')]
+    #[ORM\JoinColumn(name: 'audit_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?AbstractAudit $audit = null;
 
     public function __construct($field, $dataType, $newValue, $oldValue)
     {

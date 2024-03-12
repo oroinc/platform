@@ -3,22 +3,13 @@
 namespace Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Psr\Container\ContainerInterface;
 
 /**
  * Check MySQL Full Text compatibility
- *
- * @method ContainerInterface getContainer()
  */
 trait MysqlVersionCheckTrait
 {
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
-
     /**
      * @return bool
      */
@@ -38,7 +29,7 @@ trait MysqlVersionCheckTrait
 
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine.dbal.search_connection');
-        $version = $connection->fetchColumn('select version()');
+        $version = $connection->fetchOne('select version()');
 
         return version_compare($version, '5.6.0', '>=');
     }

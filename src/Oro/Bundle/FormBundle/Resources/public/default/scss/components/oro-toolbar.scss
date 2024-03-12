@@ -3,45 +3,20 @@
 .oro-toolbar {
     position: relative;
 
-    display: inline-block;
-    vertical-align: top;
-
     &__icon {
-        display: inline-block;
-        vertical-align: top;
-
-        margin-left: $oro-toolbar-icon-offset;
+        color: $oro-toolbar-icon-color;
     }
 
     &__content {
-        min-width: $oro-toolbar-content-min-width;
+        display: flex;
+        align-items: center;
+        gap: $oro-toolbar-gap;
 
-        padding: $oro-toolbar-content-inner-offset;
-
-        line-height: $oro-toolbar-content-line-height;
-        font-family: $oro-toolbar-content-font-family;
-        text-align: $oro-toolbar-content-text-align;
-
-        cursor: pointer;
-    }
-
-    &__dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        left: auto;
-        margin: 0;
-        padding: $oro-toolbar-dropdown-inner-offset;
-        z-index: $oro-toolbar-dropdown-z-index;
-
-        display: none;
-        min-width: $oro-toolbar-toolbar-min-width;
-
-        font-size: $base-font-size;
-
-        background: $base-ui-popup-background;
-        border-radius: $base-ui-popup-border-radius;
-        box-shadow: $base-ui-popup-box-shadow;
+        .divider {
+            height: 14px;
+            width: 1px;
+            background-color: $oro-toolbar-divider-color;
+        }
     }
 
     &__list {
@@ -63,8 +38,9 @@
     &__link {
         display: block;
         line-height: 2;
-
+        padding: $oro-toolbar-padding;
         color: $oro-toolbar-link-color;
+        text-decoration: none;
 
         &:hover {
             color: $oro-toolbar-link-hover-color;
@@ -82,7 +58,7 @@
     }
 
     &__currency {
-        margin-right: $offset-y-m * .5;
+        margin-right: spacing('sm') * .5;
     }
 
     // toolbar open

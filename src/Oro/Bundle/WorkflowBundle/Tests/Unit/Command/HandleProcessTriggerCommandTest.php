@@ -12,18 +12,20 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputInterface;
 
-class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
+class HandleProcessTriggerCommandTest extends TestCase
 {
-    /** @var ProcessHandler|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ProcessHandler|MockObject */
     private $processHandler;
 
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityRepository|MockObject */
     private $repo;
 
-    /** @var Input|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Input|MockObject */
     private $input;
 
     /** @var OutputStub */
@@ -42,7 +44,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getRepository')
-            ->with('OroWorkflowBundle:ProcessTrigger')
+            ->with(ProcessTrigger::class)
             ->willReturn($this->repo);
         $doctrine->expects($this->any())
             ->method('getManager')

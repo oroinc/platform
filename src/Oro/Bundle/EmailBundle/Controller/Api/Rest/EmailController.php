@@ -7,7 +7,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,32 +21,32 @@ class EmailController extends RestController
     /**
      * Get emails.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
-     * @QueryParam(
-     *     name="messageId",
-     *     requirements=".+",
-     *     nullable=true,
-     *     description="The email 'Message-ID' attribute. One or several message ids separated by comma."
-     * )
      * @ApiDoc(
      *      description="Get emails",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_view")
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'messageId',
+        requirements: '.+',
+        description: "The email 'Message-ID' attribute. One or several message ids separated by comma.",
+        nullable: true
+    )]
+    #[AclAncestor('oro_email_email_view')]
     public function cgetAction(Request $request)
     {
         $page  = (int)$request->get('page', 1);
@@ -72,9 +72,9 @@ class EmailController extends RestController
      *      description="Get email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
+    #[AclAncestor('oro_email_email_view')]
     public function getAction($id)
     {
         return $this->handleGetRequest($id);
@@ -89,9 +89,9 @@ class EmailController extends RestController
      *      description="Update email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_edit")
      * @return Response
      */
+    #[AclAncestor('oro_email_email_user_edit')]
     public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
@@ -104,8 +104,8 @@ class EmailController extends RestController
      *      description="Create new email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_email_user_edit")
      */
+    #[AclAncestor('oro_email_email_user_edit')]
     public function postAction()
     {
         return $this->handleCreateRequest();
@@ -136,7 +136,7 @@ class EmailController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_email.form.email.api');
+        return $this->container->get('oro_email.form.email.api');
     }
 
     /**
@@ -144,7 +144,7 @@ class EmailController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_email.form.handler.email.api');
+        return $this->container->get('oro_email.form.handler.email.api');
     }
 
     /**

@@ -52,4 +52,11 @@ class FixMessageFlattenExceptionNormalizer implements NormalizerInterface
     {
         return $this->innerNormalizer->supportsNormalization($data, $format);
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            '*' => false
+        ];
+    }
 }

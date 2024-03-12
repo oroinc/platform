@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Typed address form type
+ */
 class TypedAddressType extends AbstractType
 {
     /**
@@ -31,7 +34,7 @@ class TypedAddressType extends AbstractType
                 'types',
                 TranslatableEntityType::class,
                 array(
-                    'class' => 'OroAddressBundle:AddressType',
+                    'class' => \Oro\Bundle\AddressBundle\Entity\AddressType::class,
                     'choice_label' => 'label',
                     'required' => false,
                     'multiple' => true,

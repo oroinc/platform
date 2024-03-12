@@ -46,8 +46,8 @@ class EnsureInitialized implements ProcessorInterface
         foreach ($extras as $extra) {
             if ($extra instanceof ConfigExtraSectionInterface) {
                 $sectionName = $extra->getName();
-                if (!$context->has($sectionName)) {
-                    $context->set(
+                if (!$context->hasConfigSection($sectionName)) {
+                    $context->setConfigSection(
                         $sectionName,
                         $this->configLoaderFactory->getLoader($extra->getConfigType())->load([])
                     );

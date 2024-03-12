@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery implements ConfigurationHandlerAwareInterface
 {
+    use ConfigurationHandlerAwareTrait;
+
     /**
      * @var string
      */
@@ -43,8 +45,6 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
      */
     protected $replaceValue;
 
-    protected ConfigurationHandler $configurationHandler;
-
     /**
      * @param string $entityName
      * @param string $fieldName
@@ -61,14 +61,6 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
         $this->code         = $code;
         $this->value        = $value;
         $this->replaceValue = $replaceValue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
-    {
-        $this->configurationHandler = $configurationHandler;
     }
 
     /**
@@ -113,7 +105,7 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
             AND field_name = ?
             LIMIT 1';
         $parameters = [$this->entityName, $this->fieldName];
-        $row        = $this->connection->fetchAssoc($sql, $parameters);
+        $row        = $this->connection->fetchAssociative($sql, $parameters);
 
         if ($row) {
             $data = $row['data'];
@@ -138,7 +130,7 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
 
                 if (!$dryRun) {
                     $statement = $this->connection->prepare($sql);
-                    $statement->execute($parameters);
+                    $statement->executeQuery($parameters);
                 }
             }
         }

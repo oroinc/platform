@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ScopeBundle\Migration\Extension;
 
 /**
- * ScopeExtensionAwareInterface should be implemented by migrations that depends on a ScopeExtension.
+ * This interface should be implemented by migrations that depend on {@see ScopeExtension}.
  */
 interface ScopeExtensionAwareInterface
 {

@@ -9,7 +9,7 @@ use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -25,8 +25,8 @@ class CloneEntity extends CloneObject
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var FlashBagInterface */
-    protected $flashBag;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -35,15 +35,15 @@ class CloneEntity extends CloneObject
         ContextAccessor $contextAccessor,
         ManagerRegistry $registry,
         TranslatorInterface $translator,
-        FlashBagInterface $flashBag = null,
+        RequestStack $requestStack = null,
         LoggerInterface $logger = null
     ) {
         parent::__construct($contextAccessor);
 
-        $this->registry   = $registry;
-        $this->translator = $translator;
-        $this->flashBag   = $flashBag;
-        $this->logger     = $logger != null ? $logger : new NullLogger();
+        $this->registry     = $registry;
+        $this->translator   = $translator;
+        $this->requestStack = $requestStack;
+        $this->logger       = $logger != null ? $logger : new NullLogger();
     }
 
     /** {@inheritdoc} */
@@ -75,15 +75,15 @@ class CloneEntity extends CloneObject
             $saved = true;
         } catch (\Exception $e) {
             $saved = false;
-            if ($this->flashBag) {
-                $this->flashBag->add('error', $this->translator->trans('oro.action.clone.error'));
-            }
+            $this->requestStack?->getSession()?->getFlashBag()
+                ->add('error', $this->translator->trans('oro.action.clone.error'));
 
             $this->logger->error($e->getMessage());
         }
 
-        if ($saved && $this->flashBag) {
-            $this->flashBag->add('success', $this->translator->trans('oro.action.clone.success'));
+        if ($saved && $this->requestStack) {
+            $this->requestStack?->getSession()?->getFlashBag()
+                ->add('success', $this->translator->trans('oro.action.clone.success'));
         }
 
         return $entity;

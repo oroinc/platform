@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Symfony\Component\Form\AbstractType;
@@ -10,6 +11,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Represents email folder API form type.
+ */
 class EmailFolderApiType extends AbstractType
 {
     /**
@@ -23,7 +27,7 @@ class EmailFolderApiType extends AbstractType
                 EntityIdentifierType::class,
                 [
                     'required' => false,
-                    'class'    => 'OroEmailBundle:EmailOrigin',
+                    'class'    => EmailOrigin::class,
                     'multiple' => false
                 ]
             )

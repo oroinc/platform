@@ -3,51 +3,34 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="test_security_order")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_security_order')]
 class TestSecurityOrder implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'po_number', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $poNumber = null;
+
+    #[ORM\ManyToOne(targetEntity: TestSecurityPerson::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?TestSecurityPerson $person = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="po_number", type="string", length=255, nullable=true)
+     * @var array|Collection<int, TestSecurityProduct>|null
      */
-    protected $poNumber;
-
-    /**
-     * @var TestSecurityPerson
-     *
-     * @ORM\ManyToOne(targetEntity="TestSecurityPerson")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $person;
-
-    /**
-     * @var TestSecurityProduct[]
-     *
-     * @ORM\ManyToMany(
-     *     targetEntity="Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityProduct",
-     *     inversedBy="orders"
-     * )
-     * @ORM\JoinTable(name="test_security_order_product",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="business_unit_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     */
+    #[ORM\ManyToMany(targetEntity: TestSecurityProduct::class, inversedBy: 'orders')]
+    #[ORM\JoinTable(name: 'test_security_order_product')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'business_unit_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     protected $products;
 
     public function __construct()

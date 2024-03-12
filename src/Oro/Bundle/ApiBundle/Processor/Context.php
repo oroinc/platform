@@ -54,7 +54,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     private const RESPONSE_STATUS_CODE = 'responseStatusCode';
 
     /** indicates whether the current action processes a master API request */
-    private const MASTER_REQUEST = 'masterRequest';
+    private const MAIN_REQUEST = 'masterRequest';
 
     /** indicates whether the current request is CORS request */
     private const CORS = 'cors';
@@ -88,7 +88,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->configExtras = new ConfigExtraCollection();
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
-        $this->set(self::MASTER_REQUEST, false);
+        $this->set(self::MAIN_REQUEST, false);
         $this->set(self::CORS, false);
         $this->set(self::HATEOAS, false);
     }
@@ -251,9 +251,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritDoc}
      */
-    public function isMasterRequest(): bool
+    public function isMainRequest(): bool
     {
-        return $this->get(self::MASTER_REQUEST);
+        return $this->get(self::MAIN_REQUEST);
     }
 
     /**
@@ -261,7 +261,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setMasterRequest(bool $master): void
     {
-        $this->set(self::MASTER_REQUEST, $master);
+        $this->set(self::MAIN_REQUEST, $master);
     }
 
     /**

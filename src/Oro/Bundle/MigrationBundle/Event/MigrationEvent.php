@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Each migration event to check if need to add and to execute
+ */
 class MigrationEvent extends Event
 {
     /**
@@ -61,7 +64,7 @@ class MigrationEvent extends Event
     {
         $this->connection->connect();
 
-        return $this->connection->fetchAll($sql, $params, $types);
+        return $this->connection->fetchAllAssociative($sql, $params, $types);
     }
 
     /**

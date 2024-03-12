@@ -2,16 +2,21 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
+use Oro\Bundle\MaintenanceBundle\Maintenance\Mode as MaintenanceMode;
+
 /**
  * The default implementation of the update schema handler.
  */
 class EntityExtendUpdateHandler implements EntityExtendUpdateHandlerInterface
 {
-    private EntityExtendUpdateProcessor $entityExtendUpdateProcessor;
-
-    public function __construct(EntityExtendUpdateProcessor $entityExtendUpdateProcessor)
-    {
-        $this->entityExtendUpdateProcessor = $entityExtendUpdateProcessor;
+    /**
+     * @param EntityExtendUpdateProcessor $entityExtendUpdateProcessor
+     * @param MaintenanceMode             $maintenance
+     */
+    public function __construct(
+        private EntityExtendUpdateProcessor $entityExtendUpdateProcessor,
+        private MaintenanceMode $maintenance
+    ) {
     }
 
     /**
@@ -19,6 +24,7 @@ class EntityExtendUpdateHandler implements EntityExtendUpdateHandlerInterface
      */
     public function update(): EntityExtendUpdateResult
     {
+        $this->maintenance->activate();
         $updateResult = $this->entityExtendUpdateProcessor->processUpdate();
 
         return new EntityExtendUpdateResult($updateResult->isSuccessful());

@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\JsonType;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendNameGeneratorAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
-use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 /**
  * Updates indexes for the extend entities.
@@ -29,14 +28,9 @@ class UpdateExtendIndicesMigration implements
     NameGeneratorAwareInterface,
     RenameExtensionAwareInterface
 {
-    /** @var AbstractPlatform */
-    protected $platform;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
-
-    /** @var RenameExtension */
-    protected $renameExtension;
+    use DatabasePlatformAwareTrait;
+    use ExtendNameGeneratorAwareTrait;
+    use RenameExtensionAwareTrait;
 
     /** @var EntityMetadataHelper */
     protected $entityMetadataHelper;
@@ -53,31 +47,7 @@ class UpdateExtendIndicesMigration implements
     }
 
     /**
-     * @inheritdoc
-     */
-    public function setDatabasePlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
-    {
-        $this->nameGenerator = $nameGenerator;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setRenameExtension(RenameExtension $renameExtension)
-    {
-        $this->renameExtension = $renameExtension;
-    }
-
-    /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {

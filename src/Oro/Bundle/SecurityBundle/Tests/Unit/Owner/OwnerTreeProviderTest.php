@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\Test\OwnerTreeWrappingPropertiesAccessor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
@@ -71,7 +70,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $conn = new ConnectionMock([], new DriverMock());
         $conn->setDatabasePlatform(new PostgreSQL100Platform());
         $this->em = $this->getTestEntityManager($conn);
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
@@ -124,7 +123,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->willReturn($token);
         $token->expects(self::once())
             ->method('getUser')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(UserInterface::class));
 
         $this->assertFalse($this->treeProvider->supports());
     }
@@ -190,44 +189,43 @@ class OwnerTreeProviderTest extends OrmTestCase
         );
     }
 
-    private function assertOwnerTreeEquals(array $expected, OwnerTree $actual)
+    private function assertOwnerTreeEquals(array $expected, OwnerTree $actual): void
     {
-        $a = new OwnerTreeWrappingPropertiesAccessor($actual);
         self::assertEqualsCanonicalizing(
             $expected['userOwningOrganizationId'],
-            $a->xgetUserOwningOrganizationId()
+            ReflectionUtil::getPropertyValue($actual, 'userOwningOrganizationId')
         );
         self::assertEqualsCanonicalizing(
             $expected['userOrganizationIds'],
-            $a->xgetUserOrganizationIds()
+            ReflectionUtil::getPropertyValue($actual, 'userOrganizationIds')
         );
         self::assertEqualsCanonicalizing(
             $expected['userOwningBusinessUnitId'],
-            $a->xgetUserOwningBusinessUnitId()
+            ReflectionUtil::getPropertyValue($actual, 'userOwningBusinessUnitId')
         );
         self::assertEqualsCanonicalizing(
             $expected['userBusinessUnitIds'],
-            $a->xgetUserBusinessUnitIds()
+            ReflectionUtil::getPropertyValue($actual, 'userBusinessUnitIds')
         );
         self::assertEqualsCanonicalizing(
             $expected['userOrganizationBusinessUnitIds'],
-            $a->xgetUserOrganizationBusinessUnitIds()
+            ReflectionUtil::getPropertyValue($actual, 'userOrganizationBusinessUnitIds')
         );
         self::assertEqualsCanonicalizing(
             $expected['businessUnitOwningOrganizationId'],
-            $a->xgetBusinessUnitOwningOrganizationId()
+            ReflectionUtil::getPropertyValue($actual, 'businessUnitOwningOrganizationId')
         );
         self::assertEqualsCanonicalizing(
             $expected['assignedBusinessUnitUserIds'],
-            $a->xgetAssignedBusinessUnitUserIds()
+            ReflectionUtil::getPropertyValue($actual, 'assignedBusinessUnitUserIds')
         );
         self::assertEqualsCanonicalizing(
             $expected['subordinateBusinessUnitIds'],
-            $a->xgetSubordinateBusinessUnitIds()
+            ReflectionUtil::getPropertyValue($actual, 'subordinateBusinessUnitIds')
         );
         self::assertEqualsCanonicalizing(
             $expected['organizationBusinessUnitIds'],
-            $a->xgetOrganizationBusinessUnitIds()
+            ReflectionUtil::getPropertyValue($actual, 'organizationBusinessUnitIds')
         );
     }
 

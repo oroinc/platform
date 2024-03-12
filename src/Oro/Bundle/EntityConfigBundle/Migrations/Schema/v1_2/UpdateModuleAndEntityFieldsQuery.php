@@ -35,7 +35,7 @@ class UpdateModuleAndEntityFieldsQuery extends ParametrizedMigrationQuery
     {
         $getSql = 'SELECT id, class_name FROM oro_entity_config';
         $this->logQuery($logger, $getSql);
-        $configs   = $this->connection->fetchAll($getSql);
+        $configs   = $this->connection->fetchAllAssociative($getSql);
         $indexes   = $this->getIndexes($logger);
         $insertSql = 'INSERT INTO oro_entity_config_index_value '
             . '(entity_id, scope, code, value) '
@@ -97,7 +97,7 @@ class UpdateModuleAndEntityFieldsQuery extends ParametrizedMigrationQuery
             . 'WHERE entity_id IS NOT NULL AND scope = \'entity_config\' '
             . 'AND code IN (\'module_name\', \'entity_name\')';
         $this->logQuery($logger, $sql);
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
 
         $result = [];
         foreach ($rows as $row) {

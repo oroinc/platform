@@ -3,31 +3,34 @@
 namespace Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\UserBundle\Entity\Email;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadUserEmailData extends AbstractFixture implements ContainerAwareInterface
+class LoadUserEmailData extends AbstractFixture implements DependentFixtureInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * {@inheritDoc}
+     */
+    public function getDependencies(): array
+    {
+        return [LoadUserData::class];
+    }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(ObjectManager $manager): void
     {
-        $userManager = $this->container->get('oro_user.manager');
-
         $email = new Email();
         $email->setEmail('simple_user@example.org');
+        $this->setReference('simple_user_email', $email);
 
-        /** @var UserInterface $user */
+        /** @var User $user */
         $user = $this->getReference('simple_user');
         $user->addEmail($email);
-        $userManager->updateUser($user);
 
-        $this->setReference('simple_user_email', $email);
+        $manager->flush();
     }
 }

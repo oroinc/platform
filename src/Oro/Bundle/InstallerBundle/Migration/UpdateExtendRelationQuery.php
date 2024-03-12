@@ -8,6 +8,9 @@ use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Migrations to change class fields
+ */
 class UpdateExtendRelationQuery extends ParametrizedMigrationQuery
 {
     /**
@@ -76,7 +79,7 @@ class UpdateExtendRelationQuery extends ParametrizedMigrationQuery
      */
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
-        $row = $this->connection->fetchAssoc(
+        $row = $this->connection->fetchAssociative(
             'SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1',
             [$this->entityFrom]
         );

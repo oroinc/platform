@@ -8,7 +8,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -21,19 +21,9 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
  */
 class AttachmentController extends AbstractController
 {
-    /**
-     * @Route(
-     *      "attachment/view/widget/{entityClass}/{entityId}",
-     *      name="oro_attachment_widget_attachments"
-     * )
-     * @Acl(
-     *      id="oro_attachment_view",
-     *      type="entity",
-     *      class="OroAttachmentBundle:Attachment",
-     *      permission="VIEW"
-     * )
-     * @Template("@OroAttachment/Attachment/attachments.html.twig")
-     */
+    #[Route(path: 'attachment/view/widget/{entityClass}/{entityId}', name: 'oro_attachment_widget_attachments')]
+    #[Template('@OroAttachment/Attachment/attachments.html.twig')]
+    #[Acl(id: 'oro_attachment_view', type: 'entity', class: Attachment::class, permission: 'VIEW')]
     public function widgetAction($entityClass, $entityId)
     {
         $entityClass = $this->getEntityRoutingHelper()->resolveEntityClass($entityClass);
@@ -44,20 +34,15 @@ class AttachmentController extends AbstractController
     }
 
     /**
-     * @Route("attachment/create/{entityClass}/{entityId}", name="oro_attachment_create")
      *
-     * @Template("@OroAttachment/Attachment/update.html.twig")
-     * @Acl(
-     *      id="oro_attachment_create",
-     *      type="entity",
-     *      class="OroAttachmentBundle:Attachment",
-     *      permission="CREATE"
-     * )
      * @param Request $request
      * @param mixed $entityClass
      * @param mixed $entityId
      * @return array
      */
+    #[Route(path: 'attachment/create/{entityClass}/{entityId}', name: 'oro_attachment_create')]
+    #[Template('@OroAttachment/Attachment/update.html.twig')]
+    #[Acl(id: 'oro_attachment_create', type: 'entity', class: Attachment::class, permission: 'CREATE')]
     public function createAction(Request $request, $entityClass, $entityId)
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();
@@ -84,19 +69,14 @@ class AttachmentController extends AbstractController
     }
 
     /**
-     * @Route("attachment/update/{id}", name="oro_attachment_update")
      *
-     * @Template("@OroAttachment/Attachment/update.html.twig")
-     * @Acl(
-     *      id="oro_attachment_update",
-     *      type="entity",
-     *      class="OroAttachmentBundle:Attachment",
-     *      permission="EDIT"
-     * )
      * @param Request $request
      * @param Attachment $attachment
      * @return array
      */
+    #[Route(path: 'attachment/update/{id}', name: 'oro_attachment_update')]
+    #[Template('@OroAttachment/Attachment/update.html.twig')]
+    #[Acl(id: 'oro_attachment_update', type: 'entity', class: Attachment::class, permission: 'EDIT')]
     public function updateAction(Request $request, Attachment $attachment)
     {
         $formAction = $request->getUri();
@@ -131,7 +111,7 @@ class AttachmentController extends AbstractController
             $responseData['update'] = true;
         }
 
-        if ($this->get(AttachmentHandler::class)->process($form)) {
+        if ($this->container->get(AttachmentHandler::class)->process($form)) {
             $responseData['saved'] = true;
         } else {
             $responseData['form']       = $form->createView();
@@ -143,12 +123,12 @@ class AttachmentController extends AbstractController
 
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     protected function getAttachmentManager(): AttachmentManager
     {
-        return $this->get(AttachmentManager::class);
+        return $this->container->get(AttachmentManager::class);
     }
 
     /**

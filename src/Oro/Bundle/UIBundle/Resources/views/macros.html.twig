@@ -208,14 +208,17 @@
         <div class="collapse-block">
             {% import _self as UIMacro %}
 
-            {{ UIMacro.renderAttribute(title,
-                '<div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true" ' ~
-                      'id="'~ collapseId ~'" data-state-id="'~ collapseKey ~'" data-collapsed-text="'~ moreText|trans ~ '" data-expanded-text="'~ lessText|trans ~'">' ~
-                    data|default('oro.ui.empty'|trans) ~
-                '</div>' ~
-                '<a href="#" role="button" class="control-label collapse-toggle" data-toggle="collapse" ' ~
-                   'data-target="#'~ collapseId ~'" aria-expanded="false" aria-controls="'~ collapseId ~'"><span data-text>' ~ moreText|trans ~ '</span></a>'
-            ) }}
+            {% set propertyHtml %}
+                <div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true"
+                      id="{{ collapseId }}" data-state-id="{{ collapseKey }}" data-collapsed-text="{{ moreText|trans }}" data-expanded-text="{{ lessText|trans }}">
+                    {{ data|default('oro.ui.empty'|trans) }}
+                </div>
+                <a href="#" role="button" class="control-label collapse-toggle" data-toggle="collapse" data-target="#{{ collapseId }}" aria-expanded="false" aria-controls="{{ collapseId }}">
+                    <span data-text>{{ moreText|trans }}</span>
+                </a>
+            {% endset %}
+
+            {{ UIMacro.renderAttribute(title, propertyHtml) }}
         </div>
     {% endif %}
 {% endmacro %}
@@ -1183,7 +1186,7 @@
 
     {% set cols = subblocks|length %}
     <div class="responsive-section"{% if options.initSectionInstantly is defined and options.initSectionInstantly %} data-init-section-instantly{% endif %}>
-        <h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>
+        {% if title is defined %}<h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>{% endif %}
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
         <div class="section-content">
             <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ UIMacro.attributes(contentAttributes, ['class']) }}>

@@ -3,12 +3,14 @@
 namespace Oro\Bundle\DashboardBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,32 +24,26 @@ class WidgetController extends AbstractFOSRestController
      * @param int $dashboardId
      * @param int $widgetId
      *
-     * @QueryParam(
-     *      name="isExpanded",
-     *      requirements="(1)|(0)",
-     *      nullable=true,
-     *      strict=true,
-     *      description="Set collapse or expand"
-     * )
-     * @QueryParam(
-     *      name="layoutPosition",
-     *      nullable=true,
-     *      strict=true,
-     *      description="Set layout position"
-     * )
-     *
      * @ApiDoc(
      *      description="Update dashboard widget",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_dashboard_update",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="OroDashboardBundle:Dashboard"
-     * )
      * @return Response
      */
+    #[QueryParam(
+        name: 'isExpanded',
+        requirements: '(1)|(0)',
+        description: 'Set collapse or expand',
+        strict: true,
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'layoutPosition',
+        description: 'Set layout position',
+        strict: true,
+        nullable: true
+    )]
+    #[Acl(id: 'oro_dashboard_update', type: 'entity', class: Dashboard::class, permission: 'EDIT')]
     public function putAction(Request $request, $dashboardId, $widgetId)
     {
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
@@ -82,9 +78,9 @@ class WidgetController extends AbstractFOSRestController
      *      description="Delete dashboard widget",
      *      resource=true
      * )
-     * @AclAncestor("oro_dashboard_update")
      * @return Response
      */
+    #[AclAncestor('oro_dashboard_update')]
     public function deleteAction($dashboardId, $widgetId)
     {
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
@@ -108,21 +104,14 @@ class WidgetController extends AbstractFOSRestController
      * @param Request $request
      * @param int $dashboardId
      *
-     * @QueryParam(
-     *      name="layoutPositions",
-     *      nullable=true,
-     *      strict=true,
-     *      description="Array of layout positions"
-     * )
-     *
      * @ApiDoc(
      *      description="Update dashboard widgets positions",
      *      resource=true
      * )
-     * @AclAncestor("oro_dashboard_update")
-     *
      * @return Response
      */
+    #[QueryParam(name: 'layoutPositions', description: 'Array of layout positions', strict: true, nullable: true)]
+    #[AclAncestor('oro_dashboard_update')]
     public function putPositionsAction(Request $request, $dashboardId)
     {
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
@@ -146,26 +135,16 @@ class WidgetController extends AbstractFOSRestController
     }
 
     /**
-     * @QueryParam(
-     *      name="dashboardId",
-     *      nullable=false,
-     *      strict=true,
-     *      description="Dashboard id"
-     * )
-     * @QueryParam(
-     *      name="widgetName",
-     *      nullable=false,
-     *      strict=true,
-     *      description="Dashboard widget name"
-     * )
      * @ApiDoc(
      *      description="Add widget to dashboard",
      *      resource=true
      * )
-     * @AclAncestor("oro_dashboard_update")
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(name: 'dashboardId', description: 'Dashboard id', strict: true, nullable: false)]
+    #[QueryParam(name: 'widgetName', description: 'Dashboard widget name', strict: true, nullable: false)]
+    #[AclAncestor('oro_dashboard_update')]
     public function postAddWidgetAction(Request $request)
     {
         $dashboardId = $request->get('dashboardId');
@@ -195,12 +174,12 @@ class WidgetController extends AbstractFOSRestController
 
     private function getEntityManager(): EntityManagerInterface
     {
-        return $this->getDoctrine()->getManager();
+        return $this->container->get('doctrine')->getManager();
     }
 
     private function getDashboardManager(): Manager
     {
-        return $this->get('oro_dashboard.manager');
+        return $this->container->get('oro_dashboard.manager');
     }
 
     private function handleNotFound(): Response
@@ -216,5 +195,13 @@ class WidgetController extends AbstractFOSRestController
     private function handleNoContent(): Response
     {
         return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

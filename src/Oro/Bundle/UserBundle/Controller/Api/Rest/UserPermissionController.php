@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
@@ -22,23 +22,15 @@ class UserPermissionController extends RestGetController
      *
      * @param int $id User id
      *
-     * @QueryParam(
-     *      name="entities",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The entity class name. One or several classes names separated by comma.
-     * Defaults to all classes."
-     *)
-     *
      * @ApiDoc(
      *      description="Get user permissions",
      *      resource=true
      * )
      *
-     * @AclAncestor("oro_user_permission_view")
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
+    #[QueryParam(name: 'entities', requirements: '.+', description: '"Theentityclassname', nullable: true)]
+    #[AclAncestor('oro_user_permission_view')]
     public function cgetAction(int $id)
     {
         $manager = $this->getManager();
@@ -54,7 +46,7 @@ class UserPermissionController extends RestGetController
                 'entities' => new ChainParameterFilter(
                     [
                         new StringToArrayParameterFilter(),
-                        new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
+                        new EntityClassParameterFilter($this->container->get('oro_entity.entity_class_name_helper'))
                     ]
                 )
             ],
@@ -77,6 +69,6 @@ class UserPermissionController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_user.permission_manager.api');
+        return $this->container->get('oro_user.permission_manager.api');
     }
 }

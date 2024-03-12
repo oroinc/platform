@@ -9,20 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddOriginalFilenameIndex implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addOriginalFilenameIndex($schema);
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function addOriginalFilenameIndex(Schema $schema)
-    {
-        // Adding these index due to issue with mysql 5.6 version @see CRM-5117
-        $table = $schema->getTable('oro_attachment_file');
-        $table->addIndex(['original_filename'], 'att_file_orig_filename_idx');
+        $schema->getTable('oro_attachment_file')
+            ->addIndex(['original_filename'], 'att_file_orig_filename_idx');
     }
 }

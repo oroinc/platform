@@ -4,37 +4,25 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 
 /**
  * Typed Address
- *
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 abstract class AbstractTypedAddress extends AbstractAddress implements PrimaryItem
 {
     /**
      * Many-to-many relation field, relation parameters must be in specific class
-     *
-     * @var Collection
      */
-    protected $types;
+    protected ?Collection $types = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="is_primary", type="boolean", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $primary;
+    #[ORM\Column(name: 'is_primary', type: Types::BOOLEAN, nullable: true)]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?bool $primary = null;
 
     public function __construct()
     {

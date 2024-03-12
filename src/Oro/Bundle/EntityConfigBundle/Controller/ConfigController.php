@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -16,7 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,22 +29,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CRUD controller to manage configurable entities.
- *
- * @Route("/entity/config")
- * @Acl(
- *      id="oro_entityconfig_manage",
- *      label="oro.entity_config.action.manage",
- *      type="action",
- *      group_name="",
- *      category="entity"
- * )
  */
+#[Acl(
+    id: 'oro_entityconfig_manage',
+    label: 'oro.entity_config.action.manage',
+    type: 'action',
+    groupName: '',
+    category: 'entity'
+)]
+#[Route(path: '/entity/config')]
 class ConfigController extends AbstractController
 {
-    /**
-     * @Route("/", name="oro_entityconfig_index")
-     * @Template()
-     */
+    #[Route(path: '/', name: 'oro_entityconfig_index')]
+    #[Template]
     public function indexAction()
     {
         $actions = [];
@@ -69,14 +67,14 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/update/{id}", name="oro_entityconfig_update")
-     * @Template()
      *
      * @param Request $request
      * @param string  $id
      *
      * @return array|RedirectResponse
      */
+    #[Route(path: '/update/{id}', name: 'oro_entityconfig_update')]
+    #[Template]
     public function updateAction(Request $request, $id)
     {
         $entity  = $this->getConfigManager()
@@ -99,7 +97,7 @@ class ConfigController extends AbstractController
                     $this->getTranslator()->trans('oro.entity_config.controller.config_entity.message.saved')
                 );
 
-                return $this->get(Router::class)->redirect($entity);
+                return $this->container->get(Router::class)->redirect($entity);
             }
         }
 
@@ -113,13 +111,13 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/view/{id}", name="oro_entityconfig_view")
-     * @Template()
      *
      * @param EntityConfigModel $entity
      *
      * @return array
      */
+    #[Route(path: '/view/{id}', name: 'oro_entityconfig_view')]
+    #[Template]
     public function viewAction(EntityConfigModel $entity)
     {
         [, $entityName] = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
@@ -138,13 +136,18 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/fields/{id}", name="oro_entityconfig_fields", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template()
      *
      * @param string $id
      *
      * @return array
      */
+    #[Route(
+        path: '/fields/{id}',
+        name: 'oro_entityconfig_fields',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0]
+    )]
+    #[Template]
     public function fieldsAction($id)
     {
         $entity = $this->getConfigManager()
@@ -163,13 +166,13 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/field/update/{id}", name="oro_entityconfig_field_update")
-     * @Template()
      *
      * @param FieldConfigModel $fieldConfigModel
      *
      * @return array|RedirectResponse
      */
+    #[Route(path: '/field/update/{id}', name: 'oro_entityconfig_field_update')]
+    #[Template]
     public function fieldUpdateAction(FieldConfigModel $fieldConfigModel)
     {
         $formAction = $this->generateUrl('oro_entityconfig_field_update', ['id' => $fieldConfigModel->getId()]);
@@ -180,12 +183,11 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/field/search/{id}", name="oro_entityconfig_field_search", defaults={"id"=0})
      *
      * @param string $id
-     *
      * @return Response
      */
+    #[Route(path: '/field/search/{id}', name: 'oro_entityconfig_field_search', defaults: ['id' => 0])]
     public function fieldSearchAction($id)
     {
         $fields = [];
@@ -215,19 +217,19 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/widget/info/{id}", name="oro_entityconfig_widget_info")
-     * @Template("@OroEntityConfig/Config/widget/info.html.twig")
      *
      * @param EntityConfigModel $entity
      *
      * @return array
      */
+    #[Route(path: '/widget/info/{id}', name: 'oro_entityconfig_widget_info')]
+    #[Template('@OroEntityConfig/Config/widget/info.html.twig')]
     public function infoAction(EntityConfigModel $entity)
     {
         [$moduleName, $entityName] = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
 
         $extendConfig = $this->getConfigProvider('extend')->getConfig($entity->getClassName());
-        $ownerTypes = $this->get(OwnershipType::class)->getOwnershipsArray();
+        $ownerTypes = $this->container->get(OwnershipType::class)->getOwnershipsArray();
         $ownerType = $this->getConfigProvider('ownership')->getConfig($entity->getClassName())->get('owner_type');
         $ownerType = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
 
@@ -242,13 +244,13 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/widget/unique_keys/{id}", name="oro_entityconfig_widget_unique_keys")
-     * @Template()
      *
      * @param EntityConfigModel $entity
      *
      * @return array
      */
+    #[Route(path: '/widget/unique_keys/{id}', name: 'oro_entityconfig_widget_unique_keys')]
+    #[Template]
     public function uniqueKeysAction(EntityConfigModel $entity)
     {
         $className = $entity->getClassName();
@@ -277,13 +279,13 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/widget/entity_fields/{id}", name="oro_entityconfig_widget_entity_fields")
-     * @Template()
      *
      * @param EntityConfigModel $entity
      *
      * @return array
      */
+    #[Route(path: '/widget/entity_fields/{id}', name: 'oro_entityconfig_widget_entity_fields')]
+    #[Template]
     public function entityFieldsAction(EntityConfigModel $entity)
     {
         return ['entity' => $entity];
@@ -298,7 +300,7 @@ class ConfigController extends AbstractController
     {
         if (class_exists($entity->getClassName())) {
             /** @var QueryBuilder $qb */
-            $qb = $this->getDoctrine()
+            $qb = $this->container->get('doctrine')
                 ->getManagerForClass($entity->getClassName())
                 ->createQueryBuilder();
             $qb->select('entity');
@@ -341,7 +343,7 @@ class ConfigController extends AbstractController
      */
     private function getRoutingHelper()
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     /**
@@ -349,7 +351,7 @@ class ConfigController extends AbstractController
      */
     private function getConfigManager()
     {
-        return $this->get(ConfigManager::class);
+        return $this->container->get(ConfigManager::class);
     }
 
     /**
@@ -367,7 +369,7 @@ class ConfigController extends AbstractController
      */
     private function getConfigFieldHandler()
     {
-        return $this->get(ConfigFieldHandler::class);
+        return $this->container->get(ConfigFieldHandler::class);
     }
 
     /**
@@ -375,7 +377,7 @@ class ConfigController extends AbstractController
      */
     private function getConfigProviderHelper()
     {
-        return $this->get(EntityConfigProviderHelper::class);
+        return $this->container->get(EntityConfigProviderHelper::class);
     }
 
     /**
@@ -383,7 +385,7 @@ class ConfigController extends AbstractController
      */
     private function getEntityFieldProvider()
     {
-        return $this->get('oro_entity.entity_field_provider');
+        return $this->container->get('oro_entity.entity_field_provider');
     }
 
     /**
@@ -391,7 +393,7 @@ class ConfigController extends AbstractController
      */
     private function getTranslator()
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
@@ -410,6 +412,7 @@ class ConfigController extends AbstractController
                 Router::class,
                 ConfigFieldHandler::class,
                 OwnershipType::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

@@ -2,43 +2,29 @@
 
 namespace Oro\Bundle\MigrationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table("oro_migrations", indexes={
- *     @ORM\Index(name="idx_oro_migrations", columns={"bundle"})
- * })
- * @ORM\Entity()
- */
+* Entity that represents Data Migration
+*
+*/
+#[ORM\Entity]
+#[ORM\Table('oro_migrations')]
+#[ORM\Index(columns: ['bundle'], name: 'idx_oro_migrations')]
 class DataMigration
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="bundle", type="string", length=250)
-     */
-    protected $bundle;
+    #[ORM\Column(name: 'bundle', type: Types::STRING, length: 250)]
+    protected ?string $bundle = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="version", type="string", length=250)
-     */
-    protected $version;
+    #[ORM\Column(name: 'version', type: Types::STRING, length: 250)]
+    protected ?string $version = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="loaded_at", type="datetime")
-     */
-    protected $loadedAt;
+    #[ORM\Column(name: 'loaded_at', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $loadedAt = null;
 }

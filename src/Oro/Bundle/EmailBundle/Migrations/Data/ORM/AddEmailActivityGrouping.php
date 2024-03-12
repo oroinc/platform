@@ -11,29 +11,30 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 
+/**
+ * Adds grouping for emails in threads.
+ */
 class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtureInterface
 {
-    const BATCH_SIZE = 100;
+    private const BATCH_SIZE = 100;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [
-            'Oro\Bundle\EmailBundle\Migrations\Data\ORM\AddEmailActivityLists',
-        ];
+        return [AddEmailActivityLists::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $criteria = new Criteria();
         $criteria->where($criteria->expr()->neq('xThreadId', null));
         /** @var QueryBuilder $threadQueryBuilder */
-        $threadQueryBuilder = $manager->getRepository('OroEmailBundle:Email')->createQueryBuilder('entity');
+        $threadQueryBuilder = $manager->getRepository(Email::class)->createQueryBuilder('entity');
         $threadQueryBuilder->distinct()->select('entity.xThreadId');
         $threadQueryBuilder->addCriteria($criteria);
         $threadQueryBuilder->orderBy('entity.xThreadId'); // critical for paginating on Postgre SQL
@@ -47,7 +48,7 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
         foreach ($iterator as $threadResult) {
             $threadId = $threadResult['xThreadId'];
             /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = $manager->getRepository('OroEmailBundle:Email')->createQueryBuilder('entity');
+            $queryBuilder = $manager->getRepository(Email::class)->createQueryBuilder('entity');
             $criteria = new Criteria();
             $criteria->where($criteria->expr()->eq('xThreadId', $threadId));
             $criteria->orderBy(['created' => 'ASC']);
@@ -85,7 +86,7 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
         }
     }
 
-    protected function saveEntities(ObjectManager $manager, array $entities)
+    private function saveEntities(ObjectManager $manager, array $entities)
     {
         foreach ($entities as $email) {
             $manager->persist($email);

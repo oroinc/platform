@@ -12,8 +12,6 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
 /**
- * ORO installer for EmailBundle
- *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
@@ -22,20 +20,19 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     use DatabasePlatformAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_37';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
-        $this->createOroEmailToFolderRelationTable($schema);
         $this->createOroEmailAddressTable($schema);
         $this->createOroEmailAttachmentTable($schema);
         $this->createOroEmailRecipientTable($schema);
@@ -54,7 +51,6 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $this->createOroEmailAddressVisibilityTable($schema);
 
         /** Foreign keys generation **/
-        $this->addOroEmailToFolderRelationForeignKeys($schema);
         $this->addOroEmailAddressForeignKeys($schema);
         $this->addOroEmailAttachmentForeignKeys($schema);
         $this->addOroEmailRecipientForeignKeys($schema);
@@ -67,34 +63,22 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $this->addOroEmailForeignKeys($schema);
         $this->addOroEmailAutoResponseRuleForeignKeys($schema);
         $this->addOroEmailTemplateLocalizedForeignKeys($schema);
+        $this->addOroEmailAddressVisibilityForeignKeys($schema);
 
         $queries->addPostQuery(new EmailMessageIdIndexQuery());
     }
 
     /**
-     * Create many-to-many relation table
+     * Create oro_email_address table
      */
-    public static function createOroEmailToFolderRelationTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_email_to_folder');
-        $table->addColumn('email_id', 'integer', []);
-        $table->addColumn('emailfolder_id', 'integer', []);
-        $table->addIndex(['email_id'], 'oro_folder_email_idx', []);
-        $table->addIndex(['emailfolder_id'], 'oro_email_folder_idx', []);
-        $table->setPrimaryKey(['email_id', 'emailfolder_id']);
-    }
-
-    /**
-     * Generate table oro_email_address
-     */
-    public static function createOroEmailAddressTable(Schema $schema)
+    private function createOroEmailAddressTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_address');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('created', 'datetime', []);
-        $table->addColumn('updated', 'datetime', []);
+        $table->addColumn('created', 'datetime');
+        $table->addColumn('updated', 'datetime');
         $table->addColumn('email', 'string', ['length' => 255]);
-        $table->addColumn('has_owner', 'boolean', []);
+        $table->addColumn('has_owner', 'boolean');
         $table->addColumn('owner_mailbox_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['email'], 'oro_email_address_uq');
@@ -103,7 +87,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_attachment table
      */
-    protected function createOroEmailAttachmentTable(Schema $schema)
+    private function createOroEmailAttachmentTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_attachment');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -118,7 +102,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_recipient table
      */
-    protected function createOroEmailRecipientTable(Schema $schema)
+    private function createOroEmailRecipientTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_recipient');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -126,14 +110,14 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $table->addColumn('email_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 320]);
         $table->addColumn('type', 'string', ['length' => 3]);
-        $table->addIndex(['email_id', 'type'], 'email_id_type_idx');
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['email_id', 'type'], 'email_id_type_idx');
     }
 
     /**
      * Create oro_email_template table
      */
-    protected function createOroEmailTemplateTable(Schema $schema)
+    private function createOroEmailTemplateTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_template');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -157,21 +141,21 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_attachment_content table
      */
-    protected function createOroEmailAttachmentContentTable(Schema $schema)
+    private function createOroEmailAttachmentContentTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_attachment_content');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('attachment_id', 'integer');
         $table->addColumn('content', 'text');
         $table->addColumn('content_transfer_encoding', 'string', ['length' => 20]);
-        $table->addUniqueIndex(['attachment_id']);
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['attachment_id']);
     }
 
     /**
      * Create oro_email_origin table
      */
-    protected function createOroEmailOriginTable(Schema $schema)
+    private function createOroEmailOriginTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_origin');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -192,7 +176,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_folder table
      */
-    protected function createOroEmailFolderTable(Schema $schema)
+    private function createOroEmailFolderTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_folder');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -206,18 +190,17 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $table->addColumn('sync_enabled', 'boolean', ['default' => false]);
         $table->addColumn('sync_start_date', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
         $table->addColumn('failed_count', 'integer', ['default' => 0]);
-        $table->addIndex(['outdated_at'], 'email_folder_outdated_at_idx');
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['outdated_at'], 'email_folder_outdated_at_idx');
     }
 
     /**
      * Create oro_email_user table
      */
-    protected function createOroEmailUserTable(Schema $schema)
+    private function createOroEmailUserTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_user');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('folder_id', 'integer', ['notnull' => true]);
         $table->addColumn('email_id', 'integer', ['notnull' => true]);
         $table->addColumn('created_at', 'datetime');
         $table->addColumn('received', 'datetime');
@@ -233,7 +216,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_thread table
      */
-    protected function createOroEmailThreadTable(Schema $schema)
+    private function createOroEmailThreadTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_thread');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -245,7 +228,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_body table
      */
-    protected function createOroEmailBodyTable(Schema $schema)
+    private function createOroEmailBodyTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_body');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -261,7 +244,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_mailbox table
      */
-    protected function createOroEmailMailboxTable(Schema $schema, QueryBag $queries)
+    private function createOroEmailMailboxTable(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->createTable('oro_email_mailbox');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -272,11 +255,11 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $table->addColumn('label', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated_at', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
+        $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['email']);
         $table->addUniqueIndex(['label']);
         $table->addUniqueIndex(['process_settings_id']);
         $table->addUniqueIndex(['origin_id']);
-        $table->setPrimaryKey(['id']);
 
         if ($this->platform instanceof PostgreSqlPlatform) {
             $queries->addPostQuery(new SqlMigrationQuery(
@@ -288,7 +271,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_mailbox_process table
      */
-    protected function createOroEmailMailboxProcessTable(Schema $schema)
+    private function createOroEmailMailboxProcessTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_mailbox_process');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -299,7 +282,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email table
      */
-    protected function createOroEmailTable(Schema $schema)
+    private function createOroEmailTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -320,16 +303,16 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $table->addColumn('multi_message_id', 'text', ['notnull' => false]);
         $table->addColumn('acceptlanguageheader', 'text', ['notnull' => false]);
         $table->addColumn('body_synced', 'boolean', ['default' => false, 'notnull' => false]);
+        $table->setPrimaryKey(['id']);
         $table->addIndex(['sent'], 'idx_sent');
         $table->addIndex(['is_head'], 'oro_email_is_head');
         $table->addUniqueIndex(['email_body_id']);
-        $table->setPrimaryKey(['id']);
     }
 
     /**
      * Create oro_email_auto_response_rule table
      */
-    protected function createOroEmailAutoResponseRuleTable(Schema $schema)
+    private function createOroEmailAutoResponseRuleTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_auto_response_rule');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -345,7 +328,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Create oro_email_template_localized table
      */
-    protected function createOroEmailTemplateLocalizedTable(Schema $schema)
+    private function createOroEmailTemplateLocalizedTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_template_localized');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -359,29 +342,21 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     }
 
     /**
-     * Create many-to-many relation table
+     * Create oro_email_address_visibility table
      */
-    public static function addOroEmailToFolderRelationForeignKeys(Schema $schema)
+    private function createOroEmailAddressVisibilityTable(Schema $schema): void
     {
-        $table = $schema->getTable('oro_email_to_folder');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_email'),
-            ['email_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_email_folder'),
-            ['emailfolder_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
-        );
+        $table = $schema->createTable('oro_email_address_visibility');
+        $table->addColumn('email', 'string', ['length' => 255]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => true]);
+        $table->addColumn('is_visible', 'boolean');
+        $table->setPrimaryKey(['email', 'organization_id']);
     }
 
     /**
      * Add oro_email_address foreign keys.
      */
-    protected function addOroEmailAddressForeignKeys(Schema $schema)
+    private function addOroEmailAddressForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_address');
         $table->addForeignKeyConstraint(
@@ -395,7 +370,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_attachment foreign keys.
      */
-    protected function addOroEmailAttachmentForeignKeys(Schema $schema)
+    private function addOroEmailAttachmentForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_attachment');
         $table->addForeignKeyConstraint(
@@ -415,7 +390,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_recipient foreign keys.
      */
-    protected function addOroEmailRecipientForeignKeys(Schema $schema)
+    private function addOroEmailRecipientForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_recipient');
         $table->addForeignKeyConstraint(
@@ -435,7 +410,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_template foreign keys.
      */
-    protected function addOroEmailTemplateForeignKeys(Schema $schema)
+    private function addOroEmailTemplateForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_template');
         $table->addForeignKeyConstraint(
@@ -449,7 +424,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_attachment_content foreign keys.
      */
-    protected function addOroEmailAttachmentContentForeignKeys(Schema $schema)
+    private function addOroEmailAttachmentContentForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_attachment_content');
         $table->addForeignKeyConstraint(
@@ -463,7 +438,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_folder foreign keys.
      */
-    protected function addOroEmailFolderForeignKeys(Schema $schema)
+    private function addOroEmailFolderForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_folder');
         $table->addForeignKeyConstraint(
@@ -483,7 +458,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_user foreign keys.
      */
-    protected function addOroEmailUserForeignKeys(Schema $schema)
+    private function addOroEmailUserForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_user');
         $table->addForeignKeyConstraint(
@@ -498,19 +473,12 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_email_folder'),
-            ['folder_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null],
-            'FK_91F5CFF6162CB942'
-        );
     }
 
     /**
      * Add oro_email_thread foreign keys.
      */
-    protected function addOroEmailThreadForeignKeys(Schema $schema)
+    private function addOroEmailThreadForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_thread');
         $table->addForeignKeyConstraint(
@@ -524,7 +492,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_mailbox foreign keys.
      */
-    protected function addOroEmailMailboxForeignKeys(Schema $schema)
+    private function addOroEmailMailboxForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_mailbox');
         $table->addForeignKeyConstraint(
@@ -550,7 +518,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email foreign keys.
      */
-    protected function addOroEmailForeignKeys(Schema $schema)
+    private function addOroEmailForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email');
         $table->addForeignKeyConstraint(
@@ -576,7 +544,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_auto_response_rule foreign keys.
      */
-    protected function addOroEmailAutoResponseRuleForeignKeys(Schema $schema)
+    private function addOroEmailAutoResponseRuleForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_auto_response_rule');
         $table->addForeignKeyConstraint(
@@ -596,7 +564,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
     /**
      * Add oro_email_template_localized foreign keys.
      */
-    protected function addOroEmailTemplateLocalizedForeignKeys(Schema $schema)
+    private function addOroEmailTemplateLocalizedForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_template_localized');
         $table->addForeignKeyConstraint(
@@ -607,13 +575,12 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         );
     }
 
-    private function createOroEmailAddressVisibilityTable(Schema $schema)
+    /**
+     * Add oro_email_address_visibility foreign keys.
+     */
+    private function addOroEmailAddressVisibilityForeignKeys(Schema $schema): void
     {
-        $table = $schema->createTable('oro_email_address_visibility');
-        $table->addColumn('email', 'string', ['length' => 255]);
-        $table->addColumn('organization_id', 'integer', ['notnull' => true]);
-        $table->addColumn('is_visible', 'boolean', []);
-        $table->setPrimaryKey(['email', 'organization_id']);
+        $table = $schema->getTable('oro_email_address_visibility');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],

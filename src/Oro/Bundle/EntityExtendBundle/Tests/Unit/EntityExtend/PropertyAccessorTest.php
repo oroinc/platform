@@ -9,7 +9,6 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClass;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClassMagicCall;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClassMagicGet;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\Ticket5775Object;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -160,7 +159,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueReadsMagicCallIfEnabled()
     {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_GET);
 
         $this->assertSame(
             'John',
@@ -171,24 +170,12 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     // https://github.com/symfony/symfony/pull/4450
     public function testGetValueReadsMagicCallThatReturnsConstant()
     {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_CALL);
 
         $this->assertSame(
             'constant value',
             $this->propertyAccessor->getValue(new TestClassMagicCall('John'), 'constantMagicCallProperty')
         );
-    }
-
-    /**
-     * @dataProvider getPathsWithUnexpectedType
-     */
-    public function testGetValueThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path)
-    {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
-
-        $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
     /**
@@ -235,7 +222,10 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         object|array $objectOrArray,
         string $path
     ) {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(false, true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(
+            ReflectionExtractor::DISALLOW_MAGIC_METHODS,
+            PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
+        );
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
@@ -285,7 +275,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueUpdatesMagicCallIfEnabled()
     {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_CALL);
 
         $author = new TestClassMagicCall('John');
 
@@ -330,7 +320,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionForInvalidPropertyPathType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new \stdClass();
 
         $this->propertyAccessor->remove($testObject, 123);
@@ -437,7 +427,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveUpdatesMagicCallIfEnabled()
     {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_CALL);
 
         $author = new TestClassMagicCall('John');
 
@@ -466,7 +456,10 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueWhenArrayValueIsNullAndIndexExceptionsDisabled()
     {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(false, true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(
+            ReflectionExtractor::DISALLOW_MAGIC_METHODS,
+            PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
+        );
         $this->assertNull(
             $this->propertyAccessor->getValue(['index' => ['nullable' => null]], 'index.nullable')
         );
@@ -485,7 +478,10 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsReadableWhenIndexExceptionsDisabled(object|array $objectOrArray, string $path)
     {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(false, true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(
+            ReflectionExtractor::DISALLOW_MAGIC_METHODS,
+            PropertyAccessorWithDotArraySyntax::DO_NOT_THROW
+        );
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
             ReflectionExtractor::DISALLOW_MAGIC_METHODS
         );
@@ -540,7 +536,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testIsReadableRecognizesMagicCallIfEnabled()
     {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_GET);
 
         $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicCall('John'), 'magicCallProperty'));
     }
@@ -586,7 +582,10 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         string $path
     ) {
         // Non-existing indices can be written even if exceptions are enabled
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(false, true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(
+            ReflectionExtractor::DISALLOW_MAGIC_METHODS,
+            PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
+        );
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
@@ -602,7 +601,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testIsWritableRecognizesMagicCallIfEnabled()
     {
-        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(true);
+        $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_CALL);
 
         $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('John'), 'magicCallProperty'));
     }

@@ -59,7 +59,7 @@ class OperationRegistryTest extends WebTestCase
 
     private function setUpTokenStorage()
     {
-        $token = new UsernamePasswordToken(new User(), self::AUTH_PW, 'user');
+        $token = new UsernamePasswordToken(new User(), 'user');
 
         $this->getContainer()->get('security.token_storage')->setToken($token);
     }

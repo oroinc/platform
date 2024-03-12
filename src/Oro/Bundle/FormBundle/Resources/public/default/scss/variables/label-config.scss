@@ -1,5 +1,5 @@
 /* @theme: default; */
 
-$label-offset: $offset-x-m !default;
+$label-offset: spacing('sm') !default;
 $label-font-size: $base-font-size !default;
-$label-required-color: get-color('ui', 'error-dark') !default;
+$label-required-color: get-color('destructive', 'dark') !default;

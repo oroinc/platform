@@ -4,9 +4,11 @@ layout:
             id: logo
             parentId: middle_bar_logo
             blockType: logo
-            options:
-                width: 167
-                height: 32
+
+        - '@appendOption':
+            id: logo
+            optionName: vars.small_logo
+            optionValue: '=data["theme"].getLogoSmall("default")'
 
         - '@add':
             id: logo_print

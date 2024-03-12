@@ -2,16 +2,19 @@
 
 namespace Oro\Bundle\IntegrationBundle\Model;
 
+use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
+/**
+ * IntegrationEntity trait
+ */
 trait IntegrationEntityTrait
 {
     /**
      * @var Integration
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel")
-     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", onDelete="SET NULL")
      */
+    #[ORM\ManyToOne(targetEntity: 'Oro\Bundle\IntegrationBundle\Entity\Channel')]
+    #[ORM\JoinColumn(name: 'channel_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     protected $channel;
 
     /**

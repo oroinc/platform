@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Event\Events;
@@ -60,17 +59,12 @@ class ActivityManagerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($this->em);
-        $doctrine->expects($this->any())
-            ->method('getAliasNamespace')
-            ->willReturnMap([
-                ['Test', 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity']
-            ]);
 
         $this->activityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);

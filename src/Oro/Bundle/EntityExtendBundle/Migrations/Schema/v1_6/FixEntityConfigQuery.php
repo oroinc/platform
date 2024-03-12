@@ -2,28 +2,19 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_6;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
 class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 {
+    use ConnectionAwareTrait;
+
     const LIMIT = 100;
-
-    /** @var Connection */
-    protected $connection;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
 
     /**
      * {@inheritdoc}
@@ -47,7 +38,7 @@ class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
             $rows = $entityConfigQb
                 ->setFirstResult($i * static::LIMIT)
                 ->execute()
-                ->fetchAll(\PDO::FETCH_ASSOC);
+                ->fetchAllAssociative();
 
             foreach ($rows as $row) {
                 $this->processRow($row);
@@ -107,7 +98,7 @@ class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
         return $this->createEntityConfigQb()
             ->select('COUNT(1)')
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**

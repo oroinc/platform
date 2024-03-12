@@ -3,43 +3,37 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 
-/**
- * @ORM\Entity
- * @Config
- */
+#[ORM\Entity]
+#[Config]
 class DemoEntity
 {
     /**
      * @var integer
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     * @ORM\Column(name="name", type="string", length=255)
      */
+    #[ORM\Column(name: 'name', type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\OneToMany(targetEntity="DemoEntity", mappedBy="parent")
-     */
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: DemoEntity::class)]
     private $children;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="DemoEntity", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: DemoEntity::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
     private $parent;
 
     /**
      * @var string
-     * @ORM\Column(name="description", type="text")
      */
+    #[ORM\Column(name: 'description', type: 'text')]
     private $description;
 
     /**

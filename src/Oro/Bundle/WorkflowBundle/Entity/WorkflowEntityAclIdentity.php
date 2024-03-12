@@ -2,67 +2,42 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
- * @ORM\Table(
- *      name="oro_workflow_entity_acl_ident",
- *      indexes={
- *          @ORM\Index(
- *              name="oro_workflow_entity_acl_identity_idx",
- *              columns={"entity_id", "entity_class"}
- *          )
- *      },
- *      uniqueConstraints={
- *          @ORM\UniqueConstraint(
- *              name="oro_workflow_entity_acl_identity_unique_idx",
- *              columns={"workflow_entity_acl_id", "entity_id", "workflow_item_id"}
- *          )
- *      }
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository")
- */
+* Entity that represents Workflow Entity Acl Identity
+*
+*/
+#[ORM\Entity(repositoryClass: WorkflowEntityAclIdentityRepository::class)]
+#[ORM\Table(name: 'oro_workflow_entity_acl_ident')]
+#[ORM\Index(columns: ['entity_id', 'entity_class'], name: 'oro_workflow_entity_acl_identity_idx')]
+#[ORM\UniqueConstraint(
+    name: 'oro_workflow_entity_acl_identity_unique_idx',
+    columns: ['workflow_entity_acl_id', 'entity_id', 'workflow_item_id']
+)]
 class WorkflowEntityAclIdentity
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var WorkflowEntityAcl
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowEntityAcl")
-     * @ORM\JoinColumn(name="workflow_entity_acl_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $acl;
+    #[ORM\ManyToOne(targetEntity: WorkflowEntityAcl::class)]
+    #[ORM\JoinColumn(name: 'workflow_entity_acl_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?WorkflowEntityAcl $acl = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_class", type="string", length=255, nullable=false)
-     */
-    protected $entityClass;
+    #[ORM\Column(name: 'entity_class', type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $entityClass = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="entity_id", type="integer", nullable=false)
-     */
-    protected $entityId;
+    #[ORM\Column(name: 'entity_id', type: Types::INTEGER, nullable: false)]
+    protected ?int $entityId = null;
 
-    /**
-     * @var WorkflowItem
-     *
-     * @ORM\ManyToOne(targetEntity="WorkflowItem", inversedBy="aclIdentities")
-     * @ORM\JoinColumn(name="workflow_item_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $workflowItem;
+    #[ORM\ManyToOne(targetEntity: WorkflowItem::class, inversedBy: 'aclIdentities')]
+    #[ORM\JoinColumn(name: 'workflow_item_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?WorkflowItem $workflowItem = null;
 
     /**
      * @return integer

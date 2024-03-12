@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
@@ -40,8 +41,8 @@ use Oro\Bundle\FilterBundle\Filter\FilterBag;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -66,10 +67,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailController extends AbstractController
 {
-    /**
-     * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection", methods={"POST"})
-     * @CsrfProtection()
-     */
+    #[Route(path: '/check-smtp-connection', name: 'oro_email_check_smtp_connection', methods: ['POST'])]
+    #[CsrfProtection()]
     public function checkSmtpConnectionAction(Request $request): JsonResponse
     {
         $this->getSmtpSettingsChecker()->checkConnection(
@@ -80,10 +79,8 @@ class EmailController extends AbstractController
         return new JsonResponse($error ?? '');
     }
 
-    /**
-     * @Route("/check-saved-smtp-connection", name="oro_email_check_saved_smtp_connection", methods={"GET"})
-     * @CsrfProtection()
-     */
+    #[Route(path: '/check-saved-smtp-connection', name: 'oro_email_check_saved_smtp_connection', methods: ['GET'])]
+    #[CsrfProtection()]
     public function checkSavedSmtpConnectionAction(Request $request): JsonResponse
     {
         $this->getSmtpSettingsChecker()->checkConnection(
@@ -94,11 +91,9 @@ class EmailController extends AbstractController
         return new JsonResponse($error ?? '');
     }
 
-    /**
-     * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments", methods={"POST"})
-     * @CsrfProtection()
-     * @AclAncestor("oro_config_system")
-     */
+    #[Route(path: '/purge-emails-attachments', name: 'oro_email_purge_emails_attachments', methods: ['POST'])]
+    #[AclAncestor('oro_config_system')]
+    #[CsrfProtection()]
     public function purgeEmailsAttachmentsAction(): JsonResponse
     {
         $this->getMessageProducer()->send(PurgeEmailAttachmentsTopic::getName(), []);
@@ -110,13 +105,13 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route("/view/{id}", name="oro_email_view", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_view")
-     * @Template("@OroEmail/Email/view.html.twig")
      * @param Request $request
      * @param Email $entity
      * @return array
      */
+    #[Route(path: '/view/{id}', name: 'oro_email_view', requirements: ['id' => '\d+'])]
+    #[Template('@OroEmail/Email/view.html.twig')]
+    #[AclAncestor('oro_email_email_view')]
     public function viewAction(Request $request, Email $entity)
     {
         try {
@@ -138,9 +133,8 @@ class EmailController extends AbstractController
 
     /**
      * Get new Unread Emails for email notification
-     *
-     * @Template("@OroEmail/Notification/button.html.twig")
      */
+    #[Template('@OroEmail/Notification/button.html.twig')]
     public function placeholderLastAction()
     {
         $result = [
@@ -172,10 +166,9 @@ class EmailController extends AbstractController
      * Extra GET params for Route:
      *  "limit" - It defines amount of returned values.
      *  "folderId" -  It defines folder id.
-     *
-     * @Route("/last", name="oro_email_last")
-     * @AclAncestor("oro_email_email_view")
      */
+    #[Route(path: '/last', name: 'oro_email_last')]
+    #[AclAncestor('oro_email_email_view')]
     public function lastAction(): JsonResponse
     {
         $request = $this->getRequestStack()->getCurrentRequest();
@@ -208,13 +201,12 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_view")
-     * @Template("@OroEmail/Email/Thread/view.html.twig")
-     *
      * @param Email $entity
      * @return array
      */
+    #[Route(path: '/view/thread/{id}', name: 'oro_email_thread_view', requirements: ['id' => '\d+'])]
+    #[Template('@OroEmail/Email/Thread/view.html.twig')]
+    #[AclAncestor('oro_email_email_view')]
     public function viewThreadAction(Email $entity)
     {
         $this->getEmailManager()->setSeenStatus($entity, true, true);
@@ -223,12 +215,12 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route("/widget/thread/{id}", name="oro_email_thread_widget", requirements={"id"="\d+"})
-     * @Template("@OroEmail/Email/widget/thread.html.twig")
      * @param Request $request
      * @param Email $entity
      * @return array
      */
+    #[Route(path: '/widget/thread/{id}', name: 'oro_email_thread_widget', requirements: ['id' => '\d+'])]
+    #[Template('@OroEmail/Email/widget/thread.html.twig')]
     public function threadWidgetAction(Request $request, Email $entity)
     {
         $emails = [];
@@ -236,7 +228,7 @@ class EmailController extends AbstractController
             $emails[] = $entity;
         } else {
             $emails = $this->getEmailThreadProvider()->getThreadEmails(
-                $this->getDoctrine()->getManager(),
+                $this->container->get('doctrine')->getManager(),
                 $entity
             );
             $targetActivityClass = $request->get('targetActivityClass');
@@ -272,13 +264,13 @@ class EmailController extends AbstractController
     /**
      * Used on `My Emails` page to show emails thread with only emails being related to currently logged user.
      *
-     * @Route("/view/user-thread/{id}", name="oro_email_user_thread_view", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_view")
-     * @Template("@OroEmail/Email/Thread/userEmails.html.twig")
      *
      * @param Email $entity
      * @return array
      */
+    #[Route(path: '/view/user-thread/{id}', name: 'oro_email_user_thread_view', requirements: ['id' => '\d+'])]
+    #[Template('@OroEmail/Email/Thread/userEmails.html.twig')]
+    #[AclAncestor('oro_email_email_view')]
     public function viewUserThreadAction(Email $entity)
     {
         $this->getEmailManager()->setSeenStatus($entity, true, true);
@@ -289,12 +281,12 @@ class EmailController extends AbstractController
     /**
      * Used on `My Emails` page to show emails thread with only emails being related to currently logged user.
      *
-     * @Route("/widget/user-thread/{id}", name="oro_email_user_thread_widget", requirements={"id"="\d+"})
-     * @Template("@OroEmail/Email/widget/thread.html.twig")
      * @param Request $request
      * @param Email $entity
      * @return array
      */
+    #[Route(path: '/widget/user-thread/{id}', name: 'oro_email_user_thread_widget', requirements: ['id' => '\d+'])]
+    #[Template('@OroEmail/Email/widget/thread.html.twig')]
     public function userThreadWidgetAction(Request $request, Email $entity)
     {
         $emails = [];
@@ -302,12 +294,12 @@ class EmailController extends AbstractController
             $emails[] = $entity;
         } else {
             $emails = $this->getEmailThreadProvider()->getUserThreadEmails(
-                $this->getDoctrine()->getManager(),
+                $this->container->get('doctrine')->getManager(),
                 $entity,
                 $this->getUser(),
-                $this->get(MailboxManager::class)->findAvailableMailboxes(
+                $this->container->get(MailboxManager::class)->findAvailableMailboxes(
                     $this->getUser(),
-                    $this->get('security.token_storage')->getToken()->getOrganization()
+                    $this->container->get('security.token_storage')->getToken()->getOrganization()
                 )
             );
         }
@@ -329,17 +321,17 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route("/view-items", name="oro_email_items_view")
-     * @Template("@OroEmail/Email/items.html.twig")
      * @param Request $request
      * @return array
      */
+    #[Route(path: '/view-items', name: 'oro_email_items_view')]
+    #[Template('@OroEmail/Email/items.html.twig')]
     public function itemsAction(Request $request)
     {
         $emails = [];
         $ids = $this->prepareArrayParam($request, 'ids');
         if (count($ids) !== 0) {
-            $emails = $this->getDoctrine()->getRepository(Email::class)->findEmailsByIds($ids);
+            $emails = $this->container->get('doctrine')->getRepository(Email::class)->findEmailsByIds($ids);
         }
         $this->loadEmailBody($emails);
 
@@ -356,18 +348,18 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/view-group/{id}",
-     *     name="oro_email_view_group",
-     *     requirements={"id"="\d+"},
-     *     condition="request !== null && request.get('_widgetContainer')"
-     * )
-     * @AclAncestor("oro_email_email_view")
-     * @Template("@OroEmail/Email/dialog/viewGroup.html.twig")
      * @param Request $request
      * @param Email $email
      * @return array
      */
+    #[Route(
+        path: '/view-group/{id}',
+        name: 'oro_email_view_group',
+        requirements: ['id' => '\d+'],
+        condition: "request !== null && request.get('_widgetContainer')"
+    )]
+    #[Template('@OroEmail/Email/dialog/viewGroup.html.twig')]
+    #[AclAncestor('oro_email_email_view')]
     public function viewGroupAction(Request $request, Email $email)
     {
         $results = $this->getActivityListManager()->getGroupedEntities(
@@ -385,17 +377,14 @@ class EmailController extends AbstractController
      * This action is used to render the list of emails associated with the given entity
      * on the view page of this entity
      *
-     * @Route(
-     *      "/activity/view/{entityClass}/{entityId}",
-     *      name="oro_email_activity_view"
-     * )
      *
-     * @Template("@OroEmail/Email/activity.html.twig")
      *
      * @param string $entityClass
      * @param mixed $entityId
      * @return array
      */
+    #[Route(path: '/activity/view/{entityClass}/{entityId}', name: 'oro_email_activity_view')]
+    #[Template('@OroEmail/Email/activity.html.twig')]
     public function activityAction($entityClass, $entityId)
     {
         $entity = $this->getEntityRoutingHelper()->getEntity($entityClass, $entityId);
@@ -408,32 +397,30 @@ class EmailController extends AbstractController
         ];
     }
 
-    /**
-     * @Route(
-     *     "/create",
-     *     name="oro_email_email_create",
-     *     condition="request !== null && request.get('_widgetContainer')"
-     * )
-     * @AclAncestor("oro_email_email_create")
-     * @Template("@OroEmail/Email/update.html.twig")
-     */
+    #[Route(
+        path: '/create',
+        name: 'oro_email_email_create',
+        condition: "request !== null && request.get('_widgetContainer')"
+    )]
+    #[Template('@OroEmail/Email/update.html.twig')]
+    #[AclAncestor('oro_email_email_create')]
     public function createAction()
     {
         return $this->process($this->getEmailModelBuilder()->createEmailModel());
     }
 
     /**
-     * @Route(
-     *     "/reply/{id}", name="oro_email_email_reply",
-     *     requirements={"id"="\d+"},
-     *     condition="request !== null && request.get('_widgetContainer')"
-     * )
-     * @AclAncestor("oro_email_email_create")
-     * @Template("@OroEmail/Email/update.html.twig")
-     *
      * @param Email $email
      * @return array
      */
+    #[Route(
+        path: '/reply/{id}',
+        name: 'oro_email_email_reply',
+        requirements: ['id' => '\d+'],
+        condition: "request !== null && request.get('_widgetContainer')"
+    )]
+    #[Template('@OroEmail/Email/update.html.twig')]
+    #[AclAncestor('oro_email_email_create')]
     public function replyAction(Email $email)
     {
         if (!$this->isGranted('VIEW', $email)) {
@@ -444,18 +431,17 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/replyall/{id}",
-     *     name="oro_email_email_reply_all",
-     *     requirements={"id"="\d+"},
-     *     condition="request !== null && request.get('_widgetContainer')"
-     * )
-     * @AclAncestor("oro_email_email_create")
-     * @Template("@OroEmail/Email/update.html.twig")
-     *
      * @param Email $email
      * @return array
      */
+    #[Route(
+        path: '/replyall/{id}',
+        name: 'oro_email_email_reply_all',
+        requirements: ['id' => '\d+'],
+        condition: "request !== null && request.get('_widgetContainer')"
+    )]
+    #[Template('@OroEmail/Email/update.html.twig')]
+    #[AclAncestor('oro_email_email_create')]
     public function replyAllAction(Email $email)
     {
         if (!$this->isGranted('VIEW', $email)) {
@@ -466,18 +452,17 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/forward/{id}",
-     *     name="oro_email_email_forward",
-     *     requirements={"id"="\d+"},
-     *     condition="request !== null && request.get('_widgetContainer')"
-     * )
-     * @AclAncestor("oro_email_email_create")
-     * @Template("@OroEmail/Email/update.html.twig")
-     *
      * @param Email $email
      * @return array
      */
+    #[Route(
+        path: '/forward/{id}',
+        name: 'oro_email_email_forward',
+        requirements: ['id' => '\d+'],
+        condition: "request !== null && request.get('_widgetContainer')"
+    )]
+    #[Template('@OroEmail/Email/update.html.twig')]
+    #[AclAncestor('oro_email_email_create')]
     public function forwardAction(Email $email)
     {
         if (!$this->isGranted('VIEW', $email)) {
@@ -490,12 +475,12 @@ class EmailController extends AbstractController
     /**
      * Get the given email body content
      *
-     * @Route("/body/{id}", name="oro_email_body", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_body_view")
      *
      * @param EmailBody $entity
      * @return Response
      */
+    #[Route(path: '/body/{id}', name: 'oro_email_body', requirements: ['id' => '\d+'])]
+    #[AclAncestor('oro_email_email_body_view')]
     public function bodyAction(EmailBody $entity)
     {
         return new Response($entity->getBodyContent());
@@ -504,12 +489,12 @@ class EmailController extends AbstractController
     /**
      * Get a response for download the given email attachment
      *
-     * @Route("/attachment/{id}", name="oro_email_attachment", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_attachment_view")
      *
      * @param EmailAttachment $entity
      * @return Response
      */
+    #[Route(path: '/attachment/{id}', name: 'oro_email_attachment', requirements: ['id' => '\d+'])]
+    #[AclAncestor('oro_email_email_attachment_view')]
     public function attachmentAction(EmailAttachment $entity)
     {
         $response = new Response();
@@ -529,24 +514,25 @@ class EmailController extends AbstractController
     /**
      * Get resized image url
      *
-     * @Route("media/cache/email_attachment/resize/{id}/{width}/{height}",
-     *   name="oro_resize_email_attachment",
-     *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
-     * )
-     * @AclAncestor("oro_email_email_attachment_view")
      * @param Request $request
      * @param EmailAttachment $attachment
      * @param int $width
      * @param int $height
      * @return Response
      */
+    #[Route(
+        path: 'media/cache/email_attachment/resize/{id}/{width}/{height}',
+        name: 'oro_resize_email_attachment',
+        requirements: ['id' => '\d+', 'width' => '\d+', 'height' => '\d+']
+    )]
+    #[AclAncestor('oro_email_email_attachment_view')]
     public function getResizedAttachmentImageAction(Request $request, EmailAttachment $attachment, $width, $height)
     {
         $path = substr($request->getPathInfo(), 1);
         $fileManager = $this->getFileManager();
         $content = $fileManager->getContent($path, false);
         if (null === $content) {
-            $imageBinary = $this->get(ResizedImageProvider::class)->getResizedImageByContent(
+            $imageBinary = $this->container->get(ResizedImageProvider::class)->getResizedImageByContent(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
                     $attachment->getContent()->getContentTransferEncoding()
@@ -571,12 +557,12 @@ class EmailController extends AbstractController
     /**
      * Get a zip with email attachments from the given email body
      *
-     * @Route("/attachments/{id}", name="oro_email_body_attachments", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_body_view")
      *
      * @param EmailBody $entity
      * @return BinaryFileResponse
      */
+    #[Route(path: '/attachments/{id}', name: 'oro_email_body_attachments', requirements: ['id' => '\d+'])]
+    #[AclAncestor('oro_email_email_body_view')]
     public function downloadAttachmentsAction(EmailBody $entity)
     {
         $attachments = $entity->getAttachments();
@@ -610,14 +596,19 @@ class EmailController extends AbstractController
     /**
      * Link attachment to entity
      *
-     * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"}, methods={"POST"})
-     * @AclAncestor("oro_email_email_user_edit")
-     * @CsrfProtection()
      *
      * @param Request $request
      * @param EmailAttachment $emailAttachment
      * @return JsonResponse
      */
+    #[Route(
+        path: '/attachment/{id}/link',
+        name: 'oro_email_attachment_link',
+        requirements: ['id' => '\d+'],
+        methods: ['POST']
+    )]
+    #[AclAncestor('oro_email_email_user_edit')]
+    #[CsrfProtection()]
     public function linkAction(Request $request, EmailAttachment $emailAttachment)
     {
         try {
@@ -634,17 +625,17 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/widget",
-     *     name="oro_email_widget_emails",
-     *     condition="request !== null && request.get('_widgetContainer')"
-     * )
-     * @Template("@OroEmail/Email/widget/emails.html.twig")
      *
      * @param Request $request
      *
      * @return array
      */
+    #[Route(
+        path: '/widget',
+        name: 'oro_email_widget_emails',
+        condition: "request !== null && request.get('_widgetContainer')"
+    )]
+    #[Template('@OroEmail/Email/widget/emails.html.twig')]
     public function emailsAction(Request $request)
     {
         return [
@@ -653,16 +644,15 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/base-widget",
-     *     name="oro_email_widget_base_emails",
-     *     condition="request !== null && request.get('_widgetContainer')"
-     * )
-     * @Template("@OroEmail/Email/widget/baseEmails.html.twig")
-     *
      * @param Request $request
      * @return array
      */
+    #[Route(
+        path: '/base-widget',
+        name: 'oro_email_widget_base_emails',
+        condition: "request !== null && request.get('_widgetContainer')"
+    )]
+    #[Template('@OroEmail/Email/widget/baseEmails.html.twig')]
     public function baseEmailsAction(Request $request)
     {
         return [
@@ -670,26 +660,22 @@ class EmailController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/user-emails", name="oro_email_user_emails")
-     * @AclAncestor("oro_email_email_user_view")
-     * @Template("@OroEmail/Email/userEmails.html.twig")
-     */
+    #[Route(path: '/user-emails', name: 'oro_email_user_emails')]
+    #[Template('@OroEmail/Email/userEmails.html.twig')]
+    #[AclAncestor('oro_email_email_user_view')]
     public function userEmailsAction()
     {
         return [];
     }
 
-    /**
-     * @Route("/user-sync-emails", name="oro_email_user_sync_emails", methods={"POST"})
-     * @AclAncestor("oro_email_email_view")
-     * @CsrfProtection()
-     */
+    #[Route(path: '/user-sync-emails', name: 'oro_email_user_sync_emails', methods: ['POST'])]
+    #[AclAncestor('oro_email_email_view')]
+    #[CsrfProtection()]
     public function userEmailsSyncAction()
     {
         try {
-            $this->get(EmailSynchronizationManager::class)->syncOrigins(
-                $this->get(EmailGridHelper::class)->getEmailOrigins($this->getTokenAccessor()->getUserId()),
+            $this->container->get(EmailSynchronizationManager::class)->syncOrigins(
+                $this->container->get(EmailGridHelper::class)->getEmailOrigins($this->getTokenAccessor()->getUserId()),
                 true
             );
         } catch (\Exception $e) {
@@ -705,13 +691,18 @@ class EmailController extends AbstractController
     /**
      * Togle user emails seen status
      *
-     * @Route("/toggle-seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"}, methods={"POST"})
-     * @AclAncestor("oro_email_email_user_edit")
-     * @CsrfProtection()
      *
      * @param EmailUser $emailUser
      * @return JsonResponse
      */
+    #[Route(
+        path: '/toggle-seen/{id}',
+        name: 'oro_email_toggle_seen',
+        requirements: ['id' => '\d+'],
+        methods: ['POST']
+    )]
+    #[AclAncestor('oro_email_email_user_edit')]
+    #[CsrfProtection()]
     public function toggleSeenAction(EmailUser $emailUser)
     {
         $this->getEmailManager()->toggleEmailUserSeen($emailUser);
@@ -722,21 +713,21 @@ class EmailController extends AbstractController
     /**
      * Change email seen status for current user for single email or thread
      *
-     * @Route(
-     *      "/mark-seen/{id}/{status}/{checkThread}",
-     *      name="oro_email_mark_seen",
-     *      requirements={"id"="\d+", "status"="\d+", "checkThread"="\d+"},
-     *      defaults={"checkThread"=true},
-     *      methods={"POST"}
-     * )
-     * @AclAncestor("oro_email_email_user_edit")
-     * @CsrfProtection()
      *
      * @param Email $email
      * @param string $status
      * @param bool $checkThread if false it will be applied for single email instead of thread
      * @return JsonResponse
      */
+    #[Route(
+        path: '/mark-seen/{id}/{status}/{checkThread}',
+        name: 'oro_email_mark_seen',
+        requirements: ['id' => '\d+', 'status' => '\d+', 'checkThread' => '\d+'],
+        defaults: ['checkThread' => true],
+        methods: ['POST']
+    )]
+    #[AclAncestor('oro_email_email_user_edit')]
+    #[CsrfProtection()]
     public function markSeenAction(Email $email, $status, $checkThread)
     {
         $this->getEmailManager()->setSeenStatus($email, (bool) $status, (bool) $checkThread);
@@ -747,11 +738,11 @@ class EmailController extends AbstractController
     /**
      * Mark all user emails as seen
      *
-     * @Route("/mark_all_as_seen", name="oro_email_mark_all_as_seen", methods={"POST"})
-     * @AclAncestor("oro_email_email_user_edit")
-     * @CsrfProtection()
      * @return JsonResponse
      */
+    #[Route(path: '/mark_all_as_seen', name: 'oro_email_mark_all_as_seen', methods: ['POST'])]
+    #[AclAncestor('oro_email_email_user_edit')]
+    #[CsrfProtection()]
     public function markAllEmailsAsSeenAction()
     {
         $result = false;
@@ -761,7 +752,7 @@ class EmailController extends AbstractController
             $result = $this->getEmailManager()->markAllEmailsAsSeen(
                 $loggedUser,
                 $tokenAccessor->getOrganization(),
-                $this->getRequestStack()->getCurrentRequest()->query->get('ids', [])
+                $this->getRequestStack()->getCurrentRequest()->query->all('ids')
             );
         }
 
@@ -769,18 +760,18 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
-     * @CsrfProtection()
      *
      * @param Request $request
      * @param string $gridName
      * @param string $actionName
      * @return JsonResponse
      */
+    #[Route(path: '/{gridName}/massAction/{actionName}', name: 'oro_email_mark_massaction')]
+    #[CsrfProtection()]
     public function markMassAction(Request $request, $gridName, $actionName)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get(MassActionDispatcher::class);
+        $massActionDispatcher = $this->container->get(MassActionDispatcher::class);
 
         $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
@@ -793,12 +784,12 @@ class EmailController extends AbstractController
     }
 
     /**
-     * @Route("/autocomplete-recipient", name="oro_email_autocomplete_recipient")
-     * @AclAncestor("oro_email_email_create")
      *
      * @param Request $request
      * @return Response
      */
+    #[Route(path: '/autocomplete-recipient', name: 'oro_email_autocomplete_recipient')]
+    #[AclAncestor('oro_email_email_create')]
     public function autocompleteRecipientAction(Request $request)
     {
         $query = $request->get('query');
@@ -825,7 +816,7 @@ class EmailController extends AbstractController
             $entityClass = $request->get('entityClass');
             $entityId = $request->get('entityId');
             if ($entityClass && $entityId) {
-                $em = $this->getDoctrine()->getManagerForClass($entityClass);
+                $em = $this->container->get('doctrine')->getManagerForClass($entityClass);
                 $relatedEntity = $em->getReference($entityClass, $entityId);
                 if ($relatedEntity === $this->getUser()) {
                     $relatedEntity = null;
@@ -846,102 +837,102 @@ class EmailController extends AbstractController
 
     protected function getEmailRecipientsHelper(): EmailRecipientsHelper
     {
-        return $this->get(EmailRecipientsHelper::class);
+        return $this->container->get(EmailRecipientsHelper::class);
     }
 
     protected function getEmailRecipientsProvider(): EmailRecipientsProvider
     {
-        return $this->get(EmailRecipientsProvider::class);
+        return $this->container->get(EmailRecipientsProvider::class);
     }
 
     private function getEmailNotificationManager(): EmailNotificationManager
     {
-        return $this->get(EmailNotificationManager::class);
+        return $this->container->get(EmailNotificationManager::class);
     }
 
     private function getEmailAttachmentManager(): EmailAttachmentManager
     {
-        return $this->get(EmailAttachmentManager::class);
+        return $this->container->get(EmailAttachmentManager::class);
     }
 
     protected function getEmailCacheManager(): EmailCacheManager
     {
-        return $this->get(EmailCacheManager::class);
+        return $this->container->get(EmailCacheManager::class);
     }
 
     protected function getEmailManager(): EmailManager
     {
-        return $this->get(EmailManager::class);
+        return $this->container->get(EmailManager::class);
     }
 
     protected function getEmailThreadProvider(): EmailThreadProvider
     {
-        return $this->get(EmailThreadProvider::class);
+        return $this->container->get(EmailThreadProvider::class);
     }
 
     private function getEmailModelBuilder(): EmailModelBuilder
     {
-        return $this->get(EmailModelBuilder::class);
+        return $this->container->get(EmailModelBuilder::class);
     }
 
     protected function getOrganizationRepository(): EntityRepository
     {
-        return $this->getDoctrine()->getRepository(Organization::class);
+        return $this->container->get('doctrine')->getRepository(Organization::class);
     }
 
     private function getMessageProducer(): MessageProducerInterface
     {
-        return $this->get(MessageProducerInterface::class);
+        return $this->container->get(MessageProducerInterface::class);
     }
 
     private function getTranslator(): TranslatorInterface
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 
     private function getTokenAccessor(): TokenAccessorInterface
     {
-        return $this->get(TokenAccessorInterface::class);
+        return $this->container->get(TokenAccessorInterface::class);
     }
 
     private function getRequestStack(): RequestStack
     {
-        return $this->get('request_stack');
+        return $this->container->get('request_stack');
     }
 
     private function getFilterBag(): FilterBag
     {
-        return $this->get(FilterBag::class);
+        return $this->container->get(FilterBag::class);
     }
 
     private function getFileManager(): FileManager
     {
-        return $this->get(FileManager::class);
+        return $this->container->get(FileManager::class);
     }
 
     private function getUserConfigManager(): ConfigManager
     {
-        return $this->get('oro_config.user');
+        return $this->container->get('oro_config.user');
     }
 
     private function getActivityListManager(): ActivityListManager
     {
-        return $this->get(ActivityListManager::class);
+        return $this->container->get(ActivityListManager::class);
     }
 
     private function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     private function getSmtpSettingsChecker(): SmtpSettingsChecker
     {
-        return $this->get(SmtpSettingsChecker::class);
+        return $this->container->get(SmtpSettingsChecker::class);
     }
 
     private function getSmtpSettingsProvider(): SmtpSettingsProviderInterface
     {
-        return $this->get(SmtpSettingsProviderInterface::class);
+        return $this->container->get(SmtpSettingsProviderInterface::class);
     }
 
     protected function process(EmailModel $emailModel): array
@@ -951,10 +942,10 @@ class EmailController extends AbstractController
             'saved' => false,
             'appendSignature' => (bool)$this->getUserConfigManager()->get('oro_email.append_signature')
         ];
-        if ($this->get(EmailHandler::class)->process($emailModel)) {
+        if ($this->container->get(EmailHandler::class)->process($emailModel)) {
             $responseData['saved'] = true;
         }
-        $responseData['form'] = $this->get(EmailType::class)->createView();
+        $responseData['form'] = $this->container->get(EmailType::class)->createView();
 
         return $responseData;
     }
@@ -1042,7 +1033,7 @@ class EmailController extends AbstractController
         $entityClassName = $this->getEntityRoutingHelper()->getEntityClassName($request, 'targetActivityClass');
         if (null !== $entityClassName) {
             /** @var ConfigProvider $targetConfigProvider */
-            $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
+            $targetConfigProvider = $this->container->get('oro_entity_config.provider.attachment');
             if ($targetConfigProvider->hasConfig($entityClassName)) {
                 $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
             }
@@ -1064,7 +1055,7 @@ class EmailController extends AbstractController
             return null;
         }
 
-        return $this->get(DoctrineHelper::class)->getEntity($scopeClass, $scopeId);
+        return $this->container->get(DoctrineHelper::class)->getEntity($scopeClass, $scopeId);
     }
 
     /**
@@ -1102,6 +1093,7 @@ class EmailController extends AbstractController
                 EmailManager::class,
                 'oro_config.user' => ConfigManager::class,
                 'oro_entity_config.provider.attachment' => ConfigProvider::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

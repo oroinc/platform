@@ -2,91 +2,64 @@
 
 namespace Oro\Bundle\ConfigBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
 
 /**
  * Config Value Entity class.
- *
- * @ORM\Table(
- *  name="oro_config_value",
- *  uniqueConstraints={@ORM\UniqueConstraint(name="CONFIG_VALUE_UQ_ENTITY", columns={"name", "section", "config_id"})}
- * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository")
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Entity(repositoryClass: ConfigValueRepository::class)]
+#[ORM\Table(name: 'oro_config_value')]
+#[ORM\UniqueConstraint(name: 'CONFIG_VALUE_UQ_ENTITY', columns: ['name', 'section', 'config_id'])]
+#[ORM\HasLifecycleCallbacks]
 class ConfigValue
 {
     const FIELD_SCALAR_TYPE = 'scalar';
     const FIELD_OBJECT_TYPE = 'object';
     const FIELD_ARRAY_TYPE  = 'array';
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
+
+    #[ORM\ManyToOne(targetEntity: Config::class, inversedBy: 'values')]
+    #[ORM\JoinColumn(name: 'config_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Config $config = null;
+
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
+    protected ?string $section = null;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
      */
-    protected $name;
-
-    /**
-     * @var Config
-     *
-     * @ORM\ManyToOne(targetEntity="Config", inversedBy="values")
-     * @ORM\JoinColumn(name="config_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $config;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    protected $section;
-
-    /**
-     * @var string
-     * @ORM\Column(name="text_value", type="text", nullable=true)
-     */
+    #[ORM\Column(name: 'text_value', type: Types::TEXT, nullable: true)]
     protected $textValue;
 
     /**
      * @var string
-     * @ORM\Column(name="object_value", type="object", nullable=true)
      */
+    #[ORM\Column(name: 'object_value', type: Types::OBJECT, nullable: true)]
     protected $objectValue;
 
     /**
      * @var string
-     * @ORM\Column(name="array_value", type="array", nullable=true)
      */
+    #[ORM\Column(name: 'array_value', type: Types::ARRAY, nullable: true)]
     protected $arrayValue;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=20, nullable=false)
-     */
-    protected $type = self::FIELD_SCALAR_TYPE;
+    #[ORM\Column(type: Types::STRING, length: 20, nullable: false)]
+    protected ?string $type = self::FIELD_SCALAR_TYPE;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     */
-    protected $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * Get id
@@ -258,9 +231,8 @@ class ConfigValue
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -269,9 +241,8 @@ class ConfigValue
 
     /**
      * Pre update event handler
-     *
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function doPreUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));

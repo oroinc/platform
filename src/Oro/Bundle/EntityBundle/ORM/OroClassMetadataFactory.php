@@ -9,6 +9,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\Mapping\ReflectionService;
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendReflectionErrorHandler;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Adds the following features to the Doctrine's ClassMetadataFactory:
@@ -111,6 +112,11 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         }
 
         return $result;
+    }
+
+    public function getCacheItemPool(): ?CacheItemPoolInterface
+    {
+        return $this->getCache();
     }
 
     /**

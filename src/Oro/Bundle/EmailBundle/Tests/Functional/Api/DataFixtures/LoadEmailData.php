@@ -41,6 +41,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function load(ObjectManager $manager): void
     {
@@ -69,7 +70,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             false
         );
 
-        $this->loadEmail(
+        $email1 = $this->loadEmail(
             1,
             $emailBuilder,
             'Test First Email',
@@ -79,6 +80,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             [self::ENCODED_ATTACHMENT_CONTENT],
             $user
         );
+        $email1->getEmail()->setRefs('<other@email-api.func-test>');
         $this->loadEmail(
             2,
             $emailBuilder,
@@ -100,7 +102,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $user
         );
         $email3->setSeen(true);
-        $email3->getEmail()->setRefs('<test2@email-api.func-test> <test3@email-api.func-test>');
+        $email3->getEmail()->setRefs('<id2@email-api.func-test> <test1@email-api.func-test>');
         $email3->getEmail()->getEmailBody()->setBodyContent('Third email body');
         $email3->getEmail()->getEmailBody()->setTextBody('Third email body');
         $email3->getEmail()->getEmailBody()->getAttachments()[0]->setEmbeddedContentId('1234567890');
@@ -124,18 +126,29 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             [self::ENCODED_ATTACHMENT_CONTENT],
             $user1
         );
+        $email6 = $this->loadEmail(
+            6,
+            $emailBuilder,
+            'Test Sixth Email',
+            $user->getEmail(),
+            $user1->getEmail(),
+            false,
+            [],
+            $user
+        );
+        $email6->getEmail()->setRefs('<other@email-api.func-test>');
 
         $emailBuilder->getBatch()->persist($manager);
         $manager->flush();
 
-        $emial3User2 = new EmailUser();
-        $emial3User2->setEmail($email3->getEmail());
-        $emial3User2->setOrganization($email3->getOrganization());
-        $emial3User2->setOwner($user1);
-        $emial3User2->setReceivedAt(new \DateTime('2022-05-01 15:00:00.050'));
-        $emial3User2->addFolder($emailBuilder->folderInbox());
-        $this->setReference('emailUser_3_2', $emial3User2);
-        $manager->persist($emial3User2);
+        $email3User2 = new EmailUser();
+        $email3User2->setEmail($email3->getEmail());
+        $email3User2->setOrganization($email3->getOrganization());
+        $email3User2->setOwner($user1);
+        $email3User2->setReceivedAt(new \DateTime('2022-05-01 15:00:00.050'));
+        $email3User2->addFolder($emailBuilder->folderInbox());
+        $this->setReference('emailUser_3_2', $email3User2);
+        $manager->persist($email3User2);
         $manager->flush();
     }
 
@@ -164,7 +177,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         );
 
         $origin = $this->getReference(
-            ($owner !== $this->getReference(LoadUser::USER) ? $owner->getUsername() . '_' : '') . 'email_origin'
+            ($owner !== $this->getReference(LoadUser::USER) ? $owner->getUserIdentifier() . '_' : '') . 'email_origin'
         );
         $emailUser->setOrigin($origin);
         $emailUser->addFolder($origin->getFolder(FolderType::SENT));
@@ -189,7 +202,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             }
         }
 
-        $emailUser->getEmail()->setMessageId(sprintf('<id%s@%s>', $number, 'email-api.func-test'));
+        $emailUser->getEmail()->setMessageId(sprintf('<id%s@email-api.func-test>', $number));
         $this->setReference('email_' . $number, $emailUser->getEmail());
         $this->setReference('emailUser_' . $number, $emailUser);
 

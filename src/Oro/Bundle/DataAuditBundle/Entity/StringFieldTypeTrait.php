@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+* StringFieldType trait
+*
+*/
 trait StringFieldTypeTrait
 {
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="old_text", type="text", nullable=true)
-     */
-    protected $oldText;
+    #[ORM\Column(name: 'old_text', type: Types::TEXT, nullable: true)]
+    protected ?string $oldText = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="new_text", type="text", nullable=true)
-     */
-    protected $newText;
+    #[ORM\Column(name: 'new_text', type: Types::TEXT, nullable: true)]
+    protected ?string $newText = null;
 }

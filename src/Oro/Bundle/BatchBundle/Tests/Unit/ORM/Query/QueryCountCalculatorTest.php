@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Query;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity;
@@ -48,7 +47,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->getMock();
 
         $this->em = $this->getTestEntityManager($this->connection);
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
     }
 
     private function getQuery(string $dql, array $params = null): Query

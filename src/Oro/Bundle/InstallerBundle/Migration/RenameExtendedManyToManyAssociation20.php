@@ -92,7 +92,7 @@ class RenameExtendedManyToManyAssociation20
     private function loadTargetClassNames($entityClass, $isSupportedTarget)
     {
         $targetClassNames = [];
-        $rows = $this->connection->fetchAll('SELECT class_name, data FROM oro_entity_config');
+        $rows = $this->connection->fetchAllAssociative('SELECT class_name, data FROM oro_entity_config');
         foreach ($rows as $row) {
             $className = $row['class_name'];
             $data = $this->connection->convertToPHPValue($row['data'], 'array');

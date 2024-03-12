@@ -26,6 +26,6 @@ class TestFlushCheckListener
 
     public function onFlush(OnFlushEventArgs $event)
     {
-        $this->webTestCase->assertTrue($this->listener->isFlushInProgress($event->getEntityManager()));
+        $this->webTestCase->assertTrue($this->listener->isFlushInProgress($event->getObjectManager()));
     }
 }

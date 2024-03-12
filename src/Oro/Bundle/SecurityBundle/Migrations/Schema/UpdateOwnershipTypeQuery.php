@@ -80,7 +80,7 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
         $types  = ['class' => 'string'];
         $this->logQuery($logger, $sql, $params, $types);
 
-        $rows = $this->connection->fetchAll($sql, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($sql, $params, $types);
 
         return isset($rows[0]) ? $rows[0] : false;
     }

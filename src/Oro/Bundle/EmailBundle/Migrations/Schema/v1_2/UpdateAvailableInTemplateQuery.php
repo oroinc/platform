@@ -130,7 +130,7 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql);
 
         $result = [];
-        $rows   = $this->connection->fetchAll($sql);
+        $rows   = $this->connection->fetchAllAssociative($sql);
         foreach ($rows as $row) {
             $result[] = $row['class_name'];
         }
@@ -156,7 +156,7 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
 
         $result = [];
 
-        $rows = $this->connection->fetchAll($sql, $params, $types);
+        $rows = $this->connection->fetchAllAssociative($sql, $params, $types);
         foreach ($rows as $row) {
             $fieldName          = $row['field_name'];
             $result[$fieldName] = [
@@ -185,7 +185,7 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql, $params, $types);
 
         $result = [];
-        $rows   = $this->connection->fetchAll($sql, $params, $types);
+        $rows   = $this->connection->fetchAllAssociative($sql, $params, $types);
         foreach ($rows as $row) {
             $diff = $this->connection->convertToPHPValue($row['diff'], 'array');
             if (isset($diff['available_in_template'])) {

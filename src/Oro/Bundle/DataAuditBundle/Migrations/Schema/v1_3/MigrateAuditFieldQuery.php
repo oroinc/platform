@@ -2,23 +2,21 @@
 
 namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use PDO;
 use Psr\Log\LoggerInterface;
 
 class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 {
-    const LIMIT = 100;
+    use ConnectionAwareTrait;
 
-    /** @var Connection */
-    private $connection;
+    const LIMIT = 100;
 
     /**
      * {@inheritdoc}
@@ -26,14 +24,6 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
     public function getDescription()
     {
         return 'Copy audit data into oro_audit_field table.';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
     }
 
     /**
@@ -50,7 +40,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
             $rows = $auditQb
                 ->setFirstResult($i * static::LIMIT)
                 ->execute()
-                ->fetchAll(PDO::FETCH_ASSOC);
+                ->fetchAllAssociative();
 
             foreach ($rows as $row) {
                 $this->processRow($row);
@@ -184,7 +174,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
                 'field_name' => $field,
             ])
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**
@@ -195,7 +185,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
         return $this->createAuditQb()
             ->select('COUNT(1)')
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**

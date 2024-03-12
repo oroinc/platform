@@ -86,7 +86,6 @@ class UserType extends AbstractType
                     'multiple'      => true,
                     'expanded'      => true,
                     'required'      => !$this->isMyProfilePage,
-                    'disabled'      => $this->isMyProfilePage,
                     'translatable_options' => false,
                     'attr' => $attr
                 ]
@@ -103,7 +102,6 @@ class UserType extends AbstractType
                     'multiple'  => true,
                     'expanded'  => true,
                     'required'  => false,
-                    'disabled'  => $this->isMyProfilePage,
                     'translatable_options' => false,
                     'attr' => $attr
                 ]

@@ -4,239 +4,231 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
- * @ORM\Entity()
- * @ORM\Table(name="test_api_coll")
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_api_coll')]
 class TestCollection implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $name = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=true)
+     * @var Collection<int, TestCollectionItem>
      */
-    private $name;
+    #[ORM\OneToMany(mappedBy: 'withOrphanRemovalParent', targetEntity: TestCollectionItem::class, orphanRemoval: true)]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $withOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\OneToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="withOrphanRemovalParent", orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $withOrphanRemovalItems;
+    #[ORM\OneToMany(mappedBy: 'withoutOrphanRemovalParent', targetEntity: TestCollectionItem::class)]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $withoutOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\OneToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="withoutOrphanRemovalParent"
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $withoutOrphanRemovalItems;
+    #[ORM\OneToMany(
+        mappedBy: 'lazyWithOrphanRemovalParent',
+        targetEntity: TestCollectionItem::class,
+        fetch: 'LAZY',
+        orphanRemoval: true
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $lazyWithOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\OneToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="lazyWithOrphanRemovalParent", fetch="LAZY", orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $lazyWithOrphanRemovalItems;
+    #[ORM\OneToMany(mappedBy: 'lazyWithoutOrphanRemovalParent', targetEntity: TestCollectionItem::class, fetch: 'LAZY')]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $lazyWithoutOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\OneToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="lazyWithoutOrphanRemovalParent", fetch="LAZY"
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $lazyWithoutOrphanRemovalItems;
+    #[ORM\OneToMany(
+        mappedBy: 'extraLazyWithOrphanRemovalParent',
+        targetEntity: TestCollectionItem::class,
+        fetch: 'EXTRA_LAZY',
+        orphanRemoval: true
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $extraLazyWithOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\OneToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="extraLazyWithOrphanRemovalParent", fetch="EXTRA_LAZY", orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $extraLazyWithOrphanRemovalItems;
+    #[ORM\OneToMany(
+        mappedBy: 'extraLazyWithoutOrphanRemovalParent',
+        targetEntity: TestCollectionItem::class,
+        fetch: 'EXTRA_LAZY'
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $extraLazyWithoutOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\OneToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="extraLazyWithoutOrphanRemovalParent", fetch="EXTRA_LAZY"
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $extraLazyWithoutOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        inversedBy: 'manyToManyWithOrphanRemovalParents',
+        orphanRemoval: true
+    )]
+    #[ORM\JoinTable(name: 'test_api_coll_mtm_or')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'item_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $manyToManyWithOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      inversedBy="manyToManyWithOrphanRemovalParents", orphanRemoval=true
-     * )
-     * @ORM\JoinTable(name="test_api_coll_mtm_or",
-     *      joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="item_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $manyToManyWithOrphanRemovalItems;
+    #[ORM\ManyToMany(targetEntity: TestCollectionItem::class, inversedBy: 'manyToManyWithoutOrphanRemovalParents')]
+    #[ORM\JoinTable(name: 'test_api_coll_mtm_nor')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'item_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $manyToManyWithoutOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      inversedBy="manyToManyWithoutOrphanRemovalParents"
-     * )
-     * @ORM\JoinTable(name="test_api_coll_mtm_nor",
-     *      joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="item_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $manyToManyWithoutOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        inversedBy: 'manyToManyLazyWithOrphanRemovalParents',
+        fetch: 'LAZY',
+        orphanRemoval: true
+    )]
+    #[ORM\JoinTable(name: 'test_api_coll_mtm_l_or')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'item_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $manyToManyLazyWithOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      inversedBy="manyToManyLazyWithOrphanRemovalParents", fetch="LAZY", orphanRemoval=true
-     * )
-     * @ORM\JoinTable(name="test_api_coll_mtm_l_or",
-     *      joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="item_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $manyToManyLazyWithOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        inversedBy: 'manyToManyLazyWithoutOrphanRemovalParents',
+        fetch: 'LAZY'
+    )]
+    #[ORM\JoinTable(name: 'test_api_coll_mtm_l_nor')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'item_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $manyToManyLazyWithoutOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      inversedBy="manyToManyLazyWithoutOrphanRemovalParents", fetch="LAZY"
-     * )
-     * @ORM\JoinTable(name="test_api_coll_mtm_l_nor",
-     *      joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="item_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $manyToManyLazyWithoutOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        inversedBy: 'manyToManyExtraLazyWithOrphanRemovalParents',
+        fetch: 'EXTRA_LAZY',
+        orphanRemoval: true
+    )]
+    #[ORM\JoinTable(name: 'test_api_coll_mtm_el_or')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'item_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $manyToManyExtraLazyWithOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      inversedBy="manyToManyExtraLazyWithOrphanRemovalParents", fetch="EXTRA_LAZY", orphanRemoval=true
-     * )
-     * @ORM\JoinTable(name="test_api_coll_mtm_el_or",
-     *      joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="item_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $manyToManyExtraLazyWithOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        inversedBy: 'manyToManyExtraLazyWithoutOrphanRemovalParents',
+        fetch: 'EXTRA_LAZY'
+    )]
+    #[ORM\JoinTable(name: 'test_api_coll_mtm_el_nor')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'item_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $manyToManyExtraLazyWithoutOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      inversedBy="manyToManyExtraLazyWithoutOrphanRemovalParents", fetch="EXTRA_LAZY"
-     * )
-     * @ORM\JoinTable(name="test_api_coll_mtm_el_nor",
-     *      joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="item_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $manyToManyExtraLazyWithoutOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        mappedBy: 'inverseManyToManyWithOrphanRemovalParents',
+        orphanRemoval: true
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $inverseManyToManyWithOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="inverseManyToManyWithOrphanRemovalParents", orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $inverseManyToManyWithOrphanRemovalItems;
+    #[ORM\ManyToMany(targetEntity: TestCollectionItem::class, mappedBy: 'inverseManyToManyWithoutOrphanRemovalParents')]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $inverseManyToManyWithoutOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="inverseManyToManyWithoutOrphanRemovalParents"
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $inverseManyToManyWithoutOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        mappedBy: 'inverseManyToManyLazyWithOrphanRemovalParents',
+        fetch: 'LAZY',
+        orphanRemoval: true
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $inverseManyToManyLazyWithOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="inverseManyToManyLazyWithOrphanRemovalParents", fetch="LAZY", orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $inverseManyToManyLazyWithOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        mappedBy: 'inverseManyToManyLazyWithoutOrphanRemovalParents',
+        fetch: 'LAZY'
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $inverseManyToManyLazyWithoutOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="inverseManyToManyLazyWithoutOrphanRemovalParents", fetch="LAZY"
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $inverseManyToManyLazyWithoutOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        mappedBy: 'inverseManyToManyExtraLazyWithOrphanRemovalParents',
+        fetch: 'EXTRA_LAZY',
+        orphanRemoval: true
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $inverseManyToManyExtraLazyWithOrphanRemovalItems = null;
 
     /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="inverseManyToManyExtraLazyWithOrphanRemovalParents", fetch="EXTRA_LAZY", orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
+     * @var Collection<int, TestCollectionItem>
      */
-    private $inverseManyToManyExtraLazyWithOrphanRemovalItems;
-
-    /**
-     * @var Collection|TestCollectionItem[]
-     *
-     * @ORM\ManyToMany(targetEntity="TestCollectionItem",
-     *      mappedBy="inverseManyToManyExtraLazyWithoutOrphanRemovalParents", fetch="EXTRA_LAZY"
-     * )
-     * @ORM\OrderBy({"id" = "ASC"})
-     */
-    private $inverseManyToManyExtraLazyWithoutOrphanRemovalItems;
+    #[ORM\ManyToMany(
+        targetEntity: TestCollectionItem::class,
+        mappedBy: 'inverseManyToManyExtraLazyWithoutOrphanRemovalParents',
+        fetch: 'EXTRA_LAZY'
+    )]
+    #[ORM\OrderBy(['id' => Criteria::ASC])]
+    private ?Collection $inverseManyToManyExtraLazyWithoutOrphanRemovalItems = null;
 
     public function __construct()
     {

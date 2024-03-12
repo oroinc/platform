@@ -12,7 +12,7 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
  */
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
-    /** @var RawConfigurationProvider */
+    /** @var RawConfigurationProviderInterface */
     private $rawConfigurationProvider;
 
     /** @var SystemAwareResolver */
@@ -21,8 +21,10 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /** @var array */
     private $processedConfiguration = [];
 
-    public function __construct(RawConfigurationProvider $rawConfigurationProvider, SystemAwareResolver $resolver)
-    {
+    public function __construct(
+        RawConfigurationProviderInterface $rawConfigurationProvider,
+        SystemAwareResolver $resolver
+    ) {
         $this->rawConfigurationProvider = $rawConfigurationProvider;
         $this->resolver = $resolver;
     }
@@ -56,5 +58,16 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             $this->processedConfiguration[$gridName],
             PropertyAccess::createPropertyAccessorWithDotSyntax()
         );
+    }
+
+    public function isValidConfiguration(string $gridName): bool
+    {
+        try {
+            $this->getConfiguration($gridName);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return true;
     }
 }

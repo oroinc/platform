@@ -12,7 +12,7 @@ class FileFieldCompatibility extends Constraint
     public const INCOMPATIBLE_FIELD_FOR_EXTERNAL_FILE_ERROR = '2ddaebf5-1dc4-4d69-9baf-fa1fb69abff4';
     public const INCOMPATIBLE_FIELD_FOR_REGULAR_FILE_ERROR = '1fc38319-18e4-45e5-aa7c-919ea8bd1234';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INCOMPATIBLE_FIELD_FOR_EXTERNAL_FILE_ERROR => 'INCOMPATIBLE_FIELD_FOR_EXTERNAL_FILE_ERROR',
         self::INCOMPATIBLE_FIELD_FOR_REGULAR_FILE_ERROR => 'INCOMPATIBLE_FIELD_FOR_REGULAR_FILE_ERROR',
     ];

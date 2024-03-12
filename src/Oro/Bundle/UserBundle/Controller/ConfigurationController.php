@@ -5,10 +5,11 @@ namespace Oro\Bundle\UserBundle\Controller;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler;
 use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 use Psr\Container\ContainerInterface;
@@ -31,21 +32,14 @@ class ConfigurationController implements ServiceSubscriberInterface
         $this->container = $container;
     }
 
-    /**
-     * @Route(
-     *      "/user/{id}/{activeGroup}/{activeSubGroup}",
-     *      name="oro_user_config",
-     *      requirements={"id"="\d+"},
-     *      defaults={"activeGroup" = null, "activeSubGroup" = null}
-     * )
-     * @Template()
-     * @Acl(
-     *      id="oro_user_user_config",
-     *      type="entity",
-     *      class="OroUserBundle:User",
-     *      permission="CONFIGURE"
-     * )
-     */
+    #[Route(
+        path: '/user/{id}/{activeGroup}/{activeSubGroup}',
+        name: 'oro_user_config',
+        requirements: ['id' => '\d+'],
+        defaults: ['activeGroup' => null, 'activeSubGroup' => null]
+    )]
+    #[Template]
+    #[Acl(id: 'oro_user_user_config', type: 'entity', class: User::class, permission: 'CONFIGURE')]
     public function userConfigAction(
         User $entity,
         Request $request,
@@ -59,11 +53,9 @@ class ConfigurationController implements ServiceSubscriberInterface
         return $result;
     }
 
-    /**
-     * @Route("/user/profile/{activeGroup}/{activeSubGroup}", name="oro_user_profile_configuration")
-     * @Template("@OroUser/Configuration/userConfig.html.twig")
-     * @AclAncestor("update_own_configuration")
-     */
+    #[Route(path: '/user/profile/{activeGroup}/{activeSubGroup}', name: 'oro_user_profile_configuration')]
+    #[Template('@OroUser/Configuration/userConfig.html.twig')]
+    #[AclAncestor('update_own_configuration')]
     public function userProfileConfigAction(
         Request $request,
         ?string $activeGroup = null,
@@ -172,7 +164,7 @@ class ConfigurationController implements ServiceSubscriberInterface
             throw new \LogicException('No security token.');
         }
         $user = $token->getUser();
-        if (null === $user) {
+        if (!$user instanceof AbstractUser) {
             throw new \LogicException('No current user.');
         }
         if (!$user instanceof User) {

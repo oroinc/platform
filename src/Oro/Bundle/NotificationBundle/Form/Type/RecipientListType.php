@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -37,7 +38,7 @@ class RecipientListType extends AbstractType
             EntityType::class,
             [
                 'label'        => 'oro.user.group.entity_plural_label',
-                'class'        => 'OroUserBundle:Group',
+                'class'        => Group::class,
                 'choice_label' => 'name',
                 'multiple'     => true,
                 'expanded'     => true,

@@ -46,14 +46,12 @@ class SwitchOrganizationController
         $this->urlGenerator = $urlGenerator;
     }
 
-    /**
-     * @Route(
-     *      "/switch-organization/{id}.{_format}",
-     *      name="oro_security_switch_organization",
-     *      requirements={"id"="\d+", "_format"="html|json"},
-     *      defaults={"id"="0", "_format" = "html"}
-     * )
-     */
+    #[Route(
+        path: '/switch-organization/{id}.{_format}',
+        name: 'oro_security_switch_organization',
+        requirements: ['id' => '\d+', '_format' => 'html|json'],
+        defaults: ['id' => 0, '_format' => 'html']
+    )]
     public function switchOrganizationAction(Organization $organization, Request $request): Response
     {
         $token = $this->tokenStorage->getToken();

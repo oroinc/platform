@@ -19,54 +19,6 @@ class EmailActivityController extends RestGetController
     /**
      * Get entities where an email found by specified filters is an activity.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
-     * @QueryParam(
-     *     name="messageId",
-     *     requirements=".+",
-     *     nullable=true,
-     *     description="The email 'Message-ID' attribute. One or several message ids separated by comma."
-     * )
-     * @QueryParam(
-     *      name="from",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The email sender address. One or several addresses separated by comma."
-     * )
-     * @QueryParam(
-     *      name="to",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The email recipient address. One or several addresses separated by comma."
-     * )
-     * @QueryParam(
-     *      name="cc",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The email address of carbon copy recipient. One or several addresses separated by comma."
-     * )
-     * @QueryParam(
-     *      name="bcc",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The email address of blind carbon copy recipient. One or several addresses separated by comma."
-     * )
-     * @QueryParam(
-     *      name="subject",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The email subject."
-     * )
      * @ApiDoc(
      *      description="Get entities where an email found by specified filters is an activity",
      *      resource=true
@@ -74,6 +26,49 @@ class EmailActivityController extends RestGetController
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'messageId',
+        requirements: '.+',
+        description: "The email 'Message-ID' attribute. One or several message ids separated by comma.",
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'from',
+        requirements: '.+',
+        description: 'The email sender address. One or several addresses separated by comma.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'to',
+        requirements: '.+',
+        description: 'The email recipient address. One or several addresses separated by comma.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'cc',
+        requirements: '.+',
+        description: 'The email address of carbon copy recipient. One or several addresses separated by comma.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'bcc',
+        requirements: '.+',
+        description: 'The email address of blind carbon copy recipient. One or several addresses separated by comma.',
+        nullable: true
+    )]
+    #[QueryParam(name: 'subject', requirements: '.+', description: 'The email subject.', nullable: true)]
     public function cgetByFiltersAction(Request $request)
     {
         $manager = $this->getManager();

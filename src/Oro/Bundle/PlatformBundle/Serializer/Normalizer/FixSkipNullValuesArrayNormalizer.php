@@ -90,4 +90,11 @@ class FixSkipNullValuesArrayNormalizer implements NormalizerInterface, Serialize
 
         return $result;
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            '*' => false
+        ];
+    }
 }

@@ -59,7 +59,7 @@ oro_behat_extension:
         selector: '.filters-state'
 
     GridFiltersButton:
-      selector: 'div.toolbar div.actions-panel .action[title="Filter Toggle"]'
+      selector: '.toolbar .actions-panel .action[title="Filter Toggle"]'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
 
     GridFilterStringItem:
@@ -167,14 +167,14 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
 
     GridToolbarActions:
-      selector: 'div.toolbar div.actions-panel'
+      selector: '.toolbar .actions-panel'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolbarActions
 
     GridToolbarActionRefresh:
-        selector: 'div.toolbar div.actions-panel .refresh-action'
+        selector: 'div.toolbar .refresh-action'
 
     GridToolbarActionReset:
-        selector: 'div.toolbar div.actions-panel .reset-action'
+        selector: 'div.toolbar .reset-action'
 
     GridToolBarTools:
       selector: 'div.toolbar .grid-toolbar-tools'
@@ -188,6 +188,9 @@ oro_behat_extension:
 
     GridMassCheckMenu:
       selector: '.dropdown-menu.show'
+
+    GridMassCheckboxLabel:
+      selector: 'div.datagrid-massaction label'
 
     MassActionHeadCheckbox:
       selector: 'th.grid-header-cell-massAction div.btn-group .icon'
@@ -245,8 +248,11 @@ oro_behat_extension:
     Close Fullscreen Popup:
       selector: '.fullscreen-popup .close-dialog'
 
+    Fullscreen Popup Backdrop:
+      selector: '.fullscreen-popup__backdrop.show'
+
     Grid Toolbar Action Filter Toggle:
-      selector: '.btn .fa-filter'
+      selector: '.toggle-filters-action'
 
     Grid Row Save Changes:
       selector: '.inline-editor__action-item[type="submit"]'

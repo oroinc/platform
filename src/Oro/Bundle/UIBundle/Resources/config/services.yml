@@ -47,9 +47,6 @@ services:
         tags:
             - { name: 'cache.pool', namespace: 'oro_dynamic_asset_version' }
 
-    oro_ui.templating.template_name_parser:
-        class: Symfony\Component\Templating\TemplateNameParser
-
     oro_ui.view.listener:
         class: Oro\Bundle\UIBundle\EventListener\TemplateListener
         arguments:
@@ -57,7 +54,6 @@ services:
         tags:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: twig.loader.native_filesystem }
-            - { name: container.service_subscriber, id: oro_ui.templating.template_name_parser, key: Symfony\Component\Templating\TemplateNameParser }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
     oro_ui.view.content_provider.listener:
@@ -125,13 +121,6 @@ services:
             - !abstract '$providerContainer defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
             - !abstract '$enabledProviderNames defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
 
-    oro_ui.content_provider.manager.twig:
-        class: Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager
-        arguments:
-            - '@Psr\Container\ContainerInterface'
-        tags:
-            - { name: container.service_subscriber, id: oro_ui.content_provider.manager, key: Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager }
-
     oro_ui.provider.widget_context:
         class: Oro\Bundle\UIBundle\Provider\WidgetContextProvider
         arguments:
@@ -174,6 +163,7 @@ services:
             - ['setAttribute', ['div', 'data-delay', 'Number']]
             - ['setAttribute', ['div', 'data-autohide', 'Bool']]
             - ['setAttribute', ['div', 'tabindex', 'Text']]
+            - ['setAttribute', ['div', 'style', 'Text']]
              # span attributes
             - ['setAttribute', ['span', 'title', 'CDATA']]
             - ['setAttribute', ['span', 'role', 'Text']]
@@ -206,6 +196,7 @@ services:
             # img attributes
             - ['setAttribute', ['img', 'usemap', 'CDATA']]
             - ['setAttribute', ['img', 'ismap', 'Bool']]
+            - ['setAttribute', ['img', 'loading', 'Enum#eager,lazy']]
             # nav attributes
             - ['setAttribute', ['nav', 'aria-label', 'Text']]
             # map attributes

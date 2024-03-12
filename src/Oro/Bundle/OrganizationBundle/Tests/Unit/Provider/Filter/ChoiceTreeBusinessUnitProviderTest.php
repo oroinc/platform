@@ -6,6 +6,7 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider;
@@ -14,22 +15,24 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
+class ChoiceTreeBusinessUnitProviderTest extends TestCase
 {
     /** @var ChoiceTreeBusinessUnitProvider */
     private $choiceTreeBUProvider;
 
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|MockObject */
     private $tokenAccessor;
 
-    /** @var ChainOwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ChainOwnerTreeProvider|MockObject */
     private $treeProvider;
 
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var QueryBuilder|MockObject */
     private $qb;
 
-    /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractQuery|MockObject */
     private $query;
 
     protected function setUp(): void
@@ -44,7 +47,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->qb
             ->select('businessUnit')
-            ->from('OroOrganizationBundle:BusinessUnit', 'businessUnit');
+            ->from(BusinessUnit::class, 'businessUnit');
         $this->qb->expects($this->any())
             ->method('getQuery')
             ->willReturn($this->query);
@@ -56,7 +59,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getRepository')
-            ->with('OroOrganizationBundle:BusinessUnit')
+            ->with(BusinessUnit::class)
             ->willReturn($businessUnitRepository);
 
         $aclHelper = $this->createMock(AclHelper::class);

@@ -5,8 +5,8 @@ namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
@@ -24,16 +24,6 @@ class SegmentController extends RestController
     /**
      * Get entity segments.
      *
-     * @QueryParam(
-     *      name="entityName",
-     *      requirements="((\w+)_)+(\w+)",
-     *      nullable=false,
-     *      description=" Entity full class name; backslashes (\) should be replaced with underscore (_)."
-     * )
-     * @QueryParam(
-     *      name="term", nullable=true, strict=false, default="",
-     *      description="Search term"
-     * )
      * @ApiDoc(
      *      description="Get entity segments",
      *      resource=true
@@ -41,9 +31,16 @@ class SegmentController extends RestController
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'entityName',
+        requirements: '((\w+)_)+(\w+)',
+        description: ' Entity full class name; backslashes (\) should be replaced with underscore (_).',
+        nullable: false
+    )]
+    #[QueryParam(name: 'term', default: '', description: 'Search term', strict: false, nullable: true)]
     public function getItemsAction(Request $request)
     {
-        $entityName = $this->get('oro_entity.routing_helper')
+        $entityName = $this->container->get('oro_entity.routing_helper')
             ->resolveEntityClass($request->get('entityName'));
         $page = (int)$request->query->get('page', 1);
         $term = $request->query->get('term');
@@ -53,7 +50,7 @@ class SegmentController extends RestController
         }
 
         /** @var SegmentManager $provider */
-        $manager = $this->get('oro_segment.segment_manager');
+        $manager = $this->container->get('oro_segment.segment_manager');
 
         $statusCode = Response::HTTP_OK;
         try {
@@ -75,14 +72,9 @@ class SegmentController extends RestController
      *      description="Delete Segment",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_segment_delete",
-     *      type="entity",
-     *      permission="DELETE",
-     *      class="OroSegmentBundle:Segment"
-     * )
      * @return Response
      */
+    #[Acl(id: 'oro_segment_delete', type: 'entity', class: Segment::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
@@ -97,9 +89,9 @@ class SegmentController extends RestController
      *      description="Run Static Segment",
      *      resource=true
      * )
-     * @AclAncestor("oro_segment_update")
      * @return Response
      */
+    #[AclAncestor('oro_segment_update')]
     public function postRunAction(int $id)
     {
         /** @var Segment $segment */
@@ -109,7 +101,7 @@ class SegmentController extends RestController
         }
 
         try {
-            $this->get('oro_segment.static_segment_manager')->run($segment);
+            $this->container->get('oro_segment.static_segment_manager')->run($segment);
             return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
         } catch (\LogicException $e) {
             return $this->handleView($this->view(null, Response::HTTP_BAD_REQUEST));
@@ -123,7 +115,7 @@ class SegmentController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_segment.segment_manager.api');
+        return $this->container->get('oro_segment.segment_manager.api');
     }
 
     /**

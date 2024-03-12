@@ -25,30 +25,30 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 /**
  * Provides data for building workflow widget
- *
- * @Route("/workflowwidget")
  */
+#[Route(path: '/workflowwidget')]
 class WidgetController extends AbstractController
 {
     /**
-     * @Route("/entity-workflows/{entityClass}/{entityId}", name="oro_workflow_widget_entity_workflows")
-     * @Template
      *
      * @param string $entityClass
      * @param int $entityId
      *
      * @return array
      */
+    #[Route(path: '/entity-workflows/{entityClass}/{entityId}', name: 'oro_workflow_widget_entity_workflows')]
+    #[Template]
     public function entityWorkflowsAction($entityClass, $entityId)
     {
-        $entity = $this->get(TransitionWidgetHelper::class)->getOrCreateEntityReference($entityClass, $entityId);
+        $entity = $this->container->get(TransitionWidgetHelper::class)
+            ->getOrCreateEntityReference($entityClass, $entityId);
         if (!$entity) {
             throw $this->createNotFoundException(
                 sprintf('Entity \'%s\' with id \'%d\' not found', $entityClass, $entityId)
             );
         }
 
-        $workflowManager = $this->get(WorkflowManagerRegistry::class)->getManager();
+        $workflowManager = $this->container->get(WorkflowManagerRegistry::class)->getManager();
         $applicableWorkflows = array_filter(
             $workflowManager->getApplicableWorkflows($entity),
             function (Workflow $workflow) use ($entity) {
@@ -57,7 +57,7 @@ class WidgetController extends AbstractController
         );
 
         /* @var TransitionTranslationHelper $translationHelper */
-        $translationHelper = $this->get(TransitionTranslationHelper::class);
+        $translationHelper = $this->container->get(TransitionTranslationHelper::class);
 
         return [
             'entityId' => $entityId,
@@ -71,7 +71,7 @@ class WidgetController extends AbstractController
                         $entity
                     );
 
-                    $workflowData = $this->get(WorkflowDataProvider::class)
+                    $workflowData = $this->container->get(WorkflowDataProvider::class)
                         ->getWorkflowData($entity, $workflow, $showDisabled);
 
                     foreach ($workflowData['transitionsData'] as $transitionData) {
@@ -82,25 +82,24 @@ class WidgetController extends AbstractController
                 },
                 $applicableWorkflows
             ),
-            'originalUrl' => $this->get(OriginalUrlProvider::class)->getOriginalUrl(),
+            'originalUrl' => $this->container->get(OriginalUrlProvider::class)->getOriginalUrl(),
         ];
     }
 
     /**
-     * @Route(
-     *      "/transition/create/attributes/{workflowName}/{transitionName}",
-     *      name="oro_workflow_widget_start_transition_form"
-     * )
      *
      * @param string $transitionName
      * @param string $workflowName
      * @param Request $request
-     *
      * @return Response
      */
+    #[Route(
+        path: '/transition/create/attributes/{workflowName}/{transitionName}',
+        name: 'oro_workflow_widget_start_transition_form'
+    )]
     public function startTransitionFormAction($transitionName, $workflowName, Request $request)
     {
-        $processor = $this->get(TransitActionProcessor::class);
+        $processor = $this->container->get(TransitActionProcessor::class);
 
         $context = $this->createProcessorContext($processor, $request, $transitionName);
         $context->setWorkflowName($workflowName);
@@ -111,11 +110,6 @@ class WidgetController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/transition/edit/attributes/{workflowItemId}/{transitionName}",
-     *      name="oro_workflow_widget_transition_form"
-     * )
-     * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      *
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
@@ -123,9 +117,14 @@ class WidgetController extends AbstractController
      *
      * @return Response
      */
+    #[Route(
+        path: '/transition/edit/attributes/{workflowItemId}/{transitionName}',
+        name: 'oro_workflow_widget_transition_form'
+    )]
+    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
     public function transitionFormAction($transitionName, WorkflowItem $workflowItem, Request $request)
     {
-        $processor = $this->get(TransitActionProcessor::class);
+        $processor = $this->container->get(TransitActionProcessor::class);
 
         $context = $this->createProcessorContext($processor, $request, $transitionName);
         $context->setWorkflowItem($workflowItem);
@@ -154,22 +153,23 @@ class WidgetController extends AbstractController
     }
 
     /**
-     * @Route("/buttons/{entityClass}/{entityId}", name="oro_workflow_widget_buttons")
-     * @Template
      *
      * @param string $entityClass
      * @param int $entityId
      *
      * @return array
      */
+    #[Route(path: '/buttons/{entityClass}/{entityId}', name: 'oro_workflow_widget_buttons')]
+    #[Template]
     public function buttonsAction($entityClass, $entityId)
     {
         $workflowsData = [];
 
         /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get(WorkflowManagerRegistry::class)->getManager('default');
-        $transitionDataProvider = $this->get(TransitionDataProvider::class);
-        $entity = $this->get(TransitionWidgetHelper::class)->getOrCreateEntityReference($entityClass, $entityId);
+        $workflowManager = $this->container->get(WorkflowManagerRegistry::class)->getManager('default');
+        $transitionDataProvider = $this->container->get(TransitionDataProvider::class);
+        $entity = $this->container->get(TransitionWidgetHelper::class)
+            ->getOrCreateEntityReference($entityClass, $entityId);
 
         $workflows = $workflowManager->getApplicableWorkflows($entity);
         foreach ($workflows as $workflow) {

@@ -6,7 +6,6 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
@@ -43,23 +42,20 @@ class OwnerTreeListener
             return;
         }
 
-        $uow = $args->getEntityManager()->getUnitOfWork();
+        $uow = $args->getObjectManager()->getUnitOfWork();
         $this->isCacheOutdated =
             $this->checkInsertedOrDeletedEntities($uow->getScheduledEntityInsertions())
             || $this->checkInsertedOrDeletedEntities($uow->getScheduledEntityDeletions())
             || $this->checkUpdatedEntities($uow)
             || $this->checkToManyRelations($uow->getScheduledCollectionUpdates())
             || $this->checkToManyRelations($uow->getScheduledCollectionDeletions());
+    }
 
+    public function postFlush(): void
+    {
         if ($this->isCacheOutdated) {
             $this->ownerTreeProvider->clearCache();
-
-            // Clear doctrine query cache to be sure that queries will process hints
-            // again with updated security information.
-            $cacheDriver = $args->getEntityManager()->getConfiguration()->getQueryCache();
-            if ($cacheDriver instanceof AdapterInterface) {
-                $cacheDriver->clear();
-            }
+            $this->isCacheOutdated = false;
         }
     }
 

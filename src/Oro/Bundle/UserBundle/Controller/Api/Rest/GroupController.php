@@ -4,11 +4,13 @@ namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * REST API CRUD controller for Group entity.
@@ -22,22 +24,22 @@ class GroupController extends RestController
      *      description="Get the list of groups",
      *      resource=true
      * )
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. defaults to 10."
-     * )
-     * @AclAncestor("oro_user_group_view")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. defaults to 10.',
+        nullable: true
+    )]
+    #[AclAncestor('oro_user_group_view')]
     public function cgetAction(Request $request)
     {
         $page = (int) $request->get('page', 1);
@@ -58,9 +60,9 @@ class GroupController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @AclAncestor("oro_user_group_view")
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
+    #[AclAncestor('oro_user_group_view')]
     public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
@@ -73,9 +75,9 @@ class GroupController extends RestController
      *      description="Create new group",
      *      resource=true
      * )
-     * @AclAncestor("oro_user_group_create")
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
+    #[AclAncestor('oro_user_group_create')]
     public function postAction()
     {
         return $this->handleCreateRequest();
@@ -93,9 +95,9 @@ class GroupController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @AclAncestor("oro_user_group_update")
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
+    #[AclAncestor('oro_user_group_update')]
     public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
@@ -113,14 +115,9 @@ class GroupController extends RestController
      *          {"name"="id", "dataType"="integer"},
      *      }
      * )
-     * @Acl(
-     *      id="oro_user_group_delete",
-     *      type="entity",
-     *      class="OroUserBundle:Group",
-     *      permission="DELETE"
-     * )
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
+    #[Acl(id: 'oro_user_group_delete', type: 'entity', class: Group::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);

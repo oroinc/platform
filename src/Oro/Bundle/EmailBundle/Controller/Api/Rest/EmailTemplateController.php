@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -29,15 +31,10 @@ class EmailTemplateController extends RestController
      *      description="Delete email template",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_email_emailtemplate_delete",
-     *      type="entity",
-     *      class="OroEmailBundle:EmailTemplate",
-     *      permission="DELETE"
-     * )
      *
      * @return Response
      */
+    #[Acl(id: 'oro_email_emailtemplate_delete', type: 'entity', class: EmailTemplate::class, permission: 'DELETE')]
     public function deleteAction($id)
     {
         /** @var EmailTemplate $entity */
@@ -71,26 +68,26 @@ class EmailTemplateController extends RestController
      *     description="Get templates by entity name",
      *     resource=true
      * )
-     * @AclAncestor("oro_email_emailtemplate_index")
      *
      * @return Response
      */
+    #[AclAncestor('oro_email_emailtemplate_index')]
     public function cgetAction($entityName = null, $includeNonEntity = false, $includeSystemTemplates = true)
     {
         if (!$entityName) {
             return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
-        $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
+        $entityName = $this->container->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         /** @var EmailTemplateRepository $emailTemplateRepository */
-        $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
+        $emailTemplateRepository = $this->container->get('doctrine')->getRepository(EmailTemplate::class);
 
         $templates = $emailTemplateRepository
             ->getTemplateByEntityName(
-                $this->get('oro_security.acl_helper'),
+                $this->container->get('oro_security.acl_helper'),
                 $entityName,
-                $this->get('oro_security.token_accessor')->getOrganization(),
+                $this->container->get('oro_security.token_accessor')->getOrganization(),
                 (bool)$includeNonEntity,
                 (bool)$includeSystemTemplates
             );
@@ -110,14 +107,14 @@ class EmailTemplateController extends RestController
      *     description="Get available variables",
      *     resource=true
      * )
-     * @AclAncestor("oro_email_emailtemplate_view")
      *
      * @return Response
      */
+    #[AclAncestor('oro_email_emailtemplate_view')]
     public function getVariablesAction()
     {
         /** @var VariablesProvider $provider */
-        $provider = $this->get('oro_email.emailtemplate.variable_provider');
+        $provider = $this->container->get('oro_email.emailtemplate.variable_provider');
 
         $data = [
             'system' => $provider->getSystemVariableDefinitions(),
@@ -138,17 +135,16 @@ class EmailTemplateController extends RestController
      *     description="Get email template subject, type and content",
      *     resource=true
      * )
-     * @AclAncestor("oro_email_emailtemplate_view")
-     * @ParamConverter("emailTemplate", class="OroEmailBundle:EmailTemplate")
-     *
      * @return Response
      */
+    #[ParamConverter('emailTemplate', class: EmailTemplate::class)]
+    #[AclAncestor('oro_email_emailtemplate_view')]
     public function getCompiledAction(EmailTemplate $emailTemplate, $entityId = null)
     {
         $templateParams = [];
 
         if ($entityId && $emailTemplate->getEntityName()) {
-            $entity = $this->getDoctrine()
+            $entity = $this->container->get('doctrine')
                 ->getRepository($emailTemplate->getEntityName())
                 ->find($entityId);
             if ($entity) {
@@ -173,7 +169,8 @@ class EmailTemplateController extends RestController
         }
 
         try {
-            [$subject, $body] = $this->get('oro_email.email_renderer')->compileMessage($emailTemplate, $templateParams);
+            [$subject, $body] = $this->container->get('oro_email.email_renderer')
+                ->compileMessage($emailTemplate, $templateParams);
 
             $view = $this->view(
                 [
@@ -186,7 +183,7 @@ class EmailTemplateController extends RestController
         } catch (SyntaxError|LoaderError|RuntimeError $e) {
             $view = $this->view(
                 [
-                    'reason' => $this->get('translator')->trans('oro.email.emailtemplate.failed_to_compile'),
+                    'reason' => $this->container->get('translator')->trans('oro.email.emailtemplate.failed_to_compile'),
                 ],
                 Response::HTTP_UNPROCESSABLE_ENTITY
             );
@@ -200,7 +197,7 @@ class EmailTemplateController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_email.manager.emailtemplate.api');
+        return $this->container->get('oro_email.manager.emailtemplate.api');
     }
 
     /**
@@ -232,5 +229,16 @@ class EmailTemplateController extends RestController
             'entity_name' => $template->getEntityName(),
             'type'        => $template->getType()
         ];
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'doctrine' => ManagerRegistry::class,
+                'translator' => TranslatorInterface::class
+            ]
+        );
     }
 }

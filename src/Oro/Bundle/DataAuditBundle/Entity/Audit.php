@@ -2,85 +2,50 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Audit model
- *
- * @ORM\Entity()
- * @Config(
- *      defaultValues={
- *          "security"={}
- *     }
- * )
  */
+#[ORM\Entity]
+#[Config(defaultValues: ['security' => []])]
 class Audit extends AbstractAudit
 {
-    /**
-     * @var integer $id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string $loggedAt
-     *
-     * @ORM\Column(name="logged_at", type="datetime", nullable=true)
-     */
-    protected $loggedAt;
+    #[ORM\Column(name: 'logged_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $loggedAt = null;
 
-    /**
-     * @var string $objectId
-     *
-     * @ORM\Column(name="object_id", type="string", length=255, nullable=true)
-     */
-    protected $objectId;
+    #[ORM\Column(name: 'object_id', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $objectId = null;
 
-    /**
-     * @var string $objectClass
-     *
-     * @ORM\Column(name="object_class", type="string", length=255)
-     */
-    protected $objectClass;
+    #[ORM\Column(name: 'object_class', type: Types::STRING, length: 255)]
+    protected ?string $objectClass = null;
 
-    /**
-     * @var string $objectName
-     *
-     * @ORM\Column(name="object_name", type="string", length=255, nullable=true)
-     */
-    protected $objectName;
+    #[ORM\Column(name: 'object_name', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $objectName = null;
 
-    /**
-     * @var integer $version
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    protected $version;
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    protected ?int $version = null;
 
     /**
      * @var string $username
      */
     protected $username;
 
-    /**
-     * @var AbstractUser[] $user
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", cascade={"persist"})
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $user;
+    #[ORM\ManyToOne(targetEntity: User::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?User $user = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="owner_description", type="string", length=255, nullable=true)
-     */
-    protected $ownerDescription;
+    #[ORM\Column(name: 'owner_description', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $ownerDescription = null;
 
     /**
      * {@inheritdoc}
@@ -107,6 +72,6 @@ class Audit extends AbstractAudit
      */
     public function getUsername()
     {
-        return $this->getUser() ? $this->getUser()->getUsername() : '';
+        return $this->getUser() ? $this->getUser()->getUserIdentifier() : '';
     }
 }

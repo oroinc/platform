@@ -144,7 +144,7 @@ define(function(require) {
                             label: __('oro_datagrid.action.refresh'),
                             ariaLabel: __('oro_datagrid.action.refresh.aria_label'),
                             className: 'btn refresh-action',
-                            iconClassName: 'fa-repeat',
+                            icon: 'repeat',
                             launcherMode: 'icon-only'
                         }
                     },
@@ -153,7 +153,7 @@ define(function(require) {
                             label: __('oro_datagrid.action.reset'),
                             ariaLabel: __('oro_datagrid.action.reset.aria_label'),
                             className: 'btn reset-action',
-                            iconClassName: 'fa-refresh',
+                            icon: 'refresh',
                             launcherMode: 'icon-only'
                         }
                     }
@@ -714,9 +714,13 @@ define(function(require) {
                 extraActions: this._getToolbarExtraActions(),
                 columns: this.columns,
                 componentConstructor: ComponentConstructor,
-                addToolbarAction: function(action) {
+                addToolbarAction: action => {
                     toolbarOptions.actions.push(action);
                     sortActions(toolbarOptions.actions);
+                },
+                addToolbarExtraAction: action => {
+                    toolbarOptions.extraActions.push(action);
+                    sortActions(toolbarOptions.extraActions);
                 }
             };
             _.defaults(toolbarOptions, options);

@@ -48,6 +48,9 @@ define(function(require) {
          * @inheritdoc
          */
         initialize: function(options) {
+            if (options.containerCssClass) {
+                this.initializeOptions = {...this.initializeOptions, ...{containerCssClass: options.containerCssClass}};
+            }
             // fix select2.each2 bug, when empty string is FALSE
             const elCases = this.$el.attr('class');
 
@@ -60,7 +63,15 @@ define(function(require) {
                 const data = this.$el.data(this.widgetFunctionName);
                 data.container.data('inputWidget', this);
                 data.dropdown.data('inputWidget', this);
+
+                if (this.$el.attr('readonly')) {
+                    this.$el.select2('readonly', true);
+                }
             }
+        },
+
+        initializeWidget() {
+            Select2InputWidgetView.__super__.initializeWidget.call(this);
 
             this.updateFixedMode();
         },

@@ -14,8 +14,8 @@ class TicketToken extends UsernamePasswordToken implements OrganizationAwareToke
 {
     use RolesAndOrganizationAwareTokenTrait;
 
-    public function __construct($user, $credentials, string $providerKey, array $roles = [])
+    public function __construct($user, string $firewallName, array $roles = [])
     {
-        parent::__construct($user, $credentials, $providerKey, $this->initRoles($roles));
+        parent::__construct($user, $firewallName, $this->initRoles($roles));
     }
 }

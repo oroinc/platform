@@ -35,7 +35,7 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
      */
     protected function getOAuthProvider(): OAuthProviderInterface
     {
-        return $this->get(MicrosoftOAuthProvider::class);
+        return $this->container->get(MicrosoftOAuthProvider::class);
     }
 
     /**
@@ -64,7 +64,7 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
 
     private function getOAuthScopeProvider(): OAuthScopeProviderInterface
     {
-        return $this->get(MicrosoftOAuthScopeProvider::class);
+        return $this->container->get(MicrosoftOAuthScopeProvider::class);
     }
 
     private function storeResponse(SessionInterface $session, Response $response): Response

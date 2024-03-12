@@ -18,27 +18,6 @@ class EmailActivitySuggestionController extends RestGetController
      *
      * @param int $id The id of the email entity.
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10."
-     * )
-     * @QueryParam(
-     *      name="exclude-current-user",
-     *      requirements="true|false",
-     *      nullable=true,
-     *      strict=true,
-     *      default="false",
-     *      description="Indicates whether the current user should be excluded from the result."
-     * )
-     *
      * @ApiDoc(
      *      description="Suggests entities associated with the email activity",
      *      resource=true
@@ -46,6 +25,26 @@ class EmailActivitySuggestionController extends RestGetController
      * @param Request $request
      * @return Response
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Defaults to 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. Defaults to 10.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'exclude-current-user',
+        requirements: 'true|false',
+        default: false,
+        description: 'Indicates whether the current user should be excluded from the result.',
+        strict: true,
+        nullable: true
+    )]
     public function cgetAction(Request $request, $id)
     {
         $page  = (int)$request->get('page', 1);
@@ -62,6 +61,6 @@ class EmailActivitySuggestionController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_email.manager.email_activity_suggestion.api');
+        return $this->container->get('oro_email.manager.email_activity_suggestion.api');
     }
 }

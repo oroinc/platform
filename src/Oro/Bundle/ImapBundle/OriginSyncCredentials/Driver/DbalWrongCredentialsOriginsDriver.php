@@ -47,7 +47,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
         $existingRecord = $request
             ->setParameter('emailOriginId', $emailOriginId)
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
 
         if (!$existingRecord) {
             $connection->insert(
@@ -68,7 +68,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
             ->select('origin_id')
             ->from('oro_imap_wrong_creds_origin')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         if (count($wrongOriginIds)) {
             $origins = $this->getOriginRepository()->getOriginsByIds($wrongOriginIds);
@@ -95,7 +95,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
             $request->andWhere('owner_id is null');
         }
 
-        $wrongOriginIds = $request->execute()->fetchAll();
+        $wrongOriginIds = $request->execute()->fetchAllAssociative();
 
         if (count($wrongOriginIds)) {
             $origins = $this->getOriginRepository()->getOriginsByIds($wrongOriginIds);
@@ -122,7 +122,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
     public function deleteAllOrigins()
     {
         $this->logger->debug('Delete email origins with wrong credentials from the storage.');
-        $this->getConnection()->exec('DELETE FROM oro_imap_wrong_creds_origin');
+        $this->getConnection()->executeStatement('DELETE FROM oro_imap_wrong_creds_origin');
     }
 
     /**

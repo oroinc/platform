@@ -12,7 +12,9 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -38,13 +40,19 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->flashBag = $this->createMock(FlashBagInterface::class);
+        $session = $this->createMock(Session::class);
+        $session->method('getFlashBag')
+            ->willReturn($this->flashBag);
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getSession')
+            ->willReturn($session);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->action = new CloneEntity(
             new ContextAccessor(),
             $this->registry,
             $this->translator,
-            $this->flashBag,
+            $requestStack,
             $this->logger
         );
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));

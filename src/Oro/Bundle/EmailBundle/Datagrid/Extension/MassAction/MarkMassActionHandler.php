@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponseInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -60,7 +61,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function handle(MassActionHandlerArgs $args)
+    public function handle(MassActionHandlerArgs $args): MassActionResponseInterface
     {
         $data = $args->getData();
 
@@ -104,7 +105,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
 
             $queryBuilder = $this
                 ->entityManager
-                ->getRepository('OroEmailBundle:EmailUser')
+                ->getRepository(EmailUser::class)
                 ->getEmailUserBuilderForMassAction(
                     $emailUserIds,
                     $this->tokenAccessor->getUser(),
@@ -132,7 +133,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
 
         $queryBuilder = $this
             ->entityManager
-            ->getRepository('OroEmailBundle:EmailUser')
+            ->getRepository(EmailUser::class)
             ->getEmailUserByThreadId($this->needToProcessThreadIds, $this->tokenAccessor->getUser());
 
         $result = $queryBuilder->getQuery()->iterate();
@@ -196,10 +197,10 @@ class MarkMassActionHandler implements MassActionHandlerInterface
     protected function process($queryBuilder, $markType, $iteration)
     {
         $result = $queryBuilder->getQuery()->iterate();
+
         foreach ($result as $entity) {
             /** @var EmailUser $entity */
             $entity = $entity[0];
-
             if ($this->authorizationChecker->isGranted('EDIT', $entity)) {
                 $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
             }

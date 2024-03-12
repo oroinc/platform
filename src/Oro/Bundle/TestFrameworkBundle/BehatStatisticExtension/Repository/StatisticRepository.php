@@ -66,7 +66,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         if ($criteria) {
             $this->addCriteria($criteria, $buildIdsQueryBuilder);
         }
-        $ids = $buildIdsQueryBuilder->execute()->fetchAll();
+        $ids = $buildIdsQueryBuilder->execute()->fetchAllAssociative();
 
         $ids = array_map(function ($data) {
             return $data['build_id'];
@@ -94,7 +94,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
             $this->addCriteria($criteria, $queryBuilder);
         }
 
-        $result = $queryBuilder->execute()->fetchAll();
+        $result = $queryBuilder->execute()->fetchAllAssociative();
 
         $paths = [];
 
@@ -156,7 +156,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         }
 
         $result = $queryBuilder->execute()
-            ->fetchAll()
+            ->fetchAllAssociative()
         ;
 
         $models = array_map(function (array $data) {
@@ -185,7 +185,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
             ->setParameter(0, $id)
             ->orderBy('id', 'DESC')
             ->execute()
-            ->fetch()
+            ->fetchAssociative()
         ;
 
         if (!$result) {

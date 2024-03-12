@@ -189,6 +189,17 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
+     *  @params {jQuery.Element}
+     */
+    isVerticalMenu($menu) {
+        if (!$menu && !$menu.length) {
+            return false;
+        }
+
+        return $menu.width() === $menu.children(':first').width();
+    },
+
+    /**
      * @param {Object} event
      */
     onKeyDown(event) {
@@ -292,6 +303,12 @@ const NavigationMenuView = BaseView.extend({
      */
     onPressedEsc(event) {
         this.openNextRootMenu = false;
+
+        const $currentMenu = this.getCurrentMenu($(event.target));
+
+        if (!this.isMenuBar($currentMenu)) {
+            event.stopPropagation();
+        }
         this.setFocus(this.getRootFocusableElement($(event.target)));
         this.hideSubMenu();
     },
@@ -358,7 +375,11 @@ const NavigationMenuView = BaseView.extend({
             this.setFocus($prevElement);
 
             if (this.isMenuBar($prevMenu)) {
-                this.moveFocusToPreviousRelativeSibling($prevMenu);
+                if (this.isVerticalMenu($prevMenu)) {
+                    this.hideSubMenu();
+                } else {
+                    this.moveFocusToPreviousRelativeSibling($prevMenu);
+                }
             }
         }
     },
@@ -375,7 +396,7 @@ const NavigationMenuView = BaseView.extend({
 
         event.preventDefault();
 
-        if (this.isMenuBar($currentMenu)) {
+        if (this.isMenuBar($currentMenu) && !this.isVerticalMenu($currentMenu)) {
             this.hideSubMenu();
             this.moveFocusToNextRelativeSibling($currentMenu);
         } else {
@@ -396,10 +417,16 @@ const NavigationMenuView = BaseView.extend({
         const $element = $(event.target);
         const $currentMenu = this.getCurrentMenu($element);
         const $subMenu = this.getSubMenu($element);
+        const $prevNext = this.moveFocusToPreviousRelativeSibling($currentMenu);
 
         event.preventDefault();
 
         if (this.isMenuBar($currentMenu)) {
+            if (this.isVerticalMenu($currentMenu)) {
+                this.scrollToEl($prevNext);
+                return;
+            }
+
             if (!this.isPopupMenu($subMenu)) {
                 return;
             }
@@ -420,8 +447,6 @@ const NavigationMenuView = BaseView.extend({
 
             this.setFocus($el);
         } else {
-            const $prevNext = this.moveFocusToPreviousRelativeSibling($currentMenu);
-
             this.scrollToEl($prevNext);
         }
     },
@@ -433,10 +458,16 @@ const NavigationMenuView = BaseView.extend({
         const $element = $(event.target);
         const $currentMenu = this.getCurrentMenu($element);
         const $subMenu = this.getSubMenu($element);
+        const $nextEl = this.moveFocusToNextRelativeSibling($currentMenu);
 
         event.preventDefault();
 
         if (this.isMenuBar($currentMenu)) {
+            if (this.isVerticalMenu($currentMenu)) {
+                this.scrollToEl($nextEl);
+                return;
+            }
+
             if (!this.isPopupMenu($subMenu)) {
                 return;
             }
@@ -445,8 +476,6 @@ const NavigationMenuView = BaseView.extend({
             this.showSubMenu($element);
             this.setFocus(this.getFirstFocusableElement($subMenu));
         } else {
-            const $nextEl = this.moveFocusToNextRelativeSibling($currentMenu);
-
             this.scrollToEl($nextEl);
         }
     },

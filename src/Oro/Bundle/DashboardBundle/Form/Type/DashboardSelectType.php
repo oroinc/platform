@@ -9,6 +9,9 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Dashboard select form type
+ */
 class DashboardSelectType extends AbstractType
 {
     /**
@@ -36,7 +39,7 @@ class DashboardSelectType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'class' => 'OroDashboardBundle:Dashboard',
+                'class' => Dashboard::class,
                 'choice_label' => 'label',
                 'choices' => $this->getChoices(),
                 'placeholder' => 'oro.dashboard.start_dashboard.empty_value',

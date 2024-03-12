@@ -36,6 +36,7 @@ class EmailTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->getOptionalListenerManager()->enableListener('oro_email.listener.entity_listener');
         $this->loadFixtures([LoadEmailData::class, LoadBusinessUnit::class]);
         $this->updateRolePermissions(
             'ROLE_ADMINISTRATOR',
@@ -49,8 +50,6 @@ class EmailTest extends RestJsonApiTestCase
                 'EDIT'         => AccessLevel::GLOBAL_LEVEL
             ]
         );
-
-        $this->getOptionalListenerManager()->enableListener('oro_email.listener.entity_listener');
     }
 
     private function setAutoLinkAttachments(string $targetEntityClass, ?bool $value): ?bool
@@ -89,6 +88,22 @@ class EmailTest extends RestJsonApiTestCase
         return $result;
     }
 
+    private function getEmailMessageIdsInThread(Email $email): array
+    {
+        $rows = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->from(Email::class, 'e')
+            ->select('e.messageId')
+            ->innerJoin('e.thread', 't')
+            ->where(':emailId MEMBER OF t.emails')
+            ->setParameter('emailId', $email->getId())
+            ->orderBy('e.id', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column($rows, 'messageId');
+    }
+
     public function testGetList(): void
     {
         $response = $this->cget(['entity' => 'emails']);
@@ -102,6 +117,15 @@ class EmailTest extends RestJsonApiTestCase
             ['filter[id]' => '<toString(@email_1->id)>']
         );
         $this->assertResponseContains('cget_email_filter_by_id.yml', $response);
+    }
+
+    public function testGetListFilterBySeveralIds(): void
+    {
+        $response = $this->cget(
+            ['entity' => 'emails'],
+            ['filter' => ['id' => ['<toString(@email_1->id)>', '<toString(@email_3->id)>']]]
+        );
+        $this->assertResponseContains('cget_email_filter_by_several_ids.yml', $response);
     }
 
     public function testGet(): void
@@ -348,14 +372,40 @@ class EmailTest extends RestJsonApiTestCase
     public function testCreateWithAllData(): void
     {
         $data = $this->getRequestData('create_email.yml');
+        // the "private" field is read-only and its value should be computed automatically
         $data['included'][0]['attributes']['private'] = false;
         $response = $this->post(['entity' => 'emails'], $data);
         $createdEmail = $this->getEntityManager()->find(Email::class, (int)$this->getResourceId($response));
         $this->getReferenceRepository()->addReference('createdEmail', $createdEmail);
+        $this->assertResponseContains('create_email.yml', $response);
+        // test that the created email is added to the correct thread
+        self::assertEquals(
+            ['<test@email-api.func-test>', '<id3@email-api.func-test>', '<id2@email-api.func-test>'],
+            $this->getEmailMessageIdsInThread($createdEmail)
+        );
+    }
+
+    public function testCreateRootEmailInThreadWhenChildEmailsAlreadyExist(): void
+    {
+        $data = $this->getRequestData('create_email.yml');
+        $data['data']['attributes']['messageId'] = '<other@email-api.func-test>';
+        $data['data']['attributes']['references'] = [];
+        $response = $this->post(['entity' => 'emails'], $data);
+        $createdEmail = $this->getEntityManager()->find(Email::class, (int)$this->getResourceId($response));
+        $this->getReferenceRepository()->addReference('createdEmail', $createdEmail);
         $expectedData = $this->getResponseData('create_email.yml');
-        // the "private" field is read-only and its value is computed automatically
-        $expectedData['included'][0]['attributes']['private'] = true;
+        $expectedData['data']['attributes']['messageId'] = '<other@email-api.func-test>';
+        $expectedData['data']['attributes']['references'] = [];
+        $expectedData['data']['relationships']['activityTargets']['data'][0]['meta']['emailThreadContextItemId'] =
+            '<("users-" . @user->id . "-" . @email_1->id)>';
+        $expectedData['data']['relationships']['activityTargets']['data'][1]['meta']['emailThreadContextItemId'] =
+            '<("users-" . @user1->id . "-" . @email_1->id)>';
         $this->assertResponseContains($expectedData, $response);
+        // test that the created email is added to the correct thread
+        self::assertEquals(
+            ['<other@email-api.func-test>', '<id6@email-api.func-test>', '<id1@email-api.func-test>'],
+            $this->getEmailMessageIdsInThread($createdEmail)
+        );
     }
 
     public function testCreateWithAttachmentWhenAutoLinkAttachmentsEnabled(): void

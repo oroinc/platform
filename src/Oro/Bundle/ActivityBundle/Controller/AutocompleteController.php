@@ -16,9 +16,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Autocomplete search controller for Activities.
- *
- * @Route("/activities")
  */
+#[Route(path: '/activities')]
 class AutocompleteController extends AbstractController
 {
     /**
@@ -27,13 +26,12 @@ class AutocompleteController extends AbstractController
      *
      * @return JsonResponse
      * @throws HttpException|AccessDeniedHttpException
-     *
-     * @Route("/{activity}/search/autocomplete", name="oro_activity_form_autocomplete_search")
      */
+    #[Route(path: '/{activity}/search/autocomplete', name: 'oro_activity_form_autocomplete_search')]
     public function autocompleteAction(Request $request, $activity)
     {
         $autocompleteRequest = new AutocompleteRequest($request);
-        $validator           = $this->get(ValidatorInterface::class);
+        $validator           = $this->container->get(ValidatorInterface::class);
         $isXmlHttpRequest    = $request->isXmlHttpRequest();
         $code                = 200;
         $result              = [
@@ -49,7 +47,7 @@ class AutocompleteController extends AbstractController
             }
         }
 
-        if (!$this->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
+        if (!$this->container->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
             $result['errors'][] = 'Access denied.';
         }
 
@@ -61,7 +59,7 @@ class AutocompleteController extends AbstractController
             throw new HttpException($code, implode(', ', $result['errors']));
         }
 
-        $searchHandler = $this->get(ContextSearchHandler::class);
+        $searchHandler = $this->container->get(ContextSearchHandler::class);
         $searchHandler->setClass($activity);
 
         return new JsonResponse($searchHandler->search(

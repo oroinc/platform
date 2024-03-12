@@ -38,7 +38,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
     public function testExecuteWithoutRowResult()
     {
         $this->connection->expects(self::once())
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn(null);
         $this->connection->expects(self::never())
@@ -52,7 +52,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
     public function testExecuteWithMimeTypes()
     {
         $this->connection->expects(self::once())
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn([
                 'data' =>'data persisted serialized',
@@ -80,7 +80,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
     public function testGetDescription()
     {
         $this->connection->expects(self::once())
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn([
                 'data' => 'data persisted serialized',
@@ -124,7 +124,7 @@ testType2'
     public function testExecute()
     {
         $this->connection->expects(self::once())
-            ->method('fetchAssoc')
+            ->method('fetchAssociative')
             ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn([
                 'data' =>'data persisted serialized',
@@ -155,7 +155,7 @@ testType2'
             ->with($this->getUpdateFromConfigField())
             ->willReturn($statement);
         $statement->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->with(['data serialized to persist', 16]);
         $this->updateAttachmentOptionQuery->setConnection($this->connection);
         $this->updateAttachmentOptionQuery->execute($this->logger);

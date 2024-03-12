@@ -78,7 +78,7 @@ class UpdateExtendRelationDataQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $sql, $parameters);
 
-        $row = $this->connection->fetchAssoc($sql, $parameters, $types);
+        $row = $this->connection->fetchAssociative($sql, $parameters, $types);
         $id = $row['id'];
         $data = isset($row['data']) ? $this->connection->convertToPHPValue($row['data'], Types::ARRAY) : [];
 
@@ -100,7 +100,7 @@ class UpdateExtendRelationDataQuery extends ParametrizedMigrationQuery
 
         if (!$dryRun) {
             $statement = $this->connection->prepare($sql);
-            $statement->execute($parameters);
+            $statement->executeQuery($parameters);
         }
     }
 }

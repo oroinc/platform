@@ -72,9 +72,7 @@ class Email implements EntityHolderInterface
         return $this->attributes;
     }
 
-    /**
-     * @Assert\Callback
-     */
+    #[Assert\Callback]
     public function validate(ExecutionContextInterface $context): void
     {
         if (!$this->getToRecipients() && !$this->getCcRecipients() && !$this->getBccRecipients()) {

@@ -108,7 +108,7 @@ class WorkflowItemRepository extends ServiceEntityRepository
         // select entities for reset
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select('workflowItem.id')
-            ->from('OroWorkflowBundle:WorkflowItem', 'workflowItem')
+            ->from(WorkflowItem::class, 'workflowItem')
             ->innerJoin('workflowItem.definition', 'workflowDefinition', Join::WITH, 'workflowDefinition.name = ?1')
             ->setParameter(1, $workflowName)
             ->orderBy('workflowItem.id');
@@ -293,7 +293,7 @@ class WorkflowItemRepository extends ServiceEntityRepository
      * @param string $entityClass
      * @param string $entityIdentifier
      * @param null $dqlFilter
-     * @return array|\Oro\Bundle\WorkflowBundle\Entity\WorkflowItem[]
+     * @return array|WorkflowItem[]
      */
     public function findByStepNamesAndEntityClass(
         Collection $stepNames,

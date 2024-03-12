@@ -76,6 +76,9 @@ class WorkflowVariableDataTransformer implements DataTransformerInterface
      */
     protected function getMetadataForClass($class)
     {
+        if (null === $class) {
+            return null;
+        }
         try {
             $entityManager = $this->managerRegistry->getManagerForClass($class);
         } catch (ORMException $e) {

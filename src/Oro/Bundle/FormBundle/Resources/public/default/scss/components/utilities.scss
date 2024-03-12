@@ -7,7 +7,7 @@ label.required em {
 }
 
 .form__col {
-    margin: 0 0 $offset-x;
+    margin: 0 0 spacing('base');
 
     @include clearfix();
 }

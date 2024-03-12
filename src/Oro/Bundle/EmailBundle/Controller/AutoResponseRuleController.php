@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -11,8 +12,8 @@ use Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType;
 use Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateType;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -21,24 +22,23 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The controller for the auto response rule functionality.
- *
- * @Route("/autoresponserule")
  */
+#[Route(path: '/autoresponserule')]
 class AutoResponseRuleController extends AbstractController
 {
     /**
-     * @Route("/create/{mailbox}")
-     * @Acl(
-     *      id="oro_email_autoresponserule_create",
-     *      type="entity",
-     *      class="OroEmailBundle:AutoResponseRule",
-     *      permission="CREATE"
-     * )
-     * @Template("@OroEmail/AutoResponseRule/dialog/update.html.twig")
      * @param Request $request
      * @param Mailbox|null $mailbox
      * @return array
      */
+    #[Route(path: '/create/{mailbox}')]
+    #[Template('@OroEmail/AutoResponseRule/dialog/update.html.twig')]
+    #[Acl(
+        id: 'oro_email_autoresponserule_create',
+        type: 'entity',
+        class: AutoResponseRule::class,
+        permission: 'CREATE'
+    )]
     public function createAction(Request $request, Mailbox $mailbox = null)
     {
         $rule = new AutoResponseRule();
@@ -50,18 +50,13 @@ class AutoResponseRuleController extends AbstractController
     }
 
     /**
-     * @Route("/update/{id}", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_email_autoresponserule_update",
-     *      type="entity",
-     *      class="OroEmailBundle:AutoResponseRule",
-     *      permission="EDIT"
-     * )
-     * @Template("@OroEmail/AutoResponseRule/dialog/update.html.twig")
      * @param AutoResponseRule $rule
      * @param Request $request
      * @return array
      */
+    #[Route(path: '/update/{id}', requirements: ['id' => '\d+'])]
+    #[Template('@OroEmail/AutoResponseRule/dialog/update.html.twig')]
+    #[Acl(id: 'oro_email_autoresponserule_update', type: 'entity', class: AutoResponseRule::class, permission: 'EDIT')]
     public function updateAction(AutoResponseRule $rule, Request $request)
     {
         if ($request->isMethod('POST')) {
@@ -80,13 +75,12 @@ class AutoResponseRuleController extends AbstractController
     }
 
     /**
-     * @Route("/template/{id}", options={"expose"=true})
-     * @AclAncestor("oro_email_emailtemplate_update")
-     * @Template("@OroEmail/AutoResponseRule/editTemplate.html.twig")
-     *
      * @param EmailTemplate $template
      * @return array
      */
+    #[Route(path: '/template/{id}', options: ['expose' => true])]
+    #[Template('@OroEmail/AutoResponseRule/editTemplate.html.twig')]
+    #[AclAncestor('oro_email_emailtemplate_update')]
     public function editTemplateAction(EmailTemplate $template)
     {
         $form = $this->createForm(AutoResponseTemplateType::class, $template);
@@ -116,14 +110,14 @@ class AutoResponseRuleController extends AbstractController
         }
 
         /** @var AutoResponseManager $autoResponseManager */
-        $autoResponseManager = $this->get('oro_email.autoresponserule_manager');
+        $autoResponseManager = $this->container->get('oro_email.autoresponserule_manager');
         $entity = $autoResponseManager->createEmailEntity();
 
         return [
             'form'  => $form->createView(),
             'saved' => $form->isSubmitted() && $form->isValid(),
             'emailEntityData' => $entity,
-            'metadata' => $this->get(Manager::class)->getMetadata('string')
+            'metadata' => $this->container->get(Manager::class)->getMetadata('string')
         ];
     }
 
@@ -143,7 +137,7 @@ class AutoResponseRuleController extends AbstractController
      */
     protected function getEventDispatcher()
     {
-        return $this->get(EventDispatcherInterface::class);
+        return $this->container->get(EventDispatcherInterface::class);
     }
 
     /**
@@ -151,7 +145,7 @@ class AutoResponseRuleController extends AbstractController
      */
     protected function getAutoResponseRuleRepository()
     {
-        return $this->getDoctrine()->getRepository(AutoResponseRule::class);
+        return $this->container->get('doctrine')->getRepository(AutoResponseRule::class);
     }
 
     /**
@@ -159,7 +153,7 @@ class AutoResponseRuleController extends AbstractController
      */
     protected function getAutoResponseRuleManager()
     {
-        return $this->getDoctrine()->getManagerForClass(AutoResponseRule::class);
+        return $this->container->get('doctrine')->getManagerForClass(AutoResponseRule::class);
     }
 
     /**
@@ -173,6 +167,7 @@ class AutoResponseRuleController extends AbstractController
                 'oro_email.autoresponserule_manager' => AutoResponseManager::class,
                 Manager::class,
                 EventDispatcherInterface::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

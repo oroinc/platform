@@ -13,10 +13,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class RenameExtension extends BaseRenameExtension
 {
-    /**
-     * @var ExtendOptionsManager
-     */
-    protected $extendOptionsManager;
+    private ExtendOptionsManager $extendOptionsManager;
 
     public function __construct(ExtendOptionsManager $extendOptionsManager)
     {
@@ -24,9 +21,9 @@ class RenameExtension extends BaseRenameExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function renameTable(Schema $schema, QueryBag $queries, $oldTableName, $newTableName)
+    public function renameTable(Schema $schema, QueryBag $queries, string $oldTableName, string $newTableName): void
     {
         $extendOptions = $this->extendOptionsManager->getExtendOptions();
         foreach ($extendOptions as $name => $options) {
@@ -59,10 +56,15 @@ class RenameExtension extends BaseRenameExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function renameColumn(Schema $schema, QueryBag $queries, Table $table, $oldColumnName, $newColumnName)
-    {
+    public function renameColumn(
+        Schema $schema,
+        QueryBag $queries,
+        Table $table,
+        string $oldColumnName,
+        string $newColumnName
+    ): void {
         $this->extendOptionsManager->setColumnOptions(
             $table->getName(),
             $oldColumnName,

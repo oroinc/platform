@@ -42,10 +42,11 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
     public function testProcessOnEntityWithFullAccess(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
+        $criteria->setOption(AclAccessRule::CONDITION_DATA_BUILDER_CONTEXT, ['test' => 1]);
 
         $this->builder->expects(self::once())
             ->method('getAclConditionData')
-            ->with(CmsUser::class, 'VIEW')
+            ->with(CmsUser::class, 'VIEW', ['test' => 1])
             ->willReturn([]);
 
         $this->accessRule->process($criteria);
@@ -58,7 +59,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
 
         $this->builder->expects(self::once())
             ->method('getAclConditionData')
-            ->with(CmsUser::class, 'VIEW')
+            ->with(CmsUser::class, 'VIEW', [])
             ->willReturn([null, null, null, null, null]);
 
         $this->accessRule->process($criteria);
@@ -71,7 +72,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
 
         $this->builder->expects(self::once())
             ->method('getAclConditionData')
-            ->with(CmsUser::class, 'VIEW')
+            ->with(CmsUser::class, 'VIEW', [])
             ->willReturn(['owner', 130, null, null, null]);
 
         $this->accessRule->process($criteria);
@@ -91,7 +92,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
 
         $this->builder->expects(self::once())
             ->method('getAclConditionData')
-            ->with(CmsUser::class, 'VIEW')
+            ->with(CmsUser::class, 'VIEW', [])
             ->willReturn(['owner', [5,7,6], null, null, null]);
 
         $this->accessRule->process($criteria);
@@ -111,7 +112,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
 
         $this->builder->expects(self::once())
             ->method('getAclConditionData')
-            ->with(CmsUser::class, 'VIEW')
+            ->with(CmsUser::class, 'VIEW', [])
             ->willReturn([null, null, 'organization', 1, true]);
 
         $this->accessRule->process($criteria);
@@ -131,7 +132,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
 
         $this->builder->expects(self::once())
             ->method('getAclConditionData')
-            ->with(CmsUser::class, 'VIEW')
+            ->with(CmsUser::class, 'VIEW', [])
             ->willReturn(['owner', [5,7,6], 'organization', 1, false]);
 
         $this->accessRule->process($criteria);
@@ -161,7 +162,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
 
         $this->builder->expects(self::once())
             ->method('getAclConditionData')
-            ->with(CmsUser::class, 'VIEW')
+            ->with(CmsUser::class, 'VIEW', [])
             ->willReturn([null, null, 'organization', [1, 2, 3], true]);
 
         $this->accessRule->process($criteria);

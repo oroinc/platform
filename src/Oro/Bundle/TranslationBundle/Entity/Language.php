@@ -2,77 +2,53 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\OrganizationAwareTrait;
+use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 
 /**
  * Store Language in a database
- *
- * @ORM\Table(name="oro_language")
- * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "entity"={
- *              "icon"="fa-flag"
- *          },
- *          "ownership"={
- *              "owner_type"="ORGANIZATION",
- *              "owner_field_name"="organization",
- *              "owner_column_name"="organization_id",
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"=""
- *          }
- *      }
- * )
  */
+#[ORM\Entity(repositoryClass: LanguageRepository::class)]
+#[ORM\Table(name: 'oro_language')]
+#[ORM\HasLifecycleCallbacks]
+#[Config(
+    defaultValues: [
+        'entity' => ['icon' => 'fa-flag'],
+        'ownership' => [
+            'owner_type' => 'ORGANIZATION',
+            'owner_field_name' => 'organization',
+            'owner_column_name' => 'organization_id'
+        ],
+        'security' => ['type' => 'ACL', 'group_name' => '']
+    ]
+)]
 class Language implements DatesAwareInterface, OrganizationAwareInterface
 {
     use DatesAwareTrait;
     use OrganizationAwareTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=16, unique=true)
-     */
-    protected $code;
+    #[ORM\Column(type: Types::STRING, length: 16, unique: true)]
+    protected ?string $code = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean", options={"default"=false})
-     */
-    protected $enabled = false;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    protected ?bool $enabled = false;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="installed_build_date", type="datetime", nullable=true)
-     */
-    protected $installedBuildDate;
+    #[ORM\Column(name: 'installed_build_date', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $installedBuildDate = null;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="local_files_language", type="boolean", options={"default"=false})
-     */
-    private $localFilesLanguage = false;
+    #[ORM\Column(name: 'local_files_language', type: Types::BOOLEAN, options: ['default' => false])]
+    private ?bool $localFilesLanguage = false;
 
     /**
      * @return int

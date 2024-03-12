@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\Topic\UpdateVisibilitiesForOrganizationTopic;
 use Oro\Bundle\EmailBundle\Async\Topic\UpdateVisibilitiesTopic;
@@ -36,8 +35,7 @@ class UpdateVisibilitiesProcessorTest extends OrmTestCase
         $this->jobRunner = $this->createMock(JobRunner::class);
 
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver(
             [dirname((new \ReflectionClass(Organization::class))->getFileName())]
         ));
 

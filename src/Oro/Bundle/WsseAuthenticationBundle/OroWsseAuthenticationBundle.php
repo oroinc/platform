@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WsseAuthenticationBundle;
 
 use Oro\Bundle\WsseAuthenticationBundle\DependencyInjection\CompilerPass\WsseNonceCachePass;
-use Oro\Bundle\WsseAuthenticationBundle\DependencyInjection\Security\Factory\WsseSecurityListenerFactory;
+use Oro\Bundle\WsseAuthenticationBundle\DependencyInjection\Security\Factory\WsseSecurityAuthenticatorFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -16,11 +16,11 @@ class OroWsseAuthenticationBundle extends Bundle
     {
         parent::build($container);
 
-        $wsseSecurityListenerFactory = new WsseSecurityListenerFactory();
+        $wsseSecurityListenerFactory = new WsseSecurityAuthenticatorFactory();
 
         $container->addCompilerPass(new WsseNonceCachePass($wsseSecurityListenerFactory->getKey()));
 
         $extension = $container->getExtension('security');
-        $extension->addSecurityListenerFactory($wsseSecurityListenerFactory);
+        $extension->addAuthenticatorFactory($wsseSecurityListenerFactory);
     }
 }

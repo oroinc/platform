@@ -3,7 +3,11 @@
 namespace Oro\Bundle\OrganizationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
+/**
+ * Provides choices for business unit grid filter
+ */
 class BusinessUnitGridService
 {
     /** @var EntityManager */
@@ -39,7 +43,7 @@ class BusinessUnitGridService
         $key = $entity . '|' . $field;
         if (!isset($this->choices[$key])) {
             $choices = $this->em
-                ->getRepository('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
+                ->getRepository(BusinessUnit::class)
                 ->getGridFilterChoices($field, $entity, $alias);
             $this->choices[$key] = array_flip($choices);
         }

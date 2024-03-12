@@ -2,50 +2,44 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * CRUD controller for ProcessDefinition entities.
- * @Route("/processdefinition")
  */
+#[Route(path: '/processdefinition')]
 class ProcessDefinitionController extends AbstractController
 {
     /**
-     * @Route(name="oro_process_definition_index")
-     * @Template
-     * @Acl(
-     *      id="oro_process_definition_view",
-     *      type="entity",
-     *      class="OroWorkflowBundle:ProcessDefinition",
-     *      permission="VIEW"
-     * )
      *
      * @return array
      */
+    #[Route(name: 'oro_process_definition_index')]
+    #[Template]
+    #[Acl(id: 'oro_process_definition_view', type: 'entity', class: ProcessDefinition::class, permission: 'VIEW')]
     public function indexAction()
     {
         return [];
     }
 
     /**
-     * @Route(
-     *      "/view/{name}",
-     *      name="oro_process_definition_view"
-     * )
-     * @AclAncestor("oro_process_definition_view")
-     * @Template("@OroWorkflow/ProcessDefinition/view.html.twig")
-     *
      * @param ProcessDefinition $processDefinition
      * @return array
      */
+    #[Route(path: '/view/{name}', name: 'oro_process_definition_view')]
+    #[Template('@OroWorkflow/ProcessDefinition/view.html.twig')]
+    #[AclAncestor('oro_process_definition_view')]
     public function viewAction(ProcessDefinition $processDefinition)
     {
-        $triggers = $this->getRepository('OroWorkflowBundle:ProcessTrigger')
+        $triggers = $this->getRepository(ProcessTrigger::class)
             ->findBy(['definition' => $processDefinition]);
         return [
             'entity'   => $processDefinition,
@@ -55,10 +49,18 @@ class ProcessDefinitionController extends AbstractController
 
     /**
      * @param string $entityName
-     * @return \Doctrine\Persistence\ObjectRepository
+     * @return ObjectRepository
      */
     protected function getRepository($entityName)
     {
-        return $this->getDoctrine()->getRepository($entityName);
+        return $this->container->get('doctrine')->getRepository($entityName);
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

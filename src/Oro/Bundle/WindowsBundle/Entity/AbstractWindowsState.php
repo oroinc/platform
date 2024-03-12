@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WindowsBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
@@ -11,28 +12,22 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Window state container Entity
- *
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 abstract class AbstractWindowsState implements CreatedAtAwareInterface, UpdatedAtAwareInterface
 {
     use CreatedAtAwareTrait;
     use UpdatedAtAwareTrait;
 
-    /**
-     * @var integer $id
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
      * @var string $data
-     *
-     * @ORM\Column(name="data", type="json_array", nullable=false)
      */
+    #[ORM\Column(name: 'data', type: 'json_array', nullable: false)]
     protected $data;
 
     /**

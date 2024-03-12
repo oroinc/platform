@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
+use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
@@ -21,7 +23,14 @@ class OrmDatasourceAclListener
     {
         $config = $event->getDatagrid()->getConfig();
         if (!$config->isDatasourceSkipAclApply()) {
-            $this->aclHelper->apply($event->getQuery(), $config->getDatasourceAclApplyPermission());
+            $this->aclHelper->apply(
+                $event->getQuery(),
+                $config->getDatasourceAclApplyPermission(),
+                [
+                    AclAccessRule::CONDITION_DATA_BUILDER_CONTEXT =>
+                        $config->offsetGetByPath(DatagridConfiguration::ACL_CONDITION_DATA_BUILDER_CONTEXT, [])
+                ]
+            );
         }
     }
 }

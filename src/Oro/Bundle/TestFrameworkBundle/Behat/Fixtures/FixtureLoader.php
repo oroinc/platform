@@ -305,7 +305,6 @@ class FixtureLoader
     {
         $token = new UsernamePasswordOrganizationToken(
             $user,
-            $user->getUsernameLowercase(),
             'main',
             $user->getOrganization(),
             $user->getUserRoles()

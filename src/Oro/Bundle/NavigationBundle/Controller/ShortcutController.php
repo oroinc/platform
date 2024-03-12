@@ -13,19 +13,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Serves shortcut actions.
- * @Route("/shortcut")
  */
+#[Route(path: '/shortcut')]
 class ShortcutController extends AbstractController
 {
     protected $uris = [];
 
-    /**
-     * @Route("actionslist", name="oro_shortcut_actionslist")
-     * @Template
-     */
+    #[Route(path: 'actionslist', name: 'oro_shortcut_actionslist')]
+    #[Template]
     public function actionslistAction()
     {
-        $provider = $this->get(BuilderChainProvider::class);
+        $provider = $this->container->get(BuilderChainProvider::class);
         /**
          * merging shortcuts and application menu
          */
@@ -47,7 +45,7 @@ class ShortcutController extends AbstractController
     protected function getResults(ItemInterface $items)
     {
         /** @var $translator TranslatorInterface */
-        $translator = $this->get(TranslatorInterface::class);
+        $translator = $this->container->get(TranslatorInterface::class);
         $itemIterator = new RecursiveItemIterator($items);
         $iterator = new \RecursiveIteratorIterator($itemIterator, \RecursiveIteratorIterator::SELF_FIRST);
         $result = [];

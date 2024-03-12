@@ -5,36 +5,42 @@ namespace Oro\Bundle\UserBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
+use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserApi;
 
+/**
+ * Sets a default organization to User, Group and UserApi entities.
+ */
 class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
-    const BATCH_SIZE = 200;
+    private const BATCH_SIZE = 200;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData',
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadGroupData'
+            LoadAdminUserData::class,
+            LoadGroupData::class
         ];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $this->update($manager, 'OroUserBundle:User');
-        $this->update($manager, 'OroUserBundle:Group');
-        $this->update($manager, 'OroUserBundle:UserApi');
+        $this->update($manager, User::class);
+        $this->update($manager, Group::class);
+        $this->update($manager, UserApi::class);
 
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $usersQB      = $manager->getRepository('OroUserBundle:User')->createQueryBuilder('u');
-        $users        = new BufferedIdentityQueryResultIterator($usersQB);
+        $organization = $manager->getRepository(Organization::class)->getFirst();
+        $usersQB = $manager->getRepository(User::class)->createQueryBuilder('u');
+        $users = new BufferedIdentityQueryResultIterator($usersQB);
 
         $iteration = 0;
         /** @var User $user */
@@ -48,11 +54,11 @@ class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implemen
 
             if (0 === $iteration % self::BATCH_SIZE) {
                 $manager->flush();
-                $manager->clear('OroUserBundle:User');
+                $manager->clear(User::class);
             }
         }
 
         $manager->flush();
-        $manager->clear('OroUserBundle:User');
+        $manager->clear(User::class);
     }
 }

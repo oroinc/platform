@@ -13,12 +13,12 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 class OroOrganizationBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::updateOrganizationTable($schema);
-        self::updateConfigs($schema, $queries);
+        $this->updateOrganizationTable($schema);
+        $this->updateConfigs($schema, $queries);
 
         //Add organization fields to ownership entity config
         $queries->addQuery(
@@ -35,10 +35,9 @@ class OroOrganizationBundle implements Migration
     /**
      * Modify table oro_organization
      */
-    public static function updateOrganizationTable(Schema $schema)
+    private function updateOrganizationTable(Schema $schema): void
     {
         $table = $schema->getTable('oro_organization');
-
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn(
             'created_at',
@@ -51,17 +50,15 @@ class OroOrganizationBundle implements Migration
             ['default' => null, 'comment' => '(DC2Type:datetime)', 'notnull' => false]
         );
         $table->addColumn('enabled', 'boolean', ['default' => '1']);
-
         $table->addUniqueIndex(['name'], 'UNIQ_BB42B65D5E237E06');
     }
 
     /**
      * Modify entity config to exclude currency and currency_precision fields
      */
-    public static function updateConfigs(Schema $schema, QueryBag $queries)
+    private function updateConfigs(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_organization');
-
         $table->dropColumn('currency');
         $table->dropColumn('currency_precision');
 

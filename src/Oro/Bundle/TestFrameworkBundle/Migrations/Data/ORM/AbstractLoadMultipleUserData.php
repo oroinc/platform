@@ -105,7 +105,7 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
 
             $userManager->updateUser($user);
 
-            $this->setReference($user->getUsername(), $user);
+            $this->setReference($user->getUserIdentifier(), $user);
         }
     }
 

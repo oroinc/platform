@@ -2,53 +2,33 @@
 
 namespace Oro\Bundle\SearchBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Query
- *
- * @ORM\Table(name="oro_search_query")
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
+ * Search query entity
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_search_query')]
+#[ORM\HasLifecycleCallbacks]
 class Query
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entity", type="string", length=250)
-     */
-    private $entity;
+    #[ORM\Column(name: 'entity', type: Types::STRING, length: 250)]
+    private ?string $entity = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="query", type="text")
-     */
-    private $query;
+    #[ORM\Column(name: 'query', type: Types::TEXT)]
+    private ?string $query = null;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="result_count", type="integer")
-     */
-    private $resultCount;
+    #[ORM\Column(name: 'result_count', type: Types::INTEGER)]
+    private ?int $resultCount = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     */
-    private $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt = null;
 
     /**
      * Get id
@@ -131,8 +111,8 @@ class Query
 
     /**
      * Pre persist event listener
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));

@@ -862,14 +862,51 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be enabled$/
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be readonly$/
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be readonly in form "(?P<formElement>(?:[^"]|\\")*)"$/
+     *
+     * @throws ElementNotFoundException
      */
-    public function fieldShouldBeEnabled(string $fieldName): void
+    public function fieldShouldBeReadonly(string $fieldName, ?string $formElement = null): void
     {
-        $field = $this->getSession()->getPage()->findField($fieldName);
-        if (null === $field) {
-            $field = $this->getFieldInForm($fieldName, 'OroForm');
-        }
+        $field = $this->getFieldByFormName($fieldName, $formElement);
+
+        self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue(
+            $field->hasAttribute('readonly'),
+            sprintf('Field "%s" has readonly attribute', $fieldName)
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should not be readonly$/
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should not be readonly in form "(?P<formElement>(?:[^"]|\\")*)"$/
+     *
+     * @throws ElementNotFoundException
+     */
+    //@codingStandardsIgnoreEnd
+    public function fieldShouldNotBeReadonly(string $fieldName, ?string $formElement = null): void
+    {
+        $field = $this->getFieldByFormName($fieldName, $formElement);
+
+        self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
+        self::assertFalse(
+            $field->hasAttribute('readonly'),
+            sprintf("Field '%s' doesn't have readonly attribute", $fieldName)
+        );
+    }
+
+    /**
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be enabled$/
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be enabled$ in form "(?P<formElement>(?:[^"]|\\")*)"$/
+     *
+     * @throws ElementNotFoundException
+     */
+    public function fieldShouldBeEnabled(string $fieldName, ?string $formElement = null): void
+    {
+        $field = $this->getFieldByFormName($fieldName, $formElement);
+
         self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
         self::assertFalse($field->hasAttribute('disabled'), sprintf('Field "%s" is disabled', $fieldName));
     }
@@ -877,17 +914,12 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be disabled$/
      * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be disabled in form "(?P<formElement>(?:[^"]|\\")*)"$/
+     *
+     * @throws ElementNotFoundException
      */
     public function fieldShouldBeDisabled(string $fieldName, ?string $formElement = null): void
     {
-        if ($formElement === null) {
-            $field = $this->getSession()->getPage()->findField($fieldName);
-            if (null === $field) {
-                $field = $this->getFieldInForm($fieldName, 'OroForm');
-            }
-        } else {
-            $field = $this->getFieldInForm($fieldName, $formElement);
-        }
+        $field = $this->getFieldByFormName($fieldName, $formElement);
 
         self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
         self::assertTrue($field->hasAttribute('disabled'), sprintf('Field "%s" is enabled', $fieldName));
@@ -994,12 +1026,26 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @param string $fieldName
-     * @param string $formName
-     * @return NodeElement|mixed|null|Element
      * @throws ElementNotFoundException
      */
-    protected function getFieldInForm($fieldName, $formName)
+    protected function getFieldByFormName(string $fieldName, ?string $formElement = null): ?NodeElement
+    {
+        if ($formElement === null) {
+            $field = $this->getSession()->getPage()->findField($fieldName);
+            if (null === $field) {
+                $field = $this->getFieldInForm($fieldName, 'OroForm');
+            }
+        } else {
+            $field = $this->getFieldInForm($fieldName, $formElement);
+        }
+
+        return $field;
+    }
+
+    /**
+     * @throws ElementNotFoundException
+     */
+    protected function getFieldInForm(string $fieldName, ?string $formName = null): NodeElement
     {
         /** @var Form $form */
         $form = $this->createElement($formName);

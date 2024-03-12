@@ -20,7 +20,7 @@ class OroDataAuditBundle extends Bundle
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(
-                DoctrineOrmMappingsPass::createAnnotationMappingDriver(
+                DoctrineOrmMappingsPass::createAttributeMappingDriver(
                     ['Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity'],
                     [$this->getPath() . '/Tests/Functional/Environment/Entity']
                 )

@@ -2,60 +2,40 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 
 /**
  * Email Recipient
- *
- * @ORM\Table(name="oro_email_recipient", indexes={
- *     @ORM\Index("email_id_type_idx", columns = {"email_id", "type"})
- * })
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository")
  */
+#[ORM\Entity(repositoryClass: EmailRecipientRepository::class)]
+#[ORM\Table(name: 'oro_email_recipient')]
+#[ORM\Index(columns: ['email_id', 'type'], name: 'email_id_type_idx')]
 class EmailRecipient
 {
     const TO = 'to';
     const CC = 'cc';
     const BCC = 'bcc';
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=320)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 320)]
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type", type="string", length=3)
-     */
-    protected $type;
+    #[ORM\Column(name: 'type', type: Types::STRING, length: 3)]
+    protected ?string $type = null;
 
-    /**
-     * @var EmailAddress
-     *
-     * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER")
-     * @ORM\JoinColumn(name="email_address_id", referencedColumnName="id", nullable=false)
-     */
-    protected $emailAddress;
+    #[ORM\ManyToOne(targetEntity: EmailAddress::class, fetch: 'EAGER')]
+    #[ORM\JoinColumn(name: 'email_address_id', referencedColumnName: 'id', nullable: false)]
+    protected ?EmailAddress $emailAddress = null;
 
-    /**
-     * @var Email
-     *
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="recipients")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $email;
+    #[ORM\ManyToOne(targetEntity: Email::class, inversedBy: 'recipients')]
+    #[ORM\JoinColumn(name: 'email_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Email $email = null;
 
     /**
      * Get id

@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Form\Handler\NoteHandler;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -19,19 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The controller for Note entity.
- * @Route("/notes")
  */
+#[Route(path: '/notes')]
 class NoteController extends AbstractController
 {
-    /**
-     * @Route(
-     *      "/view/widget/{entityClass}/{entityId}",
-     *      name="oro_note_widget_notes"
-     * )
-     *
-     * @AclAncestor("oro_note_view")
-     * @Template("@OroNote/Note/notes.html.twig")
-     */
+    #[Route(path: '/view/widget/{entityClass}/{entityId}', name: 'oro_note_widget_notes')]
+    #[Template('@OroNote/Note/notes.html.twig')]
+    #[AclAncestor('oro_note_view')]
     public function widgetAction($entityClass, $entityId)
     {
         $entity = $this->getEntityRoutingHelper()->getEntity($entityClass, $entityId);
@@ -42,17 +36,14 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/view/{entityClass}/{entityId}",
-     *      name="oro_note_notes"
-     * )
      *
-     * @AclAncestor("oro_note_view")
      * @param Request $request
      * @param string $entityClass
      * @param int $entityId
      * @return Response
      */
+    #[Route(path: '/view/{entityClass}/{entityId}', name: 'oro_note_notes')]
+    #[AclAncestor('oro_note_view')]
     public function getAction(Request $request, $entityClass, $entityId)
     {
         $entityClass = $this->getEntityRoutingHelper()->resolveEntityClass($entityClass);
@@ -69,22 +60,22 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @Route(
-     *     "/widget/info/{id}/{renderContexts}",
-     *     name="oro_note_widget_info",
-     *     requirements={"id"="\d+", "renderContexts"="\d+"},
-     *     defaults={"renderContexts"=true}
-     * )
-     * @Template("@OroNote/Note/widget/info.html.twig")
-     * @AclAncestor("oro_note_view")
      * @param Request $request
      * @param Note $entity
      * @param string $renderContexts
      * @return array
      */
+    #[Route(
+        path: '/widget/info/{id}/{renderContexts}',
+        name: 'oro_note_widget_info',
+        requirements: ['id' => '\d+', 'renderContexts' => '\d+'],
+        defaults: ['renderContexts' => true]
+    )]
+    #[Template('@OroNote/Note/widget/info.html.twig')]
+    #[AclAncestor('oro_note_view')]
     public function infoAction(Request $request, Note $entity, $renderContexts)
     {
-        $attachmentProvider = $this->get(AttachmentProvider::class);
+        $attachmentProvider = $this->container->get(AttachmentProvider::class);
         $attachment = $attachmentProvider->getAttachmentInfo($entity);
 
         return [
@@ -114,13 +105,13 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @Route("/create", name="oro_note_create")
      *
-     * @Template("@OroNote/Note/update.html.twig")
-     * @AclAncestor("oro_note_create")
      * @param Request $request
      * @return array
      */
+    #[Route(path: '/create', name: 'oro_note_create')]
+    #[Template('@OroNote/Note/update.html.twig')]
+    #[AclAncestor('oro_note_create')]
     public function createAction(Request $request)
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();
@@ -139,15 +130,12 @@ class NoteController extends AbstractController
         return $this->update($noteEntity, $formAction);
     }
 
-    /**
-     * @Route("/update/{id}", name="oro_note_update", requirements={"id"="\d+"})
-     *
-     * @Template
-     * @AclAncestor("oro_note_update")
-     */
+    #[Route(path: '/update/{id}', name: 'oro_note_update', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[AclAncestor('oro_note_update')]
     public function updateAction(Note $entity)
     {
-        $formAction = $this->get('router')->generate('oro_note_update', ['id' => $entity->getId()]);
+        $formAction = $this->container->get('router')->generate('oro_note_update', ['id' => $entity->getId()]);
 
         return $this->update($entity, $formAction);
     }
@@ -159,13 +147,13 @@ class NoteController extends AbstractController
             'saved'  => false
         ];
 
-        if ($this->get(NoteHandler::class)->process($entity)) {
+        if ($this->container->get(NoteHandler::class)->process($entity)) {
             $responseData['saved'] = true;
             $responseData['model'] = $this->getNoteManager()->getEntityViewModel($entity);
         }
         $responseData['form']        = $this->getForm()->createView();
         $responseData['formAction']  = $formAction;
-        $translator = $this->get(TranslatorInterface::class);
+        $translator = $this->container->get(TranslatorInterface::class);
         if ($entity->getId()) {
             $responseData['submitLabel'] = $translator->trans('oro.note.save.label');
         } else {
@@ -177,17 +165,17 @@ class NoteController extends AbstractController
 
     public function getForm(): FormInterface
     {
-        return $this->get('oro_note.form.note');
+        return $this->container->get('oro_note.form.note');
     }
 
     protected function getNoteManager(): NoteManager
     {
-        return $this->get(NoteManager::class);
+        return $this->container->get(NoteManager::class);
     }
 
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     /**

@@ -17,7 +17,7 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
             ->select('r.id, r.definition')
             ->from('oro_report', 'r')
             ->execute()
-            ->fetchAll(\PDO::FETCH_ASSOC);
+            ->fetchAllAssociative();
         $reportsToUpdate = [];
         foreach ($reports as $report) {
             $definition = $report['definition'];

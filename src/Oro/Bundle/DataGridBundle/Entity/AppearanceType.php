@@ -2,29 +2,26 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
- * @ORM\Table(name="oro_grid_appearance_type")
- */
+* Entity that represents Appearance Type
+*
+*/
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_grid_appearance_type')]
 class AppearanceType
 {
-    /**
-     * @ORM\Column(name="name", type="string", length=32)
-     * @ORM\Id
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 32)]
+    #[ORM\Id]
+    protected ?string $name = null;
 
-    /**
-     * @ORM\Column(name="label", type="string", length=255)
-     */
-    protected $label;
+    #[ORM\Column(name: 'label', type: Types::STRING, length: 255)]
+    protected ?string $label = null;
 
-    /**
-     * @ORM\Column(name="icon", type="string", length=255)
-     */
-    protected $icon;
+    #[ORM\Column(name: 'icon', type: Types::STRING, length: 255)]
+    protected ?string $icon = null;
 
     /**
      * @param string $name

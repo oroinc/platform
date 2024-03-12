@@ -9,13 +9,15 @@ use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
+class CommentLifecycleListenerTest extends TestCase
 {
     /** @var CommentLifecycleListener */
     private $subscriber;
 
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|MockObject */
     private $tokenAccessor;
 
     protected function setUp(): void
@@ -97,7 +99,7 @@ class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return EntityManagerInterface|MockObject
      */
     private function getEntityManagerMock(bool $reloadUser = false, User $newUser = null)
     {
@@ -106,7 +108,7 @@ class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
         if ($reloadUser) {
             $result->expects($this->once())
                 ->method('find')
-                ->with('OroUserBundle:User')
+                ->with(User::class)
                 ->willReturn($newUser);
         } else {
             $result->expects($this->never())

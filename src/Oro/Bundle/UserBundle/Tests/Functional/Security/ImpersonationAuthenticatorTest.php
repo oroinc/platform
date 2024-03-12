@@ -6,12 +6,16 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
+use Oro\Bundle\UserBundle\Exception\ImpersonationAuthenticationException;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadImpersonationData;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
 class ImpersonationAuthenticatorTest extends WebTestCase
 {
@@ -32,34 +36,68 @@ class ImpersonationAuthenticatorTest extends WebTestCase
         );
     }
 
-    public function testGetUser(): void
+    public function testCreateTokenSuccess()
     {
         /** @var Impersonation $impersonation */
         $impersonation = $this->getReference(LoadImpersonationData::IMPERSONATION_SIMPLE_USER);
-        $user = $this->authenticator
-            ->getUser($impersonation->getToken(), $this->getContainer()->get('oro_user.tests.security.provider'));
+        $passport = new SelfValidatingPassport(
+            new UserBadge($impersonation->getToken(), [$this->authenticator, 'getUserByImpersonationToken'])
+        );
+        $token = $this->authenticator->createToken($passport, 'test');
 
-        $this->assertSame($impersonation->getUser(), $user);
+        self::assertInstanceOf(TokenInterface::class, $token);
     }
 
-    public function testGetUserWhenTokenNotFound(): void
+    public function testSupportSuccess()
     {
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
+        /** @var Impersonation $impersonation */
+        $impersonation = $this->getReference(LoadImpersonationData::IMPERSONATION_SIMPLE_USER);
+        $request = new Request();
+        $request->query = new InputBag(['_impersonation_token' => $impersonation->getToken()]);
 
-        $this->authenticator
-            ->getUser('invalid-token', $this->getContainer()->get('oro_user.tests.security.provider'));
+        self::assertTrue($this->authenticator->supports($request));
     }
 
-    public function testGetUserWhenTokenExpired(): void
+    public function testSupportFailure()
     {
-        $this->expectException(CustomUserMessageAuthenticationException::class);
+        $request = new Request();
+        $request->query = new InputBag([]);
+
+        self::assertFalse($this->authenticator->supports($request));
+    }
+
+    public function testAuthenticateSuccess(): void
+    {
+        /** @var Impersonation $impersonation */
+        $impersonation = $this->getReference(LoadImpersonationData::IMPERSONATION_SIMPLE_USER);
+        $request = new Request();
+        $request->query = new InputBag(['_impersonation_token' => $impersonation->getToken()]);
+        $passport = $this->authenticator->authenticate($request);
+
+        $this->assertSame($impersonation->getUser(), $passport->getUser());
+    }
+
+    public function testAuthenticateWhenTokenNotFound(): void
+    {
+        $request = new Request();
+        $this->expectException(ImpersonationAuthenticationException::class);
+        $this->expectExceptionMessage('Impersonation token is not set.');
+
+        $this->authenticator->authenticate($request);
+    }
+
+    public function testAuthenticateUserWhenTokenExpired(): void
+    {
+        $this->expectException(ImpersonationAuthenticationException::class);
         $this->expectExceptionMessage('Impersonation token has expired.');
 
         /** @var Impersonation $impersonation */
         $impersonation = $this->getReference(LoadImpersonationData::IMPERSONATION_SIMPLE_USER_EXPIRED);
+        $request = new Request();
+        $request->query = new InputBag(['_impersonation_token' => $impersonation->getToken()]);
+        $passport = $this->authenticator->authenticate($request);
 
-        $this->authenticator
-            ->getUser($impersonation->getToken(), $this->getContainer()->get('oro_user.tests.security.provider'));
+        self::assertSame($impersonation->getUser(), $passport->getUser());
     }
 
     public function testOnAuthenticationSuccess(): void
@@ -99,13 +137,24 @@ class ImpersonationAuthenticatorTest extends WebTestCase
      */
     public function testGetUserWhenTokenAlreadyUsed(): void
     {
-        $this->expectException(CustomUserMessageAuthenticationException::class);
+        $this->expectException(ImpersonationAuthenticationException::class);
         $this->expectExceptionMessage('Impersonation token has already been used.');
 
         /** @var Impersonation $impersonation */
         $impersonation = $this->getReference(LoadImpersonationData::IMPERSONATION_SIMPLE_USER);
+        $request = new Request();
+        $request->query = new InputBag(['_impersonation_token' => $impersonation->getToken()]);
+        $passport = $this->authenticator->authenticate($request);
 
-        $this->authenticator
-            ->getUser($impersonation->getToken(), $this->getContainer()->get('oro_user.tests.security.provider'));
+        self::assertSame($impersonation->getUser(), $passport->getUser());
+    }
+
+    public function testEntryPointWithoutException()
+    {
+        $request = new Request();
+        $authException = null;
+        $result = $this->authenticator->start($request, $authException);
+
+        self::assertTrue($result instanceof RedirectResponse);
     }
 }

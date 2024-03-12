@@ -46,7 +46,7 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
 
             try {
                 $stmt = $connection->prepare('SELECT 1');
-                $stmt->execute();
+                $stmt->executeQuery();
             } catch (\Throwable $e) {
                 $this->logger->error(sprintf('Can\'t ping database connection: "%s"', $name), ['exception' => $e]);
 

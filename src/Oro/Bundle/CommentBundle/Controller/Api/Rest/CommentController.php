@@ -4,9 +4,10 @@ namespace Oro\Bundle\CommentBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
@@ -27,31 +28,6 @@ class CommentController extends RestController
      * @param string  $relationClass Entity class name
      * @param integer $relationId    Entity id
      *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Default is 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. defaults to 10."
-     * )
-     * @QueryParam(
-     *     name="createdAt",
-     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
-     *     nullable=true,
-     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
-     * )
-     * @QueryParam(
-     *     name="updatedAt",
-     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
-     *     nullable=true,
-     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
-     * )
-     *
      * @ApiDoc(
      *      description="Get filtered comment for given entity class name and id",
      *      resource=true,
@@ -59,10 +35,34 @@ class CommentController extends RestController
      *          200="Returned when successful",
      *      }
      * )
-     * @AclAncestor("oro_comment_view")
      *
      * @return JsonResponse
      */
+    #[QueryParam(
+        name: 'page',
+        requirements: '\d+',
+        description: 'Page number, starting from 1. Default is 1.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'limit',
+        requirements: '\d+',
+        description: 'Number of items per page. defaults to 10.',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'createdAt',
+        requirements: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?',
+        description: 'Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'updatedAt',
+        requirements: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?',
+        description: 'Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00',
+        nullable: true
+    )]
+    #[AclAncestor('oro_comment_view')]
     public function cgetAction(Request $request, $relationClass, int $relationId)
     {
         $page             = $request->get('page', 1);
@@ -85,10 +85,10 @@ class CommentController extends RestController
      *      description="Get comment item",
      *      resource=true
      * )
-     * @AclAncestor("oro_comment_view")
      *
      * @return Response
      */
+    #[AclAncestor('oro_comment_view')]
     public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
@@ -106,9 +106,8 @@ class CommentController extends RestController
      *      description="Create new comment",
      *      resource=true
      * )
-     *
-     * @AclAncestor("oro_comment_create")
      */
+    #[AclAncestor('oro_comment_create')]
     public function postAction($relationClass, int $relationId)
     {
         $isProcessed = false;
@@ -142,10 +141,10 @@ class CommentController extends RestController
      *      description="Update comment",
      *      resource=true
      * )
-     * @AclAncestor("oro_comment_update")
      *
      * @return Response
      */
+    #[AclAncestor('oro_comment_update')]
     public function putAction(int $id)
     {
         $entity = $this->getManager()->find($id);
@@ -173,10 +172,10 @@ class CommentController extends RestController
      *      description="Remove Attachment",
      *      resource=true
      * )
-     * @AclAncestor("oro_comment_update")
      *
      * @return Response
      */
+    #[AclAncestor('oro_comment_update')]
     public function removeAttachmentAction(int $id)
     {
         $entity = $this->getManager()->find($id);
@@ -205,14 +204,9 @@ class CommentController extends RestController
      *      description="Delete Comment",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_comment_delete",
-     *      type="entity",
-     *      permission="DELETE",
-     *      class="OroCommentBundle:Comment"
-     * )
      * @return Response
      */
+    #[Acl(id: 'oro_comment_delete', type: 'entity', class: Comment::class, permission: 'DELETE')]
     public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
@@ -223,7 +217,7 @@ class CommentController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_comment.form.comment.api');
+        return $this->container->get('oro_comment.form.comment.api');
     }
 
     /**
@@ -233,7 +227,7 @@ class CommentController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_comment.comment.api_manager');
+        return $this->container->get('oro_comment.comment.api_manager');
     }
 
     /**
@@ -241,7 +235,7 @@ class CommentController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_comment.api.form.handler');
+        return $this->container->get('oro_comment.api.form.handler');
     }
 
     /**

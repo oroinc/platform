@@ -4,19 +4,18 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 
 /**
  * Email Folder
- *
- * @ORM\Table(
- *      name="oro_email_folder",
- *      indexes={@Index(name="email_folder_outdated_at_idx", columns={"outdated_at"})}
- * )
- * @ORM\Entity
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_email_folder')]
+#[Index(columns: ['outdated_at'], name: 'email_folder_outdated_at_idx')]
 class EmailFolder
 {
     const SYNC_ENABLED_TRUE = true;
@@ -29,111 +28,64 @@ class EmailFolder
 
     const MAX_FAILED_COUNT = 10;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    protected ?string $name = null;
+
+    #[ORM\Column(name: 'full_name', type: Types::STRING, length: 255)]
+    protected ?string $fullName = null;
+
+    #[ORM\Column(name: 'type', type: Types::STRING, length: 10)]
+    protected ?string $type = null;
+
+    #[ORM\Column(name: 'sync_enabled', type: Types::BOOLEAN, options: ['default' => false])]
+    protected ?bool $syncEnabled = false;
+
+    #[ORM\ManyToOne(targetEntity: EmailFolder::class, inversedBy: 'subFolders')]
+    #[ORM\JoinColumn(name: 'parent_folder_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    protected ?EmailFolder $parentFolder = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @var Collection<int, EmailFolder>
      */
-    protected $name;
+    #[ORM\OneToMany(
+        mappedBy: 'parentFolder',
+        targetEntity: EmailFolder::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $subFolders = null;
+
+    #[ORM\ManyToOne(targetEntity: EmailOrigin::class, inversedBy: 'folders')]
+    #[ORM\JoinColumn(name: 'origin_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?EmailOrigin $origin = null;
+
+    #[ORM\Column(name: 'synchronized', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $synchronizedAt = null;
+
+    #[ORM\Column(name: 'sync_start_date', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $syncStartDate = null;
+
+    #[ORM\Column(name: 'outdated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $outdatedAt = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="full_name", type="string", length=255)
+     * @var Collection<int, EmailUser>
      */
-    protected $fullName;
+    #[ORM\ManyToMany(
+        targetEntity: EmailUser::class,
+        mappedBy: 'folders',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    protected ?Collection $emailUsers = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type", type="string", length=10)
-     */
-    protected $type;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="sync_enabled", type="boolean", options={"default"=false})
-     */
-    protected $syncEnabled = false;
-
-    /**
-     * @var EmailFolder $folder
-     *
-     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="subFolders")
-     * @ORM\JoinColumn(
-     *  name="parent_folder_id", referencedColumnName="id",
-     *  nullable=true, onDelete="CASCADE")
-     */
-    protected $parentFolder;
-
-    /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(
-     *  targetEntity="EmailFolder",
-     *  mappedBy="parentFolder",
-     *  cascade={"persist", "remove"},
-     *  orphanRemoval=true)
-     */
-    protected $subFolders;
-
-    /**
-     * @var EmailOrigin
-     *
-     * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="folders")
-     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $origin;
-
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="synchronized", type="datetime", nullable=true)
-     */
-    protected $synchronizedAt;
-
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="sync_start_date", type="datetime", nullable=true)
-     */
-    protected $syncStartDate;
-
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="outdated_at", type="datetime", nullable=true)
-     */
-    protected $outdatedAt;
-
-    /**
-     * @var ArrayCollection|EmailUser[]
-     *
-     * @ORM\ManyToMany(
-     *      targetEntity="EmailUser",
-     *      mappedBy="folders",
-     *      cascade={"persist", "remove"},
-     *      orphanRemoval=true
-     * )
-     */
-    protected $emailUsers;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="failed_count", type="integer", nullable=false, options={"default" = "0"})
-     */
-    protected $failedCount = 0;
+    #[ORM\Column(name: 'failed_count', type: Types::INTEGER, nullable: false, options: ['default' => 0])]
+    protected ?int $failedCount = 0;
 
     public function __construct()
     {

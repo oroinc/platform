@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
@@ -27,7 +25,7 @@ class OrmRelatedTestCase extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
         $this->em->getConfiguration()->setEntityNamespaces([
             'Test' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity'
         ]);
@@ -39,15 +37,6 @@ class OrmRelatedTestCase extends OrmTestCase
                 return !in_array($class, $this->notManageableClassNames, true)
                     ? $this->em
                     : null;
-            });
-        $this->doctrine->expects(self::any())
-            ->method('getAliasNamespace')
-            ->willReturnCallback(function ($alias) {
-                if ('Test' !== $alias) {
-                    throw ORMException::unknownEntityNamespace($alias);
-                }
-
-                return 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity';
             });
 
         $this->doctrineHelper = new DoctrineHelper($this->doctrine);

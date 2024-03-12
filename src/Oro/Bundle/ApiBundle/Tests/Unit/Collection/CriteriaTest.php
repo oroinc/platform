@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\Join;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Role;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
@@ -56,7 +58,7 @@ class CriteriaTest extends OrmRelatedTestCase
     {
         $this->criteria->{$addMethodName}(
             'products',
-            Entity\Product::class,
+            Product::class,
             Join::WITH,
             '{entity}.name IS NOT NULL',
             'idx_name'
@@ -64,7 +66,7 @@ class CriteriaTest extends OrmRelatedTestCase
 
         $expectedJoin = new Join(
             $joinType,
-            Entity\Product::class,
+            Product::class,
             Join::WITH,
             '{entity}.name IS NOT NULL',
             'idx_name'
@@ -79,11 +81,11 @@ class CriteriaTest extends OrmRelatedTestCase
      */
     public function testAddJoinWithConditionAndEntityName(string $joinType, string $addMethodName)
     {
-        $this->criteria->{$addMethodName}('products', 'Test:Product', Join::WITH, '{entity}.name IS NOT NULL');
+        $this->criteria->{$addMethodName}('products', Product::class, Join::WITH, '{entity}.name IS NOT NULL');
 
         $expectedJoin = new Join(
             $joinType,
-            Entity\Product::class,
+            Product::class,
             Join::WITH,
             '{entity}.name IS NOT NULL'
         );
@@ -96,7 +98,7 @@ class CriteriaTest extends OrmRelatedTestCase
     {
         $this->criteria->addLeftJoin(
             'roles',
-            'Test:Role',
+            Role::class,
             Join::WITH,
             '{root}.id MEMBER OF {entity}.users'
         );
@@ -106,7 +108,7 @@ class CriteriaTest extends OrmRelatedTestCase
         );
         $this->criteria->addLeftJoin(
             'products',
-            'Test:Product',
+            Product::class,
             Join::WITH,
             '{entity}.owner = {root}'
         );
@@ -120,7 +122,7 @@ class CriteriaTest extends OrmRelatedTestCase
         $expectedJoins = [
             'roles'          => new Join(
                 Join::LEFT_JOIN,
-                Entity\Role::class,
+                Role::class,
                 Join::WITH,
                 '{root}.id MEMBER OF {entity}.users'
             ),
@@ -130,7 +132,7 @@ class CriteriaTest extends OrmRelatedTestCase
             ),
             'products'       => new Join(
                 Join::LEFT_JOIN,
-                Entity\Product::class,
+                Product::class,
                 Join::WITH,
                 '{entity}.owner = {root}'
             ),
@@ -152,7 +154,7 @@ class CriteriaTest extends OrmRelatedTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The property path must be not empty.');
 
-        $this->criteria->{$addMethodName}('', 'Test:Product');
+        $this->criteria->{$addMethodName}('', Product::class);
     }
 
     /**
@@ -172,7 +174,7 @@ class CriteriaTest extends OrmRelatedTestCase
     public function testAddJoinWithInvalidEntity(string $joinType, string $addMethodName)
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('"Test1:Product" is not valid entity name. Join path: "products".');
+        $this->expectExceptionMessage('Incorrect entity name: Test1:Product. Expected the full class name.');
 
         $this->criteria->{$addMethodName}('products', 'Test1:Product');
     }
@@ -187,7 +189,7 @@ class CriteriaTest extends OrmRelatedTestCase
             'The condition type must be specified if the condition exists. Join path: "products".'
         );
 
-        $this->criteria->{$addMethodName}('products', 'Test:Product', '', '{entity}.name IS NOT NULL');
+        $this->criteria->{$addMethodName}('products', Product::class, '', '{entity}.name IS NOT NULL');
     }
 
     /**
@@ -198,11 +200,11 @@ class CriteriaTest extends OrmRelatedTestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'The join definition for "products" conflicts with already added join.'
-            . ' Existing join: "LEFT JOIN ' . Entity\Product::class . '".'
-            . ' New join: "' . $joinType . ' JOIN ' . Entity\Category::class . '".'
+            . ' Existing join: "LEFT JOIN ' . Product::class . '".'
+            . ' New join: "' . $joinType . ' JOIN ' . Category::class . '".'
         );
-        $this->criteria->addLeftJoin('products', 'Test:Product');
-        $this->criteria->{$addMethodName}('products', 'Test:Category');
+        $this->criteria->addLeftJoin('products', Product::class);
+        $this->criteria->{$addMethodName}('products', Category::class);
     }
 
     /**

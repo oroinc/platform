@@ -16,23 +16,19 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Serves activity actions.
- * @Route("/activities")
  */
+#[Route(path: '/activities')]
 class ActivityController extends AbstractController
 {
     /**
      * @param object $entity The entity object which activities should be rendered
      *
      * @return Response
-     *
-     * @Route(
-     *      "/view/{entity}",
-     *      name="oro_activity_view_activities"
-     * )
      */
+    #[Route(path: '/view/{entity}', name: 'oro_activity_view_activities')]
     public function activitiesAction($entity)
     {
-        $widgetProvider = $this->get(ChainWidgetProvider::class);
+        $widgetProvider = $this->container->get(ChainWidgetProvider::class);
 
         $widgets = $widgetProvider->supports($entity)
             ? $widgetProvider->getWidgets($entity)
@@ -47,9 +43,7 @@ class ActivityController extends AbstractController
     }
 
     /**
-     * @Route("/{activity}/{id}/context", name="oro_activity_context")
      *
-     * @Template("@OroDataGrid/Grid/dialog/multi.html.twig")
      *
      * @param string $activity
      * @param string $id
@@ -58,9 +52,11 @@ class ActivityController extends AbstractController
      *
      * @throws AccessDeniedException
      */
+    #[Route(path: '/{activity}/{id}/context', name: 'oro_activity_context')]
+    #[Template('@OroDataGrid/Grid/dialog/multi.html.twig')]
     public function contextAction($activity, $id)
     {
-        $routingHelper = $this->get(EntityRoutingHelper::class);
+        $routingHelper = $this->container->get(EntityRoutingHelper::class);
         $entity        = $routingHelper->getEntity($activity, $id);
         $entityClass   = $routingHelper->resolveEntityClass($activity);
 
@@ -68,7 +64,7 @@ class ActivityController extends AbstractController
             throw new AccessDeniedException();
         }
 
-        $entityClassAlias = $this->get(EntityAliasResolver::class)
+        $entityClassAlias = $this->container->get(EntityAliasResolver::class)
             ->getPluralAlias($entityClass);
 
         return [
@@ -111,12 +107,12 @@ class ActivityController extends AbstractController
 
     protected function getActivityManager(): ActivityManager
     {
-        return $this->get(ActivityManager::class);
+        return $this->container->get(ActivityManager::class);
     }
 
     protected function getMultiGridProvider(): MultiGridProvider
     {
-        return $this->get(MultiGridProvider::class);
+        return $this->container->get(MultiGridProvider::class);
     }
 
     /**

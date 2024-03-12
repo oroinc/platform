@@ -13,7 +13,7 @@ class ExternalFileUrl extends Constraint
     public const EMPTY_REGEXP_ERROR = '183541f9-810c-4eb4-9f44-21f86a332c9a';
     public const INVALID_REGEXP_ERROR = '3d1cc7ef-4304-4700-970d-d72f6e721baa';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_URL_REGEXP_ERROR => 'INVALID_URL_REGEXP_ERROR',
         self::EMPTY_REGEXP_ERROR => 'EMPTY_REGEXP_ERROR',
         self::INVALID_REGEXP_ERROR => 'INVALID_REGEXP_ERROR',

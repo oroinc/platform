@@ -1,0 +1,104 @@
+{#
+A button with a Javascript handler
+
+Parameters - array:
+    [
+        'class' - default class
+        'btnCss' - additional css class for 'button' tag
+        'iconName' - svg icon name
+        'iconExtraClass' - additional css class for svg icon
+        'ariaLabel' - aria-label text for button
+        'dataId' - data-id parameter
+        'dataRedirect' - url to redirect to after the operation is finished
+        'successMessage' - message to display after the operation is finished
+        'label' - button label
+        'visible' - defines whether the button is visible (true by default)
+        'dataAttributes' - additional HTML data attributes
+    ]
+#}
+{% macro clientBtn(parameters) %}
+    {% import '@OroUI/macros.html.twig' as UIMacro %}
+    {% set parameters = parameters|merge({
+        class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
+    })%}
+    {% set type = parameters.type is defined ? parameters.type : 'button' %}
+    {% apply spaceless %}
+        <button {{- UIMacro.clientControlAttrs(parameters) -}}
+                type="{{ type }}"
+                {% if (parameters.title is defined) %}
+                    title="{{ parameters.title }}"
+                {% endif %}
+                {% if (parameters.form is defined) %}
+                    form="{{ parameters.form }}"
+                {% endif %}
+                {%- if (parameters.dataUrlRaw is defined) -%}
+                    data-url="{{ parameters.dataUrlRaw|raw }}"
+                {% elseif (parameters.dataUrl is defined) %}
+                    data-url="{{ parameters.dataUrl }}"
+                {%- endif -%}
+        >
+        {%- apply spaceless -%}
+            {%- if parameters.iconName is defined -%}
+                {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
+                {{- renderIcon.icon({
+                    name: parameters.iconName,
+                    extraClass: parameters.iconExtraClass|default(null),
+                }) -}}
+            {%- endif -%}
+            {%- if parameters.label is defined or parameters.entityName is defined -%}
+                <span class="action-label">
+                    {{- parameters.label is defined ? parameters.label|trim : '' -}}
+                    {%- if (parameters.entityName is defined and parameters.entityName|trim|length) -%}
+                        <span class="entity-name"> {{ parameters.entityName|trim }}</span>
+                    {%- endif -%}
+                </span>
+            {%- endif -%}
+        {%- endapply -%}
+        </button>
+    {% endapply %}
+{% endmacro %}
+
+{#
+A link with a Javascript handler
+
+Parameters - array:
+    [
+        'class' - default class
+        'aCss' - additional css class for 'a' tag
+        'iconName' - svg icon name
+        'iconExtraClass' - additional css class for svg icon
+        'dataId' - data-id parameter
+        'dataUrl' - data-url parameter
+        'dataRedirect' - url to redirect to after the operation is finished
+        'successMessage' - message to display after the operation is finished
+        'title' - button title
+        'ariaLabel' - button aria-label
+        'label' - button label
+        'visible' - defines whether the button is visible (true by default)
+        'dataAttributes' - additional data attributes
+    ]
+#}
+{% macro clientLink(parameters) %}
+    {% import '@OroUI/macros.html.twig' as UIMacro %}
+    {% set parameters = parameters|merge({
+        class: parameters.class|default('') ~ (parameters.aCss is defined ? ' ' ~ parameters.aCss : '')
+    })%}
+    {% apply spaceless %}
+        <a href="#"
+        {%- if (parameters.dataUrlRaw is defined) -%}
+            data-url="{{ parameters.dataUrlRaw|raw }}"
+        {% elseif (parameters.dataUrl is defined) %}
+            data-url="{{ parameters.dataUrl }}"
+        {%- endif -%}
+            {{- UIMacro.clientControlAttrs(parameters) -}}>
+        {%- if parameters.iconName is defined -%}
+            {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
+            {{- renderIcon.icon({
+                name: parameters.iconName,
+                extraClass: parameters.iconExtraClass|default(null),
+            }) -}}
+        {%- endif -%}
+            {{- parameters.label is defined ? parameters.label : '' -}}
+        </a>
+    {% endapply %}
+{% endmacro %}

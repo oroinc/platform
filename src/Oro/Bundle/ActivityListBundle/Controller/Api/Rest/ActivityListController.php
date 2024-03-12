@@ -18,15 +18,6 @@ class ActivityListController extends RestController
     /**
      * Get filtered activity lists for given entity
      *
-     * @QueryParam(
-     *     name="pageFilter", nullable=true,
-     *     description="Array with pager filters, e.g. [first|last item date, array of ids with same date, action type]"
-     * )
-     * @QueryParam(
-     *      name="filter", nullable=true,
-     *      description="Array with Activity type and Date range filters values"
-     * )
-     *
      * @ApiDoc(
      *      description="Returns an array with collection of ActivityList objects and count of all records",
      *      resource=true,
@@ -39,9 +30,19 @@ class ActivityListController extends RestController
      * @param integer $entityId    Entity id
      * @return JsonResponse
      */
+    #[QueryParam(
+        name: 'pageFilter',
+        description: 'Array with pager filters, e.g. [first|last item date, array of ids with same date, action type]',
+        nullable: true
+    )]
+    #[QueryParam(
+        name: 'filter',
+        description: 'Array with Activity type and Date range filters values',
+        nullable: true
+    )]
     public function cgetAction(Request $request, $entityClass, $entityId)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
+        $entityClass = $this->container->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         $filter      = $request->get('filter');
         $pageFilter  = $request->get('pageFilter', []);
 
@@ -94,7 +95,7 @@ class ActivityListController extends RestController
      */
     public function getActivityListOptionAction()
     {
-        $results = $this->getActivityListProvider()->getActivityListOption($this->get('oro_config.user'));
+        $results = $this->getActivityListProvider()->getActivityListOption($this->container->get('oro_config.user'));
 
         return new JsonResponse($results);
     }
@@ -104,7 +105,7 @@ class ActivityListController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_activity_list.manager');
+        return $this->container->get('oro_activity_list.manager');
     }
 
     /**
@@ -128,6 +129,6 @@ class ActivityListController extends RestController
      */
     protected function getActivityListProvider()
     {
-        return $this->get('oro_activity_list.provider.chain');
+        return $this->container->get('oro_activity_list.provider.chain');
     }
 }

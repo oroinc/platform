@@ -19,10 +19,10 @@ class EntityFieldStructure
     /** @var string */
     private $label;
 
-    /** @var string */
+    /** @var string|null */
     private $relationType;
 
-    /** @var string */
+    /** @var string|null */
     private $relatedEntityName;
 
     /** @var array */
@@ -93,7 +93,7 @@ class EntityFieldStructure
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRelationType()
     {
@@ -101,7 +101,7 @@ class EntityFieldStructure
     }
 
     /**
-     * @param string $relationType
+     * @param string|null $relationType
      */
     public function setRelationType($relationType)
     {
@@ -109,7 +109,7 @@ class EntityFieldStructure
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRelatedEntityName()
     {
@@ -117,7 +117,7 @@ class EntityFieldStructure
     }
 
     /**
-     * @param string $relatedEntityName
+     * @param string|null $relatedEntityName
      */
     public function setRelatedEntityName($relatedEntityName)
     {

@@ -46,7 +46,7 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
             ['attribute', 'test'],
             ['step', new WorkflowStep()],
             ['definition', new WorkflowDefinition()],
-            ['entityClass', new \DateTime()],
+            ['entityClass', \DateTime::class],
             ['updatable', false],
             ['deletable', false],
         ];

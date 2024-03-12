@@ -2,35 +2,27 @@
 
 namespace Oro\Bundle\ReportBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
 
 /**
  * Entity class that represents calendar_date table
- *
- * @ORM\Entity(repositoryClass="Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository")
- * @ORM\Table("oro_calendar_date", uniqueConstraints={
- *     @ORM\UniqueConstraint(name="oro_calendar_date_date_unique_idx", columns={"date"})
- * })
- * @Config(mode="hidden")
  */
+#[ORM\Entity(repositoryClass: CalendarDateRepository::class)]
+#[ORM\Table('oro_calendar_date')]
+#[ORM\UniqueConstraint(name: 'oro_calendar_date_date_unique_idx', columns: ['date'])]
+#[Config(mode: 'hidden')]
 class CalendarDate
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(type="date")
-     */
-    protected $date;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    protected ?\DateTimeInterface $date = null;
 
     /**
      * @return int

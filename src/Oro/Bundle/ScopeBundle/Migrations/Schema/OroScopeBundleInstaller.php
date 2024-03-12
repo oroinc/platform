@@ -8,10 +8,8 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroScopeBundleInstaller implements Installation
 {
-    const ORO_SCOPE = 'oro_scope';
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMigrationVersion(): string
     {
@@ -19,20 +17,19 @@ class OroScopeBundleInstaller implements Installation
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createScopeTable($schema);
     }
 
-    protected function createScopeTable(Schema $schema): void
+    private function createScopeTable(Schema $schema): void
     {
-        $table = $schema->createTable(self::ORO_SCOPE);
+        $table = $schema->createTable('oro_scope');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('row_hash', 'string', ['length' => 32, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
-
         $table->addUniqueIndex(['row_hash'], 'oro_scope_row_hash_uidx');
     }
 }

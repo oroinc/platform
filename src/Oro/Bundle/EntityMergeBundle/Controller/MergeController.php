@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
@@ -10,8 +11,8 @@ use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Oro\Bundle\EntityMergeBundle\Form\Type\MergeType;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMergerInterface;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,24 +24,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides action for simple and multiple merge.
- *
- * @Route("/merge")
  */
+#[Route(path: '/merge')]
 class MergeController extends AbstractController
 {
     /**
-     * @Route("/{gridName}/massAction/{actionName}", name="oro_entity_merge_massaction")
-     * @AclAncestor("oro_entity_merge")
-     * @Template("@OroEntityMerge/Merge/merge.html.twig")
      * @param Request $request
      * @param string $gridName
      * @param string $actionName
      * @return array|RedirectResponse
      */
+    #[Route(path: '/{gridName}/massAction/{actionName}', name: 'oro_entity_merge_massaction')]
+    #[Template('@OroEntityMerge/Merge/merge.html.twig')]
+    #[AclAncestor('oro_entity_merge')]
     public function mergeMassActionAction(Request $request, $gridName, $actionName)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get(MassActionDispatcher::class);
+        $massActionDispatcher = $this->container->get(MassActionDispatcher::class);
 
         $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
@@ -53,18 +53,13 @@ class MergeController extends AbstractController
     }
 
     /**
-     * @Route(name="oro_entity_merge")
-     * @Acl(
-     *      id="oro_entity_merge",
-     *      label="oro.entity_merge.acl.merge",
-     *      type="action",
-     *      category="entity"
-     * )
-     * @Template()
      * @param Request $request
      * @param EntityData|null $entityData
      * @return array|RedirectResponse
      */
+    #[Route(name: 'oro_entity_merge')]
+    #[Template]
+    #[Acl(id: 'oro_entity_merge', label: 'oro.entity_merge.acl.merge', type: 'action', category: 'entity')]
     public function mergeAction(Request $request, EntityData $entityData = null)
     {
         if (!$entityData) {
@@ -103,7 +98,7 @@ class MergeController extends AbstractController
                 $merger = $this->getEntityMerger();
 
                 try {
-                    $this->get('doctrine')->getManager()->transactional(
+                    $this->container->get(ManagerRegistry::class)->getManager()->transactional(
                         function () use ($merger, $entityData) {
                             $merger->merge($entityData);
                         }
@@ -117,7 +112,9 @@ class MergeController extends AbstractController
 
                 $flashBag->add(
                     'success',
-                    $this->get(TranslatorInterface::class)->trans('oro.entity_merge.controller.merged_successful')
+                    $this->container
+                        ->get(TranslatorInterface::class)
+                        ->trans('oro.entity_merge.controller.merged_successful')
                 );
 
                 return $this->redirect(
@@ -170,7 +167,7 @@ class MergeController extends AbstractController
      */
     protected function getConfigManager()
     {
-        return $this->get(ConfigManager::class);
+        return $this->container->get(ConfigManager::class);
     }
 
     /**
@@ -178,7 +175,7 @@ class MergeController extends AbstractController
      */
     protected function getEntityDataFactory()
     {
-        return $this->get(EntityDataFactory::class);
+        return $this->container->get(EntityDataFactory::class);
     }
 
     /**
@@ -186,7 +183,7 @@ class MergeController extends AbstractController
      */
     protected function getDoctineHelper()
     {
-        return $this->get(DoctrineHelper::class);
+        return $this->container->get(DoctrineHelper::class);
     }
 
     /**
@@ -194,7 +191,7 @@ class MergeController extends AbstractController
      */
     protected function getEntityMerger()
     {
-        return $this->get(EntityMergerInterface::class);
+        return $this->container->get(EntityMergerInterface::class);
     }
 
     /**
@@ -202,7 +199,7 @@ class MergeController extends AbstractController
      */
     protected function getValidator()
     {
-        return $this->get(ValidatorInterface::class);
+        return $this->container->get(ValidatorInterface::class);
     }
 
     /**
@@ -220,6 +217,7 @@ class MergeController extends AbstractController
                 ValidatorInterface::class,
                 MassActionDispatcher::class,
                 TranslatorInterface::class,
+                ManagerRegistry::class,
             ]
         );
     }

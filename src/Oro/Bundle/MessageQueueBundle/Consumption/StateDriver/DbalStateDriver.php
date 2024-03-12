@@ -136,7 +136,7 @@ class DbalStateDriver implements StateDriverInterface
             ->where('id = :id')
             ->setParameter('id', $this->key, \PDO::PARAM_STR)
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
 
         if ($result) {
             $result = new \DateTime($result, new \DateTimeZone('UTC'));

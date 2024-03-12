@@ -9,8 +9,8 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -27,23 +27,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * ConfigEntityGrid controller
  *
  * @package Oro\Bundle\EntityExtendBundle\Controller
- * @Route("/entity/extend/entity")
- * @AclAncestor("oro_entityconfig_manage")
  */
+#[AclAncestor('oro_entityconfig_manage')]
+#[Route(path: '/entity/extend/entity')]
 class ConfigEntityGridController extends AbstractController
 {
     /**
      * @param Request           $request
      * @param EntityConfigModel $entity
      * @return RedirectResponse|array
-     * @Route(
-     *      "/unique-key/{id}",
-     *      name="oro_entityextend_entity_unique_key",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
-     * )
-     * @Template
      */
+    #[Route(
+        path: '/unique-key/{id}',
+        name: 'oro_entityextend_entity_unique_key',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0]
+    )]
+    #[Template]
     public function uniqueAction(Request $request, EntityConfigModel $entity): RedirectResponse|array
     {
         $className = $entity->getClassName();
@@ -79,17 +79,17 @@ class ConfigEntityGridController extends AbstractController
     }
 
     /**
-     * @Route("/create", name="oro_entityextend_entity_create")
-     * @Template
      * @param Request $request
      * @return array|RedirectResponse
      */
+    #[Route(path: '/create', name: 'oro_entityextend_entity_create')]
+    #[Template]
     public function createAction(Request $request): RedirectResponse|array
     {
         $configManager = $this->getConfigManager();
 
         if ($request->isMethod('POST')) {
-            $formData = $request->request->get('oro_entity_config_type');
+            $formData = $request->request->all('oro_entity_config_type');
             if (!$formData || !isset($formData['model']['className'])) {
                 throw new BadRequestHttpException(
                     'Request should contains "oro_entity_config_type[model][className]" parameter'
@@ -144,18 +144,18 @@ class ConfigEntityGridController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/remove/{id}",
-     *      name="oro_entityextend_entity_remove",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0},
-     *      methods={"DELETE"}
-     * )
-     * @CsrfProtection()
      *
      * @param EntityConfigModel $entity
      * @return JsonResponse|Response
      */
+    #[Route(
+        path: '/remove/{id}',
+        name: 'oro_entityextend_entity_remove',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0],
+        methods: ['DELETE']
+    )]
+    #[CsrfProtection()]
     public function removeAction(EntityConfigModel $entity): JsonResponse|Response
     {
         $configManager = $this->getConfigManager();
@@ -179,18 +179,18 @@ class ConfigEntityGridController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/unremove/{id}",
-     *      name="oro_entityextend_entity_unremove",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0},
-     *      methods={"POST"}
-     * )
-     * @CsrfProtection()
      *
      * @param EntityConfigModel $entity
      * @return JsonResponse|Response
      */
+    #[Route(
+        path: '/unremove/{id}',
+        name: 'oro_entityextend_entity_unremove',
+        requirements: ['id' => '\d+'],
+        defaults: ['id' => 0],
+        methods: ['POST']
+    )]
+    #[CsrfProtection()]
     public function unremoveAction(EntityConfigModel $entity): JsonResponse|Response
     {
         $configManager = $this->getConfigManager();
@@ -228,16 +228,16 @@ class ConfigEntityGridController extends AbstractController
 
     private function getRouter(): Router
     {
-        return $this->get(Router::class);
+        return $this->container->get(Router::class);
     }
 
     private function getConfigManager(): ConfigManager
     {
-        return $this->get(ConfigManager::class);
+        return $this->container->get(ConfigManager::class);
     }
 
     private function getTranslator(): TranslatorInterface
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 }

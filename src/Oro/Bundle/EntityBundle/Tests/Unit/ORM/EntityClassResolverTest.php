@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
@@ -35,26 +34,10 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
         $this->resolver->getEntityClass('AcmeSomeBundle:Entity:SomeClass');
     }
 
-    public function testGetEntityClassWithUnknownEntityName()
+    public function testGetEntityClassWithUnsupportedEntityName()
     {
-        $this->expectException(ORMException::class);
-        $this->doctrine->expects($this->once())
-            ->method('getAliasNamespace')
-            ->with('AcmeSomeBundle')
-            ->willThrowException(new ORMException());
+        $this->expectException(\InvalidArgumentException::class);
         $this->resolver->getEntityClass('AcmeSomeBundle:SomeClass');
-    }
-
-    public function testGetEntityClass()
-    {
-        $this->doctrine->expects($this->once())
-            ->method('getAliasNamespace')
-            ->with('AcmeSomeBundle')
-            ->willReturn('Acme\Bundle\SomeBundle');
-        $this->assertEquals(
-            'Acme\Bundle\SomeBundle\SomeClass',
-            $this->resolver->getEntityClass('AcmeSomeBundle:SomeClass')
-        );
     }
 
     public function testIsKnownEntityClassNamespace()

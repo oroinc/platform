@@ -154,7 +154,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
         $result = null;
-        $oid = $acl->getObjectIdentity();
+        $oid = $this->getObjectIdentityForField($acl, $field);
 
         // check if field security metadata has alias and if so - use it instead of field being passed
         $type = $oid->getType();
@@ -163,14 +163,13 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             $field = $securityMetadataProvider->getProtectedFieldName($type, $field);
         }
 
-        // check object ACEs
-        $aces = $acl->getObjectFieldAces($field);
-
         // return true if entity field has no permissions.
         if (!$this->fieldHasPermission($oid, $field, $masks)) {
             return true;
         }
 
+        // check object ACEs
+        $aces = $acl->getObjectFieldAces($field);
         if (!empty($aces)) {
             $result = $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
         }
@@ -204,7 +203,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             return true;
         }
 
-        $extension = $this->getContext()->getAclExtension();
         $securityMetadataProvider = $this->getSecurityMetadataProvider();
         $fields = $securityMetadataProvider->getMetadata($oid->getType())->getFields();
         if (!isset($fields[$field])) {
@@ -217,7 +215,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             return true;
         }
 
-        $permissions = $extension->getPermissions(reset($masks), true);
+        $permissions = $this->getContext()->getAclExtension()->getPermissions(reset($masks), true);
 
         return in_array(reset($permissions), $securityFieldPermissions, true);
     }
@@ -393,5 +391,14 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     protected function getSecurityMetadataProvider()
     {
         return $this->securityMetadataProviderLink->getService();
+    }
+
+    private function getObjectIdentityForField(AclInterface $acl, string $fieldName): ObjectIdentityInterface
+    {
+        if ($acl instanceof RootBasedAclWrapper) {
+            return $acl->getFieldObjectIdentity($fieldName);
+        }
+
+        return $acl->getObjectIdentity();
     }
 }

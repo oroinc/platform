@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\TagBundle\Entity\Taxonomy;
 use Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler;
 use Oro\Bundle\UIBundle\Route\Router;
@@ -20,21 +20,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TaxonomyController extends AbstractController
 {
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_taxonomy_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @Acl(
-     *      id="oro_taxonomy_view",
-     *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
-     *      permission="VIEW"
-     * )
-     * @Template
-     */
+    #[Route(
+        path: '/{_format}',
+        name: 'oro_taxonomy_index',
+        requirements: ['_format' => 'html|json'],
+        defaults: ['_format' => 'html']
+    )]
+    #[Template]
+    #[Acl(id: 'oro_taxonomy_view', type: 'entity', class: Taxonomy::class, permission: 'VIEW')]
     public function indexAction()
     {
         return [
@@ -42,46 +35,25 @@ class TaxonomyController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/create", name="oro_taxonomy_create")
-     * @Acl(
-     *      id="oro_taxonomy_create",
-     *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
-     *      permission="CREATE"
-     * )
-     * @Template("@OroTag/Taxonomy/update.html.twig")
-     */
+    #[Route(path: '/create', name: 'oro_taxonomy_create')]
+    #[Template('@OroTag/Taxonomy/update.html.twig')]
+    #[Acl(id: 'oro_taxonomy_create', type: 'entity', class: Taxonomy::class, permission: 'CREATE')]
     public function createAction(Request $request)
     {
         return $this->update(new Taxonomy(), $request);
     }
 
-    /**
-     * @Route("/update/{id}", name="oro_taxonomy_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Acl(
-     *      id="oro_taxonomy_update",
-     *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
-     *      permission="EDIT"
-     * )
-     * @Template
-     */
+    #[Route(path: '/update/{id}', name: 'oro_taxonomy_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
+    #[Template]
+    #[Acl(id: 'oro_taxonomy_update', type: 'entity', class: Taxonomy::class, permission: 'EDIT')]
     public function updateAction(Taxonomy $entity, Request $request)
     {
         return $this->update($entity, $request);
     }
 
-    /**
-     * @Route("/view/{id}", name="oro_taxonomy_view", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_taxonomy_view",
-     *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
-     *      permission="VIEW"
-     * )
-     * @Template
-     */
+    #[Route(path: '/view/{id}', name: 'oro_taxonomy_view', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[Acl(id: 'oro_taxonomy_view', type: 'entity', class: Taxonomy::class, permission: 'VIEW')]
     public function viewAction(Taxonomy $entity)
     {
         return [
@@ -89,11 +61,9 @@ class TaxonomyController extends AbstractController
         ];
     }
 
-    /**
-     * @Route("/widget/info/{id}", name="oro_taxonomy_widget_info", requirements={"id"="\d+"})
-     * @AclAncestor("oro_taxonomy_view")
-     * @Template()
-     */
+    #[Route(path: '/widget/info/{id}', name: 'oro_taxonomy_widget_info', requirements: ['id' => '\d+'])]
+    #[Template]
+    #[AclAncestor('oro_taxonomy_view')]
     public function infoAction(Taxonomy $taxonomy)
     {
         return [
@@ -108,18 +78,18 @@ class TaxonomyController extends AbstractController
      */
     protected function update(Taxonomy $entity, Request $request)
     {
-        if ($this->get(TaxonomyHandler::class)->process($entity)) {
+        if ($this->container->get(TaxonomyHandler::class)->process($entity)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.taxonomy.controller.saved.message')
+                $this->container->get(TranslatorInterface::class)->trans('oro.taxonomy.controller.saved.message')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity' => $entity,
-            'form' => $this->get('oro_tag.form.taxonomy')->createView(),
+            'form' => $this->container->get('oro_tag.form.taxonomy')->createView(),
         ];
     }
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
@@ -18,6 +19,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
 class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -63,21 +66,6 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
         ));
 
         $this->assertFalse($this->authenticator->supports(new Request()));
-    }
-
-    public function testGetCredentials(): void
-    {
-        $this->assertEquals(
-            'sample-token',
-            $this->authenticator->getCredentials(
-                new Request([ImpersonationAuthenticator::TOKEN_PARAMETER => 'sample-token'])
-            )
-        );
-    }
-
-    public function testCheckCredentials(): void
-    {
-        $this->assertTrue($this->authenticator->checkCredentials([], new User()));
     }
 
     public function testOnAuthenticationFailure(): void
@@ -147,31 +135,29 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($url, $response->getTargetUrl());
     }
 
-    public function testSupportsRememberMe(): void
-    {
-        $this->assertFalse($this->authenticator->supportsRememberMe());
-    }
-
-    public function testCreateAuthenticatedTokenWhenOrganization(): void
+    public function testCreateTokenWhenOrganization(): void
     {
         $user = new User();
+        $user->setUsername('test_user');
         $organization = $this->createMock(Organization::class);
         $roles = [new Role()];
         $user->setUserRoles($roles);
+        $passport = new SelfValidatingPassport(
+            new UserBadge('test_user', fn () => $user)
+        );
 
         $this->organizationGuesser->expects($this->once())
             ->method('guess')
-            ->with($this->identicalTo($user), $this->isNull())
+            ->with($this->identicalTo($user))
             ->willReturn($organization);
 
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
-        $providerKey = 'sample-key';
+        $firewallName = 'sample-key';
         $this->tokenFactory->expects($this->once())
             ->method('create')
             ->with(
                 $this->identicalTo($user),
-                $this->isNull(),
-                $providerKey,
+                $firewallName,
                 $this->identicalTo($organization),
                 $roles
             )
@@ -179,15 +165,27 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             $token,
-            $this->authenticator->createAuthenticatedToken($user, $providerKey)
+            $this->authenticator->createToken($passport, $firewallName)
         );
     }
 
-    public function testCreateAuthenticatedTokenWhenNoOrganization(): void
+    public function testCreateTokenWhenNoOrganization(): void
     {
+        $authenticator = new ImpersonationAuthenticator(
+            $this->doctrine,
+            $this->tokenFactory,
+            new OrganizationGuesser(),
+            $this->eventDispatcher,
+            $this->router
+        );
+        $user = new User();
+        $user->setUsername('test_user');
         $this->expectException(BadUserOrganizationException::class);
-        $this->expectExceptionMessage("You don't have active organization assigned.");
+        $this->expectExceptionMessage('The user does not have an active organization assigned to it.');
+        $passport = new SelfValidatingPassport(
+            new UserBadge('test_user', fn () => $user)
+        );
 
-        $this->authenticator->createAuthenticatedToken(new User(), 'sample-key');
+        $authenticator->createToken($passport, 'sample-key');
     }
 }

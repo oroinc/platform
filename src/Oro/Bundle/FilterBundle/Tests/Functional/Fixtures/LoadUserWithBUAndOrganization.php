@@ -3,16 +3,18 @@
 namespace Oro\Bundle\FilterBundle\Tests\Functional\Fixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadUserWithBUAndOrganization extends AbstractFixture
+class LoadUserWithBUAndOrganization extends AbstractFixture implements DependentFixtureInterface
 {
-    /** @var array */
-    protected static $users = [
+    private static array $users = [
         [
             'username' => 'u1',
             'email' => 'u1@example.com',
@@ -42,22 +44,32 @@ class LoadUserWithBUAndOrganization extends AbstractFixture
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function getDependencies(): array
+    {
+        return [LoadOrganization::class, LoadBusinessUnit::class];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function load(ObjectManager $manager): void
     {
         /** @var BusinessUnit $businessUnit */
-        $businessUnit = $this->getEntity($manager, BusinessUnit::class, 'mainBusinessUnit');
+        $businessUnit = $this->getReference(LoadBusinessUnit::BUSINESS_UNIT);
+        $this->setReference('mainBusinessUnit', $businessUnit);
         /** @var Organization $organization */
-        $organization = $this->getEntity($manager, Organization::class, 'mainOrganization');
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
+        $this->setReference('mainOrganization', $organization);
 
         foreach (self::$users as $data) {
             $email = new Email();
             $email->setEmail($data['additional_email']);
 
             $user = new User();
-            $user->setUsername($data['username'])
-                ->setEmail($data['email'])
-                ->setPassword($data['password'])
-                ->addEmail($email);
+            $user->setUsername($data['username']);
+            $user->setEmail($data['email']);
+            $user->setPassword($data['password']);
+            $user->addEmail($email);
 
             if ($data['business_unit']) {
                 $user->addBusinessUnit($businessUnit);
@@ -72,24 +84,6 @@ class LoadUserWithBUAndOrganization extends AbstractFixture
 
             $this->setReference($data['email'], $user);
         }
-
         $manager->flush();
-    }
-
-    /**
-     * @param ObjectManager $manager
-     * @param string $className
-     * @param string $reference
-     * @return object
-     */
-    private function getEntity(ObjectManager $manager, $className, $reference)
-    {
-        $entity = $manager
-            ->getRepository($className)
-            ->getFirst();
-
-        $this->setReference($reference, $entity);
-
-        return $entity;
     }
 }

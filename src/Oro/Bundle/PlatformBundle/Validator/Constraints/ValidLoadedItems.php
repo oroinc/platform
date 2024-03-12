@@ -8,6 +8,7 @@
 
 namespace Oro\Bundle\PlatformBundle\Validator\Constraints;
 
+use Attribute;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -19,6 +20,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @Annotation
  */
+#[Attribute]
 class ValidLoadedItems extends Constraint
 {
     /** @var array|null */

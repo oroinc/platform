@@ -40,7 +40,7 @@ class TokenAccessor implements TokenAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function hasUser()
+    public function hasUser(): bool
     {
         return null !== $this->getUser();
     }
@@ -68,11 +68,8 @@ class TokenAccessor implements TokenAccessorInterface
     public function getUserId()
     {
         $user = $this->getUser();
-        if (null === $user) {
-            return null;
-        }
 
-        return $user->getId();
+        return $user?->getId();
     }
 
     /**
@@ -98,10 +95,7 @@ class TokenAccessor implements TokenAccessorInterface
     public function getOrganizationId()
     {
         $organization = $this->getOrganization();
-        if (null === $organization) {
-            return null;
-        }
 
-        return $organization->getId();
+        return $organization?->getId();
     }
 }

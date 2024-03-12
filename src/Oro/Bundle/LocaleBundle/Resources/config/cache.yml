@@ -17,14 +17,6 @@ services:
             - '%oro_cache.data_adapter_lifetime%'
             - false
 
-    oro_locale.localization.localization_provider.cache.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
-        arguments:
-            - '@oro_locale.manager.localization'
-        tags:
-            - { name: kernel.cache_warmer }
-
     oro_locale.cache.normalizer.localized_fallback_value:
         class: Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueNormalizer
         arguments:

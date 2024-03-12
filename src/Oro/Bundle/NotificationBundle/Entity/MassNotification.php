@@ -2,86 +2,51 @@
 
 namespace Oro\Bundle\NotificationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 
 /**
  * Mass Notification entity.
- *
- * @ORM\Table("oro_notification_mass_notif")
- * @ORM\Entity()
- * @Config(
- *      routeName="oro_notification_massnotification_index",
- *      defaultValues={
- *          "security"={
- *              "type"="ACL",
- *              "permissions"="VIEW",
- *              "group_name"=""
- *          }
- *      }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table('oro_notification_mass_notif')]
+#[Config(
+    routeName: 'oro_notification_massnotification_index',
+    defaultValues: ['security' => ['type' => 'ACL', 'permissions' => 'VIEW', 'group_name' => '']]
+)]
 class MassNotification
 {
     const STATUS_FAILED  = 0;
     const STATUS_SUCCESS = 1;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(name: 'email', type: Types::STRING, length: 255)]
+    protected ?string $email = null;
+
+    #[ORM\Column(name: 'sender', type: Types::STRING, length: 255)]
+    protected ?string $sender = null;
+
+    #[ORM\Column(name: 'subject', type: Types::STRING, length: 255)]
+    protected ?string $subject = null;
+
+    #[ORM\Column(name: 'body', type: Types::TEXT, nullable: true)]
+    protected ?string $body = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $scheduledAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $processedAt = null;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=255)
+     * @var string|null
      */
-    protected $email;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sender", type="string", length=255)
-     */
-    protected $sender;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="subject", type="string", length=255)
-     */
-    protected $subject;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="body", type="text", nullable=true)
-     */
-    protected $body;
-
-    /**
-     * @var \DateTimeInterface
-     *
-     * @ORM\Column(type="datetime")
-     */
-    protected $scheduledAt;
-
-    /**
-     * @var \DateTimeInterface
-     *
-     * @ORM\Column(type="datetime")
-     */
-    protected $processedAt;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="status", type="integer")
-     */
+    #[ORM\Column(name: 'status', type: Types::INTEGER)]
     protected $status;
 
     /**
@@ -173,10 +138,6 @@ class MassNotification
         return $this->scheduledAt;
     }
 
-    /**
-     * @param \DateTimeInterface $scheduledAt
-     * @return MassNotification
-     */
     public function setScheduledAt(\DateTimeInterface $scheduledAt): self
     {
         $this->scheduledAt = $scheduledAt;
@@ -189,10 +150,6 @@ class MassNotification
         return $this->processedAt;
     }
 
-    /**
-     * @param \DateTimeInterface $processedAt
-     * @return MassNotification
-     */
     public function setProcessedAt(\DateTimeInterface $processedAt): self
     {
         $this->processedAt = $processedAt;

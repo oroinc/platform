@@ -23,6 +23,7 @@ class OroTestFrameworkExtension extends Extension implements PrependExtensionInt
         $loader->load('form_types.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+        $loader->load('services_test.yml');
 
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
         if ($container->hasDefinition(self::INSTALL_DEFAULT_OPTIONS_HOLDER_SERVICE) && $config) {

@@ -78,7 +78,7 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
             ],
             'applyToAll' => [
                 'propertyName' => 'applyToAll',
-                'value' => 'false',
+                'value' => true,
                 'defaultValue' => true,
             ],
             'applyToEntities' => [

@@ -12,17 +12,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroActivityListBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_5';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroActivityListTable($schema);
@@ -36,7 +36,7 @@ class OroActivityListBundleInstaller implements Installation
     /**
      * Create oro_activity_list table
      */
-    protected function createOroActivityListTable(Schema $schema)
+    private function createOroActivityListTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_activity_list');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -46,15 +46,15 @@ class OroActivityListBundleInstaller implements Installation
         $table->addColumn('verb', 'string', ['length' => 32]);
         $table->addColumn('subject', 'string', ['length' => 255]);
         $table->addColumn('related_activity_class', 'string', ['length' => 255]);
-        $table->addColumn('related_activity_id', 'integer', []);
-        $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('related_activity_id', 'integer');
+        $table->addColumn('created_at', 'datetime');
+        $table->addColumn('updated_at', 'datetime');
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['organization_id'], 'IDX_B1F9F0132C8A3DE', []);
-        $table->addIndex(['updated_at'], 'oro_activity_list_updated_idx', []);
-        $table->addIndex(['user_owner_id'], 'IDX_B1F9F019EB185F9', []);
-        $table->addIndex(['user_editor_id'], 'IDX_B1F9F01697521A8', []);
+        $table->addIndex(['organization_id'], 'IDX_B1F9F0132C8A3DE');
+        $table->addIndex(['updated_at'], 'oro_activity_list_updated_idx');
+        $table->addIndex(['user_owner_id'], 'IDX_B1F9F019EB185F9');
+        $table->addIndex(['user_editor_id'], 'IDX_B1F9F01697521A8');
         $table->addIndex(['related_activity_class'], 'al_related_activity_class');
         $table->addIndex(['related_activity_id'], 'al_related_activity_id');
     }
@@ -62,7 +62,7 @@ class OroActivityListBundleInstaller implements Installation
     /**
      * Create oro_activity_owner table
      */
-    protected function createOroActivityOwnerTable(Schema $schema)
+    private function createOroActivityOwnerTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_activity_owner');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -73,13 +73,13 @@ class OroActivityListBundleInstaller implements Installation
         $table->addUniqueIndex(['activity_id', 'user_id'], 'UNQ_activity_owner');
         $table->addIndex(['activity_id']);
         $table->addIndex(['organization_id']);
-        $table->addIndex(['user_id'], 'idx_oro_activity_owner_user_id', []);
+        $table->addIndex(['user_id'], 'idx_oro_activity_owner_user_id');
     }
 
     /**
      * Add oro_activity_list foreign keys.
      */
-    protected function addOroActivityListForeignKeys(Schema $schema)
+    private function addOroActivityListForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_activity_list');
         $table->addForeignKeyConstraint(
@@ -105,7 +105,7 @@ class OroActivityListBundleInstaller implements Installation
     /**
      * Add oro_activity_owner foreign keys.
      */
-    protected function addOroActivityOwnerForeignKeys(Schema $schema)
+    private function addOroActivityOwnerForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_activity_owner');
         $table->addForeignKeyConstraint(

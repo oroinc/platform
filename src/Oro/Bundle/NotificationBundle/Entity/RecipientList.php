@@ -3,63 +3,56 @@
 namespace Oro\Bundle\NotificationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Holds recipients of email notification.
- *
- * @ORM\Table("oro_notification_recip_list")
- * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository")
  */
+#[ORM\Entity(repositoryClass: RecipientListRepository::class)]
+#[ORM\Table('oro_notification_recip_list')]
 class RecipientList
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
-     * @var User[]|ArrayCollection
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinTable(name="oro_notification_recip_user",
-     *      joinColumns={@ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, User>
      */
-    protected $users;
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'oro_notification_recip_user')]
+    #[ORM\JoinColumn(name: 'recipient_list_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $users = null;
 
     /**
-     * @var Group[]|ArrayCollection
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Group")
-     * @ORM\JoinTable(name="oro_notification_recip_group",
-     *      joinColumns={@ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, Group>
      */
-    protected $groups;
+    #[ORM\ManyToMany(targetEntity: Group::class)]
+    #[ORM\JoinTable(name: 'oro_notification_recip_group')]
+    #[ORM\JoinColumn(name: 'recipient_list_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $groups = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="email", type="string", length=255, nullable=true)
-     */
-    protected $email;
+    #[ORM\Column(name: 'email', type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $email = null;
 
     /**
      * @var array
-     * @ORM\Column(name="additional_email_associations", type="simple_array", nullable=true)
      */
+    #[ORM\Column(name: 'additional_email_associations', type: Types::SIMPLE_ARRAY, nullable: true)]
     protected $additionalEmailAssociations = [];
 
     /**
      * @var array
-     * @ORM\Column(name="entity_emails", type="simple_array", nullable=true)
      */
+    #[ORM\Column(name: 'entity_emails', type: Types::SIMPLE_ARRAY, nullable: true)]
     protected $entityEmails = [];
 
     public function __construct()

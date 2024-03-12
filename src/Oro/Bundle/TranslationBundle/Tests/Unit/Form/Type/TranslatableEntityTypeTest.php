@@ -75,7 +75,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
 
         $eventManager = $this->createMock(EventManager::class);
         $eventManager->expects($this->any())
-            ->method('getListeners')
+            ->method('getAllListeners')
             ->willReturn([[$translatableListener]]);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);

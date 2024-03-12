@@ -6,7 +6,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -104,15 +104,15 @@ class SearchAdvancedController extends AbstractFOSRestController
      *      {"name"="query", "dataType"="string"}
      *  }
      * )
-     * @AclAncestor("oro_search")
      * @param Request $request
      * @return Response
      */
+    #[AclAncestor('oro_search')]
     public function getAction(Request $request)
     {
         $view = new View();
 
-        $result = $this->get('oro_search.index')->advancedSearch(
+        $result = $this->container->get('oro_search.index')->advancedSearch(
             $request->get('query')
         );
 

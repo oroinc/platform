@@ -36,7 +36,6 @@ layout:
                     options:
                         action: submit
                         text: oro.workflow.transition.form.submit.label
-                        style: auto
             tree:
                 transition_form_holder:
                     transition_form_wrapper:

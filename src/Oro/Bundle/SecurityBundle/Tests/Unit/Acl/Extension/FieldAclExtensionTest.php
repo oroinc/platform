@@ -34,6 +34,27 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
  */
 class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    private const USER_1 = 101;
+    private const USER_2 = 102;
+    private const USER_3 = 103;
+    private const USER_31 = 1031;
+    private const USER_4 = 104;
+    private const USER_41 = 1041;
+    private const USER_411 = 10411;
+    private const BU_1 = 201;
+    private const BU_2 = 202;
+    private const BU_3 = 203;
+    private const BU_31 = 2031;
+    private const BU_3_A = 2030;
+    private const BU_3_A_1 = 20301;
+    private const BU_4 = 204;
+    private const BU_41 = 2041;
+    private const BU_411 = 20411;
+    private const ORG_1 = 301;
+    private const ORG_2 = 302;
+    private const ORG_3 = 303;
+    private const ORG_4 = 304;
+
     /** @var FieldAclExtension */
     private $extension;
 
@@ -122,68 +143,68 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     private function buildTestTree()
     {
         /**
-         * org1  org2     org3         org4
-         *                |            |
-         *  bu1   bu2     +-bu3        +-bu4
-         *        |       | |            |
-         *        |       | +-bu31       |
-         *        |       | | |          |
-         *        |       | | +-user31   |
-         *        |       | |            |
-         *  user1 +-user2 | +-user3      +-user4
-         *                |                |
-         *                +-bu3a           +-bu3
-         *                  |              +-bu4
-         *                  +-bu3a1          |
-         *                                   +-bu41
-         *                                     |
-         *                                     +-bu411
+         * ORG_1  ORG_2     ORG_3         ORG_4
+         *                  |             |
+         *  BU_1   BU_2     +-BU_3        +-BU_4
+         *         |        | |            |
+         *         |        | +-BU_31      |
+         *         |        | | |          |
+         *         |        | | +-USER_31  |
+         *         |        | |            |
+         *  USER_1 +-USER_2 | +-USER_3     +-USER_4
+         *                  |                |
+         *                  +-BU_3_A         +-BU_3
+         *                    |              +-BU_4
+         *                    +-BU_3_A_1       |
+         *                                     +-BU_41
          *                                       |
-         *                                       +-user411
+         *                                       +-BU_411
+         *                                         |
+         *                                         +-USER_411
          *
-         * user1 user2 user3 user31 user4 user411
+         * USER_1 USER_2 USER_3 USER_31 USER_4 USER_411
          *
-         * org1  org2  org3  org3   org4  org4
-         * org2        org2
+         * ORG_1  ORG_2  ORG_3  ORG_3   ORG_4  ORG_4
+         * ORG_2         ORG_2
          *
-         * bu1   bu2   bu3   bu31   bu4   bu411
-         * bu2         bu2
+         * BU_1   BU_2   BU_3   BU_31   BU_4   BU_411
+         * BU_2          BU_2
          */
-        $this->tree->addBusinessUnit('bu1', null);
-        $this->tree->addBusinessUnit('bu2', null);
-        $this->tree->addBusinessUnit('bu3', 'org3');
-        $this->tree->addBusinessUnit('bu31', 'org3');
-        $this->tree->addBusinessUnit('bu3a', 'org3');
-        $this->tree->addBusinessUnit('bu3a1', 'org3');
-        $this->tree->addBusinessUnit('bu4', 'org4');
-        $this->tree->addBusinessUnit('bu41', 'org4');
-        $this->tree->addBusinessUnit('bu411', 'org4');
+        $this->tree->addBusinessUnit(self::BU_1, null);
+        $this->tree->addBusinessUnit(self::BU_2, null);
+        $this->tree->addBusinessUnit(self::BU_3, self::ORG_3);
+        $this->tree->addBusinessUnit(self::BU_31, self::ORG_3);
+        $this->tree->addBusinessUnit(self::BU_3_A, self::ORG_3);
+        $this->tree->addBusinessUnit(self::BU_3_A_1, self::ORG_3);
+        $this->tree->addBusinessUnit(self::BU_4, self::ORG_4);
+        $this->tree->addBusinessUnit(self::BU_41, self::ORG_4);
+        $this->tree->addBusinessUnit(self::BU_411, self::ORG_4);
 
-        $this->tree->addUser('user1', null);
-        $this->tree->addUser('user2', 'bu2');
-        $this->tree->addUser('user3', 'bu3');
-        $this->tree->addUser('user31', 'bu31');
-        $this->tree->addUser('user4', 'bu4');
-        $this->tree->addUser('user41', 'bu41');
-        $this->tree->addUser('user411', 'bu411');
+        $this->tree->addUser(self::USER_1, null);
+        $this->tree->addUser(self::USER_2, self::BU_2);
+        $this->tree->addUser(self::USER_3, self::BU_3);
+        $this->tree->addUser(self::USER_31, self::BU_31);
+        $this->tree->addUser(self::USER_4, self::BU_4);
+        $this->tree->addUser(self::USER_41, self::BU_41);
+        $this->tree->addUser(self::USER_411, self::BU_411);
 
-        $this->tree->addUserOrganization('user1', 'org1');
-        $this->tree->addUserOrganization('user1', 'org2');
-        $this->tree->addUserOrganization('user2', 'org2');
-        $this->tree->addUserOrganization('user3', 'org2');
-        $this->tree->addUserOrganization('user3', 'org3');
-        $this->tree->addUserOrganization('user31', 'org3');
-        $this->tree->addUserOrganization('user4', 'org4');
-        $this->tree->addUserOrganization('user411', 'org4');
+        $this->tree->addUserOrganization(self::USER_1, self::ORG_1);
+        $this->tree->addUserOrganization(self::USER_1, self::ORG_2);
+        $this->tree->addUserOrganization(self::USER_2, self::ORG_2);
+        $this->tree->addUserOrganization(self::USER_3, self::ORG_2);
+        $this->tree->addUserOrganization(self::USER_3, self::ORG_3);
+        $this->tree->addUserOrganization(self::USER_31, self::ORG_3);
+        $this->tree->addUserOrganization(self::USER_4, self::ORG_4);
+        $this->tree->addUserOrganization(self::USER_411, self::ORG_4);
 
-        $this->tree->addUserBusinessUnit('user1', 'org1', 'bu1');
-        $this->tree->addUserBusinessUnit('user1', 'org2', 'bu2');
-        $this->tree->addUserBusinessUnit('user2', 'org2', 'bu2');
-        $this->tree->addUserBusinessUnit('user3', 'org3', 'bu3');
-        $this->tree->addUserBusinessUnit('user3', 'org2', 'bu2');
-        $this->tree->addUserBusinessUnit('user31', 'org3', 'bu31');
-        $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
-        $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
+        $this->tree->addUserBusinessUnit(self::USER_1, self::ORG_1, self::BU_1);
+        $this->tree->addUserBusinessUnit(self::USER_1, self::ORG_2, self::BU_2);
+        $this->tree->addUserBusinessUnit(self::USER_2, self::ORG_2, self::BU_2);
+        $this->tree->addUserBusinessUnit(self::USER_3, self::ORG_3, self::BU_3);
+        $this->tree->addUserBusinessUnit(self::USER_3, self::ORG_2, self::BU_2);
+        $this->tree->addUserBusinessUnit(self::USER_31, self::ORG_3, self::BU_31);
+        $this->tree->addUserBusinessUnit(self::USER_4, self::ORG_4, self::BU_4);
+        $this->tree->addUserBusinessUnit(self::USER_411, self::ORG_4, self::BU_411);
 
         $this->buildTree();
     }
@@ -191,10 +212,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     private function buildTree()
     {
         $subordinateBusinessUnits = [
-            'bu3'  => ['bu31'],
-            'bu3a' => ['bu3a1'],
-            'bu41' => ['bu411'],
-            'bu4'  => ['bu41', 'bu411'],
+            self::BU_3 => [self::BU_31],
+            self::BU_3_A => [self::BU_3_A_1],
+            self::BU_41 => [self::BU_411],
+            self::BU_4 => [self::BU_41, self::BU_411],
 
         ];
 
@@ -696,23 +717,23 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function decideIsGrantingProvider(): array
     {
-        $this->org1 = new Organization('org1');
-        $this->org2 = new Organization('org2');
-        $this->org3 = new Organization('org3');
-        $this->org4 = new Organization('org4');
-        $this->bu1 = new BusinessUnit('bu1');
-        $this->bu2 = new BusinessUnit('bu2');
-        $this->bu3 = new BusinessUnit('bu3');
-        $this->bu31 = new BusinessUnit('bu31', $this->bu3);
-        $this->bu4 = new BusinessUnit('bu4');
-        $this->bu41 = new BusinessUnit('bu41', $this->bu4);
-        $this->bu411 = new BusinessUnit('bu411', $this->bu41);
-        $this->user1 = new User('user1');
-        $this->user2 = new User('user2', $this->bu2);
-        $this->user3 = new User('user3', $this->bu3);
-        $this->user31 = new User('user31', $this->bu31);
-        $this->user4 = new User('user4', $this->bu4);
-        $this->user411 = new User('user411', $this->bu411);
+        $this->org1 = new Organization(self::ORG_1);
+        $this->org2 = new Organization(self::ORG_2);
+        $this->org3 = new Organization(self::ORG_3);
+        $this->org4 = new Organization(self::ORG_4);
+        $this->bu1 = new BusinessUnit(self::BU_1);
+        $this->bu2 = new BusinessUnit(self::BU_2);
+        $this->bu3 = new BusinessUnit(self::BU_3);
+        $this->bu31 = new BusinessUnit(self::BU_31, $this->bu3);
+        $this->bu4 = new BusinessUnit(self::BU_4);
+        $this->bu41 = new BusinessUnit(self::BU_41, $this->bu4);
+        $this->bu411 = new BusinessUnit(self::BU_411, $this->bu41);
+        $this->user1 = new User(self::USER_1);
+        $this->user2 = new User(self::USER_2, $this->bu2);
+        $this->user3 = new User(self::USER_3, $this->bu3);
+        $this->user31 = new User(self::USER_31, $this->bu31);
+        $this->user4 = new User(self::USER_4, $this->bu4);
+        $this->user411 = new User(self::USER_411, $this->bu411);
 
         return [
             [FieldMaskBuilder::MASK_VIEW_SYSTEM, null, $this->org4, null, true],

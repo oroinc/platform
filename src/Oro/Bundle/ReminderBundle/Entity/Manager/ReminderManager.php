@@ -41,7 +41,7 @@ class ReminderManager
         $reminders = $entity->getReminders();
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
-        $em = $this->doctrineHelper->getEntityManager('OroReminderBundle:Reminder');
+        $em = $this->doctrineHelper->getEntityManager(Reminder::class);
 
         $persist = true;
         if ($reminders instanceof RemindersPersistentCollection) {
@@ -114,7 +114,7 @@ class ReminderManager
     public function applyReminders(array &$items, $entityClassName)
     {
         if (empty($items)
-            || !is_subclass_of($entityClassName, 'Oro\Bundle\ReminderBundle\Entity\RemindableInterface')
+            || !is_subclass_of($entityClassName, RemindableInterface::class)
         ) {
             return;
         }
@@ -167,7 +167,7 @@ class ReminderManager
     protected function getRemindersRepository()
     {
         return $this->doctrineHelper
-            ->getEntityManager('OroReminderBundle:Reminder')
-            ->getRepository('OroReminderBundle:Reminder');
+            ->getEntityManager(Reminder::class)
+            ->getRepository(Reminder::class);
     }
 }

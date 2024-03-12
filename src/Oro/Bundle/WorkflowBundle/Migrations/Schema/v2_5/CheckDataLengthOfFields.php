@@ -2,23 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_5;
 
-use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
 class CheckDataLengthOfFields implements MigrationQuery, ConnectionAwareInterface
 {
-    /** @var Connection */
-    private $connection;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
+    use ConnectionAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -70,10 +61,10 @@ class CheckDataLengthOfFields implements MigrationQuery, ConnectionAwareInterfac
         $logger->info($query);
         $stmt = $this->connection->executeQuery($query);
 
-        $rows = $stmt->fetchAll(\PDO::FETCH_NUM);
+        $rows = $stmt->fetchAllNumeric();
 
         $result = '';
-        foreach ($rows as list($id, $value, $length)) {
+        foreach ($rows as [$id, $value, $length]) {
             $result .= sprintf(
                 "Table: %s. Row ID: %s. Field: '%s'. Field Value: '%s'."
                 . " Expected Max Length: %d. Actual Length: %d.\n",

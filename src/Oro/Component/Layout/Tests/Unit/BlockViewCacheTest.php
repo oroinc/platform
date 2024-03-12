@@ -6,158 +6,108 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\LayoutContext;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class BlockViewCacheTest extends LayoutTestCase
+class BlockViewCacheTest extends \PHPUnit\Framework\TestCase
 {
-    private const CONTEXT_HASH_VALUE = 'context_hash_value';
-
-    /** @var BlockView */
-    private $blockView;
-
     /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheProvider;
+    private $cache;
+
+    /** @var SerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
     /** @var BlockViewCache */
     private $blockViewCache;
 
     protected function setUp(): void
     {
-        $this->blockView = new BlockView();
-        $this->cacheProvider = $this->createMock(AbstractAdapter::class);
+        $this->cache = $this->createMock(AbstractAdapter::class);
+        $this->serializer = $this->createMock(SerializerInterface::class);
 
-        $normalizer = new ObjectNormalizer();
-        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
-        $normalizer->setSerializer($serializer);
-
-        $this->blockViewCache = new BlockViewCache($this->cacheProvider, $serializer);
+        $this->blockViewCache = new BlockViewCache($this->cache, $this->serializer);
     }
 
-    public function testSave()
+    private function getContext(string $contextHash): LayoutContext
     {
         $context = $this->createMock(LayoutContext::class);
-
         $context->expects(self::once())
             ->method('getHash')
-            ->willReturn($this::CONTEXT_HASH_VALUE);
+            ->willReturn($contextHash);
 
-        $this->cacheProvider->expects(self::once())
+        return $context;
+    }
+
+    public function testSave(): void
+    {
+        $contextHash = 'context@hash';
+        $context = $this->getContext($contextHash);
+        $cacheKey = rawurlencode($contextHash);
+        $blockView = new BlockView();
+        $serializedBlockView = '{}';
+
+        $this->cache->expects(self::once())
+            ->method('delete')
+            ->with($cacheKey);
+        $this->cache->expects(self::once())
             ->method('get')
-            ->with($this::CONTEXT_HASH_VALUE)
+            ->with($cacheKey)
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
 
-        $this->blockViewCache->save($context, $this->blockView);
+        $this->serializer->expects(self::once())
+            ->method('serialize')
+            ->with(self::identicalTo($blockView), JsonEncoder::FORMAT)
+            ->willReturn($serializedBlockView);
+
+        $this->blockViewCache->save($context, $blockView);
     }
 
-    public function testFetchNonCached()
+    public function testFetchNonCached(): void
     {
-        $context = $this->createMock(LayoutContext::class);
+        $contextHash = 'context@hash';
+        $context = $this->getContext($contextHash);
+        $cacheKey = rawurlencode($contextHash);
 
-        $context->expects(self::once())
-            ->method('getHash')
-            ->willReturn($this::CONTEXT_HASH_VALUE);
-
-        $this->cacheProvider->expects(self::once())
+        $this->cache->expects(self::once())
             ->method('get')
-            ->with($this::CONTEXT_HASH_VALUE)
+            ->with($cacheKey)
             ->willReturn(null);
 
-        $this->assertNull($this->blockViewCache->fetch($context));
+        $this->serializer->expects(self::never())
+            ->method('deserialize');
+
+        self::assertNull($this->blockViewCache->fetch($context));
     }
 
-    public function testFetchCached()
+    public function testFetchCached(): void
     {
-        $context = $this->createMock(LayoutContext::class);
+        $contextHash = 'context@hash';
+        $context = $this->getContext($contextHash);
+        $cacheKey = rawurlencode($contextHash);
+        $cachedValue = '{}';
+        $blockView = new BlockView();
 
-        $context->expects(self::once())
-            ->method('getHash')
-            ->willReturn($this::CONTEXT_HASH_VALUE);
-
-        $this->cacheProvider->expects(self::once())
+        $this->cache->expects(self::once())
             ->method('get')
-            ->with($this::CONTEXT_HASH_VALUE)
-            ->willReturn('[]');
+            ->with($cacheKey)
+            ->willReturn($cachedValue);
 
-        $context->expects(self::once())
-            ->method('getHash')
-            ->willReturn($this::CONTEXT_HASH_VALUE);
+        $this->serializer->expects(self::once())
+            ->method('deserialize')
+            ->with($cachedValue, BlockView::class, JsonEncoder::FORMAT, ['context_hash' => $contextHash])
+            ->willReturn($blockView);
 
-        $fetchedBlockView = $this->blockViewCache->fetch($context);
-
-        $this->assertEquals($this->blockView, $fetchedBlockView);
+        self::assertSame($blockView, $this->blockViewCache->fetch($context));
     }
 
-    public function testReset()
+    public function testReset(): void
     {
-        $this->cacheProvider->expects(self::once())
+        $this->cache->expects(self::once())
             ->method('clear');
 
         $this->blockViewCache->reset();
-    }
-
-    public function testCacheWhenContextWithFilledData()
-    {
-        $normalizer = $this->createMock(ObjectNormalizer::class);
-        $normalizer->expects($this->any())
-            ->method('supportsNormalization')
-            ->willReturn(true);
-        $normalizer->expects($this->any())
-            ->method('supportsDenormalization')
-            ->willReturn(true);
-        $normalizer->expects($this->any())
-            ->method('normalize')
-            ->willReturnCallback(function ($data) {
-                return $data->vars;
-            });
-        $normalizer->expects($this->any())
-            ->method('denormalize')
-            ->willReturnCallback(function ($data) {
-                if (!$data) {
-                    return null;
-                }
-
-                $object = new BlockView();
-                $object->vars = $data;
-
-                return $object;
-            });
-        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
-
-        $cache = new BlockViewCache(
-            new ArrayAdapter(0, false),
-            $serializer
-        );
-        $context = new LayoutContext(['some data']);
-        $firstBlockView = new BlockView();
-        $firstBlockView->vars = ['attr' => 'first block view data'];
-        $secondContext = new LayoutContext(['some data']);
-        $secondContext->data()->set('custom_data_key', 'custom_data_value');
-        $secondBlockView = new BlockView();
-        $secondBlockView->vars = ['attr' => 'second block view data'];
-
-        $context->getResolver()->setDefined([0]);
-        $context->resolve();
-        $secondContext->getResolver()->setDefined([0]);
-        $secondContext->resolve();
-
-        $cache->save($context, $firstBlockView);
-        $cache->save($secondContext, $secondBlockView);
-
-        self::assertEquals($firstBlockView, $cache->fetch($context));
-        self::assertEquals($secondBlockView, $cache->fetch($secondContext));
-
-        $secondContextWithAdditionalData = new LayoutContext(['some data']);
-        $secondContextWithAdditionalData->data()->set('custom_data_key', 'custom_data_value');
-        $secondContextWithAdditionalData->data()->set('additional_data_key', 'additional_data_value');
-        $secondContextWithAdditionalData->getResolver()->setDefined([0]);
-        $secondContextWithAdditionalData->resolve();
-        self::assertNull($cache->fetch($secondContextWithAdditionalData));
     }
 }

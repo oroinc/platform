@@ -3,8 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -29,22 +29,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Workflow definition controller
- * @Route("/workflowdefinition")
  */
+#[Route(path: '/workflowdefinition')]
 class WorkflowDefinitionController extends AbstractController
 {
     /**
-     * @Route(name="oro_workflow_definition_index")
-     * @Template
-     * @Acl(
-     *      id="oro_workflow_definition_view",
-     *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="VIEW"
-     * )
      *
      * @return array
      */
+    #[Route(name: 'oro_workflow_definition_index')]
+    #[Template]
+    #[Acl(id: 'oro_workflow_definition_view', type: 'entity', class: WorkflowDefinition::class, permission: 'VIEW')]
     public function indexAction()
     {
         return [
@@ -53,52 +48,42 @@ class WorkflowDefinitionController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/create",
-     *      name="oro_workflow_definition_create"
-     * )
-     * @Template("@OroWorkflow/WorkflowDefinition/update.html.twig")
-     * @Acl(
-     *      id="oro_workflow_definition_create",
-     *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="CREATE"
-     * )
      *
      * @return array
      */
+    #[Route(path: '/create', name: 'oro_workflow_definition_create')]
+    #[Template('@OroWorkflow/WorkflowDefinition/update.html.twig')]
+    #[Acl(
+        id: 'oro_workflow_definition_create',
+        type: 'entity',
+        class: WorkflowDefinition::class,
+        permission: 'CREATE'
+    )]
     public function createAction()
     {
         return $this->updateAction(new WorkflowDefinition());
     }
 
     /**
-     * @Route(
-     *      "/update/{name}",
-     *      name="oro_workflow_definition_update"
-     * )
-     * @Template("@OroWorkflow/WorkflowDefinition/update.html.twig")
-     * @Acl(
-     *      id="oro_workflow_definition_update",
-     *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="EDIT"
-     * )
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      * @throws AccessDeniedException
      */
+    #[Route(path: '/update/{name}', name: 'oro_workflow_definition_update')]
+    #[Template('@OroWorkflow/WorkflowDefinition/update.html.twig')]
+    #[Acl(id: 'oro_workflow_definition_update', type: 'entity', class: WorkflowDefinition::class, permission: 'EDIT')]
     public function updateAction(WorkflowDefinition $workflowDefinition)
     {
         if ($workflowDefinition->isSystem() || !$this->isEditable($workflowDefinition)) {
             throw new AccessDeniedException('System workflow definitions are not editable');
         }
-        $translateLinks = $this->get(TranslationsDatagridLinksProvider::class)
+        $translateLinks = $this->container->get(TranslationsDatagridLinksProvider::class)
             ->getWorkflowTranslateLinks($workflowDefinition);
-        $this->get(TranslationProcessor::class)->translateWorkflowDefinitionFields($workflowDefinition, true);
+        $this->container->get(TranslationProcessor::class)
+            ->translateWorkflowDefinitionFields($workflowDefinition, true);
 
-        $form = $this->get(FormFactoryInterface::class)->createNamed(
+        $form = $this->container->get(FormFactoryInterface::class)->createNamed(
             'oro_workflow_definition_form',
             WorkflowDefinitionType::class,
             null
@@ -116,27 +101,23 @@ class WorkflowDefinitionController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/configure/{name}",
-     *      name="oro_workflow_definition_configure"
-     * )
-     * @Template()
-     * @Acl(
-     *      id="oro_workflow_definition_configure",
-     *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="CONFIGURE"
-     * )
      *
      * @param Request $request
      * @param WorkflowDefinition $workflowDefinition
-     *
      * @return array
      * @throws AccessDeniedException
      */
+    #[Route(path: '/configure/{name}', name: 'oro_workflow_definition_configure')]
+    #[Template]
+    #[Acl(
+        id: 'oro_workflow_definition_configure',
+        type: 'entity',
+        class: WorkflowDefinition::class,
+        permission: 'CONFIGURE'
+    )]
     public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
-        $workflow = $this->get(WorkflowManagerRegistry::class)
+        $workflow = $this->container->get(WorkflowManagerRegistry::class)
             ->getManager('system')
             ->getWorkflow($workflowDefinition->getName());
 
@@ -149,19 +130,20 @@ class WorkflowDefinitionController extends AbstractController
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $this->get(WorkflowVariablesHandler::class)
+                $this->container->get(WorkflowVariablesHandler::class)
                     ->updateWorkflowVariables($workflowDefinition, $form->getData());
 
                 $this->addFlash(
                     'success',
-                    $this->get(TranslatorInterface::class)->trans('oro.workflow.variable.save.success_message')
+                    $this->container->get(TranslatorInterface::class)
+                        ->trans('oro.workflow.variable.save.success_message')
                 );
 
-                return $this->get(Router::class)->redirect($workflowDefinition);
+                return $this->container->get(Router::class)->redirect($workflowDefinition);
             }
         }
 
-        $translateLinksProvider = $this->get(TranslationsDatagridLinksProvider::class);
+        $translateLinksProvider = $this->container->get(TranslationsDatagridLinksProvider::class);
 
         return [
             'form' => $form->createView(),
@@ -171,22 +153,19 @@ class WorkflowDefinitionController extends AbstractController
     }
 
     /**
-     * @Route(
-     *      "/view/{name}",
-     *      name="oro_workflow_definition_view"
-     * )
-     * @AclAncestor("oro_workflow_definition_view")
-     * @Template("@OroWorkflow/WorkflowDefinition/view.html.twig")
-     *
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      */
+    #[Route(path: '/view/{name}', name: 'oro_workflow_definition_view')]
+    #[Template('@OroWorkflow/WorkflowDefinition/view.html.twig')]
+    #[AclAncestor('oro_workflow_definition_view')]
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
-        $translateLinks = $this->get(TranslationsDatagridLinksProvider::class)
+        $translateLinks = $this->container->get(TranslationsDatagridLinksProvider::class)
             ->getWorkflowTranslateLinks($workflowDefinition);
-        $this->get(TranslationProcessor::class)->translateWorkflowDefinitionFields($workflowDefinition, true);
-        $workflow = $this->get(WorkflowManagerRegistry::class)
+        $this->container->get(TranslationProcessor::class)
+            ->translateWorkflowDefinitionFields($workflowDefinition, true);
+        $workflow = $this->container->get(WorkflowManagerRegistry::class)
             ->getManager('system')
             ->getWorkflow($workflowDefinition->getName());
 
@@ -204,20 +183,20 @@ class WorkflowDefinitionController extends AbstractController
      */
     protected function isEditable(WorkflowDefinition $workflowDefinition)
     {
-        return $this->get(ConfigurationChecker::class)->isClean($workflowDefinition->getConfiguration());
+        return $this->container->get(ConfigurationChecker::class)->isClean($workflowDefinition->getConfiguration());
     }
 
     /**
      * Activate WorkflowDefinition form
      *
-     * @Route("/activate-form/{name}", name="oro_workflow_definition_activate_from_widget")
-     * @AclAncestor("oro_workflow_definition_update")
-     * @Template("@OroWorkflow/WorkflowDefinition/widget/activateForm.html.twig")
      *
      * @param Request $request
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      */
+    #[Route(path: '/activate-form/{name}', name: 'oro_workflow_definition_activate_from_widget')]
+    #[Template('@OroWorkflow/WorkflowDefinition/widget/activateForm.html.twig')]
+    #[AclAncestor('oro_workflow_definition_update')]
     public function activateFormAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
         $form = $this->createForm(WorkflowReplacementType::class, null, ['workflow' => $workflowDefinition]);
@@ -225,8 +204,8 @@ class WorkflowDefinitionController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $workflowManager = $this->get(WorkflowManagerRegistry::class)->getManager();
-            $helper = $this->get(WorkflowDeactivationHelper::class);
+            $workflowManager = $this->container->get(WorkflowManagerRegistry::class)->getManager();
+            $helper = $this->container->get(WorkflowDeactivationHelper::class);
             $data = $form->getData();
 
             try {
@@ -261,7 +240,7 @@ class WorkflowDefinitionController extends AbstractController
     private function deactivateWorkflows(WorkflowManager $workflowManager, array $workflowNames)
     {
         $deactivated = [];
-        $translationHelper = $this->get(WorkflowTranslationHelper::class);
+        $translationHelper = $this->container->get(WorkflowTranslationHelper::class);
 
         foreach ($workflowNames as $workflowName) {
             if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {

@@ -72,7 +72,7 @@ class ChoiceTreeBusinessUnitProvider
      */
     protected function getBusinessUnitRepo()
     {
-        return $this->registry->getRepository('OroOrganizationBundle:BusinessUnit');
+        return $this->registry->getRepository(BusinessUnit::class);
     }
 
     /**

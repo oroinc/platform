@@ -2,39 +2,31 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 
 /**
  * Entity for testing workflows
- *
- * @ORM\Table(name="test_workflow_aware_entity")
- * @ORM\Entity
- * @Config(
- *      routeName="oro_test_wfa_index",
- *      routeView="oro_test_wfa_view",
- *      routeCreate="oro_test_wfa_create",
- *      routeUpdate="oro_test_wfa_update",
- *      routeDelete="oro_test_wfa_delete"
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_workflow_aware_entity')]
+#[Config(
+    routeName: 'oro_test_wfa_index',
+    routeView: 'oro_test_wfa_view',
+    routeCreate: 'oro_test_wfa_create',
+    routeUpdate: 'oro_test_wfa_update',
+    routeDelete: 'oro_test_wfa_delete'
+)]
 class WorkflowAwareEntity implements TestFrameworkEntityInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", nullable=true)
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
+    protected ?string $name = null;
 
     /**
      * @return int

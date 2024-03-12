@@ -15,19 +15,21 @@ use Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 
-class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
+class DoctrineTagGeneratorTest extends TestCase
 {
     private const TEST_ENTITY_NAME = EntityStub::class;
-    private const TEST_ENTITY_ALIAS = 'OroSyncBundle:EntityStub';
+    private const TEST_ENTITY_ALIAS = \Oro\Bundle\SyncBundle\Entity\EntityStub::class;
     private const TEST_NEW_ENTITY_NAME = NewEntityStub::class;
     private const TEST_ASSOCIATION_FIELD = 'testField';
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|MockObject */
     private $em;
 
-    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var UnitOfWork|MockObject */
     private $uow;
 
     /** @var DoctrineTagGenerator */

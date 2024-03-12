@@ -34,6 +34,6 @@ class RegionController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_address.api.manager.region');
+        return $this->container->get('oro_address.api.manager.region');
     }
 }

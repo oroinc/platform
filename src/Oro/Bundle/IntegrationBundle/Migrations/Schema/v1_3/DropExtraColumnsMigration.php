@@ -10,7 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class DropExtraColumnsMigration implements Migration, OrderedMigrationInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function getOrder()
     {
@@ -18,7 +18,7 @@ class DropExtraColumnsMigration implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {

@@ -2,22 +2,21 @@
 
 namespace Oro\Bundle\CurrencyBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
+
+/**
+* CurrencyAware trait
+*
+*/
 trait CurrencyAwareTrait
 {
-    /**
-     * @var string
-     *
-     * @Doctrine\ORM\Mapping\Column(name="currency", type="string", nullable=true)
-     * @Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true, "immutable"=true},
-     *      "importexport"={
-     *          "order"=40
-     *      }
-     *  }
-     * )
-     */
-    protected $currency;
+    #[ORM\Column(name: 'currency', type: Types::STRING, nullable: true)]
+    #[ConfigField(
+        defaultValues: ['dataaudit' => ['auditable' => true, 'immutable' => true], 'importexport' => ['order' => 40]]
+    )]
+    protected ?string $currency = null;
 
     /**
      * @return string

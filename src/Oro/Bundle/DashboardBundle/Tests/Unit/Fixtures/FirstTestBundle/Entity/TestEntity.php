@@ -2,20 +2,17 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity;
 
-/**
- * @Entity
- * @Table(name="test")
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'test')]
 class TestEntity
 {
-    /**
-     * @Id @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
     public $id;
 
-    /**
-     * @Column(type="datetime")
-     */
-    public $createdAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    public ?\DateTimeInterface $createdAt = null;
 }

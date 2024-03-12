@@ -2,54 +2,41 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
 /**
- * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
- * @ORM\Table(name="oro_translation", uniqueConstraints={
- *      @ORM\UniqueConstraint(name="language_key_uniq", columns={"language_id", "translation_key_id"})
- * })
- */
+* Entity that represents Translation
+*
+*/
+#[ORM\Entity(repositoryClass: TranslationRepository::class)]
+#[ORM\Table(name: 'oro_translation')]
+#[ORM\UniqueConstraint(name: 'language_key_uniq', columns: ['language_id', 'translation_key_id'])]
 class Translation
 {
     const SCOPE_SYSTEM = 0;
     const SCOPE_INSTALLED = 1;
     const SCOPE_UI = 2;
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * @var TranslationKey
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\TranslationKey")
-     * @ORM\JoinColumn(name="translation_key_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
-    protected $translationKey;
+    #[ORM\ManyToOne(targetEntity: TranslationKey::class)]
+    #[ORM\JoinColumn(name: 'translation_key_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?TranslationKey $translationKey = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    protected $value;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    protected ?string $value = null;
 
-    /**
-     * @var Language
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\Language")
-     * @ORM\JoinColumn(name="language_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
-     */
-    protected $language;
+    #[ORM\ManyToOne(targetEntity: Language::class)]
+    #[ORM\JoinColumn(name: 'language_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    protected ?Language $language = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="scope", type="smallint")
-     */
-    protected $scope = self::SCOPE_SYSTEM;
+    #[ORM\Column(name: 'scope', type: Types::SMALLINT)]
+    protected ?int $scope = self::SCOPE_SYSTEM;
 
     /**
      * @return mixed

@@ -41,24 +41,38 @@ class RangeConstraintConverter implements ConstraintConverterInterface
             // Get the parent, because the current data is the numeric value
             $formData = $form?->getParent()?->getData();
             if (is_object($formData)) {
-                if ($convertedConstraint->maxPropertyPath !== null && $convertedConstraint->max === null) {
-                    $convertedConstraint->max = $this->getPropertyAccessor()->getValue(
-                        $formData,
-                        $convertedConstraint->maxPropertyPath
-                    );
-                    $convertedConstraint->maxPropertyPath = null;
-                }
-                if ($convertedConstraint->minPropertyPath !== null && $convertedConstraint->min === null) {
-                    $convertedConstraint->min = $this->getPropertyAccessor()->getValue(
-                        $formData,
-                        $convertedConstraint->minPropertyPath
-                    );
-                    $convertedConstraint->minPropertyPath = null;
-                }
+                $this->setMaxValue($convertedConstraint, $formData);
+                $this->setMinValue($convertedConstraint, $formData);
             }
         }
 
         return $convertedConstraint;
+    }
+
+    private function setMaxValue($convertedConstraint, $formData): void
+    {
+        if ($convertedConstraint->maxPropertyPath !== null && $convertedConstraint->max === null) {
+            if ($this->getPropertyAccessor()->isReadable($formData, $convertedConstraint->maxPropertyPath)) {
+                $convertedConstraint->max = $this->getPropertyAccessor()->getValue(
+                    $formData,
+                    $convertedConstraint->maxPropertyPath
+                );
+                $convertedConstraint->maxPropertyPath = null;
+            }
+        }
+    }
+
+    private function setMinValue($convertedConstraint, $formData): void
+    {
+        if ($convertedConstraint->minPropertyPath !== null && $convertedConstraint->min === null) {
+            if ($this->getPropertyAccessor()->isReadable($formData, $convertedConstraint->minPropertyPath)) {
+                $convertedConstraint->min = $this->getPropertyAccessor()->getValue(
+                    $formData,
+                    $convertedConstraint->minPropertyPath
+                );
+                $convertedConstraint->minPropertyPath = null;
+            }
+        }
     }
 
     private function getPropertyAccessor(): PropertyAccessorInterface

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,13 +15,14 @@ class TicketController extends AbstractController
 {
     /**
      * Retrieve a new Sync authorize ticket for currently authenticated user.
-     *
-     * @Route("/sync/ticket", name="oro_sync_ticket", methods={"POST"})
-     * @CsrfProtection()
      */
+    #[Route(path: '/sync/ticket', name: 'oro_sync_ticket', methods: ['POST'])]
+    #[CsrfProtection()]
     public function syncTicketAction(): JsonResponse
     {
-        return new JsonResponse(['ticket' => $this->get(TicketProvider::class)->generateTicket($this->getUser())]);
+        return new JsonResponse(
+            ['ticket' => $this->container->get(TicketProvider::class)->generateTicket($this->getUser())]
+        );
     }
 
     public static function getSubscribedServices(): array

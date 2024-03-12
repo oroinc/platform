@@ -225,9 +225,9 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider
         calls:
             - [addExtendTypeMapping, ["string", Symfony\Component\Form\Extension\Core\Type\TextType]]
-            - [addExtendTypeMapping, ["integer", Symfony\Component\Form\Extension\Core\Type\IntegerType]]
-            - [addExtendTypeMapping, ["smallint", Symfony\Component\Form\Extension\Core\Type\IntegerType]]
-            - [addExtendTypeMapping, ["bigint", Symfony\Component\Form\Extension\Core\Type\IntegerType]]
+            - [addExtendTypeMapping, ["smallint", Oro\Bundle\EntityExtendBundle\Form\Type\FixedIntegerType, { data_type: 'smallint' }]]
+            - [addExtendTypeMapping, ["integer", Oro\Bundle\EntityExtendBundle\Form\Type\FixedIntegerType, { data_type: 'integer' }]]
+            - [addExtendTypeMapping, ["bigint", Oro\Bundle\EntityExtendBundle\Form\Type\FixedIntegerType, { data_type: 'bigint' }]]
             - [addExtendTypeMapping, ["decimal", Symfony\Component\Form\Extension\Core\Type\NumberType]]
             - [addExtendTypeMapping, ["date", Oro\Bundle\FormBundle\Form\Type\OroDateType]]
             - [addExtendTypeMapping, ["time", Symfony\Component\Form\Extension\Core\Type\TimeType, { model_timezone: "UTC", view_timezone: "UTC" }]]

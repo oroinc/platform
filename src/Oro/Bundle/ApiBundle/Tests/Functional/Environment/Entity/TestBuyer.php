@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 
 /**
  * This entity is used to test associations that can have several types of the target entities,
  * including a target entity that is not accessible via API.
- * @ORM\Entity()
- * @Config()
  */
+#[ORM\Entity]
+#[Config]
 class TestBuyer extends TestPerson
 {
 }

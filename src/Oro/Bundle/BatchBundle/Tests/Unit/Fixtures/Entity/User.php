@@ -2,96 +2,92 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
-/**
- * @ORM\Entity()
- */
+#[ORM\Entity]
 class User
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
+
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+    protected ?string $username = null;
+
+    #[ORM\ManyToOne(targetEntity: BusinessUnit::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?BusinessUnit $owner = null;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @var Collection<int, BusinessUnit>
      */
-    protected $username;
+    #[ORM\ManyToMany(targetEntity: BusinessUnit::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'oro_user_business_unit')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'business_unit_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $businessUnits = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="BusinessUnit", cascade={"persist"})
-     * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @var Collection<int, Organization>
      */
-    protected $owner;
+    #[ORM\ManyToMany(targetEntity: Organization::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'oro_user_organization')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $organizations = null;
+
+    #[ORM\ManyToOne(targetEntity: Organization::class)]
+    #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    protected ?OrganizationInterface $organization = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity="BusinessUnit", inversedBy="users")
-     * @ORM\JoinTable(name="oro_user_business_unit",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="business_unit_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, Group>
      */
-    protected $businessUnits;
+    #[ORM\ManyToMany(targetEntity: Group::class)]
+    #[ORM\JoinTable(name: 'oro_user_access_group')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $groups = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Organization", inversedBy="users")
-     * @ORM\JoinTable(name="oro_user_organization",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, Role>
      */
-    protected $organizations;
+    #[ORM\ManyToMany(targetEntity: Role::class)]
+    #[ORM\JoinTable(name: 'oro_user_access_role')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?Collection $roles = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @var Collection<int, UserApi>
      */
-    protected $organization;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserApi::class, cascade: ['persist', 'remove'])]
+    protected ?Collection $apiKeys = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Group")
-     * @ORM\JoinTable(name="oro_user_access_group",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, Status>
      */
-    protected $groups;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Status::class)]
+    #[ORM\OrderBy(['createdAt' => Criteria::DESC])]
+    protected ?Collection $statuses = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Role")
-     * @ORM\JoinTable(name="oro_user_access_role",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
+     * @var Collection<int, EmailOrigin>
      */
-    protected $roles;
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: EmailOrigin::class, cascade: ['persist', 'remove'])]
+    protected ?Collection $emailOrigins = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"})
+     * @var Collection<int, UserEmail>
      */
-    protected $apiKeys;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserEmail::class, cascade: ['persist'], orphanRemoval: true)]
+    protected ?Collection $emails = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Status", mappedBy="user")
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     */
-    protected $statuses;
-
-    /**
-     * @ORM\OneToMany(targetEntity="EmailOrigin", mappedBy="owner", cascade={"persist", "remove"})
-     */
-    protected $emailOrigins;
-
-    /**
-     * @ORM\OneToMany(targetEntity="UserEmail", mappedBy="user", orphanRemoval=true, cascade={"persist"})
-     */
-    protected $emails;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    protected $createdAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $createdAt = null;
 }

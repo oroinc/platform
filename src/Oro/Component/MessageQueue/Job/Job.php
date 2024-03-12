@@ -15,65 +15,35 @@ class Job
     const STATUS_CANCELLED = 'oro.message_queue_job.status.cancelled';
     const STATUS_STALE = 'oro.message_queue_job.status.stale';
 
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int $id = null;
+
+    protected ?string $ownerId = null;
+
+    protected ?string $name = null;
+
+    protected ?string $status = null;
+
+    protected ?bool $interrupted = null;
+
+    protected ?bool $unique = null;
 
     /**
-     * @var string
-     */
-    protected $ownerId;
-
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $status;
-
-    /**
-     * @var bool
-     */
-    protected $interrupted;
-
-    /**
-     * @var bool;
-     */
-    protected $unique;
-
-    /**
-     * @var Job
+     * @var Job|null
      */
     protected $rootJob;
 
     /**
      * @var Job[]
      */
-    protected $childJobs = [];
+    protected $childJobs;
 
-    /**
-     * @var \DateTime
-     */
-    protected $createdAt;
+    protected ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     */
-    protected $startedAt;
+    protected ?\DateTimeInterface $startedAt = null;
 
-    /**
-     * @var \DateTime
-     */
-    protected $lastActiveAt;
+    protected ?\DateTimeInterface $lastActiveAt = null;
 
-    /**
-     * @var \DateTime
-     */
-    protected $stoppedAt;
+    protected ?\DateTimeInterface $stoppedAt = null;
 
     /**
      * @var array

@@ -3,58 +3,54 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
-class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, ContainerAwareInterface
+class OroUserBundle implements
+    Migration,
+    AttachmentExtensionAwareInterface,
+    ContainerAwareInterface,
+    ConnectionAwareInterface,
+    LoggerAwareInterface
 {
     use AttachmentExtensionAwareTrait;
+    use ContainerAwareTrait;
+    use ConnectionAwareTrait;
+    use LoggerAwareTrait;
 
     /**
-     * @var ContainerInterface
+     * {@inheritDoc}
      */
-    protected $container;
-
-    /**
-     * @inheritdoc
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         //add attachment extend field
-        self::addAvatarToUser($schema, $this->attachmentExtension);
-        self::addOwnerToOroFile($schema);
+        $this->attachmentExtension->addImageRelation($schema, 'oro_user', 'avatar', [], 2, 58, 58);
+        $this->addOwnerToAttachmentFileTable($schema);
 
         //save old avatars to new place
-        $em         = $this->container->get('doctrine.orm.entity_manager');
-        $query      = "SELECT id, image, createdAt FROM oro_user WHERE image != ''";
-        $userImages = $em->getConnection()->executeQuery($query)->fetchAll(\PDO::FETCH_ASSOC);
+        $query = "SELECT id, image, createdAt FROM oro_user WHERE image != ''";
+        $userImages = $this->connection->executeQuery($query)->fetchAllAssociative(\PDO::FETCH_ASSOC);
 
         if (!empty($userImages)) {
-            $maxId = (int)$em->getConnection()
+            $maxId = (int)$this->connection
                 ->executeQuery('SELECT MAX(id) FROM oro_attachment_file;')
-                ->fetchColumn();
+                ->fetchOne();
             foreach ($userImages as $userData) {
                 $filePath = $this->getUploadFileName($userData);
                 // file doesn't exists or not readable
                 if (false === $filePath || !is_readable($filePath)) {
-                    $this->container->get('logger')
-                        ->addAlert(
-                            sprintf('There\'s no image %s for user %d exists.', $userData['image'], $userData['id'])
-                        );
+                    $this->logger->error(
+                        sprintf('There\'s no image %s for user %d exists.', $userData['image'], $userData['id'])
+                    );
                     continue;
                 }
 
@@ -62,8 +58,7 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
                     $this->container->get('oro_attachment.file_manager')
                         ->writeFileToStorage($filePath, $userData['image']);
                 } catch (\Exception $e) {
-                    $this->container->get('logger')
-                        ->addError(sprintf('File copy error: %s', $e->getMessage()));
+                    $this->logger->error(sprintf('File copy error: %s', $e->getMessage()));
                 }
                 $maxId++;
                 $file = new SymfonyFile($filePath);
@@ -101,17 +96,11 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
         $schema->getTable('oro_user')->dropColumn('image');
     }
 
-    /**
-     * Add owner to table oro_file
-     */
-    public static function addOwnerToOroFile(Schema $schema)
+    private function addOwnerToAttachmentFileTable(Schema $schema): void
     {
-        /** Add user as owner to oro_attachment_file table **/
         $table = $schema->getTable('oro_attachment_file');
         $table->addColumn('owner_user_id', 'integer', ['notnull' => false]);
         $table->addIndex(['owner_user_id'], 'IDX_6E4CD01B9EB185F9', []);
-
-        /** Generate foreign keys for table oro_attachment_file **/
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['owner_user_id'],
@@ -120,30 +109,12 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
         );
     }
 
-    public static function addAvatarToUser(Schema $schema, AttachmentExtension $attachmentExtension)
+    private function getUploadFileName(array $userData): string|false
     {
-        $attachmentExtension->addImageRelation(
-            $schema,
-            'oro_user',
-            'avatar',
-            [],
-            2,
-            58,
-            58
-        );
-    }
-
-    /**
-     * @param array $userData
-     *
-     * @return string|false
-     */
-    protected function getUploadFileName(array $userData)
-    {
-        $ds         = DIRECTORY_SEPARATOR;
+        $ds = DIRECTORY_SEPARATOR;
         $dateObject = new \DateTime($userData['createdAt']);
-        $suffix     = $dateObject->format('Y-m');
-        $path       = $this->container->getParameter('kernel.project_dir')
+        $suffix = $dateObject->format('Y-m');
+        $path = $this->container->getParameter('kernel.project_dir')
             . '/public/uploads' . $ds . 'users' . $ds . $suffix . $ds . $userData['image'];
 
         return realpath($path);

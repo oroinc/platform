@@ -8,46 +8,30 @@ use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 
 /**
- * Class provides methods to manage migration extension.
+ * Provides methods to manage migration extension.
  */
 class MigrationExtensionManager
 {
-    const EXTENSION_AWARE_INTERFACE_SUFFIX = 'AwareInterface';
+    private const EXTENSION_AWARE_INTERFACE_SUFFIX = 'AwareInterface';
+
+    /** @var array {extension name} => [{extension}, {extension aware interface name}, {set extension method name}] */
+    protected array $extensions = [];
+    private ?Connection $connection = null;
+    private ?AbstractPlatform $platform = null;
+    private ?DbIdentifierNameGenerator $nameGenerator = null;
+    private ?LoggerInterface $logger = null;
+    private bool $isDependenciesUpToDate = false;
 
     /**
-     * @var array {extension name} => [{extension}, {extension aware interface name}, {set extension method name}]
+     * Sets a database connection.
      */
-    protected $extensions = [];
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
-
-    /**
-     * @var DbIdentifierNameGenerator
-     */
-    protected $nameGenerator;
-
-    /**
-     * @var bool
-     */
-    private $isDependenciesUpToDate = false;
-
-    /**
-     * Sets a database connection
-     */
-    public function setConnection(Connection $connection)
+    public function setConnection(Connection $connection): void
     {
         $this->connection = $connection;
-
         foreach ($this->extensions as $extension) {
             if ($extension[0] instanceof ConnectionAwareInterface) {
                 $extension[0]->setConnection($this->connection);
@@ -56,12 +40,11 @@ class MigrationExtensionManager
     }
 
     /**
-     * Sets a database platform
+     * Sets a database platform.
      */
-    public function setDatabasePlatform(AbstractPlatform $platform)
+    public function setDatabasePlatform(AbstractPlatform $platform): void
     {
         $this->platform = $platform;
-
         foreach ($this->extensions as $extension) {
             if ($extension[0] instanceof DatabasePlatformAwareInterface) {
                 $extension[0]->setDatabasePlatform($this->platform);
@@ -70,12 +53,11 @@ class MigrationExtensionManager
     }
 
     /**
-     * Sets a database identifier name generator
+     * Sets a database identifier name generator.
      */
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
+    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator): void
     {
         $this->nameGenerator = $nameGenerator;
-
         foreach ($this->extensions as $extension) {
             if ($extension[0] instanceof NameGeneratorAwareInterface) {
                 $extension[0]->setNameGenerator($this->nameGenerator);
@@ -84,22 +66,24 @@ class MigrationExtensionManager
     }
 
     /**
-     * Registers an extension
-     *
-     * @param string $name      The extension name
-     * @param object $extension The extension object
+     * Sets a logger.
      */
-    public function addExtension($name, $extension)
+    public function setLogger(LoggerInterface $logger): void
     {
-        if ($this->connection && $extension instanceof ConnectionAwareInterface) {
-            $extension->setConnection($this->connection);
+        $this->logger = $logger;
+        foreach ($this->extensions as $extension) {
+            if ($extension[0] instanceof LoggerAwareInterface) {
+                $extension[0]->setLogger($this->logger);
+            }
         }
-        if ($this->platform && $extension instanceof DatabasePlatformAwareInterface) {
-            $extension->setDatabasePlatform($this->platform);
-        }
-        if ($this->nameGenerator && $extension instanceof NameGeneratorAwareInterface) {
-            $extension->setNameGenerator($this->nameGenerator);
-        }
+    }
+
+    /**
+     * Registers an extension.
+     */
+    public function addExtension(string $name, object $extension): void
+    {
+        $this->configureExtension($extension);
 
         $extensionAwareInterfaceName = $this->getExtensionAwareInterfaceName($extension);
         $this->extensions[$name] = [
@@ -112,27 +96,38 @@ class MigrationExtensionManager
     }
 
     /**
-     * Sets extensions to the given migration
+     * Sets extensions to the given migration.
      */
-    public function applyExtensions(Migration $migration)
+    public function applyExtensions(Migration $migration): void
     {
-        if ($this->connection && $migration instanceof ConnectionAwareInterface) {
-            $migration->setConnection($this->connection);
-        }
-        if ($this->platform && $migration instanceof DatabasePlatformAwareInterface) {
-            $migration->setDatabasePlatform($this->platform);
-        }
-        if ($this->nameGenerator && $migration instanceof NameGeneratorAwareInterface) {
-            $migration->setNameGenerator($this->nameGenerator);
-        }
+        $this->configureExtension($migration);
         $this->ensureExtensionDependenciesApplied();
         $this->applyExtensionDependencies($migration);
     }
 
     /**
-     * Makes sure that links on depended each other extensions set
+     * Sets external services to the given object.
      */
-    protected function ensureExtensionDependenciesApplied()
+    protected function configureExtension(object $obj): void
+    {
+        if (null !== $this->connection && $obj instanceof ConnectionAwareInterface) {
+            $obj->setConnection($this->connection);
+        }
+        if (null !== $this->platform && $obj instanceof DatabasePlatformAwareInterface) {
+            $obj->setDatabasePlatform($this->platform);
+        }
+        if (null !== $this->nameGenerator && $obj instanceof NameGeneratorAwareInterface) {
+            $obj->setNameGenerator($this->nameGenerator);
+        }
+        if (null !== $this->logger && $obj instanceof LoggerAwareInterface) {
+            $obj->setLogger($this->logger);
+        }
+    }
+
+    /**
+     * Makes sure that links on depended each other extensions set.
+     */
+    private function ensureExtensionDependenciesApplied(): void
     {
         if (!$this->isDependenciesUpToDate) {
             foreach ($this->extensions as $extension) {
@@ -143,11 +138,9 @@ class MigrationExtensionManager
     }
 
     /**
-     * Sets extensions to the given object
-     *
-     * @param object $obj
+     * Sets extensions to the given object.
      */
-    protected function applyExtensionDependencies($obj)
+    private function applyExtensionDependencies(object $obj): void
     {
         foreach ($this->extensions as $extension) {
             if (is_a($obj, $extension[1])) {
@@ -158,17 +151,13 @@ class MigrationExtensionManager
     }
 
     /**
-     * Gets an name of interface which should be used to register an extension in a migration class
-     *
-     * @param object $extension
-     * @return string
-     * @throws \RuntimeException if the interface is not found
+     * Gets an name of interface which should be used to register an extension in a migration class.
      */
-    protected function getExtensionAwareInterfaceName($extension)
+    private function getExtensionAwareInterfaceName(object $extension): string
     {
         $result = null;
 
-        $extensionClassName = get_class($extension);
+        $extensionClassName = \get_class($extension);
         while ($extensionClassName) {
             $extensionAwareInterfaceName = $extensionClassName . self::EXTENSION_AWARE_INTERFACE_SUFFIX;
             if (interface_exists($extensionAwareInterfaceName)) {
@@ -183,13 +172,13 @@ class MigrationExtensionManager
             if (get_parent_class($extension)) {
                 $msg = sprintf(
                     'The extension aware interface for neither "%s" not one of its parent classes was not found.',
-                    get_class($extension)
+                    \get_class($extension)
                 );
             } else {
                 $msg = sprintf(
                     'The extension aware interface for "%s" was not found. Make sure that "%s" interface is declared.',
-                    get_class($extension),
-                    get_class($extension) . self::EXTENSION_AWARE_INTERFACE_SUFFIX
+                    \get_class($extension),
+                    \get_class($extension) . self::EXTENSION_AWARE_INTERFACE_SUFFIX
                 );
             }
 
@@ -200,23 +189,21 @@ class MigrationExtensionManager
     }
 
     /**
-     * Gets a name of set extension method
-     *
-     * @param string $extensionAwareInterfaceName
-     * @return string
-     * @throws \RuntimeException if set method is not found
+     * Gets a name of set extension method.
      */
-    protected function getSetExtensionMethodName($extensionAwareInterfaceName)
+    private function getSetExtensionMethodName(string $extensionAwareInterfaceName): string
     {
         $parts = explode('\\', $extensionAwareInterfaceName);
         $className = array_pop($parts);
-        $extensionName = substr($className, 0, strlen($className) - strlen(self::EXTENSION_AWARE_INTERFACE_SUFFIX));
+        $extensionName = substr($className, 0, \strlen($className) - \strlen(self::EXTENSION_AWARE_INTERFACE_SUFFIX));
         $setMethodName = 'set' . $extensionName;
 
         if (!EntityPropertyInfo::methodExists($extensionAwareInterfaceName, $setMethodName)) {
-            throw new \RuntimeException(
-                sprintf('The method "%s::%s" was not found.', $extensionAwareInterfaceName, $setMethodName)
-            );
+            throw new \RuntimeException(sprintf(
+                'The method "%s::%s" was not found.',
+                $extensionAwareInterfaceName,
+                $setMethodName
+            ));
         }
 
         return $setMethodName;

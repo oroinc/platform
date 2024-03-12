@@ -56,6 +56,12 @@
     color: $floating-validation-message-label-color;
     text-align: $floating-validation-message-label-text-align;
 
+    .content {
+        display: flex;
+        gap: $validation-failed-gap;
+        align-items: $validation-failed-align-items;
+    }
+
     .arrow {
         display: block;
         position: absolute;

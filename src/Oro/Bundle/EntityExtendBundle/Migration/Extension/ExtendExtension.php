@@ -21,7 +21,6 @@ use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 /**
  * Provides an ability to create extended enum tables and fields, add relations between tables.
@@ -31,13 +30,14 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
  */
 class ExtendExtension implements NameGeneratorAwareInterface
 {
+    use ExtendNameGeneratorAwareTrait;
+
     private const ALLOWED_IDENTITY_FIELDS = ['id', 'name'];
     private const DEFAULT_IDENTITY_FIELDS = ['id'];
 
     protected ExtendOptionsManager $extendOptionsManager;
     protected EntityMetadataHelper $entityMetadataHelper;
     protected PropertyConfigBag $propertyConfigBag;
-    protected ExtendDbIdentifierNameGenerator $nameGenerator;
 
     public function __construct(
         ExtendOptionsManager $extendOptionsManager,
@@ -49,18 +49,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->propertyConfigBag = $propertyConfigBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
-    {
-        $this->nameGenerator = $nameGenerator;
-    }
-
-    /**
-     * @return ExtendDbIdentifierNameGenerator
-     */
-    public function getNameGenerator()
+    public function getNameGenerator(): ExtendDbIdentifierNameGenerator
     {
         return $this->nameGenerator;
     }

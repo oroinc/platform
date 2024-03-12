@@ -63,7 +63,7 @@ HELP
         $container = $this->getContainer();
 
         $commandExecutor = new CommandExecutor(
-            $input->hasOption('env') ? $input->getOption('env') : null,
+            $input,
             $output,
             $this->getApplication(),
             $container->get('oro_cache.oro_data_cache_manager')

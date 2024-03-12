@@ -43,7 +43,7 @@ class MigrationEventTest extends \PHPUnit\Framework\TestCase
         $types = [];
 
         $this->connection->expects($this->once())
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->with($sql, $params, $types)
             ->willReturn([]);
         $this->migrationEvent->getData($sql, $params, $types);

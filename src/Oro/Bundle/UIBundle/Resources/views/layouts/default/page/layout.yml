@@ -36,6 +36,8 @@ layout:
                     options:
                         src: '=data["theme"].getStylesOutput(context["theme"], "print_styles")'
                         media: 'print'
+                service_worker:
+                    blockType: container
                 body:
                     blockType: body
                 wrapper:
@@ -71,6 +73,7 @@ layout:
                         meta_charset: ~
                         meta_viewport: ~
                         theme_icon: ~
+                        service_worker: ~
                         styles: ~
                         print_styles: ~
                     body:

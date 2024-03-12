@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroAttachmentBundle_Entity_FileItem;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
@@ -13,49 +14,27 @@ use Oro\Bundle\FormBundle\Entity\EmptyItem;
 /**
  * Entity for Multiple Files and Multiple Images relations
  *
- * @ORM\Table(name="oro_attachment_file_item")
- * @ORM\Entity()
- * @Config
  * @mixin OroAttachmentBundle_Entity_FileItem
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'oro_attachment_file_item')]
+#[Config]
 class FileItem implements EmptyItem, ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    protected ?int $id = null;
 
-    /**
-     * @var File|null
-     *
-     * @ORM\OneToOne(
-     *     targetEntity="Oro\Bundle\AttachmentBundle\Entity\File",
-     *     cascade={"persist", "remove"},
-     *     orphanRemoval=true
-     *  )
-     * @ORM\JoinColumn(name="file_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $file;
+    #[ORM\OneToOne(targetEntity: File::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\JoinColumn(name: 'file_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    protected ?File $file = null;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="sort_order", type="integer", options={"default"=0})
-     */
-    protected $sortOrder = 0;
+    #[ORM\Column(name: 'sort_order', type: Types::INTEGER, options: ['default' => 0])]
+    protected ?int $sortOrder = 0;
 
     public function __toString(): string
     {

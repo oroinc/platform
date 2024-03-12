@@ -21,31 +21,30 @@ class WidgetController extends AbstractController
     const DEFAULT_PAGE_TEMPLATE = '@OroAction/Operation/page.html.twig';
 
     /**
-     * @Route("/buttons", name="oro_action_widget_buttons")
-     * @Template()
      *
      * @return array
      */
+    #[Route(path: '/buttons', name: 'oro_action_widget_buttons')]
+    #[Template]
     public function buttonsAction()
     {
-        $buttonSearchContext = $this->get(ButtonSearchContextProvider::class)->getButtonSearchContext();
+        $buttonSearchContext = $this->container->get(ButtonSearchContextProvider::class)->getButtonSearchContext();
 
         return [
-            'buttons' => $this->get(ButtonProvider::class)->findAvailable($buttonSearchContext),
+            'buttons' => $this->container->get(ButtonProvider::class)->findAvailable($buttonSearchContext),
         ];
     }
 
     /**
-     * @Route("/form/{operationName}", name="oro_action_widget_form")
      *
      * @param Request $request
      * @param string $operationName
-     *
      * @return Response
      */
+    #[Route(path: '/form/{operationName}', name: 'oro_action_widget_form')]
     public function formAction(Request $request, $operationName)
     {
-        $handler = $this->get(OperationFormHandler::class);
+        $handler = $this->container->get(OperationFormHandler::class);
 
         $result = $handler->process($operationName, $request, $request->getSession()->getFlashBag());
 

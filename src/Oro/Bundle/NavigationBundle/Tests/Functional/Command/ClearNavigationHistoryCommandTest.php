@@ -23,6 +23,14 @@ class ClearNavigationHistoryCommandTest extends WebTestCase
         );
     }
 
+    public function testExecuteWithPositiveInterval()
+    {
+        self::assertStringContainsString(
+            "Value '-1 day' should be valid date interval",
+            $this->runCommand('oro:navigation:history:clear', ['--interval=-1 day'])
+        );
+    }
+
     public function testExecuteWithValidInterval()
     {
         /** @var HistoryItemRepository $repo */
@@ -46,7 +54,7 @@ class ClearNavigationHistoryCommandTest extends WebTestCase
                 NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_3,
                 NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_4,
                 NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_5,
-            ]));
+            ], true));
         }
     }
 }

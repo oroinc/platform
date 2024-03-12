@@ -36,8 +36,12 @@ The current file describes significant changes in the code that may affect the u
 * Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
   rendering WYSIWYG content in backoffice.
 
+#### CurrencyBundle
+* Added supporting of the `readonly` attribute in `\Oro\Bundle\CurrencyBundle\Form\Type\PriceType`.
+
 ## Changes in the Platform package versions
 
+- [6.0.0-RC](#600-rc-2024-02-29)
 - [5.1.0](#510-2023-03-31)
 - [5.0.0](#500-2022-01-26)
 - [4.2.10](#4210)
@@ -56,8 +60,150 @@ The current file describes significant changes in the code that may affect the u
 - [2.2.0](#220-2017-05-31)
 - [2.1.0](#210-2017-03-30)
 
+## 6.0.0-RC (2024-02-29)
+[Show detailed list of changes](incompatibilities-6-0-rc.md)
 
-## UNRELEASED
+### Security Changes
+
+Based on symfony security changes, the approach to user authentication was updated. The main differences in the new approach will be described below.
+
+* You should use `SecurityExtension::addAuthenticatorFactory()` instead of `SecurityExtension::addSecurityListenerFactory()`.
+
+Before:
+
+```php
+$extension->addSecurityListenerFactory(new OrganizationFormLoginFactory());
+```
+
+After:
+
+```php
+$extension->addAuthenticatorFactory(new OrganizationFormLoginFactory());
+```
+
+* Authenticators have replaced the previous implementation of authentication using providers and listeners.
+
+Before:
+
+```text
+Oro\Bundle\SecurityBundle\Http\Firewal\OrganizationBasicAuthenticationListener
+Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
+```
+
+After:
+
+```text
+Oro\Bundle\SecurityBundle\Authentication\Authenticator\UsernamePasswordOrganizationAuthenticator
+```
+
+* You should use `security.access_control` rules instead of anonymous authenticator.
+
+Before:
+
+```yaml
+security:
+    firewalls:
+        healthcheck_http_status_checks:
+            pattern:   /healthcheck/http_status_check(s$|/.*)
+            provider:  chain_provider
+            anonymous: true # anonymous authentication is not available
+```
+
+After:
+
+```yaml
+security:
+    firewalls:
+        healthcheck_http_status_checks:
+            pattern:   /healthcheck/http_status_check(s$|/.*)
+            provider:  chain_provider
+
+oro_security:
+    access_control:
+        - { path: /healthcheck/http_status_check(s$|/.*), roles: PUBLIC_ACCESS }
+```
+
+* Changed implementation of `anonymous_customer_user` authnetication. To check whether the user is authorized, it is not enough to check whether the user is absent in the token, it is also worth checking whether this user is not a customer visitor (`CustomerVisitor::class`).
+
+Before:
+
+```php
+if ($this->getUser()) {
+    # implementation
+}
+```
+
+```php
+if (null !== $this->getUser()) {
+    # implementation
+}
+```
+
+After:
+
+```php
+if ($this->getUser() instanceof AbstractUser) {
+    # implementation
+}
+```
+
+```php
+if (!$this->getUser() instanceof CustomerUser) { 
+    # implementation
+}
+```
+
+* In twig templates, to check whether the user is authorized, you need to use the function `is_authenticated` that excludes from the check (anonymous customer user).
+
+Before:
+
+```text
+{% if app.user is not null %}
+    # implementation
+{% endif %}
+```
+
+After:
+
+```text
+{% if is_authenticated() %}
+    # implementation  
+{% endif %}
+```
+
+* Added new `feature_firewall_authenticators` option to `api_firewalls` configuration to disable authenticator when some API feature is disabled.
+
+Before:
+
+```yaml
+oro_api:
+  api_firewalls:
+    api_wsse_secured:
+      feature_firewall_listeners:
+        - Oro\Bundle\OAuth2ServerBundle\Security\Firewall\OAuth2Listener
+    wsse_secured:
+      feature_firewall_listeners:
+        - Oro\Bundle\OAuth2ServerBundle\Security\Firewall\OAuth2Listener
+    frontend_api_wsse_secured:
+      feature_firewall_listeners:
+        - Oro\Bundle\OAuth2ServerBundle\Security\Firewall\OAuth2Listener
+```
+
+After:
+
+```yaml
+oro_api:
+  api_firewalls:
+    api_wsse_secured:
+      feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
+        - Oro\Bundle\OAuth2ServerBundle\Security\Authenticator\OAuth2Authenticator
+    wsse_secured:
+      feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
+        - Oro\Bundle\OAuth2ServerBundle\Security\Authenticator\OAuth2Authenticator
+    frontend_api_wsse_secured:
+      feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
+        - Oro\Bundle\OAuth2ServerBundle\Security\Authenticator\OAuth2Authenticator
+```
 
 ### Added
 
@@ -83,7 +229,28 @@ api:
 * Added `\Oro\Bundle\FormBundle\Validator\Constraints\AdaptivelyValidCollection` validation constraint for validating a collection of entities with different validation groups for the new, updated and unchanged elements.
 
 #### PlatformBundle
-* Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option. 
+* Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option.
+
+### Changed
+
+### Datagrids
+* All datagrids used in storefront application were moved from `<BundleName>/Resources/config/oro/datagrids.yml` to layouts folder of the `default` theme `<BundleName>/Resources/views/layouts/default/config/datagrids.yml`.
+This means that storefront datagrids can now differ between themes. Any storefront grid customization should also be moved to the theme folder.
+
+#### SearchBundle
+* Added `\Oro\Bundle\SearchBundle\Event\BeforeIndexEntitiesEvent` that is dispatched in `\Oro\Bundle\SearchBundle\EventListener\IndexListener` in postFlush method after changing or updating indexing entities.
+
+#### DataGridBundle
+* Added postponed delete entities logic to `\Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionHandler`.
+
+### Changed
+
+#### UIBundle
+* Removed `$offset-*` scss variables
+* Added `spacing` scss function.
+`$offset-x\$offset-y` => `spacing('base')`
+`$offset-x-m\$offset-y-m` => `spacing('sm')`
+`$offset-x-s\$offset-y-s` => `spacing('xs')`
 
 ## 5.1.0 (2023-03-31)
 
@@ -367,6 +534,7 @@ use ExtendEntityTrait;
 
 #### LayoutBundle
 * Added `\Oro\Component\Layout\Extension\Theme\Model\ThemeManager::getThemesHierarchy` to easily get the theme hierarchy for the specified theme.
+* Added the ability to specify response status code via layout context option `response_status_code`.
 
 #### Layout Component
 * Added `\Oro\Component\Layout\ContextInterface` and `\Oro\Component\Layout\LayoutContextStack` to `\Oro\Component\Layout\Layout` so now it is aware of own context and can push/pop the current context in the layout context stack.
@@ -572,6 +740,10 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 #### MessageQueueBundle
 * Every custom MQ topic needs a `topic` class now; see more in the [Message Queue Topics](https://doc.oroinc.com/backend/mq/message-queue-topics/) topic.
 
+#### WorkflowBundle
+* To unify the WorkflowBundle and ActionBundle syntax, the `pre_conditions` and `post_actions` options of the workflow process definition configuration were renamed to `preconditions` and `actions` respectively.
+
+
 ### Removed
 
 #### CronBundle
@@ -619,9 +791,6 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 * The deprecated method `tools.loadModuleAndReplace()` from `'oroui/js/tools'` module, use `loadModules.fromObjectProp` from `'oroui/js/app/services/load-modules'` instead.
 * `vertical_container` layout block type has been removed, as redundant. Use conventional `container` layout block type instead, with additions custom CSS class that implements required alignment.
 
-#### WorkflowBundle
-* The deprecated `pre_conditions` option was removed for the configuration of workflow process definitions.
-* The deprecated `pre_conditions` and `post_actions` options were removed for the configuration of workflows.
 
 #### LayoutBundle
 * Removed `Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder`, use `Oro\Component\Layout\LayoutContextStack` instead.
