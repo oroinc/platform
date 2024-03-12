@@ -18,6 +18,7 @@ services:
         arguments:
             - '@oro_action.action_factory'
             - '@oro_action.action_group_registry'
+            - '@oro_action.expression.factory'
 
     oro_action.action_assembler:
         class: 'Oro\Component\Action\Action\ActionAssembler'

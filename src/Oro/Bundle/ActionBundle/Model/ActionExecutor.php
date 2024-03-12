@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Component\Action\Action\ActionFactoryInterface;
+use Oro\Component\ConfigExpression\ExpressionFactory;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
@@ -12,7 +13,8 @@ class ActionExecutor
 {
     public function __construct(
         private ActionFactoryInterface $actionRegistry,
-        private ActionGroupRegistry $actionGroupRegistry
+        private ActionGroupRegistry $actionGroupRegistry,
+        private ExpressionFactory $expressionFactory
     ) {
     }
 
@@ -29,6 +31,18 @@ class ActionExecutor
     public function executeActionGroup(string $actionGroupName, array $data = []): ActionData
     {
         return $this->actionGroupRegistry->get($actionGroupName)->execute(new ActionData($data));
+    }
+
+    public function evaluateExpression(
+        string $expressionName,
+        array $data = [],
+        \ArrayAccess $errors = null,
+        string $message = null
+    ): bool {
+        $expression = $this->expressionFactory->create($expressionName, $this->prepareOptions($data));
+        $expression->setMessage($message);
+
+        return $expression->evaluate($data, $errors);
     }
 
     private function prepareOptions(array $data): array

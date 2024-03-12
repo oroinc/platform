@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
@@ -14,46 +13,37 @@ use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
+/**
+ * Assemble transition based on a given configuration.
+ */
 class TransitionAssembler extends BaseAbstractAssembler
 {
-    /** @var FormOptionsAssembler */
-    protected $formOptionsAssembler;
-
-    /** @var ConditionFactory */
-    protected $conditionFactory;
-
-    /** @var ActionFactoryInterface */
-    protected $actionFactory;
-
-    /** @var FormOptionsConfigurationAssembler */
-    protected $formOptionsConfigurationAssembler;
-
-    /** @var TransitionOptionsResolver */
-    protected $optionsResolver;
+    protected FormOptionsAssembler $formOptionsAssembler;
+    protected ConditionFactory $conditionFactory;
+    protected ActionFactoryInterface $actionFactory;
+    protected FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler;
+    protected TransitionOptionsResolver $optionsResolver;
+    protected ServiceProviderInterface $transitionServiceLocator;
 
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
         ActionFactoryInterface $actionFactory,
         FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler,
-        TransitionOptionsResolver $optionsResolver
+        TransitionOptionsResolver $optionsResolver,
+        ServiceProviderInterface $transitionServiceLocator
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
         $this->actionFactory = $actionFactory;
         $this->formOptionsConfigurationAssembler = $formOptionsConfigurationAssembler;
         $this->optionsResolver = $optionsResolver;
+        $this->transitionServiceLocator = $transitionServiceLocator;
     }
 
-    /**
-     * @param array $configuration
-     * @param Step[]|Collection $steps
-     * @param Attribute[]|Collection $attributes
-     * @return Collection
-     * @throws AssemblerException
-     */
-    public function assemble(array $configuration, $steps, $attributes)
+    public function assemble(array $configuration, iterable $steps, iterable $attributes): Collection
     {
         $transitionsConfiguration = $this->getOption(
             $configuration,
@@ -70,15 +60,7 @@ class TransitionAssembler extends BaseAbstractAssembler
 
         $transitions = new ArrayCollection();
         foreach ($transitionsConfiguration as $name => $options) {
-            $this->assertOptions($options, array('transition_definition'));
-            $definitionName = $options['transition_definition'];
-            if (!isset($definitions[$definitionName])) {
-                throw new AssemblerException(
-                    sprintf('Unknown transition definition %s', $definitionName)
-                );
-            }
-
-            $definition = $definitions[$definitionName];
+            $definition = $this->getTransitionDefinition($options, $definitions);
 
             $transition = $this->assembleTransition($name, $options, $definition, $steps, $attributes);
             $transitions->set($name, $transition);
@@ -87,16 +69,12 @@ class TransitionAssembler extends BaseAbstractAssembler
         return $transitions;
     }
 
-    /**
-     * @param array $configuration
-     * @return array
-     */
-    protected function parseDefinitions(array $configuration)
+    protected function parseDefinitions(array $configuration): array
     {
-        $definitions = array();
+        $definitions = [];
         foreach ($configuration as $name => $options) {
             if (empty($options)) {
-                $options = array();
+                $options = [];
             }
             $definitions[$name] = [
                 'preactions' => $this->getOption($options, 'preactions', []),
@@ -109,17 +87,19 @@ class TransitionAssembler extends BaseAbstractAssembler
         return $definitions;
     }
 
-    /**
-     * @param string $name
-     * @param array $options
-     * @param array $definition
-     * @param Step[]|ArrayCollection $steps
-     * @param Attribute[]|Collection $attributes
-     * @return Transition
-     * @throws AssemblerException
-     */
-    protected function assembleTransition($name, array $options, array $definition, $steps, $attributes)
-    {
+    protected function assembleTransition(
+        string $name,
+        array $options,
+        array $definition,
+        iterable $steps,
+        iterable $attributes
+    ): Transition {
+        $transitionServiceName = $this->getOption($options, 'transition_service', null);
+        $transitionService = null;
+        if ($transitionServiceName) {
+            $transitionService = $this->transitionServiceLocator->get($transitionServiceName);
+        }
+
         $this->assertOptions($options, array('step_to'));
         $stepToName = $options['step_to'];
         if (empty($steps[$stepToName])) {
@@ -129,6 +109,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         $transition = new Transition($this->optionsResolver);
         $transition->setName($name)
             ->setStepTo($steps[$stepToName])
+            ->setTransitionService($transitionService)
             ->setLabel($this->getOption($options, 'label'))
             ->setButtonLabel($this->getOption($options, 'button_label'))
             ->setButtonTitle($this->getOption($options, 'button_title'))
@@ -150,52 +131,13 @@ class TransitionAssembler extends BaseAbstractAssembler
 
         $this->processFrontendOptions($transition, $options);
 
-        if (!empty($definition['preactions'])) {
-            $preAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['preactions']);
-            $transition->setPreAction($preAction);
-        }
-
         $definition['preconditions'] = $this->addAclPreConditions($options, $definition, $name);
+        $this->processDefinition($transition, $definition);
 
-        if (!empty($definition['preconditions'])) {
-            $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['preconditions']);
-            $transition->setPreCondition($condition);
-        }
+        $this->processSchedule($transition, $options);
+        $this->processFormOptions($options);
+        $this->processConditionalSteps($transition, $options, $stepToName, $steps);
 
-        if (!empty($definition['conditions'])) {
-            $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['conditions']);
-            $transition->setCondition($condition);
-        }
-
-        $this->processActions($transition, $definition['actions']);
-
-        if (!empty($options['schedule'])) {
-            $transition->setScheduleCron($this->getOption($options['schedule'], 'cron', null));
-            $transition->setScheduleFilter($this->getOption($options['schedule'], 'filter', null));
-            $transition->setScheduleCheckConditions(
-                $this->getOption($options['schedule'], 'check_conditions_before_job_creation', false)
-            );
-        }
-
-        if (!empty($options['form_options'][WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION])) {
-            $this->formOptionsConfigurationAssembler->assemble($options);
-        }
-
-        if (!empty($options['conditional_steps_to'])) {
-            $stepsTo = $options['conditional_steps_to'];
-            // Add default step_to to a list of conditional steps to correctly check step ACL.
-            $stepsTo[$stepToName] = [];
-
-            foreach ($options['conditional_steps_to'] as $stepName => $conditionConfig) {
-                $conditionConfig = $this->addCondition(
-                    $conditionConfig,
-                    $this->getStepAclCheckCondition($transition->getName(), $stepName)
-                );
-
-                $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $conditionConfig);
-                $transition->addConditionalStepTo($steps[$stepName], $condition);
-            }
-        }
         return $transition;
     }
 
@@ -221,6 +163,7 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected function processActions(Transition $transition, array $actions)
     {
         if ($transition->getDisplayType() === WorkflowConfiguration::TRANSITION_DISPLAY_TYPE_PAGE) {
+            // TODO: Move me to pre-execute event listener, because current approach is unworkable with transition service
             $actions = array_merge([
                 [
                     '@resolve_destination_page' => $transition->getDestinationPage(),
@@ -235,13 +178,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         $transition->setAction($this->actionFactory->create(ConfigurableAction::ALIAS, $actions));
     }
 
-    /**
-     * @param array  $options
-     * @param array  $definition
-     * @param string $transitionName
-     * @return array
-     */
-    protected function addAclPreConditions(array $options, array $definition, $transitionName)
+    protected function addAclPreConditions(array $options, array $definition, string $transitionName): array
     {
         $aclResource = $this->getOption($options, 'acl_resource');
 
@@ -256,13 +193,13 @@ class TransitionAssembler extends BaseAbstractAssembler
              * @see AclGranted
              */
             $definition['preconditions'] = $this->addCondition(
-                $definition['preconditions'],
+                $definition['preconditions'] ?? [],
                 ['@acl_granted' => $aclPreConditionDefinition]
             );
         }
 
         $definition['preconditions'] = $this->addCondition(
-            $definition['preconditions'],
+            $definition['preconditions'] ?? [],
             $this->getStepsAclCheckCondition($options, $transitionName)
         );
 
@@ -300,15 +237,100 @@ class TransitionAssembler extends BaseAbstractAssembler
         return empty($conditions) ? $newCondition : ['@and' => [$newCondition, $conditions]];
     }
 
-    /**
-     * @param array $options
-     * @param Attribute[]|Collection $attributes
-     * @param string $transitionName
-     * @return array
-     */
-    protected function assembleFormOptions(array $options, $attributes, $transitionName)
+    protected function assembleFormOptions(array $options, iterable $attributes, string $transitionName): array
     {
-        $formOptions = $this->getOption($options, 'form_options', array());
+        $formOptions = $this->getOption($options, 'form_options', []);
+
         return $this->formOptionsAssembler->assemble($formOptions, $attributes, 'transition', $transitionName);
+    }
+
+    protected function processDefinition(Transition $transition, array $definition): void
+    {
+        if (!$definition) {
+            return;
+        }
+
+        if (!empty($definition['preactions'])) {
+            $preAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['preactions']);
+            $transition->setPreAction($preAction);
+        }
+
+        if (!empty($definition['preconditions'])) {
+            $condition = $this->conditionFactory->create(
+                ConfigurableCondition::ALIAS,
+                $definition['preconditions']
+            );
+            $transition->setPreCondition($condition);
+        }
+
+        if (!empty($definition['conditions'])) {
+            $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['conditions']);
+            $transition->setCondition($condition);
+        }
+
+        $this->processActions($transition, $definition['actions'] ?? []);
+    }
+
+    protected function processSchedule(Transition $transition, array $options): void
+    {
+        if (empty($options['schedule'])) {
+            return;
+        }
+
+        $transition->setScheduleCron($this->getOption($options['schedule'], 'cron', null));
+        $transition->setScheduleFilter($this->getOption($options['schedule'], 'filter', null));
+        $transition->setScheduleCheckConditions(
+            $this->getOption($options['schedule'], 'check_conditions_before_job_creation', false)
+        );
+    }
+
+    protected function processFormOptions(array $options): void
+    {
+        if (empty($options['form_options'][WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION])) {
+            return;
+        }
+
+        $this->formOptionsConfigurationAssembler->assemble($options);
+    }
+
+    protected function getTransitionDefinition(array $options, array $definitions): array
+    {
+        if (!empty($options['transition_service'])) {
+            return [];
+        }
+        $this->assertOptions($options, ['transition_definition']);
+        $definitionName = $options['transition_definition'];
+        if (!isset($definitions[$definitionName])) {
+            throw new AssemblerException(
+                sprintf('Unknown transition definition %s', $definitionName)
+            );
+        }
+
+        return $definitions[$definitionName];
+    }
+
+    protected function processConditionalSteps(
+        Transition $transition,
+        array $options,
+        string $stepToName,
+        iterable $steps
+    ): void {
+        if (empty($options['conditional_steps_to'])) {
+            return;
+        }
+
+        $stepsTo = $options['conditional_steps_to'];
+        // Add default step_to to a list of conditional steps to correctly check step ACL.
+        $stepsTo[$stepToName] = [];
+
+        foreach ($stepsTo as $stepName => $conditionConfig) {
+            $conditionConfig = $this->addCondition(
+                $conditionConfig,
+                $this->getStepAclCheckCondition($transition->getName(), $stepName)
+            );
+
+            $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $conditionConfig);
+            $transition->addConditionalStepTo($steps[$stepName], $condition);
+        }
     }
 }

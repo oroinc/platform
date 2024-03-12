@@ -19,6 +19,8 @@ use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -26,14 +28,17 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
  */
 class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormOptionsAssembler|MockObject */
     private $formOptionsAssembler;
 
-    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExpressionFactory|MockObject */
     private $conditionFactory;
 
-    /** @var ActionFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ActionFactoryInterface|MockObject */
     private $actionFactory;
+
+    /** @var ServiceProviderInterface|MockObject */
+    private $serviceLocator;
 
     /** @var TransitionAssembler */
     private $assembler;
@@ -74,13 +79,15 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
         $this->conditionFactory = $this->createMock(ExpressionFactory::class);
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+        $this->serviceLocator = $this->createMock(ServiceProviderInterface::class);
 
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,
             $this->actionFactory,
             $this->createMock(FormOptionsConfigurationAssembler::class),
-            $this->createMock(TransitionOptionsResolver::class)
+            $this->createMock(TransitionOptionsResolver::class),
+            $this->serviceLocator
         );
     }
 

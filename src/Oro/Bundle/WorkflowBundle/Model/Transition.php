@@ -109,6 +109,9 @@ class Transition
     /** @var TransitionOptionsResolver */
     protected $optionsResolver;
 
+    /** @var TransitionServiceInterface|null */
+    protected $transitionService;
+
     public function __construct(TransitionOptionsResolver $optionsResolver)
     {
         $this->optionsResolver = $optionsResolver;
@@ -354,6 +357,10 @@ class Transition
      */
     protected function isConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
     {
+        if ($this->transitionService) {
+            return $this->transitionService->isConditionAllowed($workflowItem, $errors);
+        }
+
         if (!$this->condition) {
             return true;
         }
@@ -374,11 +381,16 @@ class Transition
             $this->preAction->execute($workflowItem);
         }
 
-        if (!$this->preCondition) {
-            return true;
+        $isAllowed = true;
+        if ($this->preCondition) {
+            $isAllowed = (bool)$this->preCondition?->evaluate($workflowItem, $errors);
         }
 
-        return $this->preCondition->evaluate($workflowItem, $errors) ? true : false;
+        if ($this->transitionService) {
+            $isAllowed = $isAllowed && $this->transitionService->isPreConditionAllowed($workflowItem, $errors);
+        }
+
+        return $isAllowed;
     }
 
     /**
@@ -436,7 +448,9 @@ class Transition
         $stepTo = $this->getResolvedStepTo($workflowItem);
         $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
 
-        if ($this->action) {
+        if ($this->transitionService) {
+            $this->transitionService->execute($workflowItem);
+        } elseif ($this->action) {
             $this->action->execute($workflowItem);
         }
     }
@@ -856,5 +870,12 @@ class Transition
     public function hasFormConfiguration()
     {
         return !empty($this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]);
+    }
+
+    public function setTransitionService(?TransitionServiceInterface $transitionService): self
+    {
+        $this->transitionService = $transitionService;
+
+        return $this;
     }
 }

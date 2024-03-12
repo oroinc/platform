@@ -52,7 +52,7 @@ class ProcessJobRepositoryTest extends WebTestCase
 
         $actualJobs = $this->getRepository()->findByIds($ids);
 
-        $this->assertEquals($expectedJobs, $actualJobs);
+        $this->assertEqualsCanonicalizing($expectedJobs, $actualJobs);
 
         array_shift($ids);
 

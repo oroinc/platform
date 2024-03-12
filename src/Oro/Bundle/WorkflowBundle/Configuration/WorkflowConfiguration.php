@@ -367,6 +367,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->scalarNode('acl_message')
                         ->defaultNull()
                     ->end()
+                    ->scalarNode('transition_service')
+                        ->cannotBeEmpty()
+                    ->end()
                     ->scalarNode('transition_definition')
                         ->cannotBeEmpty()
                     ->end()
@@ -447,6 +450,13 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                                 'Display type "page" require "form_options" to be set.'
                             );
                         }
+
+                        if (!empty($value['transition_definition']) && !empty($value['transition_service'])) {
+                            throw new WorkflowException(
+                                'Only one of "transition_definition" or "transition_service" should to be set.'
+                            );
+                        }
+
                         return $value;
                     })
                 ->end()
