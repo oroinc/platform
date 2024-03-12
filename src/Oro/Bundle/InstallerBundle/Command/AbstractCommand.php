@@ -80,6 +80,14 @@ HELP
             $commandExecutor->setDefaultOption('no-debug');
         }
 
+        if ($input->getOption('no-ansi')) {
+            $commandExecutor->setDefaultOption('no-ansi');
+        }
+
+        if ($input->getOption('no-interaction')) {
+            $commandExecutor->setDefaultOption('no-interaction');
+        }
+
         return $commandExecutor;
     }
 
