@@ -13,6 +13,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Views a configuration value in the global scope.
@@ -88,6 +89,7 @@ HELP
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $symfonyStyle = new SymfonyStyle($input, $output);
         $configManager = $this->configManager;
         $fieldName = $input->getArgument('name');
 
@@ -96,20 +98,20 @@ HELP
         if ($configField !== null
             && $configField->getType() === OroEncodedPlaceholderPasswordType::class
         ) {
-            $output->writeln("# encrypted value");
+            $symfonyStyle->error("Encrypted value");
             return Command::INVALID;
         }
 
         $value = $configManager->get($fieldName);
         if (is_null($value)) {
-            $output->writeln("Value could not be retrieved");
+            $symfonyStyle->error("Value could not be retrieved");
             return Command::FAILURE;
         }
         if (is_array($value) || is_object($value) || is_bool($value)) {
             $value = json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
         if (!is_scalar($value)) {
-            $output->writeln("Value cannot be displayed");
+            $symfonyStyle->error("Value cannot be displayed");
             return Command::FAILURE;
         }
 
