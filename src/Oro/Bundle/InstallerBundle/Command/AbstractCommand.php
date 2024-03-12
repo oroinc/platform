@@ -79,6 +79,10 @@ HELP
             $commandExecutor->setDefaultOption('no-debug');
         }
 
+        if ($input->getOption('no-ansi')) {
+            $commandExecutor->setDefaultOption('no-ansi');
+        }
+
         return $commandExecutor;
     }
 
