@@ -11,5 +11,6 @@ services:
     Oro\Bundle\ConfigBundle\Command\ConfigViewCommand:
         arguments:
             - '@oro_config.global'
+            - '@oro_config.provider.system_configuration.form_provider'
         tags:
             - { name: console.command }

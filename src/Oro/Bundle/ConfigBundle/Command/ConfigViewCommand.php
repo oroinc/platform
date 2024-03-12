@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Oro\Bundle\ConfigBundle\Command;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
+use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+use Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,10 +22,14 @@ class ConfigViewCommand extends Command
     protected static $defaultName = 'oro:config:view';
 
     private ConfigManager $configManager;
+    private SystemConfigurationFormProvider $formProvider;
 
-    public function __construct(ConfigManager $configManager)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        SystemConfigurationFormProvider $formProvider,
+    ) {
         $this->configManager = $configManager;
+        $this->formProvider = $formProvider;
 
         parent::__construct();
     }
@@ -50,13 +58,48 @@ HELP
     }
 
     /**
+     * Find a field node by name from the config tree
+     *
+     * @param GroupNodeDefinition $node
+     * @param string $fieldName
+     * @return ?FieldNodeDefinition null if no matching node was found
+     */
+    protected function findFieldNode(GroupNodeDefinition $node, string $fieldName): ?FieldNodeDefinition {
+        foreach ($node as $child) {
+            if ($child instanceof GroupNodeDefinition) {
+                $result = $this->findFieldNode($child, $fieldName);
+                if ($result !== null) {
+                    return $result;
+                }
+            } elseif ($child instanceof FieldNodeDefinition) {
+                if ($child->getName() === $fieldName) {
+                    return $child;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configManager = $this->configManager;
-        $value = $configManager->get($input->getArgument('name'));
+        $fieldName = $input->getArgument('name');
+
+        $configTree = $this->formProvider->getTree();
+        $configField = $this->findFieldNode($configTree, $fieldName);
+        if ($configField !== null
+            && $configField->getType() === OroEncodedPlaceholderPasswordType::class
+        ) {
+            $output->writeln("# encrypted value");
+            return Command::INVALID;
+        }
+
+        $value = $configManager->get($fieldName);
         if (is_null($value)) {
             $output->writeln("Value could not be retrieved");
             return Command::FAILURE;
