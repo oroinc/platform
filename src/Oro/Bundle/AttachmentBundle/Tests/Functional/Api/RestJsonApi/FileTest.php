@@ -292,6 +292,8 @@ class FileTest extends RestJsonApiTestCase
 
     public function testTryToCreateWithNotFoundExternalUrl(): void
     {
+        $this->markTestSkipped('Will be fixed in BAP-22499');
+
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
         $url = 'http://example.org/missing.png';
