@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\FeatureNode;
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\StepNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
@@ -496,9 +497,16 @@ class OroMainContext extends MinkContext implements
 
     /**
      * {@inheritdoc}
+     *
+     * @Then /^(?:|I )should see the following lines/
      */
     public function assertPageContainsText($text)
     {
+        if ($text instanceof PyStringNode) {
+            // Prepares the text to match with the found on page text, see \Behat\Mink\Driver\Selenium2Driver::getText.
+            $text = (string)str_replace(["\r", "\r\n", "\n", '  '], ' ', $text->getRaw());
+        }
+
         $result = $this->spin(function (OroMainContext $context) use ($text) {
             $context->assertSession()->pageTextContains($this->fixStepArgument($text));
 

@@ -26,20 +26,19 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
  */
 class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    private const STRING_REQUIREMENT = '.+';
-    private const INTEGER_REQUIREMENT = '-?\d+';
-    private const UNSIGNED_INTEGER_REQUIREMENT = '\d+';
-    private const BIGINT_REQUIREMENT = '-?\d+';
-    private const BOOLEAN_REQUIREMENT = '0|1|true|false|yes|no';
-    private const DECIMAL_REQUIREMENT = '-?\d*\.?\d+';
-    private const NUMBER_REQUIREMENT = '-?\d*\.?\d+';
-    private const PERCENT100_REQUIREMENT = '-?\d*\.?\d+';
-    private const DATETIME_REQUIREMENT =
-        '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?';
-    private const DATE_REQUIREMENT = '\d{4}(-\d{2}(-\d{2}?)?)?';
-    private const TIME_REQUIREMENT = '\d{2}:\d{2}(:\d{2}(\.\d+)?)?';
-    private const GUID_REQUIREMENT = '[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}';
-    private const ORDER_BY_REQUIREMENT = '-?[\w\.]+(,-?[\w\.]+)*';
+    private const STRING_REQUIREMENT = Processor\NormalizeString::REQUIREMENT;
+    private const INTEGER_REQUIREMENT = Processor\NormalizeInteger::REQUIREMENT;
+    private const UNSIGNED_INTEGER_REQUIREMENT = Processor\NormalizeUnsignedInteger::REQUIREMENT;
+    private const BIGINT_REQUIREMENT = Processor\NormalizeBigint::REQUIREMENT;
+    private const BOOLEAN_REQUIREMENT = Processor\NormalizeBoolean::REQUIREMENT;
+    private const DECIMAL_REQUIREMENT = Processor\NormalizeDecimal::REQUIREMENT;
+    private const NUMBER_REQUIREMENT = Processor\NormalizeNumber::REQUIREMENT;
+    private const PERCENT100_REQUIREMENT = Processor\NormalizePercent100::REQUIREMENT;
+    private const GUID_REQUIREMENT = Processor\NormalizeGuid::REQUIREMENT;
+    private const DATETIME_REQUIREMENT = Processor\Rest\NormalizeDateTime::REQUIREMENT;
+    private const DATE_REQUIREMENT = Processor\Rest\NormalizeDate::REQUIREMENT;
+    private const TIME_REQUIREMENT = Processor\Rest\NormalizeTime::REQUIREMENT;
+    private const ORDER_BY_REQUIREMENT = Processor\Rest\NormalizeOrderBy::REQUIREMENT;
 
     private ValueNormalizer $valueNormalizer;
 
@@ -416,7 +415,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     private function getRangeRequirement(string $requirement): string
     {
-        return sprintf('%1$s|%1$s..%1$s', $requirement);
+        return sprintf('%1$s|%1$s\.\.%1$s', $requirement);
     }
 
     /**
@@ -529,7 +528,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     private function getArrayRangeRequirement(string $requirement): string
     {
-        return sprintf('%1$s|%2$s..%2$s', $this->getArrayRequirement($requirement), $requirement);
+        return sprintf('%1$s|%2$s\.\.%2$s', $this->getArrayRequirement($requirement), $requirement);
     }
 
     /**
