@@ -299,6 +299,30 @@ field_meta_property:
                 meta_property: true
             field2: ~
 
+field_property_data_type:
+    config:
+        fields:
+            field1:
+                data_type: ~
+            field2:
+                data_type: ""
+            field3:
+                data_type: string
+            field4:
+                data_type: bool
+            field5:
+                data_type: int
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                data_type: string
+            field4:
+                data_type: boolean
+            field5:
+                data_type: integer
+
 field_property_path:
     config:
         fields:

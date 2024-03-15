@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
  */
 class NormalizeDate extends AbstractProcessor
 {
-    private const REQUIREMENT = '\d{4}(-\d{2}(-\d{2}?)?)?';
+    public const REQUIREMENT = '\d{4}(-\d{2}(-\d{2}?)?)?';
 
     /**
      * {@inheritdoc}

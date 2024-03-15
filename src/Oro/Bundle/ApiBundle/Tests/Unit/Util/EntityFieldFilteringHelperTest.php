@@ -43,7 +43,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
     private function getFieldConfig(string $fieldName, array $config): ConfigInterface
     {
         return new Config(
-            new FieldConfigId('extend', self::TEST_CLASS_NAME, $fieldName, 'int'),
+            new FieldConfigId('extend', self::TEST_CLASS_NAME, $fieldName, 'integer'),
             $config
         );
     }
