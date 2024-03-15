@@ -37,7 +37,7 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         $objValue = new \stdClass();
         $objValue->someProp = 123;
         $config->set('test_object', $objValue);
-        $config->addField('field1')->setDataType('int');
+        $config->addField('field1')->setDataType('integer');
 
         $configClone = clone $config;
 

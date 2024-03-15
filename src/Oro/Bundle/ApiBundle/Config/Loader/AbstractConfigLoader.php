@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Loader;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
+
 /**
  * The base class for configuration section loaders.
  */
@@ -59,5 +61,21 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
     protected function camelize(string $string): string
     {
         return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
+    }
+
+    protected function resolveDataType(?string $value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        if ('bool' === $value) {
+            return DataType::BOOLEAN;
+        }
+        if ('int' === $value) {
+            return DataType::INTEGER;
+        }
+
+        return $value;
     }
 }

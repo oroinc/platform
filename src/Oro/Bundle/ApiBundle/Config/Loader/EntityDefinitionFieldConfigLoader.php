@@ -71,6 +71,9 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadTargetSection($field, $this->factory->getLoader($key), $key, $value);
             } else {
+                if (ConfigUtil::DATA_TYPE === $key) {
+                    $value = $this->resolveDataType($value);
+                }
                 $this->loadConfigValue($field, $key, $value, self::METHOD_MAP);
             }
         }

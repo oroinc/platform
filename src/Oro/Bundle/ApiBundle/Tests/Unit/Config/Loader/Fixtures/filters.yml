@@ -104,6 +104,38 @@ full:
             field22: ~
         extra1: true
 
+null_field_data_type:
+    config:
+        fields:
+            field1:
+                data_type: ~
+    expected:
+        fields:
+            field1: ~
+
+empty_field_data_type:
+    config:
+        fields:
+            field1:
+                data_type: ""
+    expected:
+        fields:
+            field1: ~
+
+field_short_data_types:
+    config:
+        fields:
+            field1:
+                data_type: bool
+            field2:
+                data_type: int
+    expected:
+        fields:
+            field1:
+                data_type: boolean
+            field2:
+                data_type: integer
+
 null_field_type:
     config:
         fields:

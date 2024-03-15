@@ -21,7 +21,7 @@ api:
                 entityName:
                     data_type: string
                 searchable:
-                    data_type: bool
+                    data_type: boolean
             filters:
                 fields:
                     searchable:
