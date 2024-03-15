@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
  */
 class NormalizeBoolean extends AbstractProcessor
 {
-    private const REQUIREMENT = '0|1|true|false|yes|no';
+    public const REQUIREMENT = '0|1|true|false|yes|no';
 
     /**
      * {@inheritdoc}
