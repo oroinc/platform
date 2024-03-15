@@ -9,7 +9,7 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
  */
 class NormalizeString extends AbstractProcessor
 {
-    private const REQUIREMENT = '.+';
+    public const REQUIREMENT = '.+';
 
     /**
      * {@inheritdoc}

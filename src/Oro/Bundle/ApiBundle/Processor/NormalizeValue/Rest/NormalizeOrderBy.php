@@ -16,7 +16,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeOrderBy implements ProcessorInterface
 {
-    private const REQUIREMENT = '-?[\w\.]+(,-?[\w\.]+)*';
+    public const REQUIREMENT = '-?[\w\.]+(,-?[\w\.]+)*';
 
     /**
      * {@inheritdoc}
