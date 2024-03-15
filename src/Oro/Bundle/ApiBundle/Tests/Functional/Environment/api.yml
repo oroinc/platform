@@ -366,7 +366,7 @@ api:
             identifier_field_names: [id]
             fields:
                 id:
-                    data_type: int
+                    data_type: string
                 name:
                     data_type: string
             # this entity does not have own API resource
@@ -440,15 +440,15 @@ api:
             identifier_field_names: [id]
             fields:
                 id:
-                    data_type: int
+                    data_type: integer
                 name:
                     data_type: string
                 articles:
-                    data_type: int
+                    data_type: integer
                     target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel1
                     target_type: collection
                 bestArticle:
-                    data_type: int
+                    data_type: integer
                     target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel1
             actions:
                 get_list: false
@@ -460,7 +460,7 @@ api:
             identifier_field_names: [id]
             fields:
                 id:
-                    data_type: int
+                    data_type: integer
                 headline:
                     data_type: string
                 body:
@@ -473,7 +473,7 @@ api:
             identifier_field_names: [id]
             fields:
                 id:
-                    data_type: int
+                    data_type: integer
                 name:
                     data_type: string
                 articles:
@@ -495,7 +495,7 @@ api:
             identifier_field_names: [id]
             fields:
                 id:
-                    data_type: int
+                    data_type: integer
                 headline:
                     data_type: string
                 body:

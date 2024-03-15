@@ -7,18 +7,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model;
  */
 class TestUnaccessibleModel
 {
-    /** @var int|null */
+    /** @var string|null */
     private $id;
 
     /** @var string|null */
     private $name;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?string $id): void
     {
         $this->id = $id;
     }

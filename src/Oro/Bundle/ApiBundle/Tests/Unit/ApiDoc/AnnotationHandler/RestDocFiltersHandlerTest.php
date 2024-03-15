@@ -84,14 +84,14 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
 
         $annotation->addFilter('firstName', ['type' => 'string']);
         $annotation->addFilter('lastName', ['type' => 'string']);
-        $annotation->addFilter('id', ['type' => 'int']);
+        $annotation->addFilter('id', ['type' => 'integer']);
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
 
         self::assertSame(
             [
                 'firstName' => ['type' => 'string'],
-                'id'        => ['type' => 'int'],
+                'id'        => ['type' => 'integer'],
                 'lastName'  => ['type' => 'string']
             ],
             $annotation->getFilters()
@@ -117,12 +117,12 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new StandaloneFilter('int', 'A filter');
+        $filter1 = new StandaloneFilter('integer', 'A filter');
         $filters->add('filter1', $filter1);
 
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -144,12 +144,12 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new StandaloneFilterWithDefaultValue('int', 'A filter', 123);
+        $filter1 = new StandaloneFilterWithDefaultValue('integer', 'A filter', 123);
         $filters->add('filter1', $filter1);
 
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -172,18 +172,18 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new ComparisonFilter('int', 'A filter');
+        $filter1 = new ComparisonFilter('integer', 'A filter');
         $filter1->setField('field1');
         $filter1->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $filters->add('filter1', $filter1);
 
         $this->dataTypeConverter->expects(self::once())
             ->method('convertDataType')
-            ->with('int', self::VIEW)
+            ->with('integer', self::VIEW)
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -207,18 +207,18 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new ComparisonFilter('int', 'A filter');
+        $filter1 = new ComparisonFilter('integer', 'A filter');
         $filter1->setField('field1');
         $filter1->setSupportedOperators([FilterOperator::EQ]);
         $filters->add('filter1', $filter1);
 
         $this->dataTypeConverter->expects(self::once())
             ->method('convertDataType')
-            ->with('int', self::VIEW)
+            ->with('integer', self::VIEW)
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -241,18 +241,18 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new ComparisonFilter('int', 'A filter');
+        $filter1 = new ComparisonFilter('integer', 'A filter');
         $filter1->setField('field1');
         $filter1->setArrayAllowed(true);
         $filters->add('filter1', $filter1);
 
         $this->dataTypeConverter->expects(self::once())
             ->method('convertDataType')
-            ->with('int', self::VIEW)
+            ->with('integer', self::VIEW)
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -275,18 +275,18 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new ComparisonFilter('int', 'A filter');
+        $filter1 = new ComparisonFilter('integer', 'A filter');
         $filter1->setField('field1');
         $filter1->setRangeAllowed(true);
         $filters->add('filter1', $filter1);
 
         $this->dataTypeConverter->expects(self::once())
             ->method('convertDataType')
-            ->with('int', self::VIEW)
+            ->with('integer', self::VIEW)
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -309,7 +309,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new ComparisonFilter('int', 'A filter');
+        $filter1 = new ComparisonFilter('integer', 'A filter');
         $filter1->setField('field1');
         $filter1->setArrayAllowed(true);
         $filter1->setRangeAllowed(true);
@@ -317,11 +317,11 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->dataTypeConverter->expects(self::once())
             ->method('convertDataType')
-            ->with('int', self::VIEW)
+            ->with('integer', self::VIEW)
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -344,21 +344,21 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new ComparisonFilter('int', 'A filter');
+        $filter1 = new ComparisonFilter('integer', 'A filter');
         $filter1->setField('field1');
         $filters->add('filter1', $filter1);
 
         $association = $metadata->addAssociation(new AssociationMetadata('field1'));
-        $association->setDataType('int');
+        $association->setDataType('integer');
         $association->addAcceptableTargetClassName('Test\TargetEntity');
 
         $this->dataTypeConverter->expects(self::once())
             ->method('convertDataType')
-            ->with('int', self::VIEW)
+            ->with('integer', self::VIEW)
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -386,7 +386,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         $filters = new FilterCollection();
         $metadata = new EntityMetadata('Test\Entity');
 
-        $filter1 = new ComparisonFilter('int', 'A filter');
+        $filter1 = new ComparisonFilter('integer', 'A filter');
         $filter1->setField('field1');
         $filters->add('filter1', $filter1);
 
@@ -396,11 +396,11 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->dataTypeConverter->expects(self::once())
             ->method('convertDataType')
-            ->with('int', self::VIEW)
+            ->with('integer', self::VIEW)
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');

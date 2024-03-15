@@ -58,15 +58,15 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
         $description = null;
 
         $metadata->setIdentifierFieldNames(['id']);
-        $metadata->addField(new FieldMetadata('id'))->setDataType('int');
+        $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
 
         $this->dataTypeConverter->expects(self::once())
             ->method('convertDataType')
-            ->with('int', self::VIEW)
+            ->with('integer', self::VIEW)
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('integer', $this->requestType)
             ->willReturn('\d+');
 
         $this->identifierHandler->handle($annotation, $route, $metadata, $description);
@@ -91,7 +91,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
         $description = 'ID field description';
 
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
-        $metadata->addField(new FieldMetadata('id1'))->setDataType('int');
+        $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('string');
 
         $this->dataTypeConverter->expects(self::once())
@@ -101,7 +101,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('getRequirement')
             ->willReturnMap([
-                ['int', $this->requestType, false, false, '\d+'],
+                ['integer', $this->requestType, false, false, '\d+'],
                 ['string', $this->requestType, false, false, ValueNormalizer::DEFAULT_REQUIREMENT]
             ]);
 
