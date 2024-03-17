@@ -10,9 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 class ExternalFileNotAccessibleException extends \RuntimeException
 {
     private string $url;
-
     private string $reason;
-
     private ?ResponseInterface $response;
 
     public function __construct(
