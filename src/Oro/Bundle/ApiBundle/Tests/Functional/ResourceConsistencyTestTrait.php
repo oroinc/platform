@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
-use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldDescriptionUtil;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
@@ -52,10 +51,8 @@ trait ResourceConsistencyTestTrait
                 . "\n" . '                myField:'
                 . "\n" . '                    form_options:'
                 . "\n" . '                        mapped: false'
-                . "\n\n" . sprintf(
-                    'Do not forget to add the "%s" hint to the description of such field.',
-                    FieldDescriptionUtil::MODIFY_READ_ONLY_FIELD_DESCRIPTION
-                );
+                . "\n\n" . 'Do not forget to add the "**The read-only field. A passed value will be ignored.**"'
+                . ' hint to the description of such field.';
             self::fail($errorMessage);
         }
     }

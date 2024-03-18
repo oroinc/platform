@@ -10,7 +10,8 @@ use Oro\Bundle\ApiBundle\Request\ApiAction;
  */
 class FieldDescriptionUtil
 {
-    public const MODIFY_READ_ONLY_FIELD_DESCRIPTION = '**The read-only field. A passed value will be ignored.**';
+    public const MODIFY_READ_ONLY_FIELD_DESCRIPTION =
+        '<strong>The read-only field. A passed value will be ignored.</strong>';
 
     public static function updateFieldDescription(
         EntityDefinitionConfig $definition,
@@ -43,11 +44,27 @@ class FieldDescriptionUtil
         $formOptions = $field->getFormOptions();
         if ($formOptions && isset($formOptions['mapped']) && !$formOptions['mapped']) {
             $existingDescription = $field->getDescription();
-            if (!empty($existingDescription)
-                && !str_contains($existingDescription, self::MODIFY_READ_ONLY_FIELD_DESCRIPTION)
-            ) {
-                $field->setDescription($existingDescription . "\n\n" . self::MODIFY_READ_ONLY_FIELD_DESCRIPTION);
+            if ($existingDescription) {
+                $field->setDescription(self::addReadOnlyFieldNote($existingDescription));
             }
         }
+    }
+
+    public static function addFieldNote(string $description, string $note): string
+    {
+        if (str_contains($description, '</p>')) {
+            return $description . "\n<p>" . $note . '</p>';
+        }
+
+        return '<p>' . $description . "</p>\n<p>" . $note . '</p>';
+    }
+
+    public static function addReadOnlyFieldNote(string $description): string
+    {
+        if (str_contains($description, self::MODIFY_READ_ONLY_FIELD_DESCRIPTION)) {
+            return $description;
+        }
+
+        return self::addFieldNote($description, self::MODIFY_READ_ONLY_FIELD_DESCRIPTION);
     }
 }
