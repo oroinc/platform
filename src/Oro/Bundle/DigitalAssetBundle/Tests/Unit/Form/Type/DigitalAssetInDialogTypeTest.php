@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
-use GuzzleHttp\ClientInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
@@ -18,7 +17,6 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
@@ -30,12 +28,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 {
-    use EntityTrait;
-
     private const SAMPLE_TITLE = 'sample title';
 
-    /** @var DigitalAssetInDialogType */
-    private $formType;
+    private DigitalAssetInDialogType $formType;
 
     protected function setUp(): void
     {
@@ -52,7 +47,6 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
     public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
-
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
@@ -78,9 +72,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         array $expectedConstraints
     ): void {
         $builder = $this->createMock(FormBuilderInterface::class);
-
-        $builder
-            ->expects($this->exactly(2))
+        $builder->expects($this->exactly(2))
             ->method('add')
             ->withConsecutive(
                 [
@@ -239,7 +231,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getExtensions(): array
     {
@@ -250,9 +242,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
             [
                 new PreloadedExtension(
                     [
-                        FileType::class => new FileType(
-                            new ExternalFileFactory($this->createMock(ClientInterface::class))
-                        ),
+                        FileType::class => new FileType($this->createMock(ExternalFileFactory::class)),
                         DigitalAssetInDialogType::class => $this->formType,
                         LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionType(
                             $doctrine
@@ -268,7 +258,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getTypeExtensions(): array
     {
@@ -281,15 +271,19 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getValidators(): array
     {
-        $fileConstraintFromSystemConfigValidator = $this->createMock(FileConstraintFromSystemConfigValidator::class);
-        $digitalAssetSourceFileMimeTypeValidator = $this->createMock(DigitalAssetSourceFileMimeTypeValidator::class);
-
         return [
             NotBlank::class => new NotBlank(),
-            FileConstraintFromSystemConfigValidator::class => $fileConstraintFromSystemConfigValidator,
-            DigitalAssetSourceFileMimeTypeValidator::class => $digitalAssetSourceFileMimeTypeValidator,
+            FileConstraintFromSystemConfigValidator::class => $this->createMock(
+                FileConstraintFromSystemConfigValidator::class
+            ),
+            DigitalAssetSourceFileMimeTypeValidator::class => $this->createMock(
+                DigitalAssetSourceFileMimeTypeValidator::class
+            ),
         ];
     }
 }
