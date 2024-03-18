@@ -55,6 +55,9 @@ class FiltersConfigLoader extends AbstractConfigLoader
         $filter = new FilterFieldConfig();
         if (!empty($config)) {
             foreach ($config as $key => $value) {
+                if (ConfigUtil::DATA_TYPE === $key) {
+                    $value = $this->resolveDataType($value);
+                }
                 $this->loadConfigValue($filter, $key, $value, self::FIELD_METHOD_MAP);
             }
         }

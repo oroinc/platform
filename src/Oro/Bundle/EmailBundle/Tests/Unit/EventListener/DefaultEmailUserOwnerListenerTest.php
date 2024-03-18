@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit\EventListener;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PrePersistEventArgs;
@@ -10,24 +10,26 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class DefaultEmailUserOwnerListenerTest extends TestCase
+class DefaultEmailUserOwnerListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private DefaultEmailUserOwnerListener $listener;
-    private DefaultUserProvider|MockObject $defaultUserProvider;
+    /** @var DefaultUserProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $defaultUserProvider;
+
+    /** @var DefaultEmailUserOwnerListener */
+    private $listener;
 
     protected function setUp(): void
     {
-        $this->defaultUserProvider = self::createMock(DefaultUserProvider::class);
+        $this->defaultUserProvider = $this->createMock(DefaultUserProvider::class);
+
         $this->listener = new DefaultEmailUserOwnerListener($this->defaultUserProvider);
     }
 
     public function testPrePersistWithInvalidEntity(): void
     {
         $entity = new TestActivity();
-        $event = self::getEvent($entity);
+        $event = $this->getEvent($entity);
 
         $this->listener->prePersist($event);
 
@@ -37,11 +39,11 @@ class DefaultEmailUserOwnerListenerTest extends TestCase
 
     public function testPrePersistWithValidEntity(): void
     {
-        $owner = self::getUser();
-        self::assertDefaultOwner($owner);
+        $owner = $this->getUser();
+        $this->assertDefaultOwner($owner);
 
         $entity = new EmailUser();
-        $event = self::getEvent($entity);
+        $event = $this->getEvent($entity);
 
         $this->listener->prePersist($event);
 
@@ -51,15 +53,15 @@ class DefaultEmailUserOwnerListenerTest extends TestCase
 
     public function testPrePersistWithEntityAndOwner(): void
     {
-        $defaultOwner = self::getUser();
-        $owner = self::getUser();
-        self::assertDefaultOwner($defaultOwner);
+        $defaultOwner = $this->getUser();
+        $owner = $this->getUser();
+        $this->assertDefaultOwner($defaultOwner);
 
         $entity = new EmailUser();
         $entity->setOwner($owner);
         $entity->setOrganization($owner->getOrganization());
 
-        $event = self::getEvent($entity);
+        $event = $this->getEvent($entity);
 
         $this->listener->prePersist($event);
 
@@ -69,17 +71,14 @@ class DefaultEmailUserOwnerListenerTest extends TestCase
 
     private function assertDefaultOwner(User $user): void
     {
-        $this->defaultUserProvider
-            ->expects(self::any())
+        $this->defaultUserProvider->expects(self::any())
             ->method('getDefaultUser')
             ->willReturn($user);
     }
 
     private function getEvent(object $entity): PrePersistEventArgs
     {
-        $objectManager = self::createMock(EntityManagerInterface::class);
-
-        return new PrePersistEventArgs($entity, $objectManager);
+        return new PrePersistEventArgs($entity, $this->createMock(EntityManagerInterface::class));
     }
 
     private function getUser(): User

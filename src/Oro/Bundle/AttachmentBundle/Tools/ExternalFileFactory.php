@@ -11,27 +11,23 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 
 /**
- * Creates {@see ExternalFile} from the specified URL.
- * Creates {@see ExternalFile} from the {@see File} entity.
+ * Creates {@see ExternalFile} from a specified URL or {@see File} entity.
  */
-class ExternalFileFactory implements LoggerAwareInterface
+class ExternalFileFactory
 {
-    use LoggerAwareTrait;
-
     private ClientInterface $httpClient;
+    private LoggerInterface $logger;
 
     private array $httpOptions;
 
-    public function __construct(ClientInterface $httpClient, array $httpOptions = [])
+    public function __construct(ClientInterface $httpClient, array $httpOptions, LoggerInterface $logger)
     {
         $this->httpClient = $httpClient;
         $this->httpOptions = $httpOptions;
-        $this->logger = new NullLogger();
+        $this->logger = $logger;
     }
 
     /**
@@ -56,7 +52,7 @@ class ExternalFileFactory implements LoggerAwareInterface
      * Makes a HEAD request to fetch file size, MIME type, file name.
      * Returns ExternalFile with $error property set if an error occurs.
      *
-     * @throws ExternalFileNotAccessibleException
+     * @throws ExternalFileNotAccessibleException when the given URL is not accessible by some reasons
      */
     public function createFromUrl(string $url): ExternalFile
     {

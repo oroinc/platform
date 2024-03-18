@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
-use GuzzleHttp\ClientInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
@@ -15,7 +14,7 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
@@ -27,8 +26,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DigitalAssetTypeTest extends FormIntegrationTestCase
 {
-    use EntityTrait;
-
     private const SAMPLE_TITLE = 'sample title';
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -102,6 +99,10 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
         $sourceFile = new File();
         $sourceFile->setFile($file);
 
+        $digitalAsset = new DigitalAsset();
+        ReflectionUtil::setId($digitalAsset, 1);
+        $digitalAsset->setSourceFile((new File())->setUpdatedAt(new \DateTime()));
+
         return [
             'title is set, source file is uploaded' => [
                 'defaultData' => new DigitalAsset(),
@@ -114,10 +115,7 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
                     ->setSourceFile($sourceFile),
             ],
             'title is updated, source file is not required when digital asset is not new' => [
-                'defaultData' => $this->getEntity(
-                    DigitalAsset::class,
-                    ['id' => 1, 'sourceFile' => (new File())->setUpdatedAt(new \DateTime()),]
-                ),
+                'defaultData' => $digitalAsset,
                 'submittedData' => [
                     'titles' => ['values' => ['default' => self::SAMPLE_TITLE]],
                     'sourceFile' => ['file' => null],
@@ -180,9 +178,7 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
             [
                 new PreloadedExtension(
                     [
-                        FileType::class => new FileType(
-                            new ExternalFileFactory($this->createMock(ClientInterface::class))
-                        ),
+                        FileType::class => new FileType($this->createMock(ExternalFileFactory::class)),
                         DigitalAssetType::class => $this->formType,
                         LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionType(
                             $doctrine

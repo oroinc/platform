@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Stub;
 
+use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 
@@ -14,6 +15,7 @@ class ExternalFileFactoryStub extends ExternalFileFactory
     public const IMAGE_A_TEST_URL = 'http://example.org/public/image-a.png';
     public const IMAGE_B_TEST_URL = 'http://example.org/public/image-b.png';
     public const FILE_A_TEST_URL = 'http://example.org/public/file-a.txt';
+    public const MISSING_URL = 'http://example.org/public/missing.txt';
 
     private const MOCKED_FILES = [
         self::IMAGE_A_TEST_URL => [
@@ -40,6 +42,9 @@ class ExternalFileFactoryStub extends ExternalFileFactory
         $this->innerFactory = $innerFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function createFromUrl(string $url): ExternalFile
     {
         if (\array_key_exists($url, self::MOCKED_FILES)) {
@@ -49,6 +54,9 @@ class ExternalFileFactoryStub extends ExternalFileFactory
                 self::MOCKED_FILES[$url]['size'],
                 self::MOCKED_FILES[$url]['mimeType']
             );
+        }
+        if (self::MISSING_URL === $url) {
+            throw new ExternalFileNotAccessibleException($url, 'Not Found', null);
         }
 
         return $this->innerFactory->createFromUrl($url);

@@ -20,26 +20,23 @@ use Psr\Log\LoggerInterface;
 class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
 {
     private const URL = 'http://example.org/image.png';
-    private const HTTP_OPTIONS = ['sample_key' => 'sample_value'];
-
-    private array $httpOptions;
+    private const DEFAULT_HTTP_OPTIONS = ['sample_key' => 'sample_value'];
 
     private ClientInterface|\PHPUnit\Framework\MockObject\MockObject $httpClient;
-
     private LoggerInterface $logger;
-
     private ExternalFileFactory $factory;
 
     protected function setUp(): void
     {
         $this->httpClient = $this->createMock(ClientInterface::class);
-
-        $this->factory = new ExternalFileFactory($this->httpClient, self::HTTP_OPTIONS);
-
         $this->logger = new BufferingLogger();
-        $this->factory->setLogger($this->logger);
 
-        $this->httpOptions = self::HTTP_OPTIONS + [
+        $this->factory = new ExternalFileFactory($this->httpClient, self::DEFAULT_HTTP_OPTIONS, $this->logger);
+    }
+
+    private function getExpectedHttpOptions(): array
+    {
+        return self::DEFAULT_HTTP_OPTIONS + [
                 RequestOptions::HTTP_ERRORS => false,
                 RequestOptions::ALLOW_REDIRECTS => true,
                 RequestOptions::CONNECT_TIMEOUT => 30,
@@ -99,10 +96,9 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
             $response,
             new \RuntimeException('Sample Error')
         );
-        $this->httpClient
-            ->expects(self::once())
+        $this->httpClient->expects(self::once())
             ->method('request')
-            ->with('HEAD', self::URL, $this->httpOptions)
+            ->with('HEAD', self::URL, $this->getExpectedHttpOptions())
             ->willThrowException($exception);
 
         $this->expectExceptionObject(
@@ -126,10 +122,9 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
             new \RuntimeException('Sample Error'),
             ['error' => 'Protocol not supported']
         );
-        $this->httpClient
-            ->expects(self::once())
+        $this->httpClient->expects(self::once())
             ->method('request')
-            ->with('HEAD', self::URL, $this->httpOptions)
+            ->with('HEAD', self::URL, $this->getExpectedHttpOptions())
             ->willThrowException($exception);
 
         $this->expectExceptionObject(
@@ -151,10 +146,9 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
             new \RuntimeException('Sample Error'),
             ['error' => 'Failed to resolve domain']
         );
-        $this->httpClient
-            ->expects(self::once())
+        $this->httpClient->expects(self::once())
             ->method('request')
-            ->with('HEAD', self::URL, $this->httpOptions)
+            ->with('HEAD', self::URL, $this->getExpectedHttpOptions())
             ->willThrowException($exception);
 
         $this->expectExceptionObject(
@@ -171,10 +165,9 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateFromUrlWhenGuzzleException(): void
     {
         $exception = new InvalidArgumentException('Sample error');
-        $this->httpClient
-            ->expects(self::once())
+        $this->httpClient->expects(self::once())
             ->method('request')
-            ->with('HEAD', self::URL, $this->httpOptions)
+            ->with('HEAD', self::URL, $this->getExpectedHttpOptions())
             ->willThrowException($exception);
 
         $this->expectExceptionObject(
@@ -202,10 +195,9 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateFromUrlWhenStatusCodeNot200(): void
     {
         $response = new Response(404);
-        $this->httpClient
-            ->expects(self::once())
+        $this->httpClient->expects(self::once())
             ->method('request')
-            ->with('HEAD', self::URL, $this->httpOptions)
+            ->with('HEAD', self::URL, $this->getExpectedHttpOptions())
             ->willReturn($response);
 
         $this->expectExceptionObject(
@@ -225,10 +217,9 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateFromUrl(ResponseInterface $response, ExternalFile $externalFile): void
     {
-        $this->httpClient
-            ->expects(self::once())
+        $this->httpClient->expects(self::once())
             ->method('request')
-            ->with('HEAD', self::URL, $this->httpOptions)
+            ->with('HEAD', self::URL, $this->getExpectedHttpOptions())
             ->willReturn($response);
 
         self::assertEquals(

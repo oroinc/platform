@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
-use GuzzleHttp\ClientInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\ExternalFileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
@@ -26,13 +25,17 @@ use Symfony\Component\Validator\Constraints\NotNull;
  */
 class FileTypeTest extends \PHPUnit\Framework\TestCase
 {
-    private FileType $type;
+    /** @var ExternalFileFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $externalFileFactory;
+
+    /** @var FileType */
+    private $type;
 
     protected function setUp(): void
     {
-        $externalFileFactory = new ExternalFileFactory($this->createMock(ClientInterface::class));
+        $this->externalFileFactory = $this->createMock(ExternalFileFactory::class);
 
-        $this->type = new FileType($externalFileFactory);
+        $this->type = new FileType($this->externalFileFactory);
     }
 
     public function testBuildForm(): void
@@ -94,7 +97,7 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
 
         $builder->expects(self::exactly(2))
             ->method('add')
-            ->withConsecutive($childBuilder, ['emptyFile', HiddenType::class]);
+            ->withConsecutive([$childBuilder], ['emptyFile', HiddenType::class]);
 
         $this->type->buildForm($builder, $options);
     }
@@ -141,33 +144,25 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(FormInterface::class);
         $event = new PreSetDataEvent($form, null);
         $parentForm = $this->createMock(FormInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getParent')
             ->willReturn($parentForm);
 
-        $file = (new File())
-            ->setExternalUrl('http://example.org/image.png')
-            ->setOriginalFilename('original-image.png')
-            ->setFileSize(4242)
-            ->setMimeType('image/png');
+        $file = $this->createMock(File::class);
+        $externalFile = $this->createMock(ExternalFile::class);
 
-        $parentForm
-            ->expects(self::once())
+        $parentForm->expects(self::once())
             ->method('getData')
             ->willReturn($file);
 
+        $this->externalFileFactory->expects(self::once())
+            ->method('createFromFile')
+            ->with(self::identicalTo($file))
+            ->willReturn($externalFile);
+
         $this->type->filePreSetData($event);
 
-        self::assertEquals(
-            new ExternalFile(
-                $file->getExternalUrl(),
-                $file->getOriginalFilename(),
-                $file->getFileSize(),
-                $file->getMimeType()
-            ),
-            $event->getData()
-        );
+        self::assertSame($externalFile, $event->getData());
     }
 
     public function testFilePreSetDataDoesNothingWhenNoExternalUrl(): void
@@ -175,13 +170,11 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(FormInterface::class);
         $event = new PreSetDataEvent($form, null);
         $parentForm = $this->createMock(FormInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getParent')
             ->willReturn($parentForm);
 
-        $parentForm
-            ->expects(self::once())
+        $parentForm->expects(self::once())
             ->method('getData')
             ->willReturn(new File());
 

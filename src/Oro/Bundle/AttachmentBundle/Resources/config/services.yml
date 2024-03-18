@@ -771,8 +771,8 @@ services:
         class: Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory
         arguments:
             - !service { class: GuzzleHttp\Client }
-        calls:
-            - [setLogger, ['@logger']]
+            - []
+            - '@logger'
 
     oro_attachment.provider.extend_field_form_options.file:
         class: Oro\Bundle\AttachmentBundle\Provider\ExtendFieldFileFormOptionsProvider
