@@ -19,7 +19,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Adds all REST API routes to API sandbox based on the current API view and API configuration.
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetInterface
@@ -68,7 +67,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes): void
     {
@@ -92,7 +91,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function reset(): void
     {
@@ -597,7 +596,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
         return $routePath;
     }
 
-    public function getEntityType(string $entityClass, RequestType $requestType): ?string
+    private function getEntityType(string $entityClass, RequestType $requestType): ?string
     {
         return ValueNormalizerUtil::tryConvertToEntityType($this->valueNormalizer, $entityClass, $requestType);
     }
