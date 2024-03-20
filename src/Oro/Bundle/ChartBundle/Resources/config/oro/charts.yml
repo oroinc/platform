@@ -9,7 +9,7 @@ charts:
           - name: value
             label: oro.chart.line_chart.params.value
             required: true
-            type_filter: [percent, number] # filter for fields, see query_designer.yml filter section
+            type_filter: [percent, number, numberDecimal] # filter for fields, see query_designer.yml filter section
             default_type: decimal
         default_settings:
             connect_dots_with_line: true
