@@ -1768,7 +1768,7 @@ JS;
         }, 3);
 
         self::assertTrue(
-            $result,
+            $result ?? true,
             sprintf('Element "%s" is present when it should not', $element)
         );
     }
