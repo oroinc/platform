@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException;
@@ -1351,7 +1352,10 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
 
     private function createTransition(string $name): Transition
     {
-        $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
+        $transition = new Transition(
+            $this->createMock(TransitionOptionsResolver::class),
+            $this->createMock(EventDispatcher::class)
+        );
         $transition->setName($name);
 
         return $transition;

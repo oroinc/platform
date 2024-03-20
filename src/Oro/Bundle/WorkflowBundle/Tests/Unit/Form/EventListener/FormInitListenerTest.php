@@ -3,18 +3,22 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Component\Action\Action\ActionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormEvents;
 
 class FormInitListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormInitListener */
-    private $listener;
+    private EventDispatcher|MockObject $eventDispatcher;
+    private FormInitListener $listener;
 
     protected function setUp(): void
     {
-        $this->listener = new FormInitListener();
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+
+        $this->listener = new FormInitListener($this->eventDispatcher);
     }
 
     public function testGetSubscribedEvents()
@@ -32,7 +36,6 @@ class FormInitListenerTest extends \PHPUnit\Framework\TestCase
             ->method('execute')
             ->with($workflowItem);
 
-        $this->listener->initialize($workflowItem, $action);
-        $this->listener->executeInitAction();
+        $this->listener->executeInitAction($action, $workflowItem);
     }
 }

@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
+use Oro\Bundle\WorkflowBundle\Event\Transition\GuardEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionEvent;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
@@ -109,12 +112,16 @@ class Transition
     /** @var TransitionOptionsResolver */
     protected $optionsResolver;
 
+    /** @var EventDispatcher */
+    protected $eventDispatcher;
+
     /** @var TransitionServiceInterface|null */
     protected $transitionService;
 
-    public function __construct(TransitionOptionsResolver $optionsResolver)
+    public function __construct(TransitionOptionsResolver $optionsResolver, EventDispatcher $eventDispatcher)
     {
         $this->optionsResolver = $optionsResolver;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -357,19 +364,31 @@ class Transition
      */
     protected function isConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
     {
+        // Pre-guard transition to be able to block transition on early stages
+        // without a need to execute conditions.
+        $event = new GuardEvent($workflowItem, $this, true, $errors);
+        $this->eventDispatcher->dispatch($event, 'pre_guard', $this->getName());
+
+        if (!$event->isAllowed()) {
+            return false;
+        }
+
+        // Execute check that transition service allows the transition or check conditions.
+        $isAllowed = true;
         if ($this->transitionService) {
-            return $this->transitionService->isConditionAllowed($workflowItem, $errors);
+            $isAllowed = $this->transitionService->isConditionAllowed($workflowItem, $errors);
+        } elseif ($this->condition) {
+            $isAllowed = (bool)$this->condition->evaluate($workflowItem, $errors);
         }
 
-        if (!$this->condition) {
-            return true;
-        }
+        $event->setAllowed($isAllowed);
+        $this->eventDispatcher->dispatch($event, 'guard', $this->getName());
 
-        return $this->condition->evaluate($workflowItem, $errors) ? true : false;
+        return $event->isAllowed();
     }
 
     /**
-     * Check is transition pre condition is allowed for current workflow item.
+     * Check is transition pre-condition is allowed for current workflow item.
      *
      * @param WorkflowItem $workflowItem
      * @param Collection|null $errors
@@ -377,6 +396,16 @@ class Transition
      */
     protected function isPreConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
     {
+        // Pre-announce transition to be able to block transition availability on early stages
+        // without a need to execute pre-actions and pre-conditions.
+        $event = new GuardEvent($workflowItem, $this, true, $errors);
+        $this->eventDispatcher->dispatch($event, 'pre_announce', $this->getName());
+
+        if (!$event->isAllowed()) {
+            return false;
+        }
+
+        // Execute pre-actions and pre-conditions
         if ($this->preAction) {
             $this->preAction->execute($workflowItem);
         }
@@ -386,11 +415,15 @@ class Transition
             $isAllowed = (bool)$this->preCondition?->evaluate($workflowItem, $errors);
         }
 
-        if ($this->transitionService) {
-            $isAllowed = $isAllowed && $this->transitionService->isPreConditionAllowed($workflowItem, $errors);
+        // If configured pre-conditions are allowed then check transition service if available.
+        if ($isAllowed && $this->transitionService) {
+            $isAllowed = $this->transitionService->isPreConditionAllowed($workflowItem, $errors);
         }
 
-        return $isAllowed;
+        $event->setAllowed($isAllowed);
+        $this->eventDispatcher->dispatch($event, 'announce', $this->getName());
+
+        return $event->isAllowed();
     }
 
     /**
@@ -445,13 +478,30 @@ class Transition
      */
     public function transitUnconditionally(WorkflowItem $workflowItem): void
     {
-        $stepTo = $this->getResolvedStepTo($workflowItem);
-        $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
+        $currentStep = $workflowItem->getCurrentStep();
+        $transitionEvent = new TransitionEvent($workflowItem, $this);
 
+        if ($currentStep) {
+            $this->eventDispatcher->dispatch($transitionEvent, 'leave', $currentStep->getName());
+        } else {
+            $this->eventDispatcher->dispatch($transitionEvent, 'start');
+        }
+
+        $stepTo = $this->getResolvedStepTo($workflowItem);
+        $this->eventDispatcher->dispatch($transitionEvent, 'enter', $stepTo->getName());
+        $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
+        $this->eventDispatcher->dispatch($transitionEvent, 'entered', $stepTo->getName());
+
+        $this->eventDispatcher->dispatch($transitionEvent, 'transition', $this->getName());
         if ($this->transitionService) {
             $this->transitionService->execute($workflowItem);
         } elseif ($this->action) {
             $this->action->execute($workflowItem);
+        }
+        $this->eventDispatcher->dispatch($transitionEvent, 'completed', $this->getName());
+
+        if ($stepTo->isFinal()) {
+            $this->eventDispatcher->dispatch($transitionEvent, 'finish');
         }
     }
 

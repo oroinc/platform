@@ -61,7 +61,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->getMock();
         $this->formInitListener = $this->getMockBuilder(FormInitListener::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['initialize', 'executeInitAction'])
+            ->onlyMethods(['dispatchFormInitEvents', 'executeInitAction'])
             ->getMock();
         $this->requiredAttributesListener = $this->getMockBuilder(RequiredAttributesListener::class)
             ->disableOriginalConstructor()
@@ -240,16 +240,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 );
         } else {
             $this->defaultValuesListener->expects($this->never())
-                ->method($this->anything());
-        }
-
-        // Check init action listener is subscribed or not subscribed
-        if (!empty($formOptions['form_init'])) {
-            $this->formInitListener->expects($this->once())
-                ->method('initialize')
-                ->with($formOptions['workflow_item'], $formOptions['form_init']);
-        } else {
-            $this->formInitListener->expects($this->never())
                 ->method($this->anything());
         }
 

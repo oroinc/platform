@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -15,6 +16,7 @@ use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -23,17 +25,17 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsResolver;
+    private TransitionOptionsResolver|MockObject $optionsResolver;
+    private EventDispatcher|MockObject $eventDispatcher;
 
-    /** @var Transition */
-    private $transition;
+    private Transition $transition;
 
     protected function setUp(): void
     {
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->transition = new Transition($this->optionsResolver);
+        $this->transition = new Transition($this->optionsResolver, $this->eventDispatcher);
     }
 
     public function testAccessors(): void

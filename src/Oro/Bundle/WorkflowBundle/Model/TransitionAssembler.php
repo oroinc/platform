@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionFactoryInterface;
@@ -26,6 +27,7 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler;
     protected TransitionOptionsResolver $optionsResolver;
     protected ServiceProviderInterface $transitionServiceLocator;
+    protected EventDispatcher $eventDispatcher;
 
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
@@ -33,6 +35,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         ActionFactoryInterface $actionFactory,
         FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler,
         TransitionOptionsResolver $optionsResolver,
+        EventDispatcher $eventDispatcher,
         ServiceProviderInterface $transitionServiceLocator
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
@@ -40,6 +43,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         $this->actionFactory = $actionFactory;
         $this->formOptionsConfigurationAssembler = $formOptionsConfigurationAssembler;
         $this->optionsResolver = $optionsResolver;
+        $this->eventDispatcher = $eventDispatcher;
         $this->transitionServiceLocator = $transitionServiceLocator;
     }
 
@@ -106,7 +110,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             throw new AssemblerException(sprintf('Step "%s" not found', $stepToName));
         }
 
-        $transition = new Transition($this->optionsResolver);
+        $transition = new Transition($this->optionsResolver, $this->eventDispatcher);
         $transition->setName($name)
             ->setStepTo($steps[$stepToName])
             ->setTransitionService($transitionService)

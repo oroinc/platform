@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
@@ -36,6 +37,9 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /** @var ActionFactoryInterface|MockObject */
     private $actionFactory;
+
+    /** @var EventDispatcher|MockObject */
+    private $eventDispatcher;
 
     /** @var ServiceProviderInterface|MockObject */
     private $serviceLocator;
@@ -79,6 +83,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
         $this->conditionFactory = $this->createMock(ExpressionFactory::class);
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->serviceLocator = $this->createMock(ServiceProviderInterface::class);
 
         $this->assembler = new TransitionAssembler(
@@ -87,6 +92,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             $this->actionFactory,
             $this->createMock(FormOptionsConfigurationAssembler::class),
             $this->createMock(TransitionOptionsResolver::class),
+            $this->eventDispatcher,
             $this->serviceLocator
         );
     }

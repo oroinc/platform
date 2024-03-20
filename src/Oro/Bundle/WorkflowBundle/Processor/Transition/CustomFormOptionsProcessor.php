@@ -2,13 +2,18 @@
 
 namespace Oro\Bundle\WorkflowBundle\Processor\Transition;
 
+use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
-use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class CustomFormOptionsProcessor implements ProcessorInterface
 {
+    public function __construct(
+        private FormInitListener $formInitListener
+    ) {
+    }
+
     /**
      * @param ContextInterface|TransitionContext $context
      */
@@ -22,9 +27,8 @@ class CustomFormOptionsProcessor implements ProcessorInterface
         $workflowItem = $context->getWorkflowItem();
 
         if (array_key_exists('form_init', $transition->getFormOptions())) {
-            /** @var ActionInterface $action */
-            $action = $transition->getFormOptions()['form_init'];
-            $action->execute($workflowItem);
+            $this->formInitListener->executeInitAction($transition->getFormOptions()['form_init'], $workflowItem);
+            $this->formInitListener->dispatchFormInitEvents($workflowItem, $transition);
         }
 
         $dataAttribute = $transition->getFormDataAttribute();

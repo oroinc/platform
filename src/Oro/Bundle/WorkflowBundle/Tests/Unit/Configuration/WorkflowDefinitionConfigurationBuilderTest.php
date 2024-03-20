@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionIn
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
@@ -385,7 +386,10 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
         $transitions = [];
         if (!empty($configuration[WorkflowConfiguration::NODE_TRANSITIONS])) {
             foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionData) {
-                $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
+                $transition = new Transition(
+                    $this->createMock(TransitionOptionsResolver::class),
+                    $this->createMock(EventDispatcher::class)
+                );
                 $transition
                     ->setStart($transitionData['is_start'] ?? false)
                     ->setName($transitionData['name'])
