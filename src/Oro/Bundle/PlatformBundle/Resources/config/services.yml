@@ -155,6 +155,7 @@ services:
         class: Oro\Bundle\PlatformBundle\Configurator\OrmConfigurationConfigurator
         arguments:
             - '@oro_distribution.handler.application_status'
+            - '%kernel.environment%'
 
     # Overrides the service from doctrine to add the configurator that changes the Configuration->autoGenerateProxyClasses option value to true if the application isn't installed
     doctrine.orm.configuration:
