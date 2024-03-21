@@ -17,7 +17,7 @@ Feature: Configuration search visibility of validation errors
     When I type "Secure" in "Configuration Quick Search"
     Then I should not see "Cookie Name"
     And I should not see "Product URL Prefix"
-    
+
     When I type "" in "Configuration Quick Search"
     Then I should see "Cookie Name"
     And I should see "Product URL Prefix"
@@ -46,10 +46,12 @@ Feature: Configuration search visibility of validation errors
     And I should see "Product URL Prefix"
 
     When click "Save settings"
-    And I should see "Configuration saved" flash message
+    Then I should see "This value should not be blank"
 
   Scenario: Validation is applied not only for system scope
     Given I go to System/ Websites
+    And I should see alert with message "You have unsaved changes, are you sure you want to leave this page?"
+    And I accept alert
     And click "Configuration" on row "Default" in grid
 
     When I follow "System Configuration/Websites/Routing" on configuration sidebar

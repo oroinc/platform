@@ -4,19 +4,19 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsFormOptionsEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigSettingsFormOptionsEventTest extends \PHPUnit\Framework\TestCase
+class ConfigSettingsFormOptionsEventTest extends TestCase
 {
     private const FORM_OPTIONS = [
         'key1' => ['option1' => 'value1'],
         'key2' => ['option2' => 'value2']
     ];
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private ConfigManager|MockObject $configManager;
 
-    /** @var ConfigSettingsFormOptionsEvent */
-    private $event;
+    private ConfigSettingsFormOptionsEvent $event;
 
     protected function setUp(): void
     {
@@ -60,5 +60,18 @@ class ConfigSettingsFormOptionsEventTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('There are no form options for "key3".');
         $this->event->setFormOptions('key3', []);
+    }
+
+    public function testUnsetFormOptions(): void
+    {
+        $this->event->unsetFormOptions('key1');
+        $this->assertFalse($this->event->hasFormOptions('key1'));
+    }
+
+    public function testUnsetFormOptionsForUndefinedConfigKey(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('There are no form options for "key3".');
+        $this->event->unsetFormOptions('key3');
     }
 }
