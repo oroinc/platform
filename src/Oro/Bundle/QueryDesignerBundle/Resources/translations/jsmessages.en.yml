@@ -10,5 +10,8 @@ oro:
         condition_operation: Operation
     query_type_switcher:
         modes:
-            simple: "Simple"
-            advanced: "Advanced"
+            simple: "Visual Editor"
+            advanced: "Expression Editor"
+        messages:
+            simple: 'Current expression is too complex for Visual Editor.'
+            advanced: 'Expression Editor is not compatible with activity, data audit and segment filters.'

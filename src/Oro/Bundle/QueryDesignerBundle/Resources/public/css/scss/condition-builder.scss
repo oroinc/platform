@@ -400,3 +400,12 @@
 .deleted-field {
     color: $error-text;
 }
+
+.query-type-switcher-container {
+    display: flex;
+    margin-top: $content-padding-medium;
+}
+
+.query-type-switcher {
+    margin-left: auto;
+}

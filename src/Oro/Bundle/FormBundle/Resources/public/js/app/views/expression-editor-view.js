@@ -78,7 +78,9 @@ const ExpressionEditorView = BaseView.extend({
                 util: this.util,
                 operationButtons: this.operationButtons,
                 interactionDelay: this.interactionDelay,
-                linterDelay: this.linterDelay
+                linterDelay: this.linterDelay,
+                dataSource: this.dataSource,
+                getDataSourceCallback: this.showDataSourceElement.bind(this)
             }).concat([
                 EditorView.updateListener.of(this.editorUpdateListener.bind(this)),
                 EditorView.editorAttributes.of({
@@ -105,7 +107,6 @@ const ExpressionEditorView = BaseView.extend({
         }
 
         this.autocompleteData = this.util.getAutocompleteData(content, to);
-        this._toggleDataSource();
     },
 
     hide() {
@@ -241,8 +242,6 @@ const ExpressionEditorView = BaseView.extend({
 
         this._hideDataSource(dataSource);
 
-        this.$el.after(dataSource.$widget).trigger('content:changed');
-
         dataSource.$field.on('change', e => {
             if (!dataSource.active) {
                 return;
@@ -250,7 +249,7 @@ const ExpressionEditorView = BaseView.extend({
 
             this.util.updateDataSourceValue(this.autocompleteData, $(e.currentTarget).val());
             this.$el.val(this.autocompleteData.expression)
-                .change().focus();
+                .change();
 
             this.el.selectionStart = this.el.selectionEnd = this.autocompleteData.position;
         });
@@ -258,31 +257,15 @@ const ExpressionEditorView = BaseView.extend({
         return dataSource;
     },
 
-    /**
-     * Hide all data sources and show active
-     *
-     * @private
-     */
-    _toggleDataSource() {
+    showDataSourceElement(dataSourceKey, dataSourceValue) {
         this._hideDataSources();
-
-        const dataSourceKey = this.autocompleteData.dataSourceKey;
-
-        if (
-            this.autocompleteData.itemsType !== 'datasource' || _.isEmpty(dataSourceKey) ||
-            !_.has(this.dataSource, dataSourceKey)
-        ) {
-            return;
-        }
-
-        const dataSourceValue = this.autocompleteData.dataSourceValue;
-
-        this.autocompleteData.items = {}; // hide autocomplete list
 
         const dataSource = this.getDataSource(dataSourceKey);
         dataSource.$field.val(dataSourceValue).change();
 
         this._showDataSource(dataSource);
+
+        return dataSource;
     },
 
     /**

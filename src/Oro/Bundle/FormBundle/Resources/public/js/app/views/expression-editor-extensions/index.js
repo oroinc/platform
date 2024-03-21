@@ -5,6 +5,7 @@ import {indentWithTab, defaultKeymap, history} from '@codemirror/commands';
 import sidePanel from 'oroform/js/app/views/expression-editor-extensions/side-panel';
 import {syntaxHighlighting, bracketMatching} from '@codemirror/language';
 import expressionLinter from 'oroform/js/app/views/expression-editor-extensions/linter';
+import elementTooltip from './element-tooltip';
 
 import {symfonyExpressionLanguageHighlightStyle} from './language/highlight';
 import {symfonyExpression} from './language';
@@ -13,7 +14,7 @@ const tooltipOptionsFacet = Facet.define();
 const tooltipOptionsFacetHost = tooltipOptionsFacet.compute([showTooltip], state => {
     const tooltips = state.facet(showTooltip).filter(t => t) || [];
 
-    tooltips.forEach(tooltip => tooltip.arrow = true);
+    tooltips.forEach(tooltip => tooltip.arrow = false);
 
     return tooltips;
 });
@@ -33,7 +34,9 @@ export const editorExtensions = ({
     operationButtons,
     interactionDelay = 75,
     linterDelay = 750,
-    maxRenderedOptions = 20
+    maxRenderedOptions = 20,
+    dataSource = {},
+    getDataSourceCallback
 }) => {
     return [
         symfonyExpression(util),
@@ -66,13 +69,15 @@ export const editorExtensions = ({
             }
         }),
         tooltips({
-            position: 'absolute'
+            position: 'fixed',
+            parent: document.body
         }),
         expressionLinter({util, linterDelay}),
         closeBrackets(),
         bracketMatching(),
         history(),
-        tooltipOptionsFacetHost
+        tooltipOptionsFacetHost,
+        elementTooltip({util, dataSource, getDataSourceCallback})
     ];
 };
 

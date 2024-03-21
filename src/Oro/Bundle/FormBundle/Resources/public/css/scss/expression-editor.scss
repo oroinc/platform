@@ -112,79 +112,6 @@
         caret-color: $primary;
     }
 
-    .cm-tooltip {
-        border: none;
-        background: none;
-
-        &.cm-tooltip-autocomplete {
-            color: $dropdown-color;
-            background-color: $dropdown-bg;
-            padding: $dropdown-padding-y 0;
-            margin: $dropdown-spacer 0 0;
-            border: none;
-            box-shadow: $dropdown-menu-box-shadow;
-
-            @include border-radius($dropdown-border-radius);
-            @include box-shadow($dropdown-box-shadow);
-
-            .cm-tooltip-arrow {
-                &::before,
-                &::after {
-                    border-top-color: transparent;
-                    border-bottom-color: transparent;
-                }
-            }
-
-            > ul {
-                min-width: 50px;
-
-                > li {
-                    padding: 6px 16px;
-                    color: $primary-200;
-
-                    &[aria-selected] {
-                        color: $primary-200;
-                        background-color: $primary-900;
-                    }
-                }
-            }
-        }
-
-        .cm-completionDetail {
-            font-style: normal;
-        }
-
-        .cm-tooltip-lint {
-            background-color: $danger-lighten;
-            color: $danger-ultra-dark;
-            padding: 2px 8px 1px 30px;
-            border-radius: $input-field-border-radius;
-            font-size: $base-font-size;
-            box-shadow: none;
-
-            @include fa-icon($fa-var-times, before, true) {
-                position: absolute;
-                left: 9px;
-                top: 0;
-                font-size: $icon-font-size;
-                color: $danger-darken;
-            }
-
-            + .cm-tooltip-arrow {
-                &::before,
-                &::after {
-                    border-bottom-color: $danger-ultra-light;
-                }
-            }
-
-            .cm-diagnostic-error {
-                border-left: none;
-                padding: 0;
-                margin: 0;
-            }
-        }
-    }
-
     .cm-panels {
         background-color: $primary-900;
         color: $primary-200;
@@ -217,7 +144,7 @@
 
     .cm-btn {
         min-width: 48px;
-        height: 28px;
+        height: 32px;
         padding: 0;
         border-radius: 3px;
         border: 1px solid $primary-800;
@@ -301,5 +228,156 @@
             color: $link-color;
             cursor: pointer;
         }
+    }
+}
+
+.cm-tooltip {
+    border: none;
+    background: none;
+    margin-left: -17px;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+
+        display: block;
+
+        width: 14px;
+        height: 7px;
+
+        left: 7px;
+
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+    }
+
+    &.cm-tooltip-above {
+        margin-top: -$content-padding-small;
+
+        &::before,
+        &::after {
+            top: 100%;
+
+            border-top: 7px solid var(--tooltip-background-color, #{$primary-inverse});
+        }
+
+        &:after {
+            margin-top: -1px;
+        }
+
+        &::before {
+            border-top: 7px solid var(--tooltip-border-color, #{$primary-750});
+        }
+    }
+
+    &.cm-tooltip-below {
+        margin-top: $content-padding-small;
+
+        &::before,
+        &::after {
+            bottom: 100%;
+
+            border-bottom: 7px solid var(--tooltip-background-color, #{$primary-inverse});
+        }
+
+        &:after {
+            margin-bottom: -1px;
+        }
+
+        &::before {
+            border-bottom: 7px solid var(--tooltip-border-color, #{$primary-750});
+        }
+    }
+
+    &.cm-tooltip-autocomplete {
+        color: $dropdown-color;
+        background-color: $dropdown-bg;
+        padding: $dropdown-padding-y 0;
+        margin: $dropdown-spacer 0 0;
+        border: none;
+        box-shadow: $dropdown-menu-box-shadow;
+
+        @include border-radius($dropdown-border-radius);
+        @include box-shadow($dropdown-box-shadow);
+
+        &::before,
+        &::after {
+            display: none;
+        }
+
+        .cm-tooltip-arrow {
+            &::before,
+            &::after {
+                border-top-color: transparent;
+                border-bottom-color: transparent;
+            }
+        }
+
+        > ul {
+            min-width: 50px;
+
+            > li {
+                display: block;
+                // stylelint-disable-next-line declaration-no-important
+                padding: 6px 16px !important;
+                color: $primary-200;
+
+                &[aria-selected] {
+                    color: $primary-200;
+                    background-color: $primary-900;
+                }
+            }
+        }
+    }
+
+    &.cm-tooltip-control {
+        --tooltip-background-color: #{$primary-inverse};
+        --tooltip-border-color: #{$primary-750};
+
+        background: $primary-inverse;
+        border-radius: $border-radius;
+        border: 1px solid $primary-750;
+        padding: $content-padding-small;
+    }
+
+    .cm-completionDetail {
+        font-style: normal;
+    }
+
+    .cm-tooltip-lint {
+        background-color: $danger-lighten;
+        color: $danger-ultra-dark;
+        padding: 2px 8px 1px 30px;
+        border-radius: $input-field-border-radius;
+        font-size: $base-font-size;
+        box-shadow: none;
+
+        @include fa-icon($fa-var-times, before, true) {
+            position: absolute;
+            left: 9px;
+            top: 0;
+            font-size: $icon-font-size;
+            color: $danger-darken;
+        }
+
+        + .cm-tooltip-arrow {
+            &::before,
+            &::after {
+                border-bottom-color: $danger-ultra-light;
+            }
+        }
+
+        .cm-diagnostic-error {
+            border-left: none;
+            padding: 0;
+            margin: 0;
+        }
+    }
+
+    &:has(> .cm-tooltip-lint) {
+        border: none;
+        --tooltip-border-color: #{$danger-lighten};
+        --tooltip-background-color: #{$danger-lighten};
     }
 }
