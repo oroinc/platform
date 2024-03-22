@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Migration\WarmUpEntityConfigCacheMigration;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
+/**
+ * Entity config update preUp, postUp migrations setup.
+ */
 class PostUpMigrationListener
 {
     /**

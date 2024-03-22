@@ -34,6 +34,7 @@ services:
         arguments:
             - '@oro_entity_extend.migration.options_parser'
             - '@oro_entity_extend.migration.config_processor'
+            - '@oro_entity_config.config_manager'
             - '%oro_entity_extend.migration.config_processor.options.path%'
         tags:
             - { name: console.command }
@@ -58,6 +59,7 @@ services:
     Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand:
         arguments:
             - '@oro_entity_extend.tools.dumper'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: console.command }
 
