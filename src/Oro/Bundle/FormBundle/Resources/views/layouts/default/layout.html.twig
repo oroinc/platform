@@ -27,3 +27,46 @@
 
     {{ parent() }}
 {% endblock %}
+
+{% block button_widget_button -%}
+    {% apply spaceless %}
+        <button{{ block('block_attributes') }}
+                type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
+                {%- if name is defined %} name="{{ name }}"{% endif %}
+                {%- if value is defined %} value="{{ value }}"{% endif %}>
+                {%- if icon is defined %}
+                    {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
+                    {% set iconSizeClass = iconSize is defined ? iconSize : 'theme-icon--medium' %}
+                    {{ renderIcon.icon({name: icon, extraClass: iconSizeClass }) }}
+                {%- endif -%}
+                {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+        </button>
+    {% endapply %}
+{%- endblock %}
+
+{% block link_widget -%}
+    {% apply spaceless %}
+        <a {{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
+            {%- if icon is defined %}
+                {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
+                {% set iconSizeClass = iconSize is defined ? iconSize : 'theme-icon--medium' %}
+                {{ renderIcon.icon({name: icon, extraClass: iconSizeClass }) }}
+            {%- endif -%}
+            {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+        </a>
+    {% endapply %}
+{%- endblock %}
+
+{% block block_label -%}
+    {%- if label is defined and label is not same as(false) %}
+        {%- if label is empty -%}
+            {% set label = id|humanize %}
+        {%- endif -%}
+        {%- if required -%}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {%- endif -%}
+        <label {{ block('block_label_attributes') }}>{{ label|block_text(translation_domain) }}
+            {%- if required %}<span class="required-symbol" aria-hidden="true">*</span>{% endif -%}
+        </label>
+    {% endif -%}
+{%- endblock %}

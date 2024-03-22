@@ -13,6 +13,7 @@ styles:
         - 'bundles/oroform/default/scss/variables/oro-toolbar-config.scss'
         - 'bundles/oroform/default/scss/variables/textarea-config.scss'
         - 'bundles/oroform/default/scss/variables/label-config.scss'
+        - 'bundles/oroform/default/scss/variables/label-required-config.scss'
         - 'bundles/oroform/default/scss/variables/form-row-config.scss'
         - 'bundles/oroform/default/scss/variables/floating-validation-message-config.scss'
         - 'bundles/oroform/default/scss/variables/validation-config.scss'
