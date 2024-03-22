@@ -97,6 +97,10 @@ class ImageFilterLoader
             $filterSettings['format'] = $dimension->getOption('format');
         }
 
+        if ($dimension->hasOption('background')) {
+            $filterSettings['filters']['background'] = $dimension->getOption('background');
+        }
+
         foreach ($this->customFilterProviders as $provider) {
             if ($provider->isApplicable($dimension)) {
                 $filterSettings = array_replace_recursive($filterSettings, $provider->getFilterConfig());
