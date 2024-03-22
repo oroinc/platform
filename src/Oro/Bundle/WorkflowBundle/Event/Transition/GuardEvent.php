@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 
+/**
+ * Transition guard event used to disallow transition availability/execution.
+ */
 class GuardEvent extends TransitionEvent
 {
     public function __construct(

@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Event;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Workflow event containing WorkflowItem entity.
+ */
 class WorkflowItemAwareEvent extends Event
 {
     public function __construct(
