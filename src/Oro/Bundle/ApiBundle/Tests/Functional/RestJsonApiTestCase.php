@@ -414,7 +414,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * Extracts the list of errors from JSON:API response.
      */
-    protected function getResponseErrors(Response $response): string
+    protected function getResponseErrors(Response $response): array
     {
         $content = self::jsonToArray($response->getContent());
         self::assertIsArray($content);

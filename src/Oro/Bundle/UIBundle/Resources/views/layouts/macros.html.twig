@@ -47,8 +47,14 @@ Parameters - array:
             {%- endif -%}
             {%- if parameters.label is defined or parameters.entityName is defined -%}
                 <span class="action-label">
-                    {{- parameters.label is defined ? parameters.label|trim : '' -}}
-                    {%- if (parameters.entityName is defined and parameters.entityName|trim|length) -%}
+                    {% set label = parameters.label is defined ? parameters.label|trim : ''  %}
+                    {{- label -}}
+                    {# Do not render entityName if it is already present in translation. It is used like this in 5.1LTS. #}
+                    {%- if (
+                            parameters.entityName is defined and parameters.entityName|trim|length
+                            and parameters.entityName not in label
+                        )
+                    -%}
                         <span class="entity-name"> {{ parameters.entityName|trim }}</span>
                     {%- endif -%}
                 </span>

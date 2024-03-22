@@ -39,7 +39,8 @@ $select-bg-dark: (
     no-repeat var(--select-arrow-position, #{$select-arrow-position})
 ) !default;
 // A smaller version of chevron-down icon
-$select-bg-open-url: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path fill="#{str-replace(string.unquote('#{$select-arrow-color}'), '#', '%23')}" fill-rule="evenodd" d="M9.41 6.91a.833.833 0 0 1 1.18 0l5 5a.833.833 0 0 1-1.18 1.18L10 8.677 5.59 13.09a.833.833 0 1 1-1.18-1.178l5-5Z" clip-rule="evenodd"/></svg>') !default;
+$select-open-arrow-color: get-color('text', 'secondary') !default;
+$select-bg-open-url: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path fill="#{str-replace(string.unquote('#{$select-open-arrow-color}'), '#', '%23')}" fill-rule="evenodd" d="M9.41 6.91a.833.833 0 0 1 1.18 0l5 5a.833.833 0 0 1-1.18 1.18L10 8.677 5.59 13.09a.833.833 0 1 1-1.18-1.178l5-5Z" clip-rule="evenodd"/></svg>') !default;
 $select-bg-open-url-dark: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path fill="#{str-replace(string.unquote('#{$base-ui-element-color}'), '#', '%23')}" fill-rule="evenodd" d="M9.41 6.91a.833.833 0 0 1 1.18 0l5 5a.833.833 0 0 1-1.18 1.18L10 8.677 5.59 13.09a.833.833 0 1 1-1.18-1.178l5-5Z" clip-rule="evenodd"/></svg>') !default;
 $select-bg-open: (
     $select-bg-open-url
@@ -49,6 +50,7 @@ $select-bg-open-dark: (
     $select-bg-open-url-dark
     no-repeat var(--select-arrow-position, #{$select-arrow-position})
 ) !default;
+
 // Hover state
 $select-border-color-hover-state: $base-ui-element-border-color-hover !default;
 

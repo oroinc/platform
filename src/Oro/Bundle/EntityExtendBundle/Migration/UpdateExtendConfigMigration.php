@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\InstallerBundle\CommandExecutor as InstallerCommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -47,10 +48,11 @@ class UpdateExtendConfigMigration implements Migration, ResetContainerMigration,
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        if ($schema instanceof ExtendSchema) {
+        $extendOptions = $schema instanceof ExtendSchema ? $schema->getExtendOptions() : [];
+        if (count($extendOptions)) {
             $queries->addQuery(
                 new UpdateExtendConfigMigrationQuery(
-                    $schema->getExtendOptions(),
+                    $extendOptions,
                     $this->commandExecutor,
                     $this->configProcessorOptionsPath
                 )
@@ -62,11 +64,13 @@ class UpdateExtendConfigMigration implements Migration, ResetContainerMigration,
                     $this->initialEntityConfigStatePath
                 )
             );
-            $queries->addQuery(
-                new RefreshExtendCacheMigrationQuery(
-                    $this->commandExecutor
-                )
-            );
+            if (!InstallerCommandExecutor::isCommandRunning('oro:platform:update')) {
+                $queries->addQuery(
+                    new RefreshExtendCacheMigrationQuery(
+                        $this->commandExecutor
+                    )
+                );
+            }
         }
     }
 }

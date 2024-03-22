@@ -48,7 +48,12 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
             null,
             ['format' => 'formatValue']
         );
-        $productLarge = new ThemeImageTypeDimension(self::PRODUCT_LARGE, self::LARGE_SIZE, self::LARGE_SIZE);
+        $productLarge = new ThemeImageTypeDimension(
+            self::PRODUCT_LARGE,
+            self::LARGE_SIZE,
+            self::LARGE_SIZE,
+            ['background' => ['transparency' => 0]]
+        );
         $productSmall = new ThemeImageTypeDimension(self::PRODUCT_SMALL, self::SMALL_SIZE, self::SMALL_SIZE);
         $productGalleryMain = new ThemeImageTypeDimension(
             self::PRODUCT_GALLERY_MAIN,
@@ -87,11 +92,17 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('set')
             ->withConsecutive(
                 [self::PRODUCT_ORIGINAL, $this->prepareBaseFilterData()],
-                [self::PRODUCT_LARGE, $this->prepareFilterDataForResize(self::LARGE_SIZE, self::LARGE_SIZE)],
+                [
+                    self::PRODUCT_LARGE,
+                    array_merge_recursive(
+                        $this->prepareFilterDataForResize(self::LARGE_SIZE, self::LARGE_SIZE),
+                        ['filters' => ['background' => ['transparency' => 0]]]
+                    ),
+                ],
                 [self::PRODUCT_SMALL, $this->prepareFilterDataForResize(self::SMALL_SIZE, self::SMALL_SIZE)],
                 [
                     self::PRODUCT_GALLERY_MAIN,
-                    $this->prepareFilterDataForResizeWithAuto(self::SMALL_SIZE, ThemeConfiguration::AUTO)
+                    $this->prepareFilterDataForResizeWithAuto(self::SMALL_SIZE, ThemeConfiguration::AUTO),
                 ],
                 [self::PRODUCT_ORIGINAL_WITH_FORMAT, $this->prepareFilterDataForFormat('formatValue')],
             );
@@ -143,12 +154,12 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
             'thumbnail' => [
                 'size' => [$width, $height],
                 'mode' => ImageFilterLoader::RESIZE_MODE,
-                'allow_upscale' => true
+                'allow_upscale' => true,
             ],
             'background' => [
                 'size' => [$width, $height],
-                'color' => ImageFilterLoader::BACKGROUND_COLOR
-            ]
+                'color' => ImageFilterLoader::BACKGROUND_COLOR,
+            ],
         ];
 
         return array_merge_recursive($this->prepareBaseFilterData(), ['filters' => $resizeFiltersData]);
@@ -160,9 +171,9 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
             'scale' => [
                 'dim' => [
                     ThemeConfiguration::AUTO === $width ? null : $width,
-                    ThemeConfiguration::AUTO === $height ? null : $height
-                ]
-            ]
+                    ThemeConfiguration::AUTO === $height ? null : $height,
+                ],
+            ],
         ];
 
         return array_merge_recursive($this->prepareBaseFilterData(), ['filters' => $resizeFiltersData]);
@@ -180,10 +191,10 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
             'filters' => [
                 'strip' => [],
                 'interlace' => [
-                    'mode' => ImageFilterLoader::INTERLACE_MODE
-                ]
+                    'mode' => ImageFilterLoader::INTERLACE_MODE,
+                ],
             ],
-            'customFilterData'
+            'customFilterData',
         ];
     }
 }

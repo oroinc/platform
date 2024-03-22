@@ -3,10 +3,6 @@
 .oro-toolbar {
     position: relative;
 
-    &__icon {
-        color: $oro-toolbar-icon-color;
-    }
-
     &__content {
         display: flex;
         align-items: center;
@@ -16,6 +12,10 @@
             height: 14px;
             width: 1px;
             background-color: $oro-toolbar-divider-color;
+        }
+
+        .theme-icon {
+            color: $oro-toolbar-icon-color;
         }
     }
 

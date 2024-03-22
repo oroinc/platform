@@ -333,7 +333,6 @@ services:
             - '%oro_entity_extend.migration.initial_entity_config_state.path%'
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp, priority: 100 }
-            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -85 }
 
     oro_entity_extend.migration.update_config.post_up.listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener

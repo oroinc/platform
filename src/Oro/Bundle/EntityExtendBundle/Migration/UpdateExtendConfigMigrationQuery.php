@@ -7,6 +7,9 @@ use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Updates extend configs into DB from schema options.
+ */
 class UpdateExtendConfigMigrationQuery implements MigrationQuery
 {
     /**

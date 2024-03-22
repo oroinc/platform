@@ -39,3 +39,7 @@ $base-ui-popup-border-radius: $base-ui-element-border-radius !default;
 
 $base-ui-popup-background: get-color('neutral', 'white-100') !default;
 $base-ui-popup-box-shadow: 1px 2px 8px rgba(0 0 0 / 40%) !default;
+
+$base-ui-bold-font-weight: font-weight('semi-bold') !default;
+
+$base-ui-grid-row-gap: spacing('xl') !default;
