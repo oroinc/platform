@@ -20,16 +20,25 @@
 {% endblock %}
 
 {% block page_subtitle_widget %}
-    {% set attr = layout_attr_defaults(attr, {'~class': ' page-subtitle'}) %}
+    {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
+    {% set attr = layout_attr_defaults(attr, {'~class': ' customer-profile__title'}) %}
     <h2 {{ block('block_attributes') }}>
         {% if icon %}
-            <span class="badge {{ badge ? 'badge--' ~ badge }}" aria-hidden="true">
-                <span class="fa-{{ icon }}"></span>
-            </span>
+            {{ renderIcon.icon({name: icon, extraClass: 'theme-icon--lg'}) }}
         {% endif %}
-        <span class="page-subtitle__text">{{ text|block_text(translation_domain) }}</span>
+        <span class="customer-profile__title--text">{{ text|block_text(translation_domain) }}</span>
         {{ block('container_widget') }}
     </h2>
+{% endblock %}
+
+{% block _page_subtitle_container_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': " customer-profile__title-wrapper"
+    }) %}
+
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
 {% endblock %}
 
 {% block breadcrumbs_widget %}
