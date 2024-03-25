@@ -45,6 +45,12 @@ $checkbox-border-color-checked-disabled: get-var-color('neutral', 'grey2') !defa
 $checkbox-color-disabled: get-var-color('text', 'disabled') !default;
 $checkbox-opacity-disabled: null !default;
 
+//Error state
+$checkbox-border-color-error: get-color('destructive', 'base') !default;
+$checkbox-background-error: get-color('destructive', 'light') !default;
+$checkbox-border-color-checked-error: get-color('destructive', 'base') !default;
+$checkbox-background-checked-error: get-color('destructive', 'base') !default;
+
 // Variables for radio
 $checkbox-radio-border-radius: 50% !default;
 

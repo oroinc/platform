@@ -35,14 +35,16 @@
             {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
 
             <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-            {%- if translatable_label is defined and not translatable_label -%}
-                {{ label }}
-            {%- elseif raw_label is defined and raw_label -%}
-                {{ label|raw }}
-            {%- else -%}
-                {{ label|trans({}, translation_domain) }}
-            {%- endif -%}
-            <em aria-hidden="true">{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
+                {%- if translatable_label is defined and not translatable_label -%}
+                    {{ label }}
+                {%- elseif raw_label is defined and raw_label -%}
+                    {{ label|raw }}
+                {%- else -%}
+                    {{ label|trans({}, translation_domain) }}
+                {%- endif -%}
+                <span aria-hidden="true" class="{{ required ? 'required-symbol' : '' }}">
+                    {%- if required and not isRadioLabel %}*{% else %}&nbsp;{% endif -%}
+                </span>
             </label>
         {%- endif -%}
     {% endapply %}

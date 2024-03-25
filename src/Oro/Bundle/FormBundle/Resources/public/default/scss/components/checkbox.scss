@@ -73,6 +73,16 @@
             }
         }
     }
+
+    &.error {
+        border-color: $checkbox-border-color-error;
+        background-color: $checkbox-background-error;
+
+        &:checked {
+            border-color: $checkbox-border-color-checked-error;
+            background-color: $checkbox-background-checked-error;
+        }
+    }
 }
 
 // Radio Button

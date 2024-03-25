@@ -1,9 +1,28 @@
 /* @theme: default; */
 
-.required-label {
-    margin: spacing('base') 0;
+.required-label,
+.all-required-label {
+    display: $label-required-label-display;
+    margin: $label-required-label-margin;
+    color: $label-required-label-color;
+    font-style: $label-required-label-font-style;
+    font-size: $label-required-label-font-size;
+    font-weight: $label-required-label-font-weight;
+}
 
-    sup {
-        color: $label-required-color;
+.required-symbol {
+    color: $label-required-symbol-color;
+}
+
+label {
+    .required-symbol {
+        margin-left: $label-required-symbol-margin-left;
+    }
+}
+
+.no-asterisks {
+    .required-symbol,
+    .required-label {
+        display: none;
     }
 }

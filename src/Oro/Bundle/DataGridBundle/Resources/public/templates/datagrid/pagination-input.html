@@ -37,5 +37,5 @@
 
 <% if (!_.isMobile()) { %>
     <span><%- _.__('oro.datagrid.pagination.totalPages', {totalPages: state.totalPages || 1}, state.totalPages || 1) %></span>
-    <span class="totals-label"><%- _.__('oro.datagrid.pagination.totalRecords', {totalRecords: state.totalRecords}, state.totalRecords) %></span>
+    <span class="totals-label"><%- _.__('oro.datagrid.pagination.totalRecordsPlural', {totalRecords: state.totalRecords}, state.totalRecords) %></span>
 <% } %>

@@ -41,6 +41,9 @@ class ConfigManager
     /** @var ConfigProviderBag */
     private $providerBag;
 
+    /** @var bool */
+    private $localCacheOnly = false;
+
     /** @var array */
     protected $originalValues = [];
 
@@ -50,10 +53,17 @@ class ConfigManager
     /** @var array */
     protected $configChangeSets = [];
 
+    private ?bool $dataBaseReadyToWork = null;
+
     public function __construct(
         protected ConfigCache $cache,
         protected ContainerInterface $locator,
     ) {
+    }
+
+    public function useLocalCacheOnly()
+    {
+        $this->localCacheOnly = true;
     }
 
     /**
@@ -95,7 +105,11 @@ class ConfigManager
      */
     public function isDatabaseReadyToWork()
     {
-        return $this->getModelManager()->checkDatabase();
+        if (null === $this->dataBaseReadyToWork) {
+            $this->dataBaseReadyToWork = $this->getModelManager()->checkDatabase();
+        }
+
+        return $this->dataBaseReadyToWork;
     }
 
     protected function getMetadataFactory(): MetadataFactory
@@ -193,7 +207,7 @@ class ConfigManager
      */
     public function hasConfig($className, $fieldName = null)
     {
-        if (!$this->getModelManager()->checkDatabase()) {
+        if (!$this->isDatabaseReadyToWork()) {
             return false;
         }
 
@@ -267,9 +281,9 @@ class ConfigManager
     public function getEntityConfig($scope, $className)
     {
         $className = ClassUtils::getRealClass($className);
-        $config = $this->cache->getEntityConfig($scope, $className);
+        $config = $this->cache->getEntityConfig($scope, $className, $this->localCacheOnly);
         if (!$config) {
-            if (!$this->getModelManager()->checkDatabase()) {
+            if (!$this->isDatabaseReadyToWork()) {
                 throw $this->createDatabaseNotSyncedException();
             }
 
@@ -282,7 +296,7 @@ class ConfigManager
                 $this->getModelManager()->getEntityModel($className)->toArray($scope)
             );
             // put to a cache
-            $this->cache->saveConfig($config);
+            $this->cache->saveConfig($config, $this->localCacheOnly);
         }
 
         // for calculate change set
@@ -304,9 +318,9 @@ class ConfigManager
      */
     public function getFieldConfig($scope, $className, $fieldName)
     {
-        $config = $this->cache->getFieldConfig($scope, $className, $fieldName);
+        $config = $this->cache->getFieldConfig($scope, $className, $fieldName, $this->localCacheOnly);
         if (!$config) {
-            if (!$this->getModelManager()->checkDatabase()) {
+            if (!$this->isDatabaseReadyToWork()) {
                 throw $this->createDatabaseNotSyncedException();
             }
 
@@ -323,7 +337,7 @@ class ConfigManager
                 $model->toArray($scope)
             );
             // put to a cache
-            $this->cache->saveConfig($config);
+            $this->cache->saveConfig($config, $this->localCacheOnly);
         }
 
         // for calculate change set
@@ -454,6 +468,7 @@ class ConfigManager
      */
     public function clearConfigurableCache()
     {
+        $this->dataBaseReadyToWork = null;
         $this->getModelManager()->clearCheckDatabase();
         $this->cache->deleteAllConfigurable();
     }
@@ -1316,14 +1331,14 @@ class ConfigManager
     {
         $result = [];
 
-        $entities = $this->cache->getEntities();
+        $entities = $this->cache->getEntities($this->localCacheOnly);
         if (null !== $entities) {
             foreach ($entities as $class => $data) {
                 if ($withHidden || !$data['h']) {
                     $result[] = $callback($scope, $class);
                 }
             }
-        } elseif ($this->getModelManager()->checkDatabase()) {
+        } elseif ($this->isDatabaseReadyToWork()) {
             $models   = $this->getModelManager()->getModels();
             $entities = [];
             /** @var EntityConfigModel $model */
@@ -1339,7 +1354,7 @@ class ConfigManager
                     $result[] = $callback($scope, $class);
                 }
             }
-            $this->cache->saveEntities($entities);
+            $this->cache->saveEntities($entities, $this->localCacheOnly);
         }
 
         return $result;
@@ -1354,8 +1369,8 @@ class ConfigManager
     {
         $result = null;
 
-        $entities = $this->cache->getEntities();
-        if (null === $entities && $this->getModelManager()->checkDatabase()) {
+        $entities = $this->cache->getEntities($this->localCacheOnly);
+        if (null === $entities && $this->isDatabaseReadyToWork()) {
             $models   = $this->getModelManager()->getModels();
             $entities = [];
             /** @var EntityConfigModel $model */
@@ -1368,7 +1383,7 @@ class ConfigManager
                     'h' => $isHidden
                 ];
             }
-            $this->cache->saveEntities($entities);
+            $this->cache->saveEntities($entities, $this->localCacheOnly);
         }
         if (null !== $entities && isset($entities[$className])) {
             $result = $entities[$className];
@@ -1389,14 +1404,14 @@ class ConfigManager
     {
         $result = [];
 
-        $fields = $this->cache->getFields($className);
+        $fields = $this->cache->getFields($className, $this->localCacheOnly);
         if (null !== $fields) {
             foreach ($fields as $field => $data) {
                 if ($withHidden || !$data['h']) {
                     $result[] = $callback($scope, $className, $field, $data['t']);
                 }
             }
-        } elseif ($this->getModelManager()->checkDatabase()) {
+        } elseif ($this->isDatabaseReadyToWork()) {
             $models = $this->getModelManager()->getModels($className);
             $fields = [];
             /** @var FieldConfigModel $model */
@@ -1414,7 +1429,7 @@ class ConfigManager
                     $result[] = $callback($scope, $className, $field, $type);
                 }
             }
-            $this->cache->saveFields($className, $fields);
+            $this->cache->saveFields($className, $fields, $this->localCacheOnly);
         }
 
         return $result;
@@ -1430,8 +1445,8 @@ class ConfigManager
     {
         $result = null;
 
-        $fields = $this->cache->getFields($className);
-        if (null === $fields && $this->getModelManager()->checkDatabase()) {
+        $fields = $this->cache->getFields($className, $this->localCacheOnly);
+        if (null === $fields && $this->isDatabaseReadyToWork()) {
             $models = $this->getModelManager()->getModels($className);
             $fields = [];
             /** @var FieldConfigModel $model */
@@ -1446,7 +1461,7 @@ class ConfigManager
                     't' => $type,
                 ];
             }
-            $this->cache->saveFields($className, $fields);
+            $this->cache->saveFields($className, $fields, $this->localCacheOnly);
         }
         if (null !== $fields && isset($fields[$fieldName])) {
             $result = $fields[$fieldName];
@@ -1467,7 +1482,7 @@ class ConfigManager
         $isConfigurable = $this->cache->getConfigurable($className);
         if (null === $isConfigurable) {
             $isConfigurable = (null !== $this->getModelManager()->findEntityModel($className));
-            $this->cache->saveConfigurable($isConfigurable, $className);
+            $this->cache->saveConfigurable($isConfigurable, $className, null, $this->localCacheOnly);
         }
 
         return $isConfigurable;
@@ -1486,7 +1501,7 @@ class ConfigManager
         $isConfigurable = $this->cache->getConfigurable($className, $fieldName);
         if (null === $isConfigurable) {
             $isConfigurable = (null !== $this->getModelManager()->findFieldModel($className, $fieldName));
-            $this->cache->saveConfigurable($isConfigurable, $className, $fieldName);
+            $this->cache->saveConfigurable($isConfigurable, $className, $fieldName, $this->localCacheOnly);
         }
 
         return $isConfigurable;

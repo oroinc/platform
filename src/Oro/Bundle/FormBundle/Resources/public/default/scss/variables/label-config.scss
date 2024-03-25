@@ -1,5 +1,6 @@
 /* @theme: default; */
 
-$label-offset: spacing('sm') !default;
+$label-offset: 0 0 spacing('sm') 0 !default;
 $label-font-size: $base-font-size !default;
-$label-required-color: get-color('destructive', 'dark') !default;
+$label-font-transform: capitalize !default;
+$label-font-weight: font-weight('semi-bold') !default;

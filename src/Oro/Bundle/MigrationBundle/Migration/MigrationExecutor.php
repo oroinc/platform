@@ -21,6 +21,7 @@ use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Migrations query executor.
@@ -125,7 +126,12 @@ class MigrationExecutor
     ): bool {
         $result = true;
 
-        $this->logger->info(sprintf('> %s', \get_class($migration)));
+        $name = \get_class($migration);
+        $stopwatch = new Stopwatch();
+        $stopwatch->start($name);
+
+        $this->logger->info(sprintf('> %s', $name));
+
         $toSchema = clone $schema;
         $this->setExtensions($migration);
         try {
@@ -161,6 +167,14 @@ class MigrationExecutor
             $result = false;
             $this->logger->error(sprintf('  ERROR: %s', $ex->getMessage()));
         }
+
+        $stopwatch->stop($name);
+
+        $this->logger->info(sprintf(
+            '  <comment>%.2F MiB - %d ms</comment>',
+            $stopwatch->getEvent($name)->getMemory() / 1024 / 1024,
+            $stopwatch->getEvent($name)->getDuration()
+        ));
 
         return $result;
     }

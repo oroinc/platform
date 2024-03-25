@@ -2,12 +2,14 @@
 
 .label {
     font-size: $label-font-size;
+    text-transform: $label-font-transform;
+    font-weight: $label-font-weight;
+    margin: $label-offset;
 
     display: inline-block;
     max-width: 100%;
 
     &--full {
         width: 100%;
-        margin-bottom: $label-offset;
     }
 }
