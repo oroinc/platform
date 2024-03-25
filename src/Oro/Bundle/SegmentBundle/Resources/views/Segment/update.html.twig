@@ -92,32 +92,31 @@
 
     {% set ownerDataBlock = oro_form_process(ownerDataBlock, form) %}
     {% set dataBlocks = [{
-            'title': 'General'|trans,
-            'class': 'active',
-            'subblocks': [
-                {
-                    'title': '',
-                    'data': [
-                        form_row(form.name, {'label': 'oro.segment.name.label'}),
-                        form_row(form.description, {
-                            'label': 'oro.segment.description.label',
-                            'attr': {
-                                'class': 'segment-descr'
-                            }
-                        })
-                    ]
-                },
-                {
-                    'title': '',
-                    'data': [
-                        form_row(form.entity, {'label': 'oro.segment.entity.label'}),
-                        form_row(form.type, {'label': 'oro.segment.type.label'}),
-                        form_row(form.recordsLimit, {'label': 'oro.segment.records_limit.label'})
-                    ] | merge(ownerDataBlock.dataBlocks[0].subblocks[0].data)
-                }
-            ]
-        }]
-    %}
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.name, {'label': 'oro.segment.name.label'}),
+                    form_row(form.description, {
+                        'label': 'oro.segment.description.label',
+                        'attr': {
+                            'class': 'segment-descr'
+                        }
+                    })
+                ]
+            },
+            {
+                'title': '',
+                'data': [
+                    form_row(form.entity, {'label': 'oro.segment.entity.label'}),
+                    form_row(form.type, {'label': 'oro.segment.type.label'}),
+                    form_row(form.recordsLimit, {'label': 'oro.segment.records_limit.label'})
+                ] | merge(ownerDataBlock.dataBlocks[0].subblocks[0].data)
+            }
+        ]
+    }] %}
 
     {% set type = 'oro_segment' %}
     {% set dataBlocks = dataBlocks|merge( [{
@@ -150,7 +149,9 @@
                         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
                         'metadata': metadata,
                         'fieldConditionOptions': form.vars.field_condition_options
-                    })
+                    }),
+                    segmentQD.expressionEditor(),
+                    QD.query_type_converter()
                 ]
             },
         ]

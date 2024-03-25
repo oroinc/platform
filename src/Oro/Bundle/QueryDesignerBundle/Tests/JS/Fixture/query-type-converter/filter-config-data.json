@@ -1,0 +1,36 @@
+{
+  "filters": [
+    {
+      "applicable": [
+        {
+          "type": "enum"
+        }
+      ],
+      "choices": [],
+      "init_module": "oroquerydesigner/js/enum-filter-initialized-mock",
+      "name": "enum",
+      "type": "dictionary"
+    },
+    {
+      "applicable": [
+        {
+          "type": "integer"
+        }
+      ],
+      "choices": [],
+      "name": "number",
+      "type": "number"
+    },
+    {
+      "applicable": [
+        {
+          "type": "float"
+        }
+      ],
+      "choices": [],
+      "name": "number",
+      "type": "number"
+    }
+  ],
+  "hierarchy": []
+}

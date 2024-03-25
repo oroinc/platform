@@ -44,6 +44,8 @@ api:
                             data_type: string
                         name:
                             data_type: string
+                        normalizedName:
+                            data_type: string
                         type:
                             data_type: string
                         relationType:

@@ -1,8 +1,6 @@
 define(function(require) {
     'use strict';
 
-    // @export oroquerydesigner/js/app/views/field-condition-view
-
     const $ = require('jquery');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
@@ -41,21 +39,17 @@ define(function(require) {
                 this.$filterContainer.html('<span class="loading-indicator">' + __('Loading...') + '</span>');
             }, 100);
 
-            loadModules(requires, function(Filter, optionResolver) {
-                const appendFilter = () => {
-                    clearTimeout(showLoadingTimeout);
-                    const filter = new (Filter.extend(filterOptions))();
-                    if (!this.disposed) {
-                        this._appendFilter(filter);
-                    }
-                };
-                if (optionResolver) {
-                    const promise = optionResolver(filterOptions, this.subview('choice-input').splitFieldId(fieldId));
-                    promise.done(appendFilter);
-                } else {
-                    appendFilter();
+            loadModules(requires, (Filter, optionResolver) => {
+                if (this.disposed) {
+                    return;
                 }
-            }, this);
+                clearTimeout(showLoadingTimeout);
+                if (optionResolver) {
+                    optionResolver(filterOptions, this.subview('choice-input').getFieldSignature(fieldId));
+                }
+                const filter = new (Filter.extend(filterOptions))();
+                this._appendFilter(filter);
+            });
         },
 
         _createFilterOptions: function(fieldId) {
@@ -72,7 +66,7 @@ define(function(require) {
                     type: 'none',
                     applicable: {},
                     popupHint: '<span class="deleted-field">' +
-                    __('oro.querydesigner.field_condition.filter_not_supported') + '</span>'
+                        __('oro.querydesigner.field_condition.filter_not_supported') + '</span>'
                 };
             }
 

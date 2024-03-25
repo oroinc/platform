@@ -122,12 +122,31 @@ class OroSelenium2Driver extends Selenium2Driver
         $element = $this->findElement($xpath);
         $elementName = strtolower($element->name());
 
-        if ($clearField && in_array($elementName, array('input', 'textarea'))) {
+        if ($clearField && in_array($elementName, ['input', 'textarea'])) {
             $existingValueLength = strlen($this->getValue($xpath));
             $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value;
         }
 
-        $element->postValue(array('value' => array($value)));
+        $element->postValue(['value' => [$value]]);
+    }
+
+    /**
+     * @param string $xpath
+     * @param string $value
+     */
+    public function setInnerHtmlForElement($xpath, $value): void
+    {
+        $element = $this->findElement($xpath);
+        $elementName = strtolower($element->name());
+
+        if (in_array($elementName, ['div'])) {
+            $value = json_encode($value);
+            $script = <<<JS
+var node = {{ELEMENT}};
+node.innerHTML = $value;
+JS;
+            $this->executeJsOnElement($element, $script);
+        }
     }
 
     /**

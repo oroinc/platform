@@ -53,7 +53,7 @@ define(function(require) {
         currentDraggingElementHeight: 0,
 
         /**
-         * @type {Object<string, View>}
+         * @type {Object.<string, View>}
          */
         criteriaModules: undefined,
 
@@ -63,7 +63,7 @@ define(function(require) {
         value: null,
 
         /**
-         * @type {Object<string, ConditionView>}
+         * @type {Object.<string, ConditionView>}
          */
         conditions: undefined,
 
@@ -172,6 +172,7 @@ define(function(require) {
             if (!tools.isEqualsLoosely(value, this.value)) {
                 this.value = value;
                 this.render();
+                this.trigger('change', value);
             }
         },
 

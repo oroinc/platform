@@ -224,6 +224,13 @@ define(function(require) {
         },
 
         /**
+         * @param {string} fieldId
+         * @returns {*|FieldSignature|null}
+         */
+        getFieldSignature: function(fieldId) {
+            return this.dataProvider.getFieldSignatureSafely(fieldId);
+        },
+        /**
          *
          * @param {string} path
          * @returns {Array}

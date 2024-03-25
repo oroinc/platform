@@ -88,31 +88,30 @@
 
     {% set ownerDataBlock = oro_form_process(ownerDataBlock, form) %}
     {% set dataBlocks = [{
-            'title': 'General'|trans,
-            'class': 'active',
-            'subblocks': [
-                {
-                    'title': '',
-                    'data': [
-                        form_row(form.name, {'label': 'oro.report.name.label'}),
-                        form_row(form.description, {
-                            'label': 'oro.report.description.label',
-                            'attr': {
-                                'class': 'report-descr'
-                            }
-                        })
-                    ]
-                },
-                {
-                    'title': '',
-                    'data': [
-                        form_row(form.entity, {'label': 'oro.report.entity.label'}),
-                        form_row(form.type, {'label': 'oro.report.type.label'})
-                    ] | merge(ownerDataBlock.dataBlocks[0].subblocks[0].data)
-                }
-            ]
-        }]
-    %}
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.name, {'label': 'oro.report.name.label'}),
+                    form_row(form.description, {
+                        'label': 'oro.report.description.label',
+                        'attr': {
+                            'class': 'report-descr'
+                        }
+                    })
+                ]
+            },
+            {
+                'title': '',
+                'data': [
+                    form_row(form.entity, {'label': 'oro.report.entity.label'}),
+                    form_row(form.type, {'label': 'oro.report.type.label'})
+                ] | merge(ownerDataBlock.dataBlocks[0].subblocks[0].data)
+            }
+        ]
+    }] %}
 
     {% set type = 'oro_report' %}
     {% set dataBlocks = dataBlocks|merge( [{
@@ -175,7 +174,9 @@
                         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
                         'metadata': metadata,
                         'fieldConditionOptions': form.vars.field_condition_options
-                    })
+                    }),
+                    segmentQD.expressionEditor(),
+                    QD.query_type_converter()
                 ]
             },
         ]

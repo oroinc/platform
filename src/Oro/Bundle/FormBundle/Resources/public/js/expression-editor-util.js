@@ -1,639 +1,544 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import BaseClass from 'oroui/js/base-class';
+import ExpressionOperandTypeValidator from 'oroform/js/expression-operand-type-validator';
+import {Token, ExpressionLanguage} from 'oroexpressionlanguage/js/expression-language-library';
 
-    const _ = require('underscore');
+/**
+ * @typedef {Object} AutocompleteData
+ * @poperty {string} expression - full expression
+ * @poperty {number} position - cursor position
+ * @poperty {number} replaceFrom - start part of expression that will be replaced by selected item,
+ * @poperty {number} replaceTo - end part of expression that will be replaced by selected item,
+ * @poperty {string} query - part of expression before cursor that recognized like part of an autocomplete item
+ * @poperty {string} itemsType - one of: `entities`, `operations`, `datasource`
+ * @poperty {Object} items - list of items for autocomplete
+ * @poperty {string} dataSourceKey -  key of data source if item is data source
+ * @poperty {string} dataSourceValue - value of data source if item is data source
+ */
 
-    const ExpressionEditorUtil = function(options) {
-        this._initialize(options);
-    };
+/**
+ * @typedef {Object} FieldChain
+ * @poperty {Token} entity - Token with name type that contains entity name
+ * @poperty {Token} [dataSourceOpenBracket] - Token with punctuation type, is presented when entity has a datasource
+ * @poperty {Token} [dataSourceValue] - Token with constant type
+ * @poperty {Token} [dataSourceCloseBracket] - Token with punctuation type
+ * @poperty {Array.<Token>} fields
+ * @poperty {Token} lastToken
+ */
 
-    ExpressionEditorUtil.prototype = {
-        /**
-         * RegEx, used for expression analyze, autocomplete and validate
-         */
-        regex: {
-            itemPartBeforeCursor: /^.*[ ]/g, // 1 == prod|uct.id and ... => prod
-            itemPartAfterCursor: /[ ].*$/g, // 1 == prod|uct.id and ... => uct.id
-            findArray: /\[[^\[\]]*\]/, // [1, [2]] or [3] => [3]
-            splitExpressionToItems: /([ \(\)])/, // item1 or (item2) => [item1, ,or, ,(,items2,)]
-            clearStringSpecialSymbols: /\\\\|\\['"]/g, // \|\"|\' =>
-            clearString: /"[^"]*"|'[^']*'/g, // 'string' => "string" => ""
-            replaceDataSourceId: /^\[\s*\d+\s*\]/, // dataSource[1] => dataSource
-            cutDataSourceId: /\[(.*?)\]/g, // dataSource[1] => "1", dataSource[] => ""
-            removeDuplicatedWhitespaces: /\s+/g, // "  " => " "
-            removeBracketsWhitespaces: /(\()\s|\s(\))/g, // "( " => "(", " )" => ")",
-            nativeReplaceLogicalIOperations: /&&|\|\|/g, // && => &, || => &
-            nativeReplaceAllowedBeforeTest: /true|false|indexOf/g, // true|false|... =>
-            nativeFindNotAllowed: /[;a-z]/i // any not allowed symbols before JS execution
+const ExpressionEditorUtil = BaseClass.extend({
+    /**
+     * Constants, used for expression build
+     */
+    strings: {
+        childSeparator: '.',
+        itemSeparator: ' '
+    },
+
+    /**
+     * Default options
+     */
+    defaultOptions: {
+        itemLevelLimit: 3,
+        allowedOperations: ['math', 'bool', 'equality', 'compare', 'inclusion', 'like'],
+        operations: {
+            math: ['+', '-', '%', '*', '/'],
+            bool: ['and', 'or'],
+            equality: ['==', '=', '!='], // @todo '==' or '=' ?
+            compare: ['>', '<', '<=', '>='],
+            inclusion: ['in', 'not in'],
+            like: ['matches']
         },
-
-        /**
-         * Constants, used for expression build
-         */
-        strings: {
-            childSeparator: '.',
-            itemSeparator: ' ',
-            arrayPlaceholder: '{array}'// used to remove nested arrays
-        },
-
-        /**
-         * Initialize options
-         */
-        options: {
-            itemLevelLimit: 3,
-            allowedOperations: ['math', 'bool', 'equality', 'compare', 'inclusion', 'like'],
-            operations: {
-                math: ['+', '-', '%', '*', '/'],
-                bool: ['and', 'or'],
-                equality: ['==', '!='],
-                compare: ['>', '<', '<=', '>='],
-                inclusion: ['in', 'not in'],
-                like: ['matches']
-            },
-            entities: {
-                root_entities: {},
-                fields_data: {}
-            },
-            dataSource: {}
-        },
-
-        /**
-         * Rules to convert single item to native JS
-         */
-        itemToNativeJS: {
-            'and': '&&',
-            'or': '||',
-            'boolean': 'true',
-            'relation': 'true',
-            'datetime': '0',
-            'integer': '0',
-            'float': '0',
-            'standalone': '""',
-            'string': '""',
-            'in': '$next.indexOf($prev) != -1',
-            'not in': '$next.indexOf($prev) == -1',
-            'matches': '$prev.indexOf($next) != -1',
-            'enum': '[]',
-            'collection': '[]'
-        },
-
-        /**
-         * Generated list of all autocomplete items
-         */
-        allItems: null,
-
-        /**
-         * Generated list of operations autocomplete items
-         */
-        operationsItems: null,
-
-        /**
-         * Generated list of entities autocomplete items
-         */
-        entitiesItems: null,
-
-        /**
-         * Generated list of available data sources
-         */
-        dataSource: null,
-
-        /**
-         * Initialize util
-         *
-         * @param {Object} options
-         */
-        _initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-            this.options.component = this;
-
-            this.dataSource = _.keys(this.options.dataSource);
-
-            this._prepareItems();
-        },
-
-        /**
-         * Validate expression syntax
-         *
-         * @param {String} expression
-         * @return {Boolean}
-         */
-        validate: function(expression) {
-            expression = _.trim(expression);
-            if (expression.length === 0) {
-                return true;
-            }
-
-            expression = this._convertExpressionToNativeJS(expression);
-            if (expression === false) {
-                return false;
-            }
-            return this._validateNativeJS(expression);
-        },
-
-        /**
-         * Convert expression to native JS code
-         *
-         * @param {String} expression
-         * @return {Boolean|String}
-         * @private
-         */
-        _convertExpressionToNativeJS: function(expression) {
-            const clearMethods = ['_clearStrings', '_clearDataSource', '_clearArrays', '_clearSeparators'];
-            for (let i = 0; i < clearMethods.length; i++) {
-                expression = this[clearMethods[i]](expression);
-                if (expression === false) {
-                    return false;
-                }
-            }
-
-            const items = expression.split(this.regex.splitExpressionToItems);
-            _.each(items, this._convertItemToNativeJS, this);
-
-            return items.join('');
-        },
-
-        /**
-         * Convert item, or group of items, to native JS code
-         *
-         * @param {String} item
-         * @param {Integer} i
-         * @param {Array} items
-         * @private
-         */
-        _convertItemToNativeJS: function(item, i, items) {
-            if (item.length === 0) {
-                return item;
-            }
-            const prevSeparator = i - 1;
-            const prevItem = prevSeparator - 1;
-            let nextSeparator = i + 1;
-            let nextItem = nextSeparator + 1;
-
-            const groupedItem = item + this.strings.itemSeparator + items[nextItem];
-            if (items[nextItem] && this.allItems[groupedItem]) {
-                // items with whitespaces, for example: `not in`
-                item = groupedItem;
-                items[nextItem] = '';
-                items[nextSeparator] = '';
-
-                nextSeparator = nextItem + 1;
-                nextItem = nextSeparator + 1;
-            }
-
-            let nativeJS = this._getNativeJS(item);
-            if (nativeJS === item) {
-                items[i] = nativeJS;
-                return nativeJS;
-            }
-
-            if (nativeJS.indexOf('$prev') !== -1 && items[prevItem]) {
-                nativeJS = nativeJS.replace('$prev', items[prevItem]);
-                items[prevItem] = '';
-                items[prevSeparator] = '';
-            }
-
-            if (nativeJS.indexOf('$next') !== -1 && items[nextItem]) {
-                nativeJS = nativeJS.replace('$next', this._convertItemToNativeJS(items[nextItem], nextItem, items));
-                items[nextItem] = '';
-                items[nextSeparator] = '';
-            }
-
-            items[i] = nativeJS;
-            return nativeJS;
-        },
-
-        /**
-         * Make all strings empty, convert all strings to use double quote
-         *
-         * @param {String} expression
-         * @return {Boolean|String}
-         * @private
-         */
-        _clearStrings: function(expression) {
-            // remove `\`, `\"` and `\'` symbols
-            expression = expression.replace(this.regex.clearStringSpecialSymbols, '');
-            // clear strings and convert quotes
-            expression = expression.replace(this.regex.clearString, '""');
-            return expression;
-        },
-
-        /**
-         * Validate data source and replace data source [id]
-         *
-         * @param {String} expression
-         * @return {Boolean|String}
-         * @private
-         */
-        _clearDataSource: function(expression) {
-            const dataSources = this.dataSource;
-            if (!dataSources.length) {
-                return expression;
-            }
-
-            const items = expression.split(this.regex.splitExpressionToItems);
-            let item;
-            // check all items
-            for (let i = 0; i < items.length; i++) {
-                item = items[i];
-                // check all data sources in item
-                for (let j = 0; j < dataSources.length; j++) {
-                    item = item.split(new RegExp('(' + dataSources[j] + ')'));
-                    if (item.length < 2 || item[0] !== '') {
-                        // data source not found in item or not in item beginning
-                        continue;
-                    } else if (item[2].indexOf(this.strings.childSeparator) === 0) {
-                        // not valid
-                        return false;
-                    }
-
-                    item[2] = item[2].replace(this.regex.replaceDataSourceId, '');
-
-                    items[i] = item.join('');
-                    break;
-                }
-            }
-
-            return items.join('');
-        },
-
-        /**
-         * Validate arrays and make them empty, remove nested arrays
-         *
-         * @param {String} expression
-         * @return {String|Boolean}
-         * @private
-         */
-        _clearArrays: function(expression) {
-            let array;
-            let changedExpression;
-            const arrayPlaceholder = this.strings.arrayPlaceholder;
-
-            /*
-            while we have an [ or ]
-                [1, [2]] or [3]     => [1, {array}] or [3]
-                [1, {array}] or [3] => {array} or [3]
-                {array} or [3]      => {array} or {array}
-            then
-                {array} or {array}  => [] or []
-             */
-            while (expression.indexOf('[') !== -1 && expression.indexOf(']') !== -1) {
-                array = expression.match(this.regex.findArray);
-                if (array.length === 0) {
-                    // we have not closed array
-                    return false;
-                }
-
-                array = array[0];
-                if (!this._validateNativeJS(array.replace(new RegExp(arrayPlaceholder, 'g'), '[]'))) {
-                    // array not valid
-                    return false;
-                }
-
-                changedExpression = expression.replace(array, arrayPlaceholder);
-                if (changedExpression === expression) {
-                    return false;// recursion
-                }
-
-                expression = changedExpression;
-            }
-
-            expression = expression.replace(new RegExp(arrayPlaceholder, 'g'), '[]');
-
-            return expression;
-        },
-
-        /**
-         * Remove duplicated/extra whitespaces
-         *
-         * @param {String} expression
-         * @return {String|Boolean}
-         * @private
-         */
-        _clearSeparators: function(expression) {
-            expression = expression.replace(this.regex.removeDuplicatedWhitespaces, ' ');
-            expression = expression.replace(this.regex.removeBracketsWhitespaces, '$1$2');
-            return expression;
-        },
-
-        /**
-         * Try to find native JS code for expression item
-         *
-         * @param {String} item
-         * @return {String}
-         * @private
-         */
-        _getNativeJS: function(item) {
-            const foundItem = this.allItems[item];
-            if (this.itemToNativeJS[item] !== undefined) {
-                return this.itemToNativeJS[item];
-            } else if (foundItem && this.itemToNativeJS[foundItem.type] !== undefined) {
-                return this.itemToNativeJS[foundItem.type];
-            }
-            return item;
-        },
-
-        /**
-         * Validate native JS expression
-         *
-         * @param {String} expression
-         * @return {Boolean}
-         * @private
-         */
-        _validateNativeJS: function(expression) {
-            const testExpression = expression.replace(this.regex.nativeReplaceAllowedBeforeTest, '');
-            if (this.regex.nativeFindNotAllowed.test(testExpression)) {
-                return false;
-            }
-            // replace all "&&" and "||" to "&", because if first part of "&&" or "||" return true or false - JS ignore(do not execute) second part
-            expression = expression.replace(this.regex.nativeReplaceLogicalIOperations, '&');
-            try {
-                const f = new Function('return ' + expression);
-                const result = f();
-                return _.isBoolean(result) || !_.isUndefined(result);
-            } catch (e) {
-                return false;
-            }
-        },
-
-        /**
-         * Build autocomplete data by expression and cursor position
-         *
-         * @param {String} expression
-         * @param {Integer} position
-         * @return {Object}
-         */
-        getAutocompleteData: function(expression, position) {
-            return this._prepareAutocompleteData(expression, position);
-        },
-
-        /**
-         * Update autocomplete expression by item parts
-         *
-         * @param {Object} autocompleteData
-         * @private
-         */
-        _updateAutocompleteExpression: function(autocompleteData) {
-            autocompleteData.expression = autocompleteData.beforeItem +
-                autocompleteData.itemChild.join(this.strings.childSeparator) +
-                autocompleteData.afterItem;
-        },
-
-        /**
-         * Insert into autocomplete data new item
-         *
-         * @param {Object} autocompleteData
-         * @param {String} item
-         */
-        updateAutocompleteItem: function(autocompleteData, item) {
-            let positionModifier = 0;
-            const hasChild = !!autocompleteData.items[item].child;
-            const hasDataSource = this.dataSource.indexOf(item) !== -1;
-
-            if (hasDataSource) {
-                item += '[]';
-                positionModifier = hasChild ? -2 : -1;
-            }
-
-            item += hasChild ? this.strings.childSeparator : this.strings.itemSeparator;
-
-            autocompleteData.itemChild[autocompleteData.itemLastChildIndex] = item;
-
-            this._updateAutocompleteExpression(autocompleteData);
-
-            autocompleteData.position = autocompleteData.expression.length - autocompleteData.afterItem.length +
-                positionModifier;
-        },
-
-        /**
-         * Set new data source value into autocomplete data
-         *
-         * @param {Object} autocompleteData
-         * @param {String} dataSourceValue
-         */
-        updateDataSourceValue: function(autocompleteData, dataSourceValue) {
-            autocompleteData.itemChild[autocompleteData.itemCursorIndex] = autocompleteData
-                .itemCursorChild.replace(this.regex.cutDataSourceId, '[' + dataSourceValue + ']');
-
-            this._updateAutocompleteExpression(autocompleteData);
-
-            autocompleteData.position = autocompleteData.expression.length - autocompleteData.afterItem.length;
-        },
-
-        /**
-         * Generate list of all autocomplete items from initialize options
-         *
-         * @private
-         */
-        _prepareItems: function() {
-            this.allItems = {};
-            this.operationsItems = {};
-            this.entitiesItems = {};
-
-            this._prepareEntitiesItems();
-            this._prepareOperationsItems();
-        },
-
-        /**
-         * Add new autocomplete item
-         *
-         * @param {String} group
-         * @param {Object} items
-         * @param {String} item
-         * @param {Object} itemInfo
-         * @private
-         */
-        _addItem: function(group, items, item, itemInfo) {
-            if (itemInfo.child !== undefined && _.isEmpty(itemInfo.child)) {
-                // item is collection without child
-                return;
-            }
-
-            itemInfo.group = group;
-            if (itemInfo.parentItem) {
-                itemInfo.item = itemInfo.parentItem + this.strings.childSeparator + item;
-            } else {
-                itemInfo.item = item;
-            }
-
-            this.allItems[itemInfo.item] = itemInfo;
-            items[item] = itemInfo;
-        },
-
-        /**
-         * Generate list of operations autocomplete items from initialize options
-         *
-         * @private
-         */
-        _prepareOperationsItems: function() {
-            _.each(this.options.allowedOperations, function(type) {
-                _.each(this.options.operations[type], function(item) {
-                    this._addItem('operations', this.operationsItems, item, {
-                        type: type
-                    });
-                }, this);
-            }, this);
-        },
-
-        /**
-         * Generate list of entities autocomplete items from initialize options
-         *
-         * @private
-         */
-        _prepareEntitiesItems: function() {
-            _.each(this.options.entities.root_entities, function(item, entity) {
-                this._addItem('entities', this.entitiesItems, item, {
-                    child: this._getEntityChild(1, item, entity)
-                });
-            }, this);
-        },
-
-        /**
-         * Prepare entity child for autocomplete items
-         *
-         * @param {Integer} level
-         * @param {String} parentItem
-         * @param {String} entity
-         * @return {Object}
-         * @private
-         */
-        _getEntityChild: function(level, parentItem, entity) {
-            const child = {};
-
-            level++;
-            if (level > this.options.itemLevelLimit) {
-                return child;
-            }
-
-            _.each(this.options.entities.fields_data[entity], function(itemInfo, item) {
-                const childItem = parentItem + this.strings.childSeparator + item;
-                itemInfo.parentItem = parentItem;
-                if (itemInfo.type === 'relation') {
-                    itemInfo.child = this._getEntityChild(level, childItem, itemInfo.relation_alias);
-                }
-                this._addItem('entities', child, item, itemInfo);
-            }, this);
-
-            return child;
-        },
-
-        /**
-         * Create autocomplete data object
-         *
-         * @param {String} expression
-         * @param {Integer} position
-         * @return {Object}
-         */
-        _prepareAutocompleteData: function(expression, position) {
-            const autocompleteData = {
-                expression: expression, // full expression
-                position: position, // cursor position
-                item: '', // item under cursor or just "item"
-                beforeItem: '', // part of expression before item
-                afterItem: '', // part of expression after item
-                itemChild: [], // child of item
-                itemLastChildIndex: 0, // index of last child of item
-                itemLastChild: '', // last child of item
-                itemCursorIndex: 0, // index of an item child under cursor
-                itemCursorChild: '', // item child under cursor
-                group: '', // group of items for autocomplete
-                items: {}, // list of items for autocomplete
-                dataSourceKey: '', // key of data source if item is data source
-                dataSourceValue: ''// value of data source if item is data source
-            };
-
-            this._setAutocompleteItem(autocompleteData);
-            this._setAutocompleteGroup(autocompleteData);
-            this._setAutocompleteItems(autocompleteData);
-            this._setAutocompleteDataSource(autocompleteData);
-
-            return autocompleteData;
-        },
-
-        /**
-         * Set item info into autocomplete data
-         *
-         * @param {Object} autocompleteData
-         * @private
-         */
-        _setAutocompleteItem: function(autocompleteData) {
-            const beforeCaret = autocompleteData.expression.slice(0, autocompleteData.position);
-            const afterCaret = autocompleteData.expression.slice(autocompleteData.position);
-
-            const itemBeforeCursor = beforeCaret.replace(this.regex.itemPartBeforeCursor, '');
-            const itemAfterCursor = afterCaret.replace(this.regex.itemPartAfterCursor, '');
-
-            autocompleteData.beforeItem = beforeCaret.slice(0, beforeCaret.length - itemBeforeCursor.length);
-            autocompleteData.afterItem = afterCaret.slice(itemAfterCursor.length);
-
-            autocompleteData.item = itemBeforeCursor + itemAfterCursor;
-            autocompleteData.itemChild = autocompleteData.item.split(this.strings.childSeparator);
-            autocompleteData.itemLastChildIndex = autocompleteData.itemChild.length - 1;
-            autocompleteData.itemLastChild = autocompleteData.itemChild[autocompleteData.itemLastChildIndex];
-            autocompleteData.itemCursorIndex = itemBeforeCursor.split(this.strings.childSeparator).length - 1;
-            autocompleteData.itemCursorChild = itemBeforeCursor.split(this.strings.childSeparator).pop() +
-                itemAfterCursor.split(this.strings.childSeparator).shift();
-        },
-
-        /**
-         * Set group info into autocomplete data
-         *
-         * @param {Object} autocompleteData
-         * @private
-         */
-        _setAutocompleteGroup: function(autocompleteData) {
-            const prevItemStr = _.trim(autocompleteData.beforeItem).split(this.strings.itemSeparator).pop();
-            const prevItem = this.allItems[prevItemStr] || {};
-
-            if (!prevItemStr || prevItemStr === '(' || prevItem.group === 'operations') {
-                autocompleteData.group = 'entities';
-            } else {
-                autocompleteData.group = 'operations';
-            }
-        },
-
-        /**
-         * Set autocomplete items into autocomplete data
-         *
-         * @param {Object} autocompleteData
-         * @private
-         */
-        _setAutocompleteItems: function(autocompleteData) {
-            let items = this[autocompleteData.group + 'Items'];
-            let item;
-            for (let i = 0; i < autocompleteData.itemChild.length - 1; i++) {
-                item = autocompleteData.itemChild[i];
-                item = item.replace(this.regex.cutDataSourceId, '');
-                items = items[item] || {};
-                items = items.child || null;
-                if (!items) {
-                    break;
-                }
-            }
-
-            autocompleteData.items = items || {};
-        },
-
-        /**
-         * Set data source info into autocomplete data
-         *
-         * @param {Object} autocompleteData
-         * @private
-         */
-        _setAutocompleteDataSource: function(autocompleteData) {
-            let dataSourceKey = autocompleteData.itemCursorChild.replace(this.regex.cutDataSourceId, '');
-            let dataSourceValue = '';
-
-            if (dataSourceKey === autocompleteData.itemCursorChild) {
-                dataSourceKey = '';
-            } else {
-                dataSourceValue = this.regex.cutDataSourceId.exec(autocompleteData.itemCursorChild);
-                dataSourceValue = dataSourceValue ? dataSourceValue[1] : '';
-            }
-
-            autocompleteData.dataSourceKey = dataSourceKey;
-            autocompleteData.dataSourceValue = dataSourceValue;
+        supportedNames: []
+    },
+
+    /**
+     * Generated list of operations autocomplete items
+     */
+    operationsItems: null,
+
+    /**
+     * Generated list of available data sources
+     */
+    dataSourceNames: null,
+
+    /**
+     * Instance of ExpressionLanguage that can parse an expression
+     */
+    expressionLanguage: null,
+
+    /**
+     * Instance of EntityStructureDataProvider that contains data about entity fields
+     */
+    entityDataProvider: null,
+
+    /**
+     * Instance of ExpressionOperandTypeValidator that can check allowed operations, type of operands, and presence
+     * used fields in an entity structure
+     */
+    expressionOperandTypeValidator: null,
+
+    constructor: function ExpressionEditorUtil(options) {
+        ExpressionEditorUtil.__super__.constructor.call(this, options);
+    },
+
+    /**
+     * Initialize util
+     *
+     * @param {Object} options
+     */
+    initialize(options) {
+        if (!options.entityDataProvider) {
+            throw new Error('Option "entityDataProvider" is required');
         }
-    };
+        if ('itemLevelLimit' in options && (!_.isNumber(options.itemLevelLimit) || options.itemLevelLimit < 2)) {
+            throw new Error('Option "itemLevelLimit" can\'t be smaller than 2');
+        }
+        _.extend(this, _.pick(options, 'entityDataProvider', 'dataSourceNames'));
+        this.options = _.defaults(_.pick(options, _.keys(this.defaultOptions)), this.defaultOptions);
+        this.expressionLanguage = new ExpressionLanguage(
+            options.expressionParserCache || void 0,
+            options.expressionFunctionProviders || []
+        );
+        this._prepareOperationsItems();
+        this._createValidator();
+        this.listenTo(this.entityDataProvider, 'root-entity-change', this.onRootEntityChanged);
+        ExpressionEditorUtil.__super__.initialize.call(this, options);
+    },
 
-    return ExpressionEditorUtil;
+    dispose() {
+        if (this.disposed) {
+            return;
+        }
+
+        [
+            'entityDataProvider', 'expressionOperandTypeValidator', 'dataSourceNames', 'options',
+            'expressionLanguage', 'operationsItems'
+        ].forEach(key=> delete this[key]);
+
+        ExpressionEditorUtil.__super__.dispose.call(this);
+    },
+
+    /**
+     * Prepares options and creates instance of ExpressionOperandTypeValidator
+     *
+     * @protected
+     */
+    _createValidator() {
+        const entities = this._getSupportedNames().map(entityName => {
+            return {
+                isCollection: this.dataSourceNames.indexOf(entityName) !== -1,
+                name: entityName,
+                fields: this.entityDataProvider.getEntityTreeNodeByPropertyPath(entityName)
+            };
+        });
+        const validatorOptions = {
+            entities: entities,
+            itemLevelLimit: this.options.itemLevelLimit,
+            operations: this.operationsItems,
+            isConditionalNodeAllowed: false
+        };
+        this.expressionOperandTypeValidator = new ExpressionOperandTypeValidator(validatorOptions);
+        this.normalizedNamesMap = this.generateNormalizedNamesMap();
+    },
+
+    /**
+     * Rebuild validator instance when supported names are changed
+     */
+    onRootEntityChanged() {
+        this._createValidator();
+    },
+
+    generateNormalizedNamesMap() {
+        if (!this.entityDataProvider.collection) {
+            return {};
+        }
+
+        const {data} = this.entityDataProvider.collection.toJSON();
+        const queue = data.filter(({attributes}) => this._getSupportedNames().includes(attributes.alias));
+        const results = {};
+
+        while (queue.length) {
+            const {attributes, normalizedName, name} = queue.shift();
+
+            if (attributes && Array.isArray(attributes.fields)) {
+                queue.unshift(...attributes.fields);
+            }
+
+            if (normalizedName && name && normalizedName !== name) {
+                results[normalizedName] = name;
+                results[name] = normalizedName;
+            }
+        }
+
+        return results;
+    },
+
+    /**
+     * Validate expression syntax
+     *
+     * @param {string} expression
+     * @param {boolean} returnException
+     * @return {boolean|any}
+     */
+    validate(expression, returnException = false) {
+        let isValid = true;
+        let exception = '';
+        try {
+            const parsedExpression = this.expressionLanguage.parse(
+                this.unNormalizePropertyNamesExpression(expression),
+                this._getSupportedNames()
+            );
+            this.expressionOperandTypeValidator.expectValid(parsedExpression);
+        } catch (ex) {
+            isValid = false;
+            exception = ex;
+        }
+
+        if (returnException) {
+            return [isValid, exception];
+        }
+
+        return isValid;
+    },
+
+    /**
+     * Build autocomplete data by expression and cursor position
+     *
+     * @param {string} expression
+     * @param {number} position
+     * @return {AutocompleteData}
+     */
+    getAutocompleteData(expression, position) {
+        const autocompleteData = {
+            expression: expression,
+            position: position,
+            replaceFrom: position,
+            replaceTo: position,
+            query: '',
+            items: {},
+            itemsType: '',
+            dataSourceKey: '',
+            dataSourceValue: ''
+        };
+
+        const tokens = this.expressionLanguage.getLexer().tokenizeForce(expression).tokens;
+        const currentTokenIndex = this._findCurrentTokenIndex(tokens, position);
+        if (currentTokenIndex === -1) {
+            this._fillEntityNamesOptions(autocompleteData);
+            return autocompleteData;
+        }
+        const fieldChain = this.findFieldChain(tokens, currentTokenIndex, this._getSupportedNames());
+        const currentToken = tokens[currentTokenIndex];
+        if (fieldChain) {
+            if (this.dataSourceNames.indexOf(fieldChain.entity.value) !== -1) {
+                const entityWithDataSource = _.values(_.pick(fieldChain, 'entity', 'dataSourceOpenBracket',
+                    'dataSourceValue', 'dataSourceCloseBracket'));
+                if (entityWithDataSource.length >= 3 && entityWithDataSource.indexOf(currentToken) !== -1) {
+                    this._fillDataSourceOptions(autocompleteData, fieldChain);
+                    return autocompleteData;
+                }
+            }
+            this._fillEntityFieldOptions(autocompleteData, fieldChain);
+        } else if (currentToken.test(Token.OPERATOR_TYPE)) {
+            this._fillOperatorsOptions(autocompleteData, currentToken);
+        } else if (currentToken.test(Token.NAME_TYPE)) {
+            this._fillEntityNamesOptions(autocompleteData, currentToken);
+        } else if (currentToken.test(Token.EOF_TYPE)) {
+            const prevToken = currentTokenIndex === 0 ? null : tokens[currentTokenIndex - 1];
+            if (!prevToken || prevToken.test(Token.OPERATOR_TYPE) || prevToken.test(Token.PUNCTUATION_TYPE, '(')) {
+                this._fillEntityNamesOptions(autocompleteData, currentToken);
+            } else {
+                this._fillOperatorsOptions(autocompleteData);
+            }
+        }
+
+        return autocompleteData;
+    },
+
+    /**
+     * Returns array of supported entity names including provider root entity name
+     *
+     * @return {Array.<string>}
+     * @private
+     */
+    _getSupportedNames() {
+        const names = _.clone(this.options.supportedNames);
+        const rootEntityName = this.entityDataProvider.rootEntity && this.entityDataProvider.rootEntity.get('alias');
+        if (rootEntityName && names.indexOf(rootEntityName) === -1) {
+            names.push(rootEntityName);
+        }
+        return names;
+    },
+
+    /**
+     * Fill autocomplete data with supported entity names items
+     *
+     * @param {AutocompleteData} autocompleteData
+     * @param {Token} [currentToken]
+     * @private
+     */
+    _fillEntityNamesOptions(autocompleteData, currentToken) {
+        autocompleteData.itemsType = 'entities';
+        autocompleteData.items = {};
+        this._getSupportedNames().forEach(alias => {
+            autocompleteData.items[alias] = {
+                item: alias,
+                isCollection: this.dataSourceNames.indexOf(alias) !== -1,
+                hasChildren: true
+            };
+        });
+        if (currentToken && currentToken.test(Token.NAME_TYPE)) {
+            autocompleteData.query = currentToken.value;
+            autocompleteData.replaceFrom = currentToken.cursor - 1;
+            autocompleteData.replaceTo = currentToken.cursor + currentToken.length;
+        }
+    },
+
+    /**
+     * Fill autocomplete data with data source options
+     *
+     * @param {AutocompleteData} autocompleteData
+     * @param {FieldChain} fieldChain
+     * @private
+     */
+    _fillDataSourceOptions(autocompleteData, fieldChain) {
+        autocompleteData.itemsType = 'datasource';
+        autocompleteData.dataSourceKey = fieldChain.entity.value;
+        if (fieldChain.dataSourceValue) {
+            autocompleteData.dataSourceValue = fieldChain.dataSourceValue.value;
+            autocompleteData.replaceFrom = fieldChain.dataSourceValue.cursor - 1;
+            autocompleteData.replaceTo =
+                autocompleteData.replaceFrom + fieldChain.dataSourceValue.length;
+        } else {
+            autocompleteData.replaceFrom =
+                autocompleteData.replaceTo = fieldChain.dataSourceCloseBracket.cursor - 1;
+        }
+        autocompleteData.position = fieldChain.lastToken.cursor - 1 + fieldChain.lastToken.length;
+    },
+
+    /**
+     * Fill autocomplete data with entity fields items
+     *
+     * @param {AutocompleteData} autocompleteData
+     * @param {FieldChain} fieldChain
+     * @private
+     */
+    _fillEntityFieldOptions(autocompleteData, fieldChain) {
+        autocompleteData.itemsType = 'entities';
+        if (fieldChain.lastToken.test(Token.PUNCTUATION_TYPE, '.')) {
+            autocompleteData.replaceFrom = fieldChain.lastToken.cursor - 1 + fieldChain.lastToken.length;
+            autocompleteData.replaceTo = autocompleteData.replaceFrom;
+        } else if (fieldChain.fields.length !== 0) {
+            const lastToken = fieldChain.fields.pop();
+            autocompleteData.query = lastToken.value;
+            autocompleteData.replaceFrom = fieldChain.lastToken.cursor - 1;
+            autocompleteData.replaceTo = autocompleteData.replaceFrom + fieldChain.lastToken.length;
+        }
+        const parts = _.pluck(fieldChain.fields, 'value').map(value => this.normalizedNamesMap[value] || value);
+        parts.unshift(fieldChain.entity.value);
+        const omitRelationFields = this.options.itemLevelLimit <= parts.length + 1;
+        const levelLimit = this.options.itemLevelLimit - parts.length;
+        const treeNode = this.entityDataProvider
+            .getEntityTreeNodeByPropertyPath(parts.join(this.strings.childSeparator));
+        if (levelLimit > 0 && treeNode && treeNode.__isEntity) {
+            _.each(treeNode, node => {
+                const isEntity = node.__isEntity;
+                if (isEntity && (omitRelationFields || !node.__hasScalarFieldsInSubtree(levelLimit - 1))) {
+                    return;
+                }
+                const item = _.extend(_.pick(node.__field, 'label', 'type', 'name', 'normalizedName'), {
+                    hasChildren: isEntity
+                });
+                autocompleteData.items[item.name] = item;
+            });
+        }
+    },
+
+    /**
+     * Fill autocomplete data with operations items
+     *
+     * @param {AutocompleteData} autocompleteData
+     * @param {Token} [currentToken]
+     * @private
+     */
+    _fillOperatorsOptions(autocompleteData, currentToken) {
+        autocompleteData.itemsType = 'operations';
+        autocompleteData.items = this.operationsItems;
+        if (currentToken !== void 0) {
+            autocompleteData.query = currentToken.value;
+            autocompleteData.replaceFrom = currentToken.cursor - 1;
+            autocompleteData.replaceTo = currentToken.cursor + currentToken.length;
+        }
+    },
+
+    /**
+     * Update autocomplete expression by item parts
+     *
+     * @param {AutocompleteData} autocompleteData
+     * @param {string} value - string that is selected in autocomplete widget
+     * @private
+     */
+    _updateAutocompleteExpression(autocompleteData, value) {
+        autocompleteData.expression = autocompleteData.expression.substr(0, autocompleteData.replaceFrom) +
+            value + autocompleteData.expression.substr(autocompleteData.replaceTo);
+    },
+
+    /**
+     * Insert into autocomplete data new item
+     *
+     * @param {AutocompleteData} autocompleteData
+     * @param {string} item - selected value in autocomplete widget
+     */
+    updateAutocompleteItem(autocompleteData, item) {
+        let positionModifier = 0;
+        if (autocompleteData.itemsType === 'entities') {
+            const hasChildren = autocompleteData.items[item].hasChildren;
+            if (this.dataSourceNames.indexOf(item) !== -1) {
+                item += '[]';
+                positionModifier = hasChildren ? -2 : -1;
+            }
+
+            item += hasChildren ? this.strings.childSeparator : this.strings.itemSeparator;
+        } else {
+            item += this.strings.itemSeparator;
+        }
+
+        this._updateAutocompleteExpression(autocompleteData, item);
+
+        autocompleteData.position = autocompleteData.replaceFrom + item.length + positionModifier;
+    },
+
+    /**
+     * Set new data source value into autocomplete data
+     *
+     * @param {AutocompleteData} autocompleteData
+     * @param {string} dataSourceValue - selected value in datasource widget
+     */
+    updateDataSourceValue(autocompleteData, dataSourceValue) {
+        const diff = autocompleteData.replaceTo - autocompleteData.replaceFrom - dataSourceValue.length;
+        this._updateAutocompleteExpression(autocompleteData, dataSourceValue);
+        autocompleteData.position -= diff;
+    },
+
+    /**
+     * Generate list of operations autocomplete items from initialize options
+     *
+     * @private
+     */
+    _prepareOperationsItems() {
+        this.operationsItems = {};
+        _.each(this.options.allowedOperations, type => {
+            _.each(this.options.operations[type], item => {
+                this.operationsItems[item] = {
+                    type: type,
+                    item: item
+                };
+            });
+        });
+    },
+
+    /**
+     * Finds index of token that corresponds to current cursor position.
+     *
+     * @param {Array.<Token>} tokens
+     * @param {number} position
+     * @return {number} - if token is not found returns -1
+     * @private
+     */
+    _findCurrentTokenIndex(tokens, position) {
+        for (let i = 0; i < tokens.length; i++) {
+            if (tokens[i].cursor - 1 <= position && tokens[i].cursor + tokens[i].length > position) {
+                return i;
+            }
+        }
+        return -1;
+    },
+
+    /**
+     * Creates field chain that current token is contained in.
+     *
+     * @param {Array.<Token>} tokens
+     * @param {number} currentTokenIndex
+     * @param {Array.<string>} names - names that can be used as start of a chain
+     * @return {FieldChain|null}
+     */
+    findFieldChain(tokens, currentTokenIndex, names) {
+        let chain = null;
+        let i = 0;
+        while (i < tokens.length && i <= currentTokenIndex) {
+            // looking for start of field chain
+            if (!tokens[i].test(Token.NAME_TYPE) || names.indexOf(tokens[i].value) === -1) {
+                i++;
+                continue;
+            }
+            chain = {
+                entity: tokens[i],
+                fields: []
+            };
+            i++;
+            if (tokens[i].test(Token.PUNCTUATION_TYPE, '[')) {
+                chain.dataSourceOpenBracket = tokens[i];
+                i++;
+                if (tokens[i].test(Token.NUMBER_TYPE)) {
+                    chain.dataSourceValue = tokens[i];
+                    i++;
+                }
+                if (tokens[i].test(Token.PUNCTUATION_TYPE, ']')) {
+                    chain.dataSourceCloseBracket = tokens[i];
+                    i++;
+                } else {
+                    chain = null;
+                    continue;
+                }
+            }
+
+            // collect separators and field names that should alternate one after another
+            while (tokens[i].test(Token.PUNCTUATION_TYPE, '.')) {
+                i++;
+                if (tokens[i].test(Token.NAME_TYPE)) {
+                    chain.fields.push(tokens[i]);
+                    i++;
+                } else {
+                    break;
+                }
+            }
+
+            chain.lastToken = tokens[i - 1];
+
+            // if last chain member located before current token in the token array then try to find another chain
+            if (i <= currentTokenIndex || chain.lastToken === chain.entity) {
+                chain = null;
+            }
+            i++;
+        }
+
+        return chain;
+    },
+
+    /**
+     * Unnormalize entity names in expression
+     *
+     * @param {string} expression
+     * @returns {string}
+     */
+    unNormalizePropertyNamesExpression(expression = '') {
+        return expression.replace(/\.([\w]+)/gi, (match, capture) => {
+            return match.replace(capture, this.normalizedNamesMap[capture] || capture);
+        });
+    },
+
+    /**
+     * Normalize entity names in expression
+     *
+     * @param {string} expression
+     * @returns {string}
+     */
+    normalizePropertyNamesExpression(expression = '') {
+        return expression.replace(/\.([\w\\:]+)/gi, (match, capture) => {
+            return match.replace(capture, this.normalizedNamesMap[capture] || capture);
+        });
+    }
 });
+
+export default ExpressionEditorUtil;

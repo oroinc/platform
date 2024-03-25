@@ -131,3 +131,9 @@ services:
         class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\SegmentFiltersPurifier
         public: false
 
+    oro_query_designer.listener.structure_options.aliases:
+        class: 'Oro\Bundle\QueryDesignerBundle\EventListener\EntityStructureOptionsListener'
+        arguments:
+            - '@oro_entity.entity_alias_resolver'
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }

@@ -29,3 +29,59 @@ oro:
             h4: "Heading 4"
             h5: "Heading 5"
             h6: "Heading 6"
+        expression_editor:
+            side_panel:
+                title: 'Click to Insert'
+            fields:
+                entity: 'Entity'
+                select_placeholder: 'Field'
+                breadcrumbs_placeholder: 'Choose a Field'
+            operators:
+                detail:
+                    equal: 'Equal'
+                    not_equal: 'Not Equal'
+                    greater_than_or_equal: 'Greater Than or Equal'
+                    greater_than: 'Greater Than'
+                    less_than_or_equal: 'Less Than or Equal'
+                    less_than: 'Less Than'
+                    multiplication: 'Multiplication'
+                    division: 'Division'
+                    remainder: 'Remainder'
+                    addition: 'Addition'
+                    subtraction: 'Subtraction'
+                    parentheses: 'Parentheses'
+                    in: 'In'
+                    not_in: 'Not in'
+                    and: 'And'
+                    match: 'Match'
+                    does_not_match: 'Not match'
+                    or: 'Or'
+                    is_empty: 'Empty'
+                    is_not_empty: 'Not empty'
+                    between: 'Between'
+                    not_between: 'Not between'
+                    yes: 'Yes'
+                    no: 'No'
+            validation:
+                has_errors: 'Invalid expression'
+                conditional: "Forbidden conditional construction is used in expression."
+                forbidden_operator: "Forbidden operator `{{ operator }}` is used in expression."
+                forbidden_operators: "Forbidden operators `{{ operators }}` are used in expression."
+                entity_name: "Entity name `{{ entityName }}` isn't supported"
+                property_path:
+                    like_variable: "Attempt using `{{ name }}` entity like a variable."
+                    like_single_entity: "Attempt using `{{ name }}` collection like a single entity."
+                    like_collection: "Attempt using `{{ name }}` entity like a collection."
+                    field_not_present: "Field `{{ fieldName }}` isn't presented in `{{ source }}`."
+                    level_limit: "Attempt using `{{ fieldName }}` field of `{{ source }}` exceeds the deep level limit."
+                    not_field: "The `{{ source }}` can't be used as field."
+                brackets:
+                    non_closed: 'Non-closed bracket'
+                    non_opened: 'Non-opened bracket'
+                braces:
+                    non_closed: 'Non-closed brace'
+                    non_opened: 'Non-opened brace'
+                array:
+                    open: 'Incorrect array declaration. Missed open square bracket'
+                    close: 'Incorrect array declaration. Missed close square bracket'
+                    comma: 'Missed comma between array items'

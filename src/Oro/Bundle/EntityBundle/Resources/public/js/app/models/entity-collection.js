@@ -67,7 +67,7 @@ define(function(require) {
          * Converts collection in to an object that is used for API requests
          *
          * @param {Object} [options]
-         * @return {Object<string, {data: Array<Object>}>}
+         * @return {Object.<string, {data: Array.<Object>}>}
          */
         toJSON: function(options) {
             const data = this.map(function(model) {

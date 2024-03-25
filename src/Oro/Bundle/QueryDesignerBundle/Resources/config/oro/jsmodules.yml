@@ -1,13 +1,16 @@
 app-modules:
     - oroquerydesigner/js/app/modules/entity-filter-preset-module
+    - oroquerydesigner/js/app/modules/query-type-converter-module
     - oroquerydesigner/js/app/modules/validator-constraints-module
 dynamic-imports:
     commons:
         - oroquerydesigner/js/app/components/condition-builder-component
+        - oroquerydesigner/js/app/components/query-type-converter-component
         - oroquerydesigner/js/app/views/aggregated-field-condition-view
         - oroquerydesigner/js/app/views/date-grouping-view
         - oroquerydesigner/js/app/views/field-condition-view
         - oroquerydesigner/js/app/views/function-choice-view
+        - oroquerydesigner/js/query-type-converter/expression-functions-provider
         - oroquerydesigner/js/dictionary-filter-initialized
         - oroquerydesigner/js/enum-filter-initialized
         - oroquerydesigner/js/validator/not-empty-filters
