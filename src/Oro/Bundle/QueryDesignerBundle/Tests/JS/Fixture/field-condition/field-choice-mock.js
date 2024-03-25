@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
+    const {defer, findWhere, pick} = require('underscore');
     let _data = null;
     const BaseView = require('oroui/js/app/views/base/view');
 
@@ -14,7 +14,7 @@ define(function(require) {
 
         constructor: function FieldChoiceMock(options) {
             FieldChoiceMock.lastCreatedInstance = this;
-            this.data = _.clone(_data);
+            this.data = {..._data};
             spyOn(this, 'setValue').and.callThrough();
             FieldChoiceMock.__super__.constructor.call(this, options);
         },
@@ -26,7 +26,7 @@ define(function(require) {
 
         render: function() {
             this._deferredRender();
-            _.defer(this._resolveDeferredRender.bind(this));
+            defer(this._resolveDeferredRender.bind(this));
         },
 
         getValue: function() {
@@ -40,7 +40,7 @@ define(function(require) {
 
         getData: function() {
             const entity = this.data[this.entity];
-            const field = _.findWhere(entity.fields, {name: this.value});
+            const field = findWhere(entity.fields, {name: this.value});
             return {id: this.value, text: field.label};
         },
 
@@ -51,9 +51,9 @@ define(function(require) {
                 return signature;
             }
 
-            const field = _.findWhere(entity.fields, {name: fieldId});
+            const field = findWhere(entity.fields, {name: fieldId});
             if (field) {
-                signature = _.pick(field, 'type', 'relationType', 'identifier');
+                signature = pick(field, 'type', 'relationType', 'identifier');
                 signature.field = field.name;
                 signature.entity = entity;
             }

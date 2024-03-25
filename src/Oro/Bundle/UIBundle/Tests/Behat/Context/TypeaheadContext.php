@@ -40,7 +40,7 @@ class TypeaheadContext extends OroFeatureContext implements OroPageObjectAware
         $suggestions = $this->getSuggestionsElement($field);
         $link = $suggestions->find(
             'css',
-            sprintf('li a:contains("%s")', $suggestion)
+            sprintf('li span:contains("%s")', $suggestion)
         );
         self::assertTrue(
             $link && $link->isValid(),
@@ -92,8 +92,14 @@ class TypeaheadContext extends OroFeatureContext implements OroPageObjectAware
      */
     protected function getSuggestionsElement($field)
     {
-        $field = $this->createElement($field);
-        $suggestions = $this->createElement('TypeaheadSuggestionsDropdown', $field->getParent());
+        $fieldElement = $this->createElement($field);
+
+        self::assertTrue(
+            $fieldElement->getParent()->find('css', '.cm-focused')->isVisible(),
+            sprintf('Field "%s" not focused', $field)
+        );
+
+        $suggestions = $this->createElement('TypeaheadSuggestionsDropdown');
         $this->spin(function () use ($suggestions) {
             return $suggestions->isVisible();
         });

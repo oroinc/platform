@@ -4,7 +4,8 @@
 {%- macro getThemeSpriteUrl() -%}
     {% set layoutContext = get_layout_context() %}
     {% set theme = layoutContext.theme %}
-    {{- asset('/build/' ~ theme ~ '/svg-icons/theme-icons.svg') -}}
+    {% set basePath = app.request.basePath|trim %}
+    {{- asset(basePath ~ '/build/' ~ theme ~ '/svg-icons/theme-icons.svg') -}}
 {%- endmacro -%}
 
 {#

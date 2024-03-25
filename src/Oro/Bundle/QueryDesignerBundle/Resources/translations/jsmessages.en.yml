@@ -8,3 +8,10 @@ oro:
             filter_not_supported: "This filter is not supported."
             lifetimevalue_filter_not_supported: "The filtering by the LifetimeValue is not supported yet."
         condition_operation: Operation
+    query_type_switcher:
+        modes:
+            simple: "Visual Editor"
+            advanced: "Expression Editor"
+        messages:
+            simple: 'Current expression is too complex for Visual Editor.'
+            advanced: 'Expression Editor is not compatible with activity, data audit and segment filters.'

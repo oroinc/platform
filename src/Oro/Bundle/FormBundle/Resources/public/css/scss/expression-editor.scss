@@ -1,18 +1,383 @@
 /* @theme: admin.oro; */
 
+:root {
+    --exp-editor-highlight-common: #585858;
+    --exp-editor-highlight-string: #519808;
+    --exp-editor-highlight-number: #7b87b8;
+    --exp-editor-highlight-literal: #7b87b8;
+    --exp-editor-highlight-name: #949bd8;
+    --exp-editor-highlight-property-name: #5dc377;
+    --exp-editor-highlight-punctuation: #585858;
+    --exp-editor-highlight-operator: #b3641e;
+    --exp-editor-highlight-boolean: #8d4402;
+}
+
+.hidden-textarea {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+    opacity: 0;
+}
+
 .expression-editor {
-    &-autocomplete {
-        &.typeahead {
-            &.dropdown-menu {
-                max-height: 152px;
-                overflow-y: auto;
+    border: 1px solid $input-border-color;
+    color: $input-color;
+    background-color: $input-background-color;
+    min-height: 300px;
+    min-width: 500px;
+    flex-direction: row;
+
+    .cm-scroller {
+        margin: 8px;
+        height: auto;
+        width: 100%;
+        border: $input-border-width solid $input-border-color;
+
+        &.cm-has-linter-panel {
+            padding-bottom: 30px;
+        }
+    }
+
+    .cm-tag {
+        &-name {
+            color: var(--exp-editor-highlight-name);
+            font-weight: bold;
+        }
+
+        &-string {
+            color: var(--exp-editor-highlight-string);
+        }
+
+        &-property-name {
+            color: var(--exp-editor-highlight-name);
+        }
+
+        &-literal {
+            color: var(--exp-editor-highlight-literal);
+        }
+
+        &-punctuation {
+            color: var(--exp-editor-highlight-punctuation);
+        }
+
+        &-operator {
+            color: var(--exp-editor-highlight-operator);
+            font-weight: bold;
+        }
+
+        &-number {
+            color: var(--exp-editor-highlight-number);
+        }
+
+        &-boolean {
+            color: var(--exp-editor-highlight-boolean);
+            font-weight: bold;
+        }
+
+        &-common {
+            color: var(--exp-editor-highlight-common);
+        }
+    }
+
+    .cm-selectionBackground,
+    .cm-content ::selection,
+    &.cm-focused .cm-selectionBackground {
+        background-color: $additional-extra-light;
+    }
+
+    &.cm-focused {
+        outline: none;
+
+        .cm-scroller {
+            border-color: $input-focus-border-color;
+        }
+
+        .cm-nonmatchingBracket {
+            background-color: $danger-ultra-light;
+
+            .cm-tag-punctuation {
+                color: $danger;
+            }
+        }
+
+        .cm-matchingBracket {
+            background-color: $success-extra-lighten;
+        }
+    }
+
+    .cm-content {
+        caret-color: $primary;
+    }
+
+    .cm-panels {
+        background-color: $primary-900;
+        color: $primary-200;
+    }
+
+    .cm-panels-top {
+        position: static;
+        width: 170px;
+        min-width: 170px;
+        padding: 8px;
+        border-top-width: 0;
+        border-bottom-width: 0;
+        border-right: 1px solid $input-border-color;
+    }
+
+    .cm-panel-title {
+        font-size: 12px;
+        color: $primary-200;
+        text-transform: uppercase;
+        text-align: center;
+        padding-bottom: 6px;
+    }
+
+    .cm-panel-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: space-between;
+    }
+
+    .cm-btn {
+        min-width: 48px;
+        height: 32px;
+        padding: 0;
+        border-radius: 3px;
+        border: 1px solid $primary-800;
+        background-color: $primary-860;
+        color: $primary-200;
+        text-align: center;
+        font-size: 13px;
+
+        &:focus {
+            outline: none;
+        }
+
+        &:hover {
+            background-color: $primary-750;
+        }
+
+        &-half {
+            min-width: 74px;
+        }
+
+        &-full {
+            width: 100%;
+        }
+    }
+
+    .cm-field-select {
+        display: flex;
+        width: 100%;
+
+        .select2-container {
+            background-color: $primary-860;
+        }
+
+        .select2-chosen {
+            color: $primary-200;
+        }
+    }
+
+    .cm-lintRange-error {
+        background-color: $danger-ultra-light;
+        background-image: none;
+
+        > span {
+            color: $danger;
+        }
+    }
+
+    .validation-error & {
+        .select2-container {
+            border: $select2-container-border;
+        }
+
+        .cm-scroller {
+            border-color: $input-error-border-color;
+        }
+    }
+
+    .expression-editor-data-source.active + & {
+        margin-top: $offset-block / 2;
+    }
+
+    .cm-linter-bottom-panel {
+        position: absolute;
+        left: 180px;
+        right: 10px;
+        bottom: 10px;
+        padding: 2px 10px;
+        background-color: $danger-ultra-light;
+        color: $danger;
+        border: none;
+    }
+}
+
+.cm-select-field-dropdown {
+    .select2-breadcrumbs .select2-breadcrumb-item {
+        .select2-breadcrumb-placeholder {
+            color: $primary-550;
+        }
+
+        &:only-child {
+            color: $link-color;
+            cursor: pointer;
+        }
+    }
+}
+
+.cm-tooltip {
+    border: none;
+    background: none;
+    margin-left: -17px;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+
+        display: block;
+
+        width: 14px;
+        height: 7px;
+
+        left: 7px;
+
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+    }
+
+    &.cm-tooltip-above {
+        margin-top: -$content-padding-small;
+
+        &::before,
+        &::after {
+            top: 100%;
+
+            border-top: 7px solid var(--tooltip-background-color, #{$primary-inverse});
+        }
+
+        &:after {
+            margin-top: -1px;
+        }
+
+        &::before {
+            border-top: 7px solid var(--tooltip-border-color, #{$primary-750});
+        }
+    }
+
+    &.cm-tooltip-below {
+        margin-top: $content-padding-small;
+
+        &::before,
+        &::after {
+            bottom: 100%;
+
+            border-bottom: 7px solid var(--tooltip-background-color, #{$primary-inverse});
+        }
+
+        &:after {
+            margin-bottom: -1px;
+        }
+
+        &::before {
+            border-bottom: 7px solid var(--tooltip-border-color, #{$primary-750});
+        }
+    }
+
+    &.cm-tooltip-autocomplete {
+        color: $dropdown-color;
+        background-color: $dropdown-bg;
+        padding: $dropdown-padding-y 0;
+        margin: $dropdown-spacer 0 0;
+        border: none;
+        box-shadow: $dropdown-menu-box-shadow;
+
+        @include border-radius($dropdown-border-radius);
+        @include box-shadow($dropdown-box-shadow);
+
+        &::before,
+        &::after {
+            display: none;
+        }
+
+        .cm-tooltip-arrow {
+            &::before,
+            &::after {
+                border-top-color: transparent;
+                border-bottom-color: transparent;
+            }
+        }
+
+        > ul {
+            min-width: 50px;
+
+            > li {
+                display: block;
+                // stylelint-disable-next-line declaration-no-important
+                padding: 6px 16px !important;
+                color: $primary-200;
+
+                &[aria-selected] {
+                    color: $primary-200;
+                    background-color: $primary-900;
+                }
             }
         }
     }
 
-    &-data-source {
-        .input-append {
-            margin-top: 10px;
+    &.cm-tooltip-control {
+        --tooltip-background-color: #{$primary-inverse};
+        --tooltip-border-color: #{$primary-750};
+
+        background: $primary-inverse;
+        border-radius: $border-radius;
+        border: 1px solid $primary-750;
+        padding: $content-padding-small;
+    }
+
+    .cm-completionDetail {
+        font-style: normal;
+    }
+
+    .cm-tooltip-lint {
+        background-color: $danger-lighten;
+        color: $danger-ultra-dark;
+        padding: 2px 8px 1px 30px;
+        border-radius: $input-field-border-radius;
+        font-size: $base-font-size;
+        box-shadow: none;
+
+        @include fa-icon($fa-var-times, before, true) {
+            position: absolute;
+            left: 9px;
+            top: 0;
+            font-size: $icon-font-size;
+            color: $danger-darken;
         }
+
+        + .cm-tooltip-arrow {
+            &::before,
+            &::after {
+                border-bottom-color: $danger-ultra-light;
+            }
+        }
+
+        .cm-diagnostic-error {
+            border-left: none;
+            padding: 0;
+            margin: 0;
+        }
+    }
+
+    &:has(> .cm-tooltip-lint) {
+        border: none;
+        --tooltip-border-color: #{$danger-lighten};
+        --tooltip-background-color: #{$danger-lighten};
     }
 }

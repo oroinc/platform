@@ -62,7 +62,7 @@ define(function(require) {
 
         addItem: function(data) {
             const collection = this.getCollection();
-            const fieldId = this.options.entityFieldsProvider.getPathByPropertyPathSafely(data.property_path);
+            const fieldId = this.options.entityFieldsProvider.getPathByRelativePropertyPathSafely(data.property_path);
             const fieldChoiceView = this.options.fieldsChoiceView;
             const hasEntityField = this.options.entityFieldsProvider.validatePath(fieldId);
             data.isSystemLabel = !data.label;

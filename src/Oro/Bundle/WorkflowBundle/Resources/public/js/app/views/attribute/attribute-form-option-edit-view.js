@@ -64,7 +64,8 @@ define(function(require) {
         onAdd: function() {
             const formData = helper.getFormData(this.form);
 
-            formData.property_path = this.options.entityFieldsProvider.getPropertyPathByPath(formData.property_path);
+            formData.property_path = this.options
+                .entityFieldsProvider.getRelativePropertyPathByPath(formData.property_path);
             formData.required = formData.hasOwnProperty('required');
 
             this.resetForm();
@@ -95,7 +96,7 @@ define(function(require) {
         editRow: function(data) {
             this.fieldSelectorEl.inputWidget(
                 'val',
-                this.options.entityFieldsProvider.getPathByPropertyPathSafely(data.property_path)
+                this.options.entityFieldsProvider.getPathByRelativePropertyPathSafely(data.property_path)
             );
             this.form.find('[name=itemId]').val(data.itemId || '');
             this.labelEl.val(data.isSystemLabel ? '' : data.label);

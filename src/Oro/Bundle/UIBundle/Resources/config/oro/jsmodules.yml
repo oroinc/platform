@@ -114,6 +114,7 @@ dynamic-imports:
         - oroui/js/app/components/viewport-component
         - oroui/js/app/components/widget-component
         - oroui/js/app/components/widget-form-component
+        - oroui/js/app/views/backdrop-view
         - oroui/js/app/views/content-sidebar-view
         - oroui/js/app/views/datepicker/datepicker-view
         - oroui/js/app/views/datepicker/datetimepicker-view

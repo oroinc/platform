@@ -79,6 +79,7 @@ operations:
             title: oro.action.delete_entity
             options:
                 ariaLabel: oro.action.delete_entity.aria_label
+                icon: trash
             confirmation:
                 title: oro.action.delete_entity
                 message: oro.action.delete_confirm
@@ -87,7 +88,7 @@ operations:
                 message_parameters:
                     entityLabel: $.entityLabel
         button_options:
-            icon: trash
+            icon: fa-trash
         actions:
             - '@run_action_group':
                 action_group: DELETE
