@@ -12,7 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class ActionExecutor
 {
     public function __construct(
-        private ActionFactoryInterface $actionRegistry,
+        private ActionFactoryInterface $actionFactory,
         private ActionGroupRegistry $actionGroupRegistry,
         private ExpressionFactory $expressionFactory
     ) {
@@ -20,7 +20,7 @@ class ActionExecutor
 
     public function executeAction(string $actionName, array $data = []): ActionData
     {
-        $action = $this->actionRegistry->create($actionName, $this->prepareOptions($data));
+        $action = $this->actionFactory->create($actionName, $this->prepareOptions($data));
 
         $context = new ActionData($data);
         $action->execute($context);

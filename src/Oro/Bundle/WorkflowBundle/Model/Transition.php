@@ -28,6 +28,12 @@ class Transition
     /** @var Step */
     protected $stepTo;
 
+    /** @var string|array|null */
+    protected $aclResource;
+
+    /** @var string|null */
+    protected $aclMessage;
+
     /** @var array */
     protected $conditionalStepsTo = [];
 
@@ -355,6 +361,30 @@ class Transition
         return $this->conditionalStepsTo;
     }
 
+    public function getAclResource(): string|array|null
+    {
+        return $this->aclResource;
+    }
+
+    public function setAclResource(string|array|null $aclResource): self
+    {
+        $this->aclResource = $aclResource;
+
+        return $this;
+    }
+
+    public function getAclMessage(): ?string
+    {
+        return $this->aclMessage;
+    }
+
+    public function setAclMessage(?string $aclMessage): self
+    {
+        $this->aclMessage = $aclMessage;
+
+        return $this;
+    }
+
     /**
      * Check is transition condition is allowed for current workflow item.
      *
@@ -406,18 +436,13 @@ class Transition
         }
 
         // Execute pre-actions and pre-conditions
-        if ($this->preAction) {
-            $this->preAction->execute($workflowItem);
-        }
-
         $isAllowed = true;
-        if ($this->preCondition) {
-            $isAllowed = (bool)$this->preCondition?->evaluate($workflowItem, $errors);
-        }
-
-        // If configured pre-conditions are allowed then check transition service if available.
-        if ($isAllowed && $this->transitionService) {
+        if ($this->transitionService) {
             $isAllowed = $this->transitionService->isPreConditionAllowed($workflowItem, $errors);
+        } elseif ($this->preCondition || $this->preAction) {
+            $this->preAction?->execute($workflowItem);
+
+            $isAllowed = !$this->preCondition || $this->preCondition->evaluate($workflowItem, $errors);
         }
 
         $event->setAllowed($isAllowed);

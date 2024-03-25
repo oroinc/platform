@@ -68,6 +68,8 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
                 ['initRoutes', ['TEST_ROUTE_1', 'TEST_ROUTE_2', 'TEST_ROUTE_3']],
                 ['initContextAttribute', 'testInitContextAttribute'],
                 ['message', 'test message'],
+                ['aclResource', 'test'],
+                ['aclMessage', 'acl_message_test']
             ]
         );
     }
