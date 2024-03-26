@@ -184,23 +184,26 @@ define(function(require) {
                     relationType: 'manyToMany',
                     field: 'Oro\\Bundle\\UserBundle\\Entity\\Group::roles',
                     entity: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
-                    parent_entity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+                    parent_entity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    relatedEntityName: 'Oro\\Bundle\\UserBundle\\Entity\\Group'
                 });
 
                 expect(dataProvider.getFieldSignatureSafely(fieldIdParts[0])).toEqual({
                     relationType: 'manyToMany',
                     field: 'roles',
-                    entity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+                    entity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    relatedEntityName: 'Oro\\Bundle\\UserBundle\\Entity\\Role'
                 });
             });
 
-            it('converts fieldId path to property path', function() {
-                expect(dataProvider.getPropertyPathByPath(fieldId))
+            it('converts fieldId path to relative property path', function() {
+                expect(dataProvider.getRelativePropertyPathByPath(fieldId))
                     .toEqual('roles.Oro\\Bundle\\UserBundle\\Entity\\Group::roles.name');
             });
 
-            it('converts property path to fieldId path', function() {
-                expect(dataProvider.getPathByPropertyPath('roles.Oro\\Bundle\\UserBundle\\Entity\\Group::roles.name'))
+            it('converts relative property path to fieldId path', function() {
+                expect(dataProvider
+                    .getPathByRelativePropertyPath('roles.Oro\\Bundle\\UserBundle\\Entity\\Group::roles.name'))
                     .toEqual(fieldId);
             });
 
@@ -379,14 +382,21 @@ define(function(require) {
 
             beforeEach(async function() {
                 EntityStructureDataProvider.defineFilterPreset('first-custom-fields-set', {
-                    optionsFilter: {configurable: true},
                     include: [{relationType: 'manyToMany'}],
-                    exclude: []
+                    fieldsFilterBlacklist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\Group': {
+                            'Oro\\Bundle\\UserBundle\\Entity\\User::groups': true
+                        }
+                    }
                 });
                 EntityStructureDataProvider.defineFilterPreset('second-custom-fields-set', {
                     optionsFilter: {virtual: true},
-                    include: [],
-                    exclude: [{relationType: 'manyToMany'}]
+                    exclude: [{relationType: 'manyToMany'}],
+                    fieldsFilterWhitelist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\Group': {
+                            roles: true
+                        }
+                    }
                 });
                 return EntityStructureDataProvider.createDataProvider({
                     rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\Group',
@@ -395,8 +405,8 @@ define(function(require) {
             });
 
             afterEach(function() {
-                delete EntityStructureDataProvider.filterPresets['first-custom-fields-set'];
-                delete EntityStructureDataProvider.filterPresets['second-custom-fields-set'];
+                delete EntityStructureDataProvider._filterPresets['first-custom-fields-set'];
+                delete EntityStructureDataProvider._filterPresets['second-custom-fields-set'];
             });
 
             it('uses initial filter configuration preset', function() {
@@ -410,8 +420,96 @@ define(function(require) {
                 dataProvider.setFilterPreset('second-custom-fields-set');
                 const chain = dataProvider.pathToEntityChain();
                 expect(chain[0].entity.fields).toEqual([
-                    jasmine.objectContaining({name: 'name', label: 'Name'})
+                    jasmine.objectContaining({name: 'name', label: 'Name'}),
+                    jasmine.objectContaining({name: 'roles', label: 'Roles'})
                 ]);
+            });
+        });
+
+        describe('whitelist of field filter', function() {
+            let fields;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    exclude: [{relationType: 'manyToMany'}],
+                    fieldsFilterWhitelist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\User': {
+                            groups: true
+                        }
+                    }
+                }, applicant1).then(function(provider) {
+                    const chain = provider.pathToEntityChain();
+                    fields = chain[0].entity.fields;
+                    done();
+                });
+            });
+
+            it('result contains field from whitelist', function() {
+                expect(fields).toContain(
+                    jasmine.objectContaining({name: 'groups', relationType: 'manyToMany'}));
+            });
+
+            it('result does not contain filtered out field that is not in whitelist', function() {
+                expect(fields).not.toContain(
+                    jasmine.objectContaining({name: 'roles', relationType: 'manyToMany'}));
+            });
+        });
+
+        describe('restrictive whitelist of field filter', function() {
+            let fields;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    isRestrictiveWhitelist: true,
+                    fieldsFilterWhitelist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\User': {
+                            groups: true,
+                            firstName: true
+                        }
+                    }
+                }, applicant1).then(function(provider) {
+                    const chain = provider.pathToEntityChain();
+                    fields = chain[0].entity.fields;
+                    done();
+                });
+            });
+
+            it('result contains only field from whitelist', function() {
+                expect(fields).toEqual([
+                    jasmine.objectContaining({name: 'firstName', type: 'string'}),
+                    jasmine.objectContaining({name: 'groups', relationType: 'manyToMany'})
+                ]);
+            });
+        });
+
+        describe('blacklist of field filter', function() {
+            let fields;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    fieldsFilterBlacklist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\User': {
+                            roles: true
+                        }
+                    }
+                }, applicant1).then(function(provider) {
+                    const chain = provider.pathToEntityChain();
+                    fields = chain[0].entity.fields;
+                    done();
+                });
+            });
+
+            it('result does not contain field from blacklist', function() {
+                expect(fields).not.toContain(
+                    jasmine.objectContaining({name: 'roles', relationType: 'manyToMany'}));
+            });
+
+            it('result contains field that is not in blacklist', function() {
+                expect(fields).toContain(
+                    jasmine.objectContaining({name: 'groups', relationType: 'manyToMany'}));
             });
         });
 
@@ -446,13 +544,240 @@ define(function(require) {
                 }).toThrow(jasmine.any(Error));
             });
 
-            it('error on invalid property path to path', function() {
+            it('error on invalid relative property path to path', function() {
                 const propertyPath = 'foo.bar';
-                expect(dataProvider.getPathByPropertyPathSafely(propertyPath)).toEqual('');
+                expect(dataProvider.getPathByRelativePropertyPathSafely(propertyPath)).toEqual('');
                 expect(errorHandler.handle).toHaveBeenCalledWith(jasmine.any(Error));
                 expect(function() {
-                    dataProvider.getPathByPropertyPath(propertyPath);
+                    dataProvider.getPathByRelativePropertyPath(propertyPath);
                 }).toThrow(jasmine.any(Error));
+            });
+        });
+
+        describe('fields data update', function() {
+            let fields;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    fieldsDataUpdate: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\User': {
+                            groups: {type: 'enum'},
+                            viewHistory: {type: 'collection', label: 'View history'}
+                        }
+                    }
+                }, applicant1).then(function(provider) {
+                    const chain = provider.pathToEntityChain();
+                    fields = chain[0].entity.fields;
+                    done();
+                });
+            });
+
+            it('is applied to results', function() {
+                expect(fields).toContain(
+                    jasmine.objectContaining({name: 'groups', type: 'enum'}));
+                expect(fields).toContain(
+                    jasmine.objectContaining({name: 'viewHistory', type: 'collection', label: 'View history'}));
+            });
+        });
+
+        describe('entity tree', function() {
+            let provider;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({}, applicant1).then(function(dataProvider) {
+                    provider = dataProvider;
+                    done();
+                });
+            });
+
+            it('returns objects tree', function() {
+                expect(provider.entityTree).toEqual({
+                    'user': jasmine.objectContaining({
+                        firstName: jasmine.objectContaining({__isEntity: false, __isField: true}),
+                        roles: jasmine.objectContaining({
+                            'role': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                            'users': jasmine.any(Object),
+                            'Oro\\Bundle\\UserBundle\\Entity\\Group::roles': jasmine.objectContaining({
+                                'Oro\\Bundle\\UserBundle\\Entity\\User::groups': jasmine.any(Object),
+                                'id': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                                'name': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                                'roles': jasmine.any(Object)
+                            })
+                        })
+                    }),
+                    'userrole': jasmine.any(Object),
+                    'Oro\\Bundle\\UserBundle\\Entity\\Group': jasmine.objectContaining({
+                        'Oro\\Bundle\\UserBundle\\Entity\\User::groups': jasmine.any(Object),
+                        'id': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                        'name': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                        'roles': jasmine.any(Object)
+                    })
+                });
+            });
+
+            it('filter affects tree', function() {
+                provider.setExcludeRules([{relationType: 'manyToMany'}]);
+                const node = provider.entityTree.user.roles;
+
+                expect(node).not.toEqual(jasmine.objectContaining(
+                    {users: jasmine.any(Object)}
+                ));
+                expect(node).not.toEqual(jasmine.objectContaining(
+                    {'Oro\\Bundle\\UserBundle\\Entity\\Group::roles': jasmine.any(Object)}
+                ));
+            });
+
+            it('entity node by alias has special properties', function() {
+                const node = provider.entityTree.user;
+
+                expect(node).toEqual(jasmine.objectContaining({
+                    __isEntity: true,
+                    __isField: false,
+                    __entity: jasmine.objectContaining({
+                        label: 'User',
+                        alias: 'user',
+                        className: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                        fields: jasmine.any(Array)
+                    })
+                }));
+            });
+
+            it('entity node by class name has special properties', function() {
+                const node = provider.entityTree['Oro\\Bundle\\UserBundle\\Entity\\Group'];
+
+                expect(node).toEqual(jasmine.objectContaining({
+                    __isEntity: true,
+                    __isField: false,
+                    __entity: jasmine.objectContaining({
+                        label: 'Group',
+                        className: 'Oro\\Bundle\\UserBundle\\Entity\\Group',
+                        fields: jasmine.any(Array)
+                    })
+                }));
+            });
+
+            it('relation-field node has special properties', function() {
+                const node = provider.entityTree.user.roles;
+
+                expect(node).toEqual(jasmine.objectContaining({
+                    __isEntity: true,
+                    __isField: true,
+                    __field: jasmine.objectContaining({
+                        label: 'Roles',
+                        name: 'roles',
+                        relationType: 'manyToMany',
+                        relatedEntityName: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+                        parentEntity: jasmine.objectContaining({
+                            label: 'User',
+                            alias: 'user',
+                            className: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                            fields: jasmine.any(Array)
+                        }),
+                        relatedEntity: jasmine.objectContaining({
+                            label: 'Role',
+                            alias: 'userrole',
+                            className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+                            fields: jasmine.any(Array)
+                        })
+                    }),
+                    __entity: jasmine.objectContaining({
+                        label: 'Role',
+                        alias: 'userrole',
+                        className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+                        fields: jasmine.any(Array)
+                    })
+                }));
+            });
+
+            it('field node has special properties', function() {
+                const node = provider.entityTree.user.roles.id;
+
+                expect(node).toEqual(jasmine.objectContaining({
+                    __isEntity: false,
+                    __isField: true,
+                    __field: jasmine.objectContaining({
+                        label: 'Id',
+                        name: 'id',
+                        type: 'integer',
+                        parentEntity: jasmine.objectContaining({
+                            label: 'Role',
+                            alias: 'userrole',
+                            className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+                            fields: jasmine.any(Array)
+                        })
+                    })
+                }));
+            });
+
+            it('returns entity node from property path string', function() {
+                const node = provider.getEntityTreeNodeByPropertyPath('user');
+
+                expect(node).toEqual(jasmine.objectContaining({
+                    __isEntity: true,
+                    __isField: false,
+                    __entity: jasmine.objectContaining({
+                        label: 'User',
+                        alias: 'user',
+                        className: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                        fields: jasmine.any(Array)
+                    }),
+                    firstName: jasmine.objectContaining({__isEntity: false, __isField: true}),
+                    createdAt: jasmine.objectContaining({__isEntity: false, __isField: true}),
+                    roles: jasmine.any(Object)
+                }));
+            });
+
+            it('returns relation-field node from property path string', function() {
+                const node = provider.getEntityTreeNodeByPropertyPath('user.roles');
+
+                expect(node).toEqual(jasmine.objectContaining({
+                    'role': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                    'users': jasmine.any(Object),
+                    'Oro\\Bundle\\UserBundle\\Entity\\Group::roles': jasmine.any(Object)
+                }));
+                expect(node).toEqual(jasmine.objectContaining({
+                    __isEntity: true,
+                    __isField: true,
+                    __field: jasmine.objectContaining({
+                        label: 'Roles',
+                        name: 'roles',
+                        relationType: 'manyToMany',
+                        relatedEntityName: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+                        parentEntity: jasmine.objectContaining({
+                            label: 'User',
+                            alias: 'user',
+                            className: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                            fields: jasmine.any(Array)
+                        }),
+                        relatedEntity: jasmine.objectContaining({
+                            label: 'Role',
+                            alias: 'userrole',
+                            className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+                            fields: jasmine.any(Array)
+                        })
+                    })
+                }));
+            });
+
+            it('returns field node from property path string', function() {
+                const node = provider.getEntityTreeNodeByPropertyPath('user.roles.id');
+
+                expect(node).toEqual(jasmine.objectContaining({
+                    __isEntity: false,
+                    __isField: true,
+                    __field: jasmine.objectContaining({
+                        label: 'Id',
+                        name: 'id',
+                        type: 'integer',
+                        parentEntity: jasmine.objectContaining({
+                            label: 'Role',
+                            alias: 'userrole',
+                            className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+                            fields: jasmine.any(Array)
+                        })
+                    })
+                }));
             });
         });
     });

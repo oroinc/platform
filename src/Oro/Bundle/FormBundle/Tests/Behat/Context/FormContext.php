@@ -451,6 +451,24 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $form->typeInField($locator, $value);
     }
 
+    /**
+     * Example: I clear text in "Price Calculation Quantity Expression Editor Content"
+     *
+     * @When /^(?:|I )clear text in "(?P<field>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )clear text in "(?P<field>(?:[^"]|\\")*)" from "(?P<formName>(?:[^"]|\\")*)"$/
+     * @throws ElementNotFoundException
+     */
+    public function iClearTextInBlock($locator, $formName = 'OroForm'): void
+    {
+        $locator = $this->fixStepArgument($locator);
+        $formName = $this->fixStepArgument($formName);
+
+        /** @var OroForm $form */
+        $form = $this->createElement($formName);
+
+        $form->setInnerHtmlForElement($locator, '');
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * Type value in field chapter by chapter. Imitate real user input from keyboard

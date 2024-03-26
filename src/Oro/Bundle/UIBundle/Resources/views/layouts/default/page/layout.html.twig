@@ -39,18 +39,21 @@
 {% block _service_worker_widget %}
     {% set layoutContext = get_layout_context() %}
     {% set url = asset('/sw.js') ~ '&theme=' ~ layoutContext.theme %}
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker
-                    .register('{{ url|raw }}', {scope: '/'})
-                    .catch(error => {console.error(error)});
-            });
-            window.addEventListener('beforeinstallprompt', e => {
-                e.preventDefault()
-            })
-        }
-    </script>
+    {# Register only if the app is installed, not in a sub-folder. #}
+    {% if app.request.basePath|trim|length == 0 %}
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker
+                        .register('{{ url|raw }}', {scope: '/'})
+                        .catch(error => {console.error(error)});
+                });
+                window.addEventListener('beforeinstallprompt', e => {
+                    e.preventDefault()
+                })
+            }
+        </script>
+    {% endif %}
 {% endblock %}
 
 {% block _wrapper_widget %}

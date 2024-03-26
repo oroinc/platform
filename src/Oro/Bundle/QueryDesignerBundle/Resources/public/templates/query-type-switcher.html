@@ -1,0 +1,3 @@
+<button type="button" class="btn btn-primary query-type-switcher<% if (disabled) { %> disabled <% } %>" <% if (disabled) { %>data-toggle="tooltip" title="<%-_.__('oro.query_type_switcher.messages.' + (obj.mode === 'simple' ? 'advanced' : 'simple')) %>"<% } %>>
+    <%-_.__('oro.query_type_switcher.modes.' + (obj.mode === 'simple' ? 'advanced' : 'simple')) %>
+</button>

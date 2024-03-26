@@ -4,7 +4,6 @@ define(function(require) {
     const $ = require('jquery');
     const Backbone = require('backbone');
     const jsmoduleExposure = require('jsmodule-exposure');
-    const markup = require('text-loader!./Fixture/aggregated-field-condition/markup.html');
     const data = require('./Fixture/aggregated-field-condition/entities.json');
     const filters = require('./Fixture/aggregated-field-condition/filters.json');
     const columnsData = require('./Fixture/aggregated-field-condition/columnsData.json');
@@ -23,16 +22,12 @@ define(function(require) {
             beforeEach(function(done) {
                 FieldChoiceMock.setData(data);
                 exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
-                window.setFixtures(markup);
                 columnsCollection = new Backbone.Collection(columnsData);
                 aggregatedFieldConditionView = new AggregatedFieldConditionView({
                     autoRender: true,
                     filters: filters,
                     columnsCollection: columnsCollection,
                     fieldChoice: {
-                        select2: {
-                            formatSelectionTemplateSelector: '#format-selection-template'
-                        },
                         entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     }
                 });
@@ -78,16 +73,12 @@ define(function(require) {
             beforeEach(function(done) {
                 FieldChoiceMock.setData(data);
                 exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
-                window.setFixtures(markup);
                 columnsCollection = new Backbone.Collection(columnsData);
                 aggregatedFieldConditionView = new AggregatedFieldConditionView({
                     autoRender: true,
                     filters: filters,
                     columnsCollection: columnsCollection,
                     fieldChoice: {
-                        select2: {
-                            formatSelectionTemplateSelector: '#format-selection-template'
-                        },
                         entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     },
                     value: initialValue

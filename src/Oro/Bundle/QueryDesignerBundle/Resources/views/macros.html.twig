@@ -296,3 +296,18 @@
     </script>
     {% endapply %}
 {% endmacro %}
+
+{#
+    Initializes QueryTypeConverterComponent and renders switcher view
+
+    @param array    params
+    @param string   param.name - name of instance of page component
+    @param array    params.options - options for js-component
+#}
+{% macro query_type_converter(params) %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'oroquerydesigner/js/app/components/query-type-converter-component',
+        name: 'query-type-converter'
+    }|merge(params|default({}))) }}></div>
+{% endmacro %}

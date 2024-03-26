@@ -32,6 +32,7 @@ class EntityStructureDataProvider
 
     private const FIELD_PROPERTY_MAPPINGS = [
         'name'                => 'setName',
+        'normalized_name'     => 'setNormalizedName',
         'type'                => 'setType',
         'label'               => 'setLabel',
         'relation_type'       => 'setRelationType',

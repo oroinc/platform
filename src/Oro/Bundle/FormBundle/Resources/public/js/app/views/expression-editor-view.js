@@ -1,335 +1,303 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import _ from 'underscore';
+import BaseView from 'oroui/js/app/views/base/view';
 
-    const $ = require('jquery');
-    const _ = require('underscore');
-    require('bootstrap');
-    const BaseView = require('oroui/js/app/views/base/view');
-    const ExpressionEditorUtil = require('oroform/js/expression-editor-util');
-    const Typeahead = $.fn.typeahead.Constructor;
+import {EditorState} from '@codemirror/state';
+import {EditorView} from '@codemirror/view';
 
-    const ExpressionEditorView = BaseView.extend({
-        optionNames: BaseView.prototype.optionNames.concat([
-            'dataSource', 'delay'
-        ]),
+import expressionEditorExtensions from 'oroform/js/app/views/expression-editor-extensions';
 
-        /**
-         * {Object} ExpressionEditorUtil
-         */
-        util: null,
+const ExpressionEditorView = BaseView.extend({
+    optionNames: BaseView.prototype.optionNames.concat([
+        'dataSource', 'interactionDelay', 'util', 'operationButtons',
+        'linterDelay'
+    ]),
 
-        /**
-         * {Object} Typeahead
-         */
-        typeahead: null,
+    /**
+     * @type {ExpressionEditorUtil}
+     */
+    util: null,
 
-        /**
-         * {Object} Autocomplete data provided by ExpressionEditorUtil.getAutocompleteData
-         */
-        autocompleteData: null,
+    /**
+     * @type {AutocompleteData} Autocomplete data provided by ExpressionEditorUtil.getAutocompleteData
+     */
+    autocompleteData: null,
 
-        /**
-         * {Object} List of data source widgets
-         */
-        dataSource: null,
+    /**
+     * {Object} List of data source widgets
+     */
+    dataSource: null,
 
-        /**
-         * {Object} List of data source widget instances
-         */
-        dataSourceInstances: null,
+    /**
+     * {Object} List of data source widget instances
+     */
+    dataSourceInstances: null,
 
-        /**
-         * {Integer} Validation and autocomplete delay in milliseconds
-         */
-        delay: 50,
+    /**
+     * @type {number} Validation and autocomplete delay in milliseconds
+     */
+    delay: 0,
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ExpressionEditorView(options) {
-            ExpressionEditorView.__super__.constructor.call(this, options);
-        },
+    events: {
+        focus: 'onFocus',
+        change: 'onChange'
+    },
 
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            this.util = new ExpressionEditorUtil(options);
+    /**
+     * @inheritdoc
+     */
+    constructor: function ExpressionEditorView(options) {
+        ExpressionEditorView.__super__.constructor.call(this, options);
+    },
 
-            this.autocompleteData = this.autocompleteData || {};
-            this.dataSource = this.dataSource || {};
-            this.dataSourceInstances = this.dataSourceInstances || {};
-
-            this.initAutocomplete();
-
-            if (_.isRTL()) {
-                this.$el.attr('dir', 'ltr');
-            }
-
-            return ExpressionEditorView.__super__.initialize.call(this, options);
-        },
-
-        /**
-         * Initialize autocomplete widget
-         */
-        initAutocomplete: function() {
-            this.$el.typeahead({
-                minLength: 0,
-                items: 20,
-                select: this._typeaheadSelect.bind(this),
-                source: this._typeaheadSource.bind(this),
-                lookup: this._typeaheadLookup.bind(this),
-                highlighter: this._typeaheadHighlighter.bind(this),
-                updater: this._typeaheadUpdater.bind(this)
-            });
-
-            this.typeahead = this.$el.data('typeahead');
-            this.typeahead.$menu.addClass('expression-editor-autocomplete');
-        },
-
-        /**
-         * @inheritdoc
-         */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-
-            _.each(this.dataSourceInstances, function(dataSource) {
-                dataSource.$widget.remove();
-            });
-
-            delete this.util;
-            delete this.typeahead;
-            delete this.autocompleteData;
-            delete this.dataSource;
-            delete this.dataSourceInstances;
-
-            return ExpressionEditorView.__super__.dispose.call(this);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        delegateEvents: function(events) {
-            const result = ExpressionEditorView.__super__.delegateEvents.call(this, events);
-
-            const self = this;
-            const namespace = this.eventNamespace();
-            const autocomplete = _.debounce(function(e) {
-                if (!self.disposed) {
-                    self.autocomplete(e);
-                }
-            }, this.delay);
-            const validate = _.debounce(function(e) {
-                if (!self.disposed) {
-                    self.validate(e);
-                }
-            }, this.delay);
-
-            this.$el
-                .on('focus' + namespace, autocomplete)
-                .on('click' + namespace, autocomplete)
-                .on('input' + namespace, autocomplete)
-                .on('keyup' + namespace, validate)
-                .on('change' + namespace, validate)
-                .on('blur' + namespace, validate)
-                .on('paste' + namespace, validate);
-
-            return result;
-        },
-
-        /**
-         * Show autocomplete list
-         */
-        autocomplete: function() {
-            this.typeahead.lookup();
-        },
-
-        /**
-         * Validate expression
-         */
-        validate: function() {
-            const isValid = this.util.validate(this.$el.val());
-            this.$el.toggleClass('error', !isValid);
-            this.$el.parent().toggleClass('expression-error', !isValid);
-        },
-
-        /**
-         * Override Typeahead.source function
-         *
-         * @return {Array}
-         * @private
-         */
-        _typeaheadSource: function() {
-            const expression = this.el.value;
-            const position = this.el.selectionStart;
-
-            this.autocompleteData = this.util.getAutocompleteData(expression, position);
-            this._toggleDataSource();
-            this.typeahead.query = this.autocompleteData.itemLastChild;
-
-            return _.sortBy(_.keys(this.autocompleteData.items));
-        },
-
-        /**
-         * Override Typeahead.lookup function
-         *
-         * @return {Typeahead}
-         * @private
-         */
-        _typeaheadLookup: function() {
-            return this.typeahead.process(this.typeahead.source());
-        },
-
-        /**
-         * Override Typeahead.select function
-         *
-         * @return {Typeahead}
-         * @private
-         */
-        _typeaheadSelect: function() {
-            const original = Typeahead.prototype.select;
-            const result = original.call(this.typeahead);
-            this.typeahead.lookup();
-            return result;
-        },
-
-        /**
-         * Override Typeahead.highlighter function
-         *
-         * @param {String} item
-         * @return {String}
-         * @private
-         */
-        _typeaheadHighlighter: function(item) {
-            const original = Typeahead.prototype.highlighter;
-            const hasChild = !!this.autocompleteData.items[item].child;
-            const suffix = hasChild ? '&hellip;' : '';
-            return original.call(this.typeahead, item) + suffix;
-        },
-
-        /**
-         * Override Typeahead.updater function
-         *
-         * @param {String} item
-         * @return {String}
-         * @private
-         */
-        _typeaheadUpdater: function(item) {
-            this.util.updateAutocompleteItem(this.autocompleteData, item);
-            const position = this.autocompleteData.position;
-            this.$el.one('change', function() {
-                // set correct position after typeahead call change event
-                this.selectionStart = this.selectionEnd = position;
-            });
-
-            return this.autocompleteData.expression;
-        },
-
-        /**
-         * Return data source instance by key
-         *
-         * @param {String} dataSourceKey
-         * @return {Object}
-         */
-        getDataSource: function(dataSourceKey) {
-            const dataSource = this.dataSourceInstances[dataSourceKey];
-            if (!dataSource) {
-                return this._initializeDataSource(dataSourceKey);
-            }
-
-            return dataSource;
-        },
-
-        /**
-         * Create data source instance
-         *
-         * @param {String} dataSourceKey
-         * @return {Object}
-         * @private
-         */
-        _initializeDataSource: function(dataSourceKey) {
-            const dataSource = this.dataSourceInstances[dataSourceKey] = {};
-
-            dataSource.$widget = $('<div>').addClass('expression-editor-data-source')
-                .html(this.dataSource[dataSourceKey]);
-            dataSource.$field = dataSource.$widget.find(':input[name]:first');
-            dataSource.active = false;
-
-            this._hideDataSource(dataSource);
-
-            this.$el.after(dataSource.$widget).trigger('content:changed');
-
-            dataSource.$field.on('change', () => {
-                if (!dataSource.active) {
-                    return;
-                }
-
-                this.util.updateDataSourceValue(this.autocompleteData, dataSource.$field.val());
-                this.$el.val(this.autocompleteData.expression)
-                    .change().focus();
-
-                this.el.selectionStart = this.el.selectionEnd = this.autocompleteData.position;
-            });
-
-            return dataSource;
-        },
-
-        /**
-         * Hide all data sources and show active
-         *
-         * @private
-         */
-        _toggleDataSource: function() {
-            this._hideDataSources();
-
-            const dataSourceKey = this.autocompleteData.dataSourceKey;
-            const dataSourceValue = this.autocompleteData.dataSourceValue;
-
-            if (_.isEmpty(dataSourceKey) || !_.has(this.dataSource, dataSourceKey)) {
-                return;
-            }
-
-            this.autocompleteData.items = {};// hide autocomplete list
-
-            const dataSource = this.getDataSource(dataSourceKey);
-            dataSource.$field.val(dataSourceValue).change();
-
-            this._showDataSource(dataSource);
-        },
-
-        /**
-         * Hide all data sources
-         *
-         * @private
-         */
-        _hideDataSources: function() {
-            _.each(this.dataSourceInstances, this._hideDataSource, this);
-        },
-
-        /**
-         * Hide data source
-         *
-         * @param {Object} dataSource
-         * @private
-         */
-        _hideDataSource: function(dataSource) {
-            dataSource.active = false;
-            dataSource.$widget.hide().removeClass('active');
-        },
-
-        /**
-         * Show data source
-         *
-         * @param {Object} dataSource
-         * @private
-         */
-        _showDataSource: function(dataSource) {
-            dataSource.$widget.show().addClass('active');
-            dataSource.active = true;
+    /**
+     * @inheritdoc
+     */
+    initialize(options) {
+        if (!options.util) {
+            throw new Error('Option `util` is required for `ExpressionEditorView`');
         }
-    });
 
-    return ExpressionEditorView;
+        this.autocompleteData = {};
+        this.dataSource = this.dataSource || {};
+        this.dataSourceInstances = {};
+
+        if (_.isRTL()) {
+            this.$el.attr('dir', 'ltr');
+        }
+
+        return ExpressionEditorView.__super__.initialize.call(this, options);
+    },
+
+    render() {
+        this._toggleErrorState(this.isValid());
+
+        const startState = EditorState.create({
+            doc: this.util.normalizePropertyNamesExpression(this.el.value),
+            extensions: expressionEditorExtensions({
+                util: this.util,
+                operationButtons: this.operationButtons,
+                interactionDelay: this.interactionDelay,
+                linterDelay: this.linterDelay,
+                dataSource: this.dataSource,
+                getDataSourceCallback: this.showDataSourceElement.bind(this)
+            }).concat([
+                EditorView.updateListener.of(this.editorUpdateListener.bind(this)),
+                EditorView.editorAttributes.of({
+                    'data-name': this.$el.attr('name')
+                })
+            ])
+        });
+
+        this.editorView = new EditorView({
+            state: startState,
+            parent: this.el.parentNode
+        });
+
+        this.$el.addClass('hidden-textarea');
+        this.$el.after(this.editorView.dom);
+    },
+
+    editorUpdateListener(event) {
+        const {state} = event;
+        const {to} = state.selection.ranges[0];
+        const content = this.util.unNormalizePropertyNamesExpression(state.doc.toString());
+        if (content !== this.getValue()) {
+            this.setValue(content);
+        }
+
+        this.autocompleteData = this.util.getAutocompleteData(content, to);
+    },
+
+    hide() {
+        this.editorView.dom.classList.add('hide');
+    },
+
+    show() {
+        this.editorView.dom.classList.remove('hide');
+    },
+
+    onFocus() {
+        this.editorView.focus();
+    },
+
+    /**
+     * @inheritdoc
+     */
+    dispose() {
+        if (this.disposed) {
+            return;
+        }
+
+        _.each(this.dataSourceInstances, dataSource => {
+            dataSource.$widget.remove();
+        });
+
+        this.editorView.destroy();
+
+        delete this.util;
+        delete this.editorView;
+        delete this.autocompleteData;
+        delete this.dataSource;
+        delete this.dataSourceInstances;
+
+        return ExpressionEditorView.__super__.dispose.call(this);
+    },
+
+    onChange(e) {
+        const isValid = this.isValid();
+        this._toggleErrorState(isValid);
+        this.trigger('change', e.currentTarget.value, isValid);
+
+        this.updateAllContent(e.currentTarget.value);
+    },
+
+    /**
+     * Update all content in editor view
+     * @param {string} content
+     */
+    updateAllContent(content) {
+        const {editorView} = this;
+
+        if (content === editorView.state.doc.toString()) {
+            return;
+        }
+
+        const normalizedContent = this.util.normalizePropertyNamesExpression(content);
+
+        editorView.dispatch(
+            editorView.state.update(
+                {
+                    changes: {
+                        from: 0,
+                        to: editorView.state.doc.length,
+                        insert: normalizedContent
+                    },
+                    selection: {
+                        anchor: normalizedContent.length
+                    }
+                }
+            )
+        );
+    },
+
+    isValid() {
+        const value = this.getValue();
+        return value === '' || this.util.validate(value);
+    },
+
+    _toggleErrorState(isValid) {
+        this.$el.toggleClass('error', !isValid);
+        this.$el.parent().toggleClass('validation-error', !isValid);
+    },
+
+    /**
+     * Sets value to view DOM element
+     *
+     * @param {string} value
+     */
+    setValue(value, sync = true) {
+        this.$el.val(value).trigger('change');
+
+        sync && this.updateAllContent(value);
+
+        const isValid = this.isValid();
+        this._toggleErrorState(isValid);
+        this.trigger('change', value, isValid);
+    },
+
+    /**
+     * Returns value of view DOM element
+     *
+     * @return {string}
+     */
+    getValue() {
+        return this.$el.val();
+    },
+
+    /**
+     * Return data source instance by key
+     *
+     * @param {String} dataSourceKey
+     * @return {Object}
+     */
+    getDataSource(dataSourceKey) {
+        return this.dataSourceInstances[dataSourceKey] || this._initializeDataSource(dataSourceKey);
+    },
+
+    /**
+     * Create data source instance
+     *
+     * @param {String} dataSourceKey
+     * @return {Object}
+     * @private
+     */
+    _initializeDataSource(dataSourceKey) {
+        const dataSource = this.dataSourceInstances[dataSourceKey] = {};
+
+        dataSource.$widget = $('<div>').addClass('expression-editor-data-source')
+            .html(this.dataSource[dataSourceKey]);
+        dataSource.$field = dataSource.$widget.find(':input[name]:first');
+        dataSource.active = false;
+
+        this._hideDataSource(dataSource);
+
+        dataSource.$field.on('change', e => {
+            if (!dataSource.active) {
+                return;
+            }
+
+            this.util.updateDataSourceValue(this.autocompleteData, $(e.currentTarget).val());
+            this.$el.val(this.autocompleteData.expression)
+                .change();
+
+            this.el.selectionStart = this.el.selectionEnd = this.autocompleteData.position;
+        });
+
+        return dataSource;
+    },
+
+    showDataSourceElement(dataSourceKey, dataSourceValue) {
+        this._hideDataSources();
+
+        const dataSource = this.getDataSource(dataSourceKey);
+        dataSource.$field.val(dataSourceValue).change();
+
+        this._showDataSource(dataSource);
+
+        return dataSource;
+    },
+
+    /**
+     * Hide all data sources
+     *
+     * @private
+     */
+    _hideDataSources() {
+        _.each(this.dataSourceInstances, this._hideDataSource, this);
+    },
+
+    /**
+     * Hide data source
+     *
+     * @param {Object} dataSource
+     * @private
+     */
+    _hideDataSource(dataSource) {
+        dataSource.active = false;
+        dataSource.$widget.hide().removeClass('active');
+    },
+
+    /**
+     * Show data source
+     *
+     * @param {Object} dataSource
+     * @private
+     */
+    _showDataSource(dataSource) {
+        dataSource.$widget.show().addClass('active');
+        dataSource.active = true;
+    }
 });
+
+export default ExpressionEditorView;

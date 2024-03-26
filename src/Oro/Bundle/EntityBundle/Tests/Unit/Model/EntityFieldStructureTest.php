@@ -16,6 +16,17 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $field->getName());
     }
 
+    public function testNormalizedName()
+    {
+        $field = new EntityFieldStructure();
+        self::assertNull($field->getNormalizedName());
+
+        $value = 'test';
+        $field->setNormalizedName($value);
+        self::assertSame($value, $field->getNormalizedName());
+    }
+
+
     public function testLabel()
     {
         $field = new EntityFieldStructure();
@@ -73,6 +84,7 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
     {
         $field = new EntityFieldStructure();
         $field->setName('field1');
+        $field->setNormalizedName('normName');
         $field->setType('integer');
         $field->setLabel('Field 1');
         $field->setRelationType('manyToOne');

@@ -141,7 +141,7 @@ define(function(require) {
         /**
          * Fetches only scalar attributes
          *
-         * @return {Object<string, string|number|boolean|null|undefined>}
+         * @return {Object.<string, string|number|boolean|null|undefined>}
          */
         getAttributes: function() {
             return _.omit(this.attributes, ['id'].concat(_.keys(this._relationships)));
@@ -150,7 +150,7 @@ define(function(require) {
         /**
          * Fetches identifiers of relationships
          *
-         * @return {Object<string, {data: EntityModel.identifier|Array<EntityModel.identifier>}>}
+         * @return {Object.<string, {data: EntityModel.identifier|Array<EntityModel.identifier>}>}
          */
         getRelationshipsIdentifiers: function() {
             return _.mapObject(this._relationships, function(value) {

@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const Backbone = require('backbone');
 
     function StubView(options) {
-        const stub = _.extend(Object.create(Backbone.Events), {
+        const stub = Object.assign(Object.create(Backbone.Events), {
             $el: options.el,
             value: options.value,
-            render: function() {
+            render() {
                 this.$el.text(options.name);
                 return this;
             },
-            getValue: function() {
+            getValue() {
                 return this.value;
             },
-            dispose: function() {}
+            dispose() {}
         });
 
         spyOn(stub, 'render', 'getValue').and.callThrough();

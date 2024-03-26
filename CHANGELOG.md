@@ -2,7 +2,39 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-# UNRELEASED
+## UNRELEASED
+
+### Changed
+
+#### EntityBundle
+* Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider/))
+  - method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`
+  - method `getPathByPropertyPath` renamed to `getPathByRelativePropertyPath`
+  - method `getPathByPropertyPathSafely` renamed to `getPathByRelativePropertyPathSafely`
+
+#### FormBundle
+* Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorview))
+* Refactored `ExpressionEditorUtil` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/FormBundle/Resources/public/js/expression-editor-util.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorutil))
+  * made it descendant of `BaseClass`
+  * changed options format
+
+#### QueryDesignerBundle
+* JS `*-filter-initialized` modules, defined over `init_module` option in filter configuration, now expected to export a sync callback function
+
+### Added
+
+#### EntityBundle
+* Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#get-entitytreenode-by-property-path))
+* Added magic property `entityTree` to `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#entity-tree)) that allows walk through entity fields tree
+* Added JS `EntityTreeNode` that is used in `EntityStructureDataProvider`
+
+#### FormBundle
+* Added JS `ExpressionEditorComponent` (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor#expressioneditorcomponent) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
+  expression-editor-component.js
+
+#### UIBundle
+* Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
+  rendering WYSIWYG content in backoffice.
 
 #### CurrencyBundle
 * Added supporting of the `readonly` attribute in `\Oro\Bundle\CurrencyBundle\Form\Type\PriceType`.
