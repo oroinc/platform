@@ -7,8 +7,8 @@ layout:
 
         - '@appendOption':
             id: logo
-            optionName: vars.small_logo
-            optionValue: '=data["theme"].getLogoSmall("default")'
+            optionName: vars.logo_small
+            optionValue: '=data["theme"].getLogoSmall(context["theme"])'
 
         - '@add':
             id: logo_print
