@@ -15,7 +15,6 @@ use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\DescriptionProcessor;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\EntityDescriptionHelper;
-use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FeatureDependedTextProcessor;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldsDescriptionHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FiltersDescriptionHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\IdentifierDescriptionHelper;
@@ -30,7 +29,6 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -102,8 +100,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $resourceDocParserProvider = new ResourceDocParserProvider($resourceDocParserRegistry);
         $descriptionProcessor = new DescriptionProcessor(
-            new RequestDependedTextProcessor(),
-            new FeatureDependedTextProcessor($this->createMock(FeatureChecker::class))
+            new RequestDependedTextProcessor()
         );
         $identifierDescriptionHelper = new IdentifierDescriptionHelper($this->doctrineHelper);
 

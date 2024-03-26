@@ -76,15 +76,9 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\DescriptionProcessor
         arguments:
             - '@oro_api.complete_descriptions.request_depended_text_processor'
-            - '@oro_api.complete_descriptions.feature_depended_text_processor'
 
     oro_api.complete_descriptions.request_depended_text_processor:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\RequestDependedTextProcessor
-
-    oro_api.complete_descriptions.feature_depended_text_processor:
-        class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FeatureDependedTextProcessor
-        arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_api.complete_descriptions.resource_doc_parser_provider:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocParserProvider

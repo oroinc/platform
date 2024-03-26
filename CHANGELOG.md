@@ -6,6 +6,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### ApiBundle
+* Removed support of `{@feature}` placeholder in API documentation. It was done because API documentation should not
+  depend on the application configuration changes made by users.
+
 #### EntityBundle
 * Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider/))
   - method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`

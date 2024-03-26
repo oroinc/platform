@@ -10,21 +10,14 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class DescriptionProcessor
 {
     private RequestDependedTextProcessor $requestDependedTextProcessor;
-    private FeatureDependedTextProcessor $featureDependedTextProcessor;
 
-    public function __construct(
-        RequestDependedTextProcessor $requestDependedTextProcessor,
-        FeatureDependedTextProcessor $featureDependedTextProcessor
-    ) {
+    public function __construct(RequestDependedTextProcessor $requestDependedTextProcessor)
+    {
         $this->requestDependedTextProcessor = $requestDependedTextProcessor;
-        $this->featureDependedTextProcessor = $featureDependedTextProcessor;
     }
 
     public function process(string $description, RequestType $requestType): string
     {
-        return $this->requestDependedTextProcessor->process(
-            $this->featureDependedTextProcessor->process($description),
-            $requestType
-        );
+        return $this->requestDependedTextProcessor->process($description, $requestType);
     }
 }
