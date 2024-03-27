@@ -368,10 +368,14 @@
     {% apply spaceless %}
         <button{{ block('block_attributes') }}
                 type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
-            {%- if name is defined %} name="{{ name }}"{% endif %}
-            {%- if value is defined %} value="{{ value }}"{% endif %}>
-            {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
-            {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+                {%- if name is defined %} name="{{ name }}"{% endif %}
+                {%- if value is defined %} value="{{ value }}"{% endif %}>
+                {%- if icon is defined %}
+                    {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
+                    {% set iconSizeClass = iconSize is defined ? iconSize : 'theme-icon--medium' %}
+                    {{ renderIcon.icon({name: icon, extraClass: iconSizeClass }) }}
+                {%- endif -%}
+                {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
         </button>
     {% endapply %}
 {%- endblock %}

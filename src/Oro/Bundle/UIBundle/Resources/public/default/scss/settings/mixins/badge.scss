@@ -24,7 +24,8 @@
     border-radius: $badge-radius;
     color: $badge-color;
 
-    [class^='fa-'] {
+    [class^='fa-'],
+    .theme-icon {
         margin: $badge-icon-offset;
 
         line-height: $badge-icon-line-height;

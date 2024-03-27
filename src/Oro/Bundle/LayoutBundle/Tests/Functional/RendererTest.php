@@ -230,7 +230,7 @@ class RendererTest extends LayoutTestCase
                 'button',
                 'content',
                 'button',
-                ['name' => 'btn1', 'text' => 'Btn1', 'icon' => 'plus', 'vars' => ['icon_class' => 'hide-text']],
+                ['name' => 'btn1', 'text' => 'Btn1', 'vars' => ['icon_class' => 'hide-text']],
                 null,
                 true
             )
@@ -319,7 +319,7 @@ class RendererTest extends LayoutTestCase
         <link rel="stylesheet" href="test_external.css">
     </head>
 <body class="content-body test-body class2" data-json="{&quot;0&quot;:&quot;test1&quot;}">
-    <button type="button" name="btn1"><i class="fa-plus hide-text"></i>Btn1</button>
+    <button type="button" name="btn1">Btn1</button>
     <input type="text" name="search">
     <input type="submit" name="btn2" value="Btn2">
     <ul>

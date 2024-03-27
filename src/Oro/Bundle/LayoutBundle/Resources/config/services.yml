@@ -186,6 +186,7 @@ services:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
             - '@oro_layout.theme_manager'
+            - '@oro_layout.current_theme_provider'
 
     Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider:
         alias: oro_layout.provider.image_type
