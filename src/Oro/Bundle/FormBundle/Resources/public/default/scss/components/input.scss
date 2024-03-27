@@ -101,8 +101,8 @@
     }
 
     @include element-state('readonly') {
-        background: $input-border-color-readonly-background;
-        border: $input-border;
+        background-color: $input-border-color-readonly-background-color;
+        border-color: $input-border-color-readonly;
 
         @include base-disabled-style();
 

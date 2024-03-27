@@ -44,5 +44,6 @@ $input-border-color-disabled: $base-ui-element-border-color-disabled-state !defa
 $input-color-disabled: $base-ui-element-color-disabled-state !default;
 
 // Read only
-$input-border-color-readonly-background: $input-border-color-disabled !default;
+$input-border-color-readonly-background-color: $base-ui-element-bg-color-disabled-state !default;
+$input-border-color-readonly: $base-ui-element-border-color-disabled-state !default;
 $input-border-color-readonly-hover-border-color: $base-ui-element-border-color-disabled-state !default;
