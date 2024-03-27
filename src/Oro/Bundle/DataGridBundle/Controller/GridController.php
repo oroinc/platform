@@ -100,7 +100,7 @@ class GridController extends AbstractController
      */
     public function filterMetadataAction(Request $request, $gridName)
     {
-        $filterNames = $request->query->get('filterNames', []);
+        $filterNames = $request->query->all('filterNames') ?? [];
 
         $gridManager = $this->get(Manager::class);
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
