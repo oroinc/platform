@@ -184,3 +184,7 @@ services:
             - '@nelmio_alice.faker.generator'
         tags:
             - { name: nelmio_alice.faker.provider }
+
+    oro_test.datagrid.filter.action_filter:
+        class: Oro\Bundle\TestFrameworkBundle\Datagrid\Filter\ActionFilter
+        public: true
