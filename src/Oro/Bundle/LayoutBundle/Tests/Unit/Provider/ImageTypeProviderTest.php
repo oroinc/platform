@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
+use Oro\Component\Layout\Extension\Theme\Model\CurrentThemeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -18,14 +19,18 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $themeManager;
 
+    /** @var CurrentThemeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $currentThemeProvider;
+
     /** @var ImageTypeProvider */
     private $provider;
 
     protected function setUp(): void
     {
         $this->themeManager = $this->createMock(ThemeManager::class);
+        $this->currentThemeProvider = $this->createMock(CurrentThemeProvider::class);
 
-        $this->provider = new ImageTypeProvider($this->themeManager);
+        $this->provider = new ImageTypeProvider($this->themeManager, $this->currentThemeProvider);
     }
 
     public function testGetImageTypes()

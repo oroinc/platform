@@ -4,6 +4,8 @@ namespace Oro\Bundle\LayoutBundle\Provider;
 
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
+use Oro\Component\Layout\Exception\NotRequestContextRuntimeException;
+use Oro\Component\Layout\Extension\Theme\Model\CurrentThemeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -14,11 +16,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 class ImageTypeProvider
 {
     /**
-     * @var ThemeManager
-     */
-    protected $themeManager;
-
-    /**
      * @var ThemeImageType[]
      */
     protected $imageTypes = [];
@@ -28,9 +25,8 @@ class ImageTypeProvider
      */
     protected $dimensions = [];
 
-    public function __construct(ThemeManager $themeManager)
+    public function __construct(private ThemeManager $themeManager, private CurrentThemeProvider $currentThemeProvider)
     {
-        $this->themeManager = $themeManager;
     }
 
     /**
@@ -55,6 +51,33 @@ class ImageTypeProvider
         }
 
         return $this->dimensions;
+    }
+
+    /**
+     * @return ThemeImageTypeDimension[]
+     */
+    public function getImageDimensionsByTheme(Theme $theme): array
+    {
+        $this->collectDimensionsFromThemes([$theme]);
+
+        return $this->dimensions;
+    }
+
+    private function updateDimensionsWithCurrentTheme()
+    {
+        $currentThemeName = $this->getCurrentThemeId();
+
+        if ($currentThemeName) {
+            $theme = $this->themeManager->getTheme($currentThemeName);
+            foreach ($this->extractDimensions($theme) as $name => $dimension) {
+                $this->dimensions[$name] = new ThemeImageTypeDimension(
+                    $name,
+                    $dimension['width'],
+                    $dimension['height'],
+                    $dimension['options'] ?? []
+                );
+            }
+        }
     }
 
     protected function collectImageTypesFromThemes()
@@ -107,6 +130,8 @@ class ImageTypeProvider
                 );
             }
         }
+
+        $this->updateDimensionsWithCurrentTheme();
     }
 
     /**
@@ -115,7 +140,14 @@ class ImageTypeProvider
      */
     protected function extractDimensions(Theme $theme)
     {
-        return $theme->getConfigByKey('images', ['dimensions' => []])['dimensions'];
+        $themes = $this->themeManager->getAllThemes();
+        $dimensions = $theme->getConfigByKey('images', ['dimensions' => []])['dimensions'];
+
+        if ($theme->getParentTheme()) {
+            $dimensions = array_merge($this->extractDimensions($themes[$theme->getParentTheme()]), $dimensions);
+        }
+
+        return $dimensions;
     }
 
     /**
@@ -159,5 +191,21 @@ class ImageTypeProvider
         }
 
         return $maxNumbers;
+    }
+
+    /**
+     * Get current theme name or default theme name if we can't get current
+     *
+     * @return string
+     */
+    private function getCurrentThemeId(): ?string
+    {
+        try {
+            $currentTheme = $this->currentThemeProvider->getCurrentThemeId();
+        } catch (NotRequestContextRuntimeException) {
+            $currentTheme = null;
+        }
+
+        return $currentTheme;
     }
 }
