@@ -177,3 +177,7 @@ services:
         public: true
         arguments:
             - !abstract '$installOptions defined in Oro\Bundle\TestFrameworkBundle\DependencyInjection\OroTestFrameworkExtension'
+
+    oro_test.datagrid.filter.action_filter:
+        class: Oro\Bundle\TestFrameworkBundle\Datagrid\Filter\ActionFilter
+        public: true

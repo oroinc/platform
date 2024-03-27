@@ -106,3 +106,18 @@ datagrids:
             export:
                 csv:
                     page_size: 499
+
+    tag-grid:
+        filters:
+            columns:
+                taxonomyName:
+                    type: entity
+                    data_name: t.taxonomy
+                    renderable: true
+                    options:
+                        lazy: true
+                        field_options:
+                            class: Oro\Bundle\TagBundle\Entity\Taxonomy
+                            choice_label: name
+                            query_builder: "@oro_test.datagrid.filter.action_filter->addSorting"
+                            translatable_options: false
