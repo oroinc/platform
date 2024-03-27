@@ -185,7 +185,7 @@ services:
             - 'oro_search.search_mapping_collect'
 
     oro_search.cache.search_mapping.warmer:
-        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        class: Oro\Bundle\SearchBundle\Cache\SearchProviderCacheWarmer
         public: false
         arguments:
             - '@oro_search.provider.search_mapping'
