@@ -14,7 +14,8 @@ use Oro\Component\MessageQueue\Job\Job as BaseJob;
  * @ORM\Table(
  *     name="oro_message_queue_job",
  *     indexes={
- *          @Index(name="idx_status", columns={"status"})
+ *          @Index(name="idx_status", columns={"status"}),
+ *          @Index(name="oro_message_queue_job_inx", columns={"root_job_id", "name", "owner_id"})
  *     }
  * )
  */

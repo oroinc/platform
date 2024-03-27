@@ -25,7 +25,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_10';
+        return 'v1_10_1';
     }
 
     /**
@@ -87,6 +87,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
             'comment' => '(DC2Type:json_array)',
         ]);
         $table->addColumn('job_progress', 'percent', ['notnull' => false, 'precision' => 0]);
+        $table->addIndex(['root_job_id', 'name', 'owner_id'], 'oro_message_queue_job_inx');
 
         $table->setPrimaryKey(['id']);
         $table->addForeignKeyConstraint(
