@@ -2,7 +2,8 @@
 
 @mixin element-state($state) {
     @if $state == 'active' {
-        &:active {
+        &:active,
+        &.active {
             @content;
         }
     } @else if $state == 'hover' {
