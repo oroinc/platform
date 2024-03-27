@@ -17,6 +17,7 @@ use Oro\Component\MessageQueue\Job\Job as BaseJob;
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Table(name: 'oro_message_queue_job')]
 #[Index(columns: ['status'], name: 'idx_status')]
+#[Index(columns: ['root_job_id', 'name', 'owner_id'], name: 'oro_message_queue_job_inx')]
 class Job extends BaseJob
 {
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
