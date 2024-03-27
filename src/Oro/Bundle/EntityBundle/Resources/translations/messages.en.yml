@@ -80,3 +80,6 @@ oro:
             scalar_value:
                 label: Scalar value
                 description: The scalar value for the field
+
+        template_renderer:
+            entity_variable_not_found: 'N/A'

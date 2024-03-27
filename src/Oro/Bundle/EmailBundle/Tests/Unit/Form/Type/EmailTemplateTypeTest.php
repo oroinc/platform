@@ -130,7 +130,7 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
         $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->willReturnMap([
-                ['oro_form.wysiwyg_enabled', false, false, null, null],
+                ['oro_email.email_template_wysiwyg_enabled', false, false, null, null],
                 ['oro_email.sanitize_html', false, false, null, $htmlPurifier]
             ]);
 

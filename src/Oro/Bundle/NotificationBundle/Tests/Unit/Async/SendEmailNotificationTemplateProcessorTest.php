@@ -4,36 +4,39 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Async\SendEmailNotificationTemplateProcessor;
 use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
+use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\TestCase
+class SendEmailNotificationTemplateProcessorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
     private const RECIPIENT_USER_ID = 7;
 
-    private EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject $emailTemplateManager;
-    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private EmailNotificationManager|MockObject $emailNotificationManager;
+    private EntityManagerInterface|MockObject $entityManager;
     private SendEmailNotificationTemplateProcessor $processor;
 
     protected function setUp(): void
     {
         $managerRegistry = $this->createMock(ManagerRegistry::class);
 
-        $this->emailTemplateManager = $this->createMock(EmailTemplateManager::class);
+        $this->emailNotificationManager = $this->createMock(EmailNotificationManager::class);
 
         $this->processor = new SendEmailNotificationTemplateProcessor(
             $managerRegistry,
-            $this->emailTemplateManager
+            $this->emailNotificationManager
         );
         $this->setUpLoggerMock($this->processor);
 
@@ -58,7 +61,7 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
             ->method('error')
             ->with('User with id "142" was not found');
 
-        $this->emailTemplateManager->expects(self::never())
+        $this->emailNotificationManager->expects(self::never())
             ->method(self::anything());
 
         $message = new Message();
@@ -76,10 +79,7 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
         );
     }
 
-    /**
-     * @dataProvider processSendsEmailDataProvider
-     */
-    public function testProcessSendsEmail(int $sentCount, string $expectedStatus): void
+    public function testProcessSendsEmail(): void
     {
         $messageBody = [
             'from' => 'from@example.com',
@@ -95,36 +95,24 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
             ->with(User::class, 42)
             ->willReturn($user);
 
-        $this->emailTemplateManager->expects(self::once())
-            ->method('sendTemplateEmail')
+        $this->emailNotificationManager->expects(self::once())
+            ->method('processSingle')
             ->with(
-                From::emailAddress($messageBody['from']),
-                [$user],
-                new EmailTemplateCriteria($messageBody['template'], $messageBody['templateEntity']),
+                new TemplateEmailNotification(
+                    new EmailTemplateCriteria($messageBody['template'], $messageBody['templateEntity']),
+                    [$user],
+                    null,
+                    From::emailAddress($messageBody['from'])
+                ),
                 $messageBody['templateParams']
-            )
-            ->willReturn($sentCount);
+            );
 
         $message = new Message();
         $message->setBody($messageBody);
 
         self::assertEquals(
-            $expectedStatus,
+            MessageProcessorInterface::ACK,
             $this->processor->process($message, $this->createMock(SessionInterface::class))
         );
-    }
-
-    public function processSendsEmailDataProvider(): array
-    {
-        return [
-            'ack when sentCount not 0' => [
-                'sentCount' => 1,
-                'expectedStatus' => MessageProcessorInterface::ACK,
-            ],
-            'reject when sentCount 0' => [
-                'sentCount' => 0,
-                'expectedStatus' => MessageProcessorInterface::REJECT,
-            ],
-        ];
     }
 }

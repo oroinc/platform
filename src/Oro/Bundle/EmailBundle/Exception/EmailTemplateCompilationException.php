@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Exception;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Twig\Error\Error;
 
 /**
@@ -10,12 +11,14 @@ use Twig\Error\Error;
  */
 class EmailTemplateCompilationException extends EmailTemplateException
 {
-    public function __construct(EmailTemplateCriteria $criteria, Error $previous = null)
-    {
-        $message = sprintf('Could not compile one email template with "%s" name', $criteria->getName());
+    public function __construct(
+        EmailTemplateCriteria|EmailTemplateInterface $object,
+        Error $previous = null
+    ) {
+        $message = sprintf('Failed to compile the email template "%s"', $object->getName());
 
-        if ($criteria->getEntityName()) {
-            $message = sprintf('%s for "%s" entity', $message, $criteria->getEntityName());
+        if ($object->getEntityName()) {
+            $message = sprintf('%s for "%s" entity', $message, $object->getEntityName());
         }
 
         parent::__construct($message, previous: $previous);

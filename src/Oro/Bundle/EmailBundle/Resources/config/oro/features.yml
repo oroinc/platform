@@ -88,6 +88,7 @@ features:
             - oro_email_emailtemplate_create
             - oro_email_emailtemplate_clone
             - oro_email_emailtemplate_preview
+            - oro_email_ajax_email_compile
             - oro_api_delete_emailtemplate
             - oro_api_get_emailtemplates
             - oro_api_get_emailtemplate_variables

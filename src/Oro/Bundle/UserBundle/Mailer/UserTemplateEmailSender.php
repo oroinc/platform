@@ -2,44 +2,37 @@
 
 namespace Oro\Bundle\UserBundle\Mailer;
 
-use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
 
 /**
  * Sends template email to the specified user.
  */
 class UserTemplateEmailSender
 {
-    /**
-     * @var NotificationSettings
-     */
-    private $notificationSettingsModel;
+    private NotificationSettings $notificationSettingsModel;
 
-    /**
-     * @var EmailTemplateManager
-     */
-    private $emailTemplateManager;
+    private EmailTemplateSender $emailTemplateSender;
 
     public function __construct(
         NotificationSettings $notificationSettingsModel,
-        EmailTemplateManager $emailTemplateManager
+        EmailTemplateSender $emailTemplateSender
     ) {
         $this->notificationSettingsModel = $notificationSettingsModel;
-        $this->emailTemplateManager = $emailTemplateManager;
+        $this->emailTemplateSender = $emailTemplateSender;
     }
 
     /**
-     * @param UserInterface $user
+     * @param EmailHolderInterface $user
      * @param string $emailTemplateName
      * @param array $emailTemplateParams
      * @param $scopeEntity
      * @return int
      */
     public function sendUserTemplateEmail(
-        UserInterface $user,
-        $emailTemplateName,
+        EmailHolderInterface $user,
+        string $emailTemplateName,
         array $emailTemplateParams = [],
         $scopeEntity = null
     ): int {
@@ -47,11 +40,13 @@ class UserTemplateEmailSender
             ? $this->notificationSettingsModel->getSenderByScopeEntity($scopeEntity)
             : $this->notificationSettingsModel->getSender();
 
-        return $this->emailTemplateManager->sendTemplateEmail(
+        $emailUser = $this->emailTemplateSender->sendEmailTemplate(
             $from,
-            [$user],
-            new EmailTemplateCriteria($emailTemplateName),
+            $user,
+            $emailTemplateName,
             $emailTemplateParams
         );
+
+        return (int) ($emailUser !== null);
     }
 }

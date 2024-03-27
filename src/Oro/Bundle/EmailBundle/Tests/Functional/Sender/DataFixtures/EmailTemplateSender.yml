@@ -1,0 +1,92 @@
+Oro\Bundle\TranslationBundle\Entity\Language:
+    language_de:
+        code: 'de'
+        enabled: true
+        organization: '@organization'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization_de:
+        name: 'German (DE)'
+        language: '@language_de'
+        formattingCode: 'de_DE'
+        __calls:
+            - setDefaultTitle: ['German (DE)']
+
+Oro\Bundle\EmailBundle\Entity\EmailTemplate:
+    email_template_regular:
+        organization: '@organization'
+        name: 'email_template_regular'
+        entity_name: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+        type: 'html'
+        is_system: 1
+        subject: 'Email Template Regular'
+        content: |-
+            Regular Template Content
+
+    email_template_base:
+        organization: '@organization'
+        name: 'email_template_base'
+        type: 'html'
+        is_system: 1
+        subject: 'Email Template Base'
+        content: |-
+            Base Template Content
+            <identity('{% block content %}{% endblock %}')>
+
+    email_template_extended_from_base:
+        organization: '@organization'
+        name: 'email_template_extended_from_base'
+        entity_name: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+        type: 'html'
+        is_system: 0
+        subject: 'Email Template Extended from Base'
+        content: |-
+            <identity('{% extends oro_get_email_template("email_template_base") %}')>
+            <identity('{% block content %}')>            
+            Content of an email template extended from base template
+            <identity('{% endblock content %}')>
+
+    email_template_extended_from_missing:
+        organization: '@organization'
+        name: 'email_template_extended_from_missing'
+        entity_name: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+        type: 'html'
+        is_system: 0
+        subject: 'Email Template Extended from Missing Template'
+        content: |-
+            <identity('{% extends oro_get_email_template("missing_email_template") %}')>
+            <identity('{% block content %}')>            
+            Content of an email template extended from missing template
+            <identity('{% endblock content %}')>
+
+Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation:
+    email_template_regular_de:
+        template: '@email_template_regular'
+        localization: '@localization_de'
+        subjectFallback: false
+        contentFallback: false
+        subject: 'Email Template (DE) Regular'
+        content: 'Regular Template (DE) Content'
+
+    email_template_base_de:
+        template: '@email_template_base'
+        localization: '@localization_de'
+        subjectFallback: false
+        contentFallback: false
+        subject: 'Email Template (DE) Base'
+        content: |-
+            Base Template (DE) Content
+            <identity('{% block content %}{% endblock %}')>
+
+    email_template_extended_from_base_de:
+        template: '@email_template_extended_from_base'
+        localization: '@localization_de'
+        subjectFallback: false
+        contentFallback: false
+        subject: 'Email Template (DE) Extended from Base'
+        content: |-
+            <identity('{% extends oro_get_email_template("email_template_base") %}')>
+            <identity('{% block content %}')>            
+            Content of an email template (DE) extended from base template
+            <identity('{% endblock content %}')>
+

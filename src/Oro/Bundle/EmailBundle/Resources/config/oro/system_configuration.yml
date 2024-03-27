@@ -248,6 +248,14 @@ system_configuration:
                 tooltip: oro.email.system_configuration.sanitize_html.tooltip
                 required: false
 
+        oro_email.email_template_wysiwyg_enabled:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            options:
+                label: oro.email.system_configuration.email_template_wysiwyg_enabled.label
+                tooltip: oro.email.system_configuration.email_template_wysiwyg_enabled.tooltip
+                required: false
+
         oro_email.threads_grouping:
             data_type: boolean
             type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
@@ -317,6 +325,7 @@ system_configuration:
                                     template_configuration:
                                         children:
                                             - oro_email.sanitize_html
+                                            - oro_email.email_template_wysiwyg_enabled
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid

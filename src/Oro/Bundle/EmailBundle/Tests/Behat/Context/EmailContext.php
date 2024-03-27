@@ -4,8 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\ConnectException;
-use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
@@ -213,37 +211,25 @@ class EmailContext extends OroFeatureContext
 
     /**
      * @Given /^take the link from email and download the file from this link$/
+     * @Given /^take the "(?P<linkCaption>[^"]+)" link from email and download the file from this link$/
      */
-    public function downloadFileFromEmail()
+    public function downloadFileFromEmail(string $linkCaption = '[^\<]+')
     {
-        $pattern = '/<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1/mi';
+        $url = $this->getLinkUrlFromEmail($linkCaption);
 
-        $found = $this->spin(function () use ($pattern) {
-            foreach ($this->getSentMessages() as $message) {
-                if (!preg_match($pattern, $message['body'], $matches)) {
-                    continue;
-                }
-
-                $found = $matches[2];
-                break;
-            }
-
-            return $found;
-        });
-
-        if ($found) {
+        if ($url) {
             $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'email';
             if (!is_dir($path)) {
                 mkdir($path);
             }
             $this->downloadedFile = tempnam($path, 'file_from_email_');
 
-            self::assertTrue((new FileDownloader())->download($found, $this->downloadedFile, $this->getSession()));
+            self::assertTrue((new FileDownloader())->download($url, $this->downloadedFile, $this->getSession()));
 
             return;
         }
 
-        self::assertNotFalse($found, 'Sent emails don\'t contain expected data.');
+        self::assertNotNull($url, 'Sent emails don\'t contain expected data.');
     }
 
     /**
@@ -302,7 +288,7 @@ class EmailContext extends OroFeatureContext
 
                 // Ensure that at least expected data is present.
                 foreach ($expectedEntityData as $property => $value) {
-                    static::assertEquals($this->processFunctions($value), $entityDataFromCsv[$property]);
+                    static::assertEquals($this->processFunctions($value), $entityDataFromCsv[$property] ?? '');
                 }
             }
 
@@ -500,16 +486,22 @@ class EmailContext extends OroFeatureContext
 
     public function getLinkUrlFromEmail(string $linkCaption): ?string
     {
-        $pattern = sprintf('/<a.*href\s*=\s*"(?P<url>[^"]+)".*>\s*%s\s*<\/a>/s', $linkCaption);
-        $url = $this->spin(function () use ($pattern) {
+        $pattern = '/<a[^\>]+?href\s*=\s*"(?P<url>[^"]+?)"[^\>]*>(?P<text>.+?)<\/a>/s';
+        $url = $this->spin(function () use ($pattern, $linkCaption) {
             $matches = [];
             foreach ($this->getSentMessages() as $message) {
                 $text = utf8_decode(html_entity_decode($message['body']));
                 // replace non-breaking spaces with plain spaces to be able to search
                 $text = str_replace(chr(160), chr(32), $text);
 
-                if (preg_match($pattern, $text, $matches) && isset($matches['url'])) {
-                    return htmlspecialchars_decode($matches['url']);
+                if (preg_match_all($pattern, $text, $matches)) {
+                    foreach ($matches['text'] as $index => $linkText) {
+                        if (preg_match('/' . $linkCaption . '/s', $linkText)) {
+                            return htmlspecialchars_decode($matches['url'][$index]);
+                        }
+                    }
+
+                    return null;
                 }
             }
 
@@ -527,14 +519,12 @@ class EmailContext extends OroFeatureContext
         $doctrine = $this->getAppContainer()->get('doctrine');
         $recipient = $doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
 
-        /** @var EmailTemplateManager $emailTemplateManager */
-        $emailTemplateManager = $this->getAppContainer()->get('oro_email.manager.template_email');
+        $emailTemplateSender = $this->getAppContainer()->get('oro_email.sender.email_template_sender');
 
-        $emailTemplateManager->sendTemplateEmail(
+        $emailTemplateSender->sendEmailTemplate(
             From::emailAddress('no-reply@example.com'),
-            [$recipient],
-            new EmailTemplateCriteria($templateName),
-            []
+            $recipient,
+            $templateName
         );
 
         // Doctrine is caching email templates and after change template data not perform that changes in behat thread

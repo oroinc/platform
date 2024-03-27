@@ -9,12 +9,20 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
  */
 class EmailTemplateNotFoundException extends EmailTemplateException
 {
-    public function __construct(EmailTemplateCriteria $criteria)
+    public function __construct(EmailTemplateCriteria|string $templateName)
     {
-        $message = sprintf('Could not found one email template with "%s" name', $criteria->getName());
+        if ($templateName instanceof EmailTemplateCriteria) {
+            $name = $templateName->getName();
+            $entityName = $templateName->getEntityName();
+        } else {
+            $name = $templateName;
+            $entityName = '';
+        }
 
-        if ($criteria->getEntityName()) {
-            $message = sprintf('%s for "%s" entity', $message, $criteria->getEntityName());
+        $message = sprintf('Could not found one email template with "%s" name', $name);
+
+        if ($entityName) {
+            $message = sprintf('%s for "%s" entity', $message, $entityName);
         } else {
             $message = sprintf('%s and without entity', $message);
         }

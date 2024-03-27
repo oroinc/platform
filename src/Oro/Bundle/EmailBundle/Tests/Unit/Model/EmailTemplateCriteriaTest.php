@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use PHPUnit\Framework\TestCase;
 
-class EmailTemplateCriteriaTest extends \PHPUnit\Framework\TestCase
+class EmailTemplateCriteriaTest extends TestCase
 {
     private const TEMPLATE_NAME = 'template_name';
     private const TEMPLATE_ENTITY_NAME = 'template_entity_name';

@@ -3,13 +3,16 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
+use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
 use Oro\Bundle\UserBundle\Entity\User as RealUserEntity;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,36 +20,27 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserHandlerTest extends \PHPUnit\Framework\TestCase
+class UserHandlerTest extends TestCase
 {
     private const FORM_DATA = ['field' => 'value'];
 
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private FormInterface|MockObject $form;
 
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
+    private Request|MockObject $request;
 
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
+    private UserManager|MockObject $manager;
 
-    /** @var EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailTemplateManager;
+    private EmailTemplateSender|MockObject $emailTemplateSender;
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userConfigManager;
+    private ConfigManager|MockObject $userConfigManager;
 
-    /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $flashBag;
+    private FlashBagInterface|MockObject $flashBag;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private TranslatorInterface|MockObject $translator;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private LoggerInterface|MockObject $logger;
 
-    /** @var UserHandler */
-    private $handler;
+    private UserHandler $handler;
 
     protected function setUp(): void
     {
@@ -55,7 +49,7 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $this->manager = $this->createMock(UserManager::class);
-        $this->emailTemplateManager = $this->createMock(EmailTemplateManager::class);
+        $this->emailTemplateSender = $this->createMock(EmailTemplateSender::class);
         $this->userConfigManager = $this->createMock(ConfigManager::class);
         $this->flashBag = $this->createMock(FlashBagInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
@@ -65,26 +59,26 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             $this->form,
             $requestStack,
             $this->manager,
-            $this->emailTemplateManager,
+            $this->emailTemplateSender,
             $this->userConfigManager,
             $this->translator,
             $this->logger
         );
     }
 
-    public function testProcessUnsupportedMethod()
+    public function testProcessUnsupportedMethod(): void
     {
         $user = new User();
 
         $this->request->setMethod(Request::METHOD_GET);
 
-        $this->manager->expects($this->never())
-            ->method($this->anything());
+        $this->manager->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertFalse($this->handler->process($user));
+        self::assertFalse($this->handler->process($user));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $user = new User();
         $user->setEmail('test@example.com');
@@ -92,18 +86,18 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod(Request::METHOD_POST);
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('submit')
             ->with(self::FORM_DATA);
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
 
-        $this->manager->expects($this->once())
+        $this->manager->expects(self::once())
             ->method('setAuthStatus')
             ->with($user, UserManager::STATUS_ACTIVE);
 
-        $this->userConfigManager->expects($this->exactly(3))
+        $this->userConfigManager->expects(self::exactly(3))
             ->method('get')
             ->willReturnMap([
                 ['oro_user.send_password_in_invitation_email', false, false, null, true],
@@ -111,7 +105,7 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
                 ['oro_notification.email_notification_sender_name', false, false, null, 'John Doe'],
             ]);
 
-        $this->form->expects($this->exactly(2))
+        $this->form->expects(self::exactly(2))
             ->method('has')
             ->willReturnMap([
                 ['passwordGenerate', true],
@@ -119,14 +113,14 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $childForm = $this->createMock(FormInterface::class);
-        $childForm->expects($this->once())
+        $childForm->expects(self::once())
             ->method('getData')
             ->willReturn(true);
-        $childForm->expects($this->once())
+        $childForm->expects(self::once())
             ->method('getViewData')
             ->willReturn(true);
 
-        $this->form->expects($this->exactly(2))
+        $this->form->expects(self::exactly(2))
             ->method('get')
             ->willReturnMap([
                 ['passwordGenerate', $childForm],
@@ -135,51 +129,51 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
 
         $plainPassword = 'Qwerty!123%$';
 
-        $this->manager->expects($this->once())
+        $this->manager->expects(self::once())
             ->method('generatePassword')
             ->with(10)
             ->willReturn($plainPassword);
-        $this->manager->expects($this->once())
+        $this->manager->expects(self::once())
             ->method('updateUser')
             ->with($user);
 
-        $this->emailTemplateManager->expects($this->once())
-            ->method('sendTemplateEmail')
+        $this->emailTemplateSender->expects(self::once())
+            ->method('sendEmailTemplate')
             ->with(
                 From::emailAddress('admin@example.com', 'John Doe'),
-                [$user],
+                $user,
                 new EmailTemplateCriteria(UserHandler::INVITE_USER_TEMPLATE, RealUserEntity::class),
-                ['user' => $user, 'password' => $plainPassword]
+                ['entity' => $user, 'user' => $user, 'password' => $plainPassword]
             )
-            ->willReturn(1);
+            ->willReturn($this->createMock(EmailUser::class));
 
-        $this->assertTrue($this->handler->process($user));
+        self::assertTrue($this->handler->process($user));
     }
 
-    public function testProcessWithoutEmailAndWithPassword()
+    public function testProcessWithoutEmailAndWithPassword(): void
     {
         $user = new User();
 
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod(Request::METHOD_POST);
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('submit')
             ->with(self::FORM_DATA);
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
 
-        $this->manager->expects($this->once())
+        $this->manager->expects(self::once())
             ->method('setAuthStatus')
             ->with($user, UserManager::STATUS_ACTIVE);
 
-        $this->userConfigManager->expects($this->once())
+        $this->userConfigManager->expects(self::once())
             ->method('get')
             ->with('oro_user.send_password_in_invitation_email', false, false, null)
             ->willReturn(false);
 
-        $this->form->expects($this->exactly(2))
+        $this->form->expects(self::exactly(2))
             ->method('has')
             ->willReturnMap([
                 ['passwordGenerate', true],
@@ -187,24 +181,24 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $childForm = $this->createMock(FormInterface::class);
-        $childForm->expects($this->once())
+        $childForm->expects(self::once())
             ->method('getData')
             ->willReturn(false);
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('get')
             ->with('passwordGenerate')
             ->willReturn($childForm);
 
-        $this->manager->expects($this->never())
+        $this->manager->expects(self::never())
             ->method('generatePassword');
-        $this->manager->expects($this->once())
+        $this->manager->expects(self::once())
             ->method('updateUser')
             ->with($user);
 
-        $this->emailTemplateManager->expects($this->never())
-            ->method('sendTemplateEmail');
+        $this->emailTemplateSender->expects(self::never())
+            ->method('sendEmailTemplate');
 
-        $this->assertTrue($this->handler->process($user));
+        self::assertTrue($this->handler->process($user));
     }
 }

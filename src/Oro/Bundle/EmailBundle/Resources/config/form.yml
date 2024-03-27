@@ -97,30 +97,30 @@ services:
         class: Oro\Bundle\EmailBundle\Form\Handler\EmailHandler
         public: true
         arguments:
-            - '@oro_email.form.email'
-            - '@request_stack'
+            - '@form.factory'
             - '@oro_email.sender.email_model_sender'
             - '@logger'
-
-    oro_email.form.email:
-        class: Symfony\Component\Form\Form
-        public: true
-        factory: ['@form.factory', createNamed]
-        arguments: ["oro_email_email", Oro\Bundle\EmailBundle\Form\Type\EmailType, null]
-
-    Oro\Bundle\EmailBundle\Form\Type\EmailType:
-        alias: 'oro_email.form.email'
+        tags:
+            - { name: monolog.logger, channel: oro_email }
 
     oro_email.form.type.email:
         class: Oro\Bundle\EmailBundle\Form\Type\EmailType
         arguments:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
-            - '@oro_email.email_renderer'
             - '@oro_email.email.model.builder.helper'
             - '@oro_config.user'
+            - '@oro_email.form.subscriber.email_template_rendering_subscriber'
         tags:
             - { name: form.type, alias: oro_email_email }
+
+    oro_email.form.subscriber.email_template_rendering_subscriber:
+        class: Oro\Bundle\EmailBundle\Form\EventListener\EmailTemplateRenderingSubscriber
+        arguments:
+            - '@oro_email.email.model.builder.helper'
+            - '@oro_email.provider.translated_email_template'
+            - '@oro_email.provider.email_template_context'
+            - '@oro_email.email_renderer'
 
     oro_email.form.handler.email.api:
         class: Oro\Bundle\EmailBundle\Form\Handler\EmailApiHandler

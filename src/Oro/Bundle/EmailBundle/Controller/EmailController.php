@@ -26,7 +26,6 @@ use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
-use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
@@ -935,6 +934,11 @@ class EmailController extends AbstractController
         return $this->container->get(SmtpSettingsProviderInterface::class);
     }
 
+    private function getEmailHandler(): EmailHandler
+    {
+        return $this->container->get(EmailHandler::class);
+    }
+
     protected function process(EmailModel $emailModel): array
     {
         $responseData = [
@@ -942,10 +946,17 @@ class EmailController extends AbstractController
             'saved' => false,
             'appendSignature' => (bool)$this->getUserConfigManager()->get('oro_email.append_signature')
         ];
-        if ($this->container->get(EmailHandler::class)->process($emailModel)) {
+
+        $emailHandler = $this->getEmailHandler();
+
+        $form = $emailHandler->createForm($emailModel);
+        $emailHandler->handleRequest($form, $this->getRequestStack()->getCurrentRequest());
+
+        if ($emailHandler->handleFormSubmit($form)) {
             $responseData['saved'] = true;
         }
-        $responseData['form'] = $this->container->get(EmailType::class)->createView();
+
+        $responseData['form'] = $form->createView();
 
         return $responseData;
     }
@@ -1074,7 +1085,6 @@ class EmailController extends AbstractController
                 EmailThreadProvider::class,
                 ActivityListManager::class,
                 EmailHandler::class,
-                EmailType::class,
                 EntityRoutingHelper::class,
                 EmailModelBuilder::class,
                 FileManager::class,

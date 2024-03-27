@@ -330,3 +330,11 @@ services:
             - '@logger'
         tags:
             - { name: kernel.cache_warmer, priority: -2000 } # Warming caches for pages should be called at the end
+
+    oro_layout.twig.email_template_loader.layout_theme_template_loader:
+        class: Oro\Bundle\LayoutBundle\Twig\EmailTemplateLoader\LayoutThemeEmailTemplateLoader
+        arguments:
+            - []
+            - '%kernel.project_dir%'
+        tags:
+            - { name: oro_email.twig.email_template_loader, priority: 10 }

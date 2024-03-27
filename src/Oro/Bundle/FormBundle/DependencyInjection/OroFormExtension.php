@@ -31,5 +31,9 @@ class OroFormExtension extends Extension
             $container->getDefinition('oro_form.provider.html_tag_provider')
                 ->replaceArgument(0, $config['html_purifier_modes']);
         }
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 }

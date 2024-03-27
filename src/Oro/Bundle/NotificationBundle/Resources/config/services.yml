@@ -145,7 +145,7 @@ services:
         class: Oro\Bundle\NotificationBundle\Async\SendEmailNotificationTemplateProcessor
         arguments:
             - '@doctrine'
-            - '@oro_email.manager.template_email'
+            - '@oro_notification.manager.email_notification'
         calls:
             - [setLogger, ['@logger']]
         tags:
@@ -174,15 +174,13 @@ services:
     oro_notification.manager.email_notification:
         class: Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager
         arguments:
-            - '@oro_notification.manager.email_notification_sender'
-            - '@logger'
-            - '@oro_email.provider.localized_template'
-
-    oro_notification.manager.email_notification_sender:
-        class: Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender
-        arguments:
-            - '@oro_notification.model.notification_settings'
             - '@oro_message_queue.client.message_producer'
+            - '@oro_notification.model.notification_settings'
+            - '@oro_email.factory.email_model_from_email_template'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_notification }
 
     oro_notification.provider.contact_information_emails:
         class: Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider

@@ -10,6 +10,7 @@ class OroFormExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoad(): void
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroFormExtension();
         $extension->load([], $container);
@@ -36,6 +37,7 @@ class OroFormExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithHtmlPurifierModes(): void
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $configs = [
             ['html_purifier_modes' => ['lax' => ['extends' => 'default']]]

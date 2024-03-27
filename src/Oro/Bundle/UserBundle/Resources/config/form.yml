@@ -181,7 +181,7 @@ services:
             - '@oro_user.form.user'
             - '@request_stack'
             - '@oro_user.manager'
-            - '@oro_email.manager.template_email'
+            - '@oro_email.sender.email_template_sender'
             - '@oro_config.user'
             - '@translator'
             - '@logger'

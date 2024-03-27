@@ -1,7 +1,9 @@
 Oro\Bundle\EmailBundle\Entity\EmailTemplate:
     constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
-              fields:     [ name, entityName ]
+        - Oro\Bundle\FormBundle\Validator\Constraints\UniqueEntity:
+              fields: '%oro_email.email_template.unique_fields%'
+              message: 'oro.email.validator.email_template.unique_entity.message'
+              buildViolationAtEntityLevel: false
               ignoreNull: false
         - Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax: ~
     properties:

@@ -292,7 +292,7 @@ services:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\EmailNotificationSender
         arguments:
             - '@oro_notification.model.notification_settings'
-            - '@oro_email.manager.template_email'
+            - '@oro_email.sender.email_template_sender'
         tags:
             - {name: oro_imap.origin_credentials.notification_sender}
 

@@ -1,0 +1,4 @@
+services:
+    oro_form.test.validator_constraints.unique_entity:
+        parent: oro_form.validator_constraints.unique_entity
+        public: true

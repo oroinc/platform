@@ -2,51 +2,57 @@
 
 namespace Oro\Bundle\NotificationBundle\Manager;
 
+use Oro\Bundle\EmailBundle\Factory\EmailModelFromEmailTemplateFactory;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Model\SenderAwareInterface;
-use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTopic;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendMassEmailNotificationTopic;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
-use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Manager that processes notifications and make them to be processed using message queue.
  */
-class EmailNotificationManager
+class EmailNotificationManager implements LoggerAwareInterface
 {
-    /** @var EmailNotificationSender */
-    private $emailNotificationSender;
+    use LoggerAwareTrait;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private MessageProducerInterface $messageProducer;
 
-    /** @var LocalizedTemplateProvider */
-    private $localizedTemplateProvider;
+    private NotificationSettings $notificationSettings;
 
-    /**
-     * EmailNotificationManager constructor.
-     */
+    private EmailModelFromEmailTemplateFactory $emailModelFromEmailTemplateFactory;
+
     public function __construct(
-        EmailNotificationSender $emailNotificationSender,
-        LoggerInterface $logger,
-        LocalizedTemplateProvider $localizedTemplateProvider
+        MessageProducerInterface $messageProducer,
+        NotificationSettings $notificationSettings,
+        EmailModelFromEmailTemplateFactory $emailModelFromEmailTemplateFactory
     ) {
-        $this->emailNotificationSender = $emailNotificationSender;
-        $this->logger = $logger;
-        $this->localizedTemplateProvider = $localizedTemplateProvider;
+        $this->messageProducer = $messageProducer;
+        $this->notificationSettings = $notificationSettings;
+        $this->emailModelFromEmailTemplateFactory = $emailModelFromEmailTemplateFactory;
+
+        $this->logger = new NullLogger();
     }
 
     /**
      * Sends the email notifications
      *
      * @param TemplateEmailNotificationInterface[] $notifications
+     * @param array $params Additional params for template renderer
      * @param LoggerInterface|null $logger Override for default logger. If this parameter is specified
      *                                     this logger will be used instead of a logger specified
      *                                     in the constructor
-     * @param array $params Additional params for template renderer
      */
-    public function process(array $notifications, LoggerInterface $logger = null, array $params = []): void
+    public function process(array $notifications, array $params = [], LoggerInterface $logger = null): void
     {
         foreach ($notifications as $notification) {
             try {
@@ -75,41 +81,69 @@ class EmailNotificationManager
         LoggerInterface $logger = null
     ): void {
         try {
-            $sender = $notification instanceof SenderAwareInterface
-                ? $notification->getSender()
-                : null;
+            $sender = $this->getSender($notification);
 
-            $templateCollection = $this->localizedTemplateProvider->getAggregated(
-                $notification->getRecipients(),
-                $notification->getTemplateCriteria(),
-                ['entity' => $notification->getEntity()] + $params
-            );
+            if ($notification instanceof TemplateMassNotification) {
+                $topic = SendMassEmailNotificationTopic::getName();
+                $subjectOverride = $notification->getSubject();
+            } else {
+                $topic = SendEmailNotificationTopic::getName();
+                $subjectOverride = null;
+            }
 
-            foreach ($templateCollection as $localizedTemplateDTO) {
-                $languageNotification = new TemplateEmailNotification(
+            if ($notification->getEntity() !== null) {
+                $params = ['entity' => $notification->getEntity()] + $params;
+            }
+
+            foreach ($notification->getRecipients() as $recipient) {
+                $emailModel = $this->emailModelFromEmailTemplateFactory->createEmailModel(
+                    $sender,
+                    $recipient,
                     $notification->getTemplateCriteria(),
-                    $localizedTemplateDTO->getRecipients(),
-                    $notification->getEntity(),
-                    $sender
+                    $params
                 );
 
-                $emailTemplate = $localizedTemplateDTO->getEmailTemplate();
-
-                if ($notification instanceof TemplateMassNotification) {
-                    if ($notification->getSubject()) {
-                        $emailTemplate->setSubject($notification->getSubject());
-                    }
-
-                    $this->emailNotificationSender->sendMass($languageNotification, $emailTemplate);
-                } else {
-                    $this->emailNotificationSender->send($languageNotification, $emailTemplate);
+                if ($subjectOverride !== null) {
+                    $emailModel->setSubject($subjectOverride);
                 }
+
+                $this->asyncSendEmail($emailModel, $topic);
             }
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $logger = $logger ?? $this->logger;
             $logger->error('An error occurred while processing notification', ['exception' => $exception]);
 
             throw new NotificationSendException($notification);
         }
+    }
+
+    /**
+     * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception
+     */
+    private function asyncSendEmail(EmailModel $emailModel, string $topic): void
+    {
+        $messageParams = [
+            'from' => $emailModel->getFrom(),
+            'toEmail' => current($emailModel->getTo()),
+            'subject' => $emailModel->getSubject(),
+            'body' => $emailModel->getBody(),
+            'contentType' => $emailModel->getType() === 'html' ? 'text/html' : 'text/plain',
+        ];
+
+        $this->messageProducer->send($topic, $messageParams);
+    }
+
+    private function getSender(TemplateEmailNotificationInterface $notification): From
+    {
+        $sender = null;
+        if ($notification instanceof SenderAwareInterface) {
+            $sender = $notification->getSender();
+        }
+
+        if ($sender === null) {
+            $sender = $this->notificationSettings->getSender();
+        }
+
+        return $sender;
     }
 }

@@ -2,33 +2,32 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Mailer;
 
-use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\From;
+use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
+class UserTemplateEmailSenderTest extends TestCase
 {
     private const TEMPLATE_NAME = 'templateName';
     private const TEMPLATE_PARAMS = ['some' => 'params'];
 
-    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $notificationSettingsModel;
+    private NotificationSettings|MockObject $notificationSettingsModel;
 
-    /** @var EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailTemplateManager;
+    private EmailTemplateSender|MockObject $emailTemplateSender;
 
-    /** @var UserTemplateEmailSender */
-    private $sender;
+    private UserTemplateEmailSender $sender;
 
     protected function setUp(): void
     {
         $this->notificationSettingsModel = $this->createMock(NotificationSettings::class);
-        $this->emailTemplateManager = $this->createMock(EmailTemplateManager::class);
+        $this->emailTemplateSender = $this->createMock(EmailTemplateSender::class);
 
-        $this->sender = new UserTemplateEmailSender($this->notificationSettingsModel, $this->emailTemplateManager);
+        $this->sender = new UserTemplateEmailSender($this->notificationSettingsModel, $this->emailTemplateSender);
     }
 
     public function testSendUserTemplateEmailWithoutScope(): void
@@ -36,51 +35,49 @@ class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $sender = From::emailAddress('some@mail.com');
 
-        $this->notificationSettingsModel->expects($this->atLeastOnce())
+        $this->notificationSettingsModel->expects(self::atLeastOnce())
             ->method('getSender')
             ->willReturn($sender);
 
-        $returnValue = 1;
-        $this->emailTemplateManager->expects($this->once())
-            ->method('sendTemplateEmail')
+        $this->emailTemplateSender->expects(self::once())
+            ->method('sendEmailTemplate')
             ->with(
                 $sender,
-                [$user],
-                new EmailTemplateCriteria(self::TEMPLATE_NAME),
+                $user,
+                self::TEMPLATE_NAME,
                 self::TEMPLATE_PARAMS
             )
-            ->willReturn($returnValue);
+            ->willReturn($this->createMock(EmailUser::class));
 
         self::assertEquals(
-            $returnValue,
+            1,
             $this->sender->sendUserTemplateEmail($user, self::TEMPLATE_NAME, self::TEMPLATE_PARAMS)
         );
     }
 
-    public function testSendUserTemplateEmailWithtScope(): void
+    public function testSendUserTemplateEmailWithScope(): void
     {
         $user = new User();
         $sender = From::emailAddress('some@mail.com');
         $scopeEntity = new User();
 
-        $this->notificationSettingsModel->expects($this->atLeastOnce())
+        $this->notificationSettingsModel->expects(self::atLeastOnce())
             ->method('getSenderByScopeEntity')
             ->with($scopeEntity)
             ->willReturn($sender);
 
-        $returnValue = 1;
-        $this->emailTemplateManager->expects($this->once())
-            ->method('sendTemplateEmail')
+        $this->emailTemplateSender->expects(self::once())
+            ->method('sendEmailTemplate')
             ->with(
                 $sender,
-                [$user],
-                new EmailTemplateCriteria(self::TEMPLATE_NAME),
+                $user,
+                self::TEMPLATE_NAME,
                 self::TEMPLATE_PARAMS
             )
-            ->willReturn($returnValue);
+            ->willReturn($this->createMock(EmailUser::class));
 
         self::assertEquals(
-            $returnValue,
+            1,
             $this->sender->sendUserTemplateEmail($user, self::TEMPLATE_NAME, self::TEMPLATE_PARAMS, $scopeEntity)
         );
     }
