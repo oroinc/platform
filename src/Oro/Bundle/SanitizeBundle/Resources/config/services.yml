@@ -1,0 +1,152 @@
+services:
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper:
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.entity_metadata_provider'
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\CompoundGuesser:
+        arguments:
+            - !tagged_iterator oro_sanitize.field_rule.processor.guesser
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\EmailGuesser:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\EmailProcessor'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper'
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor.guesser' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\NamePartsGuesser:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Md5Processor'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper'
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor.guesser' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\CryptedStringGuesser:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Md5Processor'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper'
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor.guesser' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\JsonBuildPairsPostProcessor:
+        arguments:
+            - '@doctrine'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper'
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\ProcessorsRegistry:
+        arguments:
+            - !tagged_iterator { tag: 'oro_sanitize.field_rule.processor', index_by: 'processor_name', default_index_method: 'getProcessorName' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Entity\ProcessorsRegistry:
+        arguments:
+            - !tagged_iterator { tag: 'oro_sanitize.entity_rule.processor', index_by: 'processor_name', default_index_method: 'getProcessorName' }
+
+    Oro\Bundle\SanitizeBundle\Provider\Rule\FileBasedConfiguration:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\ProcessorsRegistry'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Entity\ProcessorsRegistry'
+
+    oro_sanitize.field_rule.generic_processor:
+        abstract: true
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\JsonBuildPairsPostProcessor'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper'
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\EmailProcessor:
+        parent: oro_sanitize.field_rule.generic_processor
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Md5Processor:
+        parent: oro_sanitize.field_rule.generic_processor
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\DateProcessor:
+        parent: oro_sanitize.field_rule.generic_processor
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\SetNullProcessor:
+        parent: oro_sanitize.field_rule.generic_processor
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\AttachmentProcessor:
+        parent: oro_sanitize.field_rule.generic_processor
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor' }
+
+    oro_sanitize.field_rule.postcode_processor:
+        class: Oro\Bundle\SanitizeBundle\RuleProcessor\Field\WrappedProcessor
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Md5Processor'
+        calls:
+            - ['setOptions', [{length: 5}]]
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor', processor_name: 'postal_code' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\DigitsMaskProcessor:
+        parent: oro_sanitize.field_rule.generic_processor
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor' }
+
+    oro_sanitize.field_rule.generic_phone_processor:
+        class: Oro\Bundle\SanitizeBundle\RuleProcessor\Field\WrappedProcessor
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\DigitsMaskProcessor'
+        calls:
+            - ['setOptions', [{mask: '%oro_sanitize.generic_phone_mask%'}]]
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor', processor_name: 'generic_phone' }
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Entity\TruncateProcessor:
+        arguments:
+            - '@doctrine.dbal.default_connection'
+        tags:
+            - { name: 'oro_sanitize.entity_rule.processor'}
+
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Entity\TruncateCascadeProcessor:
+        arguments:
+            - '@doctrine.dbal.default_connection'
+        tags:
+            - { name: 'oro_sanitize.entity_rule.processor'}
+
+    Oro\Bundle\SanitizeBundle\EntityConfig\SanitizeEntityConfiguration:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Entity\ProcessorsRegistry'
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    Oro\Bundle\SanitizeBundle\EntityConfig\SanitizeFieldConfiguration:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\ProcessorsRegistry'
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    Oro\Bundle\SanitizeBundle\Provider\EntityAllMetadataProvider:
+        arguments:
+            - '@doctrine'
+        calls:
+            - [ setConfigConnactionName, ['%oro_sanitize.entity_config_connection%']]
+
+    Oro\Bundle\SanitizeBundle\Provider\Rule\FileBasedProvider:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\Provider\EntityAllMetadataProvider'
+            - '@oro_entity_config.config_manager'
+            - '@Oro\Bundle\SanitizeBundle\Provider\Rule\FileBasedConfiguration'
+
+    Oro\Bundle\SanitizeBundle\Tools\SanitizeSqlLoader:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\Provider\EntityAllMetadataProvider'
+            - '@oro_entity_config.config_manager'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\CompoundGuesser'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Entity\ProcessorsRegistry'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\ProcessorsRegistry'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\JsonBuildPairsPostProcessor'
+            - '@Oro\Bundle\SanitizeBundle\Provider\Rule\FileBasedProvider'
+
+    Oro\Bundle\SanitizeBundle\Tools\SqlSyntaxValidator:
+        arguments:
+            - '@doctrine.dbal.sql_validator_connection'

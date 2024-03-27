@@ -1,0 +1,11 @@
+oro_sanitize:
+    entity:
+        oro_address:
+            fields:
+                street: md5
+                street2: md5
+                city: md5
+                postal_code: postal_code
+                label: md5
+                organization: md5
+                last_name: md5

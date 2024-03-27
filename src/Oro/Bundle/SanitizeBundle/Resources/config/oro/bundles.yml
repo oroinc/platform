@@ -1,0 +1,2 @@
+bundles:
+    - { name: Oro\Bundle\SanitizeBundle\OroSanitizeBundle, priority: -77, kernel: true }

@@ -1,0 +1,9 @@
+oro_sanitize:
+    entity_config_connection: config
+
+doctrine:
+    dbal:
+        connections:
+            sql_validator:
+                url:            '%database_dsn%'
+                server_version: '%database_server_version%'

@@ -1,0 +1,4 @@
+oro_sanitize:
+   raw_sqls:
+      - |
+        /* Unclosed comment

@@ -1,0 +1,5 @@
+oro_sanitize:
+    entity:
+        test_sanitizable_entity:
+            fields:
+                phone: '__undefined_rule_alias__'

@@ -1,0 +1,6 @@
+oro_sanitize:
+    entity:
+        oro_search_index_text: truncate
+        oro_search_index_integer: truncate
+        oro_search_index_decimal: truncate
+        oro_search_item: truncate_cascade

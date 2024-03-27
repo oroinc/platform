@@ -1,0 +1,3 @@
+oro_sanitize:
+    entity:
+        oro_logger_log_entry: truncate_cascade

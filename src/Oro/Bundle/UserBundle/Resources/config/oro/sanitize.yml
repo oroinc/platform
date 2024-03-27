@@ -1,0 +1,23 @@
+oro_sanitize:
+    entity:
+        oro_user:
+            fields:
+                username: email
+                username_lowercase: email
+                last_name: md5
+                email: email
+                email_lowercase: email
+                phone: generic_phone
+                birthday: date
+                salt: md5
+                password: md5
+        oro_user_impersonation:
+            fields:
+                token: md5
+                ip_address: md5
+        oro_user_email:
+            fields:
+                email: email
+        oro_user_api:
+            fields:
+                api_key: md5

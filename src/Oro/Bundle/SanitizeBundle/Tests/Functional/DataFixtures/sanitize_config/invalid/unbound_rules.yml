@@ -1,0 +1,10 @@
+oro_sanitize:
+    entity:
+        non_existing_entity:
+            raw_sqls:
+                - '-- Idle comment'
+        Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Entity\TestSanitizable:
+            fields:
+                stateData: set_null
+                non_existing_field: set_null
+                first_custom_field: set_null

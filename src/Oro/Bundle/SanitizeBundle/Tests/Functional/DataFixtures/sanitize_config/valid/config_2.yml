@@ -1,0 +1,12 @@
+oro_sanitize:
+    raw_sqls:
+        - '-- Idle comment of "config_2.yml". truncate cascade catcher'
+    entity:
+        test_sanitizable_entity:
+            fields:
+                state_data: set_null
+                phone_second:
+                    rule: digits_mask
+                    rule_options:
+                        mask: '(777) XXXX-XX-XX'
+                birthday: date
