@@ -60,6 +60,22 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
     /**
      * {@inheritdoc}
      */
+    public function loadThemeResources(ResourcesContainerInterface $resourcesContainer): iterable
+    {
+        $configLoader = new CumulativeConfigLoader(
+            'oro_layout',
+            [
+                $this->getFolderingCumulativeFileLoaderForPath('Resources/views/layouts/{folder}/theme.yml'),
+                $this->getFolderingCumulativeFileLoaderForPath('../templates/layouts/{folder}/theme.yml')
+            ]
+        );
+
+        return $configLoader->load($resourcesContainer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];
@@ -77,24 +93,6 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
             $this->configuration,
             $configs
         );
-    }
-
-    /**
-     * @param ResourcesContainerInterface $resourcesContainer
-     *
-     * @return CumulativeResourceInfo[]
-     */
-    private function loadThemeResources(ResourcesContainerInterface $resourcesContainer)
-    {
-        $configLoader = new CumulativeConfigLoader(
-            'oro_layout',
-            [
-                $this->getFolderingCumulativeFileLoaderForPath('Resources/views/layouts/{folder}/theme.yml'),
-                $this->getFolderingCumulativeFileLoaderForPath('../templates/layouts/{folder}/theme.yml')
-            ]
-        );
-
-        return $configLoader->load($resourcesContainer);
     }
 
     /**

@@ -169,11 +169,18 @@ class EntityNameProvider implements EntityNameProviderInterface
     private function getFieldValue(object $entity, string $fieldName): mixed
     {
         $getterName = 'get' . $this->inflector->classify($fieldName);
+
         if (EntityPropertyInfo::methodExists($entity, $getterName)) {
-            return $entity->{$getterName}();
+            $value = $entity->{$getterName}();
+        } else {
+            $value = $entity->{$fieldName} ?? null;
         }
 
-        return $entity->{$fieldName} ?? null;
+        if ($value instanceof \UnitEnum) {
+            $value = $value->value;
+        }
+
+        return $value;
     }
 
     private function getFieldNames(string $className): array

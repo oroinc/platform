@@ -1,0 +1,4 @@
+dynamic-imports:
+    orotheme:
+        - orotheme/js/app/views/theme-configuration-form-view
+        - orotheme/js/app/views/theme-configuration-preview-view

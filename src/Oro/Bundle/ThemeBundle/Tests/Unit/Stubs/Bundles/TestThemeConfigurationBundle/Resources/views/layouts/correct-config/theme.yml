@@ -1,0 +1,42 @@
+label: Correct config theme
+description: Correct config theme.
+groups: [ commerce ]
+icon: bundles/orofrontend/default/images/favicon.ico
+logo: bundles/orofrontend/default/images/logo/demob2b-logo.svg
+rtl_support: true
+configuration:
+  sections:
+    general:
+      label: 'General Settings'
+      options:
+        palette:
+          label: 'Color Palette'
+          type: select
+          default: modern
+          values:
+            modern: 'Lightweight colors optimized for modern high screen resolutions'
+            traditional: 'More contrasting color selections that work well on all types of screens'
+          previews:
+            modern: 'bundles/orofrontend/images/previews/modern-palette.png'
+            traditional: 'bundles/orofrontend/images/previews/tradition-pallete.jpg'
+          options:
+            as_boolean: false
+            as_empty_string: ''
+            as_null: null
+            as_array:
+              foo: bar
+            as_string: 'test string'
+        rounding:
+          label: 'Rounded Controls'
+          type: checkbox
+          default: unchecked
+          previews:
+            checked: 'bundles/orofrontend/images/previews/rounded-controls.png'
+            unchecked: 'bundles/orofrontend/images/previews/square-controls.jpg'
+        button_color:
+          label: 'Primary Call-To-Action Buttons Color'
+          type: radio
+          default: blue
+          values:
+            blue: 'Deep ocean blue'
+            green: 'Forest green'

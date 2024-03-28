@@ -9,3 +9,11 @@ services:
             - '@oro_theme.registry'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\ThemeBundle\Command\ThemeValidateConfigurationCommand:
+        public: false
+        class: Oro\Bundle\ThemeBundle\Command\ThemeValidateConfigurationCommand
+        arguments:
+            - '@oro_theme.chain_configuration_validator'
+        tags:
+            - { name: console.command }

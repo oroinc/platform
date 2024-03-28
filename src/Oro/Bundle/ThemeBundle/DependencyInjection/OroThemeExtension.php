@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ThemeBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
@@ -24,16 +25,23 @@ class OroThemeExtension extends Extension
         array_unshift($configs, ['themes' => $this->getBundlesThemesSettings($container)]);
 
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
 
         $container->setParameter(self::THEMES_SETTINGS_PARAMETER, $config['themes']);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('commands.yml');
+        $loader->load('form_types.yml');
+        $loader->load('controllers.yml');
 
         if (isset($config['active_theme'])) {
             $registryDefinition = $container->getDefinition(self::THEME_REGISTRY_SERVICE_ID);
             $registryDefinition->addMethodCall('setActiveTheme', [$config['active_theme']]);
+        }
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
         }
     }
 

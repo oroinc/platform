@@ -8,12 +8,15 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntityWithEnumField;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntityWithHiddenField;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntityWithMagicEnumField;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntityWithMagicHiddenField;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
@@ -180,6 +183,69 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->entityNameProvider->getName('full', null, $entity);
         self::assertEquals('test', $result);
+    }
+
+    public function testGetNameForEntityWithEnumField()
+    {
+        $entity = new TestEntityWithEnumField(1);
+        $entity->setName('enum');
+
+        $this->metadata->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(TestEntityWithEnumField::class);
+
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'name', 'enum']);
+
+        $this->metadata->expects(self::exactly(3))
+            ->method('hasField')
+            ->willReturnMap([
+                ['id', true],
+                ['name', true],
+                ['enum', true]
+            ]);
+        $this->metadata->expects(self::exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap([
+                ['id', 'integer'],
+                ['name', 'string'],
+                ['enum', 'string']
+            ]);
+
+        $result = $this->entityNameProvider->getName('full', null, $entity);
+
+        self::assertEquals('enum', $result);
+    }
+
+    public function testGetNameForEntityWithEnumFieldThanHasAccessViaMagicMethods()
+    {
+        $entity = new TestEntityWithMagicEnumField(1);
+        $entity->setName('enum');
+
+        $this->metadata->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(TestEntityWithMagicHiddenField::class);
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'name', 'enum']);
+        $this->metadata->expects(self::exactly(3))
+            ->method('hasField')
+            ->willReturnMap([
+                ['id', true],
+                ['name', true],
+                ['enum', true]
+            ]);
+        $this->metadata->expects(self::exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap([
+                ['id', 'integer'],
+                ['name', 'string'],
+                ['enum', 'string']
+            ]);
+
+        $result = $this->entityNameProvider->getName('full', null, $entity);
+        self::assertEquals('enum Option1', $result);
     }
 
     public function testGetNameForEntityWithHiddenFieldThanHasAccessViaMagicMethods()
@@ -394,6 +460,39 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetNameDQLForEntityWithEnumField()
+    {
+        $this->metadata->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(TestEntityWithEnumField::class);
+        $this->metadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'name', 'enum']);
+        $this->metadata->expects(self::exactly(3))
+            ->method('hasField')
+            ->willReturnMap([
+                ['id', true],
+                ['name', true],
+                ['enum', true]
+            ]);
+        $this->metadata->expects(self::exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap([
+                ['id', 'integer'],
+                ['name', 'string'],
+                ['enum', 'string']
+            ]);
+
+        $result = $this->entityNameProvider->getNameDQL('full', null, TestEntityWithEnumField::class, 'alias');
+        self::assertEquals(
+            'COALESCE(CAST(CONCAT_WS(\' \', alias.name, alias.enum) AS string), CAST(alias.id AS string))',
+            $result
+        );
+    }
+
     public function testGetNameDQLForEntityWithHiddenFieldThanHasAccessViaMagicMethods()
     {
         $this->metadata->expects(self::atLeastOnce())
@@ -423,6 +522,39 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $result = $this->entityNameProvider->getNameDQL('full', null, TestEntityWithMagicHiddenField::class, 'alias');
         self::assertEquals(
             'COALESCE(CAST(CONCAT_WS(\' \', alias.name, alias.hidden) AS string), CAST(alias.id AS string))',
+            $result
+        );
+    }
+
+    public function testGetNameDQLForEntityWithEnumFieldThanHasAccessViaMagicMethods()
+    {
+        $this->metadata->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(TestEntityWithMagicEnumField::class);
+        $this->metadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'name', 'enum']);
+        $this->metadata->expects(self::exactly(3))
+            ->method('hasField')
+            ->willReturnMap([
+                ['id', true],
+                ['name', true],
+                ['enum', true]
+            ]);
+        $this->metadata->expects(self::exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap([
+                ['id', 'integer'],
+                ['name', 'string'],
+                ['enum', 'string']
+            ]);
+
+        $result = $this->entityNameProvider->getNameDQL('full', null, TestEntityWithMagicEnumField::class, 'alias');
+        self::assertEquals(
+            'COALESCE(CAST(CONCAT_WS(\' \', alias.name, alias.enum) AS string), CAST(alias.id AS string))',
             $result
         );
     }

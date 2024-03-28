@@ -10,6 +10,8 @@ use Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface;
 use Oro\Bundle\UIBundle\Twig\UiExtension;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,19 +25,19 @@ use Twig\TemplateWrapper;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class UiExtensionTest extends \PHPUnit\Framework\TestCase
+class UiExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private Environment|\PHPUnit\Framework\MockObject\MockObject $environment;
+    private Environment|MockObject $environment;
 
-    private ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject $contentProviderManager;
+    private ContentProviderManager|MockObject $contentProviderManager;
 
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
 
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+    private RequestStack|MockObject $requestStack;
 
-    private RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router;
+    private RouterInterface|MockObject $router;
 
     private UiExtension $extension;
 
@@ -815,6 +817,34 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 'https://example.com:8080/test?hello=2&third=def&second=abc',
             ],
             ['/test', ['hello' => 2, 'second' => 'abc'], '/test?hello=2&second=abc'],
+        ];
+    }
+
+    /**
+     * @dataProvider getIsStringDataProvider
+     */
+    public function testIsString(mixed $value, bool $expectedResult): void
+    {
+        self::assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_is_string', [$value])
+        );
+    }
+
+    public function getIsStringDataProvider(): array
+    {
+        return [
+            [null, false],
+            ["null", true],
+            ['some_option_value', true],
+            [123, false],
+            ["123", true],
+            [123.321, false],
+            ["123.321", true],
+            [false, false],
+            ["false", true],
+            [['foo' => 'bar'], false],
+            [new \stdClass(), false],
         ];
     }
 }

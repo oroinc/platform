@@ -1,0 +1,40 @@
+oro:
+  theme:
+    themeconfiguration:
+      controller:
+        question:
+          saved.message: 'Theme Configuration has been saved'
+      search:
+        search_title:
+          title: '{0} All Theme Configurations|[1,Inf] Search Results for "%text%"'
+      form:
+        choose: Choose a theme configuration...
+      entity_label: Theme Configuration
+      beta_entity_label: Theme Configuration (BETA)
+      entity_plural_label: Theme Configurations
+      entity_grid_all_view_label: All %entity_plural_label%
+      entity_description: Represents theme configuration information.
+      id:
+        label: ID
+      type:
+        label: Type
+      name:
+        label: Name
+      description:
+        label: Description
+      theme:
+        label: Theme
+      owner:
+        label: Owner
+      configuration:
+        label: Configuration
+      organization:
+        label: Organization
+      fields:
+        type:
+          choices:
+            storefront: Storefront
+    system_configuration:
+      fields:
+        theme_configuration:
+          label: Theme Configuration

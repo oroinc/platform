@@ -40,7 +40,7 @@ class ThemeRegistry
     /**
      * Gets instance of theme by name
      *
-     * @param string $name
+     * @param  string $name
      * @return Theme
      * @throws ThemeNotFoundException
      */
@@ -75,8 +75,8 @@ class ThemeRegistry
     /**
      * Create instance of theme based on name and settings
      *
-     * @param string $name
-     * @param array $settings
+     * @param  string $name
+     * @param  array  $settings
      * @return Theme
      */
     protected function createTheme($name, array $settings)

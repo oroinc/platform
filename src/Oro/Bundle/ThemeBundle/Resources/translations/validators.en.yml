@@ -1,0 +1,6 @@
+oro:
+  theme:
+    themeconfiguration:
+      message:
+        error:
+          type: Choose a valid type.

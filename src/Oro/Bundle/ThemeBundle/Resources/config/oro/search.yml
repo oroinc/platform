@@ -1,0 +1,21 @@
+search:
+    Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration:
+        alias:                 oro_theme_configuration
+        route:
+            name:              oro_theme_configuration_view
+            parameters:
+                id:            id
+        search_template:       '@OroTheme/ThemeConfiguration/searchResult.html.twig'
+        fields:
+            -
+                name:          name
+                target_type:   text
+                target_fields: [name]
+            -
+                name:          description
+                target_type:   text
+                target_fields: [description]
+            -
+                name:          theme
+                target_type:   text
+                target_fields: [theme]
