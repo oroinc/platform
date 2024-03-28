@@ -22,7 +22,7 @@
         <div class="filter-value">
             <div class="filter-value-range">
                 <div class="filter-start">
-                    <input class="input input--size-s input--full"
+                    <input class="input input--full"
                        type="number"
                        value="<%- value.value %>"
                        name="value"
@@ -31,7 +31,7 @@
                 </div>
                 <span class="filter-separator" aria-hidden="true">-</span>
                 <div class="filter-end">
-                    <input class="input input--size-s input--full"
+                    <input class="input input--full"
                        type="number"
                        value="<%- value.value_end %>"
                        name="value_end"
@@ -45,7 +45,7 @@
         <% if (renderMode !== 'toggle-mode') { %>
             <div class="filter-action-row">
                 <button type="button"
-                    class="btn btn--outlined btn--size-small filter-update"
+                    class="btn filter-update"
                     aria-label="<%- updateButtonAriaLabel %>"
                 ><%- _.__("oro.filter.updateButton.text") %></button>
             </div>

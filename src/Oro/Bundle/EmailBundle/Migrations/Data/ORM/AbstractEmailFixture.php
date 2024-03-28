@@ -63,7 +63,7 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
         $templates = [];
         /** @var SplFileInfo $file  */
         foreach ($files as $file) {
-            $fileName = str_replace(['.html.twig', '.html', '.txt.twig', '.txt'], '', $file->getFilename());
+            $fileName = $this->getBasename($file);
 
             $format = 'html';
             if (preg_match('#\.(html|txt)(\.twig)?#', $file->getFilename(), $match)) {
@@ -88,6 +88,20 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
     {
         $template = file_get_contents($file['path']);
         $parsedTemplate = EmailTemplate::parseContent($template);
+        if (empty($parsedTemplate['params']['name'])) {
+            throw new \LogicException(sprintf('Email template name is expected to be non empty in file %s', $fileName));
+        }
+
+        if ($parsedTemplate['params']['name'] !== $this->getBasename($fileName)) {
+            throw new \LogicException(
+                sprintf(
+                    'Email template name is expected to be equal to its filename: "%s" is not equal to "%s"',
+                    $parsedTemplate['params']['name'],
+                    $this->getBasename($fileName)
+                )
+            );
+        }
+
         $existingTemplate = $this->findExistingTemplate($manager, $parsedTemplate);
 
         if ($existingTemplate) {
@@ -156,6 +170,13 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
         }
 
         return $this->adminUser;
+    }
+
+    protected function getBasename(SplFileInfo|string $file): string
+    {
+        $filename = $file instanceof SplFileInfo ? $file->getFilename() : $file;
+
+        return str_replace(['.html.twig', '.html', '.txt.twig', '.txt'], '', $filename);
     }
 
     /**

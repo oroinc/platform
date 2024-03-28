@@ -288,6 +288,7 @@
             "Oro\\Bundle\\SecurityBundle\\": "src/Oro/Bundle/SecurityBundle",
             "Oro\\Bundle\\SegmentBundle\\": "src/Oro/Bundle/SegmentBundle",
             "Oro\\Bundle\\SidebarBundle\\": "src/Oro/Bundle/SidebarBundle",
+            "Oro\\Bundle\\SanitizeBundle\\": "src/Oro/Bundle/SanitizeBundle",
             "Oro\\Bundle\\SoapBundle\\": "src/Oro/Bundle/SoapBundle",
             "Oro\\Bundle\\SSOBundle\\": "src/Oro/Bundle/SSOBundle",
             "Oro\\Bundle\\SyncBundle\\": "src/Oro/Bundle/SyncBundle",

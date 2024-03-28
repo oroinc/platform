@@ -90,7 +90,7 @@
 
 {% block logo_widget %}
     {% import '@OroUI/macros.html.twig' as UI %}
-    {% set searchType = oro_config_value('oro_frontend.search_on_smaller_screens') %}
+    {% set searchType = oro_theme_configuration_value('header-search_on_smaller_screens') %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' logo'
     }) %}

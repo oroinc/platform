@@ -38,6 +38,7 @@ use Twig\TwigFunction;
  *   - oro_is_url_local
  *   - skype_button
  *   - oro_form_additional_data (Returns Additional section data which is used for rendering)
+ *   - oro_is_string
  *
  * Provides Twig filters that expose some common PHP functions:
  *   - oro_js_template_content
@@ -160,6 +161,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
             new TwigFunction('oro_default_page', [$this, 'getDefaultPage']),
+            new TwigFunction('oro_is_string', [$this, 'isString']),
         ];
     }
 
@@ -654,6 +656,11 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     public function getDefaultPage(): string
     {
         return $this->getRouter()->generate('oro_default');
+    }
+
+    public function isString(mixed $value): bool
+    {
+        return \is_string($value);
     }
 
     /**

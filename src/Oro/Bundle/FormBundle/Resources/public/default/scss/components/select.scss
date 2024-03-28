@@ -26,6 +26,16 @@
 
     @include element-state('focus') {
         border-color: $select-border-color-focus-state;
+        box-shadow: 0 0 0 1px $select-border-color-focus-state inset;
+    }
+
+    @include element-state('active') {
+        border-color: $select-border-color-focus-state;
+        box-shadow: 0 0 0 1px $select-border-color-focus-state inset;
+    }
+
+    &.active {
+        background: $select-bg-open;
     }
 
     &:focus-visible {

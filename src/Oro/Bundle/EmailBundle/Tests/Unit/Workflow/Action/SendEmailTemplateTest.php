@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Model\Recipient;
-use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
+use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -17,21 +17,23 @@ use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
+class SendEmailTemplateTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private ContextAccessor|\PHPUnit\Framework\MockObject\MockObject $contextAccessor;
+    private ContextAccessor|MockObject $contextAccessor;
 
-    private ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator;
+    private ValidatorInterface|MockObject $validator;
 
-    private AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject $aggregatedEmailTemplatesSender;
+    private EmailTemplateSender|MockObject $emailTemplateSender;
 
     private SendEmailTemplate $action;
 
@@ -44,7 +46,7 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 
         $this->validator = $this->createMock(ValidatorInterface::class);
         $entityNameResolver = $this->createMock(EntityNameResolver::class);
-        $this->aggregatedEmailTemplatesSender = $this->createMock(AggregatedEmailTemplatesSender::class);
+        $this->emailTemplateSender = $this->createMock(EmailTemplateSender::class);
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $this->action = new SendEmailTemplate(
@@ -52,7 +54,7 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             $this->validator,
             new EmailAddressHelper(),
             $entityNameResolver,
-            $this->aggregatedEmailTemplatesSender
+            $this->emailTemplateSender
         );
         $this->action->setDispatcher($dispatcher);
 
@@ -287,7 +289,7 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteWithInvalidEmail(): void
     {
-        $this->aggregatedEmailTemplatesSender->expects(self::never())
+        $this->emailTemplateSender->expects(self::never())
             ->method(self::anything());
 
         $this->action->initialize(
@@ -326,10 +328,10 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             ->method('getEmail')
             ->willReturn($emailEntity);
 
-        $this->aggregatedEmailTemplatesSender->expects(self::once())
-            ->method('send')
-            ->with(new \stdClass(), [$recipient], $expected['from'], 'test')
-            ->willReturn([$emailUserEntity]);
+        $this->emailTemplateSender->expects(self::once())
+            ->method('sendEmailTemplate')
+            ->with($expected['from'], $recipient, 'test', ['entity' => new \stdClass()])
+            ->willReturn($emailUserEntity);
 
         if (array_key_exists('attribute', $options)) {
             $this->contextAccessor->expects(self::once())

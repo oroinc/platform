@@ -10,7 +10,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 interface CurrentLocalizationExtensionInterface
 {
     /**
-     * @return Localization
+     * @return Localization|null
      */
     public function getCurrentLocalization();
 }

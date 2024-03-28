@@ -1,0 +1,17 @@
+Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration:
+  properties:
+    type:
+      - NotBlank: ~
+      - Choice:
+          callback: getTypes
+          message: oro.theme.themeconfiguration.message.error.type
+    name:
+      - NotBlank: ~
+      - Length:
+          max: 255
+    description:
+      - NoSuspiciousCharacters: ~
+    theme:
+      - NotBlank: ~
+      - Length:
+          max: 255

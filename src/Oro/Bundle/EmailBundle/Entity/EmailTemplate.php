@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEmailBundle_Entity_EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -42,12 +43,9 @@ use Oro\Bundle\UserBundle\Entity\User;
         'attachment' => ['immutable' => true]
     ]
 )]
-class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
+class EmailTemplate extends EmailTemplateModel implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
-
-    public const TYPE_HTML = 'html';
-    public const TYPE_TEXT = 'txt';
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
@@ -61,7 +59,7 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     protected ?bool $isEditable = null;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
-    protected ?string $name = null;
+    protected ?string $name;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -85,7 +83,7 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
      *  - text
      */
     #[ORM\Column(name: 'type', type: Types::STRING, length: 20)]
-    protected ?string $type = 'html';
+    protected ?string $type = EmailTemplateInterface::TYPE_HTML;
 
     /**
      * @var Collection<int, EmailTemplateTranslation>
@@ -105,33 +103,22 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
     protected ?bool $visible = true;
 
-    /**
-     * @param        $name
-     * @param string $content
-     * @param string $type
-     * @param bool $isSystem
-     */
-    public function __construct($name = '', $content = '', $type = 'html', $isSystem = false)
-    {
-        // name can be overridden from email template
-        $this->name = $name;
-        // isSystem can be overridden from email template
+    public function __construct(
+        string $name = '',
+        string $content = '',
+        string $type = EmailTemplateInterface::TYPE_HTML,
+        bool $isSystem = false
+    ) {
         $this->isSystem = $isSystem;
-        // isEditable can be overridden from email template
         $this->isEditable = false;
 
-        $parsedContent = self::parseContent($content);
-        foreach ($parsedContent['params'] as $param => $val) {
-            $this->$param = $val;
-        }
+        parent::__construct($name, $content, $type);
 
         // make sure that user's template is editable
         if (!$this->isSystem && !$this->isEditable) {
             $this->isEditable = true;
         }
 
-        $this->type = $type;
-        $this->content = $parsedContent['content'];
         $this->translations = new ArrayCollection();
     }
 
@@ -143,30 +130,6 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return EmailTemplate
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**
@@ -218,66 +181,6 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setSubject($subject)
-    {
-        $this->subject = $subject;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSubject()
-    {
-        return $this->subject;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContent($content)
-    {
-        $this->content = $content;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    /**
-     * Set entityName
-     *
-     * @param string $entityName
-     *
-     * @return EmailTemplate
-     */
-    public function setEntityName($entityName)
-    {
-        $this->entityName = $entityName;
-
-        return $this;
-    }
-
-    /**
-     * Get entityName
-     *
-     * @return string
-     */
-    public function getEntityName()
-    {
-        return $this->entityName;
-    }
-
-    /**
      * Set a flag indicates whether a template is system or not.
      *
      * @param boolean $isSystem
@@ -326,30 +229,6 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     public function getIsEditable()
     {
         return $this->isEditable;
-    }
-
-    /**
-     * Set template type
-     *
-     * @param string $type
-     *
-     * @return EmailTemplate
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get template type
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -469,33 +348,5 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     public function __toString()
     {
         return (string)$this->getName();
-    }
-
-    /**
-     * @param string $content
-     *
-     * @return array With keys 'content', 'params'
-     */
-    public static function parseContent($content)
-    {
-        $params = [];
-
-        $boolParams = ['isSystem', 'isEditable'];
-        $templateParams = ['name', 'subject', 'entityName', 'isSystem', 'isEditable'];
-        foreach ($templateParams as $templateParam) {
-            if (preg_match('#@' . $templateParam . '\s?=\s?(.*)\n#i', $content, $match)) {
-                $val = trim($match[1]);
-                if (isset($boolParams[$templateParam])) {
-                    $val = (bool)$val;
-                }
-                $params[$templateParam] = $val;
-                $content = trim(str_replace($match[0], '', $content));
-            }
-        }
-
-        return [
-            'content' => $content,
-            'params' => $params,
-        ];
     }
 }

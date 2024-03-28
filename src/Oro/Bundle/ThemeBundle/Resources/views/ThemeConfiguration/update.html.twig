@@ -1,0 +1,103 @@
+{% extends '@OroUI/actions/update.html.twig' %}
+
+{% oro_title_set({params : {'%title%': entity|oro_format_name(null, 'short')|default('N/A'|trans), '%entityName%': 'oro.theme.themeconfiguration.entity_label'|trans} }) %}
+
+{% set formAction = form.vars.value.id ? path('oro_theme_configuration_update', { 'id': form.vars.value.id }) : path('oro_theme_configuration_create')  %}
+
+{% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {{ parent() }}
+
+    {{ UI.cancelButton(path('oro_theme_configuration_index')) }}
+    {% set html = UI.saveAndCloseButton({
+        'route': 'oro_theme_configuration_index'
+    }) %}
+    {% if is_granted('oro_theme_configuration_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_theme_configuration_create'
+        }) %}
+    {% endif %}
+    {% if entity.id or is_granted('oro_theme_configuration_update') %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_theme_configuration_update',
+            'params': {'id': '$id'}
+        }) %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock %}
+
+{% block pageHeader %}
+    {% if entity.id %}
+        {% set breadcrumbs = {
+            'entity':      entity,
+            'indexPath':   path('oro_theme_configuration_index'),
+            'indexLabel': 'oro.theme.themeconfiguration.entity_plural_label'|trans,
+            'entityTitle': entity|oro_format_name(null, 'short')|default('N/A'|trans)
+        } %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.theme.themeconfiguration.entity_label'|trans}) %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block stats %}
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+{% endblock stats %}
+
+{% block content_data %}
+    {% set dataBlocks = [
+        {
+            'title': 'General'|trans,
+            'class': 'active',
+            'subblocks': [
+                {
+                    'data' : [
+                        form_row(form.theme),
+                        form_row(form.name),
+                        form_row(form.description),
+                        form_row(form.type)
+                    ]
+                }
+            ]
+        },
+        {
+            'title': 'oro.theme.themeconfiguration.configuration.label'|trans,
+            'subblocks': [
+            {
+                'data' : [
+                    form_row(form.configuration)
+                ]
+            }
+        ]
+        }
+    ] %}
+
+    {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
+
+    {% set data = {
+        'formErrors': form_errors(form),
+        'dataBlocks': dataBlocks
+    }%}
+
+    <div class="responsive-form-inner">
+        {% set id = 'oro-theme-configuration-edit' %}
+        {{ parent() }}
+    </div>
+{% endblock content_data %}
+
+{% block content %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    <div class="scrollable-container"
+            {{ UI.renderPageComponentAttributes({
+                view: 'orotheme/js/app/views/theme-configuration-form-view',
+                selectors: {
+                    form: '#' ~ form.vars.id
+                }
+            }) }}>
+        {{ parent() }}
+    </div>
+{% endblock %}
+

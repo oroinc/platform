@@ -1,7 +1,10 @@
+<% let oroui = _.macros('oroui') %>
 <% if (filters.length > 0) { %>
-<button class="filters-state" type="button">
+<button class="filters-state btn btn--text btn--outlined btn--full" type="button">
+    <%= oroui.renderIcon({
+        name: 'filter'
+    }) %>
     <span class="filters-state__ellipsis">
-        <span class="fa-filter hide-text" aria-hidden="true"></span>
         <% _.each(filters, function(filter, i) {
             if (i > 0) {
                 %>, <%

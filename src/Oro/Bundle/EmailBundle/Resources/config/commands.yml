@@ -34,9 +34,10 @@ services:
 
     Oro\Bundle\EmailBundle\Command\DebugEmailTemplateCompileCommand:
         arguments:
-            - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
-            - '@Oro\Bundle\EmailBundle\Provider\EmailRenderer'
-            - '@Symfony\Component\Mailer\MailerInterface'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.provider.email_template'
+            - '@oro_email.email_renderer'
+            - '@mailer'
         tags:
             - { name: console.command }
 

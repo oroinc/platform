@@ -118,6 +118,8 @@ services:
 
     oro_layout.theme_extension.configuration:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration
+        arguments:
+            - '@oro_theme.form.configuration_child_provider'
 
     oro_layout.theme_extension.visitor.import:
         class: Oro\Component\Layout\Extension\Theme\Visitor\ImportVisitor

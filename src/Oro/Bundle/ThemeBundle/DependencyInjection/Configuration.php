@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ThemeBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -14,6 +15,13 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('oro_theme');
         $rootNode = $treeBuilder->getRootNode();
+
+        SettingsBuilder::append(
+            $rootNode,
+            [
+                'theme_configuration' => ['type' => 'integer', 'value' => null]
+            ]
+        );
 
         $rootNode
             ->beforeNormalization()

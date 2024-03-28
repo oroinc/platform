@@ -3,9 +3,10 @@
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private function processConfiguration(array $config): array
     {
@@ -15,12 +16,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration(array $configs, array $expected)
+    public function testProcessConfiguration(array $configs, array $expected): void
     {
-        $this->assertEquals($expected, $this->processConfiguration($configs));
+        self::assertEquals($expected, $this->processConfiguration($configs));
     }
 
-    public function testInvalidConfiguration()
+    public function testInvalidConfiguration(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $configs = [
@@ -47,7 +48,16 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         return [
             'empty' => [
                 'configs' => [[]],
-                'expected' => ['themes' => []]
+                'expected' => [
+                    'themes' => [],
+                    'settings' => [
+                        'resolved' => true,
+                        'theme_configuration' => [
+                            'value' => null,
+                            'scope' => 'app'
+                        ]
+                    ]
+                ]
             ],
             'full' => [
                 'configs' => [
@@ -58,9 +68,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                                 'label' => 'Foo Theme',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
-                                'screenshot' => 'screenshot.png'
+                                'screenshot' => 'screenshot.png',
                             ]
-                        ]
+                        ],
+                        'settings' => [
+                            'theme_configuration' => ['value' => 1],
+                        ],
                     ]
                 ],
                 'expected' => [
@@ -71,6 +84,13 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
+                        ]
+                    ],
+                    'settings' => [
+                        'resolved' => true,
+                        'theme_configuration' => [
+                            'value' => 1,
+                            'scope' => 'app'
                         ]
                     ]
                 ]
@@ -86,7 +106,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
                             ]
-                        ]
+                        ],
+                        'settings' => [
+                            'theme_configuration' => ['value' => 1],
+                        ],
                     ],
                     [
                         'active_theme' => 'bar',
@@ -97,7 +120,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
                             ]
-                        ]
+                        ],
+                        'settings' => [
+                            'theme_configuration' => ['value' => 2],
+                        ],
                     ],
                     [
                         'themes' => [
@@ -113,7 +139,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                                 'icon' => 'favicon-extended.ico',
                                 'screenshot' => 'screenshot-extended.png'
                             ]
-                        ]
+                        ],
+                        'settings' => [
+                            'theme_configuration' => ['value' => 3],
+                        ],
                     ]
                 ],
                 'expected' => [
@@ -136,6 +165,13 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             'logo' => 'logo-extended.png',
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'
+                        ]
+                    ],
+                    'settings' => [
+                        'resolved' => true,
+                        'theme_configuration' => [
+                            'value' => 3,
+                            'scope' => 'app'
                         ]
                     ]
                 ]

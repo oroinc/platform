@@ -104,3 +104,13 @@ services:
         class: Oro\Bundle\FormBundle\Provider\FormFieldsMapProvider
         arguments:
             - '@doctrine'
+
+    oro_form.validator_constraints.unique_entity:
+        class: Oro\Bundle\FormBundle\Validator\Constraints\UniqueEntityValidator
+        arguments:
+            - '@doctrine'
+            - '@service_container'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_form.validator_constraints.unique_entity }

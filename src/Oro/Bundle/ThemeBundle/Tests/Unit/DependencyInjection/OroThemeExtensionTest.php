@@ -5,15 +5,20 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\ThemeBundle\DependencyInjection\OroThemeExtension;
 use Oro\Bundle\ThemeBundle\Tests\Unit\Fixtures;
 use Oro\Component\Config\CumulativeResourceManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
+class OroThemeExtensionTest extends TestCase
 {
     /**
      * @dataProvider loadDataProvider
      */
-    public function testLoad(array $configs, array $expectedThemeSettings, $expectedActiveTheme)
-    {
+    public function testLoad(
+        array $configs,
+        array $expectedThemeSettings,
+        ?string $expectedActiveTheme,
+        array $expectedSettings
+    ) {
         $bundle1 = new Fixtures\FooBundle\FooBundle();
         $bundle2 = new Fixtures\BarBundle\BarBundle();
         CumulativeResourceManager::getInstance()
@@ -21,27 +26,29 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
             ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
 
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroThemeExtension();
         $extension->load($configs, $container);
 
         $registryDefinition = $container->getDefinition('oro_theme.registry');
 
-        $this->assertEquals($expectedThemeSettings, $container->getParameter('oro_theme.settings'));
+        self::assertEquals($expectedThemeSettings, $container->getParameter('oro_theme.settings'));
 
         $registryDefinitionMethodCalls = $registryDefinition->getMethodCalls();
         if ($expectedActiveTheme) {
-            $this->assertCount(1, $registryDefinitionMethodCalls);
-            $this->assertEquals(
+            self::assertCount(1, $registryDefinitionMethodCalls);
+            self::assertEquals(
                 ['setActiveTheme', [$expectedActiveTheme]],
                 $registryDefinitionMethodCalls[0]
             );
         } else {
-            $this->assertCount(0, $registryDefinitionMethodCalls);
+            self::assertCount(0, $registryDefinitionMethodCalls);
         }
 
-        $this->assertNotNull($container->getDefinition('oro_theme.registry'));
-        $this->assertNotNull($container->getDefinition('oro_theme.twig.extension'));
+        self::assertNotNull($container->getDefinition('oro_theme.registry'));
+        self::assertNotNull($container->getDefinition('oro_theme.twig.extension'));
+        self::assertEquals($expectedSettings, $container->getExtensionConfig('oro_theme'));
     }
 
     public function loadDataProvider(): array
@@ -59,7 +66,15 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
                         'label' => 'Bar Theme',
                     ]
                 ],
-                'expectedActiveTheme' => null
+                'expectedActiveTheme' => null,
+                'expectedSettings' => [
+                    [
+                        'settings' => [
+                            'resolved' => true,
+                            'theme_configuration' => ['value' => null, 'scope' => 'app'],
+                        ],
+                    ],
+                ],
             ],
             'override' => [
                 'configs' => [
@@ -69,7 +84,10 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
                             'foo' => [
                                 'label' => 'Foo Extended Theme'
                             ]
-                        ]
+                        ],
+                        'settings' => [
+                            'theme_configuration' => ['value' => 123],
+                        ],
                     ]
                 ],
                 'expectedThemeSettings' => [
@@ -80,7 +98,15 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
                         'label' => 'Bar Theme',
                     ]
                 ],
-                'expectedActiveTheme' => 'foo'
+                'expectedActiveTheme' => 'foo',
+                'expectedSettings' => [
+                    [
+                        'settings' => [
+                            'resolved' => true,
+                            'theme_configuration' => ['value' => 123, 'scope' => 'app'],
+                        ],
+                    ],
+                ],
             ]
         ];
     }

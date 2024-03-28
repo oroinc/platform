@@ -1,0 +1,7 @@
+services:
+    Oro\Bundle\SanitizeBundle\Command\SanitizeDumpSqlCommand:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\Tools\SanitizeSqlLoader'
+            - '@Oro\Bundle\SanitizeBundle\Tools\SqlSyntaxValidator'
+        tags:
+            - { name: console.command }

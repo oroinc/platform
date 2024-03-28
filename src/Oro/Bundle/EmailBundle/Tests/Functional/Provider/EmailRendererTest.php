@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Provider;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -16,15 +15,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class EmailRendererTest extends WebTestCase
 {
-    /** @var EmailRenderer */
-    private $emailRenderer;
+    private EmailRenderer $emailRenderer;
 
-    /** @var Item */
-    private $entity;
+    private TestActivity $entity;
 
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
+
         $this->emailRenderer = self::getContainer()->get('oro_email.email_renderer');
         $this->entity = $this->createTestEntity();
     }
@@ -32,99 +30,99 @@ class EmailRendererTest extends WebTestCase
     /**
      * @dataProvider variablesDataProvider
      */
-    public function testVariables($variable, $expected)
+    public function testVariables($variable, $expected): void
     {
         $data = $this->emailRenderer->renderTemplate(
             sprintf('{{ %s }}', $variable),
             ['entity' => $this->entity]
         );
 
-        $this->assertEquals($expected, $data);
+        self::assertEquals($expected, $data);
     }
 
     public function variablesDataProvider(): array
     {
         return [
-            'root entity'                                                    => [
+            'root entity' => [
                 'variable' => 'entity',
-                'expected' => 'test'
+                'expected' => 'test',
             ],
-            'field for root entity'                                          => [
+            'field for root entity' => [
                 'variable' => 'entity.description',
-                'expected' => 'test'
+                'expected' => 'test',
             ],
-            'undefined field for root entity'                                => [
+            'undefined field for root entity' => [
                 'variable' => 'entity.undefined',
-                'expected' => 'N/A'
+                'expected' => 'N/A',
             ],
-            'child entity'                                                   => [
+            'child entity' => [
                 'variable' => 'entity.organization',
-                'expected' => 'Test Organization'
+                'expected' => 'Test Organization',
             ],
-            'field for child entity'                                         => [
+            'field for child entity' => [
                 'variable' => 'entity.organization.name',
-                'expected' => 'Test Organization'
+                'expected' => 'Test Organization',
             ],
-            'undefined field for child entity'                               => [
+            'undefined field for child entity' => [
                 'variable' => 'entity.organization.undefined',
-                'expected' => 'N/A'
+                'expected' => 'N/A',
             ],
-            'null child entity'                                              => [
+            'null child entity' => [
                 'variable' => 'entity.owner',
-                'expected' => ''
+                'expected' => '',
             ],
-            'field for null child entity'                                    => [
+            'field for null child entity' => [
                 'variable' => 'entity.owner.firstName',
-                'expected' => 'N/A'
+                'expected' => 'N/A',
             ],
-            'undefined field for null child entity'                          => [
+            'undefined field for null child entity' => [
                 'variable' => 'entity.owner.undefined',
-                'expected' => 'N/A'
+                'expected' => 'N/A',
             ],
-            'computed variable (array)'                                      => [
+            'computed variable (array)' => [
                 'variable' => 'entity.organization.computedArray.testProperty1',
-                'expected' => 'testProperty1 value'
+                'expected' => 'testProperty1 value',
             ],
-            'undefined field for computed variable (array)'                  => [
+            'undefined field for computed variable (array)' => [
                 'variable' => 'entity.organization.computedArray.testProperty1.undefined',
-                'expected' => 'N/A'
+                'expected' => 'N/A',
             ],
-            'computed variable (multidimensional array, 2nd level)'          => [
+            'computed variable (multidimensional array, 2nd level)' => [
                 'variable' => 'entity.organization.computedArray.testProperty2.attribute1',
-                'expected' => 'testProperty2.attribute1 value'
+                'expected' => 'testProperty2.attribute1 value',
             ],
-            'computed variable (multidimensional array, 3rd level)'          => [
+            'computed variable (multidimensional array, 3rd level)' => [
                 'variable' => 'entity.organization.computedArray.testProperty2.attribute2.attribute21',
-                'expected' => 'testProperty2.attribute2.attribute21 value'
+                'expected' => 'testProperty2.attribute2.attribute21 value',
             ],
             'undefined field for computed variable (multidimensional array)' => [
                 'variable' => 'entity.organization.computedArray.testProperty2.attribute2.undefined',
-                'expected' => 'N/A'
+                'expected' => 'N/A',
             ],
-            'computed variable (object)'                                     => [
+            'computed variable (object)' => [
                 'variable' => 'entity.organization.computedObject.subject',
-                'expected' => 'test subject'
+                'expected' => 'test subject',
             ],
-            'undefined field for computed variable (object)'                 => [
+            'undefined field for computed variable (object)' => [
                 'variable' => 'entity.organization.computedObject.undefined',
-                'expected' => 'N/A'
+                'expected' => 'N/A',
             ],
-            'nested computed variable'                                       => [
+            'nested computed variable' => [
                 'variable' => 'entity.organization.computedObject.computedOrg',
-                'expected' => 'EmailTemplate Organization'
+                'expected' => 'EmailTemplate Organization',
             ],
-            'field for nested computed variable'                             => [
+            'field for nested computed variable' => [
                 'variable' => 'entity.organization.computedObject.computedOrg.description',
-                'expected' => 'EmailTemplate Organization Description'
+                'expected' => 'EmailTemplate Organization Description',
             ],
-            'undefined field for nested computed variable'                   => [
+            'undefined field for nested computed variable' => [
                 'variable' => 'entity.organization.computedObject.computedOrg.undefined',
-                'expected' => 'N/A'
+                'expected' => 'N/A',
             ],
-            'object inside computed array variable'                          => [
+            'object inside computed array variable' => [
                 'variable' => 'entity.organization.computedArray.testProperty2.object1.subject',
-                'expected' => 'testProperty2.object1 subject'
-            ]
+                'expected' => 'testProperty2.object1 subject',
+            ],
         ];
     }
 

@@ -1,0 +1,19 @@
+services:
+    Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Provider\EntityAllMetadataProviderDecorator:
+        decorates: Oro\Bundle\SanitizeBundle\Provider\EntityAllMetadataProvider
+        parent: Oro\Bundle\SanitizeBundle\Provider\EntityAllMetadataProvider
+        public: true
+
+    Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Provider\Rule\FileBasedProviderDecorator:
+        decorates: Oro\Bundle\SanitizeBundle\Provider\Rule\FileBasedProvider
+        parent: Oro\Bundle\SanitizeBundle\Provider\Rule\FileBasedProvider
+        public: true
+
+    Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Migrations\TestEntitiesMigrationListener:
+        public: true
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
+
+    oro_sanitize.test.rule.email_field_processor:
+        alias: Oro\Bundle\SanitizeBundle\RuleProcessor\Field\EmailProcessor
+        public: true

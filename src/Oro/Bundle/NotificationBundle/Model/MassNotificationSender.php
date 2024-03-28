@@ -66,7 +66,7 @@ class MassNotificationSender
             $subject
         );
 
-        $this->emailNotificationManager->process([$massNotification], null, [self::MAINTENANCE_VARIABLE => $body]);
+        $this->emailNotificationManager->process([$massNotification], [self::MAINTENANCE_VARIABLE => $body]);
         $this->entityPool->persistAndFlush($em);
 
         return count($recipients);

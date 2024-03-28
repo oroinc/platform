@@ -1,0 +1,3 @@
+oro_sanitize:
+    entity:
+        test_sanitizable_entity: '__undefined_rule_alias__'

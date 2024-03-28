@@ -120,7 +120,12 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(13, $result);
+        $em = self::getContainer()->get('doctrine.orm.entity_manager');
+        $expectedTemplates = $em
+            ->getRepository(EmailTemplate::class)
+            ->findBy(['entityName' => [$reference->getEntityName(), null], 'visible' => true]);
+
+        self::assertCount(count($expectedTemplates), $result);
     }
 
     /**

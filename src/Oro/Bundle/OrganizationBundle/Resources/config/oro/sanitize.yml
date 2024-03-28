@@ -1,0 +1,7 @@
+oro_sanitize:
+    entity:
+        oro_business_unit:
+            fields:
+                email: email
+                name: md5
+                phone: md5

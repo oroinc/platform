@@ -30,9 +30,9 @@ class EmailTemplatesImportCommand extends Command
 
     private DoctrineHelper $doctrineHelper;
 
-    private Organization $organization;
+    private ?Organization $organization = null;
 
-    private User $adminUser;
+    private ?User $adminUser = null;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -44,11 +44,11 @@ class EmailTemplatesImportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->addArgument('source', InputArgument::REQUIRED, "Folder or File to import")
-            ->addOption('force', null, InputOption::VALUE_NONE, "Force update");
+            ->addArgument('source', InputArgument::REQUIRED, 'Folder or file to import')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force update');
     }
 
     /**
@@ -118,17 +118,16 @@ class EmailTemplatesImportCommand extends Command
         }
 
         $templates = [];
-        /** @var SplFileInfo $file */
-        foreach ($sources as $source) {
-            $fileName = str_replace(['.html.twig', '.html', '.txt.twig', '.txt'], '', $source->getFilename());
+        foreach ($sources as $eachSource) {
+            $fileName = str_replace(['.html.twig', '.html', '.txt.twig', '.txt'], '', $eachSource->getFilename());
 
             $format = 'html';
-            if (preg_match('#\.(html|txt)(\.twig)?#', $source->getFilename(), $match)) {
+            if (preg_match('#\.(html|txt)(\.twig)?#', $eachSource->getFilename(), $match)) {
                 $format = $match[1];
             }
 
             $templates[$fileName] = [
-                'path' => $source->getPath() . DIRECTORY_SEPARATOR . $source->getFilename(),
+                'path' => $eachSource->getPath() . DIRECTORY_SEPARATOR . $eachSource->getFilename(),
                 'format' => $format,
             ];
         }

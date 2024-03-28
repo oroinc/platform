@@ -10,3 +10,7 @@ oro.email:
         configuration:
             connection:
                 smtp: Could not establish the SMTP connection
+
+        email_template:
+            unique_entity:
+                message: 'This name is already used. The combination of the following fields must be unique: {{ unique_fields }}'

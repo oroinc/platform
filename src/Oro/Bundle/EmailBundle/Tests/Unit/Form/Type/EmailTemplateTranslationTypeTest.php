@@ -94,7 +94,7 @@ class EmailTemplateTranslationTypeTest extends FormIntegrationTestCase
     {
         $form = $this->factory->create(EmailTemplateTranslationType::class, null, [
             'localization' => null,
-            'wysiwyg_enabled' => true,
+            'wysiwyg_enabled' => false,
             'wysiwyg_options' => ['any-key' => 'any-val'],
         ]);
 
@@ -107,7 +107,7 @@ class EmailTemplateTranslationTypeTest extends FormIntegrationTestCase
 
         $attr = $form->get('content')->getConfig()->getOption('attr');
         $this->assertArrayHasKey('data-wysiwyg-enabled', $attr);
-        $this->assertTrue($attr['data-wysiwyg-enabled']);
+        $this->assertFalse($attr['data-wysiwyg-enabled']);
 
         $this->assertFalse($form->has('subjectFallback'));
         $this->assertFalse($form->has('contentFallback'));

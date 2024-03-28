@@ -1,0 +1,20 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+
+Oro\Bundle\EmailBundle\Entity\EmailTemplate:
+    email_template_1:
+        organization: '@organization'
+        name: 'email_template_1'
+        type: 'html'
+        is_system: 0
+        subject: 'Email 1'
+        content: 'This is an email template 1 content.'
+
+    email_template_user:
+        organization: '@organization'
+        name: 'email_template_user'
+        entityName: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+        type: 'html'
+        is_system: 0
+        subject: 'Email for user {{ entity.fullName }}'
+        content: 'Hello, {{ entity.fullName }}! This is an email template content.'

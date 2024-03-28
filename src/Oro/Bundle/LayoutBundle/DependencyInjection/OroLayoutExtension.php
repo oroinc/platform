@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\DependencyInjection;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
@@ -60,6 +61,62 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
         }
+
+        $layoutTemplateLoader = $container
+            ->getDefinition('oro_layout.twig.email_template_loader.layout_theme_template_loader');
+        foreach ($this->getAllEmailTemplatesPaths($container) as $themeName => $paths) {
+            $layoutTemplateLoader->addMethodCall('setPaths', [$paths, $themeName]);
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @return array<string,string[]>
+     */
+    private function getAllEmailTemplatesPaths(ContainerBuilder $container): array
+    {
+        $defaultPath = $container->getParameterBag()->resolveValue($container->getParameter('twig.default_path'));
+        $paths = [];
+        $pathsByTheme = $this->getEmailTemplatePathsPerTheme($defaultPath . '/layouts', $container);
+        if ($pathsByTheme) {
+            $paths[] = $pathsByTheme;
+        }
+
+        foreach (array_reverse($container->getParameter('kernel.bundles_metadata')) as $bundle) {
+            $layoutsPath = $bundle['path'] . '/Resources/views/layouts';
+            $pathsByTheme = $this->getEmailTemplatePathsPerTheme($layoutsPath, $container);
+            if ($pathsByTheme) {
+                $paths[] = $pathsByTheme;
+            }
+        }
+
+        return array_merge_recursive(...$paths);
+    }
+
+    /**
+     * @param string $layoutsPath
+     * @param ContainerBuilder $container
+     *
+     * @return array<string,string[]>
+     */
+    private function getEmailTemplatePathsPerTheme(string $layoutsPath, ContainerBuilder $container): array
+    {
+        $paths = [];
+        if (!is_dir($layoutsPath)) {
+            return [];
+        }
+
+        foreach (scandir($layoutsPath) as $themeDir) {
+            if ('.' !== $themeDir[0] && is_dir($layoutsPath.'/'.$themeDir)) {
+                $emailTemplatesPath = $layoutsPath . '/' . $themeDir . '/email-templates/';
+                if (is_dir($emailTemplatesPath)) {
+                    $paths[$themeDir][] = $emailTemplatesPath;
+                    $container->addResource(new FileExistenceResource($emailTemplatesPath));
+                }
+            }
+        }
+
+        return $paths;
     }
 
     public function prepend(ContainerBuilder $container): void

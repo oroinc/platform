@@ -3,19 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Model;
 
 /**
- * Model to specify criteria for loading email template from database.
+ * Model to specify the criteria for loading an email template.
  */
 class EmailTemplateCriteria
 {
-    /**
-     * @var string
-     */
-    private $name;
+    public const CONTEXT_PARAMETER_NULL = '~';
 
-    /**
-     * @var string
-     */
-    private $entityName;
+    private string $name;
+
+    private ?string $entityName;
 
     public function __construct(string $name, string $entityName = null)
     {
@@ -31,5 +27,12 @@ class EmailTemplateCriteria
     public function getEntityName(): ?string
     {
         return $this->entityName;
+    }
+
+    public function setEntityName(?string $entityName): self
+    {
+        $this->entityName = $entityName;
+
+        return $this;
     }
 }

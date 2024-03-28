@@ -1,0 +1,10 @@
+oro_sanitize:
+    entity:
+        test_sanitizable_entity:
+            fields:              
+                birthday: md5
+                secret: date
+                state_data: email
+                emailunguessable: date
+                first_custom_field: attachment
+                email_wrong_type: generic_phone # wrapper rule tests

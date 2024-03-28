@@ -37,7 +37,6 @@ class WorkflowNotificationHandler extends EmailNotificationHandler
             // send notifications
             $this->manager->process(
                 $notifications,
-                null,
                 [
                     'transitionRecord' => $transitionRecord,
                     'transitionUser' => $event->getTransitionUser()

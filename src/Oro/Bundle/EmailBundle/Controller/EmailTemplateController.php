@@ -6,7 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
+use Oro\Bundle\EmailBundle\Provider\TranslatedEmailTemplateProvider;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
@@ -86,10 +86,8 @@ class EmailTemplateController extends AbstractController
         }
 
         $localization = $form->get('activeLocalization')->getData();
-        $localizedTemplate = $localization
-            ? $this->container->get(EmailTemplateContentProvider::class)
-                ->getLocalizedModel($emailTemplate, $localization)
-            : $emailTemplate;
+        $localizedTemplate = $this->container->get(TranslatedEmailTemplateProvider::class)
+            ->getTranslatedEmailTemplate($emailTemplate, $localization);
 
         $templateRendered = $this->container->get(EmailRenderer::class)->compilePreview($localizedTemplate);
 
@@ -132,7 +130,7 @@ class EmailTemplateController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
-                EmailTemplateContentProvider::class,
+                TranslatedEmailTemplateProvider::class,
                 EmailRenderer::class,
                 TranslatorInterface::class,
                 Router::class,

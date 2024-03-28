@@ -6,7 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\Topic\SendEmailTemplateTopic;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Model\Recipient;
-use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
+use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -14,22 +14,21 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Uses {@see AggregatedEmailTemplatesSender} to send localized emails to specified recipients using specified email
- * template and create {@see EmailUser} entities.
+ * Sends emails to specified recipients using specified email template and creates {@see EmailUser} entities.
  */
 class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     private ManagerRegistry $doctrine;
-    private AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender;
+    private EmailTemplateSender $emailTemplateSender;
     private LoggerInterface $logger;
 
     public function __construct(
         ManagerRegistry $doctrine,
-        AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender,
+        EmailTemplateSender $emailTemplateSender,
         LoggerInterface $logger
     ) {
         $this->doctrine = $doctrine;
-        $this->aggregatedEmailTemplatesSender = $aggregatedEmailTemplatesSender;
+        $this->emailTemplateSender = $emailTemplateSender;
         $this->logger = $logger;
     }
 
@@ -59,12 +58,14 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         try {
-            $this->aggregatedEmailTemplatesSender->send(
-                $entity,
-                $recipients,
-                From::emailAddress($messageBody['from']),
-                $messageBody['templateName']
-            );
+            foreach ($recipients as $recipient) {
+                $this->emailTemplateSender->sendEmailTemplate(
+                    From::emailAddress($messageBody['from']),
+                    $recipient,
+                    $messageBody['templateName'],
+                    ['entity' => $entity]
+                );
+            }
         } catch (\Exception $exception) {
             $this->logger->error('Cannot send email template.', ['exception' => $exception]);
 

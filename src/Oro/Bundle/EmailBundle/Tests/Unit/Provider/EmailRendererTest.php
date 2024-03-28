@@ -2,192 +2,266 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Doctrine\Inflector\Rules\English\InflectorFactory;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate as EmailTemplateEntity;
+use Oro\Bundle\EmailBundle\Event\EmailTemplateRenderAfterEvent;
+use Oro\Bundle\EmailBundle\Event\EmailTemplateRenderBeforeEvent;
+use Oro\Bundle\EmailBundle\Exception\EmailTemplateCompilationException;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateRenderingContext;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
-use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
-use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
-use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
-use Twig\Extension\SandboxExtension;
-use Twig\Loader\ArrayLoader;
-use Twig\Sandbox\SecurityPolicy;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Twig\Environment as TwigEnvironment;
+use Twig\Error\Error;
+use Twig\Template;
+use Twig\TemplateWrapper;
 
-class EmailRendererTest extends \PHPUnit\Framework\TestCase
+class EmailRendererTest extends TestCase
 {
-    private TemplateRendererConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject $configProvider;
+    use LoggerAwareTraitTestTrait;
 
-    private ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container;
+    private TemplateRenderer|MockObject $templateRenderer;
+
+    private TwigEnvironment|MockObject $twigEnvironment;
+
+    private EmailTemplateRenderingContext $emailTemplateRenderingContext;
+
+    private EventDispatcherInterface|MockObject $eventDispatcher;
+
+    private HtmlTagHelper|MockObject $htmlTagHelper;
 
     private EmailRenderer $renderer;
 
     protected function setUp(): void
     {
-        $this->configProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);
-        $this->container = $this->createMock(ContainerInterface::class);
-
-        $variablesProcessorRegistry = $this->createMock(VariableProcessorRegistry::class);
-
-        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-        $htmlTagHelper->expects(self::any())
-            ->method('sanitize')
-            ->with(self::isType(\PHPUnit\Framework\Constraint\IsType::TYPE_STRING), 'default', false)
-            ->willReturnCallback(static fn (string $content) => $content . '(sanitized)');
-
-        $translation = $this->createMock(TranslatorInterface::class);
-        $translation->expects(self::any())
-            ->method('trans')
-            ->willReturnArgument(0);
-
-        $environment = new Environment(new ArrayLoader(), ['strict_variables' => true]);
-        $environment->addExtension(new SandboxExtension(new SecurityPolicy()));
-        $environment->addExtension(new HttpKernelExtension());
-        $environment->addExtension(new HtmlTagExtension($this->container));
+        $this->templateRenderer = $this->createMock(TemplateRenderer::class);
+        $this->twigEnvironment = $this->createMock(TwigEnvironment::class);
+        $this->emailTemplateRenderingContext = new EmailTemplateRenderingContext();
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $this->renderer = new EmailRenderer(
-            $environment,
-            $this->configProvider,
-            $variablesProcessorRegistry,
-            $translation,
-            (new InflectorFactory())->build(),
-            $htmlTagHelper
+            $this->templateRenderer,
+            $this->twigEnvironment,
+            $this->emailTemplateRenderingContext,
+            $this->eventDispatcher,
+            new PropertyAccessor(),
+            $this->htmlTagHelper
         );
+
+        $this->setUpLoggerMock($this->renderer);
     }
 
-    private function getEmailTemplate(string $content, string $subject = ''): EmailTemplateInterface
+    public function testRenderEmailTemplate(): void
     {
-        $emailTemplate = new EmailTemplateModel();
-        $emailTemplate->setContent($content);
-        $emailTemplate->setSubject($subject);
+        $emailTemplate = (new EmailTemplateModel('sample_name'))
+            ->setSubject('sample subject')
+            ->setContent('sample content');
+        $templateParams = ['sample_key' => 'sample_value'];
+        $templateContext = ['localization' => new Localization()];
 
-        return $emailTemplate;
+        $renderedEmailTemplate = (new EmailTemplateModel($emailTemplate->getName()))
+            ->setType($emailTemplate->getType())
+            ->setSubject('rendered ' . $emailTemplate->getSubject())
+            ->setContent('rendered ' . $emailTemplate->getContent());
+
+        $events = [
+            new EmailTemplateRenderBeforeEvent($emailTemplate, $templateParams, $templateContext),
+            new EmailTemplateRenderAfterEvent(
+                $emailTemplate,
+                $renderedEmailTemplate,
+                $templateParams,
+                $templateContext
+            ),
+        ];
+
+        $this->eventDispatcher
+            ->expects(self::exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function (Event $event) use (&$events, $templateContext) {
+                self::assertEquals($event, array_shift($events));
+                self::assertEquals($templateContext, $this->renderer->getCurrentTemplateContext());
+
+                return $event;
+            });
+
+        $this->templateRenderer
+            ->expects(self::exactly(2))
+            ->method('renderTemplate')
+            ->withConsecutive(
+                [$emailTemplate->getSubject(), $templateParams],
+                [$emailTemplate->getContent(), $templateParams]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $renderedEmailTemplate->getSubject(),
+                $renderedEmailTemplate->getContent()
+            );
+
+        self::assertEmpty($this->renderer->getCurrentTemplateContext());
+
+        self::assertEquals(
+            $renderedEmailTemplate,
+            $this->renderer->renderEmailTemplate($emailTemplate, $templateParams, $templateContext)
+        );
+
+        self::assertEmpty($this->renderer->getCurrentTemplateContext());
     }
 
-    private function expectVariables(array $entityVariableProcessors = [], array $systemVariableValues = []): void
+    public function testRenderEmailTemplateWhenTwigError(): void
     {
-        $entityVariableProcessorsMap = [];
-        foreach ($entityVariableProcessors as $entityClass => $processors) {
-            $entityVariableProcessorsMap[] = [$entityClass, $processors];
-        }
-        $this->configProvider->expects(self::any())
-            ->method('getEntityVariableProcessors')
-            ->willReturnMap($entityVariableProcessorsMap);
-        $this->configProvider->expects(self::any())
-            ->method('getSystemVariableValues')
-            ->willReturn($systemVariableValues);
+        $emailTemplate = (new EmailTemplateModel('sample_name'))
+            ->setSubject('sample subject')
+            ->setContent('sample content');
+        $templateParams = ['sample_key' => 'sample_value'];
+        $templateContext = ['localization' => new Localization()];
+
+        $renderedEmailTemplate = (new EmailTemplateModel($emailTemplate->getName()))
+            ->setType($emailTemplate->getType())
+            ->setSubject('rendered ' . $emailTemplate->getSubject());
+
+        $events = [
+            new EmailTemplateRenderBeforeEvent($emailTemplate, $templateParams, $templateContext),
+            new EmailTemplateRenderAfterEvent(
+                $emailTemplate,
+                $renderedEmailTemplate,
+                $templateParams,
+                $templateContext
+            ),
+        ];
+
+        $this->eventDispatcher
+            ->expects(self::exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function (Event $event) use (&$events, $templateContext) {
+                self::assertEquals($event, array_shift($events));
+                self::assertEquals($templateContext, $this->renderer->getCurrentTemplateContext());
+
+                return $event;
+            });
+
+        $twigError = new Error('Sample TWIG error');
+        $this->templateRenderer
+            ->expects(self::exactly(2))
+            ->method('renderTemplate')
+            ->withConsecutive(
+                [$emailTemplate->getSubject(), $templateParams],
+                [$emailTemplate->getContent(), $templateParams]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $renderedEmailTemplate->getSubject(),
+                self::throwException($twigError)
+            );
+
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('error')
+            ->with(
+                'Rendering of email template "{email_template_name}" failed. {message}',
+                [
+                    'exception' => $twigError,
+                    'message' => $twigError->getMessage(),
+                    'email_template_name' => $emailTemplate->getName(),
+                    'email_template' => $emailTemplate,
+                ]
+            );
+
+        $this->expectExceptionObject(new EmailTemplateCompilationException($emailTemplate, $twigError));
+
+        self::assertEmpty($this->renderer->getCurrentTemplateContext());
+
+        self::assertEquals(
+            $renderedEmailTemplate,
+            $this->renderer->renderEmailTemplate($emailTemplate, $templateParams, $templateContext)
+        );
+
+        self::assertEmpty($this->renderer->getCurrentTemplateContext());
+    }
+
+    public function testCompile(): void
+    {
+        $emailTemplate = (new EmailTemplateModel('sample_name'))
+            ->setSubject('sample subject')
+            ->setContent('sample content');
+        $templateParams = ['sample_key' => 'sample_value'];
+
+        $subject = 'rendered ' . $emailTemplate->getSubject();
+        $content = 'rendered ' . $emailTemplate->getContent();
+        $this->templateRenderer
+            ->expects(self::exactly(2))
+            ->method('renderTemplate')
+            ->withConsecutive(
+                [$emailTemplate->getSubject(), $templateParams],
+                [$emailTemplate->getContent(), $templateParams]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $subject,
+                $content
+            );
+
+        self::assertEquals([$subject, $content], $this->renderer->compileMessage($emailTemplate, $templateParams));
     }
 
     public function testCompilePreview(): void
     {
-        $entity = new TestEntityForVariableProvider();
+        $emailTemplate = (new EmailTemplateModel('sample_name'))
+            ->setSubject('sample subject')
+            ->setContent('sample content');
 
-        $this->configProvider->expects(self::any())
-            ->method('getConfiguration')
-            ->willReturn([
-                'properties' => [],
-                'methods' => [get_class($entity) => ['getField1']],
-                'accessors' => [get_class($entity) => ['field1' => 'getField1']],
-                'default_formatters' => [],
-            ]);
+        $sanitizedContent = 'sanitized ' . $emailTemplate->getContent();
+        $this->htmlTagHelper
+            ->expects(self::once())
+            ->method('sanitize')
+            ->with($emailTemplate->getContent(), 'default', false)
+            ->willReturn($sanitizedContent);
 
-        $template = 'test <a href="http://example.com">test</a> {{ system.testVar }}';
+        $template = $this->createMock(Template::class);
+        $templateWrapper = new TemplateWrapper($this->twigEnvironment, $template);
+        $this->twigEnvironment
+            ->expects(self::once())
+            ->method('createTemplate')
+            ->with('{% verbatim %}' . $sanitizedContent . '{% endverbatim %}')
+            ->willReturn($templateWrapper);
 
-        $emailTemplate = new EmailTemplateEntity();
-        $emailTemplate->setContent($template);
-        $emailTemplate->setSubject('');
+        $renderedContent = 'rendered ' . $emailTemplate->getContent();
+        $template
+            ->expects(self::once())
+            ->method('render')
+            ->willReturn($renderedContent);
 
-        self::assertSame($template.'(sanitized)', $this->renderer->compilePreview($emailTemplate));
-    }
-
-    public function testCompileMessage(): void
-    {
-        $entity = new TestEntityForVariableProvider();
-        $entity->setField1('Test');
-        $entityClass = get_class($entity);
-        $systemVars = ['testVar' => 'test_system'];
-        $entityVariableProcessors = [$entityClass => []];
-        $defaultFormatters = [$entityClass => ['field1' => 'formatter1']];
-
-        $subject = 'subject';
-        $content = 'test '
-            . '<a href="http://example.com">test</a>'
-            . ' {{ entity.getField1()|oro_html_sanitize }}'
-            . ' {% if entity.field2 is not empty %}{{ entity.field2|trim|raw }}{% endif %}'
-            . ' {{ max(0, 2) }}'
-            . ' {{ system.testVar }}'
-            . ' N/A';
-
-        $this->configProvider->expects(self::any())
-            ->method('getConfiguration')
-            ->willReturn([
-                'properties' => [],
-                'methods' => [$entityClass => ['getField1']],
-                'accessors' => [$entityClass => ['field1' => 'getField1']],
-                'default_formatters' => $defaultFormatters,
-            ]);
-        $this->expectVariables($entityVariableProcessors, $systemVars);
-
-        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('oro_ui.html_tag_helper')
-            ->willReturn($htmlTagHelper);
-
-        $emailTemplate = $this->getEmailTemplate($content, $subject);
-        $templateParams = [
-            'entity' => $entity,
-            'system' => $systemVars,
-        ];
-
-        $result = $this->renderer->compileMessage($emailTemplate, $templateParams);
-        $expectedContent = 'test <a href="http://example.com">test</a>   2 test_system N/A';
-
-        self::assertIsArray($result);
-        self::assertCount(2, $result);
-        self::assertSame($subject, $result[0]);
-        self::assertSame($expectedContent, $result[1]);
+        self::assertEquals($renderedContent, $this->renderer->compilePreview($emailTemplate));
     }
 
     public function testRenderTemplate(): void
     {
-        $template = 'test '
-            . "\n"
-            . '{{ entity.field1 }}'
-            . "\n"
-            . '{{ system.currentDate }}';
+        $templateContent = 'sample content';
+        $templateParams = ['sample_key' => 'sample_value'];
+        $renderedContent = 'rendered ' . $templateContent;
 
-        $entity = new TestEntityForVariableProvider();
-        $this->configProvider->expects(self::any())
-            ->method('getConfiguration')
-            ->willReturn([
-                'properties' => [],
-                'methods' => [get_class($entity) => ['getField1']],
-                'accessors' => [get_class($entity) => ['field1' => 'getField1']],
-                'default_formatters' => [],
-            ]);
-        $this->expectVariables([
-            get_class($entity) => [],
-        ], ['currentDate' => '10-12-2019']);
+        $this->templateRenderer
+            ->expects(self::once())
+            ->method('renderTemplate')
+            ->with($templateContent)
+            ->willReturn($renderedContent);
 
-        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('oro_ui.html_tag_helper')
-            ->willReturn($htmlTagHelper);
+        self::assertEquals($renderedContent, $this->renderer->renderTemplate($templateContent, $templateParams));
+    }
 
-        $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
+    public function testValidateTemplate(): void
+    {
+        $templateContent = 'sample content';
+        $templateParams = ['sample_key' => 'sample_value'];
 
-        $expectedRenderedResult =
-            'test '
-            . "\n"
-            . '10-12-2019';
-        self::assertSame($expectedRenderedResult, $result);
+        $this->templateRenderer
+            ->expects(self::once())
+            ->method('validateTemplate')
+            ->with($templateContent);
+
+        $this->renderer->validateTemplate($templateContent, $templateParams);
     }
 }

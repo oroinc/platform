@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Twig;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\EmailTemplateCandidates\EmailTemplateCandidatesProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
@@ -12,6 +13,8 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Model\EmailHolderNameInterface;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateRenderingContext;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Provider\UrlProvider;
@@ -38,6 +41,7 @@ use Twig\TwigFunction;
  *   - oro_get_email_ws_event
  *   - oro_get_unread_emails_count
  *   - oro_get_absolute_url
+ *   - oro_get_email_template
  */
 class EmailExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
@@ -123,13 +127,23 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
         return $this->container->get(AclHelper::class);
     }
 
+    protected function getEmailTemplateCandidatesProvider(): EmailTemplateCandidatesProviderInterface
+    {
+        return $this->container->get(EmailTemplateCandidatesProviderInterface::class);
+    }
+
+    protected function getEmailTemplateRenderingContext(): EmailTemplateRenderingContext
+    {
+        return $this->container->get(EmailTemplateRenderingContext::class);
+    }
+
     /**
      * @param string $entityClass
      * @return EntityRepository
      */
     protected function getRepository($entityClass)
     {
-        return $this->getDoctrine()->getManagerForClass($entityClass)->getRepository($entityClass);
+        return $this->getDoctrine()->getRepository($entityClass);
     }
 
     /**
@@ -147,7 +161,8 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
             new TwigFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
             new TwigFunction('oro_get_email_ws_event', [$this, 'getEmailWSChannel']),
             new TwigFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount']),
-            new TwigFunction('oro_get_absolute_url', [$this, 'getAbsoluteUrl'])
+            new TwigFunction('oro_get_absolute_url', [$this, 'getAbsoluteUrl']),
+            new TwigFunction('oro_get_email_template', [$this, 'getEmailTemplateCandidates']),
         ];
     }
 
@@ -320,6 +335,30 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
     }
 
     /**
+     * Returns an array of email template candidates names ordered by priority.
+     *
+     * @param string $templateName
+     * @param array $templateContext Email template context. Example:
+     *  [
+     *      'localization' => Localization|int $localization,
+     *      // ... other context parameters supported by the existing candidates names
+     *      // providers {@see EmailTemplateCandidatesProviderInterface}
+     *  ]
+     *
+     *
+     * @return string[]
+     */
+    public function getEmailTemplateCandidates(
+        string $templateName,
+        array $templateContext = []
+    ): array {
+        $templateContext += $this->getEmailTemplateRenderingContext()->toArray();
+
+        return $this->getEmailTemplateCandidatesProvider()
+            ->getCandidatesNames(new EmailTemplateCriteria($templateName), $templateContext);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices(): array
@@ -335,6 +374,8 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
             ManagerRegistry::class,
             AuthorizationCheckerInterface::class,
             AclHelper::class,
+            EmailTemplateCandidatesProviderInterface::class,
+            EmailTemplateRenderingContext::class,
         ];
     }
 }

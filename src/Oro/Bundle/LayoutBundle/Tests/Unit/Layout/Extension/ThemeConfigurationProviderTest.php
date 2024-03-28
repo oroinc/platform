@@ -7,19 +7,27 @@ use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfigurationProvider;
 use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestAppRoot\SrcStubFolder\AppKernelStub;
 use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle\TestBundle;
 use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle2\TestBundle2;
+use Oro\Bundle\ThemeBundle\Form\Provider\ConfigurationBuildersProvider;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class ThemeConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var ThemeConfigurationProvider */
-    private $configurationProvider;
+    private ThemeConfigurationProvider $configurationProvider;
+
+    private ConfigurationBuildersProvider $configurationBuildersProvider;
 
     protected function setUp(): void
     {
+        $this->configurationBuildersProvider = $this->createStub(ConfigurationBuildersProvider::class);
+        $this->configurationBuildersProvider
+            ->method('getConfigurationTypes')
+            ->willReturn(['type']);
+
         $bundle1 = new TestBundle();
         $bundle2 = new TestBundle2();
         CumulativeResourceManager::getInstance()
@@ -33,7 +41,7 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider = new ThemeConfigurationProvider(
             $this->getTempFile('ConfigurationProvider'),
             false,
-            new ThemeConfiguration(),
+            new ThemeConfiguration($this->configurationBuildersProvider),
             '[a-zA-Z][a-zA-Z0-9_\-:]*'
         );
     }

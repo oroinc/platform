@@ -88,7 +88,7 @@ class GridController extends AbstractController
     #[Route(path: '/{gridName}/filter-metadata', name: 'oro_datagrid_filter_metadata', options: ['expose' => true])]
     public function filterMetadataAction(Request $request, $gridName)
     {
-        $filterNames = $request->query->get('filterNames', []);
+        $filterNames = $request->query->all('filterNames') ?? [];
 
         $gridManager = $this->container->get(Manager::class);
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);

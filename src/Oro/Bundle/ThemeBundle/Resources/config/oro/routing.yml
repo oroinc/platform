@@ -1,0 +1,4 @@
+theme:
+  resource: "@OroThemeBundle/Controller"
+  type: attribute
+  prefix: /

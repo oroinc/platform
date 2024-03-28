@@ -74,7 +74,7 @@ class AutoResponseTemplateType extends AbstractType
             ])
             ->add('translations', EmailTemplateTranslationCollectionType::class, [
                 'localizations' => $localizations,
-                'wysiwyg_enabled' => $this->userConfig->get('oro_form.wysiwyg_enabled') ?? false,
+                'wysiwyg_enabled' => $this->userConfig->get('oro_email.email_template_wysiwyg_enabled') ?? false,
                 'wysiwyg_options' => $this->getWysiwygOptions(),
                 'block_name' => 'oro_email_emailtemplate',
             ])

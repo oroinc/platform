@@ -9,18 +9,17 @@ use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Model\AutoResponseRuleCondition;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Provider\TranslatedEmailTemplateProvider;
 use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\ConfigExpression\ConfigExpressions;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -41,6 +40,8 @@ class AutoResponseManager
     protected $emailBuilder;
 
     protected EmailModelSender $emailModelSender;
+
+    private TranslatedEmailTemplateProvider $translatedEmailTemplateProvider;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -83,6 +84,7 @@ class AutoResponseManager
         ManagerRegistry $registry,
         EmailModelBuilder $emailBuilder,
         EmailModelSender $emailModelSender,
+        TranslatedEmailTemplateProvider $translatedEmailTemplateProvider,
         EmailRenderer $emailRender,
         LoggerInterface $logger,
         TranslatorInterface $translator,
@@ -91,6 +93,7 @@ class AutoResponseManager
         $this->registry = $registry;
         $this->emailBuilder = $emailBuilder;
         $this->emailModelSender = $emailModelSender;
+        $this->translatedEmailTemplateProvider = $translatedEmailTemplateProvider;
         $this->logger = $logger;
         $this->translator = $translator;
         $this->defaultLocale = $defaultLocale;
@@ -198,39 +201,36 @@ class AutoResponseManager
 
     protected function applyTemplate(EmailModel $emailModel, EmailTemplate $template, Email $email)
     {
-        $translatedSubjects = [];
-        $translatedContents = [];
-        /** @var EmailTemplateTranslation $translation */
+        $localizationByLangCode = [];
+        $acceptedLocales = array_merge($email->getAcceptedLocales(), [$this->defaultLocale]);
         foreach ($template->getTranslations() as $translation) {
-            $langCode = $translation->getLocalization()->getLanguageCode();
-            if ($translation->getSubject()) {
-                $translatedSubjects[$langCode] = $translation->getSubject();
+            $templateLocalization = $translation->getLocalization();
+            if ($templateLocalization === null) {
+                continue;
             }
-            if ($translation->getContent()) {
-                $translatedContents[$langCode] = $translation->getContent();
+
+            $langCode = $templateLocalization->getLanguageCode();
+
+            $localizationByLangCode[$langCode][] = $templateLocalization;
+        }
+
+        $localization = null;
+        foreach ($acceptedLocales as $acceptedLocale) {
+            if (!empty($localizationByLangCode[$acceptedLocale])) {
+                $localization = reset($localizationByLangCode[$acceptedLocale]);
+                break;
             }
         }
 
-        $locales = array_flip(array_merge($email->getAcceptedLocales(), [$this->defaultLocale]));
-        $comparator = ArrayUtil::createOrderedComparator($locales);
-        uksort($translatedSubjects, $comparator);
-        uksort($translatedContents, $comparator);
+        $translatedEmailTemplate = $this->translatedEmailTemplateProvider
+            ->getTranslatedEmailTemplate($template, $localization);
 
-        $subjects = array_intersect_key($translatedSubjects, $locales);
-        $subject = reset($subjects);
-        if (false === $subject) {
-            $subject = $template->getSubject() ?? '';
-        }
-
-        $contents = array_intersect_key($translatedContents, $locales);
-        $content = reset($contents);
-        if (false === $content) {
-            $content = $template->getContent() ?? '';
-        }
+        $renderedEmailTemplate = $this->emailRender
+            ->renderEmailTemplate($translatedEmailTemplate, ['entity' => $email], ['localization' => $localization]);
 
         $emailModel
-            ->setSubject($this->emailRender->renderTemplate($subject, ['entity' => $email]))
-            ->setBody($this->emailRender->renderTemplate($content, ['entity' => $email]))
+            ->setSubject($renderedEmailTemplate->getSubject())
+            ->setBody($renderedEmailTemplate->getContent())
             ->setType($template->getType());
     }
 

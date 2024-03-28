@@ -100,7 +100,6 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
             ->method('process')
             ->with(
                 [$expectedMassNotification],
-                null,
                 [MassNotificationSender::MAINTENANCE_VARIABLE => $body]
             );
 
@@ -134,7 +133,6 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
             ->method('process')
             ->with(
                 [$expectedMassNotification],
-                null,
                 [MassNotificationSender::MAINTENANCE_VARIABLE => $body]
             );
 

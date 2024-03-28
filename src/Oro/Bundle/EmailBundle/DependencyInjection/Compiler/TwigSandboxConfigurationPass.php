@@ -6,6 +6,7 @@ namespace Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
  * Registers the following Twig functions and filters for the email templates rendering sandbox:
  * * oro_config_value
  * * oro_get_absolute_url
+ * * oro_get_email_template
  * * oro_format
  */
 class TwigSandboxConfigurationPass extends AbstractTwigSandboxConfigurationPass
@@ -17,7 +18,8 @@ class TwigSandboxConfigurationPass extends AbstractTwigSandboxConfigurationPass
     {
         return [
             'oro_config_value',
-            'oro_get_absolute_url'
+            'oro_get_absolute_url',
+            'oro_get_email_template'
         ];
     }
 
