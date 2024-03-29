@@ -1,0 +1,39 @@
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
+
+{% oro_title_set({params : {"%title%": entity|oro_format_name(null, 'short')|default('N/A'|trans) } }) %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_theme_configuration_index'),
+        'indexLabel': 'oro.theme.themeconfiguration.entity_plural_label'|trans,
+        'entityTitle': entity|oro_format_name(null, 'short')|default('N/A'|trans)
+    } %}
+
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set dataBlocks = [
+        {
+            'title': 'General'|trans,
+            'subblocks': [
+                {
+                    'data': [
+                        UI.renderProperty('oro.theme.themeconfiguration.name.label'|trans, entity.name),
+                        UI.renderProperty('oro.theme.themeconfiguration.description.label'|trans, entity.description),
+                        UI.renderProperty('oro.theme.themeconfiguration.theme.label'|trans, entity.theme),
+                        UI.renderProperty('oro.theme.themeconfiguration.type.label'|trans, entity.type.value),
+                    ]
+                }
+            ]
+        }
+    ] %}
+
+    {% set id = 'oro-theme-themeconfiguration-view' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}

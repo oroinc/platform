@@ -3,17 +3,32 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
+use Oro\Bundle\ThemeBundle\Form\Provider\ConfigurationBuildersProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
+class ThemeConfigurationTest extends TestCase
 {
+    private ConfigurationBuildersProvider $configurationBuildersProvider;
+
+    protected function setUp(): void
+    {
+        $this->configurationBuildersProvider = $this->createStub(ConfigurationBuildersProvider::class);
+        $this->configurationBuildersProvider
+            ->method('getConfigurationTypes')
+            ->willReturn(['type']);
+    }
+
     private function processConfiguration(array $config): array
     {
-        return (new Processor())->processConfiguration(new ThemeConfiguration(), [$config]);
+        return (new Processor())->processConfiguration(
+            new ThemeConfiguration($this->configurationBuildersProvider),
+            [$config]
+        );
     }
 
     public function testProcessEmptyConfiguration(): void
@@ -301,5 +316,16 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $this->processConfiguration(['test_theme' => $themeConfig]);
+    }
+
+    public function testBuildOptionKey(): void
+    {
+        $sectionName = 'mainSection';
+        $optionKey = 'mainOption';
+
+        self::assertEquals(
+            sprintf('%s' . ThemeConfiguration::OPTION_KEY_DELIMITER . '%s', $sectionName, $optionKey),
+            ThemeConfiguration::buildOptionKey($sectionName, $optionKey)
+        );
     }
 }

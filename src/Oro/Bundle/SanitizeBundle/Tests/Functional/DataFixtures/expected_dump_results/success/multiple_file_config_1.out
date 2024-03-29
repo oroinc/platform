@@ -1,0 +1,14 @@
+-- !!!Exercise caution when using TRUNCATE queries with CASCADE options --
+-- Idle comment of "config_1.yml"
+-- Idle comment of "config_2.yml". truncate cascade catcher
+-- Idle comment for 'TestSanitizable' entity
+UPDATE "test_sanitizable_entity" SET "middle_name"=SUBSTRING(MD5("middle_name" || RANDOM()::TEXT) FROM 1 FOR 255);
+UPDATE "test_sanitizable_entity" SET "last_name"=SUBSTRING(MD5("last_name" || RANDOM()::TEXT) FROM 1 FOR 255);
+UPDATE "test_sanitizable_entity" SET "birthday"=CURRENT_TIMESTAMP;
+UPDATE "test_sanitizable_entity" SET "email"=CASE WHEN POSITION('@' IN "email")>0 THEN CONCAT(SUBSTRING("email", 1, POSITION('@' IN "email")-1), id, '@', MD5(SUBSTRING("email", POSITION('@' IN "email")+1)), '.test') ELSE "email" END;
+UPDATE "test_sanitizable_entity" SET "emailunguessable"=CASE WHEN POSITION('@' IN "emailunguessable")>0 THEN CONCAT(SUBSTRING("emailunguessable", 1, POSITION('@' IN "emailunguessable")-1), id, '@', MD5(SUBSTRING("emailunguessable", POSITION('@' IN "emailunguessable")+1)), '.test') ELSE "emailunguessable" END;
+UPDATE "test_sanitizable_entity" SET "phone"=CASE WHEN "phone" IS NOT NULL THEN to_char(random() * 10000000000, 'FM"1 800 "000"-"000"-"0000"') END;
+UPDATE "test_sanitizable_entity" SET "phone_second"=CASE WHEN "phone_second" IS NOT NULL THEN to_char(random() * 100000000, 'FM"(777) "0000"-"00"-"00"') END;
+UPDATE "test_sanitizable_entity" SET "secret"=SUBSTRING(MD5("secret" || RANDOM()::TEXT) FROM 1 FOR 255);
+UPDATE "test_sanitizable_entity" SET "state_data"=encode('a:0:{}'::bytea, 'base64');
+UPDATE "test_sanitizable_entity" SET serialized_data = serialized_data || jsonb_build_object('custom_event_date', CURRENT_TIMESTAMP(0), 'email_third', CASE WHEN POSITION('@' IN serialized_data->>'email_third')>0 THEN CONCAT(SUBSTRING(serialized_data->>'email_third', 1, POSITION('@' IN serialized_data->>'email_third')-1), id, '@', MD5(SUBSTRING(serialized_data->>'email_third', POSITION('@' IN serialized_data->>'email_third')+1)), '.test') ELSE serialized_data->>'email_third' END, 'phone_third', CASE WHEN serialized_data->>'phone_third' IS NOT NULL THEN to_char(random() * 10000000000, 'FM"("000") "000"-"0000"') END);

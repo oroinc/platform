@@ -48,3 +48,10 @@ services:
             - '@oro_layout.twig.layout_renderer'
         tags:
             - { name: kernel.event_listener, event: Oro\Bundle\LayoutBundle\Event\LayoutContextChangedEvent, method: onContextChanged }
+
+    oro_layout.twig.theme_configuration_extension:
+        class: Oro\Bundle\LayoutBundle\Twig\ThemeConfigurationTwigExtension
+        arguments:
+            - '@oro_theme.provider.theme_configuration'
+        tags:
+            - { name: twig.extension }

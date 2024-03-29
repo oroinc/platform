@@ -3,21 +3,27 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EmailBundle\Exception\EmailTemplateNotFoundException;
-use Oro\Bundle\EmailBundle\Model\DTO\LocalizedTemplateDTO;
-use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
+use Oro\Bundle\EmailBundle\Factory\EmailModelFromEmailTemplateFactory;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Model\From;
-use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTopic;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendMassEmailNotificationTopic;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
-use Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UserBundle\Entity\User;
-use Psr\Log\LoggerInterface;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use PHPUnit\Framework\TestCase;
 
-class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
+class EmailNotificationManagerTest extends TestCase
 {
+    use LoggerAwareTraitTestTrait;
+
     private const TEMPLATE_NAME = 'template_name';
     private const TEMPLATE_ENTITY_NAME = 'Some/Entity';
 
@@ -27,245 +33,395 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
     private const CONTENT_ENGLISH = 'English content';
     private const CONTENT_FRENCH = 'French content';
 
-    /** @var EmailNotificationSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailNotificationSender;
+    private MessageProducerInterface $messageProducer;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private NotificationSettings $notificationSettings;
 
-    /** @var LocalizedTemplateProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizedTemplateProvider;
+    private EmailModelFromEmailTemplateFactory $emailModelFromEmailTemplateFactory;
 
-    /** @var EmailNotificationManager */
-    private $manager;
+    private EmailNotificationManager $manager;
 
     protected function setUp(): void
     {
-        $this->emailNotificationSender = $this->createMock(EmailNotificationSender::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $this->localizedTemplateProvider = $this->createMock(LocalizedTemplateProvider::class);
+        $this->messageProducer = $this->createMock(MessageProducerInterface::class);
+        $this->notificationSettings = $this->createMock(NotificationSettings::class);
+        $this->emailModelFromEmailTemplateFactory = $this->createMock(EmailModelFromEmailTemplateFactory::class);
 
         $this->manager = new EmailNotificationManager(
-            $this->emailNotificationSender,
-            $this->logger,
-            $this->localizedTemplateProvider
+            $this->messageProducer,
+            $this->notificationSettings,
+            $this->emailModelFromEmailTemplateFactory
         );
+
+        $this->setUpLoggerMock($this->manager);
     }
 
     public function testProcessSingle(): void
     {
         $entity = new User();
         $englishRecipient = (new User())->setEmail('english@mail.com');
-        $frenchRecipient1 = (new User())->setEmail('french1@mail.com');
-        $frenchRecipient2 = (new User())->setEmail('french2@mail.com');
+        $frenchRecipient = (new User())->setEmail('french@mail.com');
 
         $notification = new TemplateEmailNotification(
             new EmailTemplateCriteria(self::TEMPLATE_NAME),
-            [$englishRecipient, $frenchRecipient1, $frenchRecipient2],
+            [$englishRecipient, $frenchRecipient],
             $entity
         );
 
-        $englishEmailTemplateModel = (new EmailTemplateModel())
+        $sender = From::emailAddress('no-reply@example.com');
+        $this->notificationSettings
+            ->expects(self::once())
+            ->method('getSender')
+            ->willReturn($sender);
+
+        $englishEmailModel = (new EmailModel())
+            ->setFrom($sender->toString())
+            ->setTo([$englishRecipient->getEmail()])
             ->setSubject(self::SUBJECT_ENGLISH)
-            ->setContent(self::CONTENT_ENGLISH)
-            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+            ->setBody(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateInterface::TYPE_HTML);
 
-        $frenchEmailTemplateModel = (new EmailTemplateModel())
+        $frenchEmailModel = (new EmailModel())
+            ->setFrom($sender->toString())
+            ->setTo([$frenchRecipient->getEmail()])
             ->setSubject(self::SUBJECT_FRENCH)
-            ->setContent(self::CONTENT_FRENCH)
-            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+            ->setBody(self::CONTENT_FRENCH)
+            ->setType(EmailTemplateInterface::TYPE_HTML);
 
-        $this->localizedTemplateProvider->expects($this->once())
-            ->method('getAggregated')
-            ->with(
-                $notification->getRecipients(),
-                $notification->getTemplateCriteria(),
-                ['entity' => $notification->getEntity()]
-            )
-            ->willReturn([
-                (new LocalizedTemplateDTO($englishEmailTemplateModel))->addRecipient($englishRecipient),
-                (new LocalizedTemplateDTO($frenchEmailTemplateModel))
-                    ->addRecipient($frenchRecipient1)
-                    ->addRecipient($frenchRecipient2),
-            ]);
-
-        $expectedEnglishNotification = new TemplateEmailNotification(
-            new EmailTemplateCriteria(self::TEMPLATE_NAME),
-            [$englishRecipient],
-            $entity
-        );
-
-        $expectedFrenchNotification = new TemplateEmailNotification(
-            new EmailTemplateCriteria(self::TEMPLATE_NAME),
-            [$frenchRecipient1, $frenchRecipient2],
-            $entity
-        );
-
-        $this->emailNotificationSender->expects($this->exactly(2))
-            ->method('send')
+        $this->emailModelFromEmailTemplateFactory
+            ->expects(self::exactly(2))
+            ->method('createEmailModel')
             ->withConsecutive(
-                [$expectedEnglishNotification, $englishEmailTemplateModel],
-                [$expectedFrenchNotification, $frenchEmailTemplateModel]
+                [
+                    $sender,
+                    $englishRecipient,
+                    $notification->getTemplateCriteria(),
+                    ['entity' => $notification->getEntity()],
+                ],
+                [
+                    $sender,
+                    $frenchRecipient,
+                    $notification->getTemplateCriteria(),
+                    ['entity' => $notification->getEntity()],
+                ],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $englishEmailModel,
+                $frenchEmailModel
             );
 
-        $this->manager->processSingle($notification, []);
+        $this->messageProducer->expects(self::exactly(2))
+            ->method('send')
+            ->withConsecutive(
+                [
+                    SendEmailNotificationTopic::getName(),
+                    [
+                        'from' => $englishEmailModel->getFrom(),
+                        'toEmail' => current($englishEmailModel->getTo()),
+                        'subject' => $englishEmailModel->getSubject(),
+                        'body' => $englishEmailModel->getBody(),
+                        'contentType' => $englishEmailModel->getType() === 'html' ? 'text/html' : 'text/plain',
+                    ],
+                ],
+                [
+                    SendEmailNotificationTopic::getName(),
+                    [
+                        'from' => $frenchEmailModel->getFrom(),
+                        'toEmail' => current($frenchEmailModel->getTo()),
+                        'subject' => $frenchEmailModel->getSubject(),
+                        'body' => $frenchEmailModel->getBody(),
+                        'contentType' => $frenchEmailModel->getType() === 'html' ? 'text/html' : 'text/plain',
+                    ],
+                ],
+            );
+
+        $this->manager->processSingle($notification);
     }
 
     public function testProcessSingleMassNotification(): void
     {
         $englishRecipient = (new User())->setEmail('english@mail.com');
+        $frenchRecipient = (new User())->setEmail('french@mail.com');
+        $sender = From::emailAddress('no-reply@example.com');
 
-        $sender = From::emailAddress('some@mail.com');
         $notification = new TemplateMassNotification(
             $sender,
-            [$englishRecipient],
+            [$englishRecipient, $frenchRecipient],
             new EmailTemplateCriteria(self::TEMPLATE_NAME),
             self::SUBJECT_CUSTOM
         );
 
-        $englishEmailTemplateModel = (new EmailTemplateModel())
+        $this->notificationSettings
+            ->expects(self::never())
+            ->method('getSender');
+
+        $englishEmailModel = (new EmailModel())
+            ->setFrom($sender->toString())
+            ->setTo([$englishRecipient->getEmail()])
             ->setSubject(self::SUBJECT_ENGLISH)
-            ->setContent(self::CONTENT_ENGLISH)
-            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+            ->setBody(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateInterface::TYPE_HTML);
 
-        $this->localizedTemplateProvider->expects($this->once())
-            ->method('getAggregated')
-            ->with(
-                $notification->getRecipients(),
-                $notification->getTemplateCriteria(),
-                ['entity' => $notification->getEntity()]
+        $frenchEmailModel = (new EmailModel())
+            ->setFrom($sender->toString())
+            ->setTo([$frenchRecipient->getEmail()])
+            ->setSubject(self::SUBJECT_FRENCH)
+            ->setBody(self::CONTENT_FRENCH)
+            ->setType(EmailTemplateInterface::TYPE_HTML);
+
+        $this->emailModelFromEmailTemplateFactory
+            ->expects(self::exactly(2))
+            ->method('createEmailModel')
+            ->withConsecutive(
+                [
+                    $sender,
+                    $englishRecipient,
+                    $notification->getTemplateCriteria(),
+                    [],
+                ],
+                [
+                    $sender,
+                    $frenchRecipient,
+                    $notification->getTemplateCriteria(),
+                    [],
+                ],
             )
-            ->willReturn([
-                (new LocalizedTemplateDTO($englishEmailTemplateModel))->addRecipient($englishRecipient),
-            ]);
+            ->willReturnOnConsecutiveCalls(
+                $englishEmailModel,
+                $frenchEmailModel
+            );
 
-        $customSubjectEmailTemplateModel = (new EmailTemplateModel())
-            ->setSubject(self::SUBJECT_CUSTOM)
-            ->setContent(self::CONTENT_ENGLISH)
-            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+        $this->messageProducer->expects(self::exactly(2))
+            ->method('send')
+            ->withConsecutive(
+                [
+                    SendMassEmailNotificationTopic::getName(),
+                    [
+                        'from' => $englishEmailModel->getFrom(),
+                        'toEmail' => current($englishEmailModel->getTo()),
+                        'subject' => self::SUBJECT_CUSTOM,
+                        'body' => $englishEmailModel->getBody(),
+                        'contentType' => $englishEmailModel->getType() === 'html' ? 'text/html' : 'text/plain',
+                    ],
+                ],
+                [
+                    SendMassEmailNotificationTopic::getName(),
+                    [
+                        'from' => $frenchEmailModel->getFrom(),
+                        'toEmail' => current($frenchEmailModel->getTo()),
+                        'subject' => self::SUBJECT_CUSTOM,
+                        'body' => $frenchEmailModel->getBody(),
+                        'contentType' => $frenchEmailModel->getType() === 'html' ? 'text/html' : 'text/plain',
+                    ],
+                ],
+            );
 
-        $expectedNotification = new TemplateEmailNotification(
-            $notification->getTemplateCriteria(),
-            [$englishRecipient],
-            null,
-            $sender
-        );
-
-        $this->emailNotificationSender->expects($this->once())
-            ->method('sendMass')
-            ->with($expectedNotification, $customSubjectEmailTemplateModel);
-
-        $this->manager->processSingle($notification, []);
+        $this->manager->processSingle($notification);
     }
 
     public function testProcessSingleWhenExceptionIsThrown(): void
     {
         $englishRecipient = (new User())->setEmail('english@mail.com');
+        $params = ['some' => true];
 
         $notification = new TemplateEmailNotification(
             new EmailTemplateCriteria(self::TEMPLATE_NAME),
             [$englishRecipient]
         );
 
+        $sender = From::emailAddress('no-reply@example.com');
+        $this->notificationSettings
+            ->expects(self::once())
+            ->method('getSender')
+            ->willReturn($sender);
+
         $exception = new EmailTemplateNotFoundException($notification->getTemplateCriteria());
 
-        $this->localizedTemplateProvider->expects($this->once())
-            ->method('getAggregated')
+        $this->emailModelFromEmailTemplateFactory
+            ->expects(self::once())
+            ->method('createEmailModel')
             ->with(
-                $notification->getRecipients(),
+                $sender,
+                $englishRecipient,
                 $notification->getTemplateCriteria(),
-                ['entity' => $notification->getEntity(), 'some' => true]
+                $params,
             )
             ->willThrowException($exception);
 
-        $this->logger->expects($this->once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with('An error occurred while processing notification', ['exception' => $exception]);
 
         $this->expectException(NotificationSendException::class);
-        $this->manager->processSingle($notification, ['some' => true]);
+
+        $this->manager->processSingle($notification, $params);
     }
 
     public function testProcess(): void
     {
-        $recipient = (new User())->setEmail('english@mail.com');
+        $entity = new User();
+        $englishRecipient = (new User())->setEmail('english@mail.com');
+        $frenchRecipient = (new User())->setEmail('french@mail.com');
+        $params = ['some' => true];
+        $sender = From::emailAddress('no-reply@example.com');
 
-        $notification1 = new TemplateEmailNotification(new EmailTemplateCriteria(self::TEMPLATE_NAME), [$recipient]);
+        $notification1 = new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME),
+            [$englishRecipient]
+        );
         $notification2 = new TemplateEmailNotification(
             new EmailTemplateCriteria(self::TEMPLATE_NAME, self::TEMPLATE_ENTITY_NAME),
-            [$recipient]
+            [$frenchRecipient],
+            $entity,
+            $sender
         );
 
-        $emailTemplateModel1 = (new EmailTemplateModel())
+        $this->notificationSettings
+            ->expects(self::once())
+            ->method('getSender')
+            ->willReturn($sender);
+
+        $englishEmailModel = (new EmailModel())
+            ->setFrom($sender->toString())
+            ->setTo([$englishRecipient->getEmail()])
             ->setSubject(self::SUBJECT_ENGLISH)
-            ->setContent(self::CONTENT_ENGLISH)
-            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+            ->setBody(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateInterface::TYPE_HTML);
 
-        $emailTemplateModel2 = (new EmailTemplateModel())
-            ->setSubject(self::SUBJECT_CUSTOM)
-            ->setContent(self::CONTENT_ENGLISH)
-            ->setType(EmailTemplateModel::CONTENT_TYPE_HTML);
+        $frenchEmailModel = (new EmailModel())
+            ->setFrom($sender->toString())
+            ->setTo([$frenchRecipient->getEmail()])
+            ->setSubject(self::SUBJECT_FRENCH)
+            ->setBody(self::CONTENT_FRENCH)
+            ->setType(EmailTemplateInterface::TYPE_HTML);
 
-        $this->localizedTemplateProvider->expects($this->exactly(2))
-            ->method('getAggregated')
+        $this->emailModelFromEmailTemplateFactory
+            ->expects(self::exactly(2))
+            ->method('createEmailModel')
             ->withConsecutive(
                 [
-                    $notification1->getRecipients(),
+                    $sender,
+                    $englishRecipient,
                     $notification1->getTemplateCriteria(),
-                    ['entity' => $notification1->getEntity(), 'some' => true],
+                    $params,
                 ],
                 [
-                    $notification2->getRecipients(),
+                    $sender,
+                    $frenchRecipient,
                     $notification2->getTemplateCriteria(),
-                    ['entity' => $notification2->getEntity(), 'some' => true],
-                ]
+                    ['entity' => $notification2->getEntity()] + $params,
+                ],
             )
             ->willReturnOnConsecutiveCalls(
-                [
-                    (new LocalizedTemplateDTO($emailTemplateModel1))->addRecipient($recipient),
-                ],
-                [
-                    (new LocalizedTemplateDTO($emailTemplateModel2))->addRecipient($recipient),
-                ]
+                $englishEmailModel,
+                $frenchEmailModel
             );
 
-        $expectedNotification1 = new TemplateEmailNotification($notification1->getTemplateCriteria(), [$recipient]);
-        $expectedNotification2 = new TemplateEmailNotification($notification2->getTemplateCriteria(), [$recipient]);
-
-        $this->emailNotificationSender->expects($this->exactly(2))
+        $this->messageProducer->expects(self::exactly(2))
             ->method('send')
             ->withConsecutive(
-                [$expectedNotification1, $emailTemplateModel1],
-                [$expectedNotification2, $emailTemplateModel2]
+                [
+                    SendEmailNotificationTopic::getName(),
+                    [
+                        'from' => $englishEmailModel->getFrom(),
+                        'toEmail' => current($englishEmailModel->getTo()),
+                        'subject' => $englishEmailModel->getSubject(),
+                        'body' => $englishEmailModel->getBody(),
+                        'contentType' => $englishEmailModel->getType() === 'html' ? 'text/html' : 'text/plain',
+                    ],
+                ],
+                [
+                    SendEmailNotificationTopic::getName(),
+                    [
+                        'from' => $frenchEmailModel->getFrom(),
+                        'toEmail' => current($frenchEmailModel->getTo()),
+                        'subject' => $frenchEmailModel->getSubject(),
+                        'body' => $frenchEmailModel->getBody(),
+                        'contentType' => $frenchEmailModel->getType() === 'html' ? 'text/html' : 'text/plain',
+                    ],
+                ],
             );
 
-        $this->manager->process([$notification1, $notification2], null, ['some' => true]);
+        $this->manager->process([$notification1, $notification2], $params);
     }
 
     public function testProcessWhenExceptionIsThrown(): void
     {
-        $recipient = (new User())->setEmail('english@mail.com');
-        $notification = new TemplateEmailNotification(new EmailTemplateCriteria(self::TEMPLATE_NAME), [$recipient]);
+        $entity = new User();
+        $englishRecipient = (new User())->setEmail('english@mail.com');
+        $frenchRecipient = (new User())->setEmail('french@mail.com');
+        $params = ['some' => true];
+        $sender = From::emailAddress('no-reply@example.com');
 
-        $exception = new EmailTemplateNotFoundException($notification->getTemplateCriteria());
+        $notification1 = new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME),
+            [$englishRecipient]
+        );
+        $notification2 = new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME, self::TEMPLATE_ENTITY_NAME),
+            [$frenchRecipient],
+            $entity,
+            $sender
+        );
 
-        $this->localizedTemplateProvider->expects($this->once())
-            ->method('getAggregated')
-            ->with(
-                $notification->getRecipients(),
-                $notification->getTemplateCriteria(),
-                ['entity' => $notification->getEntity()]
+        $this->notificationSettings
+            ->expects(self::once())
+            ->method('getSender')
+            ->willReturn($sender);
+
+        $englishEmailModel = (new EmailModel())
+            ->setFrom($sender->toString())
+            ->setTo([$englishRecipient->getEmail()])
+            ->setSubject(self::SUBJECT_ENGLISH)
+            ->setBody(self::CONTENT_ENGLISH)
+            ->setType(EmailTemplateInterface::TYPE_HTML);
+
+        $exception = new EmailTemplateNotFoundException($notification1->getTemplateCriteria());
+
+        $this->emailModelFromEmailTemplateFactory
+            ->expects(self::exactly(2))
+            ->method('createEmailModel')
+            ->withConsecutive(
+                [
+                    $sender,
+                    $englishRecipient,
+                    $notification1->getTemplateCriteria(),
+                    $params,
+                ],
+                [
+                    $sender,
+                    $frenchRecipient,
+                    $notification2->getTemplateCriteria(),
+                    ['entity' => $notification2->getEntity()] + $params,
+                ],
             )
-            ->willThrowException($exception);
+            ->willReturnOnConsecutiveCalls(
+                $englishEmailModel,
+                self::throwException($exception)
+            );
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->exactly(2))
+        $this->messageProducer->expects(self::once())
+            ->method('send')
+            ->withConsecutive(
+                [
+                    SendEmailNotificationTopic::getName(),
+                    [
+                        'from' => $englishEmailModel->getFrom(),
+                        'toEmail' => current($englishEmailModel->getTo()),
+                        'subject' => $englishEmailModel->getSubject(),
+                        'body' => $englishEmailModel->getBody(),
+                        'contentType' => $englishEmailModel->getType() === 'html' ? 'text/html' : 'text/plain',
+                    ],
+                ],
+            );
+
+        $this->loggerMock->expects(self::exactly(2))
             ->method('error')
             ->withConsecutive(
                 ['An error occurred while processing notification', ['exception' => $exception]],
-                [$this->matchesRegularExpression('/An error occurred while sending .* notification/')]
+                [self::matchesRegularExpression('/An error occurred while sending .* notification/')]
             );
 
-        $this->manager->process([$notification], $logger, []);
+        $this->manager->process([$notification1, $notification2], $params);
     }
 }

@@ -8,6 +8,7 @@ use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
 
 /**
  * Load dimensions from theme config to LiipImagine filters.
@@ -45,19 +46,29 @@ class ImageFilterLoader
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    public function forceLoadByTheme(Theme $theme): void
+    {
+        $this->shouldBeLoaded = true;
+        $this->load($theme);
+    }
+
     public function forceLoad()
     {
         $this->shouldBeLoaded = true;
         $this->load();
     }
 
-    public function load()
+    public function load(Theme $theme = null)
     {
         if (!$this->shouldBeLoaded) {
             return;
         }
 
-        foreach ($this->imageTypeProvider->getImageDimensions() as $dimension) {
+        $dimensions = $theme instanceof Theme ?
+            $this->imageTypeProvider->getImageDimensionsByTheme($theme) :
+            $this->imageTypeProvider->getImageDimensions();
+
+        foreach ($dimensions as $dimension) {
             $filterName = $dimension->getName();
             $this->filterConfiguration->set(
                 $filterName,

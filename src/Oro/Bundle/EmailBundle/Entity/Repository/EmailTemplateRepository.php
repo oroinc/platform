@@ -3,13 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Provides methods for querying email templates related information such as getting localized email template or
@@ -138,35 +137,63 @@ class EmailTemplateRepository extends EntityRepository
         return $qb;
     }
 
-    /**
-     * @throws NonUniqueResultException|NoResultException
-     */
-    public function findWithLocalizations(EmailTemplateCriteria $criteria): ?EmailTemplate
-    {
+    public function findWithLocalizations(
+        EmailTemplateCriteria $emailTemplateCriteria,
+        array $templateContext = []
+    ): ?EmailTemplate {
         $queryBuilder = $this->createQueryBuilder('t')
             ->select('t', 'translations')
             ->leftJoin('t.translations', 'translations');
 
-        $this->resolveEmailTemplateCriteria($queryBuilder, $criteria);
+        $this->resolveEmailTemplateCriteria($queryBuilder, $emailTemplateCriteria, $templateContext);
 
-        return $queryBuilder->getQuery()->getSingleResult();
+        $result = $queryBuilder->getQuery()->getResult();
+
+        return $result ? array_shift($result) : null;
     }
 
-    public function isExist(EmailTemplateCriteria $criteria): bool
+    public function isExist(EmailTemplateCriteria $emailTemplateCriteria, array $templateContext = []): bool
     {
         $queryBuilder = $this->createQueryBuilder('t')->select('1');
-        $this->resolveEmailTemplateCriteria($queryBuilder, $criteria);
+        $this->resolveEmailTemplateCriteria($queryBuilder, $emailTemplateCriteria, $templateContext);
 
         return (bool)$queryBuilder->getQuery()->getResult();
     }
 
-    private function resolveEmailTemplateCriteria(QueryBuilder $queryBuilder, EmailTemplateCriteria $criteria): void
-    {
-        $queryBuilder->andWhere($queryBuilder->expr()->eq('t.name', ':name'));
-        $queryBuilder->setParameter('name', $criteria->getName());
-        if ($criteria->getEntityName()) {
-            $queryBuilder->andWhere($queryBuilder->expr()->eq('t.entityName', ':entityName'));
-            $queryBuilder->setParameter('entityName', $criteria->getEntityName());
+    private function resolveEmailTemplateCriteria(
+        QueryBuilder $queryBuilder,
+        EmailTemplateCriteria $emailTemplateCriteria,
+        array $templateContext = []
+    ): void {
+        $queryBuilder
+            ->andWhere($queryBuilder->expr()->eq('t.name', ':name'))
+            ->setParameter('name', $emailTemplateCriteria->getName());
+
+        if ($emailTemplateCriteria->getEntityName()) {
+            $queryBuilder
+                ->andWhere($queryBuilder->expr()->eq('t.entityName', ':entityName'))
+                ->setParameter('entityName', $emailTemplateCriteria->getEntityName());
+        }
+
+        $classMetadata = $this->getClassMetadata();
+        foreach ($templateContext as $parameterName => $parameterValue) {
+            if (!$classMetadata->hasField($parameterName) && !$classMetadata->hasAssociation($parameterName)) {
+                continue;
+            }
+
+            if ($parameterValue === EmailTemplateCriteria::CONTEXT_PARAMETER_NULL) {
+                $queryBuilder
+                    ->andWhere($queryBuilder->expr()->isNull(QueryBuilderUtil::getField('t', $parameterName)));
+            } else {
+                $queryBuilder
+                    ->andWhere(
+                        $queryBuilder->expr()->eq(
+                            QueryBuilderUtil::getField('t', $parameterName),
+                            QueryBuilderUtil::sprintf(':%s', $parameterName)
+                        )
+                    )
+                    ->setParameter($parameterName, $parameterValue);
+            }
         }
     }
 }

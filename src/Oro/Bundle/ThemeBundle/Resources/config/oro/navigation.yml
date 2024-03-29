@@ -1,0 +1,20 @@
+navigation:
+  menu_config:
+    items:
+      theme_configuration:
+        label: 'oro.theme.themeconfiguration.entity_plural_label'
+        route: 'oro_theme_configuration_index'
+        position: 20
+        extras:
+          routes: ['oro_theme_configuration_*']
+    tree:
+      application_menu:
+        children:
+          system_tab:
+            children:
+              theme_configuration: ~
+  titles:
+    oro_theme_configuration_index: ~
+    oro_theme_configuration_view: '%title% - oro.ui.view'
+    oro_theme_configuration_update: '%title% - oro.ui.edit'
+    oro_theme_configuration_create: 'oro.ui.create_entity'

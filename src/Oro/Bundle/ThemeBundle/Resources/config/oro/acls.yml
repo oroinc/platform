@@ -1,0 +1,35 @@
+acls:
+    oro_theme_configuration_view:
+        type: entity
+        class: Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration
+        permission: VIEW
+        group_name: ""
+        bindings: ~
+
+    oro_theme_configuration_update:
+        type: entity
+        class: Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration
+        permission: EDIT
+        group_name: ""
+        bindings: ~
+
+    oro_theme_configuration_create:
+        type: entity
+        class: Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration
+        permission: CREATE
+        group_name: ""
+        bindings: ~
+
+    oro_theme_configuration_delete:
+        type: entity
+        class: Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration
+        permission: DELETE
+        group_name: ""
+        bindings: ~
+
+    oro_theme_configuration_assign:
+        type: entity
+        class: Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration
+        permission: ASSIGN
+        group_name: ""
+        bindings: ~

@@ -1,0 +1,5 @@
+oro_sanitize:
+    raw_sqls:
+        - TRUNCATE oro_message_queue_job_unique
+        - TRUNCATE oro_message_queue_job
+        - TRUNCATE oro_message_queue

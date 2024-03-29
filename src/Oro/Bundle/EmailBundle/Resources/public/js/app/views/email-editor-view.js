@@ -122,7 +122,7 @@ define(function(require) {
             });
             confirm.on('ok', () => {
                 mediator.execute('showLoading');
-                this.templatesProvider.create(templateId, this.model.get('email').get('relatedEntityId'))
+                this.templatesProvider.create(this.$el.closest('form'))
                     .always(mediator.execute.bind(mediator, 'hideLoading'))
                     .fail(this.showTemplateErrorMessage.bind(this))
                     .done(this.fillForm.bind(this));

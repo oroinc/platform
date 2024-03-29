@@ -1,0 +1,98 @@
+datagrids:
+  oro-theme-configuration-grid:
+    acl_resource: oro_theme_configuration_view
+    source:
+      type: orm
+      query:
+        select:
+          - tc.id
+          - tc.type
+          - tc.name
+          - tc.description
+          - tc.theme
+          - owner.id as ownerId
+          - owner.name as ownerName
+        from:
+          - { table: 'Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration', alias: tc }
+        join:
+          left:
+            - { join: tc.owner, alias: owner }
+    columns:
+      id:
+        label: 'oro.theme.themeconfiguration.id.label'
+        renderable: false
+      type:
+        label: 'oro.theme.themeconfiguration.type.label'
+        frontend_type: select
+        renderable: false
+        choices:
+          Storefront: Storefront
+      name:
+        label: 'oro.theme.themeconfiguration.name.label'
+      description:
+        label: 'oro.theme.themeconfiguration.description.label'
+      theme:
+        label: 'oro.theme.themeconfiguration.theme.label'
+      ownerName:
+        label: 'oro.theme.themeconfiguration.owner.label'
+    sorters:
+      columns:
+        id:
+          data_name: tc.id
+        type:
+          data_name: tc.type
+        name:
+          data_name: tc.name
+        description:
+          data_name: tc.description
+        theme:
+          data_name: tc.theme
+        ownerName:
+          data_name: ownerName
+      default:
+        ID: DESC
+    filters:
+      columns:
+        id:
+          data_name: tc.id
+          renderable: false
+          type: number
+        type:
+          data_name: tc.type
+          type: choice
+          renderable: false
+          options:
+            field_options:
+              choices:
+                oro.theme.themeconfiguration.fields.type.choices.storefront: Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType::Storefront
+              translatable_options: true
+              multiple: true
+        name:
+          data_name: tc.name
+          type: string
+        description:
+          data_name: tc.description
+          type: string
+        theme:
+          data_name: tc.theme
+          type: string
+        owner:
+          label: oro.business_unit.label
+          type: choice-business-unit
+          data_name: tc.owner
+          className: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
+    properties:
+      id: ~
+      update_link:
+        type: url
+        route: oro_theme_configuration_update
+        params:
+          - id
+    actions:
+      update:
+        type: navigate
+        label: oro.grid.action.update
+        link: update_link
+        icon: pencil-square-o
+        acl_resource: oro_theme_configuration_update
+        rowAction: true

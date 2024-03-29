@@ -16,6 +16,9 @@ class ThemeManager
     /** @var Theme[] */
     private $instances = [];
 
+    /** @var array local cache with all the themes  */
+    private array $themes = [];
+
     /**
      * @var string[]
      */
@@ -131,6 +134,11 @@ class ThemeManager
      */
     public function getAllThemes($groups = null)
     {
+        $cacheKey = $groups === null ? 'all' : implode(',', (array)$groups);
+        if (array_key_exists($cacheKey, $this->themes) && $this->themes[$cacheKey] !== null) {
+            return $this->themes[$cacheKey];
+        }
+
         $names = $this->getThemeNames();
 
         $themes = array_combine(
@@ -152,6 +160,8 @@ class ThemeManager
                 }
             );
         }
+
+        $this->themes[$cacheKey] = $themes;
 
         return $themes;
     }

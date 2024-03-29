@@ -143,6 +143,10 @@ oro:
                 title: Default email owner
                 tooltip: Select the default owner of all emails.
 
+            email_template_wysiwyg_enabled:
+                label: Enable WYSIWYG for Email Templates
+                tooltip: WYSIWYG editor does not support variables provided by the default base email template. Enabling WYSIWYG editor may break existing email templates.
+
         emailtemplate:
             entity_label:        Email Template
             entity_plural_label: Email Templates

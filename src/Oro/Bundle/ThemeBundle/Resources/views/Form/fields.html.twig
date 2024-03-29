@@ -1,0 +1,33 @@
+{% block oro_theme_configuration_list_row %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    <div class="theme-configuration-options"
+        {{ UI.renderPageComponentAttributes({view: 'orotheme/js/app/views/theme-configuration-preview-view'}) }}>
+
+        {% for child in form.children|filter(child => not child.rendered) %}
+            {% set type = child.vars.block_prefixes[1] %}
+                <div class="control-group control-group-{{ type }}">
+                    <div class="control-label wrap">
+                        {{ form_label(child) }}
+                    </div>
+                    <div class="controls">
+                        {{ form_widget(child) }}
+                        {{ form_help(child) }}
+                        {{ form_errors(child) }}
+                    </div>
+                </div>
+            {% if child.vars.attr['data-preview-key'] is defined %}
+                {% set value = type == 'checkbox' ? child.vars.value : child.vars.data %}
+                {% set preview = value ? value : child.vars.attr['data-preview-default'] %}
+                {% if (oro_is_string(preview)) %}
+                    <div class="responsive-block">
+                        <img
+                            data-preview-image="{{ child.vars.attr['data-preview-key'] }}"
+                            src="/{{ child.vars.attr[['data-preview', preview]|join('-')]|default('') }}"
+                        />
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -186,6 +186,7 @@ services:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
             - '@oro_layout.theme_manager'
+            - '@oro_layout.current_theme_provider'
 
     Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider:
         alias: oro_layout.provider.image_type
@@ -233,6 +234,13 @@ services:
             - '@assets.packages'
         tags:
             - { name: layout.data_provider, alias: asset }
+
+    oro_layout.layout.data_provider.theme_configuration:
+        class: Oro\Bundle\LayoutBundle\Layout\DataProvider\ThemeConfigurationProvider
+        arguments:
+            - '@oro_theme.provider.theme_configuration'
+        tags:
+            - { name: layout.data_provider, alias: theme_configuration }
 
     oro_layout.loader.image_filter:
         class: Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader
@@ -329,3 +337,11 @@ services:
             - '@logger'
         tags:
             - { name: kernel.cache_warmer, priority: -2000 } # Warming caches for pages should be called at the end
+
+    oro_layout.twig.email_template_loader.layout_theme_template_loader:
+        class: Oro\Bundle\LayoutBundle\Twig\EmailTemplateLoader\LayoutThemeEmailTemplateLoader
+        arguments:
+            - []
+            - '%kernel.project_dir%'
+        tags:
+            - { name: oro_email.twig.email_template_loader, priority: 10 }

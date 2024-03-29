@@ -1,3 +1,9 @@
+<% let oroui = _.macros('oroui') %>
 <% if (visible) {%>
-    <button class="btn btn--size-small btn--no-padding" data-role="group-toggler" type="button"<% if (!enabled) {%> disabled<% } %> aria-label="<%- ariaLabel %>"><%- label %></button>
+    <button class="btn btn--no-padding btn--outlined btn--text" data-role="group-toggler" type="button"<% if (!enabled) {%> disabled<% } %> aria-label="<%- ariaLabel %>">
+        <%= oroui.renderIcon({
+            name: isGrouped ? 'ungroup' : 'group'
+        }) %>
+        <span class="hide-on-tablet-small"><%- label %></span>
+    </button>
 <% } %>

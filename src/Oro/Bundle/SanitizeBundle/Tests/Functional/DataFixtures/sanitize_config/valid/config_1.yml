@@ -1,0 +1,10 @@
+oro_sanitize:
+    raw_sqls:
+        - '-- Idle comment of "config_1.yml"'
+    entity:
+        test_sanitizable_entity:
+            raw_sqls:
+                - "-- This comment must not appear"
+            fields:
+                emailunguessable: email
+                phone_second: generic_phone

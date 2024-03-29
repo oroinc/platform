@@ -91,7 +91,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('process')
             ->with(
                 $expected,
-                null,
                 [
                     'transitionRecord' => $record,
                     'transitionUser' => $user

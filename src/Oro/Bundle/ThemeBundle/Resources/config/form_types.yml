@@ -1,0 +1,63 @@
+services:
+
+  ### FORM TYPES ###
+
+  oro_theme.form.type.configuration:
+    class: Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType
+    arguments:
+      - '@oro_theme.form.subscriber.theme_configuration'
+    tags:
+      - { name: form.type, alias: oro_theme_configuration }
+
+  oro_theme.form.type.configuration_children:
+    class: Oro\Bundle\ThemeBundle\Form\Type\ConfigurationType
+    arguments:
+      - '@oro_theme.form.configuration_child_provider'
+    tags:
+      - { name: form.type, alias: oro_theme_configuration_children }
+
+  oro_theme.form.type.theme_configuration_select:
+    class: Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationSelectType
+    tags:
+      - { name: form.type, alias: oro_theme_configuration_select }
+
+  oro_theme.form.content_block_transformer:
+    class: Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - Oro\Bundle\CMSBundle\Entity\ContentBlock
+      - id
+
+  ### CONFIGURATION CHILDREN BUILDER ###
+
+  _instanceof:
+    Oro\Bundle\ThemeBundle\Form\Configuration\ConfigurationChildBuilderInterface:
+      tags: [ 'oro_theme.form.configuration_child_builder' ]
+
+  oro_theme.form.select_option_builder:
+    class: Oro\Bundle\ThemeBundle\Form\Configuration\SelectBuilder
+
+  oro_theme.form.radio_option_builder:
+    class: Oro\Bundle\ThemeBundle\Form\Configuration\RadioBuilder
+
+  oro_theme.form.checkbox_option_builder:
+    class: Oro\Bundle\ThemeBundle\Form\Configuration\CheckboxBuilder
+
+  oro_theme.form.content_block_builder:
+    class: Oro\Bundle\ThemeBundle\Form\Configuration\ContentBlockBuilder
+    arguments:
+      - '@oro_theme.form.content_block_transformer'
+
+  oro_theme.form.menu_choice_builder:
+      class: Oro\Bundle\ThemeBundle\Form\Configuration\MenuChoiceBuilder
+
+  oro_theme.form.configuration_child_provider:
+      class: Oro\Bundle\ThemeBundle\Form\Provider\ConfigurationBuildersProvider
+      arguments:
+        - !tagged_iterator oro_theme.form.configuration_child_builder
+
+  ### SUBSCRIBERS ###
+  oro_theme.form.subscriber.theme_configuration:
+    class: Oro\Bundle\ThemeBundle\Form\EventListener\ThemeConfigurationSubscriber
+    arguments:
+      - '@oro_layout.theme_extension.configuration.provider'

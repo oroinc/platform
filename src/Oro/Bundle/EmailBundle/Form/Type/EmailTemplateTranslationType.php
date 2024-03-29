@@ -62,6 +62,7 @@ class EmailTemplateTranslationType extends AbstractType
                     'data-wysiwyg-enabled' => $options['wysiwyg_enabled'],
                 ],
                 'required' => false,
+                'wysiwyg_enabled' => $options['wysiwyg_enabled'],
                 'wysiwyg_options' => $options['wysiwyg_options'],
             ]);
 

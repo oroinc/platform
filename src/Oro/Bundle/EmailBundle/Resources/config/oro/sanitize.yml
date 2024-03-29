@@ -1,0 +1,30 @@
+oro_sanitize:
+    entity:
+        oro_email_attachment:
+            raw_sqls:
+                - |
+                    UPDATE oro_email_attachment SET file_name='test.jpg', content_type='image/jpeg'
+        oro_email:
+            fields:
+                subject: md5
+                from_name: md5
+        oro_email_origin:
+            fields:
+                imap_host: md5
+                imap_user: md5
+        oro_email_address:
+            fields:
+                email: email
+        oro_email_body:
+            fields:
+                body: md5
+                text_body: md5
+        oro_email_attachment_content:
+            raw_sqls:
+                - |
+                    UPDATE oro_email_attachment_content SET content_transfer_encoding = 'base64'
+            fields:
+                content: attachment
+        oro_email_recipient:
+            fields:
+                name: md5

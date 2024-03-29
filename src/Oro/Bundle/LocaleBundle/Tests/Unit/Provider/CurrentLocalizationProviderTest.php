@@ -2,20 +2,62 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
+use Gedmo\Translatable\TranslatableListener;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
-class CurrentLocalizationProviderTest extends \PHPUnit\Framework\TestCase
+class CurrentLocalizationProviderTest extends TestCase
 {
-    public function testGetCurrentLocalizationAndNoExtensions()
-    {
-        $provider = new CurrentLocalizationProvider([]);
+    private static string $defaultLocale;
 
-        $this->assertNull($provider->getCurrentLocalization());
+    private LocalizationManager|MockObject $localizationManager;
+
+    private LocaleAwareInterface|MockObject $translator;
+
+    private TranslatableListener|MockObject $translatableListener;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$defaultLocale = \Locale::getDefault();
     }
 
-    public function testGetCurrentLocalization()
+    public static function tearDownAfterClass(): void
+    {
+        \Locale::setDefault(self::$defaultLocale);
+    }
+
+    protected function setUp(): void
+    {
+        $this->localizationManager = $this->createMock(LocalizationManager::class);
+        $this->translator = $this->createMock(LocaleAwareInterface::class);
+        $this->translatableListener = $this->createMock(TranslatableListener::class);
+
+        \Locale::setDefault(self::$defaultLocale);
+    }
+
+    private function createProvider(array $extensions): CurrentLocalizationProvider
+    {
+        return new CurrentLocalizationProvider(
+            $extensions,
+            $this->localizationManager,
+            $this->translator,
+            $this->translatableListener
+        );
+    }
+
+    public function testGetCurrentLocalizationAndNoExtensions(): void
+    {
+        self::assertNull($this->createProvider([])->getCurrentLocalization());
+    }
+
+    public function testGetCurrentLocalization(): void
     {
         $localization = new Localization();
 
@@ -32,16 +74,12 @@ class CurrentLocalizationProviderTest extends \PHPUnit\Framework\TestCase
         $extension3->expects(self::never())
             ->method('getCurrentLocalization');
 
-        $provider = new CurrentLocalizationProvider([
-            $extension1,
-            $extension2,
-            $extension3
-        ]);
+        $provider = $this->createProvider([$extension1, $extension2, $extension3]);
 
-        $this->assertSame($localization, $provider->getCurrentLocalization());
+        self::assertSame($localization, $provider->getCurrentLocalization());
     }
 
-    public function testGetCurrentLocalizationWhenAllExtensionsDidNotReturnLocalization()
+    public function testGetCurrentLocalizationWhenAllExtensionsDidNotReturnLocalization(): void
     {
         $extension1 = $this->createMock(CurrentLocalizationExtensionInterface::class);
 
@@ -49,31 +87,149 @@ class CurrentLocalizationProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getCurrentLocalization')
             ->willReturn(null);
 
-        $provider = new CurrentLocalizationProvider([
-            $extension1
-        ]);
+        $provider = $this->createProvider([$extension1]);
 
-        $this->assertNull($provider->getCurrentLocalization());
+        self::assertNull($provider->getCurrentLocalization());
     }
 
-    public function testSetCurrentLocalization()
+    public function testSetCurrentLocalizationWithExplicitLocalization(): void
     {
-        $localization1 = new Localization();
-        $localization2 = new Localization();
+        $explicitLocalization = (new Localization())
+            ->setLanguage((new Language())->setCode('de'))
+            ->setFormattingCode('de_DE');
 
         $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
-        $extension->expects(self::once())
+        $extension
+            ->expects(self::never())
+            ->method('getCurrentLocalization');
+
+        $this->localizationManager
+            ->expects(self::never())
+            ->method('getDefaultLocalization');
+
+        $this->translator
+            ->expects(self::once())
+            ->method('setLocale')
+            ->with($explicitLocalization->getLanguageCode());
+
+        $this->translatableListener
+            ->expects(self::once())
+            ->method('setTranslatableLocale')
+            ->with($explicitLocalization->getLanguageCode());
+
+        $provider = $this->createProvider([$extension]);
+
+        self::assertEquals(self::$defaultLocale, \Locale::getDefault());
+
+        $provider->setCurrentLocalization($explicitLocalization);
+
+        self::assertSame($explicitLocalization, $provider->getCurrentLocalization());
+        self::assertEquals($explicitLocalization->getFormattingCode(), \Locale::getDefault());
+    }
+
+    public function testSetCurrentLocalizationWithNullWhenHasCurrentLocalization(): void
+    {
+        $currentLocalization = (new Localization())
+            ->setLanguage((new Language())->setCode('de'))
+            ->setFormattingCode('de_DE');
+
+        $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
+        $extension
+            ->expects(self::exactly(2))
             ->method('getCurrentLocalization')
-            ->willReturn($localization1);
+            ->willReturn($currentLocalization);
 
-        $provider = new CurrentLocalizationProvider([$extension]);
+        $this->localizationManager
+            ->expects(self::never())
+            ->method('getDefaultLocalization');
 
-        $provider->setCurrentLocalization($localization2);
-        $this->assertSame($localization2, $provider->getCurrentLocalization());
-        // test that the result is cached
-        $this->assertSame($localization2, $provider->getCurrentLocalization());
+        $this->translator
+            ->expects(self::once())
+            ->method('setLocale')
+            ->with($currentLocalization->getLanguageCode());
+
+        $this->translatableListener
+            ->expects(self::once())
+            ->method('setTranslatableLocale')
+            ->with($currentLocalization->getLanguageCode());
+
+        $provider = $this->createProvider([$extension]);
+
+        self::assertEquals(self::$defaultLocale, \Locale::getDefault());
 
         $provider->setCurrentLocalization(null);
-        $this->assertSame($localization1, $provider->getCurrentLocalization());
+
+        self::assertSame($currentLocalization, $provider->getCurrentLocalization());
+        self::assertEquals($currentLocalization->getFormattingCode(), \Locale::getDefault());
+    }
+
+    public function testSetCurrentLocalizationWithNullWhenNoCurrentLocalization(): void
+    {
+        $defaultLocalization = (new Localization())
+            ->setLanguage((new Language())->setCode('de'))
+            ->setFormattingCode('de_DE');
+
+        $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
+        $extension
+            ->expects(self::exactly(2))
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
+
+        $this->localizationManager
+            ->expects(self::once())
+            ->method('getDefaultLocalization')
+            ->willReturn($defaultLocalization);
+
+        $this->translator
+            ->expects(self::once())
+            ->method('setLocale')
+            ->with($defaultLocalization->getLanguageCode());
+
+        $this->translatableListener
+            ->expects(self::once())
+            ->method('setTranslatableLocale')
+            ->with($defaultLocalization->getLanguageCode());
+
+        $provider = $this->createProvider([$extension]);
+
+        self::assertEquals(self::$defaultLocale, \Locale::getDefault());
+
+        $provider->setCurrentLocalization(null);
+
+        self::assertNull($provider->getCurrentLocalization());
+        self::assertEquals($defaultLocalization->getFormattingCode(), \Locale::getDefault());
+    }
+
+    public function testSetCurrentLocalizationWithNullWhenNoDefaultLocalization(): void
+    {
+        $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
+        $extension
+            ->expects(self::exactly(2))
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
+
+        $this->localizationManager
+            ->expects(self::once())
+            ->method('getDefaultLocalization')
+            ->willReturn(null);
+
+        $this->translator
+            ->expects(self::once())
+            ->method('setLocale')
+            ->with(Configuration::DEFAULT_LANGUAGE);
+
+        $this->translatableListener
+            ->expects(self::once())
+            ->method('setTranslatableLocale')
+            ->with(Configuration::DEFAULT_LANGUAGE);
+
+        $provider = $this->createProvider([$extension]);
+
+        self::assertEquals(self::$defaultLocale, \Locale::getDefault());
+
+        $provider->setCurrentLocalization(null);
+
+        self::assertNull($provider->getCurrentLocalization());
+        self::assertEquals(Configuration::DEFAULT_LOCALE, \Locale::getDefault());
     }
 }

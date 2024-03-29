@@ -189,7 +189,7 @@ define(function(require, exports, module) {
                     .addClass(extraHeaderClass)
                     .attr('data-role', 'extra-header-container');
 
-                this.$extraHeaderContainer.insertBefore(this.widget);
+                this.$extraHeaderContainer.insertBefore($uiDialog.find('.ui-dialog-titlebar-buttonpane'));
             }
             if (messengerClass && !$uiDialog.find(`.${messengerClass}`).length) {
                 this.$messengerContainer = $('<div/>')

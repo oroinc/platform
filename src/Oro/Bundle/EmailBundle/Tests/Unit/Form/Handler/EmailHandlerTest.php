@@ -4,215 +4,214 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    private const FORM_DATA = ['field' => 'value'];
+    private FormFactoryInterface|MockObject $formFactory;
 
-    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private EmailModelSender|MockObject $emailModelSender;
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
+    private LoggerInterface|MockObject $logger;
 
-    /** @var EmailModelSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailModelSender;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EmailHandler */
-    private $handler;
+    private EmailHandler $handler;
 
     protected function setUp(): void
     {
-        $this->form = $this->createMock(Form::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->emailModelSender = $this->createMock(EmailModelSender::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->handler = new EmailHandler(
-            $this->form,
-            $this->requestStack,
+            $this->formFactory,
             $this->emailModelSender,
             $this->logger
         );
     }
 
-    public function testProcessGetRequest(): void
+    public function testCreateForm(): void
+    {
+        $options = ['sample_key' => 'sample_value'];
+        $emailModel = new EmailModel();
+        $form = $this->createMock(FormInterface::class);
+        $this->formFactory
+            ->expects(self::once())
+            ->method('createNamed')
+            ->with('oro_email_email', EmailType::class, $emailModel, $options)
+            ->willReturn($form);
+
+        self::assertSame($form, $this->handler->createForm($emailModel, $options));
+    }
+
+    public function testHandleRequestWhenNotSupportedMethod(): void
     {
         $request = new Request();
         $request->setMethod('GET');
 
-        $model = new Email();
-
-        $this->requestStack->expects(self::once())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-
-        $this->form->expects(self::once())
-            ->method('setData')
-            ->with($model);
-
-        $this->form->expects(self::never())
+        $form = $this->createMock(FormInterface::class);
+        $form
+            ->expects(self::never())
             ->method('submit');
 
-        self::assertFalse($this->handler->process($model));
+        $this->handler->handleRequest($form, $request);
     }
 
-    public function testProcessPostRequestWithInitParam(): void
+    public function testHandleRequestWhenSupportedMethodAndIsWidgetInit(): void
     {
         $request = new Request();
-        $request->initialize([], self::FORM_DATA);
         $request->setMethod('POST');
         $request->request->set('_widgetInit', true);
 
-        $model = new Email();
-
-        $this->requestStack->expects(self::once())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-
-        $this->form->expects(self::once())
-            ->method('setData')
-            ->with($model);
-
-        $this->form->expects(self::never())
+        $form = $this->createMock(FormInterface::class);
+        $form
+            ->expects(self::never())
             ->method('submit');
 
-        self::assertFalse($this->handler->process($model));
+        $this->handler->handleRequest($form, $request);
     }
 
     /**
-     * @dataProvider processData
+     * @dataProvider methodsDataProvider
      */
-    public function testProcessData(string $method, bool $valid, bool $assert): void
+    public function testHandleRequestWhenSupportedMethod(string $method): void
     {
         $request = new Request();
-        $request->initialize([], self::FORM_DATA);
+        $data = ['oro_email_email' => ['field' => 'value']];
+        $request->initialize([], $data);
         $request->setMethod($method);
 
-        $model = new Email();
-        $model
-            ->setFrom('from@example.com')
-            ->setTo(['to@example.com'])
-            ->setSubject('testSubject')
-            ->setBody('testBody');
-
-        $this->requestStack->expects(self::once())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-
-        $this->form->expects(self::once())
-            ->method('setData')
-            ->with($model);
-
-        if (in_array($method, ['POST', 'PUT'], true)) {
-            $this->form->expects(self::once())
-                ->method('submit')
-                ->with(self::FORM_DATA);
-
-            $this->form->expects(self::once())
-                ->method('isValid')
-                ->willReturn($valid);
-
-            if ($valid) {
-                $this->emailModelSender->expects(self::once())
-                    ->method('send')
-                    ->with(self::identicalTo($model))
-                    ->willReturnCallback(function (Email $model) {
-                        self::assertFalse($model->isUpdateEmptyContextsAllowed());
-
-                        return new EmailUser();
-                    });
-            } else {
-                $this->emailModelSender->expects(self::never())
-                    ->method('send');
-            }
-        }
-
-        self::assertEquals($assert, $this->handler->process($model));
-    }
-
-    /**
-     * @dataProvider methodsData
-     */
-    public function testProcessException(string $method): void
-    {
-        $request = new Request();
-        $request->initialize([], self::FORM_DATA);
-        $request->setMethod($method);
-
-        $model = new Email();
-        $model
-            ->setFrom('from@example.com')
-            ->setTo(['to@example.com'])
-            ->setSubject('testSubject')
-            ->setBody('testBody');
-
-        $this->requestStack->expects(self::once())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-
-        $this->form->expects(self::once())
-            ->method('setData')
-            ->with($model);
-
-        $this->form->expects(self::once())
+        $form = $this->createMock(FormInterface::class);
+        $form
+            ->method('getName')
+            ->willReturn('oro_email_email');
+        $form
+            ->expects(self::once())
             ->method('submit')
-            ->with(self::FORM_DATA);
+            ->with($data['oro_email_email']);
 
-        $this->form->expects(self::once())
-            ->method('isValid')
-            ->willReturn(true);
-
-        $exception = new \Exception('TEST');
-        $this->emailModelSender->expects(self::once())
-            ->method('send')
-            ->with(self::identicalTo($model))
-            ->willReturnCallback(function () use ($exception) {
-                throw $exception;
-            });
-
-        $this->logger->expects(self::once())
-            ->method('error')
-            ->with(
-                'Failed to send email model to to@example.com: TEST',
-                ['exception' => $exception, 'emailModel' => $model]
-            );
-        $this->form->expects(self::once())
-            ->method('addError')
-            ->with(self::isInstanceOf(FormError::class));
-
-        self::assertFalse($this->handler->process($model));
+        $this->handler->handleRequest($form, $request);
     }
 
-    public function processData(): array
-    {
-        return [
-            ['POST', true, true],
-            ['POST', false, false],
-            ['PUT', true, true],
-            ['PUT', false, false],
-            ['GET', true, false],
-            ['GET', false, false],
-            ['DELETE', true, false],
-            ['DELETE', false, false]
-        ];
-    }
-
-    public function methodsData(): array
+    public function methodsDataProvider(): array
     {
         return [
             ['POST'],
-            ['PUT']
+            ['PUT'],
         ];
+    }
+
+    public function testHandleFormSubmitWhenNotSubmitted(): void
+    {
+        $form = $this->createMock(FormInterface::class);
+        $form
+            ->expects(self::once())
+            ->method('isSubmitted')
+            ->willReturn(false);
+
+        self::assertFalse($this->handler->handleFormSubmit($form));
+    }
+
+    public function testHandleFormSubmitWhenSubmittedAndNotValid(): void
+    {
+        $form = $this->createMock(FormInterface::class);
+        $form
+            ->expects(self::once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $form
+            ->expects(self::once())
+            ->method('isValid')
+            ->willReturn(false);
+
+        self::assertFalse($this->handler->handleFormSubmit($form));
+    }
+
+    public function testHandleFormSubmitWhenSubmittedAndValid(): void
+    {
+        $form = $this->createMock(FormInterface::class);
+        $form
+            ->expects(self::once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $form
+            ->expects(self::once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $emailModel = new EmailModel();
+        $emailModel
+            ->setFrom('from@example.com')
+            ->setTo(['to@example.com'])
+            ->setSubject('testSubject')
+            ->setBody('testBody');
+
+        $form
+            ->expects(self::once())
+            ->method('getData')
+            ->willReturn($emailModel);
+
+        $this->emailModelSender->expects(self::once())
+            ->method('send')
+            ->with(self::identicalTo($emailModel))
+            ->willReturnCallback(static function (EmailModel $model) {
+                self::assertFalse($model->isUpdateEmptyContextsAllowed());
+
+                return new EmailUser();
+            });
+
+        self::assertTrue($this->handler->handleFormSubmit($form));
+    }
+
+    public function testHandleFormSubmitWhenException(): void
+    {
+        $form = $this->createMock(FormInterface::class);
+        $form
+            ->expects(self::once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $form
+            ->expects(self::once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $emailModel = new EmailModel();
+        $emailModel
+            ->setFrom('from@example.com')
+            ->setTo(['to@example.com'])
+            ->setSubject('testSubject')
+            ->setBody('testBody');
+
+        $form
+            ->expects(self::once())
+            ->method('getData')
+            ->willReturn($emailModel);
+
+        $exception = new \Exception('Sample error');
+        $this->emailModelSender->expects(self::once())
+            ->method('send')
+            ->with(self::identicalTo($emailModel))
+            ->willThrowException($exception);
+
+        $this->logger
+            ->expects(self::once())
+            ->method('error')
+            ->with(
+                'Failed to send email model to {email_addresses}: {message}',
+                [
+                    'email_addresses' => implode(', ', $emailModel->getTo()),
+                    'message' => $exception->getMessage(),
+                    'email_model' => $emailModel,
+                    'exception' => $exception,
+                ]
+            );
+
+        self::assertFalse($this->handler->handleFormSubmit($form));
     }
 }

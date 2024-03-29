@@ -13,7 +13,7 @@ const TogglePaginationView = BaseView.extend({
 
     grid: null,
 
-    className: 'datagrid-toggle-group datagrid-divider',
+    className: 'datagrid-toggle-group',
 
     defaultGroupState: false, // ungrouped by default
 
@@ -66,7 +66,8 @@ const TogglePaginationView = BaseView.extend({
             enabled: this.enabled,
             visible: this.isVisible(),
             label: __(`${translationPrefix}.label`),
-            ariaLabel: __(`${translationPrefix}.aria_label`)
+            ariaLabel: __(`${translationPrefix}.aria_label`),
+            isGrouped
         };
     },
 

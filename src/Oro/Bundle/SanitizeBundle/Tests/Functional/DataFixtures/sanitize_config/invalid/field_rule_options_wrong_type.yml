@@ -1,0 +1,7 @@
+oro_sanitize:
+    entity:
+        test_sanitizable_entity:
+            fields:
+                phone:
+                    rule: digits_mask
+                    rule_options: 'option'

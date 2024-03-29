@@ -1,0 +1,4 @@
+oro_sanitize:
+    entity:
+        oro_navigation_pagestate: truncate_cascade
+        oro_navigation_history: truncate

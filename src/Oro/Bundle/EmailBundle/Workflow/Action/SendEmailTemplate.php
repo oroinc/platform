@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\From;
-use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
+use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -15,18 +15,18 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class SendEmailTemplate extends AbstractSendEmailTemplate
 {
-    private AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender;
+    private EmailTemplateSender $emailTemplateSender;
 
     public function __construct(
         ContextAccessor $contextAccessor,
         ValidatorInterface $validator,
         EmailAddressHelper $emailAddressHelper,
         EntityNameResolver $entityNameResolver,
-        AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender
+        EmailTemplateSender $emailTemplateSender
     ) {
         parent::__construct($contextAccessor, $validator, $emailAddressHelper, $entityNameResolver);
 
-        $this->aggregatedEmailTemplatesSender = $aggregatedEmailTemplatesSender;
+        $this->emailTemplateSender = $emailTemplateSender;
     }
 
     /**
@@ -44,12 +44,14 @@ class SendEmailTemplate extends AbstractSendEmailTemplate
 
         $entity = $this->contextAccessor->getValue($context, $this->options['entity']);
 
-        $emailUsers = $this->aggregatedEmailTemplatesSender->send(
-            $entity,
-            $this->getRecipients($context, $this->options),
-            From::emailAddress($from),
-            $templateName
-        );
+        foreach ($this->getRecipients($context, $this->options) as $recipient) {
+            $emailUsers[] = $this->emailTemplateSender->sendEmailTemplate(
+                From::emailAddress($from),
+                $recipient,
+                $templateName,
+                ['entity' => $entity]
+            );
+        }
 
         $emailUser = reset($emailUsers);
         if (array_key_exists('attribute', $this->options) && $emailUser instanceof EmailUser) {

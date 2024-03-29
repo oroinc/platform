@@ -7,24 +7,14 @@ namespace Oro\Bundle\EmailBundle\Model;
  */
 interface EmailTemplateInterface
 {
-    /**
-     * Gets email template type
-     *
-     * @return string
-     */
-    public function getType();
+    public const TYPE_HTML = 'html';
+    public const TYPE_TEXT = 'txt';
 
-    /**
-     * Gets email subject
-     *
-     * @return string
-     */
-    public function getSubject();
+    public function getName(): ?string;
 
-    /**
-     * Gets email template content
-     *
-     * @return string
-     */
-    public function getContent();
+    public function getType(): ?string;
+
+    public function getSubject(): ?string;
+
+    public function getContent(): ?string;
 }

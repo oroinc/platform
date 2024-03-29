@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\ORM\NoResultException;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
@@ -74,7 +73,10 @@ class EmailTemplateRepositoryTest extends WebTestCase
             $this->getMainEmailTemplateByName('system_maintenance')->getId(),
         ];
 
-        self::assertEquals($expectedIds, $this->getEntitiesIds($actualResult));
+        $actualIds = $this->getEntitiesIds($actualResult);
+        foreach ($expectedIds as $emailTemplateId) {
+            self::assertContains($emailTemplateId, $actualIds);
+        }
     }
 
     /**
@@ -330,10 +332,8 @@ class EmailTemplateRepositoryTest extends WebTestCase
         self::assertEmpty($actualEmailTemplates);
     }
 
-    public function testFindOneLocalizedWhenNoResult(): void
+    public function testFindWithLocalizationsWhenNoResult(): void
     {
-        $this->expectException(NoResultException::class);
-
         $this->loadFixtures([LoadLocalizedEmailTemplateData::class]);
 
         self::assertNull($this->getRepository()->findWithLocalizations(
@@ -341,7 +341,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
         ));
     }
 
-    public function testFindOneLocalizedWithFrenchAsCurrentLanguage(): void
+    public function testFindWithLocalizationsWithFrenchAsCurrentLanguage(): void
     {
         $this->loadFixtures([LoadLocalizedEmailTemplateData::class]);
 
@@ -353,7 +353,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
         self::assertEquals(LoadLocalizedEmailTemplateData::FRENCH_LOCALIZED_CONTENT, $emailTemplate->getContent());
     }
 
-    public function testFindOneLocalizedWhenNoEntityName(): void
+    public function testFindWithLocalizationsWhenNoEntityName(): void
     {
         $this->loadFixtures([LoadLocalizedEmailTemplateData::class]);
 
@@ -363,6 +363,29 @@ class EmailTemplateRepositoryTest extends WebTestCase
 
         self::assertEquals(LoadLocalizedEmailTemplateData::FRENCH_LOCALIZED_SUBJECT, $emailTemplate->getSubject());
         self::assertEquals(LoadLocalizedEmailTemplateData::FRENCH_LOCALIZED_CONTENT, $emailTemplate->getContent());
+    }
+
+    public function testFindWithLocalizationsWhenContextParameters(): void
+    {
+        $this->loadFixtures([LoadLocalizedEmailTemplateData::class]);
+
+        $criteria = new EmailTemplateCriteria('no_entity_localized_template');
+        $emailTemplate = $this->getRepository()->findWithLocalizations(
+            $criteria,
+            ['missingField' => 'sampleValue', 'isVisible' => false]
+        );
+
+        self::assertEquals(LoadLocalizedEmailTemplateData::FRENCH_LOCALIZED_SUBJECT, $emailTemplate->getSubject());
+        self::assertEquals(LoadLocalizedEmailTemplateData::FRENCH_LOCALIZED_CONTENT, $emailTemplate->getContent());
+        self::assertFalse($emailTemplate->isVisible());
+    }
+
+    public function testFindWithLocalizationsWhenContextParametersAndNothingFound(): void
+    {
+        $this->loadFixtures([LoadLocalizedEmailTemplateData::class]);
+
+        $criteria = new EmailTemplateCriteria('no_entity_localized_template');
+        self::assertNull($this->getRepository()->findWithLocalizations($criteria, ['visible' => true]));
     }
 
     public function testIsExistFalse()

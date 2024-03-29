@@ -1,0 +1,4 @@
+oro_sanitize:
+    entity:
+        oro_integration_fields_changes: truncate
+        oro_integration_channel_status: truncate

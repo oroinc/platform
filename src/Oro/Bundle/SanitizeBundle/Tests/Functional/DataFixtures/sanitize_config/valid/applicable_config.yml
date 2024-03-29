@@ -1,0 +1,8 @@
+# This configuration is needed to check set null rule processing
+# The rest rules are guessed and pointed in sanitizable entity's config
+oro_sanitize:
+    entity:
+        test_sanitizable_entity:
+            fields:
+                state_data: set_null
+                first_custom_field: set_null

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\NotificationBundle\Async;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
+use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -29,12 +30,12 @@ class SendEmailNotificationTemplateProcessor implements
 
     private ManagerRegistry $managerRegistry;
 
-    private EmailTemplateManager $emailTemplateManager;
+    private EmailNotificationManager $emailNotificationManager;
 
-    public function __construct(ManagerRegistry $managerRegistry, EmailTemplateManager $emailTemplateManager)
+    public function __construct(ManagerRegistry $managerRegistry, EmailNotificationManager $emailNotificationManager)
     {
         $this->managerRegistry = $managerRegistry;
-        $this->emailTemplateManager = $emailTemplateManager;
+        $this->emailNotificationManager = $emailNotificationManager;
         $this->logger = new NullLogger();
     }
 
@@ -50,17 +51,15 @@ class SendEmailNotificationTemplateProcessor implements
             return self::REJECT;
         }
 
-        $sentCount = $this->emailTemplateManager
-            ->sendTemplateEmail(
-                From::emailAddress($messageBody['from']),
-                [$recipient],
+        $this->emailNotificationManager->processSingle(
+            new TemplateEmailNotification(
                 new EmailTemplateCriteria($messageBody['template'], $messageBody['templateEntity']),
-                $messageBody['templateParams']
-            );
-
-        if (!$sentCount) {
-            return self::REJECT;
-        }
+                [$recipient],
+                null,
+                From::emailAddress($messageBody['from'])
+            ),
+            $messageBody['templateParams']
+        );
 
         return self::ACK;
     }

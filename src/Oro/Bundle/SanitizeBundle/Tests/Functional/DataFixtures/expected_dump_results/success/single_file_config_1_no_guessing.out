@@ -1,0 +1,6 @@
+-- Idle comment of "config_1.yml"
+-- Idle comment for 'TestSanitizable' entity
+UPDATE "test_sanitizable_entity" SET "emailunguessable"=CASE WHEN POSITION('@' IN "emailunguessable")>0 THEN CONCAT(SUBSTRING("emailunguessable", 1, POSITION('@' IN "emailunguessable")-1), id, '@', MD5(SUBSTRING("emailunguessable", POSITION('@' IN "emailunguessable")+1)), '.test') ELSE "emailunguessable" END;
+UPDATE "test_sanitizable_entity" SET "phone"=CASE WHEN "phone" IS NOT NULL THEN to_char(random() * 10000000000, 'FM"1 800 "000"-"000"-"0000"') END;
+UPDATE "test_sanitizable_entity" SET "phone_second"=CASE WHEN "phone_second" IS NOT NULL THEN to_char(random() * 10000000000, 'FM"("000") "000"-"0000"') END;
+UPDATE "test_sanitizable_entity" SET serialized_data = serialized_data || jsonb_build_object('custom_event_date', CURRENT_TIMESTAMP(0), 'phone_third', CASE WHEN serialized_data->>'phone_third' IS NOT NULL THEN to_char(random() * 10000000000, 'FM"("000") "000"-"0000"') END);

@@ -1,0 +1,5 @@
+oro_sanitize:
+    entity:
+        test_sanitizable_entity:
+            rule: truncate
+            rule_options: 'option'

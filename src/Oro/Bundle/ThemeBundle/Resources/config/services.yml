@@ -14,3 +14,48 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+
+    oro_theme.chain_configuration_validator:
+        class: Oro\Bundle\ThemeBundle\Validator\ChainConfigurationValidator
+        arguments:
+            - '@oro_layout.theme_extension.configuration.provider'
+            - !tagged_iterator oro_theme.configuration_validator
+
+    oro_theme.definition_configuration_validator:
+        class: Oro\Bundle\ThemeBundle\Validator\DefinitionConfigurationValidator
+        arguments:
+            - '@oro_layout.theme_extension.configuration'
+        tags:
+            - { name: oro_theme.configuration_validator, alias: oro_theme_definition_configuration_validator }
+
+    oro_theme.preview_configuration_validator:
+        class: Oro\Bundle\ThemeBundle\Validator\PreviewConfigurationValidator
+        tags:
+            - { name: oro_theme.configuration_validator, alias: oro_theme_preview_configuration_validator }
+
+    oro_theme.form.autocomplete.theme_configuration.search_handler:
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - 'Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration'
+            - ['name']
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType, acl_resource: oro_theme_configuration_view }
+
+    oro_theme.event_listener.system_config.configuration:
+        class: Oro\Bundle\ConfigBundle\EventListener\EntitySystemConfigListener
+        arguments:
+            - '@doctrine'
+            - 'Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration'
+            - 'oro_theme.theme_configuration'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.settings_form_preset, method: onFormPreSetData }
+            - { name: kernel.event_listener, event: oro_config.settings_before_save, method: onSettingsSaveBefore }
+
+    oro_theme.provider.theme_configuration:
+        class: Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider
+        arguments:
+            - '@oro_config.manager'
+            - '@doctrine'
+
+    Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider:
+        alias: oro_theme.provider.theme_configuration

@@ -1,0 +1,10 @@
+oro_sanitize:
+    entity:
+        oro_notification_mass_notif:
+            fields:
+                email: email
+                sender: md5
+        oro_notification_recip_list:
+            fields:
+                email: email
+                entity_emails: set_null

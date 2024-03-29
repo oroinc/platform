@@ -1,0 +1,6 @@
+oro_sanitize:
+    entity:
+        test_sanitizable_entity:
+            fields:
+                phone:
+                    raw_sqls: '-- Idle comment'

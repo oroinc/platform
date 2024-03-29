@@ -1,5 +1,6 @@
 <% var selectorId = _.uniqueId('selector-'); %>
 <% var criteriaId = _.uniqueId('criteria-'); %>
+<% let oroui = _.macros('oroui') %>
 <div class="filter-item" data-filter-wrapper-template>
     <%
         var criteriaClasses = 'filter-criteria-selector';
@@ -18,10 +19,14 @@
         aria-controls="<%- criteriaId %>"
     <% } %>
     >
-        <% if (showLabel) { %><span class="filter-item-label"><%- label %></span><% } %><span class="filter-item-hint"></span>
-        <span class="filter-criteria-selector-icon-wrap" aria-hidden="true">
-            <span class="filter-criteria-selector-icon"></span>
-        </span>
+        <% if (renderMode === 'toggle-mode') { %>
+            <%= oroui.renderIcon({
+                name: 'chevron-down',
+                extraClass: 'filter-criteria-selector-icon'
+            }) %>
+        <% } %>
+        <% if (showLabel) { %><span class="filter-item-label"><%- label %></span><% } %>
+        <span class="filter-item-hint"></span>
     </button>
     <div id="<%- criteriaId %>" class="filter-criteria <% if (renderMode !== 'toggle-mode') { %>dropdown-menu<% } %>" aria-labelledby="<%- selectorId %>"></div>
 </div>

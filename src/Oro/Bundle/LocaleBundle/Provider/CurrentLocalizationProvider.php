@@ -2,34 +2,47 @@
 
 namespace Oro\Bundle\LocaleBundle\Provider;
 
+use Gedmo\Translatable\TranslatableListener;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
  * Provides localization depending on extension set and executed
  */
 class CurrentLocalizationProvider implements LocalizationProviderInterface
 {
-    /** @var iterable|CurrentLocalizationExtensionInterface[] */
-    private $extensions;
+    /** @var iterable<CurrentLocalizationExtensionInterface> */
+    private iterable $extensions;
 
-    /** @var Localization|null|bool */
-    private $currentLocalization = false;
+    private LocalizationManager $localizationManager;
+
+    private LocaleAwareInterface $translator;
+
+    private TranslatableListener $translatableListener;
+
+    private ?Localization $currentLocalization = null;
 
     /**
-     * @param iterable|CurrentLocalizationExtensionInterface[] $extensions
+     * @param iterable<CurrentLocalizationExtensionInterface> $extensions
      */
-    public function __construct(iterable $extensions)
-    {
+    public function __construct(
+        iterable $extensions,
+        LocalizationManager $localizationManager,
+        LocaleAwareInterface $translator,
+        TranslatableListener $translatableListener
+    ) {
         $this->extensions = $extensions;
+        $this->localizationManager = $localizationManager;
+        $this->translator = $translator;
+        $this->translatableListener = $translatableListener;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCurrentLocalization()
+    public function getCurrentLocalization(): ?Localization
     {
-        if (false !== $this->currentLocalization) {
+        if (null !== $this->currentLocalization) {
             return $this->currentLocalization;
         }
 
@@ -39,6 +52,8 @@ class CurrentLocalizationProvider implements LocalizationProviderInterface
                 return $localization;
             }
         }
+
+        return null;
     }
 
     /**
@@ -47,6 +62,22 @@ class CurrentLocalizationProvider implements LocalizationProviderInterface
      */
     public function setCurrentLocalization(?Localization $localization): void
     {
-        $this->currentLocalization = $localization ?? false;
+        $this->currentLocalization = $localization;
+
+        $localization = $localization
+            ?? $this->getCurrentLocalization()
+            ?? $this->localizationManager->getDefaultLocalization();
+
+        if ($localization) {
+            $languageCode = $localization->getLanguageCode();
+            $localeCode = $localization->getFormattingCode();
+        } else {
+            $languageCode = Configuration::DEFAULT_LANGUAGE;
+            $localeCode = Configuration::DEFAULT_LOCALE;
+        }
+
+        \Locale::setDefault($localeCode);
+        $this->translatableListener->setTranslatableLocale($languageCode);
+        $this->translator->setLocale($languageCode);
     }
 }

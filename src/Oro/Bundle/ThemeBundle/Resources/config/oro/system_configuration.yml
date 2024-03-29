@@ -1,0 +1,11 @@
+system_configuration:
+    fields:
+        oro_theme.theme_configuration:
+            data_type: integer
+            type: Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationSelectType
+            priority: 100
+            options:
+                label: oro.theme.system_configuration.fields.theme_configuration.label
+                required: true
+                constraints:
+                    - NotBlank: ~

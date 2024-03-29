@@ -24,6 +24,13 @@ services:
             - { name: container.service_subscriber, id: oro_email.form.handler.email, key: Oro\Bundle\EmailBundle\Form\Handler\EmailHandler }
             - { name: container.service_subscriber, id: oro_email.provider.smtp_settings, key: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProviderInterface }
 
+    Oro\Bundle\EmailBundle\Controller\AjaxEmailController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_email.form.handler.email, key: Oro\Bundle\EmailBundle\Form\Handler\EmailHandler }
+
     Oro\Bundle\EmailBundle\Controller\EmailTemplateController:
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]

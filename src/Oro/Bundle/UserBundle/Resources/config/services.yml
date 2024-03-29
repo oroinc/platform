@@ -350,7 +350,7 @@ services:
         lazy: true
         arguments:
             - '@oro_notification.model.notification_settings'
-            - '@oro_email.manager.template_email'
+            - '@oro_email.sender.email_template_sender'
 
     oro_user.placeholder.filter:
         class: Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter

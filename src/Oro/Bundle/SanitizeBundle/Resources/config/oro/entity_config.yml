@@ -1,0 +1,12 @@
+entity_config:
+    sanitize:
+        entity:
+            items:
+                raw_sqls: ~
+                rule: ~
+                rule_options: ~
+        field:
+            items:
+                raw_sqls: ~
+                rule: ~
+                rule_options: ~

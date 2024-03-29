@@ -1,0 +1,5 @@
+oro_sanitize:
+    entity:
+        oro_activity_list:
+            fields:
+                description: md5

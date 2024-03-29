@@ -7,75 +7,130 @@ namespace Oro\Bundle\EmailBundle\Model;
  */
 class EmailTemplate implements EmailTemplateInterface
 {
-    public const CONTENT_TYPE_HTML = 'text/html';
-    public const CONTENT_TYPE_TEXT = 'text/plain';
+    protected ?string $name;
+
+    protected ?string $type = EmailTemplateInterface::TYPE_HTML;
+
+    protected ?string $entityName = null;
+
+    protected ?string $subject = '';
+
+    protected ?string $content = '';
+
+    public function __construct(
+        string $name = '',
+        string $content = '',
+        string $type = EmailTemplateInterface::TYPE_HTML
+    ) {
+        $this->name = $name;
+        $this->type = $type;
+
+        $this->fillFromContent($content);
+    }
+
+    public static function createFromContent(string $content): self
+    {
+        $emailTemplate = new self();
+        $emailTemplate->fillFromContent($content);
+
+        return $emailTemplate;
+    }
+
+    protected function fillFromContent(string $content): void
+    {
+        ['content' => $parsedContent, 'params' => $params] = self::parseContent($content);
+
+        $this->content = $parsedContent;
+
+        foreach ($params as $param => $val) {
+            if (property_exists($this, $param)) {
+                $this->$param = $val;
+            }
+        }
+    }
 
     /**
-     * @var string
+     * @param string $content
+     *
+     * @return array{content: string, params: array<string,string|bool>}
      */
-    private $type;
+    public static function parseContent(string $content): array
+    {
+        $params = [];
 
-    /**
-     * @var string
-     */
-    private $subject;
+        if (preg_match_all('#(?:\{\#\s*)?@(?P<name>.+?)\s?=\s?(?P<value>.*?)(?:\s*\#\})?\n#i', $content, $matches)) {
+            foreach ($matches[0] as $i => $match) {
+                $name = trim($matches['name'][$i]);
+                $value = trim($matches['value'][$i]);
+                if (str_starts_with($name, 'is')) {
+                    $value = (bool)$value;
+                }
 
-    /**
-     * @var string
-     */
-    private $content;
+                $params[$name] = $value;
+                $content = trim(str_replace($match, '', $content));
+            }
+        }
 
-    /**
-     * @inheritdoc
-     */
-    public function getType()
+        return [
+            'content' => $content,
+            'params' => $params,
+        ];
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSubject()
-    {
-        return $this->subject;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    /**
-     * @param string $type
-     * @return EmailTemplate
-     */
-    public function setType($type)
+    public function setType(?string $type): self
     {
         $this->type = $type;
 
         return $this;
     }
 
-    /**
-     * @param string $subject
-     * @return EmailTemplate
-     */
-    public function setSubject($subject)
+    public function getEntityName(): ?string
+    {
+        return $this->entityName;
+    }
+
+    public function setEntityName(?string $entityName): self
+    {
+        $this->entityName = $entityName;
+
+        return $this;
+    }
+
+    public function getSubject(): ?string
+    {
+        return $this->subject;
+    }
+
+    public function setSubject(?string $subject): self
     {
         $this->subject = $subject;
 
         return $this;
     }
 
-    /**
-     * @param string $content
-     * @return EmailTemplate
-     */
-    public function setContent($content)
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(?string $content): self
     {
         $this->content = $content;
 
