@@ -236,7 +236,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritDoc}
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return $this->salt;
     }
