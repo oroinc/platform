@@ -82,7 +82,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritDoc}
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return 'salt';
     }
