@@ -10,11 +10,18 @@ The current file describes significant changes in the code that may affect the u
 * Removed support of `{@feature}` placeholder in API documentation. It was done because API documentation should not
   depend on the application configuration changes made by users.
 
+#### EmailBundle
+* Decomposed `\Oro\Bundle\EmailBundle\Provider\EmailRenderer`, made it as an entry point to render an email template.
+  * Added `\Oro\Bundle\EmailBundle\Event\EmailTemplateRenderBeforeEvent` and `\Oro\Bundle\EmailBundle\Event\EmailTemplateRenderAfterEvent`
+* Decomposed `\Oro\Bundle\EmailBundle\Form\Type\EmailType` into `\Oro\Bundle\EmailBundle\Form\EventListener\EmailTemplateRenderingSubscriber` to move the email template rendering responsibility to the form subscriber.
+* Changed `\Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture` to make it ensure that an email template name is equal to its file name.
+
 #### EntityBundle
 * Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider/))
   - method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`
   - method `getPathByPropertyPath` renamed to `getPathByRelativePropertyPath`
   - method `getPathByPropertyPathSafely` renamed to `getPathByRelativePropertyPathSafely`
+* Decomposed `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer` into separate processors and factories. Moved the TWIG sandbox configuration out of its responsibility.
 
 #### FormBundle
 * Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorview))
@@ -22,10 +29,22 @@ The current file describes significant changes in the code that may affect the u
   * made it descendant of `BaseClass`
   * changed options format
 
+#### LocaleBundle
+* Updated `\Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider::setCurrentLocalization` to make it additionally switch localization, language, locale in `\Locale`, `\Gedmo\Translatable\TranslatableListener` and Symfony translator.
+
 #### QueryDesignerBundle
 * JS `*-filter-initialized` modules, defined over `init_module` option in filter configuration, now expected to export a sync callback function
 
 ### Added
+
+#### EmailBundle
+* Added the email template inheritance feature that provides an ability to extend an email template from parent one.
+* Added `oro_email.email_template_wysiwyg_enabled` system config setting allowing to toggle WYSIWYG an Email Template create/edit page. Now WYSIWYG is turned off by default. It is not recommended to turn it on if you are using the email template inheritance feature as it may break template syntax.
+* Added `\Oro\Bundle\EmailBundle\Provider\RenderedEmailTemplateProvider` as an entry point to get a rendered email template by criteria.
+* Added `\Oro\Bundle\EmailBundle\Sender\EmailTemplateSender` as an entry point to render email template and send it to recipients.
+* Added `\Oro\Bundle\EmailBundle\Factory\EmailModelFromEmailTemplateFactory` as an entry point to render an email template and create an email model ready to be sent.
+* Added `\Oro\Bundle\EmailBundle\Provider\EmailTemplateContextProvider` that dispatches `\Oro\Bundle\EmailBundle\Event\EmailTemplateContextCollectEvent` to collect email template context (e.g. localization) needed for its searching and rendering.
+* Added `\Oro\Bundle\EmailBundle\Controller\AjaxEmailController::compileEmailAction` to use it for email template rendering instead of `\Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::getCompiledAction` in a Compose Email dialog.
 
 #### EntityBundle
 * Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#get-entitytreenode-by-property-path))
@@ -35,6 +54,7 @@ The current file describes significant changes in the code that may affect the u
 #### FormBundle
 * Added JS `ExpressionEditorComponent` (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor#expressioneditorcomponent) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
   expression-editor-component.js
+* Added `\Oro\Bundle\FormBundle\Validator\Constraints\UniqueEntity` validation constraint and validator.
 
 #### UIBundle
 * Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
@@ -42,6 +62,18 @@ The current file describes significant changes in the code that may affect the u
 
 #### CurrencyBundle
 * Added supporting of the `readonly` attribute in `\Oro\Bundle\CurrencyBundle\Form\Type\PriceType`.
+
+### Removed
+
+#### EmailBundle
+* Removed `\Oro\Bundle\EmailBundle\Manager\EmailTemplateManager`, use instead `\Oro\Bundle\EmailBundle\Sender\EmailTemplateSender`.
+* Removed `\Oro\Bundle\EmailBundle\Tools\EmailTemplateSerializer`, use instead `\Oro\Bundle\EmailBundle\Sender\EmailTemplateSender`.
+* Removed `\Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider` use instead `\Oro\Bundle\EmailBundle\Provider\EmailTemplateProvider` and `\Oro\Bundle\EmailBundle\Provider\TranslatedEmailTemplateProvider`.
+* Removed `\Oro\Bundle\EmailBundle\Provider\\Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider`, use instead `\Oro\Bundle\EmailBundle\Provider\RenderedEmailTemplateProvider`.
+
+#### NotificationBundle
+* Removed `\Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender`, use instead `\Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager`.
+* Removed unused `\Oro\Bundle\NotificationBundle\Model\EmailTemplate`, use instead `\Oro\Bundle\EmailBundle\Model\EmailTemplate`.
 
 ## Changes in the Platform package versions
 
