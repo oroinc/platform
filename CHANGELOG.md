@@ -2,50 +2,9 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## UNRELEASED
-
-### Changed
-
-#### ApiBundle
-* Removed support of `{@feature}` placeholder in API documentation. It was done because API documentation should not
-  depend on the application configuration changes made by users.
-
-#### EntityBundle
-* Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider/))
-  - method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`
-  - method `getPathByPropertyPath` renamed to `getPathByRelativePropertyPath`
-  - method `getPathByPropertyPathSafely` renamed to `getPathByRelativePropertyPathSafely`
-
-#### FormBundle
-* Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorview))
-* Refactored `ExpressionEditorUtil` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/FormBundle/Resources/public/js/expression-editor-util.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorutil))
-  * made it descendant of `BaseClass`
-  * changed options format
-
-#### QueryDesignerBundle
-* JS `*-filter-initialized` modules, defined over `init_module` option in filter configuration, now expected to export a sync callback function
-
-### Added
-
-#### EntityBundle
-* Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#get-entitytreenode-by-property-path))
-* Added magic property `entityTree` to `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#entity-tree)) that allows walk through entity fields tree
-* Added JS `EntityTreeNode` that is used in `EntityStructureDataProvider`
-
-#### FormBundle
-* Added JS `ExpressionEditorComponent` (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor#expressioneditorcomponent) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
-  expression-editor-component.js
-
-#### UIBundle
-* Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
-  rendering WYSIWYG content in backoffice.
-
-#### CurrencyBundle
-* Added supporting of the `readonly` attribute in `\Oro\Bundle\CurrencyBundle\Form\Type\PriceType`.
-
 ## Changes in the Platform package versions
 
-- [6.0.0-RC](#600-rc-2024-02-29)
+- [6.0.0](#600-2024-03-30)
 - [5.1.0](#510-2023-03-31)
 - [5.0.0](#500-2022-01-26)
 - [4.2.10](#4210)
@@ -64,8 +23,8 @@ The current file describes significant changes in the code that may affect the u
 - [2.2.0](#220-2017-05-31)
 - [2.1.0](#210-2017-03-30)
 
-## 6.0.0-RC (2024-02-29)
-[Show detailed list of changes](incompatibilities-6-0-rc.md)
+## 6.0.0 (2024-03-30)
+[Show detailed list of changes](incompatibilities-6-0.md)
 
 ### Security Changes
 
@@ -235,7 +194,62 @@ api:
 #### PlatformBundle
 * Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option.
 
+#### EmailBundle
+* Added the email template inheritance feature that provides an ability to extend an email template from parent one.
+* Added `oro_email.email_template_wysiwyg_enabled` system config setting allowing to toggle WYSIWYG an Email Template create/edit page. Now WYSIWYG is turned off by default. It is not recommended to turn it on if you are using the email template inheritance feature as it may break template syntax.
+* Added `\Oro\Bundle\EmailBundle\Provider\RenderedEmailTemplateProvider` as an entry point to get a rendered email template by criteria.
+* Added `\Oro\Bundle\EmailBundle\Sender\EmailTemplateSender` as an entry point to render email template and send it to recipients.
+* Added `\Oro\Bundle\EmailBundle\Factory\EmailModelFromEmailTemplateFactory` as an entry point to render an email template and create an email model ready to be sent.
+* Added `\Oro\Bundle\EmailBundle\Provider\EmailTemplateContextProvider` that dispatches `\Oro\Bundle\EmailBundle\Event\EmailTemplateContextCollectEvent` to collect email template context (e.g. localization) needed for its searching and rendering.
+* Added `\Oro\Bundle\EmailBundle\Controller\AjaxEmailController::compileEmailAction` to use it for email template rendering instead of `\Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::getCompiledAction` in a Compose Email dialog.
+
+#### EntityBundle
+* Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#get-entitytreenode-by-property-path))
+* Added magic property `entityTree` to `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#entity-tree)) that allows walk through entity fields tree
+* Added JS `EntityTreeNode` that is used in `EntityStructureDataProvider`
+
+#### FormBundle
+* Added JS `ExpressionEditorComponent` (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor#expressioneditorcomponent) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
+  expression-editor-component.js
+* Added `\Oro\Bundle\FormBundle\Validator\Constraints\UniqueEntity` validation constraint and validator.
+
+#### UIBundle
+* Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
+  rendering WYSIWYG content in backoffice.
+
+#### CurrencyBundle
+* Added supporting of the `readonly` attribute in `\Oro\Bundle\CurrencyBundle\Form\Type\PriceType`.
+
 ### Changed
+
+#### ApiBundle
+* Removed support of `{@feature}` placeholder in API documentation. It was done because API documentation should not
+  depend on the application configuration changes made by users.
+
+#### EmailBundle
+* Decomposed `\Oro\Bundle\EmailBundle\Provider\EmailRenderer`, made it as an entry point to render an email template.
+  * Added `\Oro\Bundle\EmailBundle\Event\EmailTemplateRenderBeforeEvent` and `\Oro\Bundle\EmailBundle\Event\EmailTemplateRenderAfterEvent`
+* Decomposed `\Oro\Bundle\EmailBundle\Form\Type\EmailType` into `\Oro\Bundle\EmailBundle\Form\EventListener\EmailTemplateRenderingSubscriber` to move the email template rendering responsibility to the form subscriber.
+* Changed `\Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture` to make it ensure that an email template name is equal to its file name.
+
+#### EntityBundle
+* Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider/))
+  - method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`
+  - method `getPathByPropertyPath` renamed to `getPathByRelativePropertyPath`
+  - method `getPathByPropertyPathSafely` renamed to `getPathByRelativePropertyPathSafely`
+* Decomposed `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer` into separate processors and factories. Moved the TWIG sandbox configuration out of its responsibility.
+
+#### FormBundle
+* Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorview))
+* Refactored `ExpressionEditorUtil` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/FormBundle/Resources/public/js/expression-editor-util.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorutil))
+  * made it descendant of `BaseClass`
+  * changed options format
+
+#### LocaleBundle
+* Updated `\Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider::setCurrentLocalization` to make it additionally switch localization, language, locale in `\Locale`, `\Gedmo\Translatable\TranslatableListener` and Symfony translator.
+
+#### QueryDesignerBundle
+* JS `*-filter-initialized` modules, defined over `init_module` option in filter configuration, now expected to export a sync callback function
 
 ### Datagrids
 * All datagrids used in storefront application were moved from `<BundleName>/Resources/config/oro/datagrids.yml` to layouts folder of the `default` theme `<BundleName>/Resources/views/layouts/default/config/datagrids.yml`.
@@ -247,14 +261,24 @@ This means that storefront datagrids can now differ between themes. Any storefro
 #### DataGridBundle
 * Added postponed delete entities logic to `\Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionHandler`.
 
-### Changed
-
 #### UIBundle
 * Removed `$offset-*` scss variables
 * Added `spacing` scss function.
 `$offset-x\$offset-y` => `spacing('base')`
 `$offset-x-m\$offset-y-m` => `spacing('sm')`
 `$offset-x-s\$offset-y-s` => `spacing('xs')`
+
+### Removed
+
+#### EmailBundle
+* Removed `\Oro\Bundle\EmailBundle\Manager\EmailTemplateManager`, use instead `\Oro\Bundle\EmailBundle\Sender\EmailTemplateSender`.
+* Removed `\Oro\Bundle\EmailBundle\Tools\EmailTemplateSerializer`, use instead `\Oro\Bundle\EmailBundle\Sender\EmailTemplateSender`.
+* Removed `\Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider` use instead `\Oro\Bundle\EmailBundle\Provider\EmailTemplateProvider` and `\Oro\Bundle\EmailBundle\Provider\TranslatedEmailTemplateProvider`.
+* Removed `\Oro\Bundle\EmailBundle\Provider\\Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider`, use instead `\Oro\Bundle\EmailBundle\Provider\RenderedEmailTemplateProvider`.
+
+#### NotificationBundle
+* Removed `\Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender`, use instead `\Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager`.
+* Removed unused `\Oro\Bundle\NotificationBundle\Model\EmailTemplate`, use instead `\Oro\Bundle\EmailBundle\Model\EmailTemplate`.
 
 ## 5.1.0 (2023-03-31)
 
