@@ -3,13 +3,13 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Oro\Bundle\SecurityBundle\Model\Role;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 
 /**
  * Represents the interface that all user classes must implement.
  */
-interface UserInterface extends PasswordAuthenticatedUserInterface, SymfonyUserInterface
+interface UserInterface extends LegacyPasswordAuthenticatedUserInterface, SymfonyUserInterface
 {
     /**
      * @param string $username New username

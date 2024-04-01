@@ -49,7 +49,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     /**
      * {@inheritDoc}
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return 'salt';
     }
