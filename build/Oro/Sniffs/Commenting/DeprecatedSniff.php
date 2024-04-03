@@ -4,7 +4,6 @@ namespace Oro\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * Checks if code have deprecation annotation.
@@ -22,11 +21,13 @@ class DeprecatedSniff implements Sniff
     ];
 
     /**
+     * Deprecation annotation are available for maintenance branches.
+     *
      * {@inheritDoc}
      */
     public function register()
     {
-        return array_diff(Tokens::$commentTokens, Tokens::$phpcsCommentTokens);
+        return [];
     }
 
     /**
