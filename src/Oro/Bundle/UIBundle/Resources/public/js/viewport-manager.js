@@ -37,16 +37,19 @@ const viewportManager = {
 
     /**
      * @param {HTMLElement} [context]
+     * @param {Function} [callback]
      * @returns {any}
      */
-    getBreakpoints(context) {
+    getBreakpoints(context, callback) {
         if (!context) {
             context = document.documentElement;
         }
 
-        const cssProperty = window.getComputedStyle(context).getPropertyValue('--breakpoints').trim() || '{}';
+        const cssProperty =
+            window.getComputedStyle(context).getPropertyValue('--breakpoints').trim() || '{}';
+        const result = {all: 'all', ...JSON.parse(cssProperty)};
 
-        return {all: 'all', ...JSON.parse(cssProperty)};
+        return typeof callback === 'function' ? callback(result) : result;
     },
 
     _prepareMediaTypes(breakpoints) {
