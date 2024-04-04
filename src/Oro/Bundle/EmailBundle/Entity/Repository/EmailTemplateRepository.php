@@ -181,7 +181,7 @@ class EmailTemplateRepository extends EntityRepository
                 continue;
             }
 
-            if ($parameterValue === EmailTemplateCriteria::CONTEXT_PARAMETER_NULL) {
+            if ($parameterValue === '~') {
                 $queryBuilder
                     ->andWhere($queryBuilder->expr()->isNull(QueryBuilderUtil::getField('t', $parameterName)));
             } else {
