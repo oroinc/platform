@@ -3,13 +3,16 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
+use Oro\Bundle\EmailBundle\Exception\EmailTemplateCompilationException;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Contains methods for ajax actions related to the Email entity.
@@ -42,8 +45,19 @@ class AjaxEmailController extends AbstractController
         $emailHandler->handleRequest($form, $request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Builds form again using the submitted email model.
-            $emailHandler->createForm($emailModel);
+            try {
+                // Builds form again using the submitted email model.
+                $emailHandler->createForm($emailModel);
+            } catch (EmailTemplateCompilationException $exception) {
+                return new JsonResponse(
+                    [
+                        'reason' => $this->container->get(TranslatorInterface::class)->trans(
+                            'oro.email.emailtemplate.failed_to_compile'
+                        ),
+                    ],
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
         }
 
         return new JsonResponse(
@@ -52,7 +66,7 @@ class AjaxEmailController extends AbstractController
                 'body' => $emailModel->getBody(),
                 'type' => $emailModel->getType(),
             ],
-            200
+            Response::HTTP_OK
         );
     }
 
@@ -72,6 +86,7 @@ class AjaxEmailController extends AbstractController
             ...parent::getSubscribedServices(),
             EmailModelBuilder::class,
             EmailHandler::class,
+            TranslatorInterface::class,
         ];
     }
 }
