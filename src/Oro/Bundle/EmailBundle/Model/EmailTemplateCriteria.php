@@ -7,8 +7,6 @@ namespace Oro\Bundle\EmailBundle\Model;
  */
 class EmailTemplateCriteria
 {
-    public const CONTEXT_PARAMETER_NULL = '~';
-
     private string $name;
 
     private ?string $entityName;
