@@ -42,7 +42,7 @@
         "symfony/filesystem": "~5.4.13",
         "symfony/finder": "~5.4.17",
         "symfony/form": "~5.4.17",
-        "symfony/framework-bundle": "~5.4.17",
+        "symfony/framework-bundle": "5.4.34",
         "symfony/http-client": "~5.4.17",
         "symfony/http-foundation": "~5.4.17",
         "symfony/http-kernel": "~5.4.18",
