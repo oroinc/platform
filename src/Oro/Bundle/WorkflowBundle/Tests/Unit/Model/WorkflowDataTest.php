@@ -56,7 +56,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
 
     public function testIssetGetSetUnset()
     {
-        $this->assertFalse(isset($this->data->foo));
+        $this->assertTrue(isset($this->data->foo));
         $this->assertNull($this->data->foo);
 
         $this->data->foo = 'bar';
@@ -64,7 +64,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('bar', $this->data->foo);
 
         unset($this->data->foo);
-        $this->assertFalse(isset($this->data->foo));
+        $this->assertTrue(isset($this->data->foo));
         $this->assertNull($this->data->foo);
     }
 

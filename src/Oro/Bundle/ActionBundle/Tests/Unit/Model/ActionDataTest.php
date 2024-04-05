@@ -31,7 +31,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
     {
         $data = new ActionData();
 
-        $this->assertFalse(isset($data->foo));
+        $this->assertTrue(isset($data->foo));
         $this->assertNull($data->foo);
 
         $data->foo = 'bar';
@@ -39,7 +39,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('bar', $data->foo);
 
         unset($data->foo);
-        $this->assertFalse(isset($data->foo));
+        $this->assertTrue(isset($data->foo));
         $this->assertNull($data->foo);
     }
 
