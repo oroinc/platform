@@ -223,7 +223,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function __isset($name)
     {
-        return $this->has($name);
+        return true;
     }
 
     /**
