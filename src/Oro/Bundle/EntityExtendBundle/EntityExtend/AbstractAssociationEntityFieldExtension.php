@@ -205,6 +205,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
      */
     public function isset(EntityFieldProcessTransport $transport): void
     {
+        $this->propertyExists($transport);
     }
 
     /**

@@ -376,11 +376,7 @@ EOF;
 
     public function isset(EntityFieldProcessTransport $transport): void
     {
-        $properties = $this->getProperties($transport);
-        if (array_key_exists($transport->getName(), $properties)) {
-            $transport->setResult(true);
-            $transport->setProcessed(true);
-        }
+        $this->propertyExists($transport);
     }
 
     public function propertyExists(EntityFieldProcessTransport $transport): void
