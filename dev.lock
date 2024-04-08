@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1850152db2e48ca34006f12ec0cdf27f",
+    "content-hash": "b53ee4e2825cd22b9ce3aa49d94a6710",
     "packages": [
         {
             "name": "ass/xmlsecurity",
@@ -5025,15 +5025,15 @@
             "dist": {
                 "type": "path",
                 "url": "../serialized-fields",
-                "reference": "26995f4e406e22c5a026bac13550ffe15b284389"
+                "reference": "4c918dbc2cf00e9e5e3a5a9bc4e485cd6fbbe9d0"
             },
             "require": {
-                "oro/platform": "6.0.*"
+                "oro/platform": "6.1.*"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.0-dev"
+                    "dev-master": "6.1-dev"
                 }
             },
             "autoload": {
