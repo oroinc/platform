@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1850152db2e48ca34006f12ec0cdf27f",
+    "content-hash": "e4da634bd9b6c50a566ab9f51cb66293",
     "packages": [
         {
             "name": "ass/xmlsecurity",
@@ -4885,7 +4885,7 @@
         },
         {
             "name": "oro/api-doc-bundle",
-            "version": "dev-ticket/BAP-22238",
+            "version": "2.1.0",
             "target-dir": "Nelmio/ApiDocBundle",
             "source": {
                 "type": "git",
@@ -16663,9 +16663,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "oro/api-doc-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
