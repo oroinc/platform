@@ -2192,11 +2192,11 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             'exclusion_policy' => 'all',
             'fields'           => [
                 'association1' => [
-                    'targetClass' => self::TEST_ASSOC_CLASS_NAME,
+                    'targetClass'  => self::TEST_ASSOC_CLASS_NAME,
                     'targetEntity' => $this->createConfigObject(
                         [
-                            'exclusion_policy' => 'all',
-                            'fields'           => [
+                            'exclusion_policy'     => 'all',
+                            'fields'               => [
                                 'id' => [
                                     'property_path' => 'newIdentifier'
                                 ]
@@ -2247,7 +2247,73 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'association1' => [
-                        'data_type'   => 'string'
+                        'data_type' => 'string'
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testEnumEntity(): void
+    {
+        $this->context->setClassName(TestEnumValue::class);
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id'       => null,
+                'priority' => null
+            ]
+        ];
+        $filters = [];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
+        $rootEntityMetadata->expects(self::once())
+            ->method('hasField')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getTypeOfField')
+            ->willReturn('integer');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(TestEnumValue::class)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(TestEnumValue::class)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedFields')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedAssociations')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getFieldDataType')
+            ->with(self::identicalTo($rootEntityMetadata), 'id')
+            ->willReturn('string');
+
+        $this->context->setClassName(TestEnumValue::class);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => [
+                        'data_type'   => 'string',
+                        'allow_array' => true
+                    ],
+                    'priority' => [
+                        'data_type'   => 'integer',
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],

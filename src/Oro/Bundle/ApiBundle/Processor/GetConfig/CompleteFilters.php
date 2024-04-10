@@ -171,8 +171,8 @@ class CompleteFilters extends CompleteSection
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ): void {
-        $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
-        foreach ($indexedFields as $propertyPath => $dataType) {
+        $fields = $this->getFilterFields($metadata);
+        foreach ($fields as $propertyPath => $dataType) {
             $filter = $filters->findField($propertyPath, true);
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
             if ($fieldName && (null !== $filter || !$filters->hasField($fieldName))) {
@@ -186,6 +186,19 @@ class CompleteFilters extends CompleteSection
                 $this->setFilterRangeAllowed($filter);
             }
         }
+    }
+
+    private function getFilterFields(ClassMetadata $metadata): array
+    {
+        $fields = $this->doctrineHelper->getIndexedFields($metadata);
+        if (is_subclass_of($metadata->name, AbstractEnumValue::class)
+            && !isset($fields['priority'])
+            && $metadata->hasField('priority')
+        ) {
+            $fields['priority'] = $metadata->getTypeOfField('priority');
+        }
+
+        return $fields;
     }
 
     /**
