@@ -200,7 +200,7 @@ HELP
 
             if (EntityDefinitionConfigExtra::class === $extraClassName) {
                 $action = $input->getOption('action');
-                $result[] = new $extraClassName($action);
+                $result[] = new EntityDefinitionConfigExtra($action, $this->isCollection($action));
             } else {
                 $result[] = new $extraClassName();
             }
