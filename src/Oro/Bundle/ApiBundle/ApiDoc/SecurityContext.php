@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\AnonymousToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -80,7 +81,7 @@ class SecurityContext implements SecurityContextInterface
     public function getUserName(): ?string
     {
         $token = $this->tokenStorage->getToken();
-        if (null === $token) {
+        if (null === $token || $token instanceof AnonymousToken) {
             return null;
         }
 

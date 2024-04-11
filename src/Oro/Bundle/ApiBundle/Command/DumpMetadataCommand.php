@@ -123,7 +123,7 @@ HELP
         bool $hateoas
     ): array {
         $configExtras = [
-            new EntityDefinitionConfigExtra($action)
+            new EntityDefinitionConfigExtra($action, $this->isCollection($action))
         ];
         $metadataExtras = [
             new ActionMetadataExtra($action, $parentAction)
