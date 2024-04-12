@@ -1,11 +1,11 @@
 /* @theme: default; */
 
 $label-required-label-display: inline-block !default;
-$label-required-label-font-size: $base-font-size--s !default;
+$label-required-label-font-size: $base-font-size !default;
 $label-required-label-margin: 0 !default;
 $label-required-label-color: get-color('text', 'secondary') !default;
 $label-required-label-font-style: italic !default;
-$label-required-label-font-weight: 300 !default;
+$label-required-label-font-weight: font-weight('light') !default;
 
 $label-required-symbol-color: get-color('destructive', 'main') !default;
 $label-required-symbol-margin-left: spacing('xs') !default;
