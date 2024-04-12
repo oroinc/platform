@@ -37,12 +37,16 @@ class AclManager
     public function updateAclIdentities(WorkflowItem $workflowItem)
     {
         $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
+        if (!$workflow) {
+            return $workflowItem;
+        }
+
         $definition = $workflowItem->getDefinition();
-        $currentStepName = $workflowItem->getCurrentStep()->getName();
+        $currentStepName = $workflowItem->getCurrentStep()?->getName();
 
         $aclIdentities = array();
-        foreach ($definition->getEntityAcls() as $entityAcl) {
-            if ($entityAcl->getStep()->getName() == $currentStepName) {
+        foreach ($definition?->getEntityAcls() as $entityAcl) {
+            if ($entityAcl->getStep()?->getName() === $currentStepName) {
                 $attributeName = $entityAcl->getAttribute();
                 $attribute = $workflow->getAttributeManager()->getAttribute($attributeName);
                 $entity = $workflowItem->getData()->get($attributeName);

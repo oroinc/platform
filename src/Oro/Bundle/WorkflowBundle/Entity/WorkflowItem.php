@@ -25,6 +25,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  *
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @mixin OroWorkflowBundle_Entity_WorkflowItem
  */
@@ -150,6 +151,8 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
      */
     protected $serializeFormat;
 
+    protected bool $locked = false;
+
     /**
      * {@inheritdoc}
      */
@@ -162,6 +165,21 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
         $this->result = new WorkflowResult();
     }
 
+    public function lock(): void
+    {
+        $this->locked = true;
+    }
+
+    public function unlock(): void
+    {
+        $this->locked = false;
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked;
+    }
+
     /**
      * @param WorkflowItem $source
      * @return $this
@@ -170,6 +188,16 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
     {
         $this->getData()->add($source->getData()->toArray());
         $this->getResult()->add($source->getResult()->toArray());
+
+        // Fill stub workflow item with actual data
+        if (!$this->id && !$this->getEntityId()) {
+            $this->id = $source->getId();
+            $this->entity = $source->getEntity();
+            $this->entityId = $source->getEntityId();
+            $this->currentStep = $source->getCurrentStep();
+            $this->updated = $source->getUpdated();
+            $this->created = $source->getCreated();
+        }
 
         return $this;
     }
@@ -226,6 +254,10 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
      */
     public function setCurrentStep($currentStep)
     {
+        if ($this->isLocked()) {
+            throw new WorkflowException('Changing the step of a locked workflow item is prohibited.');
+        }
+
         $this->currentStep = $currentStep;
 
         return $this;

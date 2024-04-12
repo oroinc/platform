@@ -27,8 +27,10 @@ class CustomFormOptionsProcessor implements ProcessorInterface
         $workflowItem = $context->getWorkflowItem();
 
         if (array_key_exists('form_init', $transition->getFormOptions())) {
+            $workflowItem->lock();
             $this->formInitListener->executeInitAction($transition->getFormOptions()['form_init'], $workflowItem);
             $this->formInitListener->dispatchFormInitEvents($workflowItem, $transition);
+            $workflowItem->unlock();
         }
 
         $dataAttribute = $transition->getFormDataAttribute();

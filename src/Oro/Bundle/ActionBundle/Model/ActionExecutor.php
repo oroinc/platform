@@ -18,11 +18,13 @@ class ActionExecutor
     ) {
     }
 
-    public function executeAction(string $actionName, array $data = []): ActionData
+    public function executeAction(string $actionName, array $data = [], mixed $context = null): ActionData
     {
-        $action = $this->actionFactory->create($actionName, $this->prepareOptions($data));
+        $action = $this->actionFactory->create($actionName, $context ? $data : $this->prepareOptions($data));
 
-        $context = new ActionData($data);
+        if (!$context) {
+            $context = new ActionData($data);
+        }
         $action->execute($context);
 
         return $context;
@@ -37,12 +39,18 @@ class ActionExecutor
         string $expressionName,
         array $data = [],
         \ArrayAccess $errors = null,
-        string $message = null
+        string $message = null,
+        mixed $context = null
     ): bool {
-        $expression = $this->expressionFactory->create($expressionName, $this->prepareOptions($data));
+        $options = $context ? $data : $this->prepareOptions($data);
+        $expression = $this->expressionFactory->create($expressionName, $options);
         $expression->setMessage($message);
 
-        return $expression->evaluate($data, $errors);
+        if (!$context) {
+            $context = $data;
+        }
+
+        return $expression->evaluate($context, $errors);
     }
 
     private function prepareOptions(array $data): array

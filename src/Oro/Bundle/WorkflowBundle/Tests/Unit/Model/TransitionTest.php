@@ -332,6 +332,12 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($currentStepEntity);
 
         $workflowItem = $this->createMock(WorkflowItem::class);
+        $workflowItem->expects($this->any())
+            ->method('getEntityId')
+            ->willReturn(42);
+        $workflowItem->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(\stdClass::class);
         $workflowItem->expects(self::once())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);

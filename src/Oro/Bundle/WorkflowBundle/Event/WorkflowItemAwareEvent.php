@@ -15,6 +15,11 @@ class WorkflowItemAwareEvent extends Event
     ) {
     }
 
+    public function setWorkflowItem(WorkflowItem $workflowItem): void
+    {
+        $this->workflowItem = $workflowItem;
+    }
+
     public function getWorkflowItem(): WorkflowItem
     {
         return $this->workflowItem;

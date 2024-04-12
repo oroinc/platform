@@ -19,4 +19,8 @@ abstract class TransitionServiceAbstract implements TransitionServiceInterface
     {
         return true;
     }
+
+    public function execute(WorkflowItem $workflowItem): void
+    {
+    }
 }

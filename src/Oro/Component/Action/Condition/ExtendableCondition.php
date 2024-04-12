@@ -8,7 +8,6 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -138,14 +137,10 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         $errors = [];
         foreach ($event->getErrors() as $error) {
             $errors[] = $this->translator->trans($error['message']);
+            $this->errors[] = ['message' => $error['message'], 'parameters' => ($error['parameters'] ?? [])];
         }
 
-        if ($this->options['showErrors'] instanceof PropertyPath) {
-            $showErrors = $this->contextAccessor->getValue($event->getContext(), $this->options['showErrors']);
-        } else {
-            $showErrors = $this->options['showErrors'];
-        }
-
+        $showErrors = $this->contextAccessor->getValue($event->getContext(), $this->options['showErrors']);
         if ($showErrors) {
             foreach ($errors as $error) {
                 $this->requestStack?->getSession()?->getFlashBag()->add($this->options['messageType'], $error);

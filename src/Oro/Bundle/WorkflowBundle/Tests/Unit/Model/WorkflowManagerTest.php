@@ -804,7 +804,7 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
             ->with($workflowItem, $transition)
             ->willReturn(true);
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects($this->any())
             ->method('getWorkflow')
             ->with($workflowName)
             ->willReturn($workflow);

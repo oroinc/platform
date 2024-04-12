@@ -26,7 +26,11 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
         try {
             $this->parametersResolver->resolve($data, $this, $errors, true);
 
-            $result = $this->service->{$this->method}(...$this->getMethodArguments($data));
+            // call_user_func_array allows to use named arguments
+            $result = call_user_func_array(
+                [$this->service, $this->method],
+                $this->getMethodArguments($data)
+            );
 
             if (is_array($result)) {
                 $this->mapResultToContext($data, $result);

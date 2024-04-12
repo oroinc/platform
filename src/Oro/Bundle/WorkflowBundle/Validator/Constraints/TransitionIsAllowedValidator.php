@@ -77,7 +77,7 @@ class TransitionIsAllowedValidator extends ConstraintValidator
         if (!$result) {
             if ($errors->count()) {
                 foreach ($errors as $error) {
-                    $this->context->addViolation($error['message'], $error['parameters']);
+                    $this->context->addViolation($error['message'], $error['parameters'] ?? []);
                 }
             } else {
                 $this->context->addViolation($constraint->someConditionsNotMetMessage);

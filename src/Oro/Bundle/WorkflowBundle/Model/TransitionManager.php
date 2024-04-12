@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 
 class TransitionManager
 {
-    const DEFAULT_START_TRANSITION_NAME = '__start__';
+    public const DEFAULT_START_TRANSITION_NAME = '__start__';
 
     /**
      * @var Collection

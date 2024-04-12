@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Event\Transition\GuardEvent;
 use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionEvent;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
@@ -403,6 +404,7 @@ class Transition
             return false;
         }
 
+        $workflowItem->lock();
         // Execute check that transition service allows the transition or check conditions.
         $isAllowed = true;
         if ($this->transitionService) {
@@ -410,6 +412,7 @@ class Transition
         } elseif ($this->condition) {
             $isAllowed = (bool)$this->condition->evaluate($workflowItem, $errors);
         }
+        $workflowItem->unlock();
 
         $event->setAllowed($isAllowed);
         $this->eventDispatcher->dispatch($event, 'guard', $this->getName());
@@ -435,6 +438,7 @@ class Transition
             return false;
         }
 
+        $workflowItem->lock();
         // Execute pre-actions and pre-conditions
         $isAllowed = true;
         if ($this->transitionService) {
@@ -444,6 +448,7 @@ class Transition
 
             $isAllowed = !$this->preCondition || $this->preCondition->evaluate($workflowItem, $errors);
         }
+        $workflowItem->unlock();
 
         $event->setAllowed($isAllowed);
         $this->eventDispatcher->dispatch($event, 'announce', $this->getName());
@@ -489,6 +494,10 @@ class Transition
      */
     public function transit(WorkflowItem $workflowItem, Collection $errors = null)
     {
+        if ($workflowItem->isLocked()) {
+            throw new WorkflowException('Can not transit locked WorkflowItem. Transit is allowed only in "actions".');
+        }
+
         if ($this->isAllowed($workflowItem, $errors)) {
             $this->transitUnconditionally($workflowItem);
         } else {
@@ -503,19 +512,9 @@ class Transition
      */
     public function transitUnconditionally(WorkflowItem $workflowItem): void
     {
-        $currentStep = $workflowItem->getCurrentStep();
         $transitionEvent = new TransitionEvent($workflowItem, $this);
 
-        if ($currentStep) {
-            $this->eventDispatcher->dispatch($transitionEvent, 'leave', $currentStep->getName());
-        } else {
-            $this->eventDispatcher->dispatch($transitionEvent, 'start');
-        }
-
-        $stepTo = $this->getResolvedStepTo($workflowItem);
-        $this->eventDispatcher->dispatch($transitionEvent, 'enter', $stepTo->getName());
-        $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
-        $this->eventDispatcher->dispatch($transitionEvent, 'entered', $stepTo->getName());
+        $stepTo = $this->changeCurrentStep($workflowItem, $transitionEvent);
 
         $this->eventDispatcher->dispatch($transitionEvent, 'transition', $this->getName());
         if ($this->transitionService) {
@@ -525,9 +524,34 @@ class Transition
         }
         $this->eventDispatcher->dispatch($transitionEvent, 'completed', $this->getName());
 
-        if ($stepTo->isFinal()) {
+        if ($stepTo?->isFinal()) {
             $this->eventDispatcher->dispatch($transitionEvent, 'finish');
         }
+    }
+
+    private function changeCurrentStep(WorkflowItem $workflowItem, TransitionEvent $transitionEvent): ?Step
+    {
+        // Do not change current step if workflow entity does not exist.
+        if (!$workflowItem->getEntityId()) {
+            return null;
+        }
+
+        $currentStep = $workflowItem->getCurrentStep();
+        if ($currentStep) {
+            $this->eventDispatcher->dispatch($transitionEvent, 'leave', $currentStep->getName());
+        } else {
+            $this->eventDispatcher->dispatch($transitionEvent, 'start');
+        }
+
+        $stepTo = $this->getResolvedStepTo($workflowItem);
+        // Do not enter the same step again
+        if ($workflowItem->getCurrentStep()?->getName() !== $stepTo->getName()) {
+            $this->eventDispatcher->dispatch($transitionEvent, 'enter', $stepTo->getName());
+            $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
+            $this->eventDispatcher->dispatch($transitionEvent, 'entered', $stepTo->getName());
+        }
+
+        return $stepTo;
     }
 
     /**
