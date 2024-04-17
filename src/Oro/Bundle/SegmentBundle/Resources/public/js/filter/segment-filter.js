@@ -110,7 +110,10 @@ define([
         },
 
         getSelectedLabel: function() {
-            return _.result(this.choices[this.value.value], 'label');
+            const choice = _.find(this.choices, val => {
+                return val.value === this.value.value;
+            });
+            return _.result(choice, 'label');
         }
     });
 

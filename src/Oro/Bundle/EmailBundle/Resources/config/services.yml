@@ -1482,3 +1482,19 @@ services:
         class: Oro\Bundle\EmailBundle\Provider\EmailTemplateEntityProvider
         parent: oro_entity.entity_provider.abstract
         lazy: true
+
+    oro_email.event_listener.default_email_user_owner:
+        class: Oro\Bundle\EmailBundle\EventListener\DefaultEmailUserOwnerListener
+        arguments:
+            - '@oro_user.provider.default_user'
+        tags:
+            - { name: doctrine.event_listener, event: prePersist, priority: -5 }
+
+    oro_email.event_listener.system_config.default_email_user_owner:
+        parent: oro_user.event_listener.default_user_system_config
+        calls:
+            - [setAlias, ['oro_email']]
+            - [setConfigKey, ['default_email_owner']]
+        tags:
+            - { name: kernel.event_listener, event: oro_config.settings_form_preset, method: onFormPreSetData }
+            - { name: kernel.event_listener, event: oro_config.settings_before_save.oro_email.default_email_owner, method: onSettingsSaveBefore }

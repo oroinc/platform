@@ -141,7 +141,7 @@ class FileTest extends RestJsonApiTestCase
                 'title'  => 'form constraint',
                 'detail' => 'The "content" field should be specified together with "originalFilename" field.'
             ],
-            $response,
+            $response
         );
     }
 
@@ -172,7 +172,7 @@ class FileTest extends RestJsonApiTestCase
                 'detail' => 'The file name should not have a path.',
                 'source' => ['pointer' => '/data/attributes/originalFilename']
             ],
-            $response,
+            $response
         );
     }
 
@@ -206,7 +206,7 @@ class FileTest extends RestJsonApiTestCase
                 'detail' => 'This value is too long. It should have 255 characters or less.',
                 'source' => ['pointer' => '/data/attributes/originalFilename']
             ],
-            $response,
+            $response
         );
     }
 
@@ -236,7 +236,7 @@ class FileTest extends RestJsonApiTestCase
                 'title'  => 'form constraint',
                 'detail' => 'Cannot decode content encoded with MIME base64.'
             ],
-            $response,
+            $response
         );
     }
 
@@ -266,7 +266,7 @@ class FileTest extends RestJsonApiTestCase
                     . ' Allowed URLs RegExp can be configured on the following page:'
                     . ' System -> Configuration -> General Setup -> Upload Settings.'
             ],
-            $response,
+            $response
         );
     }
 
@@ -274,32 +274,26 @@ class FileTest extends RestJsonApiTestCase
     {
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
-        $url = 'http://example.org/missing.png';
         $data = [
             'data' => [
                 'type' => 'files',
                 'attributes' => [
-                    'externalUrl' => $url,
+                    'externalUrl' => ExternalFileFactoryStub::MISSING_URL
                 ],
                 'relationships' => [
                     'parent' => [
-                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>'],
-                    ],
-                ],
-            ],
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ]
+                ]
+            ]
         ];
-        $response = $this->post(
-            ['entity' => 'files'],
-            $data,
-            [],
-            false
-        );
+        $response = $this->post(['entity' => 'files'], $data, [], false);
 
         $this->assertResponseValidationError(
             [
-                'detail' => 'The specified URL is not accessible. Reason: "Not Found"',
+                'detail' => 'The specified URL is not accessible. Reason: "Not Found"'
             ],
-            $response,
+            $response
         );
     }
 
@@ -327,7 +321,7 @@ class FileTest extends RestJsonApiTestCase
             [
                 'detail' => 'The provided URL does not match the URLs allowed in the system configuration.'
             ],
-            $response,
+            $response
         );
     }
 
@@ -357,7 +351,7 @@ class FileTest extends RestJsonApiTestCase
                 'detail' => 'The MIME type of the file is invalid ("text/plain").'
                     . ' Allowed MIME types are "image/gif", "image/jpeg", "image/png", "image/webp".'
             ],
-            $response,
+            $response
         );
 
         $this->toggleIsStoredExternally(false);
@@ -399,7 +393,7 @@ class FileTest extends RestJsonApiTestCase
             [
                 'detail' => 'Either "externalUrl" or "content" must be specified, but not both'
             ],
-            $response,
+            $response
         );
 
         $this->toggleIsStoredExternally(false);

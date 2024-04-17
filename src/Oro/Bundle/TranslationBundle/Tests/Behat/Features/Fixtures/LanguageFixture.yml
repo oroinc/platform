@@ -5,7 +5,7 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         organization: '@organization'
         owner: '@admin'
     language2:
-        code: 'cz'
+        code: 'cs'
         enabled: true
         organization: '@organization'
         owner: '@admin'

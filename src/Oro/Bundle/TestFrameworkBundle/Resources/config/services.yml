@@ -164,3 +164,7 @@ services:
     oro_test.mailer.message_logger_listener:
         decorates: mailer.message_logger_listener
         class: Oro\Bundle\TestFrameworkBundle\Mailer\EventListener\MessageLoggerListener
+
+    oro_test.datagrid.filter.action_filter:
+        class: Oro\Bundle\TestFrameworkBundle\Datagrid\Filter\ActionFilter
+        public: true
