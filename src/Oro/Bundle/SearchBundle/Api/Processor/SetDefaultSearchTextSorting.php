@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
-use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
@@ -32,6 +31,10 @@ class SetDefaultSearchTextSorting implements ProcessorInterface
     {
         /** @var Context $context */
 
+        if ($context->isProcessed(SetDefaultOrdering::OPERATION_NAME)) {
+            return;
+        }
+
         $config = $context->getConfig();
         if (null !== $config
             && $config->isSortingEnabled()
@@ -40,18 +43,19 @@ class SetDefaultSearchTextSorting implements ProcessorInterface
             $sortFilterName = $this->filterNamesRegistry
                 ->getFilterNames($context->getRequestType())
                 ->getSortFilterName();
-            /** @var SortFilter $sortFilter */
+            /** @var SortFilter|null $sortFilter */
             $sortFilter = $context->getFilters()->get($sortFilterName);
-            $sortFilter->setDefaultValue(function () {
-                return null;
-            });
-            $context->setProcessed(SetDefaultOrdering::OPERATION_NAME);
+            if (null !== $sortFilter) {
+                $sortFilter->setDefaultValue(function () {
+                    return null;
+                });
+                $context->setProcessed(SetDefaultOrdering::OPERATION_NAME);
+            }
         }
     }
 
     private function hasSearchTextFilter(FilterCollection $filters, FilterValueAccessorInterface $filterValues): bool
     {
-        /** @var FilterInterface $filter */
         foreach ($filters as $filterKey => $filter) {
             if ($filter instanceof SimpleSearchFilter && $filterValues->has($filterKey)) {
                 return true;

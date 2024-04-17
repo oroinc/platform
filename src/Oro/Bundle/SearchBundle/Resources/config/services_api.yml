@@ -67,6 +67,12 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 95 }
 
+    oro_search.api.skip_default_search_text_ordering:
+        class: Oro\Bundle\SearchBundle\Api\Processor\SkipDefaultSearchTextOrdering
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -5 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -5 }
+
     oro_search.api.build_search_query:
         class: Oro\Bundle\SearchBundle\Api\Processor\BuildSearchQuery
         arguments:
@@ -76,6 +82,7 @@ services:
             - '@security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -90 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -90 }
 
     oro_search.api.load_entities_by_search_text:
         class: Oro\Bundle\SearchBundle\Api\Processor\LoadEntitiesBySearchText
