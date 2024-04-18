@@ -78,12 +78,13 @@ class MultiFileBlockListener
         foreach ($fieldConfigs as $fieldConfig) {
             $fieldName = $fieldConfig->getFieldName();
             $config = $this->entityConfigProvider->getConfig($className, $fieldName);
+            $fieldLabel = $this->translator->trans((string) $config->get('label'));
 
             $blockKey = $fieldName . '_block_section';
 
             $scrollData->addNamedBlock(
                 $blockKey,
-                $this->translator->trans((string) $config->get('label')),
+                $fieldLabel,
                 $sectionPriority
             );
 
@@ -93,6 +94,7 @@ class MultiFileBlockListener
                     'data' => [
                         'entity' => $event->getEntity(),
                         'fieldConfigId' => $fieldConfig,
+                        'fieldLabel' => $fieldLabel
                     ]
                 ]
             );
