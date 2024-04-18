@@ -61,7 +61,11 @@ class UpdateDataActivityScopeShowOnPageValues extends ParametrizedMigrationQuery
         foreach ($configData as $id => $data) {
             $data = $this->connection->convertToPHPValue($data, Types::ARRAY);
             $oldValue = $data[ActivityScope::GROUP_ACTIVITY][ActivityScope::SHOW_ON_PAGE];
-            $newValue = constant($oldValue);
+
+            if (is_int($oldValue)) {
+                continue;
+            }
+            $newValue = empty($oldValue) ? ActivityScope::VIEW_PAGE : constant($oldValue);
             $data[ActivityScope::GROUP_ACTIVITY][ActivityScope::SHOW_ON_PAGE] = $newValue;
 
             $this->saveConfigData($logger, $id, $data, $dryRun);
