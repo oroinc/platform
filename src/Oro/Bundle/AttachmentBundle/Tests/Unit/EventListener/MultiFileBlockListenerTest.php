@@ -205,6 +205,9 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $multiFileConfigId = new FieldConfigId('extend', TestEntity1::class, 'multiFileField', 'multiFile');
         $multiImageConfigId = new FieldConfigId('extend', TestEntity1::class, 'multiImageField', 'multiImage');
 
+        $translatedMultiFileLabel = 'translated multiFileLabel';
+        $translatedMultiImageLabel = 'translated multiImageLabel';
+
         $multiFileConfig = new Config($multiFileConfigId, [
             'label' => 'multiFileLabel',
         ]);
@@ -227,8 +230,8 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects(self::exactly(2))
             ->method('trans')
             ->willReturnMap([
-                ['multiFileLabel', [], null, null, 'translated multiFileLabel'],
-                ['multiImageLabel', [], null, null, 'translated multiImageLabel'],
+                ['multiFileLabel', [], null, null, $translatedMultiFileLabel],
+                ['multiImageLabel', [], null, null, $translatedMultiImageLabel],
             ]);
 
         $twig->expects(self::exactly(2))
@@ -236,12 +239,25 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturnMap([
                 [
                     '@OroAttachment/Twig/dynamicField.html.twig',
-                    ['data' => ['entity' => $entity, 'fieldConfigId' => $multiFileConfigId]],
+                    [
+                        'data' => [
+                            'entity' => $entity,
+                            'fieldConfigId' => $multiFileConfigId,
+                            'fieldLabel' => $translatedMultiFileLabel
+                        ]
+                    ],
                     'multiFile html'
                 ],
                 [
                     '@OroAttachment/Twig/dynamicField.html.twig',
-                    ['data' => ['entity' => $entity, 'fieldConfigId' => $multiImageConfigId]],
+                    [
+                        'data' =>
+                            [
+                                'entity' => $entity,
+                                'fieldConfigId' => $multiImageConfigId,
+                                'fieldLabel' => $translatedMultiImageLabel
+                            ]
+                    ],
                     'multiImage html'
                 ],
             ]);
