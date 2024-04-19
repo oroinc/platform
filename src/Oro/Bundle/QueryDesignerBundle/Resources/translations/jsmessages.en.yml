@@ -8,6 +8,7 @@ oro:
             filter_not_supported: "This filter is not supported."
             lifetimevalue_filter_not_supported: "The filtering by the LifetimeValue is not supported yet."
         condition_operation: Operation
+        label_func: '{{ label }} (Function "{{ funcName }}")'
     query_type_switcher:
         modes:
             simple: "Visual Editor"

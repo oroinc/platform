@@ -185,11 +185,6 @@
     {% endapply %}
 {% endblock %}
 
-{% block oro_attachment_multi_file_row %}
-    {{ form_widget(form) }}
-    {{ form_errors(form) }}
-{% endblock %}
-
 {% block oro_attachment_multi_image_widget %}
     {{ form_widget(form, {addLabel: 'oro.attachment.fileitem.image.add.label', fileLabel: 'oro.attachment.fileitem.image.label'}) }}
 {% endblock %}

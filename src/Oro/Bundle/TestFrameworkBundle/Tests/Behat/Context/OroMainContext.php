@@ -1164,6 +1164,10 @@ class OroMainContext extends MinkContext implements
                 if ($btnNodeElement) {
                     $this->scrollToXpath($btnNodeElement->getXpath());
                 }
+                $btnNodeElement = $this->getSession()->getPage()->findButton($button);
+                if ($btnNodeElement) {
+                    $this->scrollToXpath($btnNodeElement->getXpath());
+                }
 
                 parent::pressButton($button);
                 break;
