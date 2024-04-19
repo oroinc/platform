@@ -13,8 +13,11 @@ define(function(require, exports, module) {
         ? require('oroform/js/validate-topmost-label-mixin') : null;
     const messageTemplate = require('tpl-loader!oroform/templates/error-template.html');
 
-    const original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors', 'resetElements');
+    const original = _.pick($.validator.prototype,
+        'init', 'showLabel', 'defaultShowErrors', 'resetElements', 'elementValue'
+    );
 
+    const rCRLF = /\r?\n/g;
     const ERROR_CLASS_NAME = 'error';
 
     /**
@@ -538,6 +541,17 @@ define(function(require, exports, module) {
             }
         },
 
+        elementValue: function(element) {
+            const value = original.elementValue.call(this, element);
+
+            // Add CRLF for multiline text
+            if (element.type === 'textarea') {
+                return value.replace(rCRLF, '\r\n');
+            }
+
+            return value;
+        },
+
         /**
          * @inheritdoc
          */
@@ -701,6 +715,14 @@ define(function(require, exports, module) {
             if (element.name in this.submitted || element.name in this.invalid) {
                 this.element(element);
             }
+        },
+        normalizer(value) {
+            // Add CRLF for multiline text
+            if (this.type === 'textarea') {
+                return value.replace(rCRLF, '\r\n');
+            }
+
+            return value;
         }
     });
 
