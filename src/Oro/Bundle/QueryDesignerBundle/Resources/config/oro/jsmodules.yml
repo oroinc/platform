@@ -11,3 +11,4 @@ dynamic-imports:
         - oroquerydesigner/js/dictionary-filter-initialized
         - oroquerydesigner/js/enum-filter-initialized
         - oroquerydesigner/js/validator/not-empty-filters
+        - oroquerydesigner/js/app/views/grouping-field-choice-view

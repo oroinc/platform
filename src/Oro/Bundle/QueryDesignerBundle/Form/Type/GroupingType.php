@@ -8,6 +8,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Grouping field choice form type.
+ */
 class GroupingType extends AbstractType
 {
     const NAME = 'oro_query_designer_grouping';
@@ -28,6 +31,9 @@ class GroupingType extends AbstractType
         $options = [
             'required'            => true,
             'page_component_name' => 'grouping-field-choice',
+            'page_component_options' => [
+                'view'         => 'oroquerydesigner/js/app/views/grouping-field-choice-view'
+            ],
         ];
 
         $metadata = $this->manager->getMetadataForGrouping();

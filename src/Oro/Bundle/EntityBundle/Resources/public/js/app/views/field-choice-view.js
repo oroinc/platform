@@ -139,7 +139,9 @@ define(function(require) {
                     let match = null;
                     let chain;
                     try {
-                        chain = this.dataProvider.pathToEntityChainExcludeTrailingField(id);
+                        chain = this.dataProvider.pathToEntityChainExcludeTrailingField(
+                            typeof this.pathCallback === 'function' ? this.pathCallback(id) : id
+                        );
                         instance.pagePath = chain[chain.length - 1].basePath;
                     } catch (e) {
                         instance.pagePath = '';
