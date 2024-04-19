@@ -3,7 +3,7 @@ define(function(require) {
 
     const EntityFieldModel = require('oroquerydesigner/js/app/models/entity-field-model');
 
-    const GroupingModel = EntityFieldModel.extend({
+    const ColumnModel = EntityFieldModel.extend({
         fieldAttribute: 'name',
 
         defaults: {
@@ -16,10 +16,10 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        constructor: function GroupingModel(...args) {
-            GroupingModel.__super__.constructor.apply(this, args);
+        constructor: function ColumnModel(...args) {
+            ColumnModel.__super__.constructor.apply(this, args);
         }
     });
 
-    return GroupingModel;
+    return ColumnModel;
 });
