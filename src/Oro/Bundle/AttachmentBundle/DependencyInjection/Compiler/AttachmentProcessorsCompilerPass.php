@@ -13,24 +13,45 @@ class AttachmentProcessorsCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $processorHelper = new ProcessorHelper($container->getParameterBag());
-        $librariesExists = false;
+        $pngquantBinaryPath = $this->getResolvedBinaryPath($container, ProcessorHelper::PNGQUANT);
+        $jpegoptimBinaryPath =  $this->getResolvedBinaryPath($container, ProcessorHelper::JPEGOPTIM);
+
+        $isLibrariesExists = $this->isLibraryExist(ProcessorHelper::PNGQUANT, $pngquantBinaryPath) &&
+            $this->isLibraryExist(ProcessorHelper::JPEGOPTIM, $jpegoptimBinaryPath);
+
+        $container->setParameter('oro_attachment.post_processors.enabled', $isLibrariesExists);
+
+        if ($isLibrariesExists) {
+            $container->setParameter('liip_imagine.pngquant.binary', $pngquantBinaryPath);
+            $container->setParameter('liip_imagine.jpegoptim.binary', $jpegoptimBinaryPath);
+
+            $container->getDefinition('liip_imagine.filter.post_processor.pngquant')
+                ->setArgument(
+                    '$executablePath',
+                    $pngquantBinaryPath
+                );
+            $container->getDefinition('liip_imagine.filter.post_processor.jpegoptim')
+                ->setArgument(
+                    '$executablePath',
+                    $jpegoptimBinaryPath
+                );
+        }
+    }
+
+    private function isLibraryExist(string $name, string $binary): bool
+    {
         try {
-            $librariesExists = $processorHelper->librariesExists();
-        } catch (\Exception $exception) {
-            // Any error in catch indicates that the library does not exist or its version does not meet the
-            // needs of the system
+            $isLibraryExists = (bool)ProcessorHelper::getBinary($name, $binary);
+        } catch (\Exception $e) {
+            $isLibraryExists = false;
         }
 
-        // liip_imagine expects paths to be strings, null is not allowed as a default value, so we override it
-        $PNGQuantLibraryPath = '';
-        $JPEGOptimLibraryPath = '';
-        if ($librariesExists) {
-            $PNGQuantLibraryPath = $processorHelper->getPNGQuantLibrary();
-            $JPEGOptimLibraryPath = $processorHelper->getJPEGOptimLibrary();
-        }
+        return $isLibraryExists;
+    }
 
-        $container->setParameter('liip_imagine.pngquant.binary', $PNGQuantLibraryPath);
-        $container->setParameter('liip_imagine.jpegoptim.binary', $JPEGOptimLibraryPath);
+    private function getResolvedBinaryPath(ContainerBuilder $container, string $binaryName): ?string
+    {
+        $parameterName = sprintf('liip_imagine.%s.binary', $binaryName);
+        return $container->getParameter($parameterName) ?: ProcessorHelper::findBinary($binaryName);
     }
 }

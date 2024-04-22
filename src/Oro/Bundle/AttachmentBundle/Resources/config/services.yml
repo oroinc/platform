@@ -627,6 +627,8 @@ services:
         arguments:
             - '%liip_imagine.jpegoptim.binary%'
             - '%liip_imagine.pngquant.binary%'
+        calls:
+            - [ setEnabled, [ '%oro_attachment.post_processors.enabled%' ] ]
         tags:
             - { name: oro_featuretogle.voter, priority: 10 }
 

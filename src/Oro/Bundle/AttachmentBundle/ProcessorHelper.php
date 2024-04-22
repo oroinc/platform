@@ -31,37 +31,29 @@ class ProcessorHelper
 
     public function getPNGQuantLibrary(): ?string
     {
-        return $this->getLibrary(self::PNGQUANT) ?? $this->findLibrary(self::PNGQUANT);
+        return self::getBinary(self::PNGQUANT, $this->getParameter(self::PNGQUANT));
     }
 
     public function getJPEGOptimLibrary(): ?string
     {
-        return $this->getLibrary(self::JPEGOPTIM) ?? $this->findLibrary(self::JPEGOPTIM);
+        return self::getBinary(self::JPEGOPTIM, $this->getParameter(self::JPEGOPTIM));
     }
 
-    private function getLibrary($name): ?string
+    public static function getBinary(string $name, ?string $binary): ?string
     {
-        $binary = null;
-        $parameter = $this->generateParameter($name);
-        # parameter may be null or an empty string
-        if (!empty($this->parameterBag->get($parameter))) {
-            $binary = $this->parameterBag->get($parameter);
-            if (!is_executable($binary)) {
-                throw new ProcessorsException($name);
-            }
-
-            if (!ProcessorVersionChecker::satisfies($binary)) {
-                [$name, $version] = ProcessorVersionChecker::getLibraryInfo($name);
-                throw new ProcessorsVersionException($name, $version, $binary);
-            }
-
-            return $binary;
+        if (!is_executable($binary)) {
+            throw new ProcessorsException($name);
         }
 
-        return null;
+        if (!ProcessorVersionChecker::satisfies($binary)) {
+            [$name, $version] = ProcessorVersionChecker::getLibraryInfo($name);
+            throw new ProcessorsVersionException($name, $version, $binary);
+        }
+
+        return $binary;
     }
 
-    private function findLibrary(string $name): ?string
+    public static function findBinary(string $name): ?string
     {
         $processorExecutableFinder = new ProcessorExecutableFinder();
 
@@ -76,5 +68,11 @@ class ProcessorHelper
     public function generateParameter(string $name): string
     {
         return sprintf('liip_imagine.%s.binary', $name);
+    }
+
+    private function getParameter(string $name): ?string
+    {
+        $parameter = $this->generateParameter($name);
+        return $this->parameterBag->get($parameter);
     }
 }

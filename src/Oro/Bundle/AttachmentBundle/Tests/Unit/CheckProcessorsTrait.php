@@ -27,8 +27,8 @@ trait CheckProcessorsTrait
     protected function getParameters(): ParameterBag
     {
         return new ParameterBag([
-            'liip_imagine.jpegoptim.binary' => null,
-            'liip_imagine.pngquant.binary' => null
+            'liip_imagine.jpegoptim.binary' => ProcessorHelper::findBinary(ProcessorHelper::JPEGOPTIM),
+            'liip_imagine.pngquant.binary' => ProcessorHelper::findBinary(ProcessorHelper::PNGQUANT)
         ]);
     }
 }
