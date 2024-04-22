@@ -13,7 +13,13 @@ trait CheckProcessorsTrait
 {
     protected function checkProcessors(): void
     {
-        $processorsFinder = new ProcessorHelper('', '', new NullAdapter());
+        $jpegoptimBinaryPath = ProcessorHelper::findBinary(ProcessorHelper::JPEGOPTIM);
+        $pngquantBinaryPath = ProcessorHelper::findBinary(ProcessorHelper::PNGQUANT);
+        $processorsFinder = new ProcessorHelper(
+            $jpegoptimBinaryPath ?? '',
+            $pngquantBinaryPath ?? '',
+            new NullAdapter()
+        );
         if (!$processorsFinder->librariesExists()) {
             $this->markTestSkipped(
                 sprintf(

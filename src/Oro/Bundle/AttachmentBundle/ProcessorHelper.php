@@ -35,25 +35,17 @@ class ProcessorHelper
 
     public function getPNGQuantLibrary(): ?string
     {
-        return $this->cache->get(self::PNGQUANT, function () {
-            return $this->getLibrary(self::PNGQUANT) ?? $this->findLibrary(self::PNGQUANT);
-        });
+        return self::getBinary(self::PNGQUANT, $this->pngquantBinaryPath);
     }
 
     public function getJPEGOptimLibrary(): ?string
     {
-        return $this->cache->get(self::JPEGOPTIM, function () {
-            return $this->getLibrary(self::JPEGOPTIM) ?? $this->findLibrary(self::JPEGOPTIM);
-        });
+        return self::getBinary(self::JPEGOPTIM, $this->jpegoptimBinaryPath);
     }
 
-    private function getLibrary($name): ?string
+    public static function getBinary(string $name, string $binary): ?string
     {
-        if ($name === self::JPEGOPTIM) {
-            $binary = $this->jpegoptimBinaryPath;
-        } elseif ($name === self::PNGQUANT) {
-            $binary = $this->pngquantBinaryPath;
-        } else {
+        if (!in_array($name, [self::JPEGOPTIM, self::PNGQUANT])) {
             throw new \InvalidArgumentException(sprintf('Library %s is not supported.', $name));
         }
         if (!empty($binary)) {
@@ -72,7 +64,7 @@ class ProcessorHelper
         return null;
     }
 
-    private function findLibrary(string $name): ?string
+    public static function findBinary(string $name): ?string
     {
         $processorExecutableFinder = new ProcessorExecutableFinder();
 
