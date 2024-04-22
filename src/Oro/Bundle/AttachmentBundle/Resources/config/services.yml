@@ -630,12 +630,11 @@ services:
         arguments:
             - '%liip_imagine.jpegoptim.binary%'
             - '%liip_imagine.pngquant.binary%'
-            - '@oro_attachment.cache.processor_helper'
 
     oro_attachment.checker.voter.post_processors_voter:
         class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessorsVoter'
-        arguments:
-            - '@oro_attachment.processor_helper'
+        calls:
+            - [setEnabled, ['%oro_attachment.post_processors.enabled%']]
         tags:
             - { name: oro_featuretogle.voter, priority: 10 }
 

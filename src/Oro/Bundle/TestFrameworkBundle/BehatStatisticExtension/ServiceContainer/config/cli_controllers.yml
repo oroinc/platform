@@ -13,6 +13,7 @@ services:
             - '@oro_behat_statistic.suite.suite_configuration_registry'
             - '%suite.configurations%'
             - '%oro_behat_statistic.suite_sets%'
+            - '%oro_test.feature_topics%'
         tags:
 #            priority should be under 700 to make it load after Behat\Behat\Gherkin\Cli\FilterController
             - { name: cli.controller, priority: 650 }
