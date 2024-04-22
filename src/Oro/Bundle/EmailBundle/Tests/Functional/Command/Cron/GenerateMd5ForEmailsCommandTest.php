@@ -1,6 +1,6 @@
 <?php
 
-namespace Functional\Command\Cron;
+namespace Oro\Bundle\EmailBundle\Tests\Functional\Command\Cron;
 
 use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateWithTranslationsData;
