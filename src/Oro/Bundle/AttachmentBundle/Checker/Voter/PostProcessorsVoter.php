@@ -14,9 +14,16 @@ class PostProcessorsVoter implements VoterInterface
 
     private ProcessorHelper $processorHelper;
 
+    private bool $isEnabled = false;
+
     public function __construct(ProcessorHelper $processorHelper)
     {
         $this->processorHelper = $processorHelper;
+    }
+
+    public function setEnabled(bool $isEnabled): void
+    {
+        $this->isEnabled = $isEnabled;
     }
 
     /**
@@ -25,13 +32,7 @@ class PostProcessorsVoter implements VoterInterface
     public function vote($feature, $scopeIdentifier = null): int
     {
         if ($feature === self::ATTACHMENT_POST_PROCESSORS) {
-            try {
-                $librariesExists = $this->processorHelper->librariesExists();
-            } catch (\Exception $exception) {
-                return self::FEATURE_DISABLED;
-            }
-
-            return $librariesExists ? self::FEATURE_ENABLED : self::FEATURE_DISABLED;
+            return $this->isEnabled ? self::FEATURE_ENABLED : self::FEATURE_DISABLED;
         }
 
         return self::FEATURE_ABSTAIN;
