@@ -16,6 +16,15 @@ services:
         tags:
             - { name: cli.controller, priority: 570 }
 
+    cli.controller.feature_topics:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\FeaturesTopicController
+        arguments:
+            - '@suite.registry'
+            - '@specifications.finder'
+            - '%oro_test.feature_topics%'
+        tags:
+            - { name: cli.controller, priority: 400 }
+
     cli.controller.available_suites:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
         arguments:

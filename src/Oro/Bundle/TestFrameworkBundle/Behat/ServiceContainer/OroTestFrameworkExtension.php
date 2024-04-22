@@ -103,6 +103,12 @@ class OroTestFrameworkExtension implements TestworkExtension
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('feature_topics')
+                    ->useAttributeAsKey('name')
+                    ->arrayPrototype()
+                        ->scalarPrototype()->end()
+                    ->end()
+                ->end()
             ->end();
     }
 
@@ -130,6 +136,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->loadSkipOnFailureStepTester($container);
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts'] ?? []);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers'] ?? []);
+        $container->setParameter('oro_test.feature_topics', $config['feature_topics'] ?? []);
 
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->removeDefinition('fob_symfony.kernel_orchestrator');
