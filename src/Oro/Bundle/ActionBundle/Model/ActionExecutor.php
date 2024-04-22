@@ -18,7 +18,7 @@ class ActionExecutor
     ) {
     }
 
-    public function executeAction(string $actionName, array $data = [], mixed $context = null): ActionData
+    public function executeAction(string $actionName, array $data = [], mixed $context = null): mixed
     {
         $action = $this->actionFactory->create($actionName, $context ? $data : $this->prepareOptions($data));
 

@@ -238,7 +238,10 @@ class TransitionAssembler extends BaseAbstractAssembler
         if (!empty($options['transition_service'])) {
             return [];
         }
-        $this->assertOptions($options, ['transition_definition']);
+        if (empty($options['transition_definition'])) {
+            return [];
+        }
+
         $definitionName = $options['transition_definition'];
         if (!isset($definitions[$definitionName])) {
             throw new AssemblerException(
