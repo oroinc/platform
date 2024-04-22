@@ -4,7 +4,6 @@ namespace Oro\Bundle\AttachmentBundle;
 
 use Oro\Bundle\AttachmentBundle\Exception\ProcessorsException;
 use Oro\Bundle\AttachmentBundle\Exception\ProcessorsVersionException;
-use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * An auxiliary class that finds libraries and validate it.
@@ -16,16 +15,13 @@ class ProcessorHelper
 
     private string $pngquantBinaryPath;
     private string $jpegoptimBinaryPath;
-    private CacheInterface $cache;
 
     public function __construct(
         string $jpegoptimBinaryPath,
-        string $pngquantBinaryPath,
-        CacheInterface $cache
+        string $pngquantBinaryPath
     ) {
         $this->jpegoptimBinaryPath = $jpegoptimBinaryPath;
         $this->pngquantBinaryPath = $pngquantBinaryPath;
-        $this->cache = $cache;
     }
 
     public function librariesExists(): bool
@@ -35,27 +31,20 @@ class ProcessorHelper
 
     public function getPNGQuantLibrary(): ?string
     {
-        return $this->cache->get(self::PNGQUANT, function () {
-            return $this->getLibrary(self::PNGQUANT) ?? $this->findLibrary(self::PNGQUANT);
-        });
+        return self::getLibrary(self::PNGQUANT, $this->pngquantBinaryPath);
     }
 
     public function getJPEGOptimLibrary(): ?string
     {
-        return $this->cache->get(self::JPEGOPTIM, function () {
-            return $this->getLibrary(self::JPEGOPTIM) ?? $this->findLibrary(self::JPEGOPTIM);
-        });
+        return self::getLibrary(self::JPEGOPTIM, $this->jpegoptimBinaryPath);
     }
 
-    private function getLibrary($name): ?string
+    public static function getLibrary(string $name, string $binary): ?string
     {
-        if ($name === self::JPEGOPTIM) {
-            $binary = $this->jpegoptimBinaryPath;
-        } elseif ($name === self::PNGQUANT) {
-            $binary = $this->pngquantBinaryPath;
-        } else {
+        if (!in_array($name, [self::JPEGOPTIM, self::PNGQUANT])) {
             throw new \InvalidArgumentException(sprintf('Library %s is not supported.', $name));
         }
+
         if (!empty($binary)) {
             if (!is_executable($binary)) {
                 throw new ProcessorsException($name);
@@ -72,7 +61,7 @@ class ProcessorHelper
         return null;
     }
 
-    private function findLibrary(string $name): ?string
+    public static function findLibrary(string $name): ?string
     {
         $processorExecutableFinder = new ProcessorExecutableFinder();
 
