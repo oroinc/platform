@@ -4,7 +4,7 @@ const DynamicEntityModel = BaseModel.extend({
     defaults: {
         name: '',
         label: '',
-        func: null
+        func: {}
     },
 
     constructor: function DynamicEntityModel(...args) {
