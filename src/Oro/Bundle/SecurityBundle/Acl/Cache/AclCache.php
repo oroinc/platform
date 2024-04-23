@@ -1,19 +1,11 @@
 <?php
 
-/*
- * This file is a copy of {@see \Symfony\Component\Security\Acl\Domain\DoctrineAclCache}.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- */
-
 namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
 use Oro\Bundle\SecurityBundle\Acl\Event\CacheClearEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
-use Symfony\Component\Security\Acl\Domain\Entry;
-use Symfony\Component\Security\Acl\Domain\FieldEntry;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -23,6 +15,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * ACL cache that stores ACL by OID and SIDs.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclCache implements AclCacheInterface
 {
@@ -51,17 +44,46 @@ class AclCache implements AclCacheInterface
      */
     public function getFromCacheByIdentityAndSids(ObjectIdentityInterface $oid, array $sids): ?AclInterface
     {
-        $key = $this->getDataKeyByIdentity($oid);
-        $sidKey = $this->getSidKey($sids);
-
-        $data =  $this->cache->get($key, function () {
+        if (empty($sids)) {
             return null;
-        });
-        if ($data && array_key_exists($sidKey, $data)) {
-            return $this->unserializeAcl($data[$sidKey]);
         }
 
-        return null;
+        $key = $this->getDataKeyByIdentity($oid);
+        // here we use -1 as ACL id because 0 used as empty id
+        // (@see \Oro\Bundle\SecurityBundle\Acl\Dbal\AclProvider::EMPTY_ACL_ID)
+        $acl = new Acl(-1, $oid, $this->permissionGrantingStrategy, $sids, false);
+
+        $cacheKeys = [];
+        $sidKeys = [];
+        foreach ($sids as $sid) {
+            $sidKey = $this->getSidKey($sid);
+            $cacheKeys[] = $key . '_' . $sidKey;
+            $sidKeys[$sidKey] = $sid;
+        }
+
+        $hasAces = false;
+        $data = $this->cache->getItems($cacheKeys);
+        $indexes = ['o' => 0, 'c' => 0, 'fo' => [], 'fc' => []];
+        foreach ($data as $sidDataItem) {
+            // we have no cache item for given SID and OID
+            if (!$sidDataItem->isHit()) {
+                return null;
+            }
+            $sidDataArray = $sidDataItem->get();
+            if (empty($sidDataArray[1])) {
+                continue;
+            }
+
+            $hasAces = true;
+            [$sidKey, $aceData] = $sidDataArray;
+            $this->unserialize($acl, $sidKeys[$sidKey], $aceData, $indexes);
+        }
+
+        if (!$hasAces) {
+            // if each SID entry cache return empty result, we should return empty ACL (with id = 0)
+            $acl = new Acl(0, $oid, $this->permissionGrantingStrategy, $sids, false);
+        }
+        return $acl;
     }
 
     /**
@@ -69,15 +91,33 @@ class AclCache implements AclCacheInterface
      */
     public function putInCacheBySids(AclInterface $acl, array $sids): void
     {
-        $acl = $this->fixAclAces($acl);
+        if (empty($sids)) {
+            return;
+        }
 
         $key = $this->getDataKeyByIdentity($acl->getObjectIdentity());
-        $sidKey = $this->getSidKey($sids);
+        $sidsItem =  $this->cache->getItem($key);
+        $batchSidItems = $sidsItem->isHit() ? $sidsItem->get() : [];
 
-        $this->cache->delete($key);
-        $this->cache->get($key, function () use ($sidKey, $acl) {
-            return [$sidKey => \serialize($acl)];
-        });
+        $hasChanges = false;
+        [$classFieldAces, $objectFieldAces] = $this->getFieldAces($acl);
+        foreach ($sids as $sid) {
+            $sidKey = $this->getSidKey($sid);
+            $itemKey = $key . '_' . $sidKey;
+            if (!\array_key_exists($sidKey, $batchSidItems)) {
+                $hasChanges = true;
+                $batchSidItems[$sidKey] = true;
+                $aceData = $this->serialize($acl, $sid, $classFieldAces, $objectFieldAces);
+                $item = $this->cache->getItem($itemKey);
+                $item->set([$sidKey, $aceData]);
+                $this->cache->save($item);
+            }
+        }
+
+        if ($hasChanges) {
+            $sidsItem->set($batchSidItems);
+            $this->cache->save($sidsItem);
+        }
     }
 
     /**
@@ -90,8 +130,14 @@ class AclCache implements AclCacheInterface
         }
 
         $key = $this->getDataKeyByIdentity($oid);
+        $itemsToDelete = [$key];
+        $sidsItems =  $this->cache->getItem($key);
+        $batchSidItems = $sidsItems->isHit() ? $sidsItems->get() : [];
+        foreach (array_keys($batchSidItems) as $batchSidItem) {
+            $itemsToDelete[] = $key . '_' . $batchSidItem;
+        }
 
-        $this->cache->delete($key);
+        $this->cache->deleteItems($itemsToDelete);
     }
 
     /**
@@ -109,111 +155,129 @@ class AclCache implements AclCacheInterface
     }
 
     /**
-     * Returns the key for the object identity.
-     *
-     * @param ObjectIdentityInterface $oid
-     *
-     * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function getDataKeyByIdentity(ObjectIdentityInterface $oid)
+    private function unserialize(
+        AclInterface $acl,
+        SecurityIdentityInterface $sid,
+        array $aceData,
+        array &$indexes
+    ): void {
+        if (\array_key_exists('o', $aceData)) {
+            foreach ($aceData['o'] as $mask) {
+                $acl->insertObjectAce($sid, $mask, $indexes['o'], true, 'all');
+
+                $indexes['o']++;
+            }
+        }
+
+        if (\array_key_exists('c', $aceData)) {
+            foreach ($aceData['c'] as $mask) {
+                $acl->insertClassAce($sid, $mask, $indexes['c'], true, 'all');
+                $indexes['c']++;
+            }
+        }
+
+        if (\array_key_exists('fc', $aceData)) {
+            foreach ($aceData['fc'] as $fieldName => $fieldAces) {
+                $this->ensureFieldIndexExist($indexes['fc'], $fieldName);
+                foreach ($fieldAces as $mask) {
+                    $acl->insertClassFieldAce($fieldName, $sid, $mask, $indexes['fc'][$fieldName], true, 'all');
+                    $indexes['fc'][$fieldName]++;
+                }
+            }
+        }
+
+        if (\array_key_exists('fo', $aceData)) {
+            foreach ($aceData['fo'] as $fieldName => $fieldAces) {
+                $this->ensureFieldIndexExist($indexes['fo'], $fieldName);
+                foreach ($fieldAces as $mask) {
+                    $acl->insertObjectFieldAce($fieldName, $sid, $mask, $indexes['fo'][$fieldName], true, 'all');
+                    $indexes['fo'][$fieldName]++;
+                }
+            }
+        }
+    }
+
+    private function ensureFieldIndexExist(&$array, string $fieldName): void
+    {
+        if (!array_key_exists($fieldName, $array)) {
+            $array[$fieldName] = 0;
+        }
+    }
+
+    private function serialize(
+        AclInterface $acl,
+        SecurityIdentityInterface $sid,
+        array $classFieldAces,
+        array $objectFieldAces
+    ): array {
+        $aceData = [];
+
+        $aceDataSerialized = $this->serializeAces($acl->getClassAces(), $sid);
+        if (!empty($aceDataSerialized)) {
+            $aceData['c'] = $aceDataSerialized;
+        }
+
+        $aceDataSerialized = $this->serializeAces($acl->getObjectAces(), $sid);
+        if (!empty($aceDataSerialized)) {
+            $aceData['o'] = $aceDataSerialized;
+        }
+
+        foreach ($classFieldAces as $fieldName => $aces) {
+            $aceDataSerialized = $this->serializeAces($aces, $sid);
+            if (!empty($aceDataSerialized)) {
+                $aceData['fc'][$fieldName] = $aceDataSerialized;
+            }
+        }
+
+        foreach ($objectFieldAces as $fieldName => $aces) {
+            $aceDataSerialized = $this->serializeAces($aces, $sid);
+            if (!empty($aceDataSerialized)) {
+                $aceData['fo'][$fieldName] = $aceDataSerialized;
+            }
+        }
+
+        return $aceData;
+    }
+
+    private function serializeAces(array $aces, SecurityIdentityInterface $sid): array
+    {
+        $data = [];
+        foreach ($aces as $ace) {
+            if ($ace->getSecurityIdentity()->equals($sid)) {
+                $data[] = $ace->getMask();
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Returns the key for the object identity.
+     */
+    private function getDataKeyByIdentity(ObjectIdentityInterface $oid): string
     {
         return md5($oid->getType()).sha1($oid->getType())
             .'_'.md5($oid->getIdentifier()).sha1($oid->getIdentifier());
     }
 
-    /**
-     * @param SecurityIdentityInterface[] $sids
-     *
-     * @return string
-     */
-    private function getSidKey(array $sids): string
+    private function getSidKey(SecurityIdentityInterface $sid): string
     {
-        $sidsString = 'sid';
-        foreach ($sids as $sid) {
-            $sidsString .= $this->sidConverter->convert($sid);
-        }
-
-        return md5($sidsString);
+        return md5('sid' . $this->sidConverter->convert($sid));
     }
 
-    /**
-     * Unserializes the ACL.
-     *
-     * @param string $serialized
-     *
-     * @return AclInterface
-     */
-    private function unserializeAcl($serialized)
+    private function getFieldAces(AclInterface $acl): array
     {
-        $acl = unserialize($serialized);
-
-        $reflectionProperty = new \ReflectionProperty($acl, 'permissionGrantingStrategy');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($acl, $this->permissionGrantingStrategy);
-        $reflectionProperty->setAccessible(false);
-
-        $aceAclProperty = new \ReflectionProperty(Entry::class, 'acl');
-        $aceAclProperty->setAccessible(true);
-
-        foreach ($acl->getObjectAces() as $ace) {
-            $aceAclProperty->setValue($ace, $acl);
-        }
-        foreach ($acl->getClassAces() as $ace) {
-            $aceAclProperty->setValue($ace, $acl);
-        }
-
-        $aceClassFieldProperty = new \ReflectionProperty($acl, 'classFieldAces');
-        $aceClassFieldProperty->setAccessible(true);
-        foreach ($aceClassFieldProperty->getValue($acl) as $aces) {
-            foreach ($aces as $ace) {
-                $aceAclProperty->setValue($ace, $acl);
-            }
-        }
-        $aceClassFieldProperty->setAccessible(false);
-
-        $aceObjectFieldProperty = new \ReflectionProperty($acl, 'objectFieldAces');
-        $aceObjectFieldProperty->setAccessible(true);
-        foreach ($aceObjectFieldProperty->getValue($acl) as $aces) {
-            foreach ($aces as $ace) {
-                $aceAclProperty->setValue($ace, $acl);
-            }
-        }
-        $aceObjectFieldProperty->setAccessible(false);
-
-        $aceAclProperty->setAccessible(false);
-
-        return $acl;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function fixAclAces(AclInterface $acl)
-    {
-        // get access to field aces in order to clone their identity
-        // to prevent serialize/unserialize bug with few field aces per one sid
-
         $privatePropReader = function (Acl $acl, $field) {
             return $acl->$field;
         };
         $privatePropReader = \Closure::bind($privatePropReader, null, $acl);
 
-        $aces = $privatePropReader($acl, 'classFieldAces');
-        $aces = array_merge($aces, $privatePropReader($acl, 'objectFieldAces'));
+        $classFieldAces = $privatePropReader($acl, 'classFieldAces');
+        $objectFieldAces = $privatePropReader($acl, 'objectFieldAces');
 
-        $privatePropWriter = function (FieldEntry $entry, $field, $value) {
-            $entry->$field = $value;
-        };
-
-        foreach ($aces as $fieldAces) {
-            /** @var FieldEntry $fieldEntry */
-            foreach ($fieldAces as $fieldEntry) {
-                $writeClosure = \Closure::bind($privatePropWriter, $fieldEntry, Entry::class);
-                $writeClosure($fieldEntry, 'securityIdentity', clone $fieldEntry->getSecurityIdentity());
-            }
-        }
-
-        return $acl;
+        return [$classFieldAces, $objectFieldAces];
     }
 
     /**
@@ -246,5 +310,36 @@ class AclCache implements AclCacheInterface
     public function putInCache(AclInterface $acl)
     {
         throw new \BadMethodCallException('Not implemented');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fixAclAces(AclInterface $acl)
+    {
+        // get access to field aces in order to clone their identity
+        // to prevent serialize/unserialize bug with few field aces per one sid
+
+        $privatePropReader = function (Acl $acl, $field) {
+            return $acl->$field;
+        };
+        $privatePropReader = \Closure::bind($privatePropReader, null, $acl);
+
+        $aces = $privatePropReader($acl, 'classFieldAces');
+        $aces = array_merge($aces, $privatePropReader($acl, 'objectFieldAces'));
+
+        $privatePropWriter = function (FieldEntry $entry, $field, $value) {
+            $entry->$field = $value;
+        };
+
+        foreach ($aces as $fieldAces) {
+            /** @var FieldEntry $fieldEntry */
+            foreach ($fieldAces as $fieldEntry) {
+                $writeClosure = \Closure::bind($privatePropWriter, $fieldEntry, Entry::class);
+                $writeClosure($fieldEntry, 'securityIdentity', clone $fieldEntry->getSecurityIdentity());
+            }
+        }
+
+        return $acl;
     }
 }
