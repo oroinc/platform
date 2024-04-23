@@ -16,7 +16,10 @@ class AttachmentProcessorsCompilerPass implements CompilerPassInterface
         $pngquantBinaryPath = $this->getResolvedBinaryPath($container, ProcessorHelper::PNGQUANT);
         $jpegoptimBinaryPath =  $this->getResolvedBinaryPath($container, ProcessorHelper::JPEGOPTIM);
 
-        $isLibrariesExists = $this->isLibraryExist(ProcessorHelper::PNGQUANT, $pngquantBinaryPath) &&
+        $isLibrariesExists =
+            $pngquantBinaryPath &&
+            $jpegoptimBinaryPath &&
+            $this->isLibraryExist(ProcessorHelper::PNGQUANT, $pngquantBinaryPath) &&
             $this->isLibraryExist(ProcessorHelper::JPEGOPTIM, $jpegoptimBinaryPath);
 
         $container->setParameter('oro_attachment.post_processors.enabled', $isLibrariesExists);
