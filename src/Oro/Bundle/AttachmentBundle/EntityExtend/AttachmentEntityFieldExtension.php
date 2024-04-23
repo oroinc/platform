@@ -14,17 +14,17 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  */
 class AttachmentEntityFieldExtension extends AbstractAssociationEntityFieldExtension
 {
-    protected function isApplicable(EntityFieldProcessTransport $transport): bool
+    public function isApplicable(EntityFieldProcessTransport $transport): bool
     {
         return $transport->getClass() === AttachmentScope::ATTACHMENT;
     }
 
-    protected function getRelationKind(): ?string
+    public function getRelationKind(): ?string
     {
         return null;
     }
 
-    protected function getRelationType(): string
+    public function getRelationType(): string
     {
         return RelationType::MANY_TO_ONE;
     }
