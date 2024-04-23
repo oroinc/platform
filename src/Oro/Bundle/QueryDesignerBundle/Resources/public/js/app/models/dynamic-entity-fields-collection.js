@@ -19,7 +19,7 @@ const DynamicEntityFieldsCollection = BaseCollection.extend({
     },
 
     isApplicable(model) {
-        return model.get('func') !== '' && model.get('func').group_type === 'converters';
+        return model.get('func')?.group_type === 'converters';
     },
 
     onAddColumn(model) {

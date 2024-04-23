@@ -39,7 +39,7 @@ define(function(require) {
         },
 
         onChangeField() {
-            this.set('func', null);
+            this.set('func', {});
         },
 
         toJSON(...args) {

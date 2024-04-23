@@ -9,7 +9,7 @@ define(function(require) {
         defaults: {
             name: null,
             label: null,
-            func: null,
+            func: {},
             sorting: null
         },
 
