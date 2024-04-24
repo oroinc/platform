@@ -1,29 +1,28 @@
 <?php
 
-declare(strict_types=1);
+namespace Oro\Bundle\ActivityBundle\EntityExtend;
 
-namespace Oro\Bundle\ActivityListBundle\EntityExtend;
-
-use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\AbstractAssociationEntityFieldExtension;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldProcessTransport;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
 
 /**
- * Extended Entity Field Processor Extension for activity list associations
+ * Activity extend entity association field extension.
  */
-class ActivityListEntityFieldExtension extends AbstractAssociationEntityFieldExtension
+class ActivityEntityFieldExtension extends AbstractAssociationEntityFieldExtension
 {
     public function isApplicable(EntityFieldProcessTransport $transport): bool
     {
-        return $transport->getClass() === ActivityListEntityConfigDumperExtension::ENTITY_CLASS
+        return $transport->getObject() instanceof ActivityInterface
             && AssociationNameGenerator::extractAssociationKind($transport->getName()) === $this->getRelationKind();
     }
 
     public function getRelationKind(): ?string
     {
-        return ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND;
+        return ActivityScope::ASSOCIATION_KIND;
     }
 
     public function getRelationType(): string
