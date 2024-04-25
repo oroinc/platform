@@ -45,7 +45,9 @@ class ActionGroupAssembler extends AbstractAssembler
                 $actionGroups[$actionGroupName] = new ActionGroupServiceAdapter(
                     $this->parametersResolver,
                     $this->actionGroupServiceLocator->get($serviceName),
-                    $this->getOption($options, 'method', 'execute')
+                    $this->getOption($options, 'method', 'execute'),
+                    $this->getOption($options, 'return_value_name'),
+                    $this->getOption($options, 'parameters')
                 );
             } else {
                 $actionGroups[$actionGroupName] = new ActionGroup(

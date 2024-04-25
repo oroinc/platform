@@ -12,12 +12,16 @@ use Oro\Component\PhpUtils\ArrayUtil;
 class ActionGroupServiceAdapter implements ActionGroupInterface
 {
     private ?array $parameters = null;
+    private array $parameterNameToArgumentName = [];
+    private array $argumentNameToParameterName = [];
     private ?ActionGroupDefinition $definition = null;
 
     public function __construct(
         private ActionGroup\ParametersResolver $parametersResolver,
         private object $service,
-        private string $method
+        private string $method,
+        private ?string $returnValueName,
+        private ?array $parametersConfig
     ) {
     }
 
@@ -31,6 +35,10 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
                 [$this->service, $this->method],
                 $this->getMethodArguments($data)
             );
+
+            if ($this->returnValueName) {
+                $result = [$this->returnValueName => $result];
+            }
 
             if (is_array($result)) {
                 $this->mapResultToContext($data, $result);
@@ -60,10 +68,15 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
     public function getParameters(): array
     {
         if ($this->parameters === null) {
+            $this->fillParameterArgumentMapping();
+
             $this->parameters = [];
             $reflection = new \ReflectionMethod($this->service, $this->method);
             foreach ($reflection->getParameters() as $methodParameter) {
-                $parameter = new Parameter($methodParameter->getName());
+                $argName = $methodParameter->getName();
+                $parameterName = $this->argumentNameToParameterName[$argName] ?? $argName;
+
+                $parameter = new Parameter($parameterName);
                 if ($methodParameter->hasType()) {
                     $parameter->setType($methodParameter->getType()->getName());
                 }
@@ -81,7 +94,14 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
 
     private function getMethodArguments(ActionData $data): array
     {
-        return $this->parametersResolver->getParametersValues($data, $this, true);
+        $parameterValues = $this->parametersResolver->getParametersValues($data, $this, true);
+        $arguments = [];
+        foreach ($parameterValues as $parameterName => $parameterValue) {
+            $argName = $this->parameterNameToArgumentName[$parameterName] ?? $parameterName;
+            $arguments[$argName] = $parameterValue;
+        }
+
+        return $arguments;
     }
 
     private function mapResultToContext(ActionData $data, array $result): void
@@ -105,5 +125,19 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
         }
 
         $errors->add(['message' => $e->getMessage()]);
+    }
+
+    private function fillParameterArgumentMapping(): void
+    {
+        if ($this->parametersConfig) {
+            foreach ($this->parametersConfig as $name => $parameterConfig) {
+                if (empty($parameterConfig['service_argument_name'])) {
+                    continue;
+                }
+                $argName = $parameterConfig['service_argument_name'];
+                $this->parameterNameToArgumentName[$name] = $argName;
+                $this->argumentNameToParameterName[$argName] = $name;
+            }
+        }
     }
 }
