@@ -76,7 +76,7 @@ define(function(require) {
                 $.each(attrs, function(name, value) {
                     const $elem = elementsMap[name];
                     if ($elem) {
-                        value = self.options.setter($elem, name, value);
+                        value = self.options.setter($elem, name, value, attrs);
                         setValue($elem, value);
                     }
                 });

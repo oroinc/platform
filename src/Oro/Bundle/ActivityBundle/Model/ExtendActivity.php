@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ActivityBundle\Model;
 
-use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\EntityExtend\ActivityEntityFieldExtension;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\AssociationExtendEntity;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * Extend activity trait.
@@ -21,7 +20,7 @@ trait ExtendActivity
      */
     public function supportActivityTarget($targetClass)
     {
-        return AssociationExtendEntity::support($this, $targetClass);
+        return AssociationExtendEntity::support($this, $targetClass, $this->getActivityExt());
     }
 
     /**
@@ -32,7 +31,7 @@ trait ExtendActivity
      */
     public function getActivityTargets($targetClass = null)
     {
-        return AssociationExtendEntity::getTargets($this, $targetClass);
+        return AssociationExtendEntity::getTargets($this, $this->getActivityExt(), $targetClass);
     }
 
     /**
@@ -44,7 +43,7 @@ trait ExtendActivity
      */
     public function hasActivityTarget($target)
     {
-        return AssociationExtendEntity::hasTarget($this, $target);
+        return AssociationExtendEntity::hasTarget($this, $target, $this->getActivityExt());
     }
 
     /**
@@ -55,7 +54,7 @@ trait ExtendActivity
      */
     public function addActivityTarget($target)
     {
-        AssociationExtendEntity::addTarget($this, $target);
+        AssociationExtendEntity::addTarget($this, $target, $this->getActivityExt());
 
         return $this;
     }
@@ -68,18 +67,13 @@ trait ExtendActivity
      */
     public function removeActivityTarget($target)
     {
-        AssociationExtendEntity::removeTarget($this, $target);
+        AssociationExtendEntity::removeTarget($this, $target, $this->getActivityExt());
 
         return $this;
     }
 
-    public function getAssociationRelationType(): string
+    private function getActivityExt(): ActivityEntityFieldExtension
     {
-        return RelationType::MANY_TO_MANY;
-    }
-
-    public function getAssociationRelationKind(): string
-    {
-        return ActivityScope::ASSOCIATION_KIND;
+        return new ActivityEntityFieldExtension();
     }
 }

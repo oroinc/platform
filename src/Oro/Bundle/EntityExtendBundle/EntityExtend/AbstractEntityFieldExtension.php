@@ -66,6 +66,7 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
 
     public function isset(EntityFieldProcessTransport $transport): void
     {
+        $this->propertyExists($transport);
     }
 
     protected function getMethodsData(EntityFieldProcessTransport $transport): array

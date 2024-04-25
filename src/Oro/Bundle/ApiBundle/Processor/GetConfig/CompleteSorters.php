@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\EntitySerializer\EntityConfigInterface;
 
@@ -56,13 +57,26 @@ class CompleteSorters extends CompleteSection
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ): void {
-        $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
-        foreach ($indexedFields as $propertyPath => $dataType) {
+        $fields = $this->getSorterFields($metadata);
+        foreach ($fields as $propertyPath => $dataType) {
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
             if ($fieldName && !$sorters->hasField($fieldName)) {
                 $sorters->addField($fieldName);
             }
         }
+    }
+
+    private function getSorterFields(ClassMetadata $metadata): array
+    {
+        $fields = $this->doctrineHelper->getIndexedFields($metadata);
+        if (is_subclass_of($metadata->name, AbstractEnumValue::class)
+            && !isset($fields['priority'])
+            && $metadata->hasField('priority')
+        ) {
+            $fields['priority'] = $metadata->getTypeOfField('priority');
+        }
+
+        return $fields;
     }
 
     private function completeSortersForAssociations(

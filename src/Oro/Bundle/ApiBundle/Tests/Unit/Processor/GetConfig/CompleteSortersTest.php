@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteSorters;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -27,7 +28,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         $this->processor = new CompleteSorters($this->doctrineHelper);
     }
 
-    public function testProcessForAlreadyCompletedFilters()
+    public function testProcessForAlreadyCompletedSorters()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -343,7 +344,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIndexedFieldWithExcludedFilterInConfig()
+    public function testIndexedFieldWithExcludedSorterInConfig()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -397,7 +398,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedIndexedFieldAndRenamedFilter()
+    public function testRenamedIndexedFieldAndRenamedSorter()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -412,7 +413,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         $sorters = [
             'fields' => [
                 'field1' => [
-                    'property_path' => 'realFilterField1'
+                    'property_path' => 'realSorterField1'
                 ]
             ]
         ];
@@ -445,7 +446,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'property_path' => 'realFilterField1'
+                        'property_path' => 'realSorterField1'
                     ]
                 ]
             ],
@@ -453,7 +454,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedFieldAndRenamedFilterByIndexedField()
+    public function testRenamedFieldAndRenamedSorterByIndexedField()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -468,7 +469,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         $sorters = [
             'fields' => [
                 'field1' => [
-                    'property_path' => 'realFilterField1'
+                    'property_path' => 'realSorterField1'
                 ]
             ]
         ];
@@ -486,7 +487,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedFields')
             ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn(['realFilterField1' => 'integer']);
+            ->willReturn(['realSorterField1' => 'integer']);
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
@@ -501,7 +502,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'property_path' => 'realFilterField1'
+                        'property_path' => 'realSorterField1'
                     ]
                 ]
             ],
@@ -859,7 +860,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedAssociationAndRenamedFilterByIndexedToOneAssociation()
+    public function testRenamedAssociationAndRenamedSorterByIndexedToOneAssociation()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -874,7 +875,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         $sorters = [
             'fields' => [
                 'toOneAssociation' => [
-                    'property_path' => 'realFilterToOneAssociation'
+                    'property_path' => 'realSorterToOneAssociation'
                 ]
             ]
         ];
@@ -898,7 +899,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn(['realFilterToOneAssociation' => 'integer']);
+            ->willReturn(['realSorterToOneAssociation' => 'integer']);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
@@ -909,7 +910,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'toOneAssociation' => [
-                        'property_path' => 'realFilterToOneAssociation'
+                        'property_path' => 'realSorterToOneAssociation'
                     ]
                 ]
             ],
@@ -917,7 +918,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedAssociationAndRenamedFilterByIndexedToManyAssociation()
+    public function testRenamedAssociationAndRenamedSorterByIndexedToManyAssociation()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -932,7 +933,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         $sorters = [
             'fields' => [
                 'toManyAssociation' => [
-                    'property_path' => 'realFilterToManyAssociation.id'
+                    'property_path' => 'realSorterToManyAssociation.id'
                 ]
             ]
         ];
@@ -956,7 +957,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn(['realFilterToManyAssociation' => 'integer']);
+            ->willReturn(['realSorterToManyAssociation' => 'integer']);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
@@ -967,8 +968,63 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'toManyAssociation' => [
-                        'property_path' => 'realFilterToManyAssociation.id'
+                        'property_path' => 'realSorterToManyAssociation.id'
                     ]
+                ]
+            ],
+            $this->context->getSorters()
+        );
+    }
+
+    public function testEnumEntity()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id'       => null,
+                'priority' => null
+            ]
+        ];
+
+        $sorters = [];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
+        $rootEntityMetadata->expects(self::once())
+            ->method('hasField')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getTypeOfField')
+            ->willReturn('integer');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(TestEnumValue::class)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(TestEnumValue::class)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedFields')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedAssociations')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+
+        $this->context->setClassName(TestEnumValue::class);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => null,
+                    'priority' => null
                 ]
             ],
             $this->context->getSorters()

@@ -55,6 +55,8 @@ class SuiteConfigurationRegistry
      */
     protected $suiteGenerators = [];
 
+    private ?string $regex = null;
+
     public function __construct(
         SpecificationFinder $specificationFinder,
         SpecificationCountDivider $specificationDivider,
@@ -73,6 +75,11 @@ class SuiteConfigurationRegistry
     public function getSets()
     {
         return $this->suiteSets;
+    }
+
+    public function setRegex(string $regex)
+    {
+        $this->regex = $regex;
     }
 
     public function setSets(array $sets)
@@ -231,6 +238,14 @@ class SuiteConfigurationRegistry
             /** @var FeatureNode $featureNode */
             foreach ($iterator as $featureNode) {
                 $absolutePath = $featureNode->getFile();
+
+                if ($this->regex !== null) {
+                    $fileContent = \file_get_contents($absolutePath);
+                    if (\preg_match('/' . $this->regex . '/', $fileContent) !== 1) {
+                        continue;
+                    }
+                }
+
                 $relativePath = $this->featurePathLocator->getRelativePath($absolutePath);
                 $features[$relativePath] = null;
             }
