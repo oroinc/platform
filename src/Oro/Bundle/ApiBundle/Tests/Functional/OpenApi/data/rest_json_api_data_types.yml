@@ -1,0 +1,2520 @@
+openapi: 3.1.0
+info:
+  title: 'JSON:API'
+  description: '[The documentation](https://doc.oroinc.com/api/)'
+  version: 0.0.0
+paths:
+  /admin/api/testapialldatatypes:
+    get:
+      tags:
+        - testapialldatatypes
+      summary: 'Get Test All Data Types'
+      description: 'Get a list of entities'
+      operationId: testapialldatatypes-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/filterFieldBigInt'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntEq'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntNeq'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntLt'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntLte'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntGt'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntGte'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntExists'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldBoolean'
+        -
+          $ref: '#/components/parameters/filterFieldBooleanEq'
+        -
+          $ref: '#/components/parameters/filterFieldBooleanNeq'
+        -
+          $ref: '#/components/parameters/filterFieldBooleanExists'
+        -
+          $ref: '#/components/parameters/filterFieldBooleanNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldCurrency'
+        -
+          $ref: '#/components/parameters/filterFieldCurrencyEq'
+        -
+          $ref: '#/components/parameters/filterFieldCurrencyNeq'
+        -
+          $ref: '#/components/parameters/filterFieldCurrencyExists'
+        -
+          $ref: '#/components/parameters/filterFieldCurrencyNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDateTime'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeEq'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeLt'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeLte'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeGt'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeGte'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeExists'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDate'
+        -
+          $ref: '#/components/parameters/filterFieldDateEq'
+        -
+          $ref: '#/components/parameters/filterFieldDateNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDateLt'
+        -
+          $ref: '#/components/parameters/filterFieldDateLte'
+        -
+          $ref: '#/components/parameters/filterFieldDateGt'
+        -
+          $ref: '#/components/parameters/filterFieldDateGte'
+        -
+          $ref: '#/components/parameters/filterFieldDateExists'
+        -
+          $ref: '#/components/parameters/filterFieldDateNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefault'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultEq'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultLt'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultLte'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultGt'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultGte'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultExists'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDecimal'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalEq'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalLt'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalLte'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalGt'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalGte'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalExists'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDuration'
+        -
+          $ref: '#/components/parameters/filterFieldDurationEq'
+        -
+          $ref: '#/components/parameters/filterFieldDurationNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDurationLt'
+        -
+          $ref: '#/components/parameters/filterFieldDurationLte'
+        -
+          $ref: '#/components/parameters/filterFieldDurationGt'
+        -
+          $ref: '#/components/parameters/filterFieldDurationGte'
+        -
+          $ref: '#/components/parameters/filterFieldDurationExists'
+        -
+          $ref: '#/components/parameters/filterFieldDurationNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldFloat'
+        -
+          $ref: '#/components/parameters/filterFieldFloatEq'
+        -
+          $ref: '#/components/parameters/filterFieldFloatNeq'
+        -
+          $ref: '#/components/parameters/filterFieldFloatLt'
+        -
+          $ref: '#/components/parameters/filterFieldFloatLte'
+        -
+          $ref: '#/components/parameters/filterFieldFloatGt'
+        -
+          $ref: '#/components/parameters/filterFieldFloatGte'
+        -
+          $ref: '#/components/parameters/filterFieldFloatExists'
+        -
+          $ref: '#/components/parameters/filterFieldFloatNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldGuid'
+        -
+          $ref: '#/components/parameters/filterFieldGuidEq'
+        -
+          $ref: '#/components/parameters/filterFieldGuidNeq'
+        -
+          $ref: '#/components/parameters/filterFieldGuidExists'
+        -
+          $ref: '#/components/parameters/filterFieldGuidNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldInt'
+        -
+          $ref: '#/components/parameters/filterFieldIntEq'
+        -
+          $ref: '#/components/parameters/filterFieldIntNeq'
+        -
+          $ref: '#/components/parameters/filterFieldIntLt'
+        -
+          $ref: '#/components/parameters/filterFieldIntLte'
+        -
+          $ref: '#/components/parameters/filterFieldIntGt'
+        -
+          $ref: '#/components/parameters/filterFieldIntGte'
+        -
+          $ref: '#/components/parameters/filterFieldIntExists'
+        -
+          $ref: '#/components/parameters/filterFieldIntNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValue'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueEq'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueNeq'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueLt'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueLte'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueGt'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueGte'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueExists'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldMoney'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyEq'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyNeq'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyLt'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyLte'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyGt'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyGte'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyExists'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Eq'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Neq'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Lt'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Lte'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Gt'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Gte'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Exists'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100NeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldPercent'
+        -
+          $ref: '#/components/parameters/filterFieldPercentEq'
+        -
+          $ref: '#/components/parameters/filterFieldPercentNeq'
+        -
+          $ref: '#/components/parameters/filterFieldPercentLt'
+        -
+          $ref: '#/components/parameters/filterFieldPercentLte'
+        -
+          $ref: '#/components/parameters/filterFieldPercentGt'
+        -
+          $ref: '#/components/parameters/filterFieldPercentGte'
+        -
+          $ref: '#/components/parameters/filterFieldPercentExists'
+        -
+          $ref: '#/components/parameters/filterFieldPercentNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldSmallInt'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntEq'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntNeq'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntLt'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntLte'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntGt'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntGte'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntExists'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldString'
+        -
+          $ref: '#/components/parameters/filterFieldStringEq'
+        -
+          $ref: '#/components/parameters/filterFieldStringNeq'
+        -
+          $ref: '#/components/parameters/filterFieldStringExists'
+        -
+          $ref: '#/components/parameters/filterFieldStringNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldTextExists'
+        -
+          $ref: '#/components/parameters/filterFieldTime'
+        -
+          $ref: '#/components/parameters/filterFieldTimeEq'
+        -
+          $ref: '#/components/parameters/filterFieldTimeNeq'
+        -
+          $ref: '#/components/parameters/filterFieldTimeLt'
+        -
+          $ref: '#/components/parameters/filterFieldTimeLte'
+        -
+          $ref: '#/components/parameters/filterFieldTimeGt'
+        -
+          $ref: '#/components/parameters/filterFieldTimeGte'
+        -
+          $ref: '#/components/parameters/filterFieldTimeExists'
+        -
+          $ref: '#/components/parameters/filterFieldTimeNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+        -
+          $ref: '#/components/parameters/fieldsTestapialldatatypes'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapialldatatypesCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    post:
+      tags:
+        - testapialldatatypes
+      summary: 'Create Test All Data Types'
+      description: 'Create an entity'
+      operationId: testapialldatatypes-post
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude1'
+      requestBody:
+        $ref: '#/components/requestBodies/testapialldatatypes1Model'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapialldatatypesModel'
+        '201':
+          $ref: '#/components/responses/testapialldatatypesModel1'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '409':
+          $ref: '#/components/responses/err409_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapialldatatypes
+      summary: 'Delete Test All Data Types'
+      description: 'Delete a list of entities<p><strong>Note:</strong> The maximum number of records this endpoint can delete at a time is 100.</p>'
+      operationId: testapialldatatypes-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude2'
+        -
+          $ref: '#/components/parameters/filterFieldBigInt'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntEq'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntNeq'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntLt'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntLte'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntGt'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntGte'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntExists'
+        -
+          $ref: '#/components/parameters/filterFieldBigIntNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldBoolean'
+        -
+          $ref: '#/components/parameters/filterFieldBooleanEq'
+        -
+          $ref: '#/components/parameters/filterFieldBooleanNeq'
+        -
+          $ref: '#/components/parameters/filterFieldBooleanExists'
+        -
+          $ref: '#/components/parameters/filterFieldBooleanNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldCurrency'
+        -
+          $ref: '#/components/parameters/filterFieldCurrencyEq'
+        -
+          $ref: '#/components/parameters/filterFieldCurrencyNeq'
+        -
+          $ref: '#/components/parameters/filterFieldCurrencyExists'
+        -
+          $ref: '#/components/parameters/filterFieldCurrencyNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDateTime'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeEq'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeLt'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeLte'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeGt'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeGte'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeExists'
+        -
+          $ref: '#/components/parameters/filterFieldDateTimeNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDate'
+        -
+          $ref: '#/components/parameters/filterFieldDateEq'
+        -
+          $ref: '#/components/parameters/filterFieldDateNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDateLt'
+        -
+          $ref: '#/components/parameters/filterFieldDateLte'
+        -
+          $ref: '#/components/parameters/filterFieldDateGt'
+        -
+          $ref: '#/components/parameters/filterFieldDateGte'
+        -
+          $ref: '#/components/parameters/filterFieldDateExists'
+        -
+          $ref: '#/components/parameters/filterFieldDateNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefault'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultEq'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultLt'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultLte'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultGt'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultGte'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultExists'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalDefaultNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDecimal'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalEq'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalLt'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalLte'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalGt'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalGte'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalExists'
+        -
+          $ref: '#/components/parameters/filterFieldDecimalNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldDuration'
+        -
+          $ref: '#/components/parameters/filterFieldDurationEq'
+        -
+          $ref: '#/components/parameters/filterFieldDurationNeq'
+        -
+          $ref: '#/components/parameters/filterFieldDurationLt'
+        -
+          $ref: '#/components/parameters/filterFieldDurationLte'
+        -
+          $ref: '#/components/parameters/filterFieldDurationGt'
+        -
+          $ref: '#/components/parameters/filterFieldDurationGte'
+        -
+          $ref: '#/components/parameters/filterFieldDurationExists'
+        -
+          $ref: '#/components/parameters/filterFieldDurationNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldFloat'
+        -
+          $ref: '#/components/parameters/filterFieldFloatEq'
+        -
+          $ref: '#/components/parameters/filterFieldFloatNeq'
+        -
+          $ref: '#/components/parameters/filterFieldFloatLt'
+        -
+          $ref: '#/components/parameters/filterFieldFloatLte'
+        -
+          $ref: '#/components/parameters/filterFieldFloatGt'
+        -
+          $ref: '#/components/parameters/filterFieldFloatGte'
+        -
+          $ref: '#/components/parameters/filterFieldFloatExists'
+        -
+          $ref: '#/components/parameters/filterFieldFloatNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldGuid'
+        -
+          $ref: '#/components/parameters/filterFieldGuidEq'
+        -
+          $ref: '#/components/parameters/filterFieldGuidNeq'
+        -
+          $ref: '#/components/parameters/filterFieldGuidExists'
+        -
+          $ref: '#/components/parameters/filterFieldGuidNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldInt'
+        -
+          $ref: '#/components/parameters/filterFieldIntEq'
+        -
+          $ref: '#/components/parameters/filterFieldIntNeq'
+        -
+          $ref: '#/components/parameters/filterFieldIntLt'
+        -
+          $ref: '#/components/parameters/filterFieldIntLte'
+        -
+          $ref: '#/components/parameters/filterFieldIntGt'
+        -
+          $ref: '#/components/parameters/filterFieldIntGte'
+        -
+          $ref: '#/components/parameters/filterFieldIntExists'
+        -
+          $ref: '#/components/parameters/filterFieldIntNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValue'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueEq'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueNeq'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueLt'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueLte'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueGt'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueGte'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueExists'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyValueNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldMoney'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyEq'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyNeq'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyLt'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyLte'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyGt'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyGte'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyExists'
+        -
+          $ref: '#/components/parameters/filterFieldMoneyNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Eq'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Neq'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Lt'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Lte'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Gt'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Gte'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100Exists'
+        -
+          $ref: '#/components/parameters/filterFieldPercent100NeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldPercent'
+        -
+          $ref: '#/components/parameters/filterFieldPercentEq'
+        -
+          $ref: '#/components/parameters/filterFieldPercentNeq'
+        -
+          $ref: '#/components/parameters/filterFieldPercentLt'
+        -
+          $ref: '#/components/parameters/filterFieldPercentLte'
+        -
+          $ref: '#/components/parameters/filterFieldPercentGt'
+        -
+          $ref: '#/components/parameters/filterFieldPercentGte'
+        -
+          $ref: '#/components/parameters/filterFieldPercentExists'
+        -
+          $ref: '#/components/parameters/filterFieldPercentNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldSmallInt'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntEq'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntNeq'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntLt'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntLte'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntGt'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntGte'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntExists'
+        -
+          $ref: '#/components/parameters/filterFieldSmallIntNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldString'
+        -
+          $ref: '#/components/parameters/filterFieldStringEq'
+        -
+          $ref: '#/components/parameters/filterFieldStringNeq'
+        -
+          $ref: '#/components/parameters/filterFieldStringExists'
+        -
+          $ref: '#/components/parameters/filterFieldStringNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldTextExists'
+        -
+          $ref: '#/components/parameters/filterFieldTime'
+        -
+          $ref: '#/components/parameters/filterFieldTimeEq'
+        -
+          $ref: '#/components/parameters/filterFieldTimeNeq'
+        -
+          $ref: '#/components/parameters/filterFieldTimeLt'
+        -
+          $ref: '#/components/parameters/filterFieldTimeLte'
+        -
+          $ref: '#/components/parameters/filterFieldTimeGt'
+        -
+          $ref: '#/components/parameters/filterFieldTimeGte'
+        -
+          $ref: '#/components/parameters/filterFieldTimeExists'
+        -
+          $ref: '#/components/parameters/filterFieldTimeNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty1'
+        '403':
+          $ref: '#/components/responses/err403_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapialldatatypes
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapialldatatypes-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapialldatatypes/{id}':
+    get:
+      tags:
+        - testapialldatatypes
+      summary: 'Get Test All Data Types'
+      description: 'Get an entity'
+      operationId: testapialldatatypes-id-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapialldatatypes'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapialldatatypesModel2'
+        '403':
+          $ref: '#/components/responses/err403_4'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapialldatatypes
+      summary: 'Delete Test All Data Types'
+      description: 'Delete an entity'
+      operationId: testapialldatatypes-id-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty2'
+        '403':
+          $ref: '#/components/responses/err403_6'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapialldatatypes
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapialldatatypes-id-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapialldatatypes
+      summary: 'Update Test All Data Types'
+      description: 'Update an entity'
+      operationId: testapialldatatypes-id-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapialldatatypesModel'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapialldatatypesModel3'
+        '201':
+          $ref: '#/components/responses/testapialldatatypesModel4'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_5'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '409':
+          $ref: '#/components/responses/err409_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+components:
+  schemas:
+    meta:
+      type: object
+      additionalProperties: true
+    link:
+      type: object
+      oneOf:
+        -
+          description: 'A string containing the link’s URL'
+          type: string
+          format: uri-reference
+        -
+          required:
+            - href
+          properties:
+            href:
+              description: 'A string containing the link’s URL.'
+              type: string
+              format: uri-reference
+            meta:
+              $ref: '#/components/schemas/meta'
+          type: object
+    links:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    error:
+      properties:
+        id:
+          description: 'A unique identifier for this particular occurrence of the problem.'
+          type: string
+        status:
+          description: 'The HTTP status code applicable to this problem.'
+          type: string
+        code:
+          description: 'An application-specific error code.'
+          type: string
+        title:
+          description: 'A short, human-readable summary of the problem that is not changed from occurrence to occurrence of the problem.'
+          type: string
+        detail:
+          description: 'A human-readable explanation specific to this occurrence of the problem.'
+          type: string
+        source:
+          description: 'An object containing references to the source of the error.'
+          properties:
+            pointer:
+              description: 'A [JSON Pointer](https://tools.ietf.org/html/rfc6901) to the associated entity in the request document (e.g. `/data` for a primary data object, or `/data/attributes/title` for a specific attribute).'
+              type: string
+            parameter:
+              description: 'A string indicating which URI query parameter caused the error.'
+              type: string
+          type: object
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    errors:
+      type: array
+      items:
+        $ref: '#/components/schemas/error'
+      uniqueItems: true
+    failure:
+      required:
+        - errors
+      properties:
+        errors:
+          $ref: '#/components/schemas/errors'
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/relationshipDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForDataModel:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    linksForRelationshipToOne:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the relationship itself.'
+        related:
+          $ref: '#/components/schemas/link'
+          description: 'A link provides access to resource object linked in the relationship.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    relationshipCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/relationshipDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForRelationshipToMany:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the relationship itself.'
+        related:
+          $ref: '#/components/schemas/link'
+          description: 'A link provides access to resource objects linked in the relationship.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    testapialldatatypesCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapialldatatypesDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelCollection'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapialldatatypesDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapialldatatypes
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          properties:
+            fieldArray:
+              $ref: '#/components/schemas/array'
+            fieldBigInt:
+              $ref: '#/components/schemas/bigint'
+            fieldBoolean:
+              type: boolean
+            fieldCurrency:
+              $ref: '#/components/schemas/currency'
+            fieldDate:
+              $ref: '#/components/schemas/date'
+            fieldDateTime:
+              $ref: '#/components/schemas/datetime'
+            fieldDecimal:
+              type: number
+            fieldDecimalDefault:
+              type: number
+            fieldDuration:
+              type: integer
+            fieldFloat:
+              type: number
+            fieldGuid:
+              $ref: '#/components/schemas/guid'
+            fieldInt:
+              type: integer
+            fieldJson:
+              $ref: '#/components/schemas/object'
+            fieldJsonArray:
+              $ref: '#/components/schemas/object'
+            fieldMoney:
+              type: number
+            fieldMoneyValue:
+              type: number
+            fieldPercent:
+              type: number
+            fieldPercent100:
+              type: number
+            fieldPercent100Round:
+              type: number
+            fieldPercentRound:
+              type: number
+            fieldSimpleArray:
+              $ref: '#/components/schemas/scalarArray'
+            fieldSmallInt:
+              type: integer
+            fieldString:
+              type: string
+            fieldText:
+              $ref: '#/components/schemas/text'
+            fieldTime:
+              $ref: '#/components/schemas/time'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    array:
+      type: array
+      items:
+        $ref: '#/components/schemas/mixed'
+    mixed:
+      type: object
+      oneOf:
+        -
+          type: string
+        -
+          type: integer
+        -
+          type: number
+        -
+          type: boolean
+        -
+          $ref: '#/components/schemas/object'
+        -
+          $ref: '#/components/schemas/array'
+        -
+          type: 'null'
+    object:
+      type: object
+      additionalProperties: true
+    bigint:
+      type: string
+      format: bigint
+      pattern: '-?\d+'
+    currency:
+      type: string
+      format: currency
+    date:
+      type: string
+      format: date
+      pattern: '\d{4}(-\d{2}(-\d{2}?)?)?'
+    datetime:
+      type: string
+      format: datetime
+      pattern: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
+    guid:
+      type: string
+      format: guid
+      pattern: '[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}'
+    scalarArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/scalar'
+    scalar:
+      type: object
+      oneOf:
+        -
+          type: string
+        -
+          type: integer
+        -
+          type: number
+        -
+          type: boolean
+        -
+          type: 'null'
+    text:
+      type: string
+      format: text
+    time:
+      type: string
+      format: time
+      pattern: '\d{2}:\d{2}(:\d{2}(\.\d+)?)?'
+    linksForTopLevelCollection:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+        first:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the first page of data.'
+        last:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the last page of data.'
+        prev:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the previous page of data.'
+        next:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the next page of data.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    objectArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/object'
+    testapialldatatypesModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapialldatatypesDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    linksForTopLevelItem:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    testapialldatatypes1Model:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapialldatatypes1DataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapialldatatypes1DataModel:
+      required:
+        - type
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapialldatatypes
+        id:
+          description: '<p>The unique identifier of a resource.</p><p><strong>The read-only field. A passed value will be ignored.</strong></p>'
+          type: string
+        attributes:
+          properties:
+            fieldArray:
+              $ref: '#/components/schemas/array'
+            fieldBigInt:
+              $ref: '#/components/schemas/bigint'
+            fieldBoolean:
+              type: boolean
+            fieldCurrency:
+              $ref: '#/components/schemas/currency'
+            fieldDate:
+              $ref: '#/components/schemas/date'
+            fieldDateTime:
+              $ref: '#/components/schemas/datetime'
+            fieldDecimal:
+              type: number
+            fieldDecimalDefault:
+              type: number
+            fieldDuration:
+              type: integer
+            fieldFloat:
+              type: number
+            fieldGuid:
+              $ref: '#/components/schemas/guid'
+            fieldInt:
+              type: integer
+            fieldJson:
+              $ref: '#/components/schemas/object'
+            fieldJsonArray:
+              $ref: '#/components/schemas/object'
+            fieldMoney:
+              type: number
+            fieldMoneyValue:
+              type: number
+            fieldPercent:
+              type: number
+            fieldPercent100:
+              type: number
+            fieldPercent100Round:
+              type: number
+            fieldPercentRound:
+              type: number
+            fieldSimpleArray:
+              $ref: '#/components/schemas/scalarArray'
+            fieldSmallInt:
+              type: integer
+            fieldString:
+              type: string
+            fieldText:
+              $ref: '#/components/schemas/text'
+            fieldTime:
+              $ref: '#/components/schemas/time'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    bigintUnionArrayRange:
+      oneOf:
+        -
+          $ref: '#/components/schemas/bigint'
+        -
+          $ref: '#/components/schemas/bigintArray'
+        -
+          $ref: '#/components/schemas/bigintRange'
+    bigintArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/bigint'
+    bigintRange:
+      type: string
+      pattern: '-?\d+\.\.-?\d+'
+    stringUnionArray:
+      oneOf:
+        -
+          type: string
+        -
+          $ref: '#/components/schemas/stringArray'
+    stringArray:
+      type: array
+      items:
+        type: string
+    datetimeUnionRange:
+      oneOf:
+        -
+          $ref: '#/components/schemas/datetime'
+        -
+          $ref: '#/components/schemas/datetimeRange'
+    datetimeRange:
+      type: string
+      pattern: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?\.\.\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
+    dateUnionRange:
+      oneOf:
+        -
+          $ref: '#/components/schemas/date'
+        -
+          $ref: '#/components/schemas/dateRange'
+    dateRange:
+      type: string
+      pattern: '\d{4}(-\d{2}(-\d{2}?)?)?\.\.\d{4}(-\d{2}(-\d{2}?)?)?'
+    decimalUnionArrayRange:
+      oneOf:
+        -
+          type: number
+        -
+          $ref: '#/components/schemas/decimalArray'
+        -
+          $ref: '#/components/schemas/decimalRange'
+    decimalArray:
+      type: array
+      items:
+        type: number
+    decimalRange:
+      type: string
+      pattern: '-?\d*\.?\d+\.\.-?\d*\.?\d+'
+    integerUnionArrayRange:
+      oneOf:
+        -
+          type: integer
+        -
+          $ref: '#/components/schemas/integerArray'
+        -
+          $ref: '#/components/schemas/integerRange'
+    integerArray:
+      type: array
+      items:
+        type: integer
+    integerRange:
+      type: string
+      pattern: '-?\d+\.\.-?\d+'
+    floatUnionArrayRange:
+      oneOf:
+        -
+          type: number
+        -
+          $ref: '#/components/schemas/floatArray'
+        -
+          $ref: '#/components/schemas/floatRange'
+    floatArray:
+      type: array
+      items:
+        type: number
+    floatRange:
+      type: string
+      pattern: '-?\d*\.?\d+\.\.-?\d*\.?\d+'
+    moneyUnionArrayRange:
+      oneOf:
+        -
+          type: number
+        -
+          $ref: '#/components/schemas/moneyArray'
+        -
+          $ref: '#/components/schemas/moneyRange'
+    moneyArray:
+      type: array
+      items:
+        type: number
+    moneyRange:
+      type: string
+      pattern: '-?\d*\.?\d+\.\.-?\d*\.?\d+'
+    smallintUnionArrayRange:
+      oneOf:
+        -
+          type: integer
+        -
+          $ref: '#/components/schemas/smallintArray'
+        -
+          $ref: '#/components/schemas/smallintRange'
+    smallintArray:
+      type: array
+      items:
+        type: integer
+    smallintRange:
+      type: string
+      pattern: '-?\d+\.\.-?\d+'
+    timeUnionRange:
+      oneOf:
+        -
+          $ref: '#/components/schemas/time'
+        -
+          $ref: '#/components/schemas/timeRange'
+    timeRange:
+      type: string
+      pattern: '\d{2}:\d{2}(:\d{2}(\.\d+)?)?\.\.\d{2}:\d{2}(:\d{2}(\.\d+)?)?'
+    unsignedInteger_1:
+      type: integer
+      default: 1
+      minimum: 0
+    orderBy_id:
+      type: string
+      format: orderBy
+      default: id
+      pattern: '-?[\w\.]+(,-?[\w\.]+)*'
+  responses:
+    empty:
+      description: 'Returned when successful'
+    err400_1:
+      description: 'Returned when the request data is not valid'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err404_1:
+      description: 'Returned when the entity is not found'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err500_1:
+      description: 'Returned when an unexpected error occurs'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapialldatatypesCollectionModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapialldatatypesCollectionModel'
+    err403_1:
+      description: 'Returned when no permissions to get the entities'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapialldatatypesModel:
+      description: 'Returned when the entity was successfully updated'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapialldatatypesModel'
+    testapialldatatypesModel1:
+      description: 'Returned when the entity was successfully created'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapialldatatypesModel'
+    err403_2:
+      description: 'Returned when no permissions to create the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err409_1:
+      description: "Returned when the specified entity type does not match the server's endpoint"
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty1:
+      description: 'Returned when the entities successfully deleted'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+        X-Include-Deleted-Count:
+          $ref: '#/components/headers/xIncludeDeletedCount'
+    err403_3:
+      description: 'Returned when no permissions to delete the entities'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapialldatatypesModel2:
+      description: 'Returned when successful'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapialldatatypesModel'
+    err403_4:
+      description: 'Returned when no permissions to get the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapialldatatypesModel3:
+      description: 'Returned when the entity was successfully updated'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapialldatatypesModel'
+    testapialldatatypesModel4:
+      description: 'Returned when the entity was successfully created'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapialldatatypesModel'
+    err403_5:
+      description: 'Returned when no permissions to update the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err409_2:
+      description: "Returned when the specified entity type and identifier do not match the server's endpoint"
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty2:
+      description: 'Returned when the entity successfully deleted'
+    err403_6:
+      description: 'Returned when no permissions to delete the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+  parameters:
+    accept:
+      name: Accept
+      in: header
+      schema:
+        type: string
+      example: application/vnd.api+json
+    xInclude:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: totalCount
+    filterFieldBigInt:
+      name: 'filter[fieldBigInt]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        $ref: '#/components/schemas/bigintUnionArrayRange'
+    filterFieldBigIntEq:
+      name: 'filter[fieldBigInt][eq]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        $ref: '#/components/schemas/bigintUnionArrayRange'
+    filterFieldBigIntNeq:
+      name: 'filter[fieldBigInt][neq]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        $ref: '#/components/schemas/bigintUnionArrayRange'
+    filterFieldBigIntLt:
+      name: 'filter[fieldBigInt][lt]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        $ref: '#/components/schemas/bigintUnionArrayRange'
+    filterFieldBigIntLte:
+      name: 'filter[fieldBigInt][lte]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        $ref: '#/components/schemas/bigintUnionArrayRange'
+    filterFieldBigIntGt:
+      name: 'filter[fieldBigInt][gt]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        $ref: '#/components/schemas/bigintUnionArrayRange'
+    filterFieldBigIntGte:
+      name: 'filter[fieldBigInt][gte]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        $ref: '#/components/schemas/bigintUnionArrayRange'
+    filterFieldBigIntExists:
+      name: 'filter[fieldBigInt][exists]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        type: boolean
+    filterFieldBigIntNeqOrNull:
+      name: 'filter[fieldBigInt][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldBigInt' field."
+      schema:
+        $ref: '#/components/schemas/bigintUnionArrayRange'
+    filterFieldBoolean:
+      name: 'filter[fieldBoolean]'
+      in: query
+      description: "Filter records by 'fieldBoolean' field."
+      schema:
+        type: boolean
+    filterFieldBooleanEq:
+      name: 'filter[fieldBoolean][eq]'
+      in: query
+      description: "Filter records by 'fieldBoolean' field."
+      schema:
+        type: boolean
+    filterFieldBooleanNeq:
+      name: 'filter[fieldBoolean][neq]'
+      in: query
+      description: "Filter records by 'fieldBoolean' field."
+      schema:
+        type: boolean
+    filterFieldBooleanExists:
+      name: 'filter[fieldBoolean][exists]'
+      in: query
+      description: "Filter records by 'fieldBoolean' field."
+      schema:
+        type: boolean
+    filterFieldBooleanNeqOrNull:
+      name: 'filter[fieldBoolean][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldBoolean' field."
+      schema:
+        type: boolean
+    filterFieldCurrency:
+      name: 'filter[fieldCurrency]'
+      in: query
+      description: "Filter records by 'fieldCurrency' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldCurrencyEq:
+      name: 'filter[fieldCurrency][eq]'
+      in: query
+      description: "Filter records by 'fieldCurrency' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldCurrencyNeq:
+      name: 'filter[fieldCurrency][neq]'
+      in: query
+      description: "Filter records by 'fieldCurrency' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldCurrencyExists:
+      name: 'filter[fieldCurrency][exists]'
+      in: query
+      description: "Filter records by 'fieldCurrency' field."
+      schema:
+        type: boolean
+    filterFieldCurrencyNeqOrNull:
+      name: 'filter[fieldCurrency][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldCurrency' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldDateTime:
+      name: 'filter[fieldDateTime]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        $ref: '#/components/schemas/datetimeUnionRange'
+    filterFieldDateTimeEq:
+      name: 'filter[fieldDateTime][eq]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        $ref: '#/components/schemas/datetimeUnionRange'
+    filterFieldDateTimeNeq:
+      name: 'filter[fieldDateTime][neq]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        $ref: '#/components/schemas/datetimeUnionRange'
+    filterFieldDateTimeLt:
+      name: 'filter[fieldDateTime][lt]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        $ref: '#/components/schemas/datetimeUnionRange'
+    filterFieldDateTimeLte:
+      name: 'filter[fieldDateTime][lte]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        $ref: '#/components/schemas/datetimeUnionRange'
+    filterFieldDateTimeGt:
+      name: 'filter[fieldDateTime][gt]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        $ref: '#/components/schemas/datetimeUnionRange'
+    filterFieldDateTimeGte:
+      name: 'filter[fieldDateTime][gte]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        $ref: '#/components/schemas/datetimeUnionRange'
+    filterFieldDateTimeExists:
+      name: 'filter[fieldDateTime][exists]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        type: boolean
+    filterFieldDateTimeNeqOrNull:
+      name: 'filter[fieldDateTime][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldDateTime' field."
+      schema:
+        $ref: '#/components/schemas/datetimeUnionRange'
+    filterFieldDate:
+      name: 'filter[fieldDate]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        $ref: '#/components/schemas/dateUnionRange'
+    filterFieldDateEq:
+      name: 'filter[fieldDate][eq]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        $ref: '#/components/schemas/dateUnionRange'
+    filterFieldDateNeq:
+      name: 'filter[fieldDate][neq]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        $ref: '#/components/schemas/dateUnionRange'
+    filterFieldDateLt:
+      name: 'filter[fieldDate][lt]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        $ref: '#/components/schemas/dateUnionRange'
+    filterFieldDateLte:
+      name: 'filter[fieldDate][lte]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        $ref: '#/components/schemas/dateUnionRange'
+    filterFieldDateGt:
+      name: 'filter[fieldDate][gt]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        $ref: '#/components/schemas/dateUnionRange'
+    filterFieldDateGte:
+      name: 'filter[fieldDate][gte]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        $ref: '#/components/schemas/dateUnionRange'
+    filterFieldDateExists:
+      name: 'filter[fieldDate][exists]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        type: boolean
+    filterFieldDateNeqOrNull:
+      name: 'filter[fieldDate][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldDate' field."
+      schema:
+        $ref: '#/components/schemas/dateUnionRange'
+    filterFieldDecimalDefault:
+      name: 'filter[fieldDecimalDefault]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalDefaultEq:
+      name: 'filter[fieldDecimalDefault][eq]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalDefaultNeq:
+      name: 'filter[fieldDecimalDefault][neq]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalDefaultLt:
+      name: 'filter[fieldDecimalDefault][lt]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalDefaultLte:
+      name: 'filter[fieldDecimalDefault][lte]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalDefaultGt:
+      name: 'filter[fieldDecimalDefault][gt]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalDefaultGte:
+      name: 'filter[fieldDecimalDefault][gte]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalDefaultExists:
+      name: 'filter[fieldDecimalDefault][exists]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        type: boolean
+    filterFieldDecimalDefaultNeqOrNull:
+      name: 'filter[fieldDecimalDefault][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldDecimalDefault' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimal:
+      name: 'filter[fieldDecimal]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalEq:
+      name: 'filter[fieldDecimal][eq]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalNeq:
+      name: 'filter[fieldDecimal][neq]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalLt:
+      name: 'filter[fieldDecimal][lt]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalLte:
+      name: 'filter[fieldDecimal][lte]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalGt:
+      name: 'filter[fieldDecimal][gt]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalGte:
+      name: 'filter[fieldDecimal][gte]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDecimalExists:
+      name: 'filter[fieldDecimal][exists]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        type: boolean
+    filterFieldDecimalNeqOrNull:
+      name: 'filter[fieldDecimal][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldDecimal' field."
+      schema:
+        $ref: '#/components/schemas/decimalUnionArrayRange'
+    filterFieldDuration:
+      name: 'filter[fieldDuration]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldDurationEq:
+      name: 'filter[fieldDuration][eq]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldDurationNeq:
+      name: 'filter[fieldDuration][neq]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldDurationLt:
+      name: 'filter[fieldDuration][lt]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldDurationLte:
+      name: 'filter[fieldDuration][lte]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldDurationGt:
+      name: 'filter[fieldDuration][gt]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldDurationGte:
+      name: 'filter[fieldDuration][gte]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldDurationExists:
+      name: 'filter[fieldDuration][exists]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        type: boolean
+    filterFieldDurationNeqOrNull:
+      name: 'filter[fieldDuration][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldDuration' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldFloat:
+      name: 'filter[fieldFloat]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldFloatEq:
+      name: 'filter[fieldFloat][eq]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldFloatNeq:
+      name: 'filter[fieldFloat][neq]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldFloatLt:
+      name: 'filter[fieldFloat][lt]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldFloatLte:
+      name: 'filter[fieldFloat][lte]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldFloatGt:
+      name: 'filter[fieldFloat][gt]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldFloatGte:
+      name: 'filter[fieldFloat][gte]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldFloatExists:
+      name: 'filter[fieldFloat][exists]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        type: boolean
+    filterFieldFloatNeqOrNull:
+      name: 'filter[fieldFloat][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldFloat' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldGuid:
+      name: 'filter[fieldGuid]'
+      in: query
+      description: "Filter records by 'fieldGuid' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldGuidEq:
+      name: 'filter[fieldGuid][eq]'
+      in: query
+      description: "Filter records by 'fieldGuid' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldGuidNeq:
+      name: 'filter[fieldGuid][neq]'
+      in: query
+      description: "Filter records by 'fieldGuid' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldGuidExists:
+      name: 'filter[fieldGuid][exists]'
+      in: query
+      description: "Filter records by 'fieldGuid' field."
+      schema:
+        type: boolean
+    filterFieldGuidNeqOrNull:
+      name: 'filter[fieldGuid][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldGuid' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldInt:
+      name: 'filter[fieldInt]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldIntEq:
+      name: 'filter[fieldInt][eq]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldIntNeq:
+      name: 'filter[fieldInt][neq]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldIntLt:
+      name: 'filter[fieldInt][lt]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldIntLte:
+      name: 'filter[fieldInt][lte]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldIntGt:
+      name: 'filter[fieldInt][gt]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldIntGte:
+      name: 'filter[fieldInt][gte]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldIntExists:
+      name: 'filter[fieldInt][exists]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        type: boolean
+    filterFieldIntNeqOrNull:
+      name: 'filter[fieldInt][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldInt' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterFieldMoneyValue:
+      name: 'filter[fieldMoneyValue]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyValueEq:
+      name: 'filter[fieldMoneyValue][eq]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyValueNeq:
+      name: 'filter[fieldMoneyValue][neq]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyValueLt:
+      name: 'filter[fieldMoneyValue][lt]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyValueLte:
+      name: 'filter[fieldMoneyValue][lte]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyValueGt:
+      name: 'filter[fieldMoneyValue][gt]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyValueGte:
+      name: 'filter[fieldMoneyValue][gte]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyValueExists:
+      name: 'filter[fieldMoneyValue][exists]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        type: boolean
+    filterFieldMoneyValueNeqOrNull:
+      name: 'filter[fieldMoneyValue][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldMoneyValue' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoney:
+      name: 'filter[fieldMoney]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyEq:
+      name: 'filter[fieldMoney][eq]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyNeq:
+      name: 'filter[fieldMoney][neq]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyLt:
+      name: 'filter[fieldMoney][lt]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyLte:
+      name: 'filter[fieldMoney][lte]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyGt:
+      name: 'filter[fieldMoney][gt]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyGte:
+      name: 'filter[fieldMoney][gte]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldMoneyExists:
+      name: 'filter[fieldMoney][exists]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        type: boolean
+    filterFieldMoneyNeqOrNull:
+      name: 'filter[fieldMoney][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldMoney' field."
+      schema:
+        $ref: '#/components/schemas/moneyUnionArrayRange'
+    filterFieldPercent100:
+      name: 'filter[fieldPercent100]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercent100Eq:
+      name: 'filter[fieldPercent100][eq]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercent100Neq:
+      name: 'filter[fieldPercent100][neq]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercent100Lt:
+      name: 'filter[fieldPercent100][lt]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercent100Lte:
+      name: 'filter[fieldPercent100][lte]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercent100Gt:
+      name: 'filter[fieldPercent100][gt]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercent100Gte:
+      name: 'filter[fieldPercent100][gte]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercent100Exists:
+      name: 'filter[fieldPercent100][exists]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        type: boolean
+    filterFieldPercent100NeqOrNull:
+      name: 'filter[fieldPercent100][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldPercent100' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercent:
+      name: 'filter[fieldPercent]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercentEq:
+      name: 'filter[fieldPercent][eq]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercentNeq:
+      name: 'filter[fieldPercent][neq]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercentLt:
+      name: 'filter[fieldPercent][lt]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercentLte:
+      name: 'filter[fieldPercent][lte]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercentGt:
+      name: 'filter[fieldPercent][gt]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercentGte:
+      name: 'filter[fieldPercent][gte]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldPercentExists:
+      name: 'filter[fieldPercent][exists]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        type: boolean
+    filterFieldPercentNeqOrNull:
+      name: 'filter[fieldPercent][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldPercent' field."
+      schema:
+        $ref: '#/components/schemas/floatUnionArrayRange'
+    filterFieldSmallInt:
+      name: 'filter[fieldSmallInt]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        $ref: '#/components/schemas/smallintUnionArrayRange'
+    filterFieldSmallIntEq:
+      name: 'filter[fieldSmallInt][eq]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        $ref: '#/components/schemas/smallintUnionArrayRange'
+    filterFieldSmallIntNeq:
+      name: 'filter[fieldSmallInt][neq]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        $ref: '#/components/schemas/smallintUnionArrayRange'
+    filterFieldSmallIntLt:
+      name: 'filter[fieldSmallInt][lt]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        $ref: '#/components/schemas/smallintUnionArrayRange'
+    filterFieldSmallIntLte:
+      name: 'filter[fieldSmallInt][lte]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        $ref: '#/components/schemas/smallintUnionArrayRange'
+    filterFieldSmallIntGt:
+      name: 'filter[fieldSmallInt][gt]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        $ref: '#/components/schemas/smallintUnionArrayRange'
+    filterFieldSmallIntGte:
+      name: 'filter[fieldSmallInt][gte]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        $ref: '#/components/schemas/smallintUnionArrayRange'
+    filterFieldSmallIntExists:
+      name: 'filter[fieldSmallInt][exists]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        type: boolean
+    filterFieldSmallIntNeqOrNull:
+      name: 'filter[fieldSmallInt][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldSmallInt' field."
+      schema:
+        $ref: '#/components/schemas/smallintUnionArrayRange'
+    filterFieldString:
+      name: 'filter[fieldString]'
+      in: query
+      description: "Filter records by 'fieldString' field."
+      schema:
+        type: string
+    filterFieldStringEq:
+      name: 'filter[fieldString][eq]'
+      in: query
+      description: "Filter records by 'fieldString' field."
+      schema:
+        type: string
+    filterFieldStringNeq:
+      name: 'filter[fieldString][neq]'
+      in: query
+      description: "Filter records by 'fieldString' field."
+      schema:
+        type: string
+    filterFieldStringExists:
+      name: 'filter[fieldString][exists]'
+      in: query
+      description: "Filter records by 'fieldString' field."
+      schema:
+        type: boolean
+    filterFieldStringNeqOrNull:
+      name: 'filter[fieldString][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldString' field."
+      schema:
+        type: string
+    filterFieldTextExists:
+      name: 'filter[fieldText][exists]'
+      in: query
+      description: "Filter records by 'fieldText' field."
+      schema:
+        type: boolean
+    filterFieldTime:
+      name: 'filter[fieldTime]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        $ref: '#/components/schemas/timeUnionRange'
+    filterFieldTimeEq:
+      name: 'filter[fieldTime][eq]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        $ref: '#/components/schemas/timeUnionRange'
+    filterFieldTimeNeq:
+      name: 'filter[fieldTime][neq]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        $ref: '#/components/schemas/timeUnionRange'
+    filterFieldTimeLt:
+      name: 'filter[fieldTime][lt]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        $ref: '#/components/schemas/timeUnionRange'
+    filterFieldTimeLte:
+      name: 'filter[fieldTime][lte]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        $ref: '#/components/schemas/timeUnionRange'
+    filterFieldTimeGt:
+      name: 'filter[fieldTime][gt]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        $ref: '#/components/schemas/timeUnionRange'
+    filterFieldTimeGte:
+      name: 'filter[fieldTime][gte]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        $ref: '#/components/schemas/timeUnionRange'
+    filterFieldTimeExists:
+      name: 'filter[fieldTime][exists]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        type: boolean
+    filterFieldTimeNeqOrNull:
+      name: 'filter[fieldTime][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldTime' field."
+      schema:
+        $ref: '#/components/schemas/timeUnionRange'
+    filterId:
+      name: 'filter[id]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdEq:
+      name: 'filter[id][eq]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdNeq:
+      name: 'filter[id][neq]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdLt:
+      name: 'filter[id][lt]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdLte:
+      name: 'filter[id][lte]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdGt:
+      name: 'filter[id][gt]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdGte:
+      name: 'filter[id][gte]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    fieldsTestapialldatatypes:
+      name: 'fields[testapialldatatypes]'
+      in: query
+      description: "A list of fields of 'testapialldatatypes' entity that will be returned in the response."
+      schema:
+        type: string
+    meta:
+      name: meta
+      in: query
+      description: 'A list of meta properties to be returned. Comma-separated names.'
+      schema:
+        type: string
+    pageNumber:
+      name: 'page[number]'
+      in: query
+      description: 'The page number, starting from 1.'
+      schema:
+        $ref: '#/components/schemas/unsignedInteger_1'
+    pageSize:
+      name: 'page[size]'
+      in: query
+      description: 'The number of items per page.'
+      schema:
+        type: integer
+        default: 10
+    sort:
+      name: sort
+      in: query
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'."
+      schema:
+        $ref: '#/components/schemas/orderBy_id'
+    contentType:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      example: application/vnd.api+json
+    xInclude1:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: noHateoas
+    xInclude2:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: deletedCount
+    id:
+      name: id
+      in: path
+      description: 'The unique identifier of a resource.'
+      required: true
+      schema:
+        type: integer
+  requestBodies:
+    testapialldatatypes1Model:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapialldatatypes1Model'
+    testapialldatatypesModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapialldatatypesModel'
+  headers:
+    xIncludeTotalCount:
+      description: 'The total number of entities. Returned when the total count was requested by "X-Include: totalCount" request header.'
+      schema:
+        type: integer
+    location:
+      description: 'The URL of a newly created API resource.'
+      schema:
+        type: string
+    xIncludeDeletedCount:
+      description: 'The total number of deleted entities. Returned when the total count was requested by "X-Include: deletedCount" request header.'
+      schema:
+        type: integer

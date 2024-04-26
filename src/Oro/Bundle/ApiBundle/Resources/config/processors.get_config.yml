@@ -285,14 +285,14 @@ services:
     oro_api.get_config.complete_status_codes:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\Rest\CompleteStatusCodes
         tags:
-            - { name: oro.api.processor, action: get_config, extra: 'descriptions&!identifier_fields_only', requestType: rest, priority: -200 }
+            - { name: oro.api.processor, action: get_config, extra: 'descriptions', requestType: rest, priority: -200 }
 
     oro_api.get_config.json_api.complete_status_codes:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi\CompleteStatusCodes
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: 'descriptions&!identifier_fields_only', requestType: rest&json_api, priority: -205 }
+            - { name: oro.api.processor, action: get_config, extra: 'descriptions', requestType: rest&json_api, priority: -205 }
 
     oro_api.get_config.complete_descriptions:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions
