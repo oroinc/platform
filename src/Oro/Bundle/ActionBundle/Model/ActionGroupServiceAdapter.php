@@ -72,24 +72,36 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
 
             $this->parameters = [];
             $reflection = new \ReflectionMethod($this->service, $this->method);
-            foreach ($reflection->getParameters() as $methodParameter) {
-                $argName = $methodParameter->getName();
-                $parameterName = $this->argumentNameToParameterName[$argName] ?? $argName;
+            foreach ($reflection->getParameters() as $methodArg) {
+                $parameter = $this->createParameterByMethodArgument($methodArg);
 
-                $parameter = new Parameter($parameterName);
-                if ($methodParameter->hasType()) {
-                    $parameter->setType($methodParameter->getType()->getName());
-                }
-
-                if ($methodParameter->isOptional() && $methodParameter->isDefaultValueAvailable()) {
-                    $parameter->setDefault($methodParameter->getDefaultValue());
-                }
-
-                $this->parameters[] = $parameter;
+                $this->parameters[$parameter->getName()] = $parameter;
             }
         }
 
         return $this->parameters;
+    }
+
+    private function createParameterByMethodArgument(\ReflectionParameter $methodParameter): Parameter
+    {
+        $argName = $methodParameter->getName();
+        $parameterName = $this->argumentNameToParameterName[$argName] ?? null;
+        $parameterConfig = $this->parametersConfig[$parameterName] ?? [];
+
+        $parameter = new Parameter($parameterName ?? $argName);
+        if (!empty($parameterConfig['type']) || $methodParameter->hasType()) {
+            $parameter->setType($parameterConfig['type'] ?? $methodParameter->getType()?->getName());
+        }
+
+        if (!empty($parameterConfig['type'])
+            || ($methodParameter->isOptional() && $methodParameter->isDefaultValueAvailable())
+        ) {
+            $parameter->setDefault($parameterConfig['type'] ?? $methodParameter->getDefaultValue());
+        }
+
+        $parameter->setMessage($parameterConfig['message'] ?? null);
+
+        return $parameter;
     }
 
     private function getMethodArguments(ActionData $data): array
