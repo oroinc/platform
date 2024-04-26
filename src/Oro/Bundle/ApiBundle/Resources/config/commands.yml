@@ -66,3 +66,9 @@ services:
             - '@oro_entity.delete_handler_registry'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\OpenApiDumpCommand:
+        arguments:
+            - '@oro_api.api_doc.open_api.renderer'
+        tags:
+            - { name: console.command }

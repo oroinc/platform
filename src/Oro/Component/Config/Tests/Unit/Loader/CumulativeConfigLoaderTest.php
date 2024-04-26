@@ -216,7 +216,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
                         DIRECTORY_SEPARATOR,
                         $appRootDir . '/Resources/TestBundle1' . $pathWithoutResources
                     ),
-                    ['test' => 456]
+                    ['test' => PHP_INT_MAX]
                 )
             ],
             $result

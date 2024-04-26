@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 class OroAttachmentExtension extends Extension implements PrependExtensionInterface
 {
@@ -62,8 +62,7 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
             $config['cleanup']['load_attachments_batch_size']
         );
 
-        $yaml = new Parser();
-        $value = $yaml->parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));
+        $value = Yaml::parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));
         $container->setParameter('oro_attachment.files', $value['file-icons']);
     }
 
