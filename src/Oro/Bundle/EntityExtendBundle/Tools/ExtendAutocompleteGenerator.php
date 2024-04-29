@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Collections\Collection;
 use Nette\PhpGenerator\TraitType;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldAccessorsHelper;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldIterator;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendedEntityFieldsProcessor;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProvider;
@@ -20,10 +22,10 @@ use Psr\Log\LoggerInterface;
 class ExtendAutocompleteGenerator
 {
     public function __construct(
-        protected ConfigManager      $configManager,
+        protected ConfigManager $configManager,
         protected ContainerInterface $locator,
-        protected string             $storageDir,
-        protected LoggerInterface    $logger
+        protected string $storageDir,
+        protected LoggerInterface $logger
     ) {
         ExtendedEntityFieldsProcessor::initialize(
             $locator->get(EntityFieldIterator::class),
@@ -69,7 +71,7 @@ class ExtendAutocompleteGenerator
         $result = "\n" . '/** ' . "\n";
         $extendMethods = EntityPropertyInfo::getExtendedMethods($schema['entity']);
         $extendProperties = EntityPropertyInfo::getExtendedProperties($schema['entity']);
-        $result .= ' * @see \\'. $schema['entity'] . "\n *\n";
+        $result .= ' * @see \\' . $schema['entity'] . "\n *\n";
         if (empty($extendProperties) && empty($extendMethods)) {
             return '';
         }
@@ -83,9 +85,10 @@ class ExtendAutocompleteGenerator
         foreach ($extendMethods as $methodName) {
             $arguments = [$schema['entity'], $methodName];
             $format = ' * @method \%s %s';
-            $format .= $this->getTypedFormat(
+            $format .= $this->getTypedFormatWithPropertyCheck(
                 $methodName,
                 EntityPropertyInfo::getExtendedMethodInfo($schema['entity'], $methodName),
+                $extendProperties,
                 $entityMetadata
             );
             $result .= sprintf($format, ...$arguments) . "\n";
@@ -101,10 +104,20 @@ class ExtendAutocompleteGenerator
         if (!empty($entityValues['relation'])) {
             foreach ($entityValues['relation'] as $relation) {
                 if ($relation['field_id']->getFieldName() === $propertyName) {
-                    return '?\\' . $relation['target_entity'];
+                    return $relation['field_id']->getFieldType() === 'manyToMany'
+                        ? '\\' . Collection::class
+                        : '?\\' . $relation['target_entity'];
                 }
             }
         }
+
+        return $this->getTypedPropertyFormatFormMeta($propertyName, $entityMetadata);
+    }
+
+    protected function getTypedPropertyFormatFormMeta(string $propertyName, ConfigInterface $entityMetadata): string
+    {
+        $entityValues = $entityMetadata->getValues();
+
         if (empty($entityValues['schema']['doctrine'][$entityValues['schema']['entity']]['fields'][$propertyName])) {
             return '';
         }
@@ -114,28 +127,17 @@ class ExtendAutocompleteGenerator
         return isset($propertyConf['type']) ? $isNullable . $this->getMappedType($propertyConf['type']) : '';
     }
 
-    protected function isAdderMethod(string $methodName): bool
-    {
-        return str_starts_with($methodName, 'set') || str_starts_with($methodName, 'add');
-    }
-
-    protected function isHasSupportMethod(string $methodName): bool
-    {
-        return str_starts_with($methodName, 'support') || str_starts_with($methodName, 'has');
-    }
-
-    protected function isRemoveMethod(string $methodName): bool
-    {
-        return str_starts_with($methodName, 'remove');
-    }
-
     protected function isMethodHasArgument(string $methodName): bool
     {
         return $this->isAdderMethod($methodName)
+            || $this->isSetterMethod($methodName)
             || $this->isHasSupportMethod($methodName)
             || $this->isRemoveMethod($methodName);
     }
 
+    /**
+     * @deprecated
+     */
     protected function getTypedFormat(
         string $methodName,
         array $fieldConfig,
@@ -164,9 +166,58 @@ class ExtendAutocompleteGenerator
         return '()';
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function getTypedFormatWithPropertyCheck(
+        string $methodName,
+        array $fieldConfig,
+        array $extendProperties,
+        ConfigInterface $entityMetadata
+    ): string {
+        if (empty($fieldConfig) || !isset($fieldConfig[ExtendEntityMetadataProvider::FIELD_NAME])) {
+            foreach ($extendProperties as $propertyName) {
+                if (!$this->isPropertyMatched($methodName, $propertyName)) {
+                    continue;
+                }
+                $propertyType = $this->getTypedPropertyFormatFormMeta($propertyName, $entityMetadata);
+                if (empty($propertyType)) {
+                    continue;
+                }
+
+                return $this->isMethodHasArgument($methodName)
+                    ? '(' . str_replace('?', '', $propertyType) . ' $value)'
+                    : '(): ' . $propertyType;
+            }
+
+            return $this->isMethodHasArgument($methodName) ? '($value)' : '()';
+        }
+        $formatFromRelation = $this->getFormatFromRelation(
+            $methodName,
+            $fieldConfig[ExtendEntityMetadataProvider::FIELD_NAME],
+            $entityMetadata
+        );
+        if (null !== $formatFromRelation) {
+            return $formatFromRelation;
+        }
+        $formatFromMeta = $this->getFormatFromMeta(
+            $methodName,
+            $fieldConfig[ExtendEntityMetadataProvider::FIELD_NAME],
+            $entityMetadata
+        );
+        if (null !== $formatFromMeta) {
+            return $formatFromMeta;
+        }
+
+        return '()';
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function getFormatFromRelation(
-        string          $methodName,
-        string          $fieldName,
+        string $methodName,
+        string $fieldName,
         ConfigInterface $entityMetadata,
     ): ?string {
         if (empty($entityMetadata->getValues()['relation'])) {
@@ -177,8 +228,33 @@ class ExtendAutocompleteGenerator
                 continue;
             }
             $targetEntity = '\\' . $relation['target_entity'];
+            if ($relation['field_id']->getFieldType() === 'manyToMany') {
+                $collection = '\\' . Collection::class;
+                if ($this->isAdderMethod($methodName)) {
+                    return '(' . $targetEntity . ' $value): void';
+                } elseif ($this->isGetterMethod($methodName)) {
+                    // Check if the method name is singular
+                    return EntityFieldAccessorsHelper::getterName($fieldName) !== $methodName
+                        ? '(): ?' . $targetEntity
+                        : '(): ' . $collection;
+                } elseif ($this->isRemoveMethod($methodName)) {
+                    return '(' . $targetEntity . ' $value): void';
+                } elseif ($this->isDefaultMethod($methodName)) {
+                    return '(): ?' . $targetEntity;
+                } elseif ($this->isSetterMethod($methodName)) {
+                    // Check if the method name is singular
+                    return EntityFieldAccessorsHelper::setterName($fieldName) !== $methodName
+                        ? '(?' . $targetEntity . ' $value): self'
+                        : '(' . $collection . ' $value): void';
+                }
+                return '(): void';
+            }
+            $getFormatedByMethodName = $this->getFormatedByMethodType($methodName, $targetEntity);
+            if (null !== $getFormatedByMethodName) {
+                return $getFormatedByMethodName;
+            }
 
-            return $this->isAdderMethod($methodName)
+            return $this->isSetterMethod($methodName)
                 ? '(?' . $targetEntity . ' $value): self'
                 : '(): ?' . $targetEntity;
         }
@@ -186,16 +262,31 @@ class ExtendAutocompleteGenerator
         return null;
     }
 
+    protected function getFormatedByMethodType(string $methodName, string $targetEntity): ?string
+    {
+        if ($this->isAdderMethod($methodName)) {
+            return '(' . $targetEntity . ' $value): void';
+        } elseif ($this->isGetterMethod($methodName)) {
+            return '(): ?' . $targetEntity;
+        } elseif ($this->isRemoveMethod($methodName)) {
+            return '(' . $targetEntity . ' $value): void';
+        } elseif ($this->isDefaultMethod($methodName)) {
+            return '(): ?' . $targetEntity;
+        }
+
+        return null;
+    }
+
     protected function getFormatFromMeta(
-        string          $methodName,
-        string          $fieldName,
+        string $methodName,
+        string $fieldName,
         ConfigInterface $entityMetadata,
     ): ?string {
         $schema = $entityMetadata->getValues()['schema'];
         $issetDoctrineConfig = isset($schema['doctrine'][$schema['entity']]['fields'][$fieldName]);
         if ($this->isMethodHasArgument($methodName)) {
-            $returnType = $this->isAdderMethod($methodName) ? 'self' : 'bool';
-            if ($this->isRemoveMethod($methodName)) {
+            $returnType = $this->isSetterMethod($methodName) ? 'self' : 'bool';
+            if ($this->isRemoveMethod($methodName) || $this->isAdderMethod($methodName)) {
                 $returnType = 'void';
             }
             $formatValue = $issetDoctrineConfig
@@ -250,6 +341,47 @@ class ExtendAutocompleteGenerator
         }
 
         return $classHeader . $class;
+    }
+
+    protected function isPropertyMatched(string $methodName, string $propertyName): bool
+    {
+        return match ($methodName) {
+            EntityFieldAccessorsHelper::getterName($propertyName) => true,
+            EntityFieldAccessorsHelper::setterName($propertyName) => true,
+            EntityFieldAccessorsHelper::adderName($propertyName) => true,
+            EntityFieldAccessorsHelper::removerName($propertyName) => true,
+            default => false,
+        };
+    }
+
+    protected function isAdderMethod(string $methodName): bool
+    {
+        return str_starts_with($methodName, 'add');
+    }
+
+    protected function isGetterMethod(string $methodName): bool
+    {
+        return str_starts_with($methodName, 'get');
+    }
+
+    protected function isSetterMethod(string $methodName): bool
+    {
+        return str_starts_with($methodName, 'set');
+    }
+
+    protected function isHasSupportMethod(string $methodName): bool
+    {
+        return str_starts_with($methodName, 'support') || str_starts_with($methodName, 'has');
+    }
+
+    protected function isRemoveMethod(string $methodName): bool
+    {
+        return str_starts_with($methodName, 'remove');
+    }
+
+    protected function isDefaultMethod(string $methodName): bool
+    {
+        return str_starts_with($methodName, 'default');
     }
 
     private function writePhpFile(string $path, string $content): void
