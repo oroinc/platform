@@ -5,7 +5,10 @@ namespace Oro\Component\Config\Loader;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-// TODO: Override CumulativeFileLoader::isResourceFresh to check also imported files
+/**
+ * The implementation of a cumulative file loader that loads resources from YAML files.
+ * Not implemented yet: Override CumulativeFileLoader::isResourceFresh to check also imported files
+ */
 class YamlCumulativeFileLoader extends CumulativeFileLoader
 {
     /**
@@ -27,7 +30,7 @@ class YamlCumulativeFileLoader extends CumulativeFileLoader
     protected function parseFile($file, $importedPaths = [])
     {
         try {
-            $configData = Yaml::parse(file_get_contents($file)) ?: [];
+            $configData = Yaml::parse(file_get_contents($file), Yaml::PARSE_CONSTANT) ?: [];
 
             if (array_key_exists('imports', $configData) && is_array($configData['imports'])) {
                 if (count($importedPaths) === 0) {

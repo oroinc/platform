@@ -74,7 +74,7 @@ class ExtendAutocompleteGeneratorTest extends WebTestCase
         /** @var \phpDocumentor\Reflection\DocBlock\Tags\Method $method */
         foreach ($methods as $method) {
             $methodName = $method->getMethodName();
-            if ($this->isMethodSkipped($methodName)) {
+            if ($this->isMethodSkipped($object, $methodName)) {
                 return;
             }
             $reflectionMethod = new VirtualReflectionMethod($object, $methodName);
@@ -124,8 +124,12 @@ class ExtendAutocompleteGeneratorTest extends WebTestCase
         };
     }
 
-    private function isMethodSkipped(string $methodName): bool
+    private function isMethodSkipped(object $object, string $methodName): bool
     {
+        // skipping the actual method that overrides extends
+        if ($methodName === 'setSerializedData') {
+            return method_exists($object, $methodName);
+        }
         // skip all remove methods
         return str_starts_with($methodName, 'remove');
     }

@@ -97,6 +97,7 @@
         "friendsofsymfony/rest-bundle": "~3.5.0",
         "friendsofsymfony/jsrouting-bundle": "3.2.*",
         "oro/api-doc-bundle": "2.1.*",
+        "zircote/swagger-php": "4.8.*",
         "nelmio/security-bundle": "~3.0.0",
         "ass/xmlsecurity": "1.1.1",
         "stof/doctrine-extensions-bundle": "~1.7.0",

@@ -7,14 +7,3 @@ security:
 oro_security:
     access_control:
         - { path: ^%web_backend_prefix%/embedded-form/(submit|success), roles: PUBLIC_ACCESS }
-
-# X-Frame-Options header should be removed from embedded forms
-# OroEmbeddedForm bundle has lower priority than OroSecurityBundle
-# Therefore, app.yml cannot be used for setting the correct sequence of `clickjacking` paths
-# For adding appropriate configuration used `OroEmbeddedFormExtension::prepend`
-#
-#nelmio_security:
-#    clickjacking:
-#        paths:
-#            '/embedded-form/submit': ALLOW
-#            '/embedded-form/success': ALLOW

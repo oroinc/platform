@@ -1,0 +1,2868 @@
+openapi: 3.1.0
+info:
+  title: 'JSON:API'
+  description: '[The documentation](https://doc.oroinc.com/api/)'
+  version: 0.0.0
+paths:
+  '/admin/api/asyncoperations/{id}':
+    get:
+      tags:
+        - asyncoperations
+      summary: 'Get asynchronous operation'
+      description: '<p>Retrieve a specific asynchronous operation record.</p><p>Represents details of an API asynchronous operation.</p>'
+      operationId: asyncoperations-id-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsAsyncoperations'
+        -
+          $ref: '#/components/parameters/fieldsOrganizations'
+        -
+          $ref: '#/components/parameters/fieldsUsers'
+        -
+          $ref: '#/components/parameters/include'
+      responses:
+        '200':
+          $ref: '#/components/responses/asyncoperationsModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - asyncoperations
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: asyncoperations-id-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/asyncoperations/{id}/errors':
+    get:
+      tags:
+        - asyncoperations
+      summary: 'Get errors occurred when processing an asynchronous operation'
+      description: '<p>Retrieve errors occurred when processing a specific asynchronous operation.</p>'
+      operationId: asyncoperations-id-errors-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          $ref: '#/components/responses/asyncoperationsSubresourceForErrorsModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - asyncoperations
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: asyncoperations-id-errors-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  /admin/api/testapiorderlineitems:
+    get:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get Test Order Line Items'
+      description: 'Get a list of entities'
+      operationId: testapiorderlineitems-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+        -
+          $ref: '#/components/parameters/filterOrder'
+        -
+          $ref: '#/components/parameters/filterOrderEq'
+        -
+          $ref: '#/components/parameters/filterOrderNeq'
+        -
+          $ref: '#/components/parameters/filterOrderExists'
+        -
+          $ref: '#/components/parameters/filterOrderNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterProduct'
+        -
+          $ref: '#/components/parameters/filterProductEq'
+        -
+          $ref: '#/components/parameters/filterProductNeq'
+        -
+          $ref: '#/components/parameters/filterProductExists'
+        -
+          $ref: '#/components/parameters/filterProductNeqOrNull'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorderlineitems'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorders'
+        -
+          $ref: '#/components/parameters/fieldsTestproducts'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiorderlineitemsCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    post:
+      tags:
+        - testapiorderlineitems
+      summary: 'Create Test Order Line Item'
+      description: 'Create an entity'
+      operationId: testapiorderlineitems-post
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiorderlineitems1Model'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiorderlineitemsModel'
+        '201':
+          $ref: '#/components/responses/testapiorderlineitemsModel1'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_3'
+        '409':
+          $ref: '#/components/responses/err409_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapiorderlineitems
+      summary: 'Delete Test Order Line Items'
+      description: 'Delete a list of entities<p><strong>Note:</strong> The maximum number of records this endpoint can delete at a time is 100.</p>'
+      operationId: testapiorderlineitems-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude2'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+        -
+          $ref: '#/components/parameters/filterOrder'
+        -
+          $ref: '#/components/parameters/filterOrderEq'
+        -
+          $ref: '#/components/parameters/filterOrderNeq'
+        -
+          $ref: '#/components/parameters/filterOrderExists'
+        -
+          $ref: '#/components/parameters/filterOrderNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterProduct'
+        -
+          $ref: '#/components/parameters/filterProductEq'
+        -
+          $ref: '#/components/parameters/filterProductNeq'
+        -
+          $ref: '#/components/parameters/filterProductExists'
+        -
+          $ref: '#/components/parameters/filterProductNeqOrNull'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty1'
+        '403':
+          $ref: '#/components/responses/err403_4'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorderlineitems-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorderlineitems/{id}':
+    get:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get Test Order Line Item'
+      description: 'Get an entity'
+      operationId: testapiorderlineitems-id-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorderlineitems'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorders'
+        -
+          $ref: '#/components/parameters/fieldsTestproducts'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiorderlineitemsModel2'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapiorderlineitems
+      summary: 'Delete Test Order Line Item'
+      description: 'Delete an entity'
+      operationId: testapiorderlineitems-id-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty2'
+        '403':
+          $ref: '#/components/responses/err403_6'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorderlineitems-id-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapiorderlineitems
+      summary: 'Update Test Order Line Item'
+      description: 'Update an entity'
+      operationId: testapiorderlineitems-id-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiorderlineitemsModel'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiorderlineitemsModel3'
+        '201':
+          $ref: '#/components/responses/testapiorderlineitemsModel4'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_5'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '409':
+          $ref: '#/components/responses/err409_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorderlineitems/{id}/order':
+    get:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get order'
+      description: 'Get a related entity'
+      operationId: testapiorderlineitems-id-order-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorderlineitems'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorders'
+        -
+          $ref: '#/components/parameters/fieldsTestapitargets'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiordersModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorderlineitems-id-order-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorderlineitems/{id}/product':
+    get:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get product'
+      description: 'Get a related entity'
+      operationId: testapiorderlineitems-id-product-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestproducts'
+        -
+          $ref: '#/components/parameters/fieldsTestproducttypes'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiorderlineitemsSubresourceForProductModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorderlineitems-id-product-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorderlineitems/{id}/relationships/order':
+    get:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get "order" relationship'
+      description: 'Get the relationship data'
+      operationId: testapiorderlineitems-id-relationships-order-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiorderlineitemsRelationshipForOrderModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorderlineitems-id-relationships-order-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapiorderlineitems
+      summary: 'Update "order" relationship'
+      description: 'Update the relationship'
+      operationId: testapiorderlineitems-id-relationships-order-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiorderlineitemsRelationshipForOrderModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorderlineitems/{id}/relationships/product':
+    get:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get "product" relationship'
+      description: 'Get the relationship data'
+      operationId: testapiorderlineitems-id-relationships-product-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiorderlineitemsRelationshipForProductModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorderlineitems
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorderlineitems-id-relationships-product-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapiorderlineitems
+      summary: 'Update "product" relationship'
+      description: 'Update the relationship'
+      operationId: testapiorderlineitems-id-relationships-product-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiorderlineitemsRelationshipForProductModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  /admin/api/testapiorders:
+    get:
+      tags:
+        - testapiorders
+      summary: 'Get Test Orders'
+      description: 'Get a list of entities'
+      operationId: testapiorders-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+        -
+          $ref: '#/components/parameters/filterItems'
+        -
+          $ref: '#/components/parameters/filterItemsEq'
+        -
+          $ref: '#/components/parameters/filterItemsNeq'
+        -
+          $ref: '#/components/parameters/filterItemsExists'
+        -
+          $ref: '#/components/parameters/filterItemsNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterItemsContains'
+        -
+          $ref: '#/components/parameters/filterItemsNotContains'
+        -
+          $ref: '#/components/parameters/filterTargetEntity'
+        -
+          $ref: '#/components/parameters/filterTargetEntityEq'
+        -
+          $ref: '#/components/parameters/filterTargetEntityNeq'
+        -
+          $ref: '#/components/parameters/filterTargetEntityExists'
+        -
+          $ref: '#/components/parameters/filterTargetEntityNeqOrNull'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorderlineitems'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorders'
+        -
+          $ref: '#/components/parameters/fieldsTestapitargets'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiordersCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    post:
+      tags:
+        - testapiorders
+      summary: 'Create Test Order'
+      description: 'Create an entity'
+      operationId: testapiorders-post
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiorders1Model'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiordersModel1'
+        '201':
+          $ref: '#/components/responses/testapiordersModel2'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_3'
+        '409':
+          $ref: '#/components/responses/err409_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapiorders
+      summary: 'Delete Test Orders'
+      description: 'Delete a list of entities<p><strong>Note:</strong> The maximum number of records this endpoint can delete at a time is 100.</p>'
+      operationId: testapiorders-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude2'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+        -
+          $ref: '#/components/parameters/filterItems'
+        -
+          $ref: '#/components/parameters/filterItemsEq'
+        -
+          $ref: '#/components/parameters/filterItemsNeq'
+        -
+          $ref: '#/components/parameters/filterItemsExists'
+        -
+          $ref: '#/components/parameters/filterItemsNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterItemsContains'
+        -
+          $ref: '#/components/parameters/filterItemsNotContains'
+        -
+          $ref: '#/components/parameters/filterTargetEntity'
+        -
+          $ref: '#/components/parameters/filterTargetEntityEq'
+        -
+          $ref: '#/components/parameters/filterTargetEntityNeq'
+        -
+          $ref: '#/components/parameters/filterTargetEntityExists'
+        -
+          $ref: '#/components/parameters/filterTargetEntityNeqOrNull'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty1'
+        '403':
+          $ref: '#/components/responses/err403_4'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorders
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorders-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorders/{id}':
+    get:
+      tags:
+        - testapiorders
+      summary: 'Get Test Order'
+      description: 'Get an entity'
+      operationId: testapiorders-id-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorderlineitems'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorders'
+        -
+          $ref: '#/components/parameters/fieldsTestapitargets'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiordersModel3'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapiorders
+      summary: 'Delete Test Order'
+      description: 'Delete an entity'
+      operationId: testapiorders-id-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty2'
+        '403':
+          $ref: '#/components/responses/err403_6'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorders
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorders-id-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapiorders
+      summary: 'Update Test Order'
+      description: 'Update an entity'
+      operationId: testapiorders-id-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiordersModel'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiordersModel4'
+        '201':
+          $ref: '#/components/responses/testapiordersModel5'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_5'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '409':
+          $ref: '#/components/responses/err409_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorders/{id}/items':
+    get:
+      tags:
+        - testapiorders
+      summary: 'Get items'
+      description: 'Get a list of related entities'
+      operationId: testapiorders-id-items-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+        -
+          $ref: '#/components/parameters/filterOrder'
+        -
+          $ref: '#/components/parameters/filterOrderEq'
+        -
+          $ref: '#/components/parameters/filterOrderNeq'
+        -
+          $ref: '#/components/parameters/filterOrderExists'
+        -
+          $ref: '#/components/parameters/filterOrderNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterProduct'
+        -
+          $ref: '#/components/parameters/filterProductEq'
+        -
+          $ref: '#/components/parameters/filterProductNeq'
+        -
+          $ref: '#/components/parameters/filterProductExists'
+        -
+          $ref: '#/components/parameters/filterProductNeqOrNull'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorderlineitems'
+        -
+          $ref: '#/components/parameters/fieldsTestapiorders'
+        -
+          $ref: '#/components/parameters/fieldsTestproducts'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiorderlineitemsCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorders
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorders-id-items-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorders/{id}/relationships/items':
+    get:
+      tags:
+        - testapiorders
+      summary: 'Get "items" relationship'
+      description: 'Get the relationship data'
+      operationId: testapiorders-id-relationships-items-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiordersRelationshipForItemsModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    post:
+      tags:
+        - testapiorders
+      summary: 'Add members to "items" relationship'
+      description: 'Add the specified members to the relationship'
+      operationId: testapiorders-id-relationships-items-post
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiordersRelationshipForItemsModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapiorders
+      summary: 'Delete members from "items" relationship'
+      description: 'Delete the specified members from the relationship'
+      operationId: testapiorders-id-relationships-items-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiordersRelationshipForItemsModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorders
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorders-id-relationships-items-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapiorders
+      summary: 'Replace "items" relationship'
+      description: 'Completely replace every member of the relationship'
+      operationId: testapiorders-id-relationships-items-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiordersRelationshipForItemsModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorders/{id}/relationships/targetEntity':
+    get:
+      tags:
+        - testapiorders
+      summary: 'Get "target entity" relationship'
+      description: 'Get the relationship data'
+      operationId: testapiorders-id-relationships-targetEntity-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiordersRelationshipForTargetEntityModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorders
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorders-id-relationships-targetEntity-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapiorders
+      summary: 'Update "target entity" relationship'
+      description: 'Update the relationship'
+      operationId: testapiorders-id-relationships-targetEntity-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiordersRelationshipForTargetEntityModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiorders/{id}/targetEntity':
+    get:
+      tags:
+        - testapiorders
+      summary: 'Get target entity'
+      description: 'Get a related entity'
+      operationId: testapiorders-id-targetEntity-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapiactivities'
+        -
+          $ref: '#/components/parameters/fieldsTestapiowners'
+        -
+          $ref: '#/components/parameters/fieldsTestapitargets'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiordersSubresourceForTargetEntityModel'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '404':
+          $ref: '#/components/responses/err404_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiorders
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiorders-id-targetEntity-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+components:
+  schemas:
+    meta:
+      type: object
+      additionalProperties: true
+    link:
+      type: object
+      oneOf:
+        -
+          description: 'A string containing the link’s URL'
+          type: string
+          format: uri-reference
+        -
+          required:
+            - href
+          properties:
+            href:
+              description: 'A string containing the link’s URL.'
+              type: string
+              format: uri-reference
+            meta:
+              $ref: '#/components/schemas/meta'
+          type: object
+    links:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    error:
+      properties:
+        id:
+          description: 'A unique identifier for this particular occurrence of the problem.'
+          type: string
+        status:
+          description: 'The HTTP status code applicable to this problem.'
+          type: string
+        code:
+          description: 'An application-specific error code.'
+          type: string
+        title:
+          description: 'A short, human-readable summary of the problem that is not changed from occurrence to occurrence of the problem.'
+          type: string
+        detail:
+          description: 'A human-readable explanation specific to this occurrence of the problem.'
+          type: string
+        source:
+          description: 'An object containing references to the source of the error.'
+          properties:
+            pointer:
+              description: 'A [JSON Pointer](https://tools.ietf.org/html/rfc6901) to the associated entity in the request document (e.g. `/data` for a primary data object, or `/data/attributes/title` for a specific attribute).'
+              type: string
+            parameter:
+              description: 'A string indicating which URI query parameter caused the error.'
+              type: string
+          type: object
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    errors:
+      type: array
+      items:
+        $ref: '#/components/schemas/error'
+      uniqueItems: true
+    failure:
+      required:
+        - errors
+      properties:
+        errors:
+          $ref: '#/components/schemas/errors'
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/relationshipDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForDataModel:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    linksForRelationshipToOne:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the relationship itself.'
+        related:
+          $ref: '#/components/schemas/link'
+          description: 'A link provides access to resource object linked in the relationship.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    relationshipCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/relationshipDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForRelationshipToMany:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the relationship itself.'
+        related:
+          $ref: '#/components/schemas/link'
+          description: 'A link provides access to resource objects linked in the relationship.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    asyncoperationsModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/asyncoperationsDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    asyncoperationsDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - asyncoperations
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          required:
+            - createdAt
+            - elapsedTime
+            - entityType
+            - status
+            - updatedAt
+          properties:
+            createdAt:
+              $ref: '#/components/schemas/datetime'
+              description: 'The date and time when the asynchronous operation was created.'
+            elapsedTime:
+              description: 'The number of seconds the asynchronous operation has been running.'
+              type: integer
+            entityType:
+              $ref: '#/components/schemas/entityType'
+              description: 'The type of an entity for which the asynchronous operation was created.'
+            progress:
+              description: 'The progress, in percentage, for the asynchronous operation.'
+              type: number
+            status:
+              description: 'The status of the asynchronous operation. Possible values: `new`, `running`, `failed`, `success`, `cancelled`.'
+              type: string
+            summary:
+              $ref: '#/components/schemas/object'
+              description: "<p>The summary statistics of the asynchronous operation.</p><p>This field will have data only when an asynchronous operation is finished successfully.</p><p>The summary can have the following properties:</p><ul>\n<li><strong>aggregateTime</strong> - The accumulated time, in milliseconds, taken by the system to accomplish the asynchronous operation.</li>\n<li><strong>readCount</strong> - The number of items that have been successfully read.</li>\n<li><strong>writeCount</strong> - The number of items that have been successfully written.</li>\n<li><strong>errorCount</strong> - The number of errors occurred when processing the asynchronous operation.</li>\n<li><strong>createCount</strong> - The number of items that have been successfully created.</li>\n<li><strong>updateCount</strong> - The number of items that have been successfully updated.</li>\n</ul>"
+            updatedAt:
+              $ref: '#/components/schemas/datetime'
+              description: 'The date and time when the asynchronous operation was last updated.'
+          type: object
+        relationships:
+          properties:
+            organization:
+              $ref: '#/components/schemas/organizationsRelationshipToOne'
+              description: 'An organization record represents a real enterprise, business, firm, company or another organization to which the users belong.'
+            owner:
+              $ref: '#/components/schemas/usersRelationshipToOne'
+              description: 'An owner record represents the ownership capabilities of the record.'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    datetime:
+      type: string
+      format: datetime
+      pattern: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
+    entityType:
+      type: string
+      format: entityType
+      pattern: '[a-zA-Z][\w\\]+'
+    object:
+      type: object
+      additionalProperties: true
+    organizationsRelationshipToOne:
+      description: 'A to-one relationship to "organizations" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/organizationsLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    organizationsLinkage:
+      description: 'A linkage to "organizations" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - organizations
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    usersRelationshipToOne:
+      description: 'A to-one relationship to "users" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/usersLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    usersLinkage:
+      description: 'A linkage to "users" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - users
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForTopLevelItem:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    objectArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/object'
+    testapiorderlineitemsCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapiorderlineitemsDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelCollection'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiorderlineitemsDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiorderlineitems
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          properties:
+            quantity:
+              type: number
+          type: object
+        relationships:
+          properties:
+            order:
+              $ref: '#/components/schemas/testapiordersRelationshipToOne'
+            product:
+              $ref: '#/components/schemas/testproductsRelationshipToOne'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersRelationshipToOne:
+      description: 'A to-one relationship to "testapiorders" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/testapiordersLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersLinkage:
+      description: 'A linkage to "testapiorders" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiorders
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testproductsRelationshipToOne:
+      description: 'A to-one relationship to "testproducts" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/testproductsLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testproductsLinkage:
+      description: 'A linkage to "testproducts" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testproducts
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForTopLevelCollection:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+        first:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the first page of data.'
+        last:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the last page of data.'
+        prev:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the previous page of data.'
+        next:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the next page of data.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    testapiorderlineitemsModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiorderlineitemsDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiorderlineitems1Model:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiorderlineitems1DataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiorderlineitems1DataModel:
+      required:
+        - type
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiorderlineitems
+        id:
+          description: '<p>The unique identifier of a resource.</p><p><strong>The read-only field. A passed value will be ignored.</strong></p>'
+          type: string
+        attributes:
+          properties:
+            quantity:
+              type: number
+          type: object
+        relationships:
+          properties:
+            order:
+              $ref: '#/components/schemas/testapiordersRelationshipToOne'
+            product:
+              $ref: '#/components/schemas/testproductsRelationshipToOne'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapiordersDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelCollection'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiordersDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiorders
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          properties:
+            poNumber:
+              type: string
+          type: object
+        relationships:
+          properties:
+            items:
+              $ref: '#/components/schemas/testapiorderlineitemsRelationshipToMany'
+            targetEntity:
+              $ref: '#/components/schemas/testapitargetsRelationshipToOne'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiorderlineitemsRelationshipToMany:
+      description: 'A to-many relationship to "testapiorderlineitems" resource.'
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapiorderlineitemsLinkage'
+          uniqueItems: true
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiorderlineitemsLinkage:
+      description: 'A linkage to "testapiorderlineitems" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiorderlineitems
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapitargetsRelationshipToOne:
+      description: 'A to-one relationship to "testapitargets" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/testapitargetsLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapitargetsLinkage:
+      description: 'A linkage to "testapitargets" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapitargets
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiordersDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiorders1Model:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiorders1DataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiorders1DataModel:
+      required:
+        - type
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiorders
+        id:
+          description: '<p>The unique identifier of a resource.</p><p><strong>The read-only field. A passed value will be ignored.</strong></p>'
+          type: string
+        attributes:
+          properties:
+            poNumber:
+              type: string
+          type: object
+        relationships:
+          properties:
+            items:
+              $ref: '#/components/schemas/testapiorderlineitemsRelationshipToMany'
+            targetEntity:
+              $ref: '#/components/schemas/testapitargetsRelationshipToOne'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    unsignedInteger_1:
+      type: integer
+      default: 1
+      minimum: 0
+    asyncoperationsSubresourceForErrorsModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/asyncoperationsSubresourceForErrorsDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelCollection'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    asyncoperationsSubresourceForErrorsDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - asyncoperationerrors
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          properties:
+            detail:
+              description: 'A human-readable explanation specific to this occurrence of the problem.'
+              type: string
+            source:
+              $ref: '#/components/schemas/object'
+              description: "<p>An object that contains references to the source of the error.</p><p>This object can have the following properties:</p><ul>\n<li><strong>pointer</strong> - A <a href=\"https://tools.ietf.org/html/rfc6901\">JSON Pointer</a> to the value in the request document that caused the error, e.g., \"/data/0\" for a primary data object, or \"/data/0/attributes/title\" for a specific attribute.</li>\n<li><strong>propertyPath</strong> - A path to the value in the request document that caused the error. This property is returned if the <strong>pointer</strong> property cannot be computed.</li>\n</ul>"
+            status:
+              description: 'The HTTP status code applicable to the problem.'
+              type: string
+            title:
+              description: 'A short, human-readable summary that describes the problem type.'
+              type: string
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    integerUnionArrayRange:
+      oneOf:
+        -
+          type: integer
+        -
+          $ref: '#/components/schemas/integerArray'
+        -
+          $ref: '#/components/schemas/integerRange'
+    integerArray:
+      type: array
+      items:
+        type: integer
+    integerRange:
+      type: string
+      pattern: '-?\d+\.\.-?\d+'
+    orderBy_id:
+      type: string
+      format: orderBy
+      default: id
+      pattern: '-?[\w\.]+(,-?[\w\.]+)*'
+    testapiorderlineitemsSubresourceForProductModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiorderlineitemsSubresourceForProductDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiorderlineitemsSubresourceForProductDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testproducts
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          properties:
+            name:
+              type: string
+          type: object
+        relationships:
+          properties:
+            productType:
+              $ref: '#/components/schemas/testproducttypesRelationshipToOne'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testproducttypesRelationshipToOne:
+      description: 'A to-one relationship to "testproducttypes" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/testproducttypesLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testproducttypesLinkage:
+      description: 'A linkage to "testproducttypes" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testproducttypes
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiorderlineitemsRelationshipForOrderModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiorderlineitemsRelationshipForOrderDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiorderlineitemsRelationshipForOrderDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiorders
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiorderlineitemsRelationshipForProductModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiorderlineitemsRelationshipForProductDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiorderlineitemsRelationshipForProductDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testproducts
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersRelationshipForItemsModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapiordersRelationshipForItemsDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersRelationshipForItemsDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiorderlineitems
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersRelationshipForTargetEntityModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiordersRelationshipForTargetEntityDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersRelationshipForTargetEntityDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapitargets
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiordersSubresourceForTargetEntityModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiordersSubresourceForTargetEntityDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiordersSubresourceForTargetEntityDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapitargets
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          properties:
+            name:
+              type: string
+          type: object
+        relationships:
+          properties:
+            activityTestActivities:
+              $ref: '#/components/schemas/testapiactivitiesRelationshipToMany'
+            owners:
+              $ref: '#/components/schemas/testapiownersRelationshipToMany'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiactivitiesRelationshipToMany:
+      description: 'A to-many relationship to "testapiactivities" resource.'
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapiactivitiesLinkage'
+          uniqueItems: true
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiactivitiesLinkage:
+      description: 'A linkage to "testapiactivities" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiactivities
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiownersRelationshipToMany:
+      description: 'A to-many relationship to "testapiowners" resource.'
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapiownersLinkage'
+          uniqueItems: true
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapiownersLinkage:
+      description: 'A linkage to "testapiowners" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiowners
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+  responses:
+    empty:
+      description: 'Returned when successful'
+    err400_1:
+      description: 'Returned when the request data is not valid'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err404_1:
+      description: 'Returned when the entity is not found'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err500_1:
+      description: 'Returned when an unexpected error occurs'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    asyncoperationsModel:
+      description: 'Returned when successful'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/asyncoperationsModel'
+    err403_1:
+      description: 'Returned when no permissions to get the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    asyncoperationsSubresourceForErrorsModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/asyncoperationsSubresourceForErrorsModel'
+    err403_2:
+      description: 'Returned when no permissions to get the entities'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err404_2:
+      description: 'Returned when the parent entity does not exist'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapiorderlineitemsCollectionModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsCollectionModel'
+    testapiorderlineitemsModel:
+      description: 'Returned when the entity was successfully updated'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsModel'
+    testapiorderlineitemsModel1:
+      description: 'Returned when the entity was successfully created'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsModel'
+    err403_3:
+      description: 'Returned when no permissions to create the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err409_1:
+      description: "Returned when the specified entity type does not match the server's endpoint"
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty1:
+      description: 'Returned when the entities successfully deleted'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+        X-Include-Deleted-Count:
+          $ref: '#/components/headers/xIncludeDeletedCount'
+    err403_4:
+      description: 'Returned when no permissions to delete the entities'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapiorderlineitemsModel2:
+      description: 'Returned when successful'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsModel'
+    testapiorderlineitemsModel3:
+      description: 'Returned when the entity was successfully updated'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsModel'
+    testapiorderlineitemsModel4:
+      description: 'Returned when the entity was successfully created'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsModel'
+    err403_5:
+      description: 'Returned when no permissions to update the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err409_2:
+      description: "Returned when the specified entity type and identifier do not match the server's endpoint"
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty2:
+      description: 'Returned when the entity successfully deleted'
+    err403_6:
+      description: 'Returned when no permissions to delete the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapiordersModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersModel'
+    testapiorderlineitemsSubresourceForProductModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsSubresourceForProductModel'
+    testapiorderlineitemsRelationshipForOrderModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsRelationshipForOrderModel'
+    err404_3:
+      description: 'Returned when the parent entity of the relationship does not exist'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty3:
+      description: 'Returned when an update of the relationship is successful'
+    err403_7:
+      description: 'Returned when no permissions to update the relationship'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapiorderlineitemsRelationshipForProductModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsRelationshipForProductModel'
+    testapiordersCollectionModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersCollectionModel'
+    testapiordersModel1:
+      description: 'Returned when the entity was successfully updated'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersModel'
+    testapiordersModel2:
+      description: 'Returned when the entity was successfully created'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersModel'
+    testapiordersModel3:
+      description: 'Returned when successful'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersModel'
+    testapiordersModel4:
+      description: 'Returned when the entity was successfully updated'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersModel'
+    testapiordersModel5:
+      description: 'Returned when the entity was successfully created'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersModel'
+    testapiordersRelationshipForItemsModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersRelationshipForItemsModel'
+    testapiordersRelationshipForTargetEntityModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersRelationshipForTargetEntityModel'
+    testapiordersSubresourceForTargetEntityModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersSubresourceForTargetEntityModel'
+  parameters:
+    accept:
+      name: Accept
+      in: header
+      schema:
+        type: string
+      example: application/vnd.api+json
+    id:
+      name: id
+      in: path
+      description: 'The unique identifier of a resource.'
+      required: true
+      schema:
+        type: integer
+    xInclude:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: noHateoas
+    fieldsAsyncoperations:
+      name: 'fields[asyncoperations]'
+      in: query
+      description: "A list of fields of 'asyncoperations' entity that will be returned in the response."
+      schema:
+        type: string
+    fieldsOrganizations:
+      name: 'fields[organizations]'
+      in: query
+      description: "A list of fields of 'organizations' entity that will be returned in the response."
+      schema:
+        type: string
+    fieldsUsers:
+      name: 'fields[users]'
+      in: query
+      description: "A list of fields of 'users' entity that will be returned in the response."
+      schema:
+        type: string
+    include:
+      name: include
+      in: query
+      description: "A list of related entities to be included. Comma-separated paths, e.g. 'comments,comments.author'."
+      schema:
+        type: string
+    xInclude1:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: totalCount
+    pageNumber:
+      name: 'page[number]'
+      in: query
+      description: 'The page number, starting from 1.'
+      schema:
+        $ref: '#/components/schemas/unsignedInteger_1'
+    pageSize:
+      name: 'page[size]'
+      in: query
+      description: 'The number of items per page.'
+      schema:
+        type: integer
+        default: 10
+    filterId:
+      name: 'filter[id]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdEq:
+      name: 'filter[id][eq]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdNeq:
+      name: 'filter[id][neq]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdLt:
+      name: 'filter[id][lt]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdLte:
+      name: 'filter[id][lte]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdGt:
+      name: 'filter[id][gt]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdGte:
+      name: 'filter[id][gte]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterOrder:
+      name: 'filter[order]'
+      in: query
+      description: "Filter records by 'order' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterOrderEq:
+      name: 'filter[order][eq]'
+      in: query
+      description: "Filter records by 'order' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterOrderNeq:
+      name: 'filter[order][neq]'
+      in: query
+      description: "Filter records by 'order' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterOrderExists:
+      name: 'filter[order][exists]'
+      in: query
+      description: "Filter records by 'order' relationship."
+      schema:
+        type: boolean
+    filterOrderNeqOrNull:
+      name: 'filter[order][neq_or_null]'
+      in: query
+      description: "Filter records by 'order' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterProduct:
+      name: 'filter[product]'
+      in: query
+      description: "Filter records by 'product' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterProductEq:
+      name: 'filter[product][eq]'
+      in: query
+      description: "Filter records by 'product' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterProductNeq:
+      name: 'filter[product][neq]'
+      in: query
+      description: "Filter records by 'product' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterProductExists:
+      name: 'filter[product][exists]'
+      in: query
+      description: "Filter records by 'product' relationship."
+      schema:
+        type: boolean
+    filterProductNeqOrNull:
+      name: 'filter[product][neq_or_null]'
+      in: query
+      description: "Filter records by 'product' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    fieldsTestapiorderlineitems:
+      name: 'fields[testapiorderlineitems]'
+      in: query
+      description: "A list of fields of 'testapiorderlineitems' entity that will be returned in the response."
+      schema:
+        type: string
+    fieldsTestapiorders:
+      name: 'fields[testapiorders]'
+      in: query
+      description: "A list of fields of 'testapiorders' entity that will be returned in the response."
+      schema:
+        type: string
+    fieldsTestproducts:
+      name: 'fields[testproducts]'
+      in: query
+      description: "A list of fields of 'testproducts' entity that will be returned in the response."
+      schema:
+        type: string
+    meta:
+      name: meta
+      in: query
+      description: 'A list of meta properties to be returned. Comma-separated names.'
+      schema:
+        type: string
+    sort:
+      name: sort
+      in: query
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'."
+      schema:
+        $ref: '#/components/schemas/orderBy_id'
+    contentType:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      example: application/vnd.api+json
+    xInclude2:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: deletedCount
+    fieldsTestapitargets:
+      name: 'fields[testapitargets]'
+      in: query
+      description: "A list of fields of 'testapitargets' entity that will be returned in the response."
+      schema:
+        type: string
+    fieldsTestproducttypes:
+      name: 'fields[testproducttypes]'
+      in: query
+      description: "A list of fields of 'testproducttypes' entity that will be returned in the response."
+      schema:
+        type: string
+    filterItems:
+      name: 'filter[items]'
+      in: query
+      description: "Filter records by 'items' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterItemsEq:
+      name: 'filter[items][eq]'
+      in: query
+      description: "Filter records by 'items' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterItemsNeq:
+      name: 'filter[items][neq]'
+      in: query
+      description: "Filter records by 'items' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterItemsExists:
+      name: 'filter[items][exists]'
+      in: query
+      description: "Filter records by 'items' relationship."
+      schema:
+        type: boolean
+    filterItemsNeqOrNull:
+      name: 'filter[items][neq_or_null]'
+      in: query
+      description: "Filter records by 'items' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterItemsContains:
+      name: 'filter[items][contains]'
+      in: query
+      description: "Filter records by 'items' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterItemsNotContains:
+      name: 'filter[items][not_contains]'
+      in: query
+      description: "Filter records by 'items' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterTargetEntity:
+      name: 'filter[targetEntity]'
+      in: query
+      description: "Filter records by 'targetEntity' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterTargetEntityEq:
+      name: 'filter[targetEntity][eq]'
+      in: query
+      description: "Filter records by 'targetEntity' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterTargetEntityNeq:
+      name: 'filter[targetEntity][neq]'
+      in: query
+      description: "Filter records by 'targetEntity' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterTargetEntityExists:
+      name: 'filter[targetEntity][exists]'
+      in: query
+      description: "Filter records by 'targetEntity' relationship."
+      schema:
+        type: boolean
+    filterTargetEntityNeqOrNull:
+      name: 'filter[targetEntity][neq_or_null]'
+      in: query
+      description: "Filter records by 'targetEntity' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    fieldsTestapiactivities:
+      name: 'fields[testapiactivities]'
+      in: query
+      description: "A list of fields of 'testapiactivities' entity that will be returned in the response."
+      schema:
+        type: string
+    fieldsTestapiowners:
+      name: 'fields[testapiowners]'
+      in: query
+      description: "A list of fields of 'testapiowners' entity that will be returned in the response."
+      schema:
+        type: string
+  requestBodies:
+    testapiorderlineitems1Model:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitems1Model'
+    testapiorderlineitemsModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsModel'
+    testapiorderlineitemsRelationshipForOrderModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsRelationshipForOrderModel'
+    testapiorderlineitemsRelationshipForProductModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorderlineitemsRelationshipForProductModel'
+    testapiorders1Model:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiorders1Model'
+    testapiordersModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersModel'
+    testapiordersRelationshipForItemsModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersRelationshipForItemsModel'
+    testapiordersRelationshipForTargetEntityModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiordersRelationshipForTargetEntityModel'
+  headers:
+    xIncludeTotalCount:
+      description: 'The total number of entities. Returned when the total count was requested by "X-Include: totalCount" request header.'
+      schema:
+        type: integer
+    location:
+      description: 'The URL of a newly created API resource.'
+      schema:
+        type: string
+    xIncludeDeletedCount:
+      description: 'The total number of deleted entities. Returned when the total count was requested by "X-Include: deletedCount" request header.'
+      schema:
+        type: integer

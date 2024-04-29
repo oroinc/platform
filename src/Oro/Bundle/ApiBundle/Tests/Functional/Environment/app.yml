@@ -39,6 +39,11 @@ oro_api:
         test_percent_round: float
         test_percent_100_round: float
 
+    open_api:
+        data_types:
+            test_percent_round: [number]
+            test_percent_100_round: [number]
+
     form_type_guesses:
         test_percent_round:
             form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
