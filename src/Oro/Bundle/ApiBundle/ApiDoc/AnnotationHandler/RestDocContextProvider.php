@@ -52,6 +52,7 @@ class RestDocContextProvider
         if ($associationName && $context instanceof SubresourceContext) {
             $context->setParentClassName($entityClass);
             $context->setAssociationName($associationName);
+            $context->addParentConfigExtra(new DescriptionsConfigExtra());
         } else {
             $context->setClassName($entityClass);
         }

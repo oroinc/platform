@@ -158,7 +158,8 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals(
                     [
                         new EntityDefinitionConfigExtra($action, false, $entityClass, $associationName),
-                        new FilterFieldsConfigExtra([$entityClass => [$associationName]])
+                        new FilterFieldsConfigExtra([$entityClass => [$associationName]]),
+                        new DescriptionsConfigExtra()
                     ],
                     $context->getParentConfigExtras()
                 );

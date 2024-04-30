@@ -40,6 +40,7 @@ class Configuration implements ConfigurationInterface
         $this->appendConfigExtensionsNode($node);
         $this->appendApiDocCacheNode($node);
         $this->appendApiDocViewsNode($node);
+        $this->appendOpenApiNode($node);
         $this->appendActionsNode($node);
         $this->appendFiltersNode($node);
         $this->appendFilterOperatorsNode($node);
@@ -383,6 +384,64 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
+    private function appendOpenApiNode(NodeBuilder $node): void
+    {
+        $node
+            ->arrayNode('open_api')
+                ->info('The configuration of OpenAPI specification generation.')
+                ->children()
+                    ->scalarNode('version')->end()
+                    ->arrayNode('data_types')
+                        ->info('The map between data-types and their representation in OpenAPI specification.')
+                        ->example(['float' => ['number'], 'text' => ['string', ['format' => 'text']]])
+                        ->useAttributeAsKey('name')
+                        ->normalizeKeys(false)
+                        ->prototype('variable')->end()
+                    ->end()
+                    ->arrayNode('data_type_aliases')
+                        ->info(
+                            'The list of data-type aliases.'
+                            . ' It is used to prevent several definition of identical data-types.'
+                        )
+                        ->example(['json' => 'object', 'blob' => 'binary'])
+                        ->useAttributeAsKey('name')
+                        ->normalizeKeys(false)
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                    ->arrayNode('data_type_plural_map')
+                        ->info(
+                            'The map between plural and singular data-type names.'
+                            . ' It is used to resolve data-type by expressions like "array of integers".'
+                        )
+                        ->example(['strings' => 'string', 'integers' => 'integer'])
+                        ->useAttributeAsKey('name')
+                        ->normalizeKeys(false)
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                    ->arrayNode('data_type_pattern_map')
+                        ->info(
+                            'The map between a regex and corresponding data-type.'
+                            . ' It is used to resolve data-type by its regex representation.'
+                        )
+                        ->example(['-?\d+' => 'integer', '\d+' => 'unsignedInteger'])
+                        ->useAttributeAsKey('name')
+                        ->normalizeKeys(false)
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                    ->arrayNode('data_type_range_value_patterns')
+                        ->info(
+                            'The map between a data-type and its regex.'
+                            . ' It is used to build regex for range data-type.'
+                        )
+                        ->example(['integer' => '-?\d+', 'unsignedInteger' => '\d+'])
+                        ->useAttributeAsKey('name')
+                        ->normalizeKeys(false)
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
     private function appendConfigExtensionsNode(NodeBuilder $node): void
     {
         $node
@@ -572,7 +631,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('form_type_guesses')
-                ->info('The definition of data type to form type guesses.')
+                ->info('The definition of data-type to form type guesses.')
                 ->example(
                     [
                         'integer' => [

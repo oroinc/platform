@@ -47,7 +47,7 @@ class RoleRepository extends EntityRepository
 
     /**
      * @param Role $role
-     * @return User
+     * @return User|null
      */
     public function getFirstMatchedUser(Role $role)
     {
