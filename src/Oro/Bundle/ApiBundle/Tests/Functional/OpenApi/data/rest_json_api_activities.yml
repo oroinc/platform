@@ -1,0 +1,1117 @@
+openapi: 3.1.0
+info:
+  title: 'JSON:API'
+  description: '[The documentation](https://doc.oroinc.com/api/)'
+  version: 0.0.0
+paths:
+  /admin/api/testapiactivities:
+    get:
+      tags:
+        - testapiactivities
+      summary: 'Get Test Activities'
+      description: 'Get a list of entities'
+      operationId: testapiactivities-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsType'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsTypeEq'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsTypeNeq'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsTypeExists'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsTypeNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+        -
+          $ref: '#/components/parameters/fieldsTestapiactivities'
+        -
+          $ref: '#/components/parameters/fieldsTestapiowners'
+        -
+          $ref: '#/components/parameters/fieldsTestapitargets'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiactivitiesCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    post:
+      tags:
+        - testapiactivities
+      summary: 'Create Test Activity'
+      description: 'Create an entity'
+      operationId: testapiactivities-post
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude1'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiactivities1Model'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiactivitiesModel'
+        '201':
+          $ref: '#/components/responses/testapiactivitiesModel1'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '409':
+          $ref: '#/components/responses/err409_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapiactivities
+      summary: 'Delete Test Activities'
+      description: 'Delete a list of entities<p><strong>Note:</strong> The maximum number of records this endpoint can delete at a time is 100.</p>'
+      operationId: testapiactivities-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude2'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsType'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsTypeEq'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsTypeNeq'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsTypeExists'
+        -
+          $ref: '#/components/parameters/filterActivityTargetsTypeNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty1'
+        '403':
+          $ref: '#/components/responses/err403_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiactivities
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiactivities-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiactivities/{id}':
+    get:
+      tags:
+        - testapiactivities
+      summary: 'Get Test Activity'
+      description: 'Get an entity'
+      operationId: testapiactivities-id-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapiactivities'
+        -
+          $ref: '#/components/parameters/fieldsTestapiowners'
+        -
+          $ref: '#/components/parameters/fieldsTestapitargets'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiactivitiesModel2'
+        '403':
+          $ref: '#/components/responses/err403_4'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapiactivities
+      summary: 'Delete Test Activity'
+      description: 'Delete an entity'
+      operationId: testapiactivities-id-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty2'
+        '403':
+          $ref: '#/components/responses/err403_6'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiactivities
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiactivities-id-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapiactivities
+      summary: 'Update Test Activity'
+      description: 'Update an entity'
+      operationId: testapiactivities-id-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapiactivitiesModel'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapiactivitiesModel3'
+        '201':
+          $ref: '#/components/responses/testapiactivitiesModel4'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_5'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '409':
+          $ref: '#/components/responses/err409_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiactivities/{id}/activityTargets':
+    get:
+      tags:
+        - testapiactivities
+      summary: 'Get activity targets'
+      description: '<p>Retrieve records associated with a specific test activity record.</p>'
+      operationId: testapiactivities-id-activityTargets-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsEntityidentifiers'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort1'
+      responses:
+        '200':
+          $ref: '#/components/responses/relationshipCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiactivities
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiactivities-id-activityTargets-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapiactivities/{id}/relationships/activityTargets':
+    get:
+      tags:
+        - testapiactivities
+      summary: 'Get "activity targets" relationship'
+      description: '<p>Retrieve the IDs of records associated with a specific test activity record.</p>'
+      operationId: testapiactivities-id-relationships-activityTargets-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          $ref: '#/components/responses/relationshipCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    post:
+      tags:
+        - testapiactivities
+      summary: 'Add members to "activity targets" relationship'
+      description: "<p>Associate records with a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiowners\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
+      operationId: testapiactivities-id-relationships-activityTargets-post
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/relationshipCollectionModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapiactivities
+      summary: 'Delete members from "activity targets" relationship'
+      description: "<p>Remove an association between records and a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiowners\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
+      operationId: testapiactivities-id-relationships-activityTargets-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/relationshipCollectionModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapiactivities
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapiactivities-id-relationships-activityTargets-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapiactivities
+      summary: 'Replace "activity targets" relationship'
+      description: "<p>Replace records that are associated with a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiowners\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
+      operationId: testapiactivities-id-relationships-activityTargets-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/relationshipCollectionModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+components:
+  schemas:
+    meta:
+      type: object
+      additionalProperties: true
+    link:
+      type: object
+      oneOf:
+        -
+          description: 'A string containing the link’s URL'
+          type: string
+          format: uri-reference
+        -
+          required:
+            - href
+          properties:
+            href:
+              description: 'A string containing the link’s URL.'
+              type: string
+              format: uri-reference
+            meta:
+              $ref: '#/components/schemas/meta'
+          type: object
+    links:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    error:
+      properties:
+        id:
+          description: 'A unique identifier for this particular occurrence of the problem.'
+          type: string
+        status:
+          description: 'The HTTP status code applicable to this problem.'
+          type: string
+        code:
+          description: 'An application-specific error code.'
+          type: string
+        title:
+          description: 'A short, human-readable summary of the problem that is not changed from occurrence to occurrence of the problem.'
+          type: string
+        detail:
+          description: 'A human-readable explanation specific to this occurrence of the problem.'
+          type: string
+        source:
+          description: 'An object containing references to the source of the error.'
+          properties:
+            pointer:
+              description: 'A [JSON Pointer](https://tools.ietf.org/html/rfc6901) to the associated entity in the request document (e.g. `/data` for a primary data object, or `/data/attributes/title` for a specific attribute).'
+              type: string
+            parameter:
+              description: 'A string indicating which URI query parameter caused the error.'
+              type: string
+          type: object
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    errors:
+      type: array
+      items:
+        $ref: '#/components/schemas/error'
+      uniqueItems: true
+    failure:
+      required:
+        - errors
+      properties:
+        errors:
+          $ref: '#/components/schemas/errors'
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/relationshipDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForDataModel:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    linksForRelationshipToOne:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the relationship itself.'
+        related:
+          $ref: '#/components/schemas/link'
+          description: 'A link provides access to resource object linked in the relationship.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    relationshipCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/relationshipDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForRelationshipToMany:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the relationship itself.'
+        related:
+          $ref: '#/components/schemas/link'
+          description: 'A link provides access to resource objects linked in the relationship.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    testapiactivitiesCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapiactivitiesDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelCollection'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiactivitiesDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiactivities
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          properties:
+            name:
+              type: string
+          type: object
+        relationships:
+          properties:
+            activityTargets:
+              $ref: '#/components/schemas/relationshipToMany'
+              description: 'Records associated with the test activity record.'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipToMany:
+      description: 'A to-many relationship to a resource.'
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/linkage'
+          uniqueItems: true
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linkage:
+      description: 'A linkage to a resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForTopLevelCollection:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+        first:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the first page of data.'
+        last:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the last page of data.'
+        prev:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the previous page of data.'
+        next:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the next page of data.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    objectArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/object'
+    object:
+      type: object
+      additionalProperties: true
+    testapiactivitiesModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiactivitiesDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    linksForTopLevelItem:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    testapiactivities1Model:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapiactivities1DataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapiactivities1DataModel:
+      required:
+        - type
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapiactivities
+        id:
+          description: '<p>The unique identifier of a resource.</p><p><strong>The read-only field. A passed value will be ignored.</strong></p>'
+          type: string
+        attributes:
+          properties:
+            name:
+              type: string
+          type: object
+        relationships:
+          properties:
+            activityTargets:
+              $ref: '#/components/schemas/relationshipToMany'
+              description: 'Records associated with the test activity record.'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    integerUnionArrayRange:
+      oneOf:
+        -
+          type: integer
+        -
+          $ref: '#/components/schemas/integerArray'
+        -
+          $ref: '#/components/schemas/integerRange'
+    integerArray:
+      type: array
+      items:
+        type: integer
+    integerRange:
+      type: string
+      pattern: '-?\d+\.\.-?\d+'
+    unsignedInteger_1:
+      type: integer
+      default: 1
+      minimum: 0
+    orderBy_id:
+      type: string
+      format: orderBy
+      default: id
+      pattern: '-?[\w\.]+(,-?[\w\.]+)*'
+    orderBy:
+      type: string
+      format: orderBy
+      pattern: '-?[\w\.]+(,-?[\w\.]+)*'
+  responses:
+    empty:
+      description: 'Returned when successful'
+    err400_1:
+      description: 'Returned when the request data is not valid'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err404_1:
+      description: 'Returned when the entity is not found'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err500_1:
+      description: 'Returned when an unexpected error occurs'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapiactivitiesCollectionModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiactivitiesCollectionModel'
+    err403_1:
+      description: 'Returned when no permissions to get the entities'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapiactivitiesModel:
+      description: 'Returned when the entity was successfully updated'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiactivitiesModel'
+    testapiactivitiesModel1:
+      description: 'Returned when the entity was successfully created'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiactivitiesModel'
+    err403_2:
+      description: 'Returned when no permissions to create the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err409_1:
+      description: "Returned when the specified entity type does not match the server's endpoint"
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty1:
+      description: 'Returned when the entities successfully deleted'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+        X-Include-Deleted-Count:
+          $ref: '#/components/headers/xIncludeDeletedCount'
+    err403_3:
+      description: 'Returned when no permissions to delete the entities'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapiactivitiesModel2:
+      description: 'Returned when successful'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiactivitiesModel'
+    err403_4:
+      description: 'Returned when no permissions to get the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapiactivitiesModel3:
+      description: 'Returned when the entity was successfully updated'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiactivitiesModel'
+    testapiactivitiesModel4:
+      description: 'Returned when the entity was successfully created'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiactivitiesModel'
+    err403_5:
+      description: 'Returned when no permissions to update the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err409_2:
+      description: "Returned when the specified entity type and identifier do not match the server's endpoint"
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty2:
+      description: 'Returned when the entity successfully deleted'
+    err403_6:
+      description: 'Returned when no permissions to delete the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    relationshipCollectionModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/relationshipCollectionModel'
+    err404_2:
+      description: 'Returned when the parent entity does not exist'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err404_3:
+      description: 'Returned when the parent entity of the relationship does not exist'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty3:
+      description: 'Returned when an update of the relationship is successful'
+    err403_7:
+      description: 'Returned when no permissions to update the relationship'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+  parameters:
+    accept:
+      name: Accept
+      in: header
+      schema:
+        type: string
+      example: application/vnd.api+json
+    xInclude:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: totalCount
+    filterActivityTargetsType:
+      name: 'filter[activityTargets][type]'
+      in: query
+      description: "Filter records by 'activityTargets' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterActivityTargetsTypeEq:
+      name: 'filter[activityTargets][type][eq]'
+      in: query
+      description: "Filter records by 'activityTargets' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterActivityTargetsTypeNeq:
+      name: 'filter[activityTargets][type][neq]'
+      in: query
+      description: "Filter records by 'activityTargets' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterActivityTargetsTypeExists:
+      name: 'filter[activityTargets][type][exists]'
+      in: query
+      description: "Filter records by 'activityTargets' relationship."
+      schema:
+        type: boolean
+    filterActivityTargetsTypeNeqOrNull:
+      name: 'filter[activityTargets][type][neq_or_null]'
+      in: query
+      description: "Filter records by 'activityTargets' relationship."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterId:
+      name: 'filter[id]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdEq:
+      name: 'filter[id][eq]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdNeq:
+      name: 'filter[id][neq]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdLt:
+      name: 'filter[id][lt]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdLte:
+      name: 'filter[id][lte]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdGt:
+      name: 'filter[id][gt]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterIdGte:
+      name: 'filter[id][gte]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    fieldsTestapiactivities:
+      name: 'fields[testapiactivities]'
+      in: query
+      description: "A list of fields of 'testapiactivities' entity that will be returned in the response."
+      schema:
+        type: string
+    fieldsTestapiowners:
+      name: 'fields[testapiowners]'
+      in: query
+      description: "A list of fields of 'testapiowners' entity that will be returned in the response."
+      schema:
+        type: string
+    fieldsTestapitargets:
+      name: 'fields[testapitargets]'
+      in: query
+      description: "A list of fields of 'testapitargets' entity that will be returned in the response."
+      schema:
+        type: string
+    include:
+      name: include
+      in: query
+      description: "A list of related entities to be included. Comma-separated paths, e.g. 'comments,comments.author'."
+      schema:
+        type: string
+    meta:
+      name: meta
+      in: query
+      description: 'A list of meta properties to be returned. Comma-separated names.'
+      schema:
+        type: string
+    pageNumber:
+      name: 'page[number]'
+      in: query
+      description: 'The page number, starting from 1.'
+      schema:
+        $ref: '#/components/schemas/unsignedInteger_1'
+    pageSize:
+      name: 'page[size]'
+      in: query
+      description: 'The number of items per page.'
+      schema:
+        type: integer
+        default: 10
+    sort:
+      name: sort
+      in: query
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'."
+      schema:
+        $ref: '#/components/schemas/orderBy_id'
+    contentType:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      example: application/vnd.api+json
+    xInclude1:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: noHateoas
+    xInclude2:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: deletedCount
+    id:
+      name: id
+      in: path
+      description: 'The unique identifier of a resource.'
+      required: true
+      schema:
+        type: integer
+    fieldsEntityidentifiers:
+      name: 'fields[entityidentifiers]'
+      in: query
+      description: "A list of fields of 'entityidentifiers' entity that will be returned in the response."
+      schema:
+        type: string
+    sort1:
+      name: sort
+      in: query
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'."
+      schema:
+        $ref: '#/components/schemas/orderBy'
+  requestBodies:
+    testapiactivities1Model:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiactivities1Model'
+    testapiactivitiesModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapiactivitiesModel'
+    relationshipCollectionModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/relationshipCollectionModel'
+  headers:
+    xIncludeTotalCount:
+      description: 'The total number of entities. Returned when the total count was requested by "X-Include: totalCount" request header.'
+      schema:
+        type: integer
+    location:
+      description: 'The URL of a newly created API resource.'
+      schema:
+        type: string
+    xIncludeDeletedCount:
+      description: 'The total number of deleted entities. Returned when the total count was requested by "X-Include: deletedCount" request header.'
+      schema:
+        type: integer

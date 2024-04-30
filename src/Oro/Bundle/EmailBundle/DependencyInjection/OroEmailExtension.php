@@ -55,7 +55,7 @@ class OroEmailExtension extends Extension implements PrependExtensionInterface
      */
     public function prepend(ContainerBuilder $container): void
     {
-        // X-Frame-Options header should be removed from embedded forms
+        // X-Frame-Options header should be removed from email template preview
         $securityConfig = $container->getExtensionConfig('nelmio_security');
 
         $emailTemplatePreviewPath = [

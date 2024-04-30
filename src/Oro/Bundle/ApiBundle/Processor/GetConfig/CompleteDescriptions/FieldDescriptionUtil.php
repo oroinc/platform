@@ -53,10 +53,10 @@ class FieldDescriptionUtil
     public static function addFieldNote(string $description, string $note): string
     {
         if (str_contains($description, '</p>')) {
-            return $description . "\n<p>" . $note . '</p>';
+            return $description . "<p>" . $note . '</p>';
         }
 
-        return '<p>' . $description . "</p>\n<p>" . $note . '</p>';
+        return '<p>' . $description . "</p><p>" . $note . '</p>';
     }
 
     public static function addReadOnlyFieldNote(string $description): string

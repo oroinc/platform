@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -17,8 +18,7 @@ class OroApiBundle extends Bundle
     use Compiler\ApiTaggedServiceTrait;
 
     /**
-     * {@inheritdoc}
-     *
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function build(ContainerBuilder $container): void
@@ -116,6 +116,17 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new LoadApplicableCheckersCompilerPass(
             'oro_api.processor_bag',
             'oro.api.processor.applicable_checker'
+        ));
+        $container->addCompilerPass(new Compiler\OpenApiCompilerPass());
+        $container->addCompilerPass(new PriorityNamedTaggedServiceCompilerPass(
+            'oro_api.api_doc.open_api.formatter_registry',
+            'oro.api.open_api.formatter',
+            'format'
+        ));
+        $container->addCompilerPass(new PriorityNamedTaggedServiceCompilerPass(
+            'oro_api.api_doc.open_api.generator_registry',
+            'oro.api.open_api.generator',
+            'view'
         ));
         $container->addCompilerPass(
             new CleanUpProcessorsCompilerPass(

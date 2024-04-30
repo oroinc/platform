@@ -1,0 +1,70 @@
+services:
+    oro_api.api_doc.open_api.renderer:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Renderer\OpenApiRenderer
+        arguments:
+            - ['logger', 'no-validation', 'entities', 'title']
+            - '@oro_api.api_doc.open_api.generator_registry'
+            - '@oro_api.api_doc.open_api.formatter_registry'
+            - '@oro_api.rest.doc_view_detector'
+
+    oro_api.api_doc.open_api.formatter_registry:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Formatter\OpenApiFormatterRegistry
+        arguments:
+            - [] # formats. Injected by Oro\Bundle\ApiBundle\OroApiBundle
+            - ~ # service locator for rendered. Injected by Oro\Bundle\ApiBundle\OroApiBundle
+
+    oro_api.api_doc.open_api.formatter.json:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Formatter\JsonOpenApiFormatter
+        tags:
+            - { name: oro.api.open_api.formatter, format: json }
+
+    oro_api.api_doc.open_api.formatter.json_pretty:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Formatter\JsonPrettyOpenApiFormatter
+        tags:
+            - { name: oro.api.open_api.formatter, format: json-pretty }
+
+    oro_api.api_doc.open_api.formatter.yaml:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Formatter\YamlOpenApiFormatter
+        tags:
+            - { name: oro.api.open_api.formatter, format: yaml }
+
+    oro_api.api_doc.open_api.generator_registry:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Generator\OpenApiGeneratorRegistry
+        arguments:
+            - [] # views. Injected by Oro\Bundle\ApiBundle\OroApiBundle
+            - ~ # service locator for generators. Injected by Oro\Bundle\ApiBundle\OroApiBundle
+
+    oro_api.api_doc.open_api.name_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Provider\OpenApiSpecificationNameProvider
+        arguments:
+            - [] # viewLabels. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\OpenApiCompilerPass
+
+    oro_api.api_doc.open_api.data_type_describe_helper:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Describer\DataTypeDescribeHelper
+
+    oro_api.api_doc.open_api.resource_info_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Describer\ResourceInfoProvider
+        arguments:
+            - '@oro_api.resources_provider'
+            - '@oro_api.subresources_provider'
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.value_normalizer'
+
+    oro_api.api_doc.open_api.request_header_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Describer\RequestHeaderProvider
+        arguments:
+            - [] # headers. Injected by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\OpenApiCompilerPass
+            - '@oro_api.rest.doc_view_detector'
+
+    oro_api.api_doc.open_api.response_header_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Describer\ResponseHeaderProvider
+        arguments:
+            - '@oro_api.api_doc.open_api.resource_info_provider'
+
+    oro_api.api_doc.open_api.model_normalizer:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Describer\ModelNormalizer
+
+    oro_api.api_doc.open_api.model_normalizer.json_api:
+        class: Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Describer\JsonApi\ModelNormalizer
+        arguments:
+            - '@oro_api.api_doc.open_api.model_normalizer'

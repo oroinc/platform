@@ -1,0 +1,1719 @@
+openapi: 3.1.0
+info:
+  title: 'JSON:API'
+  description: '[The documentation](https://doc.oroinc.com/api/)'
+  version: 0.0.0
+paths:
+  /admin/api/testapicustomidentifiers:
+    get:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get Test Custom Identifiers'
+      description: 'Get a list of entities'
+      operationId: testapicustomidentifiers-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/filterChildren'
+        -
+          $ref: '#/components/parameters/filterChildrenEq'
+        -
+          $ref: '#/components/parameters/filterChildrenNeq'
+        -
+          $ref: '#/components/parameters/filterChildrenExists'
+        -
+          $ref: '#/components/parameters/filterChildrenNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterChildrenContains'
+        -
+          $ref: '#/components/parameters/filterChildrenNotContains'
+        -
+          $ref: '#/components/parameters/filterDatabaseId'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdEq'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdNeq'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdLt'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdLte'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdGt'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdGte'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdExists'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterName'
+        -
+          $ref: '#/components/parameters/filterNameEq'
+        -
+          $ref: '#/components/parameters/filterNameNeq'
+        -
+          $ref: '#/components/parameters/filterNameExists'
+        -
+          $ref: '#/components/parameters/filterNameNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterParent'
+        -
+          $ref: '#/components/parameters/filterParentEq'
+        -
+          $ref: '#/components/parameters/filterParentNeq'
+        -
+          $ref: '#/components/parameters/filterParentExists'
+        -
+          $ref: '#/components/parameters/filterParentNeqOrNull'
+        -
+          $ref: '#/components/parameters/fieldsTestapicustomidentifiers'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapicustomidentifiersCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    post:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Create Test Custom Identifier'
+      description: 'Create an entity<p><strong>Note:</strong> This resource supports <a href="https://doc.oroinc.com/api/upsert-operation/" target="_blank">the upsert operation</a> by the resource identifier.</p>'
+      operationId: testapicustomidentifiers-post
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude1'
+      requestBody:
+        $ref: '#/components/requestBodies/testapicustomidentifiersModel'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapicustomidentifiersModel'
+        '201':
+          $ref: '#/components/responses/testapicustomidentifiersModel1'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_2'
+        '409':
+          $ref: '#/components/responses/err409_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Delete Test Custom Identifiers'
+      description: 'Delete a list of entities<p><strong>Note:</strong> The maximum number of records this endpoint can delete at a time is 100.</p>'
+      operationId: testapicustomidentifiers-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude2'
+        -
+          $ref: '#/components/parameters/filterChildren'
+        -
+          $ref: '#/components/parameters/filterChildrenEq'
+        -
+          $ref: '#/components/parameters/filterChildrenNeq'
+        -
+          $ref: '#/components/parameters/filterChildrenExists'
+        -
+          $ref: '#/components/parameters/filterChildrenNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterChildrenContains'
+        -
+          $ref: '#/components/parameters/filterChildrenNotContains'
+        -
+          $ref: '#/components/parameters/filterDatabaseId'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdEq'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdNeq'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdLt'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdLte'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdGt'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdGte'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdExists'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterName'
+        -
+          $ref: '#/components/parameters/filterNameEq'
+        -
+          $ref: '#/components/parameters/filterNameNeq'
+        -
+          $ref: '#/components/parameters/filterNameExists'
+        -
+          $ref: '#/components/parameters/filterNameNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterParent'
+        -
+          $ref: '#/components/parameters/filterParentEq'
+        -
+          $ref: '#/components/parameters/filterParentNeq'
+        -
+          $ref: '#/components/parameters/filterParentExists'
+        -
+          $ref: '#/components/parameters/filterParentNeqOrNull'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty2'
+        '403':
+          $ref: '#/components/responses/err403_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapicustomidentifiers-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Create or update a list of Test Custom Identifiers'
+      description: "Create or update a list of test custom identifier records.\n\nThe request is processed asynchronously, and the details of the corresponding asynchronous operation\nare returned in the response.\n\n**Note:** *The server may process records in any order regardless of the order\nin which they are specified in the request.*\n\nThe input data for each record is the same as for the API resources to create or update\na single test custom identifier record.\n\nExample:\n\n```JSON\n{\n   \"data\": [\n      {\n          \"type\":\"entityType\",\n          \"attributes\": {...},\n          \"relationships\": {...}\n      },\n      {\n          \"type\":\"entityType\",\n          \"attributes\": {...},\n          \"relationships\": {...}\n       }\n   ]\n}\n```\n\nUse the **update** meta property to mark the records that should be updated.\nSee [Creating and Updating Related Resources with Primary API Resource](https://doc.oroinc.com/api/create-update-related-resources/)\nfor more details about this meta property.\n\nExample:\n\n```JSON\n{\n   \"data\": [\n      {\n          \"meta\": {\"update\": true},\n          \"type\":\"entityType\",\n          \"id\": \"1\",\n          \"attributes\": {...},\n          \"relationships\": {...}\n      },\n      {\n          \"meta\": {\"update\": true},\n          \"type\":\"entityType\",\n          \"id\": \"2\",\n          \"attributes\": {...},\n          \"relationships\": {...}\n       }\n   ]\n}\n```\n\nThe related entities can be created or updated when processing primary entities.\nThe list of related entities should be specified in the **included** section\nthat must be placed at the root level, the same as the **data** section.\n\nExample:\n\n```JSON\n{\n   \"data\": [\n      {\n          \"type\":\"entityType\",\n          \"attributes\": {...},\n          \"relationships\": {\n              \"relation\": {\n                  \"data\": {\n                      \"type\":\"entityType1\",\n                      \"id\": \"included_entity_1\"\n                  }\n              },\n              ...\n          }\n      },\n      ...\n   ],\n   \"included\": [\n       {\n          \"type\":\"entityType1\",\n          \"id\": \"included_entity_1\",\n          \"attributes\": {...},\n          \"relationships\": {...}\n      },\n      ...\n   ]\n}\n```"
+      operationId: testapicustomidentifiers-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+      requestBody:
+        $ref: '#/components/requestBodies/testapicustomidentifiersUpdateListModel'
+      responses:
+        '202':
+          $ref: '#/components/responses/empty1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapicustomidentifiers/{id}':
+    get:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get Test Custom Identifier'
+      description: 'Get an entity'
+      operationId: testapicustomidentifiers-id-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapicustomidentifiers'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapicustomidentifiersModel2'
+        '403':
+          $ref: '#/components/responses/err403_4'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Delete Test Custom Identifier'
+      description: 'Delete an entity'
+      operationId: testapicustomidentifiers-id-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty3'
+        '403':
+          $ref: '#/components/responses/err403_6'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapicustomidentifiers-id-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Update Test Custom Identifier'
+      description: 'Update an entity<p><strong>Note:</strong> This resource supports <a href="https://doc.oroinc.com/api/upsert-operation/" target="_blank">the upsert operation</a> by the resource identifier.</p>'
+      operationId: testapicustomidentifiers-id-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapicustomidentifiers2Model'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapicustomidentifiersModel3'
+        '201':
+          $ref: '#/components/responses/testapicustomidentifiersModel4'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '403':
+          $ref: '#/components/responses/err403_5'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '409':
+          $ref: '#/components/responses/err409_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapicustomidentifiers/{id}/children':
+    get:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get children'
+      description: 'Get a list of related entities'
+      operationId: testapicustomidentifiers-id-children-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/filterChildren'
+        -
+          $ref: '#/components/parameters/filterChildrenEq'
+        -
+          $ref: '#/components/parameters/filterChildrenNeq'
+        -
+          $ref: '#/components/parameters/filterChildrenExists'
+        -
+          $ref: '#/components/parameters/filterChildrenNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterChildrenContains'
+        -
+          $ref: '#/components/parameters/filterChildrenNotContains'
+        -
+          $ref: '#/components/parameters/filterDatabaseId'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdEq'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdNeq'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdLt'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdLte'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdGt'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdGte'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdExists'
+        -
+          $ref: '#/components/parameters/filterDatabaseIdNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterName'
+        -
+          $ref: '#/components/parameters/filterNameEq'
+        -
+          $ref: '#/components/parameters/filterNameNeq'
+        -
+          $ref: '#/components/parameters/filterNameExists'
+        -
+          $ref: '#/components/parameters/filterNameNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterParent'
+        -
+          $ref: '#/components/parameters/filterParentEq'
+        -
+          $ref: '#/components/parameters/filterParentNeq'
+        -
+          $ref: '#/components/parameters/filterParentExists'
+        -
+          $ref: '#/components/parameters/filterParentNeqOrNull'
+        -
+          $ref: '#/components/parameters/fieldsTestapicustomidentifiers'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapicustomidentifiersCollectionModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapicustomidentifiers-id-children-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapicustomidentifiers/{id}/parent':
+    get:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get parent'
+      description: 'Get a related entity'
+      operationId: testapicustomidentifiers-id-parent-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapicustomidentifiers'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapicustomidentifiersModel5'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_2'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapicustomidentifiers-id-parent-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapicustomidentifiers/{id}/relationships/children':
+    get:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get "children" relationship'
+      description: 'Get the relationship data'
+      operationId: testapicustomidentifiers-id-relationships-children-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapicustomidentifiersRelationshipForChildrenModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    post:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Add members to "children" relationship'
+      description: 'Add the specified members to the relationship'
+      operationId: testapicustomidentifiers-id-relationships-children-post
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapicustomidentifiersRelationshipForChildrenModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty4'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    delete:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Delete members from "children" relationship'
+      description: 'Delete the specified members from the relationship'
+      operationId: testapicustomidentifiers-id-relationships-children-delete
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapicustomidentifiersRelationshipForChildrenModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty4'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapicustomidentifiers-id-relationships-children-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Replace "children" relationship'
+      description: 'Completely replace every member of the relationship'
+      operationId: testapicustomidentifiers-id-relationships-children-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapicustomidentifiersRelationshipForChildrenModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty4'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+  '/admin/api/testapicustomidentifiers/{id}/relationships/parent':
+    get:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get "parent" relationship'
+      description: 'Get the relationship data'
+      operationId: testapicustomidentifiers-id-relationships-parent-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/testapicustomidentifiersRelationshipForParentModel'
+        '403':
+          $ref: '#/components/responses/err403_1'
+        '404':
+          $ref: '#/components/responses/err404_3'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    options:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Get options'
+      description: 'Get communication options for a resource'
+      operationId: testapicustomidentifiers-id-relationships-parent-options
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/empty'
+        '400':
+          $ref: '#/components/responses/err400_1'
+        '404':
+          $ref: '#/components/responses/err404_1'
+        '500':
+          $ref: '#/components/responses/err500_1'
+    patch:
+      tags:
+        - testapicustomidentifiers
+      summary: 'Update "parent" relationship'
+      description: 'Update the relationship'
+      operationId: testapicustomidentifiers-id-relationships-parent-patch
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/contentType'
+        -
+          $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/testapicustomidentifiersRelationshipForParentModel'
+      responses:
+        '204':
+          $ref: '#/components/responses/empty4'
+        '403':
+          $ref: '#/components/responses/err403_7'
+        '500':
+          $ref: '#/components/responses/err500_1'
+components:
+  schemas:
+    meta:
+      type: object
+      additionalProperties: true
+    link:
+      type: object
+      oneOf:
+        -
+          description: 'A string containing the link’s URL'
+          type: string
+          format: uri-reference
+        -
+          required:
+            - href
+          properties:
+            href:
+              description: 'A string containing the link’s URL.'
+              type: string
+              format: uri-reference
+            meta:
+              $ref: '#/components/schemas/meta'
+          type: object
+    links:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    error:
+      properties:
+        id:
+          description: 'A unique identifier for this particular occurrence of the problem.'
+          type: string
+        status:
+          description: 'The HTTP status code applicable to this problem.'
+          type: string
+        code:
+          description: 'An application-specific error code.'
+          type: string
+        title:
+          description: 'A short, human-readable summary of the problem that is not changed from occurrence to occurrence of the problem.'
+          type: string
+        detail:
+          description: 'A human-readable explanation specific to this occurrence of the problem.'
+          type: string
+        source:
+          description: 'An object containing references to the source of the error.'
+          properties:
+            pointer:
+              description: 'A [JSON Pointer](https://tools.ietf.org/html/rfc6901) to the associated entity in the request document (e.g. `/data` for a primary data object, or `/data/attributes/title` for a specific attribute).'
+              type: string
+            parameter:
+              description: 'A string indicating which URI query parameter caused the error.'
+              type: string
+          type: object
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    errors:
+      type: array
+      items:
+        $ref: '#/components/schemas/error'
+      uniqueItems: true
+    failure:
+      required:
+        - errors
+      properties:
+        errors:
+          $ref: '#/components/schemas/errors'
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/relationshipDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    relationshipDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForDataModel:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    linksForRelationshipToOne:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the relationship itself.'
+        related:
+          $ref: '#/components/schemas/link'
+          description: 'A link provides access to resource object linked in the relationship.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    relationshipCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/relationshipDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForRelationshipToMany:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the relationship itself.'
+        related:
+          $ref: '#/components/schemas/link'
+          description: 'A link provides access to resource objects linked in the relationship.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    testapicustomidentifiersCollectionModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapicustomidentifiersDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelCollection'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapicustomidentifiersDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapicustomidentifiers
+        id:
+          description: 'The unique identifier of a resource. It is a key.'
+          type: string
+        attributes:
+          required:
+            - databaseId
+          properties:
+            databaseId:
+              type: integer
+            name:
+              type: string
+          type: object
+        relationships:
+          properties:
+            children:
+              $ref: '#/components/schemas/testapicustomidentifiersRelationshipToMany'
+            parent:
+              $ref: '#/components/schemas/testapicustomidentifiersRelationshipToOne'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapicustomidentifiersRelationshipToMany:
+      description: 'A to-many relationship to "testapicustomidentifiers" resource.'
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapicustomidentifiersLinkage'
+          uniqueItems: true
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapicustomidentifiersLinkage:
+      description: 'A linkage to "testapicustomidentifiers" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapicustomidentifiers
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapicustomidentifiersRelationshipToOne:
+      description: 'A to-one relationship to "testapicustomidentifiers" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/testapicustomidentifiersLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    linksForTopLevelCollection:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+        first:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the first page of data.'
+        last:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the last page of data.'
+        prev:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the previous page of data.'
+        next:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the next page of data.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    objectArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/object'
+    object:
+      type: object
+      additionalProperties: true
+    testapicustomidentifiersModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapicustomidentifiersDataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    linksForTopLevelItem:
+      properties:
+        self:
+          $ref: '#/components/schemas/link'
+          description: 'A link for the resource itself.'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/link'
+    testapicustomidentifiers1Model:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapicustomidentifiers1DataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapicustomidentifiers1DataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapicustomidentifiers
+        id:
+          description: 'The unique identifier of a resource.'
+          type: string
+        attributes:
+          required:
+            - createdAt
+            - elapsedTime
+            - entityType
+            - status
+            - updatedAt
+          properties:
+            createdAt:
+              $ref: '#/components/schemas/datetime'
+              description: 'The date and time when the asynchronous operation was created.'
+            elapsedTime:
+              description: 'The number of seconds the asynchronous operation has been running.'
+              type: integer
+            entityType:
+              $ref: '#/components/schemas/entityType'
+              description: 'The type of an entity for which the asynchronous operation was created.'
+            progress:
+              description: 'The progress, in percentage, for the asynchronous operation.'
+              type: number
+            status:
+              description: 'The status of the asynchronous operation. Possible values: `new`, `running`, `failed`, `success`, `cancelled`.'
+              type: string
+            summary:
+              $ref: '#/components/schemas/object'
+              description: "<p>The summary statistics of the asynchronous operation.</p><p>This field will have data only when an asynchronous operation is finished successfully.</p><p>The summary can have the following properties:</p><ul>\n<li><strong>aggregateTime</strong> - The accumulated time, in milliseconds, taken by the system to accomplish the asynchronous operation.</li>\n<li><strong>readCount</strong> - The number of items that have been successfully read.</li>\n<li><strong>writeCount</strong> - The number of items that have been successfully written.</li>\n<li><strong>errorCount</strong> - The number of errors occurred when processing the asynchronous operation.</li>\n<li><strong>createCount</strong> - The number of items that have been successfully created.</li>\n<li><strong>updateCount</strong> - The number of items that have been successfully updated.</li>\n</ul>"
+            updatedAt:
+              $ref: '#/components/schemas/datetime'
+              description: 'The date and time when the asynchronous operation was last updated.'
+          type: object
+        relationships:
+          properties:
+            organization:
+              $ref: '#/components/schemas/organizationsRelationshipToOne'
+              description: 'An organization record represents a real enterprise, business, firm, company or another organization to which the users belong.'
+            owner:
+              $ref: '#/components/schemas/usersRelationshipToOne'
+              description: 'An owner record represents the ownership capabilities of the record.'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    datetime:
+      type: string
+      format: datetime
+      pattern: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
+    entityType:
+      type: string
+      format: entityType
+      pattern: '[a-zA-Z][\w\\]+'
+    organizationsRelationshipToOne:
+      description: 'A to-one relationship to "organizations" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/organizationsLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    organizationsLinkage:
+      description: 'A linkage to "organizations" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - organizations
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    usersRelationshipToOne:
+      description: 'A to-one relationship to "users" resource.'
+      required:
+        - data
+      properties:
+        data:
+          oneOf:
+            -
+              $ref: '#/components/schemas/usersLinkage'
+            -
+              type: 'null'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    usersLinkage:
+      description: 'A linkage to "users" resource.'
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - users
+        id:
+          type: string
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapicustomidentifiers2Model:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapicustomidentifiers2DataModel'
+        links:
+          $ref: '#/components/schemas/linksForTopLevelItem'
+        meta:
+          $ref: '#/components/schemas/meta'
+        included:
+          $ref: '#/components/schemas/objectArray'
+      type: object
+    testapicustomidentifiers2DataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapicustomidentifiers
+        id:
+          description: 'The unique identifier of a resource. It is a key.'
+          type: string
+        attributes:
+          properties:
+            databaseId:
+              type: integer
+            name:
+              type: string
+          type: object
+        relationships:
+          properties:
+            children:
+              $ref: '#/components/schemas/testapicustomidentifiersRelationshipToMany'
+            parent:
+              $ref: '#/components/schemas/testapicustomidentifiersRelationshipToOne'
+          type: object
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    integerUnionArrayRange:
+      oneOf:
+        -
+          type: integer
+        -
+          $ref: '#/components/schemas/integerArray'
+        -
+          $ref: '#/components/schemas/integerRange'
+    integerArray:
+      type: array
+      items:
+        type: integer
+    integerRange:
+      type: string
+      pattern: '-?\d+\.\.-?\d+'
+    stringUnionArray:
+      oneOf:
+        -
+          type: string
+        -
+          $ref: '#/components/schemas/stringArray'
+    stringArray:
+      type: array
+      items:
+        type: string
+    unsignedInteger_1:
+      type: integer
+      default: 1
+      minimum: 0
+    orderBy_id:
+      type: string
+      format: orderBy
+      default: id
+      pattern: '-?[\w\.]+(,-?[\w\.]+)*'
+    testapicustomidentifiersUpdateListModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            oneOf:
+              -
+                $ref: '#/components/schemas/testapicustomidentifiersModel'
+              -
+                $ref: '#/components/schemas/testapicustomidentifiers2Model'
+        links:
+          $ref: '#/components/schemas/links'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapicustomidentifiersRelationshipForChildrenModel:
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/testapicustomidentifiersRelationshipForChildrenDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToMany'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapicustomidentifiersRelationshipForChildrenDataModel:
+      required:
+        - type
+        - id
+      properties:
+        type:
+          description: 'The type of an entity.'
+          type: string
+          enum:
+            - testapicustomidentifiers
+        id:
+          description: 'The unique identifier of a resource. It is a key.'
+          type: string
+        links:
+          $ref: '#/components/schemas/linksForDataModel'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    testapicustomidentifiersRelationshipForParentModel:
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/testapicustomidentifiersRelationshipForChildrenDataModel'
+        links:
+          $ref: '#/components/schemas/linksForRelationshipToOne'
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+  responses:
+    empty:
+      description: 'Returned when successful'
+    err400_1:
+      description: 'Returned when the request data is not valid'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err404_1:
+      description: 'Returned when the entity is not found'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err500_1:
+      description: 'Returned when an unexpected error occurs'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapicustomidentifiersCollectionModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersCollectionModel'
+    err403_1:
+      description: 'Returned when no permissions to get the entities'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapicustomidentifiersModel:
+      description: 'Returned when the entity was successfully updated'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersModel'
+    testapicustomidentifiersModel1:
+      description: 'Returned when the entity was successfully created'
+      headers:
+        Location:
+          $ref: '#/components/headers/location'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersModel'
+    err403_2:
+      description: 'Returned when no permissions to create the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err409_1:
+      description: "Returned when the specified entity type does not match the server's endpoint or a client-generated identifier already exists"
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty1:
+      description: 'Returned when request data was accepted to asynchronous processing'
+      headers:
+        Content-Location:
+          $ref: '#/components/headers/contentLocation'
+    empty2:
+      description: 'Returned when the entities successfully deleted'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+        X-Include-Deleted-Count:
+          $ref: '#/components/headers/xIncludeDeletedCount'
+    err403_3:
+      description: 'Returned when no permissions to delete the entities'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapicustomidentifiersModel2:
+      description: 'Returned when successful'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersModel'
+    err403_4:
+      description: 'Returned when no permissions to get the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapicustomidentifiersModel3:
+      description: 'Returned when the entity was successfully updated'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersModel'
+    testapicustomidentifiersModel4:
+      description: 'Returned when the entity was successfully created'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersModel'
+    err403_5:
+      description: 'Returned when no permissions to update the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err409_2:
+      description: "Returned when the specified entity type and identifier do not match the server's endpoint"
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty3:
+      description: 'Returned when the entity successfully deleted'
+    err403_6:
+      description: 'Returned when no permissions to delete the entity'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    err404_2:
+      description: 'Returned when the parent entity does not exist'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapicustomidentifiersModel5:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersModel'
+    testapicustomidentifiersRelationshipForChildrenModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersRelationshipForChildrenModel'
+    err404_3:
+      description: 'Returned when the parent entity of the relationship does not exist'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    empty4:
+      description: 'Returned when an update of the relationship is successful'
+    err403_7:
+      description: 'Returned when no permissions to update the relationship'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/failure'
+    testapicustomidentifiersRelationshipForParentModel:
+      description: 'Returned when successful'
+      headers:
+        X-Include-Total-Count:
+          $ref: '#/components/headers/xIncludeTotalCount'
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersRelationshipForParentModel'
+  parameters:
+    accept:
+      name: Accept
+      in: header
+      schema:
+        type: string
+      example: application/vnd.api+json
+    xInclude:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: totalCount
+    filterChildren:
+      name: 'filter[children]'
+      in: query
+      description: "Filter records by 'children' relationship."
+      schema:
+        type: string
+    filterChildrenEq:
+      name: 'filter[children][eq]'
+      in: query
+      description: "Filter records by 'children' relationship."
+      schema:
+        type: string
+    filterChildrenNeq:
+      name: 'filter[children][neq]'
+      in: query
+      description: "Filter records by 'children' relationship."
+      schema:
+        type: string
+    filterChildrenExists:
+      name: 'filter[children][exists]'
+      in: query
+      description: "Filter records by 'children' relationship."
+      schema:
+        type: boolean
+    filterChildrenNeqOrNull:
+      name: 'filter[children][neq_or_null]'
+      in: query
+      description: "Filter records by 'children' relationship."
+      schema:
+        type: string
+    filterChildrenContains:
+      name: 'filter[children][contains]'
+      in: query
+      description: "Filter records by 'children' relationship."
+      schema:
+        type: string
+    filterChildrenNotContains:
+      name: 'filter[children][not_contains]'
+      in: query
+      description: "Filter records by 'children' relationship."
+      schema:
+        type: string
+    filterDatabaseId:
+      name: 'filter[databaseId]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterDatabaseIdEq:
+      name: 'filter[databaseId][eq]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterDatabaseIdNeq:
+      name: 'filter[databaseId][neq]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterDatabaseIdLt:
+      name: 'filter[databaseId][lt]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterDatabaseIdLte:
+      name: 'filter[databaseId][lte]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterDatabaseIdGt:
+      name: 'filter[databaseId][gt]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterDatabaseIdGte:
+      name: 'filter[databaseId][gte]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterDatabaseIdExists:
+      name: 'filter[databaseId][exists]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        type: boolean
+    filterDatabaseIdNeqOrNull:
+      name: 'filter[databaseId][neq_or_null]'
+      in: query
+      description: "Filter records by 'databaseId' field."
+      schema:
+        $ref: '#/components/schemas/integerUnionArrayRange'
+    filterId:
+      name: 'filter[id]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterIdEq:
+      name: 'filter[id][eq]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterIdNeq:
+      name: 'filter[id][neq]'
+      in: query
+      description: 'Filter records by the identifier field'
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterName:
+      name: 'filter[name]'
+      in: query
+      description: "Filter records by 'name' field."
+      schema:
+        type: string
+    filterNameEq:
+      name: 'filter[name][eq]'
+      in: query
+      description: "Filter records by 'name' field."
+      schema:
+        type: string
+    filterNameNeq:
+      name: 'filter[name][neq]'
+      in: query
+      description: "Filter records by 'name' field."
+      schema:
+        type: string
+    filterNameExists:
+      name: 'filter[name][exists]'
+      in: query
+      description: "Filter records by 'name' field."
+      schema:
+        type: boolean
+    filterNameNeqOrNull:
+      name: 'filter[name][neq_or_null]'
+      in: query
+      description: "Filter records by 'name' field."
+      schema:
+        type: string
+    filterParent:
+      name: 'filter[parent]'
+      in: query
+      description: "Filter records by 'parent' relationship."
+      schema:
+        type: string
+    filterParentEq:
+      name: 'filter[parent][eq]'
+      in: query
+      description: "Filter records by 'parent' relationship."
+      schema:
+        type: string
+    filterParentNeq:
+      name: 'filter[parent][neq]'
+      in: query
+      description: "Filter records by 'parent' relationship."
+      schema:
+        type: string
+    filterParentExists:
+      name: 'filter[parent][exists]'
+      in: query
+      description: "Filter records by 'parent' relationship."
+      schema:
+        type: boolean
+    filterParentNeqOrNull:
+      name: 'filter[parent][neq_or_null]'
+      in: query
+      description: "Filter records by 'parent' relationship."
+      schema:
+        type: string
+    fieldsTestapicustomidentifiers:
+      name: 'fields[testapicustomidentifiers]'
+      in: query
+      description: "A list of fields of 'testapicustomidentifiers' entity that will be returned in the response."
+      schema:
+        type: string
+    include:
+      name: include
+      in: query
+      description: "A list of related entities to be included. Comma-separated paths, e.g. 'comments,comments.author'."
+      schema:
+        type: string
+    meta:
+      name: meta
+      in: query
+      description: 'A list of meta properties to be returned. Comma-separated names.'
+      schema:
+        type: string
+    pageNumber:
+      name: 'page[number]'
+      in: query
+      description: 'The page number, starting from 1.'
+      schema:
+        $ref: '#/components/schemas/unsignedInteger_1'
+    pageSize:
+      name: 'page[size]'
+      in: query
+      description: 'The number of items per page.'
+      schema:
+        type: integer
+        default: 10
+    sort:
+      name: sort
+      in: query
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'."
+      schema:
+        $ref: '#/components/schemas/orderBy_id'
+    contentType:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      example: application/vnd.api+json
+    xInclude1:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: noHateoas
+    xInclude2:
+      name: X-Include
+      in: header
+      schema:
+        type: string
+      example: deletedCount
+    id:
+      name: id
+      in: path
+      description: 'The unique identifier of a resource. It is a key.'
+      required: true
+      schema:
+        type: string
+  requestBodies:
+    testapicustomidentifiersModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersModel'
+    testapicustomidentifiersUpdateListModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersUpdateListModel'
+    testapicustomidentifiers2Model:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiers2Model'
+    testapicustomidentifiersRelationshipForChildrenModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersRelationshipForChildrenModel'
+    testapicustomidentifiersRelationshipForParentModel:
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/testapicustomidentifiersRelationshipForParentModel'
+  headers:
+    xIncludeTotalCount:
+      description: 'The total number of entities. Returned when the total count was requested by "X-Include: totalCount" request header.'
+      schema:
+        type: integer
+    location:
+      description: 'The URL of a newly created API resource.'
+      schema:
+        type: string
+    contentLocation:
+      description: 'The URL of API resource provides details of an asynchronous operation created to process submitted data.'
+      schema:
+        type: string
+    xIncludeDeletedCount:
+      description: 'The total number of deleted entities. Returned when the total count was requested by "X-Include: deletedCount" request header.'
+      schema:
+        type: integer

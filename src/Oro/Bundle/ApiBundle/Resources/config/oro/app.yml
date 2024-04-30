@@ -136,10 +136,19 @@ oro_api:
 
     # default data-type mapping for all views
     api_doc_data_types:
+        entityType: string
+        entityType[]: array of strings
+        entityClass: string
+        entityClass[]: array of strings
+        nestedObject: object
         unsignedInteger: integer
         unsignedInteger[]: array of integers
+        smallint[]: array of smallints
+        scalar[]: array of scalars
         text: string
         text[]: array of strings
+        ascii_string: string
+        ascii_string[]: array of string
         guid: string
         guid[]: array of strings
         json: object
@@ -151,31 +160,113 @@ oro_api:
         percent_100[]: array of floats
         currency: string
         currency[]: array of strings
+        money[]: array of moneys
         money_value: money
         money_value[]: array of moneys
         duration: integer
         duration[]: array of integers
-        entityType: string
-        entityType[]: array of strings
+        decimal[]: array of decimals
         objects: array of objects
         object[]: array of objects
         strings: array of strings
         string[]: array of strings
         integer[]: array of integers
-        smallint[]: array of smallints
         bigint[]: array of bigints
         boolean[]: array of booleans
-        decimal[]: array of decimals
         float[]: array of floats
         datetime[]: array of datetimes
         date[]: array of dates
         time[]: array of times
-        money[]: array of moneys
-        scalar[]: array of scalars
-        nestedObject: object
+        dateinterval: string
+        dateinterval[]: array of string
+        datetimetz: datetime
+        datetimetz[]: array of datetimes
+        datetimetz_immutable: datetime
+        datetimetz_immutable[]: array of datetimes
+        datetime_immutable: datetime
+        datetime_immutable[]: array of datetimes
+        date_immutable: date
+        date_immutable[]: array of dates
+        time_immutable: time
+        time_immutable[]: array of times
+        config_object: object
+        crypted_string: string
+        crypted_string[]: array of strings
 
     api_doc_cache:
         excluded_features: [ web_api ]
+
+    open_api:
+        data_types:
+            entityType: [string, {format: entityType, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityType::REQUIREMENT}]
+            entityClass: [string, {format: entityClass, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass::REQUIREMENT}]
+            orderBy: [string, {format: orderBy, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeOrderBy::REQUIREMENT}]
+            unsignedInteger: [integer, {'minimum': 0}]
+            smallint: [integer]
+            text: [string, {format: text}]
+            ascii_string: [string, {format: ascii}]
+            guid: [string, {format: guid, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeGuid::REQUIREMENT}]
+            percent: [number]
+            percent_100: [number]
+            currency: [string, {format: currency}]
+            money: [number]
+            duration: [integer]
+            decimal: [number]
+            bigint: [string, {format: bigint, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeBigint::REQUIREMENT}]
+            float: [number]
+            binary: [string, {format: binary}]
+            datetime: [string, {format: datetime, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDateTime::REQUIREMENT}]
+            date: [string, {format: date, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDate::REQUIREMENT}]
+            time: [string, {format: time, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeTime::REQUIREMENT}]
+            dateinterval: [string, {format: dateinterval}]
+            crypted_string: [string, {format: crypted}]
+        data_type_aliases:
+            nestedObject: object
+            json: object
+            json_array: object
+            config_object: object
+            money_value: money
+            blob: binary
+            simple_array: 'scalar[]'
+            datetimetz: datetime
+            datetimetz_immutable: datetime
+            datetime_immutable: datetime
+            date_immutable: date
+            time_immutable: time
+        data_type_plural_map:
+            scalars: scalar
+            strings: string
+            booleans: boolean
+            integers: integer
+            smallints: smallint
+            bigints: bigint
+            floats: float
+            decimals: decimal
+            moneys: money
+            datetimes: datetime
+            dates: date
+            times: time
+            objects: object
+        data_type_pattern_map:
+            !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityType::REQUIREMENT: entityType
+            !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass::REQUIREMENT: entityClass
+            !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger::REQUIREMENT: integer
+            !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeUnsignedInteger::REQUIREMENT: unsignedInteger
+            !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeOrderBy::REQUIREMENT: orderBy
+        data_type_range_value_patterns:
+            integer: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger::REQUIREMENT
+            smallint: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger::REQUIREMENT
+            duration: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger::REQUIREMENT
+            bigint: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeBigint::REQUIREMENT
+            unsignedInteger: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeUnsignedInteger::REQUIREMENT
+            decimal: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeDecimal::REQUIREMENT
+            money: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeDecimal::REQUIREMENT
+            float: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber::REQUIREMENT
+            percent: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber::REQUIREMENT
+            percent_100: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizePercent100::REQUIREMENT
+            datetime: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDateTime::REQUIREMENT
+            date: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDate::REQUIREMENT
+            time: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeTime::REQUIREMENT
 
     config_extensions:
         - oro_api.config_extension.filters

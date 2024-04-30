@@ -14,6 +14,7 @@ final class ApiDocAnnotationUtil
 {
     private static ?\ReflectionClass $reflClass = null;
     private static ?\ReflectionProperty $statusCodesReflProperty = null;
+    private static ?\ReflectionProperty $responseReflProperty = null;
     private static ?\ReflectionProperty $filtersReflProperty = null;
     private static ?\ReflectionProperty $inputReflProperty = null;
     private static ?\ReflectionProperty $outputReflProperty = null;
@@ -31,6 +32,21 @@ final class ApiDocAnnotationUtil
         }
 
         return self::$statusCodesReflProperty->getValue($annotation);
+    }
+
+    public static function getResponse(ApiDoc $annotation): ?array
+    {
+        if (null === self::$responseReflProperty) {
+            self::$responseReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'response');
+            self::$responseReflProperty->setAccessible(true);
+        }
+
+        $result = self::$responseReflProperty->getValue($annotation);
+        if (!$result) {
+            $result = null;
+        }
+
+        return $result;
     }
 
     public static function setFilters(ApiDoc $annotation, array $filters): void

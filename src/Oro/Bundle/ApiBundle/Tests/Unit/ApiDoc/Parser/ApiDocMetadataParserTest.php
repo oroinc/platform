@@ -39,7 +39,13 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $dataTypeConverter->expects(self::any())
             ->method('convertDataType')
             ->with(self::anything(), 'test_view')
-            ->willReturnArgument(0);
+            ->willReturnCallback(function (string $dataType) {
+                if ('guid' === $dataType) {
+                    return 'string';
+                }
+
+                return $dataType;
+            });
 
         $this->parser = new ApiDocMetadataParser(
             $this->valueNormalizer,
@@ -113,7 +119,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->setHasIdentifierGenerator(true);
-        $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
+        $metadata->addField(new FieldMetadata('id'))->setDataType('guid');
 
         $config = new EntityDefinitionConfig();
         $config->addField('id')->setDescription('Field Description');
@@ -129,8 +135,8 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'id' => [
                     'required'    => true,
-                    'dataType'    => 'integer',
-                    'actualType'  => 'integer',
+                    'dataType'    => 'string',
+                    'actualType'  => 'guid',
                     'description' => 'Field Description',
                     'readonly'    => true
                 ]
@@ -145,7 +151,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
-        $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
+        $metadata->addField(new FieldMetadata('id'))->setDataType('guid');
 
         $config = new EntityDefinitionConfig();
         $config->addField('id')->setDescription('Field Description');
@@ -161,8 +167,8 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'id' => [
                     'required'    => true,
-                    'dataType'    => 'integer',
-                    'actualType'  => 'integer',
+                    'dataType'    => 'string',
+                    'actualType'  => 'guid',
                     'description' => 'Field Description'
                 ]
             ],
@@ -177,7 +183,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->setHasIdentifierGenerator(true);
-        $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
+        $metadata->addField(new FieldMetadata('id'))->setDataType('guid');
 
         $config = new EntityDefinitionConfig();
         $config->addField('id')->setDescription('Field Description');
@@ -193,8 +199,8 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'id' => [
                     'required'    => true,
-                    'dataType'    => 'integer',
-                    'actualType'  => 'integer',
+                    'dataType'    => 'string',
+                    'actualType'  => 'guid',
                     'description' => 'Field Description'
                 ]
             ],
@@ -210,7 +216,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addMetaProperty(new MetaPropertyMetadata('property1'));
-        $field->setDataType('string');
+        $field->setDataType('guid');
 
         $config = new EntityDefinitionConfig();
         $config->addField('property1')->setDescription('Property Description');
@@ -227,7 +233,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
                 'property1' => [
                     'required'    => false,
                     'dataType'    => 'string',
-                    'actualType'  => 'string',
+                    'actualType'  => 'guid',
                     'description' => 'Property Description'
                 ]
             ],
@@ -243,7 +249,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addMetaProperty(new MetaPropertyMetadata(ConfigUtil::CLASS_NAME));
-        $field->setDataType('string');
+        $field->setDataType('guid');
 
         $config = new EntityDefinitionConfig();
         $config->addField(ConfigUtil::CLASS_NAME);
@@ -266,7 +272,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addMetaProperty(new MetaPropertyMetadata('renamedClassName'));
-        $field->setDataType('string');
+        $field->setDataType('guid');
         $field->setPropertyPath(ConfigUtil::CLASS_NAME);
 
         $config = new EntityDefinitionConfig();
@@ -290,7 +296,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addField(new FieldMetadata('field1'));
-        $field->setDataType('string');
+        $field->setDataType('guid');
         $field->setIsNullable(true);
 
         $config = new EntityDefinitionConfig();
@@ -308,7 +314,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
                 'field1' => [
                     'required'    => false,
                     'dataType'    => 'string',
-                    'actualType'  => 'string',
+                    'actualType'  => 'guid',
                     'description' => 'Field Description'
                 ]
             ],
@@ -324,7 +330,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addField(new FieldMetadata('field1'));
-        $field->setDataType('string');
+        $field->setDataType('guid');
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1')->setDescription('Field Description');
@@ -341,7 +347,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
                 'field1' => [
                     'required'    => true,
                     'dataType'    => 'string',
-                    'actualType'  => 'string',
+                    'actualType'  => 'guid',
                     'description' => 'Field Description'
                 ]
             ],
@@ -357,7 +363,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
 
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
-        $association->setDataType('integer');
+        $association->setDataType('guid');
         $association->setTargetClassName('Test\TargetClass');
         $association->setIsNullable(true);
 
@@ -380,7 +386,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'association1' => [
                     'required'    => false,
-                    'dataType'    => 'integer',
+                    'dataType'    => 'string',
                     'description' => 'Association Description',
                     'actualType'  => 'model',
                     'subType'     => 'targets'
@@ -398,7 +404,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
 
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
-        $association->setDataType('integer');
+        $association->setDataType('guid');
         $association->setTargetClassName('Test\TargetClass');
 
         $this->valueNormalizer->expects(self::any())
@@ -420,7 +426,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'association1' => [
                     'required'    => true,
-                    'dataType'    => 'integer',
+                    'dataType'    => 'string',
                     'description' => 'Association Description',
                     'actualType'  => 'model',
                     'subType'     => 'targets'
@@ -438,7 +444,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
 
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
-        $association->setDataType('integer');
+        $association->setDataType('guid');
         $association->setTargetClassName('Test\TargetClass');
         $association->setIsCollection(true);
 
@@ -461,7 +467,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'association1' => [
                     'required'    => true,
-                    'dataType'    => 'integer',
+                    'dataType'    => 'string',
                     'description' => 'Association Description',
                     'actualType'  => 'collection',
                     'subType'     => 'targets'
@@ -519,7 +525,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata->setHasIdentifierGenerator(true);
 
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
-        $association->setDataType('integer');
+        $association->setDataType('guid');
         $association->setTargetClassName('Test\TargetClass');
 
         $this->valueNormalizer->expects(self::any())
@@ -541,7 +547,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'association1' => [
                     'required'    => true,
-                    'dataType'    => 'integer',
+                    'dataType'    => 'string',
                     'description' => 'Association Description',
                     'readonly'    => true,
                     'actualType'  => 'model',
@@ -558,7 +564,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $field = $metadata->addField(new FieldMetadata('field1'));
-        $field->setDataType('string');
+        $field->setDataType('guid');
         $field->setDirection(true, false);
 
         $config = new EntityDefinitionConfig();
@@ -576,7 +582,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
                 'field1' => [
                     'required'    => true,
                     'dataType'    => 'string',
-                    'actualType'  => 'string',
+                    'actualType'  => 'guid',
                     'description' => 'Field Description'
                 ]
             ],
@@ -590,7 +596,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $field = $metadata->addField(new FieldMetadata('field1'));
-        $field->setDataType('string');
+        $field->setDataType('guid');
         $field->setDirection(true, false);
 
         $config = new EntityDefinitionConfig();
@@ -612,7 +618,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $field = $metadata->addField(new FieldMetadata('field1'));
-        $field->setDataType('string');
+        $field->setDataType('guid');
         $field->setDirection(false, true);
 
         $config = new EntityDefinitionConfig();
@@ -630,7 +636,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
                 'field1' => [
                     'required'    => true,
                     'dataType'    => 'string',
-                    'actualType'  => 'string',
+                    'actualType'  => 'guid',
                     'description' => 'Field Description'
                 ]
             ],
@@ -644,7 +650,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $field = $metadata->addField(new FieldMetadata('field1'));
-        $field->setDataType('string');
+        $field->setDataType('guid');
         $field->setDirection(false, true);
 
         $config = new EntityDefinitionConfig();
@@ -666,7 +672,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
-        $association->setDataType('integer');
+        $association->setDataType('guid');
         $association->setTargetClassName('Test\TargetClass');
         $association->setDirection(true, false);
 
@@ -689,7 +695,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'association1' => [
                     'required'    => true,
-                    'dataType'    => 'integer',
+                    'dataType'    => 'string',
                     'description' => 'Association Description',
                     'actualType'  => 'model',
                     'subType'     => 'targets'
@@ -705,7 +711,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
-        $association->setDataType('integer');
+        $association->setDataType('guid');
         $association->setTargetClassName('Test\TargetClass');
         $association->setDirection(true, false);
 
@@ -731,7 +737,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
-        $association->setDataType('integer');
+        $association->setDataType('guid');
         $association->setTargetClassName('Test\TargetClass');
         $association->setDirection(false, true);
 
@@ -754,7 +760,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             [
                 'association1' => [
                     'required'    => true,
-                    'dataType'    => 'integer',
+                    'dataType'    => 'string',
                     'description' => 'Association Description',
                     'actualType'  => 'model',
                     'subType'     => 'targets'
@@ -770,7 +776,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
-        $association->setDataType('integer');
+        $association->setDataType('guid');
         $association->setTargetClassName('Test\TargetClass');
         $association->setDirection(false, true);
 
