@@ -104,20 +104,29 @@ define(function(require) {
             const startSteps = this.stepCollection.filter(function(item) {
                 return item.get('allowed_transitions').indexOf(name) !== -1;
             });
-            const endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
+
+            const endSteps = _.keys(this.model.get('conditional_steps_to') || {});
+            endSteps.push(this.model.get('step_to'));
+
             this.addStaleMark();
-            for (i = 0; i < startSteps.length; i++) {
-                startStep = startSteps[i];
-                connection = this.findConnectionByStartStep(startStep);
-                if (connection && connection.endStep === endStep) {
-                    delete connection.stale;
-                } else {
-                    this.createConnection(startStep, endStep);
+            for (let k = 0; k < endSteps.length; k++) {
+                const endStep = this.stepCollection.findWhere({name: endSteps[k]});
+                for (i = 0; i < startSteps.length; i++) {
+                    startStep = startSteps[i];
+                    connection = this.findConnectionByStartStep(startStep);
+                    if (connection && connection.endStep === endStep) {
+                        delete connection.stale;
+                    } else {
+                        this.createConnection(startStep, endStep);
+                    }
                 }
             }
             this.removeStaleConnections();
 
-            this.stepCollectionView.getItemView(endStep).updateStepMinWidth();
+            for (let k = 0; k < endSteps.length; k++) {
+                const endStep = this.stepCollection.findWhere({name: endSteps[k]});
+                this.stepCollectionView.getItemView(endStep).updateStepMinWidth();
+            }
             for (i = 0; i < startSteps.length; i++) {
                 startStep = startSteps[i];
                 this.stepCollectionView.getItemView(startStep).updateStepMinWidth();
