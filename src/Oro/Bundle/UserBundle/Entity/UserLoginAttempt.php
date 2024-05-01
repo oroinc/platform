@@ -47,7 +47,7 @@ class UserLoginAttempt
     #[ORM\Column(name: 'ip', type: Types::STRING, length: 255, nullable: true)]
     private ?string $ip;
 
-    #[ORM\Column(name: 'user_agent', type: Types::STRING, length: 255, nullable: true)]
+    #[ORM\Column(name: 'user_agent', type: Types::TEXT, nullable: true, options: ['default' => ''])]
     private ?string $userAgent;
 
     #[ORM\Column(name: 'context', type: Types::JSON, nullable: false)]
