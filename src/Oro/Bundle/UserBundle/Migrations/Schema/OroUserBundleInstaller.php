@@ -67,7 +67,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_10';
+        return 'v2_10_1';
     }
 
     /**
@@ -343,7 +343,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('username', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('user_id', 'integer', ['notnull' => false]);
         $table->addColumn('ip', 'string', ['length' => 255, 'notnull' => false]);
-        $table->addColumn('user_agent', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('user_agent', 'text', ['notnull' => false, 'default' => '']);
         $table->addColumn('context', 'json', ['notnull' => true, 'comment' => '(DC2Type:json)']);
         $table->addIndex(['user_id'], 'idx_aa4c6465a76ed395', []);
         $table->setPrimaryKey(['id']);

@@ -61,7 +61,7 @@ class UserLoginAttempt
     private ?string $ip;
 
     /**
-     * @ORM\Column(name="user_agent", type="string", length=255, nullable=true)
+     * @ORM\Column(name="user_agent", type="text", nullable=true, options={"default"=""})
      */
     private ?string $userAgent;
 
