@@ -4,6 +4,7 @@ return [
     'workflow_with_config_reuse' => [
         'entity' => 'Some\Another\Entity',
         'start_step' => 'step_a',
+        'metadata' => [],
         'steps' => [
             'step_a' => [
                 'allowed_transitions' => ['transition_one'],

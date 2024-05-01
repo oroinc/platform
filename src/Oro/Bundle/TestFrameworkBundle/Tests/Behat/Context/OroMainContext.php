@@ -386,13 +386,16 @@ class OroMainContext extends MinkContext implements
 
         /** @var NodeElement $closeButton */
         foreach ($flashMessages as $flashMessage) {
-            if (!$flashMessage->isValid() || !$flashMessage->isVisible()) {
-                continue;
-            }
+            try {
+                if (!$flashMessage->isValid() || !$flashMessage->isVisible()) {
+                    continue;
+                }
 
-            $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
-            if ($closeButton?->isValid() && $closeButton?->isVisible()) {
-                $closeButton->press();
+                $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
+                if ($closeButton?->isValid() && $closeButton?->isVisible()) {
+                    $closeButton->press();
+                }
+            } catch (NoSuchElement $e) {
             }
         }
     }

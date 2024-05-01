@@ -25,6 +25,7 @@ return [
                 'scope1' => 'value3',
             ],
         ],
+        'metadata' => ['has_limits' => true],
         'datagrids' => ['datagrid1', 'datagrid2'],
         'steps' => [
             'first_step' => [
@@ -292,6 +293,7 @@ return [
         'defaults' => [
             'active' => false,
         ],
+        'metadata' => [],
         'steps' => [
             'second_step' => [
                 'order' => 1,

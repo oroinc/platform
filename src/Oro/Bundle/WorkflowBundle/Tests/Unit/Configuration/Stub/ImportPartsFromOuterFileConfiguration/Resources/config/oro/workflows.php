@@ -3,6 +3,7 @@
 return [
     'with_parts_from_file' => [
         'entity' => 'Some\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_a' => [
                 'order' => 0,

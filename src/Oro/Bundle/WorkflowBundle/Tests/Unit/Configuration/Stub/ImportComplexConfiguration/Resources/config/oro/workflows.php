@@ -3,6 +3,7 @@
 return [
     'chained_result' => [
         'entity' => 'MyOwn\\SuperCustom\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_a' => [
                 'allowed_transitions' => ['transition_two'],

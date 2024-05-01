@@ -3,6 +3,7 @@
 return [
     'with_split_parts' => [
         'entity' => 'Some\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_b' => [
                 'order' => 0,
@@ -62,6 +63,7 @@ return [
     ],
     'destination_of_split_parts' => [
         'entity' => 'Some\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_a' => [
                 'order' => 0,

@@ -50,6 +50,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const TRANSITION_DISPLAY_TYPE_DIALOG = 'dialog';
     const TRANSITION_DISPLAY_TYPE_PAGE = 'page';
 
+    public const METADATA = 'metadata';
+
     /**
      * @param array $configs
      *
@@ -114,6 +116,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->end()
             ->integerNode('priority')
                 ->defaultValue(0)
+            ->end()
+            ->arrayNode(self::METADATA)
+                ->prototype('variable')->end()
             ->end()
             ->arrayNode(WorkflowDefinition::CONFIG_SCOPES)
                 ->prototype('variable')->end()

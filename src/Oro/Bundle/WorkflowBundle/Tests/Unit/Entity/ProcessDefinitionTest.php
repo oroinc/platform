@@ -25,7 +25,7 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
         $setter = 'set' . ucfirst($propertyName);
         $getter = (is_bool($testValue) ? 'is' : 'get') . ucfirst($propertyName);
 
-        $this->assertSame($defaultValue, $this->entity->$getter());
+        $this->assertSame($defaultValue, $this->entity->$getter(), "Unexpected result returned by the $getter");
         $this->assertSame($this->entity, $this->entity->$setter($testValue));
         $this->assertSame($testValue, $this->entity->$getter());
     }
@@ -36,7 +36,7 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
             'name' => ['name', 'test'],
             'label' => ['label', 'Test Definition'],
             'enabled' => ['enabled', false, true],
-            'actionsConfiguration' => ['actionsConfiguration', ['my' => 'configuration']],
+            'actionsConfiguration' => ['actionsConfiguration', ['my' => 'configuration'], []],
             'relatedEntity' => ['relatedEntity', 'My\Entity'],
             'executionOrder' => ['executionOrder', 42, 0],
             'excludeDefinitions' => ['excludeDefinitions', ['test'], []],

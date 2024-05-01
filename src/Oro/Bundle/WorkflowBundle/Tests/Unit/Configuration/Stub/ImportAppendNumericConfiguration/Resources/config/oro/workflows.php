@@ -4,6 +4,7 @@ return [
     'workflow_with_numeric_array' => [
             'entity' => 'Some\\Another\\Entity',
             'start_step' => 'step_a',
+            'metadata' => [],
             'steps' => [
                 'step_a' => [
                     'order' => 10,

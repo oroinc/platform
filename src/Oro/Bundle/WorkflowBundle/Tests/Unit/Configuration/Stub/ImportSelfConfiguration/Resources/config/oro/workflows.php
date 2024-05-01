@@ -3,6 +3,7 @@
 return [
     'change' => [
         'entity' => 'MyOwn\\SuperCustom\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_a' => [
                 'allowed_transitions' => ['transition_two'],
@@ -70,6 +71,7 @@ return [
     ],
     'bar' => [
         'entity' => 'Some\\Another\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_a' => [
                 'allowed_transitions' => ['transition_two'],
@@ -137,6 +139,7 @@ return [
     ],
     'foo' => [
         'entity' => 'Some\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_a' => [
                 'allowed_transitions' => [],

@@ -48,7 +48,7 @@ class WorkflowRestriction
     /**
      * @var array
      */
-    #[ORM\Column(name: 'mode_values', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'mode_values', type: Types::JSON, nullable: true)]
     protected $values = [];
 
     /**

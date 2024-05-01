@@ -6,6 +6,8 @@ workflows:
         entity_attribute: my_entity
         steps_display_ordered: true
         priority: 1
+        metadata:
+            has_limits: true
         scopes:
             -
                 scope1: value1

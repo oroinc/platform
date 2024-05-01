@@ -3,6 +3,7 @@
 return [
     'first' => [
         'entity' => 'Entity1',
+        'metadata' => [],
         'steps' => [
             'step_one' => [
                 'order' => 0,
@@ -113,6 +114,7 @@ return [
     ],
     'second' => [
         'entity' => 'Entity2',
+        'metadata' => [],
         'steps' => [
             'step_one' => [
                 'order' => 0,
@@ -223,6 +225,7 @@ return [
     ],
     'third' => [
         'entity' => 'Entity3',
+        'metadata' => [],
         'steps' => [
             'step_one' => [
                 'order' => 0,

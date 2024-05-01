@@ -16,6 +16,7 @@ return [
         'defaults' => [
             'active' => true,
         ],
+        'metadata' => [],
         'scopes' => [
             [
                 'scope1' => 'value1',
@@ -291,6 +292,7 @@ return [
         'defaults' => [
             'active' => false,
         ],
+        'metadata' => [],
         'steps' => [
             'second_step' => [
                 'order' => 1,
