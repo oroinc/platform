@@ -1,9 +1,19 @@
 /* @theme: default; */
 
 $ui-timepicker-list-border: 1px solid get-color('neutral', 'grey2') !default;
-$ui-timepicker-list-box-shadow: 0 5px 10px rgba(0 0 0 / 20%) !default;
+$ui-timepicker-list-box-shadow: 0 0 4px 0 rgba(5, 59, 66, .08), 0 3px 12px 0 rgba(91, 126, 131, .14) !default;
 $ui-timepicker-list-background: get-color('neutral', 'white-100') !default;
+$ui-timepicker-list-padding-block: spacing('sm') !default;
 
-$ui-timepicker-list-item-color: get-color('neutral', 'dark') !default;
-$ui-timepicker-list-item-hover-background: get-color('neutral', 'focus') !default;
-$ui-timepicker-list-item-hover-color: get-color('neutral', 'white-100') !default;
+$ui-timepicker-list-item-color: get-color('text', 'primary') !default;
+$ui-timepicker-list-item-hover-background: get-color('primary', 'light') !default;
+$ui-timepicker-list-item-hover-color: get-color('text', 'primary') !default;
+
+$ui-timepicker-list-item-before-content: '' !default;
+$ui-timepicker-list-item-before-background: get-color('primary', 'main') !default;
+$ui-timepicker-list-item-before-width: 3px !default;
+$ui-timepicker-list-item-before-position: absolute !default;
+$ui-timepicker-list-item-before-inset-block: 0 !default;
+$ui-timepicker-list-item-before-inset-inline-start: 0 !default;
+$ui-timepicker-list-item-before-border-start-end-radius: 4px !default;
+$ui-timepicker-list-item-before-border-end-end-radius: 4px !default;

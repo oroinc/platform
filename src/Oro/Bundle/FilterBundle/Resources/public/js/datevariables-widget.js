@@ -2,9 +2,10 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const layout = require('oroui/js/layout');
+    const tooltipTemplate = require('tpl-loader!orofilter/templates/datevariables-tooltip.html');
+    const htmlTemplate = require('tpl-loader!orofilter/templates/datevariables-html.html');
     require('jquery-ui/widget');
 
     /**
@@ -17,14 +18,8 @@ define(function(require) {
             part: 'value',
             dateParts: null,
             dateVars: null,
-            tooltipTemplate: '<i class="fa-info-circle fa--offset-l fa--x-large" data-content="<%- content %>"' +
-                ' data-placement="top" data-toggle="popover" data-original-title="<%- title %>"></i>',
-            htmlTemplate: '<div class="ui-datevariables-div <%- attributes %>">' +
-                '<span class="datevariables-title"><%- title %></span> <%= tooltipHTML %><ul>' +
-                '<% _.each(dateVars, function(dateVariable, varCode) { %>' +
-                '<li><a class="ui_date_variable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a></li>' +
-                '<% }); %>' +
-                '</ul></div>'
+            tooltipTemplate: tooltipTemplate,
+            htmlTemplate: htmlTemplate
         },
 
         _create: function() {
@@ -59,8 +54,8 @@ define(function(require) {
             const o = this.options;
             const currentDatePart = o.part;
             const dateVars = this._getVariablesByPart(currentDatePart);
-            const tooltipTemplate = _.template(o.tooltipTemplate);
-            const htmlTemplate = _.template(o.htmlTemplate);
+            const tooltipTemplate = o.tooltipTemplate;
+            const htmlTemplate = o.htmlTemplate;
 
             const $dv = $(htmlTemplate({
                 attributes: '',

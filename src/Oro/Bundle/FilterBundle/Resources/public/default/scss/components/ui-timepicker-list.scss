@@ -10,13 +10,18 @@
     border: $ui-timepicker-list-border;
     box-shadow: $ui-timepicker-list-box-shadow;
     border-radius: $base-ui-element-border-radius;
+    padding-block: $ui-timepicker-list-padding-block;
 
     background: $ui-timepicker-list-background;
 }
 
 .ui-timepicker-list {
     li {
-        padding: 4px 9px;
+        height: 44px;
+        padding-inline: spacing('base');
+        display: flex;
+        align-items: center;
+        position: relative;
 
         color: $ui-timepicker-list-item-color;
 
@@ -28,6 +33,17 @@
         &:hover {
             background: $ui-timepicker-list-item-hover-background;
             color: $ui-timepicker-list-item-hover-color;
+
+            &::before {
+                content: $ui-timepicker-list-item-before-content;
+                background: $ui-timepicker-list-item-before-background;
+                width: $ui-timepicker-list-item-before-width;
+                position: $ui-timepicker-list-item-before-position;
+                inset-block: $ui-timepicker-list-item-before-inset-block;
+                inset-inline-start: $ui-timepicker-list-item-before-inset-inline-start;
+                border-start-end-radius: $ui-timepicker-list-item-before-border-start-end-radius;
+                border-end-end-radius: $ui-timepicker-list-item-before-border-end-end-radius;
+            }
         }
     }
 }
