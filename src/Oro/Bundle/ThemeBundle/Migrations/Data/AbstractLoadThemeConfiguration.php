@@ -8,6 +8,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration as LayoutThemeConfiguration;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Bundle\WebsiteBundle\Entity\Website;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
@@ -31,6 +32,8 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
 
     abstract protected function getScopes(): iterable;
 
+    abstract protected function isApplicable(): bool;
+
     /**
      * Options from System configuration that should replace values from theme.yml
      */
@@ -40,14 +43,12 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
     {
         $this->init($manager);
 
-        foreach ($this->getScopes() as $scope) {
-            $frontendTheme = $this->configManager->get(
-                'oro_frontend.frontend_theme',
-                false,
-                false,
-                $scope
-            );
+        if (!$this->isApplicable()) {
+            return;
+        }
 
+        foreach ($this->getScopes() as $scope) {
+            $frontendTheme = $this->getFrontendTheme($this->configManager, $scope);
             if (!$frontendTheme) {
                 continue;
             }
@@ -65,8 +66,11 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
             $this->manager->persist($themeConfiguration);
             $manager->flush();
 
-            $this->configManager
-                ->set('oro_theme.theme_configuration', $themeConfiguration->getId(), $scope);
+            $this->configManager->set(
+                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                $themeConfiguration->getId(),
+                $scope
+            );
         }
 
         $this->configManager->flush();
@@ -77,6 +81,11 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
         $this->manager = $manager;
         $this->themeDefinitionBag = $this->container->get('oro_layout.theme_extension.configuration.provider');
         $this->configManager = $this->getConfigManager();
+    }
+
+    protected function getFrontendTheme(ConfigManager $configManager, ?object $scope): ?string
+    {
+        return $configManager->get('oro_frontend.frontend_theme', false, false, $scope);
     }
 
     protected function getThemeConfigurationName(array $definition, object|null $scope): string
@@ -124,7 +133,7 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
         foreach ($definitionConfiguration['sections'] ?? [] as $sKey => $section) {
             foreach ($section['options'] ?? [] as $oKey => $option) {
                 $configurationKey = LayoutThemeConfiguration::buildOptionKey($sKey, $oKey);
-                $configurationValue = $option['default'];
+                $configurationValue = $option['default'] ?? null;
                 if ($option['type'] === 'checkbox') {
                     $configurationValue = $configurationValue === 'checked';
                 }

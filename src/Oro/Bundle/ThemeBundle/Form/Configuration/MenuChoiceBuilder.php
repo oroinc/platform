@@ -7,16 +7,11 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuChoiceType;
 /**
  * Builds menu choice type for theme configuration
  */
-class MenuChoiceBuilder extends AbstractConfigurationChildBuilder
+class MenuChoiceBuilder extends AbstractChoiceBuilder
 {
     #[\Override] public static function getType(): string
     {
         return 'menu_selector';
-    }
-
-    #[\Override] public function supports(array $option): bool
-    {
-        return $option['type'] === self::getType();
     }
 
     #[\Override] protected function getTypeClass(): string

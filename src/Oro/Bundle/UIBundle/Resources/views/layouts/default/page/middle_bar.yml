@@ -10,7 +10,7 @@ layout:
                     prepend: true
                     options:
                         vars:
-                            searchType: '=data["theme_configuration"].getThemeConfigurationOption("header-search_on_smaller_screens")'
+                            searchType: '=data["theme_configuration"].getThemeConfigurationOption("header__search_on_smaller_screens")'
                 middle_bar_logo:
                     blockType: container
                 middle_bar_center:
@@ -19,7 +19,7 @@ layout:
                     blockType: container
                     options:
                         vars:
-                            searchType: '=data["theme_configuration"].getThemeConfigurationOption("header-search_on_smaller_screens")'
+                            searchType: '=data["theme_configuration"].getThemeConfigurationOption("header__search_on_smaller_screens")'
                 middle_bar_right_menus:
                     blockType: container
             tree:

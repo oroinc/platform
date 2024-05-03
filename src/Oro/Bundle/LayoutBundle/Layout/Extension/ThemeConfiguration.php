@@ -20,7 +20,7 @@ class ThemeConfiguration implements ConfigurationInterface
 
     public const AUTO = 'auto';
 
-    public const OPTION_KEY_DELIMITER = '-';
+    public const OPTION_KEY_DELIMITER = '__';
 
     /** @var ThemeConfigurationExtensionInterface[] */
     private array $extensions = [];
@@ -301,13 +301,13 @@ INFO
                                     ->scalarNode('default')
                                         ->info(
                                             <<<INFO
-The option label is displayed in the theme configuration UI.
+The value is displayed by default in the theme configuration UI.
 INFO
                                         )
-                                        ->isRequired()
                                     ->end()
                                     ->arrayNode('values')
                                         ->info('Available input values')
+                                        ->normalizeKeys(false)
                                         ->prototype('scalar')
                                             ->cannotBeEmpty()
                                         ->end()
@@ -329,6 +329,7 @@ INFO
 Images that will illustrate UI changes if this option is selected.
 INFO
                                         )
+                                        ->normalizeKeys(false)
                                         ->prototype('scalar')
                                             ->cannotBeEmpty()
                                         ->end()

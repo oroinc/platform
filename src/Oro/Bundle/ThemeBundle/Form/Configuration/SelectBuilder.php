@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ThemeBundle\Form\Configuration;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * SelectOptionBuilder class
- *
- * Provide supporting 'select' form type for the theme configuration section of theme.yml files
+ * Provides supporting 'select' form type for the theme configuration section of theme.yml files
  */
-class SelectBuilder extends AbstractConfigurationChildBuilder
+class SelectBuilder extends AbstractChoiceBuilder
 {
     #[\Override] public static function getType(): string
     {
@@ -19,17 +17,13 @@ class SelectBuilder extends AbstractConfigurationChildBuilder
     /**
      * {@inheritDoc}
      */
-    public function supports(array $option): bool
+    public function buildOption(FormBuilderInterface $builder, array $option): void
     {
-        return $option['type'] === self::getType();
-    }
+        if (array_key_exists('default', $option) && $this->isMultipleSelect($option)) {
+            $option['default'] = [$option['default']];
+        }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function getTypeClass(): string
-    {
-        return ChoiceType::class;
+        parent::buildOption($builder, $option);
     }
 
     /**
@@ -45,14 +39,8 @@ class SelectBuilder extends AbstractConfigurationChildBuilder
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function getConfiguredOptions($option): array
+    protected function isMultipleSelect(array $option): bool
     {
-        return array_merge(parent::getConfiguredOptions($option), [
-            'choices' => array_flip($option['values']),
-            'data' => $option['default'],
-        ]);
+        return isset($option['options']['multiple']) && $option['options']['multiple'];
     }
 }

@@ -1,5 +1,15 @@
 /* @theme: admin.oro; */
 
+@import 'theme-configuration-preview';
+
 .theme-configuration-options [type=radio] + label {
     display: inline;
+}
+
+.control-group-preview {
+    flex-wrap: wrap;
+
+    .controls {
+        max-width: min-content;
+    }
 }
