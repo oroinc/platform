@@ -1,0 +1,16 @@
+Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration:
+    theme_configuration_default:
+        name: 'Default'
+        description: 'Default Description'
+        theme: 'default'
+        type: 'Storefront'
+        organization: '@organization'
+        owner: '@business_unit'
+
+    theme_configuration_custom:
+        name: 'Custom'
+        description: 'Custom'
+        theme: 'custom'
+        type: 'Storefront'
+        organization: '@organization'
+        owner: '@business_unit'

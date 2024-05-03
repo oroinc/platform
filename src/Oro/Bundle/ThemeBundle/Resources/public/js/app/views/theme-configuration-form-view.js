@@ -33,6 +33,7 @@ define(function(require) {
 
             const $form = this.$(this.selectors.form);
             const data = $form.serializeArray();
+            data.push({name: 'reloadWithoutSaving', value: true});
 
             mediator.execute('submitPage', {
                 url: $form.attr('action'),

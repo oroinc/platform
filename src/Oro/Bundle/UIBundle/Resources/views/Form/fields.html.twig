@@ -21,6 +21,9 @@
             {% if hint|default() and hint_position|default() == 'below' %}
                 <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
             {% endif %}
+            {% if html_controls_after|default(null) %}
+                {{ html_controls_after|raw }}
+            {% endif %}
         </div>
     {% endapply %}
 {% endblock form_row %}

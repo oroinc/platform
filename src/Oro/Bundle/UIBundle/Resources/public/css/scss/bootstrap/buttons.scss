@@ -227,6 +227,11 @@ input[type='button'] {
     }
 }
 
+.btn--no-x-offset {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .mobile-version {
     .btn {
         @include button-size(
@@ -270,5 +275,10 @@ input[type='button'] {
     %btn-square {
         line-height: $btn-square-mobile-line-height;
         border-radius: $btn-square-mobile-border-radius;
+    }
+
+    .btn--no-x-offset {
+        padding-left: 0;
+        padding-right: 0;
     }
 }

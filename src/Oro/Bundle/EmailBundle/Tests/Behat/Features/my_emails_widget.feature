@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-11239
 @automatically-ticket-tagged
 Feature: My emails widget

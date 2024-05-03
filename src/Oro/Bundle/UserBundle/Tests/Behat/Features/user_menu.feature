@@ -1,4 +1,3 @@
-@regression
 @ticket-BAP-11238
 @automatically-ticket-tagged
 Feature: User menu

@@ -1,3 +1,4 @@
+@regression
 @fixture-OroUserBundle:user.yml
 @fixture-OroUserBundle:user_without_business_unit.yml
 

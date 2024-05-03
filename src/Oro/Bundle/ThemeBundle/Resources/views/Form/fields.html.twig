@@ -1,33 +1,53 @@
 {% block oro_theme_configuration_list_row %}
-    {% import '@OroUI/macros.html.twig' as UI %}
-
-    <div class="theme-configuration-options"
-        {{ UI.renderPageComponentAttributes({view: 'orotheme/js/app/views/theme-configuration-preview-view'}) }}>
-
+    <div class="theme-configuration-options">
         {% for child in form.children|filter(child => not child.rendered) %}
-            {% set type = child.vars.block_prefixes[1] %}
-                <div class="control-group control-group-{{ type }}">
-                    <div class="control-label wrap">
-                        {{ form_label(child) }}
+            {% set themePreview = null %}
+            {% set groupOptions = null %}
+            {% if child.vars.attr['data-role']|default('') == constant('Oro\\Bundle\\ThemeBundle\\Form\\Configuration\\ConfigurationChildBuilderInterface::DATA_ROLE_CHANGE_PREVIEW') %}
+                {% set componentOptions = child.vars.group_attr['data-page-component-options']|default([])|merge({
+                    previewAlt: 'oro.theme.themeconfiguration.preview.image.alt'|trans,
+                })|json_encode %}
+
+                {% set groupOptions = child.vars.group_attr|default([])|merge({'data-page-component-options': componentOptions}) %}
+
+                {% set themePreview %}
+                    <div id="{{ 'collapse-' ~ child.vars.id|default('') }}" class="theme-configuration-container collapse no-transition"
+                         data-trigger-icon-show-class="fa-eye-slash"
+                         data-trigger-icon-hide-class="fa-eye"
+                         data-collapsed-text="{{ 'oro.theme.themeconfiguration.preview.collapse.show_text'|trans }}"
+                         data-expanded-text="{{ 'oro.theme.themeconfiguration.preview.collapse.hide_text'|trans }}"
+                    >
+                        <div class="theme-configuration-preview">
+                            <div data-role="preview"></div>
+                            <p class="theme-configuration-preview__text">{{ 'oro.theme.themeconfiguration.preview.text'|trans }}</p>
+                        </div>
                     </div>
-                    <div class="controls">
-                        {{ form_widget(child) }}
-                        {{ form_help(child) }}
-                        {{ form_errors(child) }}
-                    </div>
-                </div>
-            {% if child.vars.attr['data-preview-key'] is defined %}
-                {% set value = type == 'checkbox' ? child.vars.value : child.vars.data %}
-                {% set preview = value ? value : child.vars.attr['data-preview-default'] %}
-                {% if (oro_is_string(preview)) %}
-                    <div class="responsive-block">
-                        <img
-                            data-preview-image="{{ child.vars.attr['data-preview-key'] }}"
-                            src="/{{ child.vars.attr[['data-preview', preview]|join('-')]|default('') }}"
-                        />
-                    </div>
-                {% endif %}
+                {% endset %}
             {% endif %}
+            {{ form_row(child, {
+                attr: {class: 'control-group-preview'},
+                group_attr: groupOptions|default({}),
+                html_controls_after: themePreview
+            }) }}
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block oro_theme_configuration_list_item_widget %}
+    {{ form_widget(form) }}
+    {% set collapseId = 'collapse-' ~ form.vars.id|default('') %}
+    {% if form.vars.attr['data-role']|default('') == constant('Oro\\Bundle\\ThemeBundle\\Form\\Configuration\\ConfigurationChildBuilderInterface::DATA_ROLE_CHANGE_PREVIEW') %}
+        <div class="heme-configuration-trigger">
+            <button type="button"
+                class="btn btn-link btn--no-x-offset"
+                data-toggle="collapse"
+                data-target="{{ '#' ~ collapseId }}"
+                aria-controls="{{ collapseId }}"
+                aria-expanded="false"
+            >
+                <span class="fa-eye" aria-hidden="true" data-icon></span>
+                <span data-text>{{ 'oro.theme.themeconfiguration.preview.collapse.show_text'|trans }}</span>
+            </button>
+        </div>
+    {% endif %}
 {% endblock %}

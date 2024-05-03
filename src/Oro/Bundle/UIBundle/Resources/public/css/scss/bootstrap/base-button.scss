@@ -64,6 +64,10 @@
         margin: $btn-not-btn-icon-fa-offset;
     }
 
+    &:not(.btn-icon) .icon-end {
+        margin: $btn-not-btn-icon-fa-offset-end;
+    }
+
     &.icon-end:not(.btn-icon) [class^='fa-'] {
         margin: $btn-not-btn-icon-end-fa-offset;
     }

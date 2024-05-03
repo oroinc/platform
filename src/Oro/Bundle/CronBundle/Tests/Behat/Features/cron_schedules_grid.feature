@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-21510
 Feature: Cron schedules grid
   As an Administrator

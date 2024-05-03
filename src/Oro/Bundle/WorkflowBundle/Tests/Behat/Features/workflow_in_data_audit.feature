@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-16008
 Feature: Workflow in Data Audit
   In order to check workflow step changes

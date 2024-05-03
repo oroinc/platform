@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-20913
 
 Feature: User delete

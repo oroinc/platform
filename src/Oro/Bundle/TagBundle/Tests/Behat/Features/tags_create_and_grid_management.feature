@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-21510
 @ticket-BAP-15034
 Feature: Tags create and grid management

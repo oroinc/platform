@@ -1,0 +1,27 @@
+/* @theme: admin.oro; */
+
+.theme-configuration-preview {
+    background-color: $primary-200;
+    border-radius: 6px;
+
+    color: $primary-inverse;
+
+    max-width: 100%;
+
+    padding: 12px;
+
+    &__text {
+        margin: 0;
+        padding-top: 12px;
+    }
+}
+
+.theme-configuration-img {
+    &.no-preview {
+        display: none;
+    }
+}
+
+.theme-configuration-container {
+    width: 100%;
+}

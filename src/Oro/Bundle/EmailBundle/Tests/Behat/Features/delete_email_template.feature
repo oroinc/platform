@@ -1,3 +1,4 @@
+@regression
 @fixture-OroEmailBundle:templates.yml
 Feature: Delete email template
   As Administrator

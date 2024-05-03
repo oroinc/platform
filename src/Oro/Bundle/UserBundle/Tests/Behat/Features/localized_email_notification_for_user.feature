@@ -1,4 +1,3 @@
-@regression
 @ticket-BAP-17336
 @fixture-OroUserBundle:UserLocalizations.yml
 

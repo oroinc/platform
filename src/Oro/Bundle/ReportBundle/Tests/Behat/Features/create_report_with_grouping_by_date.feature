@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-12097
 
 Feature: Create Report with grouping by date
