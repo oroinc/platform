@@ -7,6 +7,7 @@ services:
     Oro\Bundle\ThemeBundle\Model\ThemeRegistry:
         alias: oro_theme.registry
 
+    # Twig extension
     oro_theme.twig.extension:
         class: Oro\Bundle\ThemeBundle\Twig\ThemeExtension
         public: false
@@ -15,6 +16,7 @@ services:
         tags:
             - { name: twig.extension }
 
+    # Validators
     oro_theme.chain_configuration_validator:
         class: Oro\Bundle\ThemeBundle\Validator\ChainConfigurationValidator
         arguments:
@@ -33,6 +35,7 @@ services:
         tags:
             - { name: oro_theme.configuration_validator, alias: oro_theme_preview_configuration_validator }
 
+    # Search
     oro_theme.form.autocomplete.theme_configuration.search_handler:
         parent: oro_form.autocomplete.search_handler
         arguments:
@@ -41,6 +44,7 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType, acl_resource: oro_theme_configuration_view }
 
+    # System Configuration
     oro_theme.event_listener.system_config.configuration:
         class: Oro\Bundle\ConfigBundle\EventListener\EntitySystemConfigListener
         arguments:
@@ -51,6 +55,7 @@ services:
             - { name: kernel.event_listener, event: oro_config.settings_form_preset, method: onFormPreSetData }
             - { name: kernel.event_listener, event: oro_config.settings_before_save, method: onSettingsSaveBefore }
 
+    # Provider
     oro_theme.provider.theme_configuration:
         class: Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider
         arguments:
@@ -59,3 +64,13 @@ services:
 
     Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider:
         alias: oro_theme.provider.theme_configuration
+
+    # Voter
+    oro_theme.acl.voter.theme_configuration_delete:
+        class: Oro\Bundle\ThemeBundle\Acl\Voter\ThemeConfigurationDeleteVoter
+        calls:
+            - [setClassName, ['Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration']]
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: security.voter }

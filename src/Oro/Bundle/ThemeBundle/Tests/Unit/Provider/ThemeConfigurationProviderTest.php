@@ -5,6 +5,7 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\Provider;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -36,7 +37,7 @@ class ThemeConfigurationProviderTest extends TestCase
     {
         $this->configManager->expects(self::once())
             ->method('get')
-            ->with('oro_theme.theme_configuration')
+            ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn(null);
 
         $this->repository->expects(self::never())
@@ -54,7 +55,7 @@ class ThemeConfigurationProviderTest extends TestCase
 
         $this->configManager->expects(self::once())
             ->method('get')
-            ->with('oro_theme.theme_configuration')
+            ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn($themeConfigurationId);
 
         $this->repository->expects(self::once())
@@ -74,7 +75,7 @@ class ThemeConfigurationProviderTest extends TestCase
 
         $this->configManager->expects(self::once())
             ->method('get')
-            ->with('oro_theme.theme_configuration')
+            ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn($themeConfigurationId);
 
         $this->repository->expects(self::once())
@@ -106,7 +107,12 @@ class ThemeConfigurationProviderTest extends TestCase
 
         $this->configManager->expects(self::once())
             ->method('get')
-            ->with('oro_theme.theme_configuration', false, false, $scopeIdentifier)
+            ->with(
+                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                false,
+                false,
+                $scopeIdentifier
+            )
             ->willReturn($themeConfigurationId);
 
         $this->repository->expects(self::once())
@@ -160,7 +166,12 @@ class ThemeConfigurationProviderTest extends TestCase
 
         $this->configManager->expects(self::once())
             ->method('get')
-            ->with('oro_theme.theme_configuration', false, false, $scopeIdentifier)
+            ->with(
+                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                false,
+                false,
+                $scopeIdentifier
+            )
             ->willReturn($themeConfigurationId);
 
         $this->repository->expects(self::once())

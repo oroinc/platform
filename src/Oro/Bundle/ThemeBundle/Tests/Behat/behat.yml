@@ -1,0 +1,28 @@
+oro_behat_extension:
+  elements:
+    Theme Configurations Grid:
+      selector: 'div[data-page-component-name="oro-theme-configuration-grid"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+    Standalone Main Menu:
+      selector: 'div.page-header--standalone-main-menu'
+    Quick Access Button Menu:
+      selector: 'div.quick-access-button-menu'
+    Search Widget Standalone:
+      selector: 'div.search-widget--standalone'
+    Search Widget Integrated:
+      selector: 'div.search-widget--integrated'
+    Quick Access Button Field:
+      selector: 'div[data-name="field__header--quick-access-button"]'
+    Quick Access Button Label Input:
+      selector: '[name="theme_configuration[configuration][header__quick_access_button][label][default]"]'
+    Quick Access Button Frontend Menu Input:
+      selector: '[name="theme_configuration[configuration][header__quick_access_button][menu]"]'
+  suites:
+    OroThemeBundle:
+      contexts:
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\UIBundle\Tests\Behat\Context\BreadcrumbContext
+      paths:
+        - '@OroThemeBundle/Tests/Behat/Features'

@@ -5,8 +5,8 @@ namespace Oro\Bundle\ThemeBundle\Form\Configuration;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 /**
  * Provide supporting 'checkbox' form type for the theme configuration section of theme.yml files
@@ -18,11 +18,6 @@ class CheckboxBuilder extends AbstractConfigurationChildBuilder
         return 'checkbox';
     }
 
-    public function supports(array $option): bool
-    {
-        return $option['type'] === self::getType();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -32,15 +27,6 @@ class CheckboxBuilder extends AbstractConfigurationChildBuilder
 
         $builder
             ->get($option['name'])
-            ->addEventListener(
-                FormEvents::PRE_SUBMIT,
-                function (FormEvent $event) {
-                    $data = $event->getData();
-                    if (!$data) {
-                        $event->setData('unchecked');
-                    }
-                }
-            )
             ->addModelTransformer(new CallbackTransformer(
                 function ($value) {
                     return match ($value) {
@@ -70,17 +56,34 @@ class CheckboxBuilder extends AbstractConfigurationChildBuilder
     {
         return [
             'required' => false,
-            'false_values' => ['unchecked']
+            'false_values' => ['unchecked', null],
         ];
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function getConfiguredOptions($option): array
+    public function finishView(FormView $view, FormInterface $form, array $formOptions, array $themeOption): void
     {
-        return array_merge(parent::getConfiguredOptions($option), [
-            'data' => $option['default'],
-        ]);
+        parent::finishView($view, $form, $formOptions, $themeOption);
+
+        foreach ($themeOption['previews'] ?? [] as $value => $preview) {
+            if ($value === static::DEFAULT_PREVIEW_KEY) {
+                continue;
+            }
+
+            $view->vars['attr']["data-preview-$value"] = $this->getOptionPreview($themeOption, $value);
+        }
+    }
+
+    protected function getOptionPreview(array $option, mixed $value = null, bool $default = false): ?string
+    {
+        $value = match ($value) {
+            true => 'checked',
+            false => 'unchecked',
+            default => $value
+        };
+
+        return parent::getOptionPreview($option, $value, $default);
     }
 }
