@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-16165
 Feature: Navigating on workflow states
   In order to create or edit workflow

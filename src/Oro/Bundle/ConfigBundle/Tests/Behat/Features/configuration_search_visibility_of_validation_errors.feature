@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-17525
 Feature: Configuration search visibility of validation errors
   In order to fill all required configuration options

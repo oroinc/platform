@@ -1,3 +1,4 @@
+@regression
 @fixture-OroEmailBundle:public-private-emails.yml
 @ticket-BAP-21219
 

@@ -1,3 +1,4 @@
+@regression
 @behat-test-env
 Feature: Email SMTP settings with enabled account types
   In order to manager Email setting of application

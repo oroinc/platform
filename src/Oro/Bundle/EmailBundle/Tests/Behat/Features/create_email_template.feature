@@ -1,3 +1,4 @@
+@regression
 Feature: Create email template
   As Administrator
   I need to be able to create email template

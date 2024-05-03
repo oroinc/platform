@@ -1,3 +1,4 @@
+@regression
 Feature: Managing workflows
   In order to check workflows crud
   As an Administrator

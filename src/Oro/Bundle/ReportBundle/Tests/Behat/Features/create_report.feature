@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-14559
 @automatically-ticket-tagged
 Feature: Create report

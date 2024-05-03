@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-20190
 @ticket-BAP-15115
 @fixture-OroSegmentBundle:samantha_and_charlie_users.yml

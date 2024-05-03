@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-15922
 Feature: User session after logout
 

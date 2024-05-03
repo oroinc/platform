@@ -1,3 +1,4 @@
+@regression
 Feature: Check that all entity schema is updated after application install
   As an Administrator
   I want to be sure that all entity schema is updated after application install

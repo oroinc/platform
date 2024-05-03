@@ -1,3 +1,4 @@
+@regression
 @behat-test-env
 @ticket-BAP-16290
 @fixture-OroUserBundle:user.yml

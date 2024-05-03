@@ -1,3 +1,4 @@
+@regression
 @fixture-OroUserBundle:user.yml
 Feature: Create email without template permissions
   In order to ensure email templates can be used only by users who have permissions

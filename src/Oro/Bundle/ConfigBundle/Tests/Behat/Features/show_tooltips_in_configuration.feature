@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-15478
 Feature: Show tooltips in configuration
   In order to control system display behavior

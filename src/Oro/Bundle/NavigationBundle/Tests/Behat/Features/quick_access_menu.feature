@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-11232
 @automatically-ticket-tagged
 Feature: Quick access menu
