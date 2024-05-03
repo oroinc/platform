@@ -31,10 +31,8 @@ class ThemeConfigurationSelectTypeTest extends FormIntegrationTestCase
         $resolvedOptions = $resolver->resolve();
 
         self::assertArrayHasKey('autocomplete_alias', $resolvedOptions);
-        self::assertArrayHasKey('create_form_route', $resolvedOptions);
         self::assertArrayHasKey('configs', $resolvedOptions);
         self::assertEquals(ThemeConfigurationType::class, $resolvedOptions['autocomplete_alias']);
-        self::assertEquals('oro_theme_configuration_create', $resolvedOptions['create_form_route']);
         self::assertEquals(
             ['placeholder' => 'oro.theme.themeconfiguration.form.choose'],
             $resolvedOptions['configs']

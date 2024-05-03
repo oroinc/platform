@@ -1,3 +1,4 @@
+@regression
 @fixture-OroNotificationBundle:NotificationAlertsFixture.yml
 
 Feature: Notification Alerts Grid operations

@@ -34,6 +34,7 @@ class OroThemeExtension extends Extension
         $loader->load('commands.yml');
         $loader->load('form_types.yml');
         $loader->load('controllers.yml');
+        $loader->load('fallbacks.yml');
 
         if (isset($config['active_theme'])) {
             $registryDefinition = $container->getDefinition(self::THEME_REGISTRY_SERVICE_ID);

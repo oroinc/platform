@@ -6,6 +6,7 @@ namespace Oro\Bundle\ThemeBundle\Provider;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 
 /**
@@ -24,12 +25,11 @@ class ThemeConfigurationProvider
 
     public function getThemeConfiguration(object|int|null $scopeIdentifier = null): ?ThemeConfiguration
     {
-        $themeConfigurationId = $this->configManager
-            ->get('oro_theme.theme_configuration', false, false, $scopeIdentifier);
+        $themeConfigurationId = $this->getThemeConfigurationId($scopeIdentifier);
         if ($themeConfigurationId) {
             return $this->registry
                 ->getRepository(ThemeConfiguration::class)
-                ->find((int) $themeConfigurationId);
+                ->find($themeConfigurationId);
         }
 
         return null;
@@ -60,11 +60,18 @@ class ThemeConfigurationProvider
 
     public function getThemeName(object|int|null $scopeIdentifier = null): ?string
     {
-        $themeConfigurationId = $this->configManager
-            ->get('oro_theme.theme_configuration', false, false, $scopeIdentifier);
-
         return $this->registry
             ->getRepository(ThemeConfiguration::class)
-            ->getThemeByThemeConfigurationId($themeConfigurationId);
+            ->getThemeByThemeConfigurationId($this->getThemeConfigurationId($scopeIdentifier));
+    }
+
+    private function getThemeConfigurationId(object|int|null $scopeIdentifier = null): ?int
+    {
+        return $this->configManager->get(
+            Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+            false,
+            false,
+            $scopeIdentifier
+        );
     }
 }

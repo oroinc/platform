@@ -40,3 +40,9 @@ configuration:
           values:
             blue: 'Deep ocean blue'
             green: 'Forest green'
+        no_default_value:
+          label: 'No Default Value'
+          type: select
+          values:
+            modern: 'Lightweight colors optimized for modern high screen resolutions'
+            traditional: 'More contrasting color selections that work well on all types of screens'

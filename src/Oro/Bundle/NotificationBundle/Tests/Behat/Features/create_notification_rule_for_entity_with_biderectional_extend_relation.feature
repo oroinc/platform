@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-17292
 @automatically-ticket-tagged
 Feature: Create notification rule for entity with biderectional extend relation

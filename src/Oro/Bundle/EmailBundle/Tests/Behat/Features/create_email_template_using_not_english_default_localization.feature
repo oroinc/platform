@@ -1,3 +1,4 @@
+@regression
 @fixture-OroLocaleBundle:ZuluLocalization.yml
 @fixture-OroEmailBundle:templates.yml
 Feature: Create email template using not english default localization

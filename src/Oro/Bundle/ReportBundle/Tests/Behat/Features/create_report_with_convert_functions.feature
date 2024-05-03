@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-20370
 @fixture-OroUserBundle:AdditionalUsersFixture.yml
 

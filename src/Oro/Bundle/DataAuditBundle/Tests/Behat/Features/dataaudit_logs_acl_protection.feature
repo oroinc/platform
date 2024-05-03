@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-9497
 @ticket-BAP-15092
 Feature: DataAudit logs acl protection

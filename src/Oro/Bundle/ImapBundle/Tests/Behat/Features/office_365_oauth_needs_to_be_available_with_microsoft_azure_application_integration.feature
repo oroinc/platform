@@ -1,3 +1,4 @@
+@regression
 Feature: Office 365 OAuth needs to be available with Microsoft Azure Application integration
   In order to allow OAuth for Office 365 clients
   As an administrator

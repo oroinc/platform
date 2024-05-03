@@ -2,17 +2,22 @@
 
 namespace Oro\Bundle\ThemeBundle\Form\Configuration;
 
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 /**
  * Provide a general functionality for FormType from the theme configuration section of theme.yml files
  */
 abstract class AbstractConfigurationChildBuilder implements ConfigurationChildBuilderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    abstract public function supports(array $option): bool;
+    public function __construct(
+        protected Packages $packages
+    ) {
+    }
 
     /**
      * Returns the FormType class name that will be used for this option
@@ -27,6 +32,14 @@ abstract class AbstractConfigurationChildBuilder implements ConfigurationChildBu
     /**
      * {@inheritDoc}
      */
+    public function supports(array $option): bool
+    {
+        return $option['type'] === static::getType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function buildOption(FormBuilderInterface $builder, array $option): void
     {
         $builder->add(
@@ -34,6 +47,40 @@ abstract class AbstractConfigurationChildBuilder implements ConfigurationChildBu
             $this->getTypeClass(),
             array_merge($this->getDefaultOptions(), $this->getConfiguredOptions($option))
         );
+        $builder
+            ->get($option['name'])
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($option) {
+                $parentData = $event->getForm()->getParent()?->getData();
+                if (\array_key_exists('default', $option) &&
+                    !\array_key_exists($option['name'], $parentData)
+                ) {
+                    $event->setData($option['default']);
+                }
+            });
+    }
+
+    public function finishView(FormView $view, FormInterface $form, array $formOptions, array $themeOption): void
+    {
+        if ($this->isApplicablePreviews($themeOption)) {
+            $defaultPreview = $this->getOptionPreview($themeOption, static::DEFAULT_PREVIEW_KEY);
+            if ($defaultPreview) {
+                $view->vars['attr']['data-default-preview'] = $defaultPreview;
+            }
+
+            $preview = $this->getOptionPreview($themeOption, $form->getData(), true);
+            if ($preview) {
+                $view->vars['attr']['data-preview'] = $preview;
+            }
+
+            $view->vars['group_attr'] = [
+                'data-page-component-view' => static::VIEW_MODULE_NAME,
+                'data-page-component-options' => [
+                    'autoRender' => true,
+                    'previewSource' => $preview ?? '',
+                    'defaultPreview' => $defaultPreview ?? '',
+                ]
+            ];
+        }
     }
 
     /**
@@ -43,7 +90,6 @@ abstract class AbstractConfigurationChildBuilder implements ConfigurationChildBu
     {
         return [
             'label' => $option['label'],
-            'empty_data' => $option['default'],
             'attr' => array_merge($this->getPreviewAttributes($option), $option['attributes'] ?? []),
             ...$option['options'] ?? []
         ];
@@ -55,15 +101,28 @@ abstract class AbstractConfigurationChildBuilder implements ConfigurationChildBu
     protected function getPreviewAttributes(array $option): array
     {
         $attr = [];
-        if (array_key_exists('previews', $option) && !empty($option['previews'])) {
-            $attr['data-role'] = 'change-preview';
+        if ($this->isApplicablePreviews($option)) {
+            $attr['data-role'] = static::DATA_ROLE_CHANGE_PREVIEW;
             $attr['data-preview-key'] = $option['name'];
-            $attr['data-preview-default'] = $option['default'];
-            foreach ($option['previews'] as $value => $preview) {
-                $attr["data-preview-$value"] = $preview;
-            }
         }
 
         return $attr;
+    }
+
+    protected function getOptionPreview(array $option, mixed $value = null, bool $default = false): ?string
+    {
+        $key = $value ?? $option['default'] ?? null;
+        $preview = $option['previews'][$key] ?? null;
+
+        if (!$preview && $default) {
+            $preview = $option['previews'][static::DEFAULT_PREVIEW_KEY] ?? null;
+        }
+
+        return $preview ? $this->packages->getUrl($preview) : $preview;
+    }
+
+    protected function isApplicablePreviews(array $option): bool
+    {
+        return array_key_exists('previews', $option) && !empty($option['previews']);
     }
 }

@@ -1,3 +1,4 @@
+@regression
 Feature: Create email template with special characters
   As Administrator
 

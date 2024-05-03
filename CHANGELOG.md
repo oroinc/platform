@@ -2,6 +2,30 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## UNRELEASED
+
+### Added
+* Added public method `loadThemeResources` to `\Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface`
+
+#### ThemeBundle
+* Added theme configuration feature that provides theme developers a way to make a storefront theme configurable by a store owner.
+* Added new `\Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration` entity that contains theme configuration options.
+* Added new `oro:theme:configuration:validate` command that validates theme configuration.
+* Added `\Oro\Bundle\ThemeBundle\Fallback\Provider\ThemeConfigurationFallbackProvider` fallback provider which fetches data from theme configuration.
+
+#### UIBundle
+* Added new twig function `oro_is_string` that finds whether the given variable type is a string.
+* Added new twig `html_controls_after` variable for `form_row` widget that renders passed html content.
+
+#### LayoutBundle
+* Added new twig function `oro_theme_configuration_value` that returns theme configuration option value.
+* Added theme configuration definition for configuration section into `\Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration`.
+
+### Changed
+
+#### EntityBundle
+* Changed `\Oro\Bundle\EntityBundle\Provider\EntityNameProvider` to make it work with enum fields.
+
 ## Changes in the Platform package versions
 
 - [6.0.0](#600-2024-03-30)

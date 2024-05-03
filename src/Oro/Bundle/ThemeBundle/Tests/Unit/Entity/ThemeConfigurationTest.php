@@ -20,6 +20,7 @@ class ThemeConfigurationTest extends TestCase
             ['id', 1],
             ['type', ThemeConfigurationType::Storefront],
             ['name', 'test'],
+            ['description', null],
             ['description', 'Test Description'],
             ['theme', 'default'],
             ['configuration', ['some' => 'data'], false],

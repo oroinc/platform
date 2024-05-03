@@ -5,6 +5,7 @@ namespace Oro\Bundle\ThemeBundle\Controller;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
+use Oro\Bundle\ThemeBundle\Form\Handler\ThemeConfigurationHandler;
 use Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,23 +71,32 @@ class ThemeConfigurationController extends AbstractController
         Request $request,
         string $message = ''
     ): array|RedirectResponse {
+        $form = $this->createForm(ThemeConfigurationType::class, $entity);
+        if ($request->get($form->getName())) {
+            if ($request->get(ThemeConfigurationHandler::WITHOUT_SAVING_KEY)) {
+                $configuration = $request->get($form->getName());
+                unset($configuration['configuration']);
+                $request->request->set($form->getName(), $configuration);
+            }
+
+            $form->handleRequest($request);
+            $form = $this->createForm(ThemeConfigurationType::class, $form->getData());
+        }
+
         return $this->container->get(UpdateHandlerFacade::class)->update(
             $entity,
-            $this->createForm(ThemeConfigurationType::class, $entity),
+            $form,
             $message,
             $request,
-            null
+            'oro_theme.form.handler.theme_configuration'
         );
     }
 
     public static function getSubscribedServices(): array
     {
-        return array_merge(
-            parent::getSubscribedServices(),
-            [
-                TranslatorInterface::class,
-                UpdateHandlerFacade::class,
-            ]
-        );
+        return array_merge(parent::getSubscribedServices(), [
+            TranslatorInterface::class,
+            UpdateHandlerFacade::class
+        ]);
     }
 }

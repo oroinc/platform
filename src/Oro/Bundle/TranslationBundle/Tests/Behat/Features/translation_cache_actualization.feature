@@ -1,3 +1,4 @@
+@regression
 Feature: Translation cache actualization
   In order to apply translation changes on the fly (immediately)
   As a User

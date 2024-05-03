@@ -1,3 +1,4 @@
+@regression
 @fixture-OroWorkflowBundle:Users.yml
 @fixture-OroWorkflowBundle:TestWorkflow.yml
 Feature: Workflow variables

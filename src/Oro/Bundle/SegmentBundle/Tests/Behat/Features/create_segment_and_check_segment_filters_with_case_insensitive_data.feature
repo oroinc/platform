@@ -1,3 +1,4 @@
+@regression
 @ticket-BB-19429
 @fixture-OroSegmentBundle:case_sensitive_segment.yml
 

@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-13968
 @automatically-ticket-tagged
 @fixture-OroWorkflowBundle:Workflow.yml
