@@ -10,6 +10,7 @@ use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType;
+use Oro\Bundle\SalesBundle\Form\Type\OpportunityStatusConfigType;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -30,6 +31,7 @@ class ConfigViewCommandTest extends TestCase
                     // Plain values
                     'oro_frontend.web_api' => true,
                     'oro_locale.default_localization' => 1,
+                    'oro_sales.opportunity_statuses' => null,
                     'oro_website.secure_url' => 'https://example.com',
                     'oro_locale.enabled_localizations' => [1, 2, 3],
                     'oro_example.dummy_object' => (object)['test' => 'value'],
@@ -49,8 +51,16 @@ class ConfigViewCommandTest extends TestCase
             'getType' => OroEncodedPlaceholderPasswordType::class,
         ]);
 
+        $nullField = $this->createConfiguredMock(FieldNodeDefinition::class, [
+            'getName' => 'oro_sales.opportunity_statuses',
+            'getType' => OpportunityStatusConfigType::class,
+        ]);
+
         $fieldGroup = $this->createConfiguredMock(GroupNodeDefinition::class, [
-            'getIterator' => new \ArrayIterator([$encryptedField]),
+            'getIterator' => new \ArrayIterator([
+                $encryptedField,
+                $nullField,
+            ]),
         ]);
 
         $formProvider = $this->createConfiguredMock(SystemConfigurationFormProvider::class, [
@@ -73,6 +83,7 @@ class ConfigViewCommandTest extends TestCase
     {
         $this->validateConfigView('oro_frontend.web_api', 'true');
         $this->validateConfigView('oro_locale.default_localization', '1');
+        $this->validateConfigView('oro_sales.opportunity_statuses', 'null');
         $this->validateConfigView('oro_website.secure_url', 'https://example.com');
     }
 
@@ -106,7 +117,7 @@ class ConfigViewCommandTest extends TestCase
     {
         $this->assertProducedError(
             $this->doExecuteCommand($this->command, ['name' => 'oro_example.nonexistent_field']),
-            "Value could not be retrieved"
+            "Unknown config field"
         );
     }
 }
