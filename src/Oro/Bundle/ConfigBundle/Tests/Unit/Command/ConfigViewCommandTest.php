@@ -22,7 +22,7 @@ class ConfigViewCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $configManager = $this->createMock(ConfigManager::class, []);
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->method('get')->will(
             $this->returnCallback(function ($fieldName) {
                 $configValues = [
