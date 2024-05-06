@@ -125,7 +125,7 @@ class ConfigUtil extends BaseConfigUtil
     /** the type that represents a collection valued association */
     public const TO_MANY = 'to-many';
 
-    /** a list of fields on which this field depends on */
+    /** a list of properties on which this field depends on */
     public const DEPENDS_ON = 'depends_on';
 
     /** the type of the filter */
