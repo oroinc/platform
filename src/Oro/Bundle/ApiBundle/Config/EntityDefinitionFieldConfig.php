@@ -403,7 +403,7 @@ class EntityDefinitionFieldConfig extends FieldConfig
     }
 
     /**
-     * Gets a list of fields on which this field depends on.
+     * Gets a list of properties on which this field depends on.
      *
      * @return string[]|null
      */
@@ -413,27 +413,27 @@ class EntityDefinitionFieldConfig extends FieldConfig
     }
 
     /**
-     * Sets a list of fields on which this field depends on.
+     * Sets a list of properties on which this field depends on.
      *
-     * @param string[] $fieldNames
+     * @param string[] $propertyPaths
      */
-    public function setDependsOn(array $fieldNames): void
+    public function setDependsOn(array $propertyPaths): void
     {
-        if ($fieldNames) {
-            $this->items[ConfigUtil::DEPENDS_ON] = $fieldNames;
+        if ($propertyPaths) {
+            $this->items[ConfigUtil::DEPENDS_ON] = $propertyPaths;
         } else {
             unset($this->items[ConfigUtil::DEPENDS_ON]);
         }
     }
 
     /**
-     * Adds a field to a list of fields on which this field depends on.
+     * Adds a property to a list of properties on which this field depends on.
      */
-    public function addDependsOn(string $fieldName): void
+    public function addDependsOn(string $propertyPath): void
     {
         $dependsOn = $this->getDependsOn();
-        if (!$dependsOn || !\in_array($fieldName, $dependsOn, true)) {
-            $dependsOn[] = $fieldName;
+        if (!$dependsOn || !\in_array($propertyPath, $dependsOn, true)) {
+            $dependsOn[] = $propertyPath;
             $this->setDependsOn($dependsOn);
         }
     }

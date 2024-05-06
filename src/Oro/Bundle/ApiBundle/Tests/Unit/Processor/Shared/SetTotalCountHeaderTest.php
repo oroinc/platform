@@ -6,6 +6,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
@@ -92,11 +93,10 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessOrmQueryBuilder()
     {
-        $entityClass = Group::class;
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
 
-        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
+        $query = $this->doctrineHelper->createQueryBuilder(Group::class, 'e');
         $query->setFirstResult(20);
         $query->setMaxResults(10);
 
@@ -132,11 +132,10 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
      */
     public function testProcessOrmQueryBuilderWithComputedFields(string $computedFieldExpr)
     {
-        $entityClass = Group::class;
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
 
-        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
+        $query = $this->doctrineHelper->createQueryBuilder(Group::class, 'e');
         $query->addSelect($computedFieldExpr);
         $query->setFirstResult(20);
         $query->setMaxResults(10);
@@ -182,11 +181,10 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessOrmQuery()
     {
-        $entityClass = Group::class;
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
 
-        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
+        $query = $this->doctrineHelper->createQueryBuilder(Group::class, 'e');
         $query->setFirstResult(20);
         $query->setMaxResults(10);
 
@@ -309,6 +307,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     {
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->context->setResult([['id' => 1], ['id' => 2]]);
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -321,6 +320,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     {
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->context->setResult(new \stdClass());
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         self::assertFalse(
@@ -331,10 +331,107 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     public function testNoData()
     {
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         self::assertFalse(
             $this->context->getResponseHeaders()->has('X-Include-Total-Count')
+        );
+    }
+
+    public function testPagingDisabled()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setPageSize(-1);
+
+        $this->countQueryBuilderOptimizer->expects(self::never())
+            ->method('getCountQueryBuilder');
+
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setResult([['id' => 1], ['id' => 2]]);
+        $this->context->setQuery($this->doctrineHelper->createQueryBuilder(Group::class, 'e'));
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            2,
+            $this->context->getResponseHeaders()->get('X-Include-Total-Count')
+        );
+    }
+
+    public function testPagingDisabledObjectData()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setPageSize(-1);
+
+        $this->countQueryBuilderOptimizer->expects(self::never())
+            ->method('getCountQueryBuilder');
+
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setResult(new \stdClass());
+        $this->context->setQuery($this->doctrineHelper->createQueryBuilder(Group::class, 'e'));
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertNull(
+            $this->context->getResponseHeaders()->get('X-Include-Total-Count')
+        );
+    }
+
+    public function testPagingDisabledNoData()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setPageSize(-1);
+
+        $this->countQueryBuilderOptimizer->expects(self::never())
+            ->method('getCountQueryBuilder');
+
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setQuery($this->doctrineHelper->createQueryBuilder(Group::class, 'e'));
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertNull(
+            $this->context->getResponseHeaders()->get('X-Include-Total-Count')
+        );
+    }
+
+    public function testPagingDisabledForDeleteList()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setPageSize(-1);
+        $totalCount = 123;
+
+        $query = $this->doctrineHelper->createQueryBuilder(Group::class, 'e');
+        $query->setFirstResult(20);
+        $query->setMaxResults(10);
+
+        $this->countQueryBuilderOptimizer->expects(self::once())
+            ->method('getCountQueryBuilder')
+            ->willReturnCallback(function (QueryBuilder $qb) {
+                $qb->select('e.id');
+
+                return $qb;
+            });
+        $this->queryResolver->expects(self::once())
+            ->method('resolveQuery')
+            ->with(self::isInstanceOf(Query::class), self::identicalTo($config));
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT count(DISTINCT g0_.id) AS sclr_0 FROM group_table g0_',
+            [['sclr_0' => $totalCount]]
+        );
+
+        $this->context->setAction(ApiAction::DELETE_LIST);
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setQuery($query);
+        $this->context->setResult([['id' => 1], ['id' => 2]]);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            $totalCount,
+            $this->context->getResponseHeaders()->get('X-Include-Total-Count')
         );
     }
 }

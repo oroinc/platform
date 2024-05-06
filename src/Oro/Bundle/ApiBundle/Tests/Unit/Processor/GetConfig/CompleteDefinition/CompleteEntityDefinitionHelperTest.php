@@ -26,8 +26,10 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 /**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -1375,10 +1377,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->entityOverrideProvider->expects(self::once())
+        $this->entityOverrideProvider->expects(self::exactly(2))
             ->method('getSubstituteEntityClass')
-            ->with('Test\Association1Target')
-            ->willReturn('Test\Association1SubstituteTarget');
+            ->willReturnMap([
+                ['Test\Association1Target', 'Test\Association1SubstituteTarget'],
+                [self::TEST_CLASS_NAME, null]
+            ]);
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -1415,6 +1419,182 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                             ]
                         ]
                     ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForTranslatableEntity()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'field1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(TestEnumValue::class);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field1']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(TestEnumValue::class)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::exactly(2))
+            ->method('isIgnoredField')
+            ->with(self::identicalTo($rootEntityMetadata), self::isType('string'))
+            ->willReturn(false);
+
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with(TestEnumValue::class)
+            ->willReturn(null);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'hints'                  => ['HINT_TRANSLATABLE'],
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => null
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForTranslatableEntityWhenTranslatableHintAlreadySet()
+    {
+        $config = $this->createConfigObject([
+            'hints'  => ['HINT_TRANSLATABLE'],
+            'fields' => [
+                'field1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(TestEnumValue::class);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field1']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(TestEnumValue::class)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::exactly(2))
+            ->method('isIgnoredField')
+            ->with(self::identicalTo($rootEntityMetadata), self::isType('string'))
+            ->willReturn(false);
+
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with(TestEnumValue::class)
+            ->willReturn(null);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'hints'                  => ['HINT_TRANSLATABLE'],
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => null
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForTranslatableEntityWhenTranslatableHintDisabled()
+    {
+        $config = $this->createConfigObject([
+            'hints'  => ['name' => 'HINT_TRANSLATABLE', 'value' => false],
+            'fields' => [
+                'field1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(TestEnumValue::class);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field1']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(TestEnumValue::class)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::exactly(2))
+            ->method('isIgnoredField')
+            ->with(self::identicalTo($rootEntityMetadata), self::isType('string'))
+            ->willReturn(false);
+
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with(TestEnumValue::class)
+            ->willReturn(null);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'hints'                  => ['name' => 'HINT_TRANSLATABLE', 'value' => false],
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => null
                 ]
             ],
             $config
@@ -3177,7 +3357,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'id' => [
+                'id'           => [
                     'depends_on' => ['association1.id']
                 ],
                 'association1' => null
@@ -3260,7 +3440,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     [
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
-                            'id' => [
+                            'id'       => [
                                 'property_path' => 'customizedIdentifier'
                             ],
                             'renameId' => [
@@ -3287,12 +3467,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
-                            'id' => [
+                            'id'       => [
                                 'property_path' => 'customizedIdentifier'
                             ],
                             'renameId' => [
                                 'property_path' => 'id',
-                                'exclude' => true
+                                'exclude'       => true
                             ]
                         ]
                     ]
