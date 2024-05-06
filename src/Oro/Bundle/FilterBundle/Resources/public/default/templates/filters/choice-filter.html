@@ -23,13 +23,11 @@
     <div class="value-field-frame">
         <input class="input input--full" type="text" name="value" value="" aria-label="<%- inputFieldAriaLabel %>">
         <input class="name_input" type="hidden" name="<%- name %>" id="<%- name %>" value="<%- selectedChoice %>">
-        <% if (renderMode !== 'toggle-mode') { %>
             <div class="filter-action-row">
                 <button type="button"
                     class="btn filter-update"
                     aria-label="<%- updateButtonAriaLabel %>"
                 ><%- _.__("oro.filter.updateButton.text") %></button>
             </div>
-        <% } %>
     </div>
 </div>

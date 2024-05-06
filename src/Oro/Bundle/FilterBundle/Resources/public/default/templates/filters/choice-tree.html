@@ -2,12 +2,10 @@
     <input type="hidden" name="value">
     <input type="hidden" name="type">
 
-    <% if (renderMode !== 'toggle-mode') { %>
-        <div class="filter-action-row">
-            <button type="button"
-                class="btn btn--outlined filter-update"
-                aria-label="<%- updateButtonAriaLabel %>"
-            ><%- _.__("oro.filter.updateButton.text") %></button>
-        </div>
-    <% } %>
+    <div class="filter-action-row">
+        <button type="button"
+            class="btn btn--outlined filter-update"
+            aria-label="<%- updateButtonAriaLabel %>"
+        ><%- _.__("oro.filter.updateButton.text") %></button>
+    </div>
 </div>
