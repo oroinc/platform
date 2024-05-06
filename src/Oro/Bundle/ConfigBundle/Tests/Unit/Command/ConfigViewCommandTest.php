@@ -73,7 +73,7 @@ class ConfigViewCommandTest extends TestCase
         );
     }
 
-    private function validateConfigView(string $configFieldName, string $expectedValue)
+    private function validateConfigView(string $configFieldName, string $expectedValue): void
     {
         $commandTester = $this->doExecuteCommand($this->command, ['name' => $configFieldName]);
         $this->assertOutputContains($commandTester, $expectedValue);
