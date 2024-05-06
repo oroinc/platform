@@ -103,11 +103,11 @@ HELP
         }
 
         $value = $configManager->get($fieldName);
-        if (is_null($value)) {
-            $symfonyStyle->error("Value could not be retrieved");
+        if (is_null($value) && $configField === null) {
+            $symfonyStyle->error("Unknown config field");
             return Command::FAILURE;
         }
-        if (is_array($value) || is_object($value) || is_bool($value)) {
+        if (is_array($value) || is_object($value) || is_bool($value) || is_null($value)) {
             $value = json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
         if (!is_scalar($value)) {
