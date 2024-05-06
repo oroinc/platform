@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Gedmo\Translatable\Translatable;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
@@ -111,6 +112,11 @@ class CompleteEntityDefinitionHelper
                 $entityClass,
                 $version,
                 $requestType
+            );
+            $this->completeTranslatableHint(
+                $entityOverrideProvider,
+                $definition,
+                $metadata
             );
         }
         // make sure that identifier field names are set
@@ -715,5 +721,26 @@ class CompleteEntityDefinitionHelper
         }
 
         return $field;
+    }
+
+    private function completeTranslatableHint(
+        EntityOverrideProviderInterface $entityOverrideProvider,
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata
+    ): void {
+        $resolvedEntityClass = $this->resolveEntityClass($metadata->name, $entityOverrideProvider);
+        if (is_subclass_of($resolvedEntityClass, Translatable::class)) {
+            $hasTranslatableHint = false;
+            $hints = $definition->getHints();
+            foreach ($hints as $hint) {
+                if ('HINT_TRANSLATABLE' === (\is_string($hint) ? $hint : $hint['name'])) {
+                    $hasTranslatableHint = true;
+                    break;
+                }
+            }
+            if (!$hasTranslatableHint) {
+                $definition->addHint('HINT_TRANSLATABLE');
+            }
+        }
     }
 }
