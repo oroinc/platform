@@ -19,8 +19,6 @@ class ConfigViewCommandTest extends TestCase
     use CommandTestingTrait;
 
     private ConfigViewCommand $command;
-    private ConfigManager $configManager;
-
 
     protected function setUp(): void
     {
