@@ -58,3 +58,4 @@ map:
         orofilter/templates/filter/select-filter.html: orofilter/default/templates/filters/select-filter.html
         orofilter/templates/filter/text-filter.html: orofilter/default/templates/filters/text-filter.html
         orofilter/templates/filters-container.html: orofilter/default/templates/filters/filters-container.html
+        orofilter/templates/datevariables-tooltip.html: orofilter/default/templates/datevariables-tooltip.html
