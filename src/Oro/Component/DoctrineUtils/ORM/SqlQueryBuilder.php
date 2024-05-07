@@ -248,7 +248,7 @@ class SqlQueryBuilder
     /**
      * Sets the position of the first result to retrieve (the "offset").
      *
-     * @param integer $firstResult The first result to return.
+     * @param int|null $firstResult The first result to return.
      *
      * @return self
      */
@@ -263,7 +263,7 @@ class SqlQueryBuilder
      * Gets the position of the first result the query object was set to retrieve (the "offset").
      * Returns NULL if {@link setFirstResult} was not applied to this query builder.
      *
-     * @return integer The position of the first result.
+     * @return int|null The position of the first result.
      */
     public function getFirstResult()
     {
@@ -273,7 +273,7 @@ class SqlQueryBuilder
     /**
      * Sets the maximum number of results to retrieve (the "limit").
      *
-     * @param integer $maxResults The maximum number of results to retrieve.
+     * @param int|null $maxResults The maximum number of results to retrieve.
      *
      * @return self
      */
@@ -288,7 +288,7 @@ class SqlQueryBuilder
      * Gets the maximum number of results the query object was set to retrieve (the "limit").
      * Returns NULL if {@link setMaxResults} was not applied to this query builder.
      *
-     * @return integer The maximum number of results.
+     * @return int|null The maximum number of results.
      */
     public function getMaxResults()
     {
