@@ -5,7 +5,15 @@ $ui-timepicker-list-box-shadow: 0 0 4px 0 rgba(5, 59, 66, .08), 0 3px 12px 0 rgb
 $ui-timepicker-list-background: get-color('neutral', 'white-100') !default;
 $ui-timepicker-list-padding-block: spacing('sm') !default;
 
+$ui-timepicker-list-item-height: 44px !default;
+$ui-timepicker-list-item-padding-inline: spacing('base') !default;
+$ui-timepicker-list-item-display: flex !default;
+$ui-timepicker-list-item-align-items: center !default;
+$ui-timepicker-list-item-position: relative !default;
 $ui-timepicker-list-item-color: get-color('text', 'primary') !default;
+$ui-timepicker-list-item-white-space: nowrap !default;
+$ui-timepicker-list-item-cursor: pointer !default;
+
 $ui-timepicker-list-item-hover-background: get-color('primary', 'light') !default;
 $ui-timepicker-list-item-hover-color: get-color('text', 'primary') !default;
 

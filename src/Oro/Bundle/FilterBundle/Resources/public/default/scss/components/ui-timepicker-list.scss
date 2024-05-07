@@ -17,17 +17,17 @@
 
 .ui-timepicker-list {
     li {
-        height: 44px;
-        padding-inline: spacing('base');
-        display: flex;
-        align-items: center;
-        position: relative;
+        height: $ui-timepicker-list-item-height;
+        padding-inline: $ui-timepicker-list-item-padding-inline;
+        display: $ui-timepicker-list-item-display;
+        align-items: $ui-timepicker-list-item-align-items;
+        position: $ui-timepicker-list-item-position;
 
         color: $ui-timepicker-list-item-color;
 
-        white-space: nowrap;
+        white-space: $ui-timepicker-list-item-white-space;
 
-        cursor: pointer;
+        cursor: $ui-timepicker-list-item-cursor;
 
         &.ui-timepicker-selected,
         &:hover {

@@ -1,3 +1,4 @@
+<% let oroui = _.macros('oroui') %>
 <div class="data-filter-choice" data-date-filter-template>
     <%= parts.join('') %>
 
@@ -28,7 +29,9 @@
             <div class="filter-start-date">
                 <div class="datepicker-box">
                     <span class="datepicker-box__icon" aria-hidden="true">
-                        <span class="fa-calendar"></span>
+                        <%= oroui.renderIcon({
+                            name: 'calendar'
+                        }) %>
                     </span>
                     <input type="text"
                            class="<%- inputClass %>"
@@ -43,7 +46,9 @@
             <div class="filter-end-date">
                 <div class="datepicker-box">
                     <span class="datepicker-box__icon" aria-hidden="true">
-                        <span class="fa-calendar"></span>
+                        <%= oroui.renderIcon({
+                            name: 'calendar'
+                        }) %>
                     </span>
                     <input type="text" class="<%- inputClass %>"
                            value="<%- value.value.end %>"
