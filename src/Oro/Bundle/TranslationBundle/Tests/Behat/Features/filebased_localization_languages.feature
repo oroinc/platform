@@ -1,3 +1,4 @@
+@regression
 @fixture-OroTranslationBundle:FileBasedLanguage.yml
 
 Feature: File-Based localization languages

@@ -83,7 +83,7 @@ oro:
                 description:     The country that a region is a part of.
             combined_code:
                 label:           Combined code
-                description:     The identifier of an entity. The region (country subdivision) code according to ISO 3166-2.
+                description:     The region (country subdivision) code according to ISO 3166-2.
             code:
                 label:           Code
                 description:     The part of after hyphen of an ISO 3166-2 region code.
@@ -110,10 +110,10 @@ oro:
                 description:      The name that identifies the country record
             iso3_code:
                 label:            ISO3 code
-                description:      A country three-letter code.
+                description:      A three letter ISO country code.
             iso2_code:
                 label:            ISO2 code
-                description:      The identifier of an entity.
+                description:      A two letter ISO country code.
             label:                Country
             description:          The country specified in the address record.
 

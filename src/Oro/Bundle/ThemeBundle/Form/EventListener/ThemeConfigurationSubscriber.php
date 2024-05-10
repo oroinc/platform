@@ -15,9 +15,6 @@ use Symfony\Component\Form\FormEvents;
  */
 class ThemeConfigurationSubscriber implements EventSubscriberInterface
 {
-    /** @var array['option-key' => 'value'] */
-    private array $configuration = [];
-
     public function __construct(
         private ThemeConfigurationProvider $provider
     ) {
@@ -36,20 +33,10 @@ class ThemeConfigurationSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        /** @var ThemeConfiguration $themeConfiguration */
-        $themeConfiguration = $event->getData();
         $configuration = $this->getConfiguration($event);
 
-        // Replace theme.yml options value from ThemeConfiguration
-        if ($themeConfiguration->getId()) {
-            foreach ($configuration['sections'] ?? [] as $sKey => $section) {
-                foreach ($section['options'] ?? [] as $oKey => $option) {
-                    $value = $themeConfiguration->getConfigurationOption(
-                        LayoutThemeConfiguration::buildOptionKey($sKey, $oKey)
-                    );
-                    $configuration['sections'][$sKey]['options'][$oKey]['default'] = $value;
-                }
-            }
+        if ($event->getData()?->getId()) {
+            FormUtils::replaceField($event->getForm(), 'theme', ['disabled' => true]);
         }
 
         FormUtils::replaceField($event->getForm(), 'configuration', ['theme_configuration' => $configuration]);
@@ -64,7 +51,9 @@ class ThemeConfigurationSubscriber implements EventSubscriberInterface
         // Remove outdated options from ThemeConfiguration
         foreach ($themeConfiguration->getConfiguration() as $key => $value) {
             list($sKey, $oKey) = explode(LayoutThemeConfiguration::OPTION_KEY_DELIMITER, $key);
-            if (isset($configuration['sections'][$sKey]['options'][$oKey])) {
+            if (isset($configuration['sections'][$sKey]['options']) &&
+                array_key_exists($oKey, $configuration['sections'][$sKey]['options'])
+            ) {
                 continue;
             }
 
@@ -74,18 +63,13 @@ class ThemeConfigurationSubscriber implements EventSubscriberInterface
 
     private function getConfiguration(FormEvent $event): array
     {
-        if ($this->configuration) {
-            return $this->configuration;
-        }
-
         /** @var ThemeConfiguration $themeConfiguration */
         $themeConfiguration = $event->getData();
         $choices = $event->getForm()->get('theme')->getConfig()->getOption('choices');
         $themeName = $themeConfiguration->getTheme() ?? reset($choices);
 
         $themeDefinition = $this->provider->getThemeDefinition($themeName);
-        $this->configuration = $themeDefinition['configuration'] ?? [];
 
-        return $this->configuration;
+        return $themeDefinition['configuration'] ?? [];
     }
 }

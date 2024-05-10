@@ -19,7 +19,6 @@ class ThemeConfigurationSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'autocomplete_alias' => ThemeConfigurationType::class,
-                'create_form_route' => 'oro_theme_configuration_create',
                 'configs' => [
                     'placeholder' => 'oro.theme.themeconfiguration.form.choose',
                 ],

@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-16174
 @fixture-OroUserBundle:user.yml
 Feature: Create Report with Segment as filter

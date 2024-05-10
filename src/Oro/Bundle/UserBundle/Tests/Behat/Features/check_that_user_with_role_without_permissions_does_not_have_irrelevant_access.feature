@@ -1,3 +1,4 @@
+@regression
 @ticket-BB-14072
 Feature: Check that user with role without permissions does not have irrelevant access
   In order to ensure that user without permissions does not have irrelevant access

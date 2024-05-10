@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-15471
 @fixture-OroEmailBundle:my-emails.yml
 Feature: My emails 

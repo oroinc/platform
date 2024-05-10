@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -56,26 +57,30 @@ class SetTotalCountHeader implements ProcessorInterface
             return;
         }
 
-        $totalCount = null;
-
-        $totalCountCallback = $context->getTotalCountCallback();
-        if (null !== $totalCountCallback) {
-            $totalCount = $this->executeTotalCountCallback($totalCountCallback);
-        } else {
-            $query = $context->getQuery();
-            if (null !== $query) {
-                $totalCount = $this->calculateTotalCount($query, $context->getConfig());
-            } else {
-                $data = $context->getResult();
-                if (\is_array($data)) {
-                    $totalCount = \count($data);
-                }
-            }
-        }
-
+        $totalCount = $this->getTotalCount($context);
         if (null !== $totalCount) {
             $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $totalCount);
         }
+    }
+
+    private function getTotalCount(ListContext $context): ?int
+    {
+        $totalCountCallback = $context->getTotalCountCallback();
+        if (null !== $totalCountCallback) {
+            return $this->executeTotalCountCallback($totalCountCallback);
+        }
+
+        if ($context->getAction() !== ApiAction::DELETE_LIST && $context->getConfig()?->getPageSize() === -1) {
+            // the paging is disabled, no need to execute a separate DB query to calculate total count
+            return $this->calculateResultCount($context);
+        }
+
+        $query = $context->getQuery();
+        if (null !== $query) {
+            return $this->calculateTotalCount($query, $context->getConfig());
+        }
+
+        return $this->calculateResultCount($context);
     }
 
     private function executeTotalCountCallback(callable $callback): int
@@ -89,6 +94,20 @@ class SetTotalCountHeader implements ProcessorInterface
         }
 
         return $totalCount;
+    }
+
+    private function calculateResultCount(ListContext $context): ?int
+    {
+        if (!$context->hasResult()) {
+            return null;
+        }
+
+        $data = $context->getResult();
+        if (!\is_array($data)) {
+            return null;
+        }
+
+        return \count($data);
     }
 
     private function calculateTotalCount(mixed $query, ?EntityDefinitionConfig $config): int

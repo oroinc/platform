@@ -1,3 +1,4 @@
+@regression
 @ticket-BB-11878
 
 Feature: Create segment

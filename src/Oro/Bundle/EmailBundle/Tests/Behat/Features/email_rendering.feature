@@ -1,3 +1,4 @@
+@regression
 @fixture-OroEmailBundle:bad-emails.yml
 @fixture-OroEmailBundle:bad-emails-widget.yml
 @ticket-BAP-15135

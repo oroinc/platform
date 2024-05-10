@@ -1,3 +1,4 @@
+@regression
 Feature: Microsoft Azure Application configuration available
   In order to allow integration with Microsoft Azure application
   As an administrator

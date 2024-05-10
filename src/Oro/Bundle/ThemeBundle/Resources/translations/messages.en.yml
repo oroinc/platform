@@ -10,7 +10,6 @@ oro:
       form:
         choose: Choose a theme configuration...
       entity_label: Theme Configuration
-      beta_entity_label: Theme Configuration (BETA)
       entity_plural_label: Theme Configurations
       entity_grid_all_view_label: All %entity_plural_label%
       entity_description: Represents theme configuration information.
@@ -34,6 +33,17 @@ oro:
         type:
           choices:
             storefront: Storefront
+      preview:
+        text: '*please note that elements other than the selected one may differ on the actual website'
+        collapse:
+          show_text: 'Show Preview'
+          hide_text: 'Hide Preview'
+
+        image:
+          alt: 'Preview'
+
+      fallback:
+          label: Theme Configuration
     system_configuration:
       fields:
         theme_configuration:

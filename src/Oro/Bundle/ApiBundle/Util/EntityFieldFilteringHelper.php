@@ -33,28 +33,28 @@ class EntityFieldFilteringHelper
         ?string $exclusionPolicy
     ): array {
         if (ConfigUtil::EXCLUSION_POLICY_ALL === $exclusionPolicy) {
-            $filteredWysiwygFields = [];
+            $filteredFields = [];
             foreach ($fieldNames as $fieldName) {
                 if (\in_array($fieldName, $explicitlyConfiguredFieldNames, true)) {
-                    $filteredWysiwygFields[] = $fieldName;
+                    $filteredFields[] = $fieldName;
                 }
             }
 
-            return $filteredWysiwygFields;
+            return $filteredFields;
         }
         if (ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS === $exclusionPolicy
             && $this->isExtendSystemEntity($entityClass)
         ) {
-            $filteredWysiwygFields = [];
+            $filteredFields = [];
             foreach ($fieldNames as $fieldName) {
                 if (\in_array($fieldName, $explicitlyConfiguredFieldNames, true)
                     || !$this->isCustomField($entityClass, $fieldName)
                 ) {
-                    $filteredWysiwygFields[] = $fieldName;
+                    $filteredFields[] = $fieldName;
                 }
             }
 
-            return $filteredWysiwygFields;
+            return $filteredFields;
         }
 
         return $fieldNames;

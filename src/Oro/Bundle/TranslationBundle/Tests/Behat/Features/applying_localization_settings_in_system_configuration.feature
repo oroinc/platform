@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-13139
 @automatically-ticket-tagged
 @fixture-OroUserBundle:user.yml

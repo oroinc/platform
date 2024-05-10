@@ -9,3 +9,5 @@ system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
+                attr:
+                    class: control-subgroup

@@ -1,4 +1,3 @@
-@regression
 @ticket-BAP-16903
 @fixture-OroUserBundle:UsersGridViewsFeature.yml
 Feature: User Grid Views

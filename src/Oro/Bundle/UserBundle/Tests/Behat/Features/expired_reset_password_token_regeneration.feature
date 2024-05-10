@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-17151
 @fixture-OroUserBundle:user_with_expired_reset_password_token.yml
 

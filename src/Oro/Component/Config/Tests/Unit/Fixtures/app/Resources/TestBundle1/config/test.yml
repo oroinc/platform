@@ -1,1 +1,1 @@
-test: 456
+test: !php/const PHP_INT_MAX

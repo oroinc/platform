@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-22005
 @fixture-OroReportBundle:users_with_birthdate.yml
 

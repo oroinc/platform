@@ -1,3 +1,4 @@
+@regression
 @ticket-BB-16157
 @fixture-OroUserBundle:user.yml
 Feature: Reset password link expire

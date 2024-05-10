@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-18446
 Feature: Accessing url with invalid entity id
   In order to be able to use UI without 500 errors
