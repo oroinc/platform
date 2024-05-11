@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -13,151 +12,133 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
+
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $groupingConfigProvider;
 
     /** @var DictionaryValueListProvider */
     private $dictionaryValueListProvider;
 
     protected function setUp(): void
     {
-        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects($this->any())
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($this->em);
 
-        $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
-            ->method('getProvider')
-            ->willReturnMap([
-                ['extend', $this->extendConfigProvider],
-                ['grouping', $this->groupingConfigProvider],
-            ]);
-
-        $this->dictionaryValueListProvider = new DictionaryValueListProvider($configManager, $doctrine);
+        $this->dictionaryValueListProvider = new DictionaryValueListProvider($this->configManager, $doctrine);
     }
 
-    public function testSupports()
+    private function getEntityConfig(string $className, array $values): Config
+    {
+        return new Config(new EntityConfigId('grouping', $className), $values);
+    }
+
+    private function getEntityFieldConfig(string $className, string $fieldName, array $values): Config
+    {
+        return new Config(new FieldConfigId('extend', $className, $fieldName), $values);
+    }
+
+    public function testSupports(): void
     {
         $className = 'Test\Dictionary';
 
-        $groupingConfig = $this->getEntityConfig(
-            $className,
-            [
-                'groups' => [GroupingScope::GROUP_DICTIONARY, 'another'],
-            ],
-            'grouping'
-        );
+        $groupingConfig = $this->getEntityConfig($className, [
+            'groups' => [GroupingScope::GROUP_DICTIONARY, 'another']
+        ]);
 
-        $this->groupingConfigProvider->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($className)
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('grouping', $className)
             ->willReturn($groupingConfig);
 
-        $this->assertTrue($this->dictionaryValueListProvider->supports($className));
+        self::assertTrue($this->dictionaryValueListProvider->supports($className));
     }
 
-    public function testSupportsForNotConfigurableEntity()
+    public function testSupportsForNotConfigurableEntity(): void
     {
         $className = 'Test\NotConfigurableEntity';
 
-        $this->groupingConfigProvider->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(false);
 
-        $this->assertFalse($this->dictionaryValueListProvider->supports($className));
+        self::assertFalse($this->dictionaryValueListProvider->supports($className));
     }
 
-    public function testSupportsForNotDictionary()
+    public function testSupportsForNotDictionary(): void
     {
         $className = 'Test\NotDictionary';
 
-        $groupingConfig = $this->getEntityConfig(
-            $className,
-            [],
-            'grouping'
-        );
+        $groupingConfig = $this->getEntityConfig($className, []);
 
-        $this->groupingConfigProvider->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($className)
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('grouping', $className)
             ->willReturn($groupingConfig);
 
-        $this->assertFalse($this->dictionaryValueListProvider->supports($className));
+        self::assertFalse($this->dictionaryValueListProvider->supports($className));
     }
 
-    public function testSupportsForNotDictionaryWithGroups()
+    public function testSupportsForNotDictionaryWithGroups(): void
     {
         $className = 'Test\NotDictionaryWithGroups';
 
-        $groupingConfig = $this->getEntityConfig(
-            $className,
-            [
-                'groups' => ['another'],
-            ],
-            'grouping'
-        );
+        $groupingConfig = $this->getEntityConfig($className, ['groups' => ['another']]);
 
-        $this->groupingConfigProvider->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($className)
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('grouping', $className)
             ->willReturn($groupingConfig);
 
-        $this->assertFalse($this->dictionaryValueListProvider->supports($className));
+        self::assertFalse($this->dictionaryValueListProvider->supports($className));
     }
 
-    public function testGetValueListQueryBuilder()
+    public function testGetValueListQueryBuilder(): void
     {
         $className = 'Test\Dictionary';
 
         $qb = $this->createMock(QueryBuilder::class);
-        $repo = $this->createMock(EntityRepository::class);
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with($className)
-            ->willReturn($repo);
-        $repo->expects($this->once())
+        $this->em->expects(self::once())
             ->method('createQueryBuilder')
-            ->with('e')
             ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('select')
+            ->with('e')
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('from')
+            ->with($className, 'e')
+            ->willReturnSelf();
 
-        $this->assertSame(
-            $qb,
-            $this->dictionaryValueListProvider->getValueListQueryBuilder($className)
-        );
+        self::assertSame($qb, $this->dictionaryValueListProvider->getValueListQueryBuilder($className));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetSerializationConfig()
+    public function testGetSerializationConfig(): void
     {
         $className = 'Test\Dictionary';
         $manyToOneTargetClassName = 'Test\ManyToOne';
@@ -166,20 +147,20 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 
         $manyToOneTargetMetadata = $this->createMock(ClassMetadata::class);
 
-        $this->em->expects($this->exactly(2))
+        $this->em->expects(self::exactly(2))
             ->method('getClassMetadata')
             ->willReturnMap([
                 [$className, $metadata],
                 [$manyToOneTargetClassName, $manyToOneTargetMetadata],
             ]);
 
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id', 'name', 'default', 'extend_field']);
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getAssociationNames')
             ->willReturn(['manyToOne', 'manyToMany', 'extend_association']);
-        $metadata->expects($this->exactly(2))
+        $metadata->expects(self::exactly(2))
             ->method('getAssociationMapping')
             ->willReturnMap([
                 [
@@ -200,51 +181,58 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $manyToOneTargetMetadata->expects($this->once())
+        $manyToOneTargetMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $this->extendConfigProvider->expects($this->exactly(7))
-            ->method('getConfig')
+        $this->configManager->expects(self::exactly(7))
+            ->method('getFieldConfig')
             ->willReturnMap([
                 [
+                    'extend',
                     $className,
                     'id',
                     $this->getEntityFieldConfig($className, 'id', [])
                 ],
                 [
+                    'extend',
                     $className,
                     'name',
                     $this->getEntityFieldConfig($className, 'name', [])
                 ],
                 [
+                    'extend',
                     $className,
                     'default',
                     $this->getEntityFieldConfig($className, 'default', [])
                 ],
                 [
+                    'extend',
                     $className,
                     'extend_field',
                     $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
                 ],
                 [
+                    'extend',
                     $className,
                     'manyToOne',
                     $this->getEntityFieldConfig($className, 'manyToOne', [])
                 ],
                 [
+                    'extend',
                     $className,
                     'manyToMany',
                     $this->getEntityFieldConfig($className, 'manyToMany', [])
                 ],
                 [
+                    'extend',
                     $className,
                     'extend_association',
                     $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
                 ]
             ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'exclusion_policy' => 'all',
                 'hints'            => ['HINT_TRANSLATABLE'],
@@ -259,60 +247,22 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSupportedEntityClasses()
+    public function testGetSupportedEntityClasses(): void
     {
         $configs = [
-            $this->getEntityConfig(
-                'Test\Dictionary',
-                [
-                    'groups' => [GroupingScope::GROUP_DICTIONARY, 'another'],
-                ],
-                'grouping'
-            ),
-            $this->getEntityConfig(
-                'Test\NotDictionary',
-                [],
-                'grouping'
-            ),
-            $this->getEntityConfig(
-                'Test\NotDictionaryWithGroups',
-                [
-                    'groups' => ['another'],
-                ],
-                'grouping'
-            ),
+            $this->getEntityConfig('Test\Dictionary', ['groups' => [GroupingScope::GROUP_DICTIONARY, 'another']]),
+            $this->getEntityConfig('Test\NotDictionary', []),
+            $this->getEntityConfig('Test\NotDictionaryWithGroups', ['groups' => ['another']])
         ];
 
-        $this->groupingConfigProvider->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getConfigs')
-            ->with(null, true)
+            ->with('grouping', null, true)
             ->willReturn($configs);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Dictionary'],
             $this->dictionaryValueListProvider->getSupportedEntityClasses()
         );
-    }
-
-    private function getEntityConfig(string $className, array $values, string $scope = 'extend'): Config
-    {
-        $configId = new EntityConfigId($scope, $className);
-        $config   = new Config($configId);
-        $config->setValues($values);
-
-        return $config;
-    }
-
-    private function getEntityFieldConfig(
-        string $className,
-        string $fieldName,
-        array $values,
-        string $scope = 'extend'
-    ): Config {
-        $configId = new FieldConfigId($scope, $className, $fieldName);
-        $config   = new Config($configId);
-        $config->setValues($values);
-
-        return $config;
     }
 }

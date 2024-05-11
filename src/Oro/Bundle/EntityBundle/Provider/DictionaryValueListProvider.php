@@ -2,68 +2,67 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
+/**
+ * Provides information about dictionary entities.
+ */
 class DictionaryValueListProvider implements DictionaryValueListProviderInterface
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    private ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    public function __construct(
-        ConfigManager $configManager,
-        ManagerRegistry $doctrine
-    ) {
+    public function __construct(ConfigManager $configManager, ManagerRegistry $doctrine)
+    {
         $this->configManager = $configManager;
-        $this->doctrine      = $doctrine;
+        $this->doctrine = $doctrine;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function supports($className)
+    public function supports(string $className): bool
     {
-        $groupingConfigProvider = $this->configManager->getProvider('grouping');
-        if (!$groupingConfigProvider->hasConfig($className)) {
+        if (!$this->configManager->hasConfig($className)) {
             return false;
         }
 
-        $groups = $groupingConfigProvider->getConfig($className)->get('groups');
+        $groups = $this->configManager->getEntityConfig('grouping', $className)->get('groups');
 
-        return !empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true);
+        return $groups && \in_array(GroupingScope::GROUP_DICTIONARY, $groups, true);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getValueListQueryBuilder($className)
+    public function getValueListQueryBuilder(string $className): QueryBuilder
     {
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $this->doctrine->getManagerForClass($className);
-        $qb = $em->getRepository($className)->createQueryBuilder('e');
 
-        return $qb;
+        return $em->createQueryBuilder()
+            ->select('e')
+            ->from($className, 'e');
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getSerializationConfig($className)
+    public function getSerializationConfig(string $className): array
     {
-        /** @var EntityManager $em */
-        $em                   = $this->doctrine->getManagerForClass($className);
-        $metadata             = $em->getClassMetadata($className);
-        $extendConfigProvider = $this->configManager->getProvider('extend');
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass($className);
+        $metadata = $em->getClassMetadata($className);
 
         $fields = [];
-        foreach ($metadata->getFieldNames() as $fieldName) {
-            $extendFieldConfig = $extendConfigProvider->getConfig($className, $fieldName);
+        $fieldNames = $metadata->getFieldNames();
+        foreach ($fieldNames as $fieldName) {
+            $extendFieldConfig = $this->configManager->getFieldConfig('extend', $className, $fieldName);
             if ($extendFieldConfig->is('is_extend')) {
                 // skip extended fields
                 continue;
@@ -71,19 +70,20 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
 
             $fields[$fieldName] = null;
         }
-        foreach ($metadata->getAssociationNames() as $fieldName) {
-            $extendFieldConfig = $extendConfigProvider->getConfig($className, $fieldName);
+        $associationNames = $metadata->getAssociationNames();
+        foreach ($associationNames as $associationName) {
+            $extendFieldConfig = $this->configManager->getFieldConfig('extend', $className, $associationName);
             if ($extendFieldConfig->is('is_extend')) {
                 // skip extended fields
                 continue;
             }
 
-            $mapping = $metadata->getAssociationMapping($fieldName);
+            $mapping = $metadata->getAssociationMapping($associationName);
             if (($mapping['type'] & ClassMetadata::TO_ONE) && $mapping['isOwningSide']) {
                 $targetMetadata = $em->getClassMetadata($mapping['targetEntity']);
-                $idFieldNames   = $targetMetadata->getIdentifierFieldNames();
-                if (count($idFieldNames) === 1) {
-                    $fields[$fieldName] = ['fields' => $idFieldNames[0]];
+                $idFieldNames = $targetMetadata->getIdentifierFieldNames();
+                if (\count($idFieldNames) === 1) {
+                    $fields[$associationName] = ['fields' => $idFieldNames[0]];
                 }
             }
         }
@@ -96,17 +96,16 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getSupportedEntityClasses()
+    public function getSupportedEntityClasses(): array
     {
         $result = [];
-
-        $groupingConfigProvider = $this->configManager->getProvider('grouping');
-        foreach ($groupingConfigProvider->getConfigs(null, true) as $config) {
-            $groups = $config->get('groups');
-            if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
-                $result[] = $config->getId()->getClassName();
+        $entityConfigs = $this->configManager->getConfigs('grouping', null, true);
+        foreach ($entityConfigs as $entityConfig) {
+            $groups = $entityConfig->get('groups');
+            if ($groups && \in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
+                $result[] = $entityConfig->getId()->getClassName();
             }
         }
 

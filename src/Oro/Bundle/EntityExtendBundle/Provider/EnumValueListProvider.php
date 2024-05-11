@@ -2,69 +2,60 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
- * Implements the DictionaryValueListProviderInterface for enum entities.
+ * Provides information about enum entities.
  */
 class EnumValueListProvider implements DictionaryValueListProviderInterface
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    private ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    public function __construct(
-        ConfigManager $configManager,
-        ManagerRegistry $doctrine
-    ) {
+    public function __construct(ConfigManager $configManager, ManagerRegistry $doctrine)
+    {
         $this->configManager = $configManager;
-        $this->doctrine      = $doctrine;
+        $this->doctrine = $doctrine;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function supports($className)
+    public function supports(string $className): bool
     {
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-
         return
-            $extendConfigProvider->hasConfig($className)
-            && ExtendHelper::isEnumValueEntityAccessible($extendConfigProvider->getConfig($className));
+            $this->configManager->hasConfig($className)
+            && ExtendHelper::isEnumValueEntityAccessible($this->configManager->getEntityConfig('extend', $className));
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getValueListQueryBuilder($className)
+    public function getValueListQueryBuilder(string $className): QueryBuilder
     {
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $this->doctrine->getManagerForClass($className);
-        $qb = $em->getRepository($className)->createQueryBuilder('e');
 
-        return $qb;
+        return $em->createQueryBuilder()
+            ->select('e')
+            ->from($className, 'e');
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getSerializationConfig($className)
+    public function getSerializationConfig(string $className): array
     {
-        /** @var EntityManager $em */
-        $em                   = $this->doctrine->getManagerForClass($className);
-        $metadata             = $em->getClassMetadata($className);
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-
         $fields = [];
+        $metadata = $this->doctrine->getManagerForClass($className)->getClassMetadata($className);
         foreach ($metadata->getFieldNames() as $fieldName) {
-            $extendFieldConfig = $extendConfigProvider->getConfig($className, $fieldName);
-            if ($extendFieldConfig->is('is_extend')) {
+            $fieldConfig = $this->configManager->getFieldConfig('extend', $className, $fieldName);
+            if ($fieldConfig->is('is_extend')) {
                 // skip extended fields
                 continue;
             }
@@ -82,16 +73,15 @@ class EnumValueListProvider implements DictionaryValueListProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getSupportedEntityClasses()
+    public function getSupportedEntityClasses(): array
     {
         $result = [];
-
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        foreach ($extendConfigProvider->getConfigs(null, true) as $extendConfig) {
-            if (ExtendHelper::isEnumValueEntityAccessible($extendConfig)) {
-                $result[] = $extendConfig->getId()->getClassName();
+        $entityConfigs = $this->configManager->getConfigs('extend', null, true);
+        foreach ($entityConfigs as $entityConfig) {
+            if (ExtendHelper::isEnumValueEntityAccessible($entityConfig)) {
+                $result[] = $entityConfig->getId()->getClassName();
             }
         }
 

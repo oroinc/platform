@@ -57,6 +57,27 @@ class UserTest extends RestJsonApiTestCase
         );
     }
 
+    public function testGetListWithTitles()
+    {
+        $response = $this->cget(
+            ['entity' => 'users'],
+            ['meta' => 'title', 'fields[users]' => 'id', 'filter[email]' => LoadUserData::SIMPLE_USER_EMAIL]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => 'users',
+                        'id'   => '<toString(@simple_user->id)>',
+                        'meta' => ['title' => 'Elley Towards']
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
     public function testDelete()
     {
         $userId = $this->getReference(LoadUserData::SIMPLE_USER)->getId();
