@@ -104,6 +104,10 @@ class ParametersResolver
             return true;
         }
 
+        if ($parameter->isNullsAllowed() && $value === null) {
+            return true;
+        }
+
         $type = $parameter->getType();
         $type = array_key_exists($type, self::$typeAliases) ? self::$typeAliases[$type] : $type;
 
