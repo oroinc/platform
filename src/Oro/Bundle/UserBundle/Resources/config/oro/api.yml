@@ -24,6 +24,7 @@ api:
 
         Oro\Bundle\UserBundle\Entity\User:
             documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
+            disable_meta_properties: false # set manually because this entity is marked as a dictionary
             fields:
                 emails:
                     data_type: objects

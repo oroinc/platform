@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityFieldFilteringHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -37,23 +38,26 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
  */
 class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
+    /** @var EntityOverrideProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityOverrideProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomDataTypeHelper */
+    /** @var CompleteCustomDataTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $customDataTypeHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderRegistry */
+    /** @var ExclusionProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $exclusionProviderRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
+
+    /** @var ChainDictionaryValueListProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $dictionaryProvider;
 
     /** @var CompleteEntityDefinitionHelper */
     private $completeEntityDefinitionHelper;
@@ -68,6 +72,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->customDataTypeHelper = $this->createMock(CompleteCustomDataTypeHelper::class);
         $this->exclusionProviderRegistry = $this->createMock(ExclusionProviderRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
+        $this->dictionaryProvider = $this->createMock(ChainDictionaryValueListProvider::class);
 
         $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
         $entityOverrideProviderRegistry->expects(self::any())
@@ -82,26 +87,24 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             $this->customDataTypeHelper,
             $this->exclusionProviderRegistry,
             new ExpandedAssociationExtractor(),
-            new EntityFieldFilteringHelper($this->configManager)
+            new EntityFieldFilteringHelper($this->configManager),
+            $this->dictionaryProvider
         );
     }
 
     private function getEntityConfig(array $config): ConfigInterface
     {
-        return new Config(
-            new EntityConfigId('extend', self::TEST_CLASS_NAME),
-            $config
-        );
+        return new Config(new EntityConfigId('extend', self::TEST_CLASS_NAME), $config);
     }
 
     private function getFieldConfig(string $fieldName, array $config): ConfigInterface
     {
-        return new Config(
-            new FieldConfigId('extend', self::TEST_CLASS_NAME, $fieldName, 'integer'),
-            $config
-        );
+        return new Config(new FieldConfigId('extend', self::TEST_CLASS_NAME, $fieldName, 'integer'), $config);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testCompleteDefinitionForFields()
     {
         $config = $this->createConfigObject([
@@ -169,6 +172,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -241,6 +249,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->willReturn(false);
         $this->configProvider->expects(self::never())
             ->method('getConfig');
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -325,6 +338,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -396,6 +414,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn($this->createRelationConfigObject());
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -474,6 +497,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 )
             );
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -559,6 +587,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 )
             );
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -651,6 +684,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -740,6 +778,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 )
             );
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -831,6 +874,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -920,6 +968,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -993,6 +1046,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('isIgnoredRelation');
         $this->configProvider->expects(self::never())
             ->method('getConfig');
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -1076,6 +1134,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 )
             );
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -1170,6 +1233,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -1249,6 +1317,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -1311,6 +1384,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->configProvider->expects(self::never())
             ->method('getConfig');
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -1329,6 +1407,9 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testCompleteDefinitionForAssociationToOverriddenEntity()
     {
         $config = $this->createConfigObject([
@@ -1400,6 +1481,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -1468,13 +1554,19 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(TestEnumValue::class)
             ->willReturn(null);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(TestEnumValue::class)
+            ->willReturn(true);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
             [
-                'hints'                  => ['HINT_TRANSLATABLE'],
-                'identifier_field_names' => ['id'],
-                'fields'                 => [
+                'disable_meta_properties' => true,
+                'hints'                   => ['HINT_TRANSLATABLE'],
+                'identifier_field_names'  => ['id'],
+                'fields'                  => [
                     'id'     => null,
                     'field1' => null
                 ]
@@ -1527,13 +1619,19 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(TestEnumValue::class)
             ->willReturn(null);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(TestEnumValue::class)
+            ->willReturn(true);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
             [
-                'hints'                  => ['HINT_TRANSLATABLE'],
-                'identifier_field_names' => ['id'],
-                'fields'                 => [
+                'disable_meta_properties' => true,
+                'hints'                   => ['HINT_TRANSLATABLE'],
+                'identifier_field_names'  => ['id'],
+                'fields'                  => [
                     'id'     => null,
                     'field1' => null
                 ]
@@ -1545,8 +1643,9 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     public function testCompleteDefinitionForTranslatableEntityWhenTranslatableHintDisabled()
     {
         $config = $this->createConfigObject([
-            'hints'  => ['name' => 'HINT_TRANSLATABLE', 'value' => false],
-            'fields' => [
+            'disable_meta_properties' => false,
+            'hints'                   => ['name' => 'HINT_TRANSLATABLE', 'value' => false],
+            'fields'                  => [
                 'field1' => null
             ]
         ]);
@@ -1585,6 +1684,9 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getSubstituteEntityClass')
             ->with(TestEnumValue::class)
             ->willReturn(null);
+
+        $this->dictionaryProvider->expects(self::never())
+            ->method('isSupportedEntityClass');
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -1631,6 +1733,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -1674,6 +1781,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -1715,6 +1827,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -1758,6 +1875,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -1792,6 +1914,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -1825,6 +1952,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -1863,6 +1995,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -1903,6 +2040,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -1948,6 +2090,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
@@ -1978,6 +2125,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->configProvider->expects(self::never())
             ->method('getConfig');
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -2028,6 +2180,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->configProvider->expects(self::never())
             ->method('getConfig');
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -2075,6 +2232,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->configProvider->expects(self::never())
             ->method('getConfig');
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -2145,6 +2307,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -2203,6 +2370,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -2361,6 +2533,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
@@ -2399,6 +2576,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
@@ -2619,6 +2801,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -2694,6 +2881,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -2802,6 +2994,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -2819,6 +3016,9 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testCustomFieldsExclusionPolicyForAssociationOfNonConfigurableEntity()
     {
         $config = $this->createConfigObject([
@@ -2892,6 +3092,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 )
             );
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -2999,6 +3204,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 )
             );
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -3112,6 +3322,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 )
             );
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -3235,6 +3450,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 )
             );
 
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
         $this->assertConfig(
@@ -3335,6 +3555,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->configProvider->expects(self::never())
             ->method('getConfig');
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
@@ -3450,6 +3675,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 )
             );
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
 
