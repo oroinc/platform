@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-17886
 @fixture-OroUserBundle:AdditionalUsersFixture.yml
 Feature: Clone report

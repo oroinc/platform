@@ -1,3 +1,4 @@
+@regression
 @ticket-CRM-9335
 @fixture-OroUserBundle:second-admin.yml
 Feature: Private emails visibility

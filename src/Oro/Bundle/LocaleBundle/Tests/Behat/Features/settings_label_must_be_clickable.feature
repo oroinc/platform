@@ -1,3 +1,4 @@
+@regression
 Feature: Settings label must be clickable
 
   Scenario: Click by settings label must change status of the appropriate checkbox

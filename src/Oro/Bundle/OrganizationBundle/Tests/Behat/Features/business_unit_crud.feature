@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-13745
 @automatically-ticket-tagged
 Feature: Business Unit crud

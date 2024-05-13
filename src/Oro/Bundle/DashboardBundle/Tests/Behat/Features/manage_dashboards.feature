@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-11233
 @automatically-ticket-tagged
 @ticket-BAP-21510

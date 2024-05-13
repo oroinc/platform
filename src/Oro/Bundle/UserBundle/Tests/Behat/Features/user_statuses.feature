@@ -1,3 +1,4 @@
+@regression
 Feature: User statuses
   In order to allow or deny users to login
   As Administrator

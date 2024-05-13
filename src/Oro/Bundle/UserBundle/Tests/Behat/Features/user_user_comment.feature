@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-11224
 @automatically-ticket-tagged
 Feature: User user comment

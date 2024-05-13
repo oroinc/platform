@@ -1,3 +1,4 @@
+@regression
 @ticket-BB-13983
 @fixture-OroTranslationBundle:PluralTranslationsManagementFixture.yml
 
