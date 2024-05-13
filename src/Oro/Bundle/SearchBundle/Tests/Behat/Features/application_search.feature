@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-11236
 @automatically-ticket-tagged
 @fixture-OroSearchBundle:searchEntities.yml

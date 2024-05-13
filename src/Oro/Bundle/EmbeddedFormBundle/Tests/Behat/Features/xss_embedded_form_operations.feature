@@ -1,3 +1,4 @@
+@regression
 @waf-skip
 Feature: Xss embedded form operations
 

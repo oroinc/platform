@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-17600
 @fixture-OroUserBundle:user.yml
 Feature:  DataAudit labels are translated

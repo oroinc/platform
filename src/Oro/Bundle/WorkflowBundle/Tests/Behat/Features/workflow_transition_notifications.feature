@@ -1,3 +1,4 @@
+@regression
 @fixture-OroWorkflowBundle:UserWorkflowFixture.yml
 Feature: Workflow transition notifications
   In order to check notifications for workflow transitions

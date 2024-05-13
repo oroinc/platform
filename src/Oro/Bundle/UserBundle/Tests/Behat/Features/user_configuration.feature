@@ -1,4 +1,3 @@
-@regression
 @ticket-BB-6429
 @automatically-ticket-tagged
 Feature: User configuration

@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-12990
 @automatically-ticket-tagged
 Feature: Configure application URL

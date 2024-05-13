@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-13987
 @fixture-OroEmailBundle:other_users_emails_displayed_in_grid_in_my_emails_page.yml
 

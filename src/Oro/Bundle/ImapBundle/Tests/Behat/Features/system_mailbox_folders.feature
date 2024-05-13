@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-21500
 @fixture-OroImapBundle:system-mailbox.yml
 

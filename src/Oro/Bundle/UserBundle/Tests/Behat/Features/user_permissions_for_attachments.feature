@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-18637
 @fixture-OroUserBundle:user_permissions_for_attachments.yml
 

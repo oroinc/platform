@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-15030
 @fixture-OroWorkflowBundle:WorkflowLabelsFixture.yml
 Feature: Status labels on workflow view page

@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-9607
 @fixture-OroDataGridBundle:groups_data.yml
 
