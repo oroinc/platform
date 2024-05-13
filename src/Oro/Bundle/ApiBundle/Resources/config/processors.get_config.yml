@@ -37,6 +37,7 @@ services:
             - '@oro_api.entity_exclusion_provider_registry'
             - '@oro_api.expanded_association_extractor'
             - '@oro_api.entity_field_filtering_helper'
+            - '@oro_entity.dictionary_value_list_provider'
 
     oro_api.complete_definition_helper.object:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteObjectDefinitionHelper

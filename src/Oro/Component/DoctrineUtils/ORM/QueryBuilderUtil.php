@@ -124,16 +124,16 @@ class QueryBuilderUtil
     public static function getSingleRootAlias(QueryBuilder $qb, $throwException = true)
     {
         $rootAliases = $qb->getRootAliases();
-        if (count($rootAliases) === 1) {
+        if (\count($rootAliases) === 1) {
             return $rootAliases[0];
         }
 
         if ($throwException) {
             throw new QueryException(sprintf(
                 'Can\'t get single root alias for the given query. Reason: %s.',
-                count($rootAliases) === 0
+                \count($rootAliases) === 0
                     ? 'the query has no any root aliases'
-                    : sprintf('the query has several root aliases: %s.', implode(', ', $rootAliases))
+                    : sprintf('the query has several root aliases: %s', implode(', ', $rootAliases))
             ));
         }
 
@@ -153,16 +153,16 @@ class QueryBuilderUtil
     public static function getSingleRootEntity(QueryBuilder $qb, $throwException = true)
     {
         $rootEntities = $qb->getRootEntities();
-        if (count($rootEntities) === 1) {
+        if (\count($rootEntities) === 1) {
             return $rootEntities[0];
         }
 
         if ($throwException) {
             throw new QueryException(sprintf(
                 'Can\'t get single root entity for the given query. Reason: %s.',
-                count($rootEntities) === 0
+                \count($rootEntities) === 0
                     ? 'the query has no any root entities'
-                    : sprintf('the query has several root entities: %s.', implode(', ', $rootEntities))
+                    : sprintf('the query has several root entities: %s', implode(', ', $rootEntities))
             ));
         }
 

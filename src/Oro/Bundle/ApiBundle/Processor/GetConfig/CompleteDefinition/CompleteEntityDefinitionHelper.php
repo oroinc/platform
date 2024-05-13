@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Gedmo\Translatable\Translatable;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
@@ -21,6 +22,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityFieldFilteringHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 
 /**
  * The helper class to complete the configuration of API resource based on ORM entity.
@@ -37,6 +39,7 @@ class CompleteEntityDefinitionHelper
     private ExclusionProviderRegistry $exclusionProviderRegistry;
     private ExpandedAssociationExtractor $expandedAssociationExtractor;
     private EntityFieldFilteringHelper $entityFieldFilteringHelper;
+    private ChainDictionaryValueListProvider $dictionaryProvider;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -46,7 +49,8 @@ class CompleteEntityDefinitionHelper
         CompleteCustomDataTypeHelper $customDataTypeHelper,
         ExclusionProviderRegistry $exclusionProviderRegistry,
         ExpandedAssociationExtractor $expandedAssociationExtractor,
-        EntityFieldFilteringHelper $entityFieldFilteringHelper
+        EntityFieldFilteringHelper $entityFieldFilteringHelper,
+        ChainDictionaryValueListProvider $dictionaryProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
@@ -56,6 +60,7 @@ class CompleteEntityDefinitionHelper
         $this->exclusionProviderRegistry = $exclusionProviderRegistry;
         $this->expandedAssociationExtractor = $expandedAssociationExtractor;
         $this->entityFieldFilteringHelper = $entityFieldFilteringHelper;
+        $this->dictionaryProvider = $dictionaryProvider;
     }
 
     public function completeDefinition(
@@ -112,7 +117,13 @@ class CompleteEntityDefinitionHelper
                 $version,
                 $requestType
             );
+            $this->completeTranslatableHint(
+                $entityOverrideProvider,
+                $definition,
+                $metadata
+            );
         }
+        $this->completeDisableMetaProperties($definition, $metadata);
         // make sure that identifier field names are set
         $idFieldNames = $definition->getIdentifierFieldNames();
         if (empty($idFieldNames)) {
@@ -715,5 +726,35 @@ class CompleteEntityDefinitionHelper
         }
 
         return $field;
+    }
+
+    private function completeTranslatableHint(
+        EntityOverrideProviderInterface $entityOverrideProvider,
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata
+    ): void {
+        $resolvedEntityClass = $this->resolveEntityClass($metadata->name, $entityOverrideProvider);
+        if (is_subclass_of($resolvedEntityClass, Translatable::class)) {
+            $hasTranslatableHint = false;
+            $hints = $definition->getHints();
+            foreach ($hints as $hint) {
+                if ('HINT_TRANSLATABLE' === (\is_string($hint) ? $hint : $hint['name'])) {
+                    $hasTranslatableHint = true;
+                    break;
+                }
+            }
+            if (!$hasTranslatableHint) {
+                $definition->addHint('HINT_TRANSLATABLE');
+            }
+        }
+    }
+
+    private function completeDisableMetaProperties(EntityDefinitionConfig $definition, ClassMetadata $metadata): void
+    {
+        if (!$definition->hasDisableMetaProperties()
+            && $this->dictionaryProvider->isSupportedEntityClass($metadata->name)
+        ) {
+            $definition->disableMetaProperties();
+        }
     }
 }
