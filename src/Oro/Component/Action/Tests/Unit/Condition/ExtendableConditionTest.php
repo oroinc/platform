@@ -4,45 +4,27 @@ namespace Oro\Component\Action\Tests\Unit\Condition;
 
 use Oro\Component\Action\Condition\ExtendableCondition;
 use Oro\Component\Action\Event\ExtendableConditionEvent;
+use Oro\Component\Action\Model\ExtendableConditionEventErrorsProcessorInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var FlashBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $flashBag;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ExtendableCondition */
-    private $extendableCondition;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
+    private ExtendableConditionEventErrorsProcessorInterface|MockObject $errorsProcessor;
+    private ExtendableCondition $extendableCondition;
 
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->flashBag = $this->createMock(FlashBag::class);
-        $session = $this->createMock(Session::class);
-        $session->method('getFlashBag')
-            ->willReturn($this->flashBag);
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->method('getSession')
-            ->willReturn($session);
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->errorsProcessor = $this->createMock(ExtendableConditionEventErrorsProcessorInterface::class);
 
         $this->extendableCondition = new ExtendableCondition(
             $this->eventDispatcher,
-            $requestStack,
-            $this->translator
+            $this->errorsProcessor
         );
         $this->extendableCondition->setContextAccessor(new ContextAccessor());
     }
@@ -89,10 +71,8 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectsDispatchWithErrors(array_merge(['events' => ['aaa']], $options));
 
-        $this->translator->expects($this->exactly(2))
-            ->method('trans');
-        $this->flashBag->expects($this->never())
-            ->method('add');
+        $this->errorsProcessor->expects($this->once())
+            ->method('processErrors');
 
         $this->assertFalse($this->extendableCondition->isConditionAllowed($context));
     }
@@ -131,15 +111,23 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
     ): void {
         $this->expectsDispatchWithErrors(array_merge(['events' => ['aaa']], $options));
 
-        $this->translator->expects($this->exactly(2))
-            ->method('trans')
-            ->withConsecutive(['First error'], ['Second error'])
-            ->willReturnOnConsecutiveCalls('Translated first error', 'Translated second error');
-        $this->flashBag->expects($this->exactly(2))
-            ->method('add')
-            ->withConsecutive(
-                [$expectedMessageType, 'Translated first error'],
-                [$expectedMessageType, 'Translated second error']
+        $this->errorsProcessor->expects($this->once())
+            ->method('processErrors')
+            ->willReturnCallback(
+                function ($event, $showErrors, $errorsCollection, $messageType) use ($expectedMessageType) {
+                    self::assertInstanceOf(ExtendableConditionEvent::class, $event);
+                    self::assertEquals(
+                        [
+                            ['message' => 'First error', 'context' => null],
+                            ['message' => 'Second error', 'context' => null],
+                        ],
+                        $event->getErrors()->toArray()
+                    );
+                    self::assertTrue($showErrors);
+                    self::assertEquals($expectedMessageType, $messageType);
+
+                    return [];
+                }
             );
 
         $this->assertFalse($this->extendableCondition->isConditionAllowed($context));

@@ -19,6 +19,8 @@ use Oro\Bundle\WorkflowBundle\Model\EntityAwareInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Component\Action\Model\AbstractStorage;
+use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
 
 /**
  * Workflow item
@@ -42,7 +44,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
         'attachment' => ['immutable' => true]
     ]
 )]
-class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
+class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface, ActionDataStorageAwareInterface
 {
     use ExtendEntityTrait;
 
@@ -686,6 +688,11 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
         $this->getResult()->set('redirectUrl', $url);
 
         return $this;
+    }
+
+    public function getActionDataStorage(): AbstractStorage
+    {
+        return $this->getData();
     }
 
     /**

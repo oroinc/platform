@@ -3,24 +3,44 @@
 namespace Oro\Component\Action\Action;
 
 use Oro\Component\Action\Event\ExtendableActionEvent;
-use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Event\ExtendableEventData;
+use Oro\Component\Action\Model\AbstractStorage;
+use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Triggers given event.
+ *
+ * Usage:
+ *
+ * @extendable:
+ *     events: ['extendable_condition.shopping_list_start']
+ *     eventData: { 'entity': $.someEntity }
+ */
 class ExtendableAction extends AbstractAction
 {
-    const NAME = 'extendable';
+    public const NAME = 'extendable';
 
     /**
-     * @var string[]
+     * @var string[]|PropertyPathInterface
      */
     protected $subscribedEvents;
+
+    /**
+     * @var array|PropertyPathInterface|null
+     */
+    protected $eventData;
 
     /**
      * {@inheritDoc}
      */
     protected function executeAction($context)
     {
-        $event = new ExtendableActionEvent($context);
-        foreach ($this->subscribedEvents as $eventName) {
+        $eventData = $this->getEventData($context);
+        $event = new ExtendableActionEvent($eventData);
+        $subscribeEvents = $this->contextAccessor->getValue($context, $this->subscribedEvents);
+        foreach ($subscribeEvents as $eventName) {
             if (!$this->eventDispatcher->hasListeners($eventName)) {
                 continue;
             }
@@ -29,25 +49,41 @@ class ExtendableAction extends AbstractAction
         }
     }
 
+    private function getEventData($context): AbstractStorage
+    {
+        if ($this->eventData) {
+            return new ExtendableEventData($this->contextAccessor->getValue($context, $this->eventData));
+        }
+        if ($context instanceof ActionDataStorageAwareInterface) {
+            return $context->getActionDataStorage();
+        }
+        if ($context instanceof AbstractStorage) {
+            return $context;
+        }
+        if (\is_array($context)) {
+            return new ExtendableEventData($context);
+        }
+
+        throw new \RuntimeException('Unsupported context given');
+    }
+
     /**
      * {@inheritDoc}
      */
     public function initialize(array $options)
     {
-        if (!array_key_exists('events', $options)) {
-            throw new InvalidParameterException('The required option "events" is missing.');
-        }
+        $optionsResolver = new OptionsResolver();
+        $optionsResolver->setRequired('events');
+        $optionsResolver->setAllowedTypes('events', ['array', PropertyPathInterface::class]);
 
-        if (!is_array($options['events'])) {
-            throw new InvalidParameterException(
-                sprintf(
-                    'The option "events" is expected to be of type "array", "%s" given.',
-                    gettype($options['events'])
-                )
-            );
-        }
+        $optionsResolver->setDefined('eventData');
+        $optionsResolver->setDefault('eventData', null);
+        $optionsResolver->setAllowedTypes('eventData', ['array', PropertyPathInterface::class, 'null']);
 
-        $this->subscribedEvents = $options['events'];
+        $resolvedOptions = $optionsResolver->resolve($options);
+
+        $this->subscribedEvents = $resolvedOptions['events'];
+        $this->eventData = $resolvedOptions['eventData'];
 
         return $this;
     }

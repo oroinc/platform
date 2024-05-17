@@ -3,20 +3,24 @@
 namespace Oro\Component\Action\Condition;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
+use Oro\Component\Action\Event\ExtendableEventData;
+use Oro\Component\Action\Model\AbstractStorage;
+use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
+use Oro\Component\Action\Model\ExtendableConditionEventErrorsProcessorInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
- * Checks if the event has errors.
+ * Checks that condition is allowed when all listeners add no data to the event object.
  *
  * Usage:
  *
  * @extendable:
  *     events: [extendable_condition.shopping_list_start]
+ *     eventData: { 'entity': $.someEntity }
  *     showErrors: true
  *     messageType: 'error'
  */
@@ -24,24 +28,8 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
 {
     use ContextAccessorAwareTrait;
 
-    const DEFAULT_MESSAGE_TYPE = 'error';
-
-    const NAME = 'extendable';
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    public const DEFAULT_MESSAGE_TYPE = 'error';
+    public const NAME = 'extendable';
 
     /**
      * @var OptionsResolver
@@ -49,18 +37,29 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     private $optionsResolver;
 
     /**
-     * @var array
+     * @var string[]|PropertyPathInterface
      */
-    private $options;
+    private $subscribedEvents;
+
+    /**
+     * @var array|PropertyPathInterface|null
+     */
+    private $eventData;
+
+    /**
+     * @var string|PropertyPathInterface
+     */
+    private $messageType;
+
+    /**
+     * @var bool|PropertyPathInterface
+     */
+    private $showErrors;
 
     public function __construct(
-        EventDispatcherInterface $eventDispatcher,
-        RequestStack $requestStack,
-        TranslatorInterface $translator
+        private EventDispatcherInterface $eventDispatcher,
+        private ExtendableConditionEventErrorsProcessorInterface $errorsProcessor
     ) {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->requestStack = $requestStack;
-        $this->translator = $translator;
     }
 
     /**
@@ -68,8 +67,11 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
      */
     public function isConditionAllowed($context)
     {
-        $event = new ExtendableConditionEvent($context);
-        foreach ($this->options['events'] as $eventName) {
+        $eventData = $this->getEventData($context);
+        $event = new ExtendableConditionEvent($eventData);
+
+        $subscribeEvents = $this->contextAccessor->getValue($context, $this->subscribedEvents);
+        foreach ($subscribeEvents as $eventName) {
             if (!$this->eventDispatcher->hasListeners($eventName)) {
                 continue;
             }
@@ -78,12 +80,30 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         }
 
         if ($event->hasErrors()) {
-            $this->processErrors($event);
+            $this->processErrors($context, $event);
 
             return false;
         }
 
         return true;
+    }
+
+    private function getEventData($context): AbstractStorage
+    {
+        if ($this->eventData) {
+            return new ExtendableEventData($this->contextAccessor->getValue($context, $this->eventData));
+        }
+        if ($context instanceof ActionDataStorageAwareInterface) {
+            return $context->getActionDataStorage();
+        }
+        if ($context instanceof AbstractStorage) {
+            return $context;
+        }
+        if (\is_array($context)) {
+            return new ExtendableEventData($context);
+        }
+
+        throw new \RuntimeException('Unsupported context given');
     }
 
     /**
@@ -104,15 +124,24 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         $resolver = $this->getOptionsResolver();
         $this->configureOptions($resolver);
 
-        $this->options = $resolver->resolve($options);
+        $resolvedOptions = $resolver->resolve($options);
+
+        $this->subscribedEvents = $resolvedOptions['events'];
+        $this->eventData = $resolvedOptions['eventData'];
+        $this->messageType = $resolvedOptions['messageType'];
+        $this->showErrors = $resolvedOptions['showErrors'];
     }
 
-    private function configureOptions(OptionsResolver $resolver)
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('events');
         $resolver->setDefined(['messageType', 'showErrors']);
-        $resolver->setAllowedTypes('events', 'array');
-        $resolver->setAllowedTypes('messageType', 'string');
+        $resolver->setAllowedTypes('events', ['array', PropertyPathInterface::class]);
+        $resolver->setAllowedTypes('messageType', ['string', PropertyPathInterface::class]);
+
+        $resolver->setDefined('eventData');
+        $resolver->setDefault('eventData', null);
+        $resolver->setAllowedTypes('eventData', ['array', PropertyPathInterface::class, 'null']);
 
         $resolver->setDefaults([
             'showErrors' => false,
@@ -120,10 +149,7 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         ]);
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    private function getOptionsResolver()
+    private function getOptionsResolver(): OptionsResolver
     {
         if (!$this->optionsResolver) {
             $this->optionsResolver = new OptionsResolver();
@@ -132,23 +158,14 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         return $this->optionsResolver;
     }
 
-    protected function processErrors(ExtendableConditionEvent $event)
+    private function processErrors($context, ExtendableConditionEvent $event): void
     {
-        $errors = [];
-        foreach ($event->getErrors() as $error) {
-            $errors[] = $this->translator->trans($error['message']);
-            $this->errors[] = ['message' => $error['message'], 'parameters' => ($error['parameters'] ?? [])];
-        }
-
-        $showErrors = $this->contextAccessor->getValue($event->getContext(), $this->options['showErrors']);
-        if ($showErrors) {
-            foreach ($errors as $error) {
-                $this->requestStack?->getSession()?->getFlashBag()->add($this->options['messageType'], $error);
-            }
-        }
-
-        if ($event->getContext() instanceof \ArrayAccess) {
-            $event->getContext()->offsetSet('errors', $errors);
-        }
+        $translatedErrors = $this->errorsProcessor->processErrors(
+            $event,
+            (bool)$this->contextAccessor->getValue($context, $this->showErrors),
+            $this->errors,
+            (string)$this->contextAccessor->getValue($context, $this->messageType)
+        );
+        $event->getContext()?->offsetSet('errors', $translatedErrors);
     }
 }
