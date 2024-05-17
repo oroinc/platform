@@ -1,24 +1,25 @@
 /* @theme: default; */
 
 @mixin badge(
-    $badge-size:        26px,
-    $badge-f-size:      14px,
-    $badge-bg:          get-color('secondary', 'c1'),
-    $badge-radius:      50%,
-    $badge-color:       get-color('neutral', 'white-100'),
+    $badge-size:        18px,
+    $badge-f-size:      12px,
+    $badge-bg:          var(--badge-bg-color, get-var-color('primary', 'main')),
+    $badge-radius:      100px,
+    $badge-color:       var(--badge-color, get-var-color('neutral', 'white-100')),
     $badge-icon-align:  baseline,
     $badge-icon-offset: 0,
     $badge-icon-line-height: inherit
 ) {
-    display: inline-block;
-    vertical-align: middle;
-    width: $badge-size;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
     min-width: $badge-size;
-    height: $badge-size;
+
+    padding-inline: 5px;
 
     text-align: center;
     font-size: $badge-f-size;
-    line-height: $badge-size;
 
     background-color: $badge-bg;
     border-radius: $badge-radius;
