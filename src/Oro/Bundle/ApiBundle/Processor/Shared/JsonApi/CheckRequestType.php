@@ -149,11 +149,7 @@ class CheckRequestType extends BaseCheckRequestType
         foreach ($acceptHeaderValues as $value) {
             [$mediaType] = MediaTypeHeaderUtil::parseMediaType($value);
             if (self::JSON_API_MEDIA_TYPE !== $mediaType
-                && (
-                    '*/*' === $mediaType
-                    || 'application/*' === $mediaType
-                    || 'application/json' === $mediaType
-                )
+                && ('application/json' === $mediaType || 'application/*' === $mediaType || '*/*' === $mediaType)
             ) {
                 return true;
             }

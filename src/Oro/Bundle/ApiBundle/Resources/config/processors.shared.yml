@@ -26,6 +26,26 @@ services:
             - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: options, group: initialize, priority: 250 }
 
+    oro_api.validate_request_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\ValidateRequestType
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: delete, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: create, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: update, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: update_list, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: delete_relationship, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: add_relationship, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: update_relationship, group: initialize, requestType: rest&!json_api, priority: 240 }
+            - { name: oro.api.processor, action: options, group: initialize, requestType: rest&!json_api, priority: 240 }
+
     oro_api.validate_request_type_and_version:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion
         tags:
