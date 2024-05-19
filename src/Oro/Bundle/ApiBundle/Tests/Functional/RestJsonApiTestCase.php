@@ -54,6 +54,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         array $server = [],
         string $content = null
     ): Response {
+        $contentTypeHeaderValue = $server['CONTENT_TYPE'] ?? null;
         $this->checkTwigState();
         $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
@@ -96,9 +97,11 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             unset($parameters['filters']);
         }
 
-        $server['HTTP_ACCEPT'] = self::JSON_API_MEDIA_TYPE;
+        if (!\array_key_exists('HTTP_ACCEPT', $server)) {
+            $server['HTTP_ACCEPT'] = self::JSON_API_MEDIA_TYPE;
+        }
         if ('POST' === $method || 'PATCH' === $method || 'DELETE' === $method) {
-            $server['CONTENT_TYPE'] = self::JSON_API_CONTENT_TYPE;
+            $server['CONTENT_TYPE'] = $contentTypeHeaderValue ?? self::JSON_API_CONTENT_TYPE;
         } elseif (isset($server['CONTENT_TYPE'])) {
             unset($server['CONTENT_TYPE']);
         }
@@ -296,10 +299,6 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     protected function dumpYmlTemplate(?string $fileName, Response $response): void
     {
         $data = self::jsonToArray($response->getContent());
-        if (null === $data) {
-            throw new \RuntimeException('The response does not have the content.');
-        }
-
         if ($this->hasReferenceRepository()) {
             $idReferences = [];
             $doctrine = self::getContainer()->get('doctrine');
