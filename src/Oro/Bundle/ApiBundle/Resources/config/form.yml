@@ -125,6 +125,34 @@ services:
         tags:
             - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType }
 
+    oro_api.form.type.open_api_specification:
+        class: Oro\Bundle\ApiBundle\Form\Type\OpenApiSpecificationType
+        arguments:
+            - '@oro_api.open_api_choices_provider'
+        tags:
+            - { name: form.type, alias: oro_openapi_specification }
+
+    oro_api.form.type.open_api_specification_clone:
+        class: Oro\Bundle\ApiBundle\Form\Type\OpenApiSpecificationCloneType
+        arguments:
+            - '@oro_api.open_api_choices_provider'
+        tags:
+            - { name: form.type, alias: oro_openapi_specification_clone }
+
+    oro_api.form.type.open_api_specification_entities_select:
+        class: Oro\Bundle\ApiBundle\Form\Type\OpenApiSpecificationEntitiesSelectType
+        arguments:
+            - '@oro_api.autocomplete.open_api_specification_entity_provider'
+        tags:
+            - { name: form.type, alias: oro_openapi_specification_entities_select }
+
+    oro_api.form.type.open_api_specification_view_choice:
+        class: Oro\Bundle\ApiBundle\Form\Type\OpenApiSpecificationViewChoiceType
+        arguments:
+            - '@translator'
+        tags:
+            - { name: form.type, alias: oro_openapi_specification_view_choice }
+
     oro_api.validator.access_granted:
         class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator
         arguments:

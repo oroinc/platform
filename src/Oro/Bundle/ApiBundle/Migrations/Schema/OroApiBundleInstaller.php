@@ -19,7 +19,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
      */
     public function getMigrationVersion(): string
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -28,18 +28,20 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
-        $this->createOroApiAsyncOperationTable($schema);
-        $this->createOroApiAsyncDataTable($schema);
+        $this->createAsyncOperationTable($schema);
+        $this->createAsyncDataTable($schema);
         $this->createBatchApiLockTable($schema);
+        $this->createOpenApiSpecificationTable($schema);
 
         /** Foreign keys generation **/
-        $this->addOroApiAsyncOperationForeignKeys($schema);
+        $this->addAsyncOperationForeignKeys($schema);
+        $this->addOpenApiSpecificationForeignKeys($schema);
     }
 
     /**
      * Create oro_api_async_operation table
      */
-    private function createOroApiAsyncOperationTable(Schema $schema): void
+    private function createAsyncOperationTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_api_async_operation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -64,7 +66,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     /**
      * Create oro_api_async_data table
      */
-    private function createOroApiAsyncDataTable(Schema $schema): void
+    private function createAsyncDataTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_api_async_data');
         $table->addColumn('name', 'string', ['length' => 255]);
@@ -91,11 +93,56 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     }
 
     /**
+     * Create oro_api_openapi_specification table
+     */
+    private function createOpenApiSpecificationTable(Schema $schema): void
+    {
+        $table = $schema->createTable('oro_api_openapi_specification');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('status', 'string', ['length' => 8]);
+        $table->addColumn('published', 'boolean');
+        $table->addColumn('created_at', 'datetime');
+        $table->addColumn('updated_at', 'datetime');
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('public_slug', 'string', ['length' => 100, 'notnull' => false]);
+        $table->addColumn('view', 'string', ['length' => 100]);
+        $table->addColumn('format', 'string', ['length' => 20]);
+        $table->addColumn('entities', 'simple_array', ['comment' => '(DC2Type:simple_array)', 'notnull' => false]);
+        $table->addColumn('specification', 'text', ['notnull' => false]);
+        $table->addColumn('specification_created_at', 'datetime', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['organization_id'], 'IDX_9AE6DA3A32C8A3DE');
+        $table->addIndex(['user_owner_id'], 'IDX_9AE6DA3A9EB185F9');
+    }
+
+    /**
      * Add oro_api_async_operation foreign keys.
      */
-    private function addOroApiAsyncOperationForeignKeys(Schema $schema): void
+    private function addAsyncOperationForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_api_async_operation');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_owner_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add oro_api_openapi_specification foreign keys.
+     */
+    private function addOpenApiSpecificationForeignKeys(Schema $schema): void
+    {
+        $table = $schema->getTable('oro_api_openapi_specification');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],

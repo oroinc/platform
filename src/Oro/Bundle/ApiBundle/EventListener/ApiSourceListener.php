@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
+use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
 
 /**
@@ -10,9 +11,9 @@ use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
  */
 class ApiSourceListener
 {
+    use OpenApiSourceListenerTrait;
+
     private CacheManager $cacheManager;
-    /** @var string[] */
-    private array $excludedFeatures;
 
     /**
      * @param CacheManager $cacheManager
@@ -32,15 +33,14 @@ class ApiSourceListener
 
     public function onFeaturesChange(FeaturesChange $event): void
     {
-        // do not clear the cache if only excluded features are changed
-        $numberOfChangedExcludedFeatures = 0;
-        $changeSet = $event->getChangeSet();
-        foreach ($this->excludedFeatures as $featureName) {
-            if (\array_key_exists($featureName, $changeSet)) {
-                $numberOfChangedExcludedFeatures++;
-            }
+        if ($this->isApplicableFeaturesChanged($event)) {
+            $this->clearCache();
         }
-        if (0 === $numberOfChangedExcludedFeatures || \count($changeSet) > $numberOfChangedExcludedFeatures) {
+    }
+
+    public function onEntityConfigPostFlush(PostFlushConfigEvent $event): void
+    {
+        if ($this->isApplicableEntityConfigsChanged($event)) {
             $this->clearCache();
         }
     }

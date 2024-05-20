@@ -1,0 +1,166 @@
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroUser/macros.html.twig' as U %}
+
+{% oro_title_set({params : {"%form.title%": entity.name }}) %}
+
+{% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {% if entity.specificationCreatedAt is not null %}
+        {{ UI.button({
+            'path': path('oro_openapi_specification_download', {'id': entity.id}),
+            'aCss': 'no-hash',
+            'iCss': 'fa-download',
+            'target': '_blank',
+            'label': 'oro.api.open_api.specification.download_button.label'|trans,
+            'title': 'oro.api.open_api.specification.download_button.tooltip'|trans
+        }) }}
+    {% endif %}
+    {% if not entity.published and entity.specificationCreatedAt %}
+        {% set publishType = entity.publicSlug ? 'public' : 'private' %}
+        {{ UI.clientButton({
+            'dataUrl': path('oro_openapi_specification_publish', {'id': entity.id}),
+            'dataAttributes': {
+                'page-component-module': 'oroui/js/app/components/post-button',
+                'page-component-options': {'reloadRequired': true}
+            },
+            'iCss': 'fa-share-square-o',
+            'aCss' : 'no-hash',
+            'label': ('oro.api.open_api.specification.publish_' ~ publishType ~ '_button.label')|trans,
+            'title': ('oro.api.open_api.specification.publish_' ~ publishType ~ '_button.tooltip')|trans
+        }) }}
+    {% endif %}
+    {% if not entity.published and is_granted('EDIT', entity) %}
+        {{ UI.editButton({
+            'path' : path('oro_openapi_specification_update', { id: entity.id }),
+            'entity_label': 'oro.api.openapispecification.entity_label'|trans
+        }) }}
+    {% endif %}
+
+    {% set moreButtons %}
+        {% if entity.status != constant('Oro\\Bundle\\ApiBundle\\Entity\\OpenApiSpecification::STATUS_CREATING') and is_granted('oro_openapi_specification_create') %}
+            {{ UI.clientLink({
+                'dataUrl': path('oro_openapi_specification_renew', {'id': entity.id}),
+                'dataAttributes': {
+                    'page-component-module': 'oroui/js/app/components/post-button',
+                    'page-component-options': {'reloadRequired': true}
+                },
+                'iCss': 'fa-refresh',
+                'aCss' : 'no-hash dropdown-item',
+                'label': 'oro.api.open_api.specification.renew_button.label'|trans,
+                'title': 'oro.api.open_api.specification.renew_button.tooltip'|trans
+            }) }}
+        {% endif %}
+        {% if is_granted('oro_openapi_specification_create') %}
+            {{ UI.link({
+                'path' : path('oro_openapi_specification_clone', { id: entity.id }),
+                'iCss': 'fa-files-o',
+                'aCss': 'dropdown-item',
+                'label': 'oro.api.open_api.specification.clone_button.label'|trans,
+                'title': 'oro.api.open_api.specification.clone_button.tooltip'|trans
+            }) }}
+        {% endif %}
+        {% if is_granted('DELETE', entity) %}
+            {{ UI.deleteLink({
+                'dataUrl': path('oro_openapi_specification_delete', { id: entity.id }),
+                'dataRedirect': path('oro_openapi_specification_index'),
+                'aCss': 'no-hash remove-button dropdown-item',
+                'entity_label': 'oro.api.openapispecification.entity_label'|trans
+            }) }}
+        {% endif %}
+    {% endset %}
+    {{ UI.dropdownButton({
+        'label': 'oro.ui.dropdown_option_aria_label'|trans,
+        'html': moreButtons
+    }) }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_openapi_specification_index'),
+        'indexLabel': 'oro.api.openapispecification.entity_plural_label'|trans,
+        'entityTitle': entity.name
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block breadcrumbs %}
+    {% import '@OroApi/OpenApiSpecification/macros.html.twig' as OpenApiSpecification %}
+
+    {{ parent() }}
+    <span class="page-title__status">
+        {{ OpenApiSpecification.openapi_specification_status(entity.status, entity.published) }}
+    </span>
+{% endblock breadcrumbs %}
+
+{% block stats %}
+    {{ parent() }}
+    {% if entity.specificationCreatedAt is not null %}
+        <li>{{ 'oro.api.openapispecification.specification_created_at.label'|trans }}: {{ entity.specificationCreatedAt|oro_format_datetime }}</li>
+    {% endif %}
+{% endblock stats %}
+
+{% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {%- if entity.publicSlug -%}
+        {%- if entity.specificationCreatedAt and entity.published -%}
+            {%- set publicUrl = url('oro_public_openapi_specification_download', {organizationId: entity.organization.id, slug: entity.publicSlug}) -%}
+            {%- set publicUrlId = 'public-slug-' ~ entity.id -%}
+            {%- set publicSlug -%}
+                {{- UI.link({
+                    'path' : publicUrl,
+                    'label': entity.publicSlug,
+                    'title': publicUrl,
+                    'aCss': 'no-hash text-nowrap',
+                    'target': '_blank'
+                }) -}}
+                <span class="hide" id="{{ publicUrlId }}">{{ publicUrl }}</span>
+                {{- UI.clientLink({
+                    aCss: 'btn btn-icon btn-icon-sm',
+                    iCss: 'fa-copy',
+                    title: 'oro.api.open_api.specification.copy_public_url_to_clipboard_button.label'|trans,
+                    labelInIcon: false,
+                    pageComponent: {
+                        view: {
+                            view: 'oroui/js/app/views/element-value-copy-to-clipboard-view',
+                            elementSelector: '#' ~ publicUrlId
+                        }
+                    }
+                }) -}}
+            {%- endset -%}
+        {%- else -%}
+            {%- set publicSlug -%}
+                <span class="text-nowrap">{{ entity.publicSlug }}</span>
+            {%- endset -%}
+        {%- endif -%}
+    {%- endif -%}
+    {%- set openApiSpecificationInformation -%}
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderProperty('oro.api.openapispecification.name.label'|trans, entity.name) }}
+                {{ UI.renderHtmlProperty('oro.api.openapispecification.public_slug.label'|trans, publicSlug|default('')) }}
+                {{ UI.renderHtmlProperty('oro.api.openapispecification.owner.label'|trans, U.render_user_name(entity.owner)) }}
+                {{ UI.renderProperty('oro.api.openapispecification.format.label'|trans, entity.format|oro_open_api_format) }}
+                {{ UI.renderProperty('oro.api.openapispecification.view.label'|trans, entity.view|oro_open_api_view) }}
+                {{ UI.renderHtmlProperty('oro.api.openapispecification.entities.label'|trans, entity.entities|oro_open_api_entities(entity.view)) }}
+            </div>
+        </div>
+    {%- endset -%}
+
+    {% set dataBlocks = [
+        {
+            'title': 'General Information'|trans,
+            'subblocks': [
+                {'data' : [openApiSpecificationInformation]}
+            ]
+        }
+    ] %}
+
+    {% set id = 'openapispecification-view' %}
+    {% set data = { 'dataBlocks': dataBlocks } %}
+
+    {{ parent() }}
+{% endblock content_data %}

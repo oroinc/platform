@@ -17,12 +17,18 @@ $label-theme-warning: (
     'color': $warning-darken
 ) !default;
 
+$label-theme-danger: (
+    'background': $danger,
+    'color': $danger-ultra-light
+) !default;
+
 $label-theme-keys: () !default;
 $label-theme-keys: map.merge(
     (
         'success': $label-theme-success,
         'info': $label-theme-info,
-        'warning': $label-theme-warning
+        'warning': $label-theme-warning,
+        'danger': $label-theme-danger
     ),
     $label-theme-keys
 );

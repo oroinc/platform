@@ -36,6 +36,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const FILE_LOCATOR_SERVICE = 'file_locator';
     private const DOCUMENTATION_PROVIDER_SERVICE = 'oro_api.api_doc.documentation_provider';
     private const API_SOURCE_LISTENER_SERVICE = 'oro_api.listener.api_source';
+    private const OPEN_API_SOURCE_LISTENER_SERVICE = 'oro_api.listener.api_source.open_api';
     private const API_CACHE_MANAGER_SERVICE = 'oro_api.cache_manager';
     private const TWIG = 'twig';
 
@@ -168,6 +169,8 @@ class ApiDocCompilerPass implements CompilerPassInterface
     {
         $config = DependencyInjectionUtil::getConfig($container);
         $container->getDefinition(self::API_SOURCE_LISTENER_SERVICE)
+            ->setArgument('$excludedFeatures', $config['api_doc_cache']['excluded_features']);
+        $container->getDefinition(self::OPEN_API_SOURCE_LISTENER_SERVICE)
             ->setArgument('$excludedFeatures', $config['api_doc_cache']['excluded_features']);
     }
 

@@ -6,3 +6,23 @@ features:
         routes:
             - nelmio_api_doc_index
             - oro_rest_api_doc_resource
+
+    manage_openapi_specifications:
+        label: oro.api.feature.manage_openapi_specifications.label
+        description: oro.api.feature.manage_openapi_specifications.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_openapi_specification_index
+            - oro_openapi_specification_view
+            - oro_openapi_specification_create
+            - oro_openapi_specification_update
+            - oro_openapi_specification_delete
+            - oro_openapi_specification_clone
+            - oro_openapi_specification_renew
+            - oro_openapi_specification_publish
+            - oro_openapi_specification_download
+            - oro_public_openapi_specification_download
+        entities:
+            - Oro\Bundle\ApiBundle\Entity\OpenApiSpecification
+        navigation_items:
+            - application_menu.system_tab.integrations_submenu.openapi_specifications

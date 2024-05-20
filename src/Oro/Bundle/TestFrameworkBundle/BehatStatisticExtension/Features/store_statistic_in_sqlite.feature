@@ -1,7 +1,7 @@
 Feature: Store statistic in sqlite
-  In order to to store and process behat tests execution time
-  As a develper
-  I shold have statistic in persistent layer as sqlite
+  In order to store and process behat tests execution time
+  As a developer
+  I should have statistic in persistent layer as sqlite
 
   Background: Setup statistic extension
     Given enabled Extension in behat.yml:

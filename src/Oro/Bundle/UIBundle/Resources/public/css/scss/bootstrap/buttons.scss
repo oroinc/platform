@@ -98,6 +98,16 @@ fieldset:disabled a.btn {
             }
         }
     }
+
+    &-sm {
+        width: $btn-icon-small-width;
+        height: $btn-icon-small-height;
+
+        [class^='fa-'],
+        [class*=' fa-'] {
+            font-size: $btn-icon-small-font-size;
+        }
+    }
 }
 
 /*
