@@ -26,20 +26,20 @@ $checkbox-icon-opacity: 0 !default;
 $checkbox-icon-opacity-checked: 1 !default;
 
 // Checked
-$checkbox-background-checked: get-var-color('primary', 'main') !default;
-$checkbox-border-color-checked: get-var-color('primary', 'main') !default;
+$checkbox-background-checked: var(--checkbox-skin-color, get-var-color('primary', 'main')) !default;
+$checkbox-border-color-checked: var(--checkbox-skin-color, get-var-color('primary', 'main')) !default;
 
 // Indeterminate
-$checkbox-background-indeterminate: get-var-color('primary', 'main') !default;
-$checkbox-border-color-indeterminate: get-var-color('primary', 'main') !default;
+$checkbox-background-indeterminate: var(--checkbox-skin-color, get-var-color('primary', 'main')) !default;
+$checkbox-border-color-indeterminate: var(--checkbox-skin-color, get-var-color('primary', 'main')) !default;
 
 // Hover
-$checkbox-background-hover: get-var-color('primary', 'hover') !default;
-$checkbox-border-color-hover: get-var-color('primary', 'hover') !default;
+$checkbox-background-hover: var(--checkbox-skin-color, get-var-color('primary', 'hover')) !default;
+$checkbox-border-color-hover: var(--checkbox-skin-color, get-var-color('primary', 'hover')) !default;
 
 // Disable
-$checkbox-background-disabled: get-var-color('neutral', 'grey1') !default;
-$checkbox-border-color-disabled: get-var-color('neutral', 'grey2') !default;
+$checkbox-background-disabled: var(--checkbox-skin-disabled-color, get-var-color('neutral', 'grey1')) !default;
+$checkbox-border-color-disabled: var(--checkbox-skin-disabled-color, get-var-color('neutral', 'grey2')) !default;
 $checkbox-background-checked-disabled: get-var-color('neutral', 'grey1') !default;
 $checkbox-border-color-checked-disabled: get-var-color('neutral', 'grey2') !default;
 $checkbox-color-disabled: get-var-color('text', 'disabled') !default;

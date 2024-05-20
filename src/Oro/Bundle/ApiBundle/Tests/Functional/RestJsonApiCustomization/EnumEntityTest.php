@@ -134,6 +134,19 @@ class EnumEntityTest extends RestJsonApiTestCase
         );
     }
 
+    public function testTryToGetListWithTitles(): void
+    {
+        $response = $this->cget(['entity' => 'testapienum1'], ['meta' => 'title'], [], false);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
     public function testTryToCreate(): void
     {
         $response = $this->post(

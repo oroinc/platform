@@ -10,7 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 class ChainDictionaryValueListProvider
 {
     /** @var iterable|DictionaryValueListProviderInterface[] */
-    private $providers;
+    private iterable $providers;
 
     /**
      * @param iterable|DictionaryValueListProviderInterface[] $providers
@@ -21,18 +21,24 @@ class ChainDictionaryValueListProvider
     }
 
     /**
-     * Returns the configuration of the entity serializer for a given dictionary class
-     *
-     * @param string $className The FQCN of a dictionary entity
-     *
-     * @return array|null
+     * Checks whether the given class is a dictionary.
      */
-    public function getSerializationConfig($className)
+    public function isSupportedEntityClass(string $className): bool
     {
-        if (null === $className) {
-            return null;
+        foreach ($this->providers as $provider) {
+            if ($provider->supports($className)) {
+                return true;
+            }
         }
 
+        return false;
+    }
+
+    /**
+     * Returns the configuration of the entity serializer for the given dictionary class.
+     */
+    public function getSerializationConfig(string $className): ?array
+    {
         foreach ($this->providers as $provider) {
             if ($provider->supports($className)) {
                 return $provider->getSerializationConfig($className);
@@ -43,18 +49,10 @@ class ChainDictionaryValueListProvider
     }
 
     /**
-     * Gets a query builder for getting dictionary item values for a given dictionary class
-     *
-     * @param string $className The FQCN of a dictionary entity
-     *
-     * @return QueryBuilder|null
+     * Gets a query builder for getting dictionary item values for the given dictionary class.
      */
-    public function getValueListQueryBuilder($className)
+    public function getValueListQueryBuilder(string $className): ?QueryBuilder
     {
-        if (null === $className) {
-            return null;
-        }
-
         foreach ($this->providers as $provider) {
             if ($provider->supports($className)) {
                 return $provider->getValueListQueryBuilder($className);
@@ -65,11 +63,11 @@ class ChainDictionaryValueListProvider
     }
 
     /**
-     * Gets a list of supported entity classes
+     * Gets a list of dictionary entity classes.
      *
      * @return string[]
      */
-    public function getSupportedEntityClasses()
+    public function getSupportedEntityClasses(): array
     {
         $supportedClasses = [];
         foreach ($this->providers as $provider) {

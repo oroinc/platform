@@ -2,7 +2,7 @@
 @ticket-BAP-20922
 
 Feature: Export extend entity fields
-  Сheck if the select and multi select fields are exported without problems with html symbols
+  Check if the select and multi select fields are exported without problems with html symbols
 
   Scenario: Feature background
     Given I login as administrator
