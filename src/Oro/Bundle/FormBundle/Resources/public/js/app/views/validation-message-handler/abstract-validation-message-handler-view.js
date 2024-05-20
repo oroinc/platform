@@ -109,8 +109,9 @@ define(function(require) {
                     return 'window';
                 };
 
+                const placement = this.getVerticalReferencePlacement(popperReference);
                 this.popper = new Popper(popperReference, messageEl, {
-                    placement: _.isRTL() ? 'top-end' : 'top-start',
+                    placement,
                     positionFixed: true,
                     removeOnDestroy: true,
                     modifiers: {
@@ -192,6 +193,12 @@ define(function(require) {
             if (!this.disposed && this.popper) {
                 this.popper.scheduleUpdate();
             }
+        },
+
+        getVerticalReferencePlacement(reference) {
+            const placement = reference.attr('placement') ?? 'top';
+
+            return _.isRTL() ? `${placement}-end` : `${placement}-start`;
         },
 
         dispose: function() {

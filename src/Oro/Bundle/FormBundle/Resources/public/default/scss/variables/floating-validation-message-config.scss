@@ -10,9 +10,12 @@ $floating-validation-message-after-color: get-var-color('destructive', 'light') 
 $floating-validation-message-label-top: -24px !default;
 $floating-validation-message-label-left: 0 !default;
 $floating-validation-message-label-text-align: left !default;
-$floating-validation-message-label-background-color: get-var-color('destructive', 'light') !default;
-$floating-validation-message-label-color: get-var-color('destructive', 'dark') !default;
-$floating-validation-message-label-inner-offset: spacing('xs') 6px !default;
+$floating-validation-message-label-background-color: get-var-color('neutral', 'white-100') !default;
+$floating-validation-message-label-color: get-var-color('destructive', 'main') !default;
+$floating-validation-message-label-inner-offset: spacing('sm') spacing('md') !default;
 $floating-validation-message-label-border-radius: $base-ui-element-border-radius !default;
+$floating-validation-message-label-font-size: 13px !default;
+$floating-validation-message-box-shadow: 0px 3px 10px 0px rgba(125, 87, 87, .16),
+    0px 0px 3px 0px rgba(66, 5, 5, .1) !default;
 
 $floating-validation-message-icon-display: none !default;

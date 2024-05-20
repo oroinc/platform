@@ -45,38 +45,20 @@
 }
 
 .floating-error-message {
-    $arrow-height: 6px;
-
-    margin-bottom: $arrow-height;
+    margin: spacing('xs') 0;
     padding: $floating-validation-message-label-inner-offset;
     z-index: z('base') + 1;
-
     background-color: $floating-validation-message-label-background-color;
     border-radius: $floating-validation-message-label-border-radius;
+    box-shadow: $floating-validation-message-box-shadow;
     color: $floating-validation-message-label-color;
     text-align: $floating-validation-message-label-text-align;
+    font-size: $floating-validation-message-label-font-size;
 
     .content {
         display: flex;
         gap: $validation-failed-gap;
         align-items: $validation-failed-align-items;
-    }
-
-    .arrow {
-        display: block;
-        position: absolute;
-        top: 100%;
-        width: 0;
-
-        &::after {
-            content: '';
-            position: absolute;
-            left: 10px;
-
-            border-style: solid;
-            border-color: $floating-validation-message-after-color transparent;
-            border-width: $arrow-height ($arrow-height - 1) 0;
-        }
     }
 
     &[x-out-of-boundaries] {
