@@ -1,0 +1,6 @@
+aliases:
+    oro/select2-autocomplete-openapi-specification-entities-component$: oroapi/js/app/components/select2-autocomplete-openapi-specification-entities-component
+dynamic-imports:
+    commons:
+        - oro/select2-autocomplete-openapi-specification-entities-component
+        - oroapi/js/app/views/openapi-view-field-view

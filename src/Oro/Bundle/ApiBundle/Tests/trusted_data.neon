@@ -33,6 +33,9 @@ trusted_data:
         Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager:
             updateOperation:
                 fieldName: true
+        Oro\Bundle\ApiBundle\Datagrid\OpenApiSpecificationStatusFilter:
+            buildExpr:
+                parentExpr: true
 
     safe_methods:
         Oro\Bundle\ApiBundle\Util\DoctrineHelper:
@@ -49,6 +52,11 @@ trusted_data:
             getIdentifierFieldNames: true
         Oro\Bundle\ApiBundle\Util\WhereExpressionModifier:
             processWhereExpression: true
+        Oro\Bundle\ApiBundle\Datagrid\OpenApiSpecificationStatusFilter:
+            getPublishedExpr: true
+            getNotPublishedExpr: true
+            getRenewingExpr: true
+            getPublishedFieldName: true
 
     check_methods:
         Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface:

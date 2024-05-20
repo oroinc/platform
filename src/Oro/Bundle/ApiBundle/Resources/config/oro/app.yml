@@ -42,6 +42,11 @@ security:
                 httponly:                   true
                 csrf_protected_mode:        true
             custom_authenticator: oro_user.impersonation_authenticator
+        public_openapi_specifications:
+            pattern: '^/public-openapi-specification/\d+/.+$'
+            methods: [GET]
+            security: false
+            stateless: true
 
 knp_gaufrette:
     adapters:

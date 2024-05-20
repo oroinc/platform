@@ -1,0 +1,23 @@
+navigation:
+    menu_config:
+        items:
+            openapi_specifications:
+                label: oro.api.openapispecification.entity_plural_label
+                route: oro_openapi_specification_index
+                position: 30
+                extras:
+                    routes: ['oro_openapi_specification_*']
+        tree:
+            application_menu:
+                children:
+                    system_tab:
+                        children:
+                            integrations_submenu:
+                                children:
+                                    openapi_specifications: ~
+
+    titles:
+        oro_openapi_specification_index: ~
+        oro_openapi_specification_view: '%form.title%'
+        oro_openapi_specification_create: oro.ui.create_entity
+        oro_openapi_specification_update: '%entity.subject% - oro.ui.edit'
