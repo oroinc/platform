@@ -151,6 +151,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
                 $group = rawurldecode($match['group']);
                 $path = rawurldecode($match['path']);
                 $operator = rawurldecode($match['operator']);
+                $sourceKey = $key;
 
                 // check if a filter is provided as "key[operator name]=value"
                 if (str_ends_with($path, ']')) {
@@ -173,7 +174,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
                     $normalizedKey = $group . '[' . $path . ']';
                 }
 
-                $this->addParsed($key, $group, $normalizedKey, $path, rawurldecode($match['value']), $operator);
+                $this->addParsed($sourceKey, $group, $normalizedKey, $path, rawurldecode($match['value']), $operator);
             }
         }
     }
@@ -188,13 +189,20 @@ class RestFilterValueAccessor extends FilterValueAccessor
         foreach ($requestBody as $group => $val) {
             if (\is_array($val)) {
                 if ($this->isValueWithOperator($val)) {
-                    $this->addParsed($group, $group, $group, $group, current($val), key($val));
+                    $this->addParsed(
+                        $group . sprintf('[%s]', key($val)),
+                        $group,
+                        $group,
+                        $group,
+                        current($val),
+                        key($val)
+                    );
                 } elseif (ArrayUtil::isAssoc($val)) {
                     foreach ($val as $subKey => $subValue) {
                         $paramKey = $group . '[' . $subKey . ']';
                         if (\is_array($subValue) && $this->isValueWithOperator($subValue)) {
                             $this->addParsed(
-                                $paramKey,
+                                $paramKey . sprintf('[%s]', key($subValue)),
                                 $group,
                                 $paramKey,
                                 $subKey,

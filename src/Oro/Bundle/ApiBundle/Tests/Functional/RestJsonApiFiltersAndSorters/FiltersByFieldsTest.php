@@ -1205,7 +1205,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "empty" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][empty]']
             ],
             $response
         );
@@ -1220,7 +1220,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "empty" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][empty]']
             ],
             $response
         );
