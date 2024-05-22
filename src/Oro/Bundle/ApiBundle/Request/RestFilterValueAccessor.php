@@ -15,20 +15,17 @@ use Symfony\Component\HttpFoundation\Request;
  * the filter from the query string will override the filter from the request body.
  *
  * Filter syntax for the query string:
- * * key=value, where "=" is an operator; see $this->operators to find a list of supported operators
+ * * key=value
  * * key[operator name]=value, where "operator name" can be "eq", "neq", etc.; see $this->operatorNameMap
  *                             to find a map between operators and their names
  * Examples:
- * * /api/users?filter[name]!=John
  * * /api/users?filter[name][neq]=John
  * * /api/users?page[number]=10&sort=name
  *
  * Filter syntax for the request body:
  *  * [key => value, ...]
- *  * [key => [operator => value, ...], ...]
  *  * [key => [operator name => value, ...], ...]
  *  * [group => [key => value, ...], ...]
- *  * [group => [key => [operator => value, ...], ...], ...]
  *  * [group => [key => [operator name => value, ...], ...], ...]
  * Example:
  * <code>
@@ -45,29 +42,21 @@ use Symfony\Component\HttpFoundation\Request;
 class RestFilterValueAccessor extends FilterValueAccessor
 {
     private Request $request;
-    private string $operatorPattern;
-    /** @var string[] [operator short name, ...] */
-    private array $operators;
     /** @var array [operator name => operator short name or NULL, ...] */
     private array $operatorNameMap;
     /** @var array [operator short name => operator name, ...] */
     private array $operatorShortNameMap;
 
-    public function __construct(Request $request, string $operatorPattern, array $operatorNameMap)
+    public function __construct(Request $request, array $operatorNameMap)
     {
         $this->request = $request;
-        $this->operatorPattern = $operatorPattern;
         $this->operatorNameMap = $operatorNameMap;
-        $this->operators = [];
         $this->operatorShortNameMap = [];
         foreach ($operatorNameMap as $name => $shortName) {
             if ($shortName && !\array_key_exists($shortName, $this->operatorShortNameMap)) {
-                $this->operators[] = $shortName;
                 $this->operatorShortNameMap[$shortName] = $name;
             }
         }
-        // "<>" is an alias for "!="
-        $this->operators[] = '<>';
     }
 
     /**
@@ -129,18 +118,16 @@ class RestFilterValueAccessor extends FilterValueAccessor
 
     private function parseQueryString(): void
     {
-        $queryString = $this->request->server->get('QUERY_STRING');
-        $queryString = RequestQueryStringNormalizer::normalizeQueryString($queryString);
-
-        $queryString = '' === $queryString ? null : $queryString;
-
-        if (empty($queryString)) {
+        $queryString = RequestQueryStringNormalizer::normalizeQueryString(
+            $this->request->server->get('QUERY_STRING')
+        );
+        if (!$queryString) {
             return;
         }
 
         $matchResult = preg_match_all(
             '/(?P<key>((?P<group>[\w\d\-\.]+)(?P<path>((\[[\w\d\-\.]*\])|(%5B[\w\d\-\.]*%5D))*)))'
-            . '(?P<operator>' . $this->operatorPattern . ')'
+            . '(?P<operator>=)'
             . '(?P<value>[^&]*)/',
             $queryString,
             $matches,
@@ -236,11 +223,6 @@ class RestFilterValueAccessor extends FilterValueAccessor
 
     private function isOperator(mixed $value): bool
     {
-        return
-            \is_string($value)
-            && (
-                \in_array($value, $this->operators, true)
-                || \array_key_exists($value, $this->operatorNameMap)
-            );
+        return \is_string($value) && \array_key_exists($value, $this->operatorNameMap);
     }
 }

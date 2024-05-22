@@ -14,7 +14,7 @@ class RequestQueryStringNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeQueryStringDataProvider
      */
-    public function testNormalizeQueryString(string $query, string $expectedQuery, string $msg): void
+    public function testNormalizeQueryString(?string $query, string $expectedQuery, string $msg): void
     {
         self::assertSame($expectedQuery, RequestQueryStringNormalizer::normalizeQueryString($query), $msg);
     }
@@ -58,6 +58,7 @@ class RequestQueryStringNormalizerTest extends \PHPUnit\Framework\TestCase
             ['foo=bar&=a=b&=x=y', 'foo=bar', 'removes params with empty key'],
 
             ['', '', 'returns empty string for empty query string'],
+            [null, '', 'returns empty string for null query string'],
         ];
     }
 }
