@@ -16,3 +16,6 @@ oro:
             load_entity_failed: 'The entity cannot be loaded.'
             entity_does_not_exist: 'The entity does not exist.'
         new_entity_in_includes: "Creation a new include entity that can lead to a circular dependency is forbidden."
+        openapi_public_slug:
+            regex: "OpenAPI specification slug should contain only alphabetic symbols, underscore, hyphen and numbers."
+            duplicate: "OpenAPI specification with this slug already exists."

@@ -1,0 +1,24 @@
+oro_behat_extension:
+  suites:
+    OroApiBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ConsoleContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\ApiBundle\Tests\Behat\Context\ApiContext
+      paths:
+        - '@OroApiBundle/Tests/Behat/Features'
+
+  elements:
+    Creating Label:
+      selector: '.label.label-info:contains("Creating")'
+    Created Label:
+      selector: '.label.label-warning:contains("Created")'
+    Renewing Label:
+      selector: '.label.label-info:contains("Renewing")'
+    Published Label:
+      selector: '.label.label-success:contains("Published")'

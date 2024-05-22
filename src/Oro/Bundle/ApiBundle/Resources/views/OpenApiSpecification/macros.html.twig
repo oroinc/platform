@@ -1,0 +1,11 @@
+{%- macro openapi_specification_status(status, published) -%}
+    {%- set statusClass = {'creating': 'info', 'created': 'warning', 'failed': 'danger', 'renewing': 'info'} -%}
+    {%- if published -%}
+        <span class="label label-success">{{ 'published'|oro_open_api_status }}</span>
+        {% if status == constant('Oro\\Bundle\\ApiBundle\\Entity\\OpenApiSpecification::STATUS_RENEWING') -%}
+            <span class="label {{ 'label-' ~ statusClass[status] }}">{{ status|oro_open_api_status }}</span>
+        {%- endif -%}
+    {%- else -%}
+        <span class="label {{ 'label-' ~ statusClass[status] }}">{{ status|oro_open_api_status }}</span>
+    {%- endif -%}
+{%- endmacro -%}

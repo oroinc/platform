@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Renderer\OpenApiRenderer;
+use Oro\Bundle\ApiBundle\Provider\OpenApiChoicesProvider;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -21,10 +22,12 @@ class OpenApiDumpCommand extends Command
     protected static $defaultDescription = 'Dumps API documentation in OpenAPI format.';
 
     private OpenApiRenderer $openApiRenderer;
+    private OpenApiChoicesProvider $openApiChoicesProvider;
 
-    public function __construct(OpenApiRenderer $openApiRenderer)
+    public function __construct(OpenApiRenderer $openApiRenderer, OpenApiChoicesProvider $openApiChoicesProvider)
     {
         $this->openApiRenderer = $openApiRenderer;
+        $this->openApiChoicesProvider = $openApiChoicesProvider;
         parent::__construct();
     }
 
@@ -35,7 +38,7 @@ class OpenApiDumpCommand extends Command
                 'view',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'The view to dump. Possible values: ' . implode(', ', $this->openApiRenderer->getAvailableViews())
+                'The view to dump. Possible values: ' . implode(', ', $this->getAvailableViews())
             )
             ->addOption(
                 'format',
@@ -180,5 +183,20 @@ HELP
         }
 
         return $options;
+    }
+
+    public function getAvailableViews(): array
+    {
+        $result = [];
+        $views = $this->openApiRenderer->getAvailableViews();
+        foreach ($views as $view) {
+            $result[] = sprintf(
+                '%s (%s)',
+                $view,
+                $this->openApiChoicesProvider->getOpenApiSpecificationName($view)
+            );
+        }
+
+        return $result;
     }
 }

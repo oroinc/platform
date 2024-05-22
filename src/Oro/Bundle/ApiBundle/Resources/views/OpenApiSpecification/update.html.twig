@@ -1,0 +1,59 @@
+{% extends '@OroUI/actions/update.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+
+{% oro_title_set({params : {"%entity.subject%": entity.name, "%entityName%": 'oro.api.openapispecification.entity_label'|trans }}) %}
+{% set entityId = entity.id %}
+
+{% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {{ UI.dropdownSaveButton({'html':
+        UI.saveAndCloseButton({'route': 'oro_openapi_specification_view', 'params': {'id': '$id'}})
+        ~ UI.saveAndStayButton({'route': 'oro_openapi_specification_update', 'params': {'id': '$id'}})
+    }) }}
+    {{ UI.cancelButton(path('oro_openapi_specification_index')) }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_openapi_specification_index'),
+        'indexLabel': 'oro.api.openapispecification.entity_plural_label'|trans,
+        'entityTitle': entity.name
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block stats %}
+    {{ parent() }}
+    {% if entity.specificationCreatedAt is not null %}
+        <li>{{ 'oro.api.openapispecification.specification_created_at.label'|trans }}: {{ entity.specificationCreatedAt|oro_format_datetime }}</li>
+    {% endif %}
+{% endblock stats %}
+
+{% block content_data %}
+    {% set id = 'openapispecification-edit' %}
+
+    {% set dataBlocks = [{
+        'title': 'General Information'|trans,
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.name),
+                    form_row(form.publicSlug),
+                    form_row(form.owner),
+                    form_row(form.format),
+                    form_row(form.view),
+                    form_row(form.entities)
+                ]
+            }
+        ]
+    }] %}
+
+    {% set data = {
+        'formErrors': form_errors(form) ? form_errors(form) : null,
+        'dataBlocks': dataBlocks
+    } %}
+    {{ parent() }}
+{% endblock content_data %}
