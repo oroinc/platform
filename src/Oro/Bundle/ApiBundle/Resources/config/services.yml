@@ -321,6 +321,18 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: clearCache }
             - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: onFeaturesChange }
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: onEntityConfigPostFlush }
+
+    oro_api.listener.api_source.open_api:
+        class: Oro\Bundle\ApiBundle\EventListener\OpenApiSourceListener
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+            - !abstract '$excludedFeatures defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: renewOpenApiSpecifications }
+            - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: onFeaturesChange }
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: onEntityConfigPostFlush }
 
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry
@@ -1249,3 +1261,69 @@ services:
         arguments:
             - '@security.http_utils'
             - '@oro_api.rest.doc_url_generator'
+
+    oro_api.open_api_specification_archive:
+        class: Oro\Bundle\ApiBundle\Util\OpenApiSpecificationArchive
+
+    oro_api.open_api_choices_provider:
+        class: Oro\Bundle\ApiBundle\Provider\OpenApiChoicesProvider
+        public: true
+        arguments:
+            - '@translator'
+            - '@oro_api.api_doc.open_api.generator_registry'
+            - '@oro_api.api_doc.open_api.formatter_registry'
+            - '@oro_api.api_doc.open_api.name_provider'
+
+    oro_api.open_api_specification_datagrid_helper:
+        class: Oro\Bundle\ApiBundle\Datagrid\OpenApiSpecificationDatagridHelper
+        public: true
+
+    oro_api.open_api_specification_status_filter:
+        class: Oro\Bundle\ApiBundle\Datagrid\OpenApiSpecificationStatusFilter
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: oro_openapi_specification_status }
+
+    oro_api.twig.open_api_specification:
+        class: Oro\Bundle\ApiBundle\Twig\OpenApiSpecificationExtension
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }
+
+    oro_api.event_listener.open_api_specification_form:
+        class: Oro\Bundle\ApiBundle\EventListener\OpenApiSpecificationEventListener
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: kernel.event_listener, event: oro.form.update_handler.before_entity_flush.oro_openapi_specification, method: beforeFlush }
+            - { name: kernel.event_listener, event: oro.form.update_handler.after_entity_flush.oro_openapi_specification, method: afterFlush }
+            - { name: kernel.event_listener, event: oro.form.update_handler.after_entity_flush.oro_openapi_specification_clone, method: afterFlush }
+
+    oro_api.autocomplete.search_handler.open_api_specification_entity:
+        class: Oro\Bundle\ApiBundle\Autocomplete\OpenApiSpecificationEntitySearchHandler
+        arguments:
+            - '@oro_api.autocomplete.open_api_specification_entity_provider'
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: openapi_specification_entities, acl_resource: oro_openapi_specification_view }
+
+    oro_api.autocomplete.open_api_specification_entity_provider:
+        class: Oro\Bundle\ApiBundle\Autocomplete\OpenApiSpecificationEntityProvider
+        arguments:
+            - '@oro_api.resources_provider'
+            - '@oro_api.value_normalizer'
+            - '@oro_api.entity_name_provider'
+            - '@oro_api.rest.doc_view_detector'
+
+    oro_api.async.create_open_api_specification:
+        class: Oro\Bundle\ApiBundle\Async\CreateOpenApiSpecificationMessageProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_api.api_doc.open_api.renderer'
+            - '@oro_api.open_api_specification_archive'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: api }

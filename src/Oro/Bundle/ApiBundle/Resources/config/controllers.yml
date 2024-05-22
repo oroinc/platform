@@ -11,3 +11,21 @@ services:
             - '@nelmio_api_doc.extractor.api_doc_extractor'
             - '@nelmio_api_doc.formatter.html_formatter'
             - '@session'
+
+    Oro\Bundle\ApiBundle\Controller\OpenApiSpecificationController:
+        arguments:
+            - '@form.factory'
+            - '@oro_form.update_handler'
+            - '@oro_entity.delete_handler_registry'
+            - '@translator'
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+
+    Oro\Bundle\ApiBundle\Controller\DownloadOpenApiSpecificationController:
+        arguments:
+            - '@oro_api.open_api_specification_archive'
+
+    Oro\Bundle\ApiBundle\Controller\DownloadPublicOpenApiSpecificationController:
+        arguments:
+            - '@doctrine'
+            - '@oro_api.open_api_specification_archive'

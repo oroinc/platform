@@ -1,0 +1,23 @@
+Oro\Bundle\ApiBundle\Entity\OpenApiSpecification:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            fields: [publicSlug, organization]
+            ignoreNull: [publicSlug]
+            message: oro.api.openapi_public_slug.duplicate
+    properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                  max: 255
+        publicSlug:
+            - Length:
+                  max: 100
+            - Regex:
+                  pattern: '/^[a-zA-Z0-9_\-]*$/'
+                  message: oro.api.openapi_public_slug.regex
+        view:
+            - NotBlank: ~
+        format:
+            - NotBlank: ~
+        owner:
+            - NotBlank: ~

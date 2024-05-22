@@ -44,6 +44,11 @@ security:
             guard: # see "main" firewall
                 authenticators:
                     - oro_user.impersonation_authenticator
+        public_openapi_specifications:
+            pattern: '^/public-openapi-specification/\d+/.+$'
+            methods: [GET]
+            security: false
+            stateless: true
 
 knp_gaufrette:
     adapters:

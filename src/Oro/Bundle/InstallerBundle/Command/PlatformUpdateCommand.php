@@ -216,6 +216,7 @@ HELP
 
         $commandExecutor->runCommand('fos:js-routing:dump', ['--process-isolation' => true]);
         $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
+        $commandExecutor->runCommand('oro:api:doc:open-api:schedule-renew', ['--process-isolation' => true]);
 
         return $this;
     }

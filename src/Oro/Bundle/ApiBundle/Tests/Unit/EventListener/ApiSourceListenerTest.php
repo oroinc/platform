@@ -4,6 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\ApiBundle\EventListener\ApiSourceListener;
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
 
 class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
@@ -24,7 +29,7 @@ class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function expectCachesCleared()
+    private function expectCachesCleared(): void
     {
         $this->cacheManager->expects(self::once())
             ->method('clearCaches');
@@ -32,7 +37,7 @@ class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
             ->method('clearApiDocCache');
     }
 
-    private function expectCachesNotCleared()
+    private function expectCachesNotCleared(): void
     {
         $this->cacheManager->expects(self::never())
             ->method('clearCaches');
@@ -40,13 +45,31 @@ class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
             ->method('clearApiDocCache');
     }
 
-    public function testClearCache()
+    private function getPostFlushConfigEvent(array $models): PostFlushConfigEvent
+    {
+        return new PostFlushConfigEvent($models, $this->createMock(ConfigManager::class));
+    }
+
+    private function getEntityConfigModel(): EntityConfigModel
+    {
+        return new EntityConfigModel('Test\Entity');
+    }
+
+    private function getFieldConfigModel(array $extendOptions): FieldConfigModel
+    {
+        $model = new FieldConfigModel('testField');
+        $model->fromArray('extend', $extendOptions);
+
+        return $model;
+    }
+
+    public function testClearCache(): void
     {
         $this->expectCachesCleared();
         $this->listener->clearCache();
     }
 
-    public function testOnFeaturesChangeForNotExcludedFeature()
+    public function testOnFeaturesChangeForNotExcludedFeature(): void
     {
         $this->expectCachesCleared();
         $this->listener->onFeaturesChange(
@@ -54,7 +77,7 @@ class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnFeaturesChangeForSeveralNotExcludedFeatures()
+    public function testOnFeaturesChangeForSeveralNotExcludedFeatures(): void
     {
         $this->expectCachesCleared();
         $this->listener->onFeaturesChange(
@@ -62,7 +85,7 @@ class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnFeaturesChangeForExcludedFeature()
+    public function testOnFeaturesChangeForExcludedFeature(): void
     {
         $this->expectCachesNotCleared();
         $this->listener->onFeaturesChange(
@@ -70,7 +93,7 @@ class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnFeaturesChangeForSeveralExcludedFeatures()
+    public function testOnFeaturesChangeForSeveralExcludedFeatures(): void
     {
         $this->expectCachesNotCleared();
         $this->listener->onFeaturesChange(
@@ -78,11 +101,43 @@ class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnFeaturesChangeForBothExcludedAndNotExcludedFeatures()
+    public function testOnFeaturesChangeForBothExcludedAndNotExcludedFeatures(): void
     {
         $this->expectCachesCleared();
         $this->listener->onFeaturesChange(
             new FeaturesChange(['excluded_feature1' => false, 'another_feature1' => false])
+        );
+    }
+
+    public function testOnEntityConfigPostFlushForEntitiesOnly(): void
+    {
+        $this->expectCachesNotCleared();
+        $this->listener->onEntityConfigPostFlush(
+            $this->getPostFlushConfigEvent([$this->getEntityConfigModel()])
+        );
+    }
+
+    public function testOnEntityConfigPostFlushForNewRegularField(): void
+    {
+        $this->expectCachesNotCleared();
+        $this->listener->onEntityConfigPostFlush(
+            $this->getPostFlushConfigEvent([$this->getFieldConfigModel(['state' => ExtendScope::STATE_NEW])])
+        );
+    }
+
+    public function testOnEntityConfigPostFlushForUpdatedRegularField(): void
+    {
+        $this->expectCachesCleared();
+        $this->listener->onEntityConfigPostFlush(
+            $this->getPostFlushConfigEvent([$this->getFieldConfigModel(['state' => ExtendScope::STATE_ACTIVE])])
+        );
+    }
+
+    public function testOnEntityConfigPostFlushForUpdatedSerializedField(): void
+    {
+        $this->expectCachesCleared();
+        $this->listener->onEntityConfigPostFlush(
+            $this->getPostFlushConfigEvent([$this->getFieldConfigModel(['is_serialized' => true])])
         );
     }
 }
