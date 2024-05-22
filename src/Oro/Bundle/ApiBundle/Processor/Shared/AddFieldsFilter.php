@@ -54,8 +54,8 @@ class AddFieldsFilter implements ProcessorInterface
             return;
         }
 
-        $filters = $context->getFilters();
-        if ($filters->has($filterGroupName)) {
+        $filterCollection = $context->getFilters();
+        if ($filterCollection->has($filterGroupName)) {
             // filters have been already set
             return;
         }
@@ -67,9 +67,9 @@ class AddFieldsFilter implements ProcessorInterface
             $this->addFiltersForDocumentation($context, $filterTemplate);
         } else {
             // add all requested "fields" filters
-            $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
-            foreach ($filterValues as $filterValue) {
-                $this->addFilter($filterTemplate, $filters, $filterValue->getPath());
+            $allFilterValues = $context->getFilterValues()->getGroup($filterGroupName);
+            foreach ($allFilterValues as $filterValues) {
+                $this->addFilter($filterTemplate, $filterCollection, end($filterValues)->getPath());
             }
         }
     }
@@ -82,11 +82,11 @@ class AddFieldsFilter implements ProcessorInterface
             return;
         }
 
-        $filters = $context->getFilters();
+        $filterCollection = $context->getFilters();
         $requestType = $context->getRequestType();
 
         // the "fields" filter for the primary entity
-        $this->addFilterForEntityClass($filterTemplate, $filters, $context->getClassName(), $requestType);
+        $this->addFilterForEntityClass($filterTemplate, $filterCollection, $context->getClassName(), $requestType);
 
         // the "fields" filters for associated entities
         $config = $context->getConfig();
@@ -98,31 +98,34 @@ class AddFieldsFilter implements ProcessorInterface
             }
             $targetClasses = $association->getAcceptableTargetClassNames();
             foreach ($targetClasses as $targetClass) {
-                $this->addFilterForEntityClass($filterTemplate, $filters, $targetClass, $requestType);
+                $this->addFilterForEntityClass($filterTemplate, $filterCollection, $targetClass, $requestType);
             }
         }
     }
 
     private function addFilterForEntityClass(
         string $filterTemplate,
-        FilterCollection $filters,
+        FilterCollection $filterCollection,
         string $entityClass,
         RequestType $requestType
     ): void {
         $entityType = $this->convertToEntityType($entityClass, $requestType);
         if ($entityType) {
-            $this->addFilter($filterTemplate, $filters, $entityType);
+            $this->addFilter($filterTemplate, $filterCollection, $entityType);
         }
     }
 
-    private function addFilter(string $filterTemplate, FilterCollection $filters, string $entityType): void
+    private function addFilter(string $filterTemplate, FilterCollection $filterCollection, string $entityType): void
     {
-        $filter = new FieldsFilter(
-            DataType::STRING,
-            sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)
-        );
-        $filter->setArrayAllowed(true);
-        $filters->add(sprintf($filterTemplate, $entityType), $filter, false);
+        $key = sprintf($filterTemplate, $entityType);
+        if (null === $filterCollection->get($key)) {
+            $filter = new FieldsFilter(
+                DataType::STRING,
+                sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)
+            );
+            $filter->setArrayAllowed(true);
+            $filterCollection->add($key, $filter, false);
+        }
     }
 
     private function convertToEntityType(string $entityClass, RequestType $requestType): ?string

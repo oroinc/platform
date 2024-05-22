@@ -37,8 +37,8 @@ class AddMetaPropertyFilter implements ProcessorInterface
         $filterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getMetaPropertyFilterName();
-        $filters = $context->getFilters();
-        if ($filters->has($filterName)) {
+        $filterCollection = $context->getFilters();
+        if ($filterCollection->has($filterName)) {
             // the "meta" filter is already added
             return;
         }
@@ -46,6 +46,6 @@ class AddMetaPropertyFilter implements ProcessorInterface
         $filter = new MetaPropertyFilter(DataType::STRING, self::FILTER_DESCRIPTION);
         $filter->setArrayAllowed(true);
         $filter->addAllowedMetaProperty('title', DataType::STRING);
-        $filters->add($filterName, $filter, false);
+        $filterCollection->add($filterName, $filter, false);
     }
 }

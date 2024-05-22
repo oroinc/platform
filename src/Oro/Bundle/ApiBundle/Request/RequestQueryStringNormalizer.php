@@ -9,8 +9,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 
 /**
  * Symfony 4 changed Request::normalizeQueryString() - https://github.com/symfony/symfony/pull/26220
- * Due to our logic has own filters (query params) which is not compatible with new implementation
- * we use old approach till we change our logic to use new syntax.
+ * We use old approach due to our query params parsing logic is not compatible with new implementation.
  */
 class RequestQueryStringNormalizer
 {
@@ -19,20 +18,15 @@ class RequestQueryStringNormalizer
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized,
      * have consistent escaping and unneeded delimiters are removed.
-     *
-     * @param string $qs Query string
-     *
-     * @return string A normalized query string for the Request
      */
-    public static function normalizeQueryString($qs)
+    public static function normalizeQueryString(?string $qs): string
     {
-        if ('' == $qs) {
+        if (null === $qs || '' === $qs) {
             return '';
         }
 
         $parts = [];
         $order = [];
-
         foreach (explode('&', $qs) as $param) {
             if ('' === $param || '=' === $param[0]) {
                 // Ignore useless delimiters, e.g. "x=y&".
@@ -49,12 +43,11 @@ class RequestQueryStringNormalizer
             // PHP also converts "+" to spaces when filling the global _GET or when using the function
             // parse_str. This is why we use urldecode and then normalize to
             // RFC 3986 with rawurlencode.
-            $parts[] = isset($keyValuePair[1]) ?
-                rawurlencode(urldecode($keyValuePair[0])).'='.rawurlencode(urldecode($keyValuePair[1])) :
-                rawurlencode(urldecode($keyValuePair[0]));
+            $parts[] = isset($keyValuePair[1])
+                ? rawurlencode(urldecode($keyValuePair[0])) . '=' . rawurlencode(urldecode($keyValuePair[1]))
+                : rawurlencode(urldecode($keyValuePair[0]));
             $order[] = urldecode($keyValuePair[0]);
         }
-
         array_multisort($order, SORT_ASC, $parts);
 
         return implode('&', $parts);

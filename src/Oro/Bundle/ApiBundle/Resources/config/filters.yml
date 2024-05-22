@@ -2,8 +2,6 @@ services:
     oro_api.rest.filter_value_accessor_factory:
         class: Oro\Bundle\ApiBundle\Request\RestFilterValueAccessorFactory
         arguments:
-            # regex pattern to match the following operators: =, !=, <>, >, <, >=, <=, *, !*, ~, !~, ^, !^, $, !$
-            - '(!|<|>|%%21|%%3C|%%3E)?(=|%%3D)|<>|%%3C%%3E|<|>|\*|%%3C|%%3E|%%2A|(!|%%21)?(\*|~|\^|\$|%%2A|%%7E|%%5E|%%24)'
             - [] # operators. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.filter_operator_registry:

@@ -23,6 +23,14 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### ApiBundle
+* Changed `\Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface` to be able to use filters by same field but with different operators, e.g. `?filter[id][gt]=1&filter[id][lt]=10`:
+  - added `getOne` method
+  - changed return value for `get` method from `?FilterValue` to `FilterValue[]`
+  - changed return value for `getGroup` method from `array [filter key => FilterValue, ...]` to `array [filter key => [FilterValue, ...], ...]`
+  - changed return value for `getAll` method from `array [filter key => FilterValue, ...]` to `array [filter key => [FilterValue, ...], ...]`
+* Outdated format of API filters like `filter[id]>=1` is not supported from now, use `filter[field][operator]=value` syntax instead, e.g. `filter[id][gte]=1`.
+
 #### EntityBundle
 * Changed `\Oro\Bundle\EntityBundle\Provider\EntityNameProvider` to make it work with enum fields.
 

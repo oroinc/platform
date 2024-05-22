@@ -11,15 +11,15 @@ class FilterHelper
     private const PAGE_SIZE_FIELD_NAME = '__page_size__';
     private const SORT_FIELD_NAME = '__sort__';
 
-    private FilterCollection $filters;
-    private FilterValueAccessorInterface $filterValues;
+    private FilterCollection $filterCollection;
+    private FilterValueAccessorInterface $filterValueAccessor;
     /** @var array|null [field name => [FilterValue|null, filterKey, filter], ...] */
     private ?array $filterMap = null;
 
-    public function __construct(FilterCollection $filters, FilterValueAccessorInterface $filterValues)
+    public function __construct(FilterCollection $filterCollection, FilterValueAccessorInterface $filterValueAccessor)
     {
-        $this->filters = $filters;
-        $this->filterValues = $filterValues;
+        $this->filterCollection = $filterCollection;
+        $this->filterValueAccessor = $filterValueAccessor;
     }
 
     /**
@@ -96,28 +96,28 @@ class FilterHelper
         }
 
         $this->filterMap = [];
-        foreach ($this->filters as $filterKey => $filter) {
+        foreach ($this->filterCollection as $filterKey => $filter) {
             if ($filter instanceof FieldAwareFilterInterface) {
                 $this->filterMap[$filter->getField()] = [
-                    $this->filterValues->get($filterKey),
+                    $this->filterValueAccessor->getOne($filterKey),
                     $filterKey,
                     $filter
                 ];
             } elseif ($filter instanceof PageNumberFilter) {
                 $this->filterMap[self::PAGE_NUMBER_FIELD_NAME] = [
-                    $this->filterValues->get($filterKey),
+                    $this->filterValueAccessor->getOne($filterKey),
                     $filterKey,
                     $filter
                 ];
             } elseif ($filter instanceof PageSizeFilter) {
                 $this->filterMap[self::PAGE_SIZE_FIELD_NAME] = [
-                    $this->filterValues->get($filterKey),
+                    $this->filterValueAccessor->getOne($filterKey),
                     $filterKey,
                     $filter
                 ];
             } elseif ($filter instanceof SortFilter) {
                 $this->filterMap[self::SORT_FIELD_NAME] = [
-                    $this->filterValues->get($filterKey),
+                    $this->filterValueAccessor->getOne($filterKey),
                     $filterKey,
                     $filter
                 ];

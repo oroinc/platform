@@ -84,8 +84,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
     private function prepareFilters(string $sortBy = '-id'): void
     {
-        $filterValues = $this->context->getFilterValues();
-        $filterValues->set('sort', new FilterValue('sort', $sortBy));
+        $filterValueAccessor = $this->context->getFilterValues();
+        $filterValueAccessor->set('sort', new FilterValue('sort', $sortBy));
 
         // emulate sort normalizer
         $orderBy = [];
@@ -98,9 +98,9 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
                 $orderBy[$item] = 'ASC';
             }
         }
-        $filterValues->get('sort')->setValue($orderBy);
+        $filterValueAccessor->getOne('sort')->setValue($orderBy);
 
-        $this->context->setFilterValues($filterValues);
+        $this->context->setFilterValues($filterValueAccessor);
         $this->context->getFilters()->add('sort', new SortFilter(DataType::ORDER_BY));
     }
 
@@ -139,7 +139,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig->getField('id')->setExcluded(true);
 
         $this->prepareFilters();
-        $sortFilterValue = $this->context->getFilterValues()->get('sort');
+        $sortFilterValue = $this->context->getFilterValues()->getOne('sort');
         $sortFilterValue->setSource(
             FilterValue::createFromSource('sortFilterSourceKey', $sortFilterValue->getPath(), '')
         );
@@ -242,7 +242,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         self::assertEmpty($this->context->getErrors());
         self::assertEquals(
             ['name' => 'ASC'],
-            $this->context->getFilterValues()->get('sort')->getValue()
+            $this->context->getFilterValues()->getOne('sort')->getValue()
         );
     }
 
@@ -274,7 +274,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         self::assertEmpty($this->context->getErrors());
         self::assertEquals(
             ['category.name' => 'ASC'],
-            $this->context->getFilterValues()->get('sort')->getValue()
+            $this->context->getFilterValues()->getOne('sort')->getValue()
         );
     }
 
@@ -307,7 +307,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         self::assertEmpty($this->context->getErrors());
         self::assertEquals(
             ['category.name' => 'ASC'],
-            $this->context->getFilterValues()->get('sort')->getValue()
+            $this->context->getFilterValues()->getOne('sort')->getValue()
         );
     }
 
@@ -343,7 +343,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         self::assertEmpty($this->context->getErrors());
         self::assertEquals(
             ['category.name' => 'ASC'],
-            $this->context->getFilterValues()->get('sort')->getValue()
+            $this->context->getFilterValues()->getOne('sort')->getValue()
         );
     }
 
@@ -378,7 +378,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         self::assertEmpty($this->context->getErrors());
         self::assertEquals(
             ['category.name' => 'ASC'],
-            $this->context->getFilterValues()->get('sort')->getValue()
+            $this->context->getFilterValues()->getOne('sort')->getValue()
         );
     }
 
