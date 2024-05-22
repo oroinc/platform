@@ -48,25 +48,25 @@ class ValidateSorting implements ProcessorInterface
             return;
         }
 
-        $sortFilterName = $this->filterNamesRegistry
+        $filterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getSortFilterName();
-        if (!$context->getFilters()->has($sortFilterName)) {
+        if (!$context->getFilters()->has($filterName)) {
             // no sort filter
             return;
         }
 
-        $sortFilterValue = $context->getFilterValues()->get($sortFilterName);
-        if (null === $sortFilterValue) {
+        $filterValue = $context->getFilterValues()->getOne($filterName);
+        if (null === $filterValue) {
             // sorting is not requested
             return;
         }
 
-        $unsupportedFields = $this->validateSortValues($sortFilterValue, $context);
+        $unsupportedFields = $this->validateSortValues($filterValue, $context);
         if (!empty($unsupportedFields)) {
             $context->addError(
                 Error::createValidationError(Constraint::SORT, $this->getValidationErrorMessage($unsupportedFields))
-                    ->setSource(ErrorSource::createByParameter($sortFilterValue->getSourceKey() ?: $sortFilterName))
+                    ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey() ?: $filterName))
             );
         }
     }

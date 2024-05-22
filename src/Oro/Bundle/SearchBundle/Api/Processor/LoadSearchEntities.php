@@ -35,7 +35,7 @@ class LoadSearchEntities implements ProcessorInterface
             $this->searchEntityRepository->getSearchEntities(
                 $context->getVersion(),
                 $context->getRequestType(),
-                $context->getFilterValues()->get('searchable')?->getValue()
+                $context->getFilterValues()->getOne('searchable')?->getValue()
             )
         );
     }

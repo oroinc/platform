@@ -1,0 +1,29 @@
+{%- if value -%}
+    {%- if record.getValue('specificationCreatedAt') and record.getValue('published') -%}
+        {%- import '@OroUI/macros.html.twig' as UI -%}
+        {%- set publicUrl = url('oro_public_openapi_specification_download', {organizationId: record.getValue('organizationId'), slug: value}) -%}
+        {%- set publicUrlId = 'public-slug-' ~ record.getValue('id') -%}
+        {{- UI.link({
+            'path' : publicUrl,
+            'label': value,
+            'title': publicUrl,
+            'aCss': 'no-hash text-nowrap',
+            'target': '_blank'
+        }) -}}
+        <span class="hide" id="{{ publicUrlId }}">{{ publicUrl }}</span>
+        {{- UI.clientLink({
+            aCss: 'btn btn-icon btn-icon-sm',
+            iCss: 'fa-copy',
+            title: 'oro.api.open_api.specification.copy_public_url_to_clipboard_button.label'|trans,
+            labelInIcon: false,
+            pageComponent: {
+                view: {
+                    view: 'oroui/js/app/views/element-value-copy-to-clipboard-view',
+                    elementSelector: '#' ~ publicUrlId
+                }
+            }
+        }) -}}
+    {%- else -%}
+        <span class="text-nowrap">{{ value }}</span>
+    {%- endif -%}
+{%- endif -%}

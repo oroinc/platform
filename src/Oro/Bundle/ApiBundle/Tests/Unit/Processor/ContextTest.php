@@ -650,7 +650,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         self::assertNotNull($this->context->getFilterValues());
         self::assertFalse($this->context->getFilterValues()->has('test'));
-        self::assertNull($this->context->getFilterValues()->get('test'));
+        self::assertNull($this->context->getFilterValues()->getOne('test'));
     }
 
     public function testFilterValues()

@@ -40,17 +40,17 @@ class RestDocFiltersHandler
         $this->sorterRegistry = $sorterRegistry;
     }
 
-    public function handle(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata): void
+    public function handle(ApiDoc $annotation, FilterCollection $filterCollection, EntityMetadata $metadata): void
     {
-        if (!$filters->isEmpty()) {
-            $this->addFilters($annotation, $filters, $metadata);
+        if (!$filterCollection->isEmpty()) {
+            $this->addFilters($annotation, $filterCollection, $metadata);
         }
         $this->sortFilters($annotation);
     }
 
-    private function addFilters(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata): void
+    private function addFilters(ApiDoc $annotation, FilterCollection $filterCollection, EntityMetadata $metadata): void
     {
-        foreach ($filters as $key => $filter) {
+        foreach ($filterCollection as $key => $filter) {
             if ($filter instanceof StandaloneFilter) {
                 if ($filter instanceof NamedValueFilterInterface) {
                     $key .= sprintf('[%s]', $filter->getFilterValueName());

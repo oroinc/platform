@@ -8,7 +8,11 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -97,53 +101,9 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
             'new_item_value_path'           => 'value',
         ]);
 
-        $resolver->setNormalizer(
-            'create_enabled',
-            function (Options $options, $createEnabled) {
-                $createRouteName = $options['create_form_route'];
-                $createEnabled = $createEnabled && !empty($createRouteName);
-                if ($createEnabled) {
-                    $createEnabled = $this->isCreateGranted($options);
-                }
-
-                return $createEnabled;
-            }
-        )
-            ->setNormalizer(
-                'grid_name',
-                function (Options $options, $gridName) {
-                    if (!empty($gridName)) {
-                        return $gridName;
-                    }
-
-                    $entityClass = $options['entity_class'];
-                    $formConfig = $this->configManager->getProvider('form')->getConfig($entityClass);
-                    if ($formConfig->has('grid_name')) {
-                        return $formConfig->get('grid_name');
-                    }
-
-                    throw new InvalidConfigurationException(
-                        'The option "grid_name" must be set.'
-                    );
-                }
-            )
-            ->setNormalizer(
-                'transformer',
-                function (Options $options, $value) {
-                    if (!$value && !empty($options['entity_class'])) {
-                        $value = $this->createDefaultTransformer(
-                            $options['entity_class'],
-                            $options['new_item_property_name'],
-                            $options['new_item_allow_empty_property'],
-                            $options['new_item_value_path'],
-                            $options['create_enabled'] && $this->isCreateGranted($options)
-                        );
-                    }
-
-                    return $value;
-                }
-            );
-
+        $this->setCreateEnabledNormalizer($resolver);
+        $this->setGridNameNormalizer($resolver);
+        $this->setTransformerNormalizer($resolver);
         $this->setConfigsNormalizer($resolver);
     }
 
@@ -155,10 +115,77 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         }
 
         $createAcl = $options['create_acl'];
+        if ($createAcl) {
+            return $this->authorizationChecker->isGranted($createAcl);
+        }
 
-        return $createAcl
-            ? $this->authorizationChecker->isGranted($createAcl)
-            : $this->authorizationChecker->isGranted('CREATE', 'entity:' . $options['entity_class']);
+        $entityClass = $options['entity_class'];
+        if ($this->isManageableEntity($entityClass)) {
+            return $this->authorizationChecker->isGranted(
+                BasicPermission::CREATE,
+                ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, $entityClass)
+            );
+        }
+
+        return true;
+    }
+
+    private function setCreateEnabledNormalizer(OptionsResolver $resolver): void
+    {
+        $resolver->setNormalizer(
+            'create_enabled',
+            function (Options $options, $createEnabled) {
+                $createRouteName = $options['create_form_route'];
+                $createEnabled = $createEnabled && !empty($createRouteName);
+                if ($createEnabled) {
+                    $createEnabled = $this->isCreateGranted($options);
+                }
+
+                return $createEnabled;
+            }
+        );
+    }
+
+    private function setGridNameNormalizer(OptionsResolver $resolver): void
+    {
+        $resolver->setNormalizer(
+            'grid_name',
+            function (Options $options, $gridName) {
+                if ($gridName) {
+                    return $gridName;
+                }
+
+                $entityClass = $options['entity_class'];
+                if ($this->isManageableEntity($entityClass) && $this->configManager->hasConfig($entityClass)) {
+                    $formConfig = $this->configManager->getEntityConfig('form', $entityClass);
+                    if ($formConfig->has('grid_name')) {
+                        return $formConfig->get('grid_name');
+                    }
+                }
+
+                throw new InvalidConfigurationException('The option "grid_name" must be set.');
+            }
+        );
+    }
+
+    private function setTransformerNormalizer(OptionsResolver $resolver): void
+    {
+        $resolver->setNormalizer(
+            'transformer',
+            function (Options $options, $value) {
+                if (!$value && !empty($options['entity_class'])) {
+                    $value = $this->createDefaultTransformer(
+                        $options['entity_class'],
+                        $options['new_item_property_name'],
+                        $options['new_item_allow_empty_property'],
+                        $options['new_item_value_path'],
+                        $options['create_enabled'] && $this->isCreateGranted($options)
+                    );
+                }
+
+                return $value;
+            }
+        );
     }
 
     private function setConfigsNormalizer(OptionsResolver $resolver): void
@@ -186,9 +213,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                 }
 
                 if (empty($configs['route_name'])) {
-                    throw new InvalidConfigurationException(
-                        'Option "configs[route_name]" must be set.'
-                    );
+                    throw new InvalidConfigurationException('Option "configs[route_name]" must be set.');
                 }
 
                 if (isset($configs['allowCreateNew']) && $configs['allowCreateNew']) {
@@ -222,16 +247,21 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         bool $newItemAllowEmptyProperty = false,
         string $newItemValuePath = null,
         bool $isCreateGranted = true
-    ): EntityToIdTransformer {
+    ): DataTransformerInterface {
         if ($newItemPropertyName && $isCreateGranted) {
             $transformer = new EntityCreationTransformer($this->entityManager, $entityClass);
             $transformer->setNewEntityPropertyName($newItemPropertyName);
             $transformer->setAllowEmptyProperty($newItemAllowEmptyProperty);
             $transformer->setValuePath($newItemValuePath);
-        } else {
-            $transformer = new EntityToIdTransformer($this->entityManager, $entityClass);
+
+            return $transformer;
         }
 
-        return $transformer;
+        return new EntityToIdTransformer($this->entityManager, $entityClass);
+    }
+
+    private function isManageableEntity(string $entityClass): bool
+    {
+        return $this->entityManager->getMetadataFactory()->hasMetadataFor($entityClass);
     }
 }

@@ -25,9 +25,11 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * Filter syntax for the request body:
  *  * [key => value, ...]
- *  * [key => [operator => value], ...]
- *  * [key => [operator name => value], ...]
+ *  * [key => [operator => value, ...], ...]
+ *  * [key => [operator name => value, ...], ...]
  *  * [group => [key => value, ...], ...]
+ *  * [group => [key => [operator => value, ...], ...], ...]
+ *  * [group => [key => [operator name => value, ...], ...], ...]
  * Example:
  * <code>
  *  [
@@ -151,6 +153,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
                 $group = rawurldecode($match['group']);
                 $path = rawurldecode($match['path']);
                 $operator = rawurldecode($match['operator']);
+                $sourceKey = $key;
 
                 // check if a filter is provided as "key[operator name]=value"
                 if (str_ends_with($path, ']')) {
@@ -173,11 +176,14 @@ class RestFilterValueAccessor extends FilterValueAccessor
                     $normalizedKey = $group . '[' . $path . ']';
                 }
 
-                $this->addParsed($key, $group, $normalizedKey, $path, rawurldecode($match['value']), $operator);
+                $this->addParsed($sourceKey, $group, $normalizedKey, $path, rawurldecode($match['value']), $operator);
             }
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function parseRequestBody(): void
     {
         if (null === $this->request->request) {
@@ -188,19 +194,16 @@ class RestFilterValueAccessor extends FilterValueAccessor
         foreach ($requestBody as $group => $val) {
             if (\is_array($val)) {
                 if ($this->isValueWithOperator($val)) {
-                    $this->addParsed($group, $group, $group, $group, current($val), key($val));
+                    foreach ($val as $k => $v) {
+                        $this->addParsed($group . sprintf('[%s]', $k), $group, $group, $group, $v, $k);
+                    }
                 } elseif (ArrayUtil::isAssoc($val)) {
                     foreach ($val as $subKey => $subValue) {
                         $paramKey = $group . '[' . $subKey . ']';
                         if (\is_array($subValue) && $this->isValueWithOperator($subValue)) {
-                            $this->addParsed(
-                                $paramKey,
-                                $group,
-                                $paramKey,
-                                $subKey,
-                                current($subValue),
-                                key($subValue)
-                            );
+                            foreach ($subValue as $k => $v) {
+                                $this->addParsed($paramKey . sprintf('[%s]', $k), $group, $paramKey, $subKey, $v, $k);
+                            }
                         } else {
                             $this->addParsed($paramKey, $group, $paramKey, $subKey, $subValue);
                         }
@@ -216,17 +219,28 @@ class RestFilterValueAccessor extends FilterValueAccessor
 
     private function isValueWithOperator(array $value): bool
     {
-        if (1 !== \count($value)) {
+        if (!$value) {
             return false;
         }
 
-        $key = key($value);
+        $result = true;
+        foreach ($value as $key => $val) {
+            if (!$this->isOperator($key)) {
+                $result = false;
+                break;
+            }
+        }
 
+        return $result;
+    }
+
+    private function isOperator(mixed $value): bool
+    {
         return
-            \is_string($key)
+            \is_string($value)
             && (
-                \in_array($key, $this->operators, true)
-                || \array_key_exists($key, $this->operatorNameMap)
+                \in_array($value, $this->operators, true)
+                || \array_key_exists($value, $this->operatorNameMap)
             );
     }
 }

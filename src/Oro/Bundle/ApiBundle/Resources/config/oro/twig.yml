@@ -1,0 +1,2 @@
+bundles:
+    - '@OroApi/OpenApiSpecification/Form/fields.html.twig'

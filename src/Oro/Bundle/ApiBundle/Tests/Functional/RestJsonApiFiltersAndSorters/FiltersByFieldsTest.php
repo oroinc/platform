@@ -363,6 +363,25 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
+    /**
+     * @dataProvider rangeFilterDataProvider
+     */
+    public function testRangeFilterViaSeveralFiltersBySameField(array $filter, array $expectedRows)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        $this->prepareExpectedRows($expectedRows, $entityType);
+
+        $fieldName = key($filter);
+        $rangeValue = current($filter);
+        $filters =
+            sprintf('filter[%s][gte]=%s', $fieldName, substr($rangeValue, 0, strpos($rangeValue, '..')))
+            . '&'
+            . sprintf('filter[%s][lte]=%s', $fieldName, substr($rangeValue, strpos($rangeValue, '..') + 2));
+        $response = $this->cget(['entity' => $entityType], ['filters' => $filters]);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
     public function rangeFilterDataProvider(): array
     {
         $expectedRows = [
@@ -1205,7 +1224,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "empty" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][empty]']
             ],
             $response
         );
@@ -1220,7 +1239,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "empty" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][empty]']
             ],
             $response
         );

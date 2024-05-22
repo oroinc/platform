@@ -69,7 +69,7 @@ class LoadEmailContextSearchItems implements ProcessorInterface
 
         $maxResults = $criteria->getMaxResults();
         $searchQuery = $this->searchIndexer->getSimpleSearchQuery(
-            $context->getFilterValues()->get('searchText')?->getValue(),
+            $context->getFilterValues()->getOne('searchText')?->getValue(),
             $criteria->getFirstResult(),
             (null !== $maxResults && $context->getConfig()->getHasMore()) ? $maxResults + 1 : $maxResults,
             array_values($entities)

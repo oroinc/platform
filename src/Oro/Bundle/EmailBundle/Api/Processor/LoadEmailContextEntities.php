@@ -35,7 +35,7 @@ class LoadEmailContextEntities implements ProcessorInterface
             $this->repository->getEntities(
                 $context->getVersion(),
                 $context->getRequestType(),
-                $context->getFilterValues()->get('allowed')?->getValue()
+                $context->getFilterValues()->getOne('allowed')?->getValue()
             )
         );
     }

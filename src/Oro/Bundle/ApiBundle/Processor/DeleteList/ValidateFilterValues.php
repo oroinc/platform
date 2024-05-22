@@ -24,11 +24,11 @@ class ValidateFilterValues implements ProcessorInterface
             return;
         }
 
-        $filterValues = $context->getFilterValues();
-        $filters = $context->getFilters();
+        $filterValueAccessor = $context->getFilterValues();
+        $filterCollection = $context->getFilters();
         $hasFilters = false;
-        foreach ($filters as $filterKey => $filter) {
-            if ($filterValues->has($filterKey)) {
+        foreach ($filterCollection as $filterKey => $filter) {
+            if ($filterValueAccessor->has($filterKey)) {
                 $hasFilters = true;
                 break;
             }

@@ -72,10 +72,10 @@ class RegisterConfiguredFilters extends RegisterFilters
         $configs = $context->getConfig();
         $idFieldName = $this->getSingleIdentifierFieldName($configs);
         $associationNames = $this->getAssociationNames($metadata);
-        $filters = $context->getFilters();
+        $filterCollection = $context->getFilters();
         $fields = $configOfFilters->getFields();
         foreach ($fields as $filterKey => $field) {
-            if ($filters->has($filterKey)) {
+            if ($filterCollection->has($filterKey)) {
                 continue;
             }
             $propertyPath = $field->getPropertyPath($filterKey);
@@ -101,7 +101,7 @@ class RegisterConfiguredFilters extends RegisterFilters
                     }
                 }
 
-                $filters->add($filterKey, $filter);
+                $filterCollection->add($filterKey, $filter);
             }
         }
     }
