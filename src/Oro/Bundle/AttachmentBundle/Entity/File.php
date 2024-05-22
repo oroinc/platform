@@ -30,7 +30,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
         'entity' => ['icon' => 'fa-file'],
         'comment' => ['immutable' => true],
         'activity' => ['immutable' => true],
-        'attachment' => ['immutable' => true]
+        'attachment' => ['immutable' => true],
+        'entity_management' => ['enabled' => false]
     ]
 )]
 class File implements FileExtensionInterface, ExtendEntityInterface
