@@ -29,8 +29,6 @@ Feature: Extended table fields
       | Type     |
       | BigInt   |
       | Boolean  |
-      | Date     |
-      | DateTime |
       | Decimal  |
       | Float    |
       | Integer  |
@@ -40,6 +38,8 @@ Feature: Extended table fields
       | String   |
       | Text     |
       | WYSIWYG  |
+      | Date     |
+      | DateTime |
 
   Scenario: Create Custom Field File
     When I click "Create Field"
@@ -130,44 +130,50 @@ Feature: Extended table fields
   Scenario: Create a record for Custom entity
     When I go to System/Entities/Custom Entity
     And I click "Create Custom Entity"
+    And I reload the page
     Then I fill "CustomEntityForm" with:
-      | CustomBigIntField      | 1                              |
-      | CustomIntegerField     | 1                              |
-      | CustomBooleanField     | Yes                            |
-      | CustomDateField        | <Date:Jul 28, 2021>            |
-      | CustomDateTimeField    | <DateTime:2022-10-31 08:00:00> |
-      | CustomDecimalField     | 1.0                            |
-      | CustomFloatField       | 1.0                            |
-      | CustomIntegerField     | 1                              |
-      | CustomMoneyField       | 1                              |
-      | CustomPercentField     | 1                              |
-      | CustomSmallIntField    | 1                              |
-      | CustomStringField      | String                         |
-      | CustomTextField        | Text                           |
-      | CustomMultiSelectField | [Option1, Option2]             |
-      | CustomSelectField      | Option1                        |
-      | CustomWYSIWYGField     | TWYSIWYG                       |
+      | CustomBigIntField      | 1                  |
+      | CustomIntegerField     | 1                  |
+      | CustomBooleanField     | Yes                |
+      | CustomDecimalField     | 1.0                |
+      | CustomFloatField       | 1.0                |
+      | CustomIntegerField     | 1                  |
+      | CustomMoneyField       | 1                  |
+      | CustomPercentField     | 1                  |
+      | CustomSmallIntField    | 1                  |
+      | CustomStringField      | String             |
+      | CustomTextField        | Text               |
+      | CustomMultiSelectField | [Option1, Option2] |
+      | CustomSelectField      | Option1            |
+      | CustomWYSIWYGField     | TWYSIWYG           |
+    And I fill "CustomEntityForm" with:
+      | CustomDateField        | <Date:today>       |
+    And I fill "CustomEntityForm" with:
+      | CustomDateTimeField    | <DateTime:today>   |
     And I save and close form
     And I should see "Entity saved" flash message
 
   Scenario: Edit a record for Custom entity
     When I click "Edit"
+    And I reload the page
     And I fill "CustomEntityForm" with:
-      | CustomBigIntField      | 2                              |
-      | CustomIntegerField     | 2                              |
-      | CustomBooleanField     | No                             |
-      | CustomDateField        | <Date:Jul 18, 2021>            |
-      | CustomDateTimeField    | <DateTime:2022-10-11 11:00:00> |
-      | CustomDecimalField     | 2.0                            |
-      | CustomFloatField       | 2.0                            |
-      | CustomIntegerField     | 2                              |
-      | CustomMoneyField       | 2                              |
-      | CustomPercentField     | 2                              |
-      | CustomSmallIntField    | 2                              |
-      | CustomStringField      | String update                  |
-      | CustomTextField        | Text update                    |
-      | CustomMultiSelectField | [Option1, Option3]             |
-      | CustomSelectField      | Option2                        |
-      | CustomWYSIWYGField     | TWYSIWYG update                |
+      | CustomBigIntField      | 2                  |
+      | CustomIntegerField     | 2                  |
+      | CustomBooleanField     | No                 |
+      | CustomDecimalField     | 2.0                |
+      | CustomFloatField       | 2.0                |
+      | CustomIntegerField     | 2                  |
+      | CustomMoneyField       | 2                  |
+      | CustomPercentField     | 2                  |
+      | CustomSmallIntField    | 2                  |
+      | CustomStringField      | String update      |
+      | CustomTextField        | Text update        |
+      | CustomMultiSelectField | [Option1, Option3] |
+      | CustomSelectField      | Option2            |
+      | CustomWYSIWYGField     | TWYSIWYG update    |
+    And I fill "CustomEntityForm" with:
+      | CustomDateField        | <Date:today>       |
+    And I fill "CustomEntityForm" with:
+      | CustomDateTimeField    | <DateTime:today>   |
     And I save and close form
     Then I should see "Entity saved" flash message

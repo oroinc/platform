@@ -33,6 +33,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "entity_management"={
+ *              "enabled"=false
  *          }
  *      }
  * )

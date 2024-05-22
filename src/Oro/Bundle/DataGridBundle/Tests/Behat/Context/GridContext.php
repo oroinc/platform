@@ -2061,6 +2061,80 @@ TEXT;
         }
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     *  Example: Then I should see in row #1 column "Values" contains items in "TestGrid" grid:
+     *             | [attribute_1: attribute_1 "Option1", attribute_1: attribute_1 "Option2"] |
+     *             | [attribute_2: attribute_2 "Option1", attribute_2: attribute_2 "Option2"] |
+     *
+     * @Then /^(?:|I )should see in row #(?P<rowNumber>\d+) column "(?P<columnName>(?:[^"]|\\")*)" contains items in "(?P<gridName>[^"]+)" grid:$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iShouldSeeInRowColumnContainsItemsInGrid(
+        TableNode $table,
+        $rowNumber,
+        $columnName,
+        $gridName
+    ) {
+        $grid = $this->getGrid($gridName);
+        $header = $grid->getHeader();
+
+        self::assertCount(
+            1,
+            $table->getRow(0),
+            "You can't use more then one column in this method"
+        );
+
+        self::assertTrue(
+            $header->hasColumn($columnName),
+            sprintf('"%s" column is not in grid "%s"', $columnName, $gridName)
+        );
+
+        $columnNumber = $header->getColumnNumber($columnName);
+
+        $row = $grid->getRowByNumber($rowNumber);
+        $cell = $row->getCellByNumber($columnNumber);
+
+        $crawler = new Crawler($cell->getHtml());
+
+        $normalizeValue = function (string $value): array {
+            if (str_starts_with($value, '[')) {
+                $value = trim($value, '[]');
+                $value = explode(',', $value);
+                $value = array_map('trim', $value);
+            }
+
+            if (is_string($value)) {
+                $value = [$value];
+            }
+
+            return $value;
+        };
+
+        foreach ($table->getRows() as $row) {
+            $value = current($row);
+            $rowValues = $normalizeValue($value);
+
+            foreach ($rowValues as $value) {
+                $countMatches = $crawler
+                    ->filter('li')
+                    ->filterXPath(sprintf("//*[contains(text(), '%s')]", $value))
+                    ->count();
+
+                self::assertTrue(
+                    $countMatches > 0,
+                    sprintf(
+                        'Value "%s" not found in #%s row "%s" cell in "%s" grid',
+                        $value,
+                        $rowNumber,
+                        $columnNumber,
+                        $gridName
+                    )
+                );
+            }
+        }
+    }
+
     /**
      * Check column is not present in grid
      * Example: Then I shouldn't see Example column in grid

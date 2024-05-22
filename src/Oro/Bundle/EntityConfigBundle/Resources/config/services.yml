@@ -651,3 +651,20 @@ services:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: oro_entity_extend.warmer, priority: -1000 }
+
+    Oro\Bundle\EntityConfigBundle\EntityConfig\EntityManagementConfig:
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    oro_entity_config.voter.entity_management_config_voter:
+        class: Oro\Bundle\EntityConfigBundle\Voter\EntityManagementConfigVoter
+        tags:
+            - { name: security.voter }
+
+    oro_entity_config.datagrid.entity_management_grid_action_extension:
+        class: Oro\Bundle\EntityConfigBundle\Datagrid\EntityManagementGridActionExtension
+        arguments:
+            - '@oro_security.authorization_checker'
+            - '@doctrine'
+        tags:
+            - { name: oro_datagrid.extension }
