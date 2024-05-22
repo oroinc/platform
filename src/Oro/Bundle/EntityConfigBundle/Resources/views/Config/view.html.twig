@@ -14,7 +14,7 @@
 {% block navButtons %}
     {% import '@OroUI/macros.html.twig' as UI %}
 
-    {% if is_granted('oro_entityconfig_manage') %}
+    {% if is_granted('oro_entityconfig_manage') and is_granted('EDIT', entity) %}
         {% if extend_config.is('is_extend') %}
             {% include '@OroImportExport/ImportExport/buttons_from_configuration.html.twig' with {
                 'alias': 'oro_field_config_model',
