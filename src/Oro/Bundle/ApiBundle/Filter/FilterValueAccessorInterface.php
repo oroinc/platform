@@ -14,17 +14,25 @@ interface FilterValueAccessorInterface extends QueryStringAccessorInterface
     public function has(string $key): bool;
 
     /**
-     * Gets a filter value by its key.
+     * Gets all filter values with the given key.
+     * In additional finds filter values in the default filter's group if it is set.
+     *
+     * @return FilterValue[]
+     */
+    public function get(string $key): array;
+
+    /**
+     * Gets a filter value by its key. The last value is returned if there are several values with the given key.
      * In additional finds the filter value in the default filter's group if it is set.
      */
-    public function get(string $key): ?FilterValue;
+    public function getOne(string $key): ?FilterValue;
 
     /**
      * Gets all filter values from the given group.
      *
      * @param string $group
      *
-     * @return FilterValue[] [filter key => FilterValue, ...]
+     * @return array [filter key => [FilterValue, ...], ...]
      */
     public function getGroup(string $group): array;
 
@@ -41,17 +49,18 @@ interface FilterValueAccessorInterface extends QueryStringAccessorInterface
     /**
      * Gets all filter values.
      *
-     * @return FilterValue[] [filter key => FilterValue, ...]
+     * @return array [filter key => [FilterValue, ...], ...]
      */
     public function getAll(): array;
 
     /**
      * Sets a filter value.
+     * Removes all filter values with the given key if the given filter value is NULL.
      */
     public function set(string $key, ?FilterValue $value): void;
 
     /**
-     * Removes a filter value.
+     * Removes all filter values with the given key.
      */
     public function remove(string $key): void;
 }

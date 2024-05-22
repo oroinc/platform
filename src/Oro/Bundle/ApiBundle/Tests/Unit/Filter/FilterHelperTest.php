@@ -16,20 +16,20 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 class FilterHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FilterCollection */
-    private $filters;
+    private $filterCollection;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterValueAccessorInterface */
-    private $filterValues;
+    /** @var FilterValueAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $filterValueAccessor;
 
     /** @var FilterHelper */
     private $filterHelper;
 
     protected function setUp(): void
     {
-        $this->filters = new FilterCollection();
-        $this->filterValues = $this->createMock(FilterValueAccessorInterface::class);
+        $this->filterCollection = new FilterCollection();
+        $this->filterValueAccessor = $this->createMock(FilterValueAccessorInterface::class);
 
-        $this->filterHelper = new FilterHelper($this->filters, $this->filterValues);
+        $this->filterHelper = new FilterHelper($this->filterCollection, $this->filterValueAccessor);
     }
 
     public function testEmptyFilters()
@@ -43,27 +43,27 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testWithoutFilterValuesAndWithoutDefaultValues()
     {
-        $this->filters->add(
+        $this->filterCollection->add(
             'page[number]',
             new PageNumberFilter(DataType::UNSIGNED_INTEGER, 'page number')
         );
-        $this->filters->add(
+        $this->filterCollection->add(
             'page[size]',
             new PageSizeFilter(DataType::INTEGER, 'page size')
         );
-        $this->filters->add(
+        $this->filterCollection->add(
             'sorting',
             new SortFilter(DataType::ORDER_BY, 'sorting')
         );
         $testFilter = new ComparisonFilter(DataType::BOOLEAN, 'test filter');
         $testFilter->setField('test');
-        $this->filters->add(
+        $this->filterCollection->add(
             'filter[test]',
             $testFilter
         );
 
-        $this->filterValues->expects(self::any())
-            ->method('get')
+        $this->filterValueAccessor->expects(self::any())
+            ->method('getOne')
             ->willReturn(null);
 
         self::assertNull($this->filterHelper->getFilterValue('test'));
@@ -75,27 +75,27 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testWithoutFilterValues()
     {
-        $this->filters->add(
+        $this->filterCollection->add(
             'page[number]',
             new PageNumberFilter(DataType::UNSIGNED_INTEGER, 'page number', 1)
         );
-        $this->filters->add(
+        $this->filterCollection->add(
             'page[size]',
             new PageSizeFilter(DataType::INTEGER, 'page size', 10)
         );
-        $this->filters->add(
+        $this->filterCollection->add(
             'sorting',
             new SortFilter(DataType::ORDER_BY, 'sorting', ['id' => 'ASC'])
         );
         $testFilter = new ComparisonFilter(DataType::BOOLEAN, 'test filter');
         $testFilter->setField('test');
-        $this->filters->add(
+        $this->filterCollection->add(
             'filter[test]',
             $testFilter
         );
 
-        $this->filterValues->expects(self::any())
-            ->method('get')
+        $this->filterValueAccessor->expects(self::any())
+            ->method('getOne')
             ->willReturn(null);
 
         self::assertNull($this->filterHelper->getFilterValue('test'));
@@ -107,27 +107,27 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testWithFilterValues()
     {
-        $this->filters->add(
+        $this->filterCollection->add(
             'page[number]',
             new PageNumberFilter(DataType::UNSIGNED_INTEGER, 'page number', 1)
         );
-        $this->filters->add(
+        $this->filterCollection->add(
             'page[size]',
             new PageSizeFilter(DataType::INTEGER, 'page size', 10)
         );
-        $this->filters->add(
+        $this->filterCollection->add(
             'sorting',
             new SortFilter(DataType::ORDER_BY, 'sorting', ['id' => 'ASC'])
         );
         $testFilter = new ComparisonFilter(DataType::BOOLEAN, 'test filter');
         $testFilter->setField('test');
-        $this->filters->add(
+        $this->filterCollection->add(
             'filter[test]',
             $testFilter
         );
 
-        $this->filterValues->expects(self::any())
-            ->method('get')
+        $this->filterValueAccessor->expects(self::any())
+            ->method('getOne')
             ->willReturnMap([
                 ['page[number]', new FilterValue('page[number]', 2)],
                 ['page[size]', new FilterValue('page[size]', 20)],
@@ -149,13 +149,13 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $testFilter = new ComparisonFilter(DataType::BOOLEAN, 'test filter');
         $testFilter->setField('test');
-        $this->filters->add(
+        $this->filterCollection->add(
             'filter[test]',
             $testFilter
         );
 
-        $this->filterValues->expects(self::once())
-            ->method('get')
+        $this->filterValueAccessor->expects(self::once())
+            ->method('getOne')
             ->with('filter[test]')
             ->willReturn(new FilterValue('filter[test]', true, FilterOperator::EQ));
 
@@ -170,13 +170,13 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $testFilter = new ComparisonFilter(DataType::BOOLEAN, 'test filter');
         $testFilter->setField('test');
-        $this->filters->add(
+        $this->filterCollection->add(
             'filter[test]',
             $testFilter
         );
 
-        $this->filterValues->expects(self::once())
-            ->method('get')
+        $this->filterValueAccessor->expects(self::once())
+            ->method('getOne')
             ->with('filter[test]')
             ->willReturn(new FilterValue('filter[test]', true, FilterOperator::NEQ));
 

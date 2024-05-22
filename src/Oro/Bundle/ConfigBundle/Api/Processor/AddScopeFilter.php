@@ -29,13 +29,13 @@ class AddScopeFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $filters = $context->getFilters();
-        if ($filters->has(self::FILTER_KEY)) {
+        $filterCollection = $context->getFilters();
+        if ($filterCollection->has(self::FILTER_KEY)) {
             // the filter already exists
             return;
         }
 
-        $filters->add(
+        $filterCollection->add(
             self::FILTER_KEY,
             new StandaloneFilterWithDefaultValue(
                 DataType::STRING,

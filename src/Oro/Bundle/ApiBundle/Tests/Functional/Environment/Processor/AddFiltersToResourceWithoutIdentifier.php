@@ -23,15 +23,15 @@ class AddFiltersToResourceWithoutIdentifier implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $filters = $context->getFilters();
-        if (!$filters->has(self::FILTER1_KEY)) {
-            $filters->add(
+        $filterCollection = $context->getFilters();
+        if (!$filterCollection->has(self::FILTER1_KEY)) {
+            $filterCollection->add(
                 self::FILTER1_KEY,
                 new StandaloneFilter(DataType::STRING, 'Test Filter 1')
             );
         }
-        if (!$filters->has(self::FILTER2_KEY)) {
-            $filters->add(
+        if (!$filterCollection->has(self::FILTER2_KEY)) {
+            $filterCollection->add(
                 self::FILTER2_KEY,
                 new StandaloneFilter(DataType::DATE, 'Test Filter 2')
             );

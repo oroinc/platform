@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -29,9 +30,10 @@ class SetCaseSensitivityForFilter implements ProcessorInterface
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */
-        if ($context->getFilters()->has($this->filterName)) {
-            $isCaseInsensitive = (bool) $this->configManager->get($this->sensitivityConfigOptionName);
-            $context->getFilters()->get($this->filterName)->setCaseInsensitive($isCaseInsensitive);
+
+        $filter = $context->getFilters()->get($this->filterName);
+        if ($filter instanceof ComparisonFilter) {
+            $filter->setCaseInsensitive((bool)$this->configManager->get($this->sensitivityConfigOptionName));
         }
     }
 }

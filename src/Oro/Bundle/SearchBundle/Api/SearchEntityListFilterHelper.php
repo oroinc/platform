@@ -40,7 +40,7 @@ class SearchEntityListFilterHelper
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
         $allowedEntityClasses = $this->searchEntityClassProvider->getAllowedEntityClasses($version, $requestType);
-        $filterValue = $context->getFilterValues()->get($filterName);
+        $filterValue = $context->getFilterValues()->getOne($filterName);
         if (null === $filterValue) {
             return $allowedEntityClasses;
         }
@@ -93,14 +93,14 @@ class SearchEntityListFilterHelper
         array $accessibleEntityClasses,
         RequestType $requestType
     ): Error {
-        $detail = sprintf(
-            'The "%s" is not known entity. Known entities: %s',
-            $entityType,
-            implode(', ', $this->convertToEntityTypes($accessibleEntityClasses, $requestType))
-        );
-
-        return Error::createValidationError(Constraint::FILTER, $detail)
-            ->setSource(ErrorSource::createByParameter($filterKey));
+        return Error::createValidationError(
+            Constraint::FILTER,
+            sprintf(
+                'The "%s" is not known entity. Known entities: %s',
+                $entityType,
+                implode(', ', $this->convertToEntityTypes($accessibleEntityClasses, $requestType))
+            )
+        )->setSource(ErrorSource::createByParameter($filterKey));
     }
 
     private function convertToEntityTypes(array $entityClasses, RequestType $requestType): array

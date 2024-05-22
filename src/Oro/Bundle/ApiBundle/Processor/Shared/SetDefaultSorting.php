@@ -109,12 +109,12 @@ class SetDefaultSorting implements ProcessorInterface
 
     private function addSortFilter(
         string $filterName,
-        FilterCollection $filters,
+        FilterCollection $filterCollection,
         EntityDefinitionConfig $config,
         ?SortersConfig $configOfSorters
     ): void {
-        if (!$filters->has($filterName)) {
-            $filters->add(
+        if (!$filterCollection->has($filterName)) {
+            $filterCollection->add(
                 $filterName,
                 new SortFilter(
                     DataType::ORDER_BY,

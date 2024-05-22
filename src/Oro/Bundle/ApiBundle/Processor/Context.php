@@ -67,8 +67,8 @@ class Context extends NormalizeResultContext implements ContextInterface
 
     protected ConfigProvider $configProvider;
     protected MetadataProvider $metadataProvider;
-    private ?FilterCollection $filters = null;
-    private ?FilterValueAccessorInterface $filterValues = null;
+    private ?FilterCollection $filterCollection = null;
+    private ?FilterValueAccessorInterface $filterValueAccessor = null;
     private ?ParameterBagInterface $requestHeaders = null;
     private ?ParameterBagInterface $responseHeaders = null;
     private ?DocumentBuilderInterface $responseDocumentBuilder = null;
@@ -221,11 +221,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getFilters(): FilterCollection
     {
-        if (null === $this->filters) {
-            $this->filters = new FilterCollection();
+        if (null === $this->filterCollection) {
+            $this->filterCollection = new FilterCollection();
         }
 
-        return $this->filters;
+        return $this->filterCollection;
     }
 
     /**
@@ -233,11 +233,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getFilterValues(): FilterValueAccessorInterface
     {
-        if (null === $this->filterValues) {
-            $this->filterValues = new FilterValueAccessor();
+        if (null === $this->filterValueAccessor) {
+            $this->filterValueAccessor = new FilterValueAccessor();
         }
 
-        return $this->filterValues;
+        return $this->filterValueAccessor;
     }
 
     /**
@@ -245,7 +245,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setFilterValues(FilterValueAccessorInterface $accessor): void
     {
-        $this->filterValues = $accessor;
+        $this->filterValueAccessor = $accessor;
     }
 
     /**

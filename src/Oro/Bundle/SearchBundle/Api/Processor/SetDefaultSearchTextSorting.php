@@ -54,10 +54,12 @@ class SetDefaultSearchTextSorting implements ProcessorInterface
         }
     }
 
-    private function hasSearchTextFilter(FilterCollection $filters, FilterValueAccessorInterface $filterValues): bool
-    {
-        foreach ($filters as $filterKey => $filter) {
-            if ($filter instanceof SimpleSearchFilter && $filterValues->has($filterKey)) {
+    private function hasSearchTextFilter(
+        FilterCollection $filterCollection,
+        FilterValueAccessorInterface $filterValueAccessor
+    ): bool {
+        foreach ($filterCollection as $filterKey => $filter) {
+            if ($filter instanceof SimpleSearchFilter && $filterValueAccessor->has($filterKey)) {
                 return true;
             }
         }

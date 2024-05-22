@@ -49,7 +49,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
             return;
         }
 
-        $filterValue = $context->getFilterValues()->get($filterName);
+        $filterValue = $context->getFilterValues()->getOne($filterName);
         if (null === $filterValue) {
             // meta properties were not requested
             return;

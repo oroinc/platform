@@ -53,8 +53,8 @@ class CorrectSortValue implements ProcessorInterface
         $sortFilterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getSortFilterName();
-        $filterValues = $context->getFilterValues();
-        $sortFilterValue = $filterValues->get($sortFilterName);
+        $filterValueAccessor = $context->getFilterValues();
+        $sortFilterValue = $filterValueAccessor->getOne($sortFilterName);
         if (null === $sortFilterValue) {
             $sortFilter = $context->getFilters()->get($sortFilterName);
             if ($sortFilter instanceof StandaloneFilterWithDefaultValue) {
@@ -67,7 +67,7 @@ class CorrectSortValue implements ProcessorInterface
                         $sortFilter->isArrayAllowed()
                     );
                     $sortFilterValue = new FilterValue($sortFilterName, $defaultValue);
-                    $filterValues->set($sortFilterName, $sortFilterValue);
+                    $filterValueAccessor->set($sortFilterName, $sortFilterValue);
                 }
             }
         }

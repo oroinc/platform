@@ -79,12 +79,12 @@ abstract class AbstractLoadEmailContextItems implements ProcessorInterface
 
     protected function getRequestedExcludeCurrentUser(Context $context): ?bool
     {
-        return $context->getFilterValues()->get('excludeCurrentUser')?->getValue();
+        return $context->getFilterValues()->getOne('excludeCurrentUser')?->getValue();
     }
 
     protected function getRequestedIsContext(Context $context): ?bool
     {
-        return $context->getFilterValues()->get('isContext')?->getValue();
+        return $context->getFilterValues()->getOne('isContext')?->getValue();
     }
 
     protected function getRequestedMessageIds(Context $context): ?array
@@ -99,7 +99,7 @@ abstract class AbstractLoadEmailContextItems implements ProcessorInterface
 
     protected function getRequestedMessageId(Context $context): mixed
     {
-        $filterValue = $context->getFilterValues()->get('messageId');
+        $filterValue = $context->getFilterValues()->getOne('messageId');
         $value = $filterValue?->getValue();
         if (!$value) {
             $context->addError(
@@ -125,14 +125,16 @@ abstract class AbstractLoadEmailContextItems implements ProcessorInterface
         return $filterKey;
     }
 
-    protected function getRequestedEmailAddresses(FilterValueAccessorInterface $filterValues): array
+    protected function getRequestedEmailAddresses(FilterValueAccessorInterface $filterValueAccessor): array
     {
         $emailAddresses = [];
-        $emailAddress = $this->emailAddressHelper->extractPureEmailAddress($filterValues->get('from')?->getValue());
+        $emailAddress = $this->emailAddressHelper->extractPureEmailAddress(
+            $filterValueAccessor->getOne('from')?->getValue()
+        );
         if ($emailAddress) {
             $emailAddresses[] = $emailAddress;
         }
-        $values = $filterValues->get('to')?->getValue();
+        $values = $filterValueAccessor->getOne('to')?->getValue();
         if ($values) {
             foreach ((array)$values as $val) {
                 $emailAddress = $this->emailAddressHelper->extractPureEmailAddress($val);
@@ -141,7 +143,7 @@ abstract class AbstractLoadEmailContextItems implements ProcessorInterface
                 }
             }
         }
-        $values = $filterValues->get('cc')?->getValue();
+        $values = $filterValueAccessor->getOne('cc')?->getValue();
         if ($values) {
             foreach ((array)$values as $val) {
                 $emailAddress = $this->emailAddressHelper->extractPureEmailAddress($val);
@@ -160,7 +162,7 @@ abstract class AbstractLoadEmailContextItems implements ProcessorInterface
         ?bool $excludeCurrentUser,
         ?bool $isContext
     ): ?string {
-        $filterValue = $context->getFilterValues()->get('searchText');
+        $filterValue = $context->getFilterValues()->getOne('searchText');
         if (null === $filterValue) {
             return null;
         }
