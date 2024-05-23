@@ -78,6 +78,12 @@ services:
         tags:
             - { name: layout.data_provider, alias: feature }
 
+    oro_featuretoggle.layout.data_provider.feature_provider_decorator:
+        class: Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider50SupportDecorator
+        decorates: oro_featuretoggle.layout.data_provider.feature_provider
+        arguments:
+            - '@.inner'
+
     oro_featuretoggle.voter.config_voter:
         class: Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter
         arguments:
