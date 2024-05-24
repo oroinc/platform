@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder as RestApiDoc;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
 /**
@@ -20,7 +19,7 @@ class RestPlainDocContainsConstraint extends ArrayContainsConstraint
             && \is_array($this->expected)
             && \is_array($other)
             && !empty($this->expected)
-            && !ArrayUtil::isAssoc($this->expected)
+            && !$this->isAssocArray($this->expected)
             && \count($this->expected) !== \count($other)
         ) {
             try {
