@@ -17,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -74,14 +75,15 @@ class ConfigController extends AbstractController
      * @return array|RedirectResponse
      */
     #[Route(path: '/update/{id}', name: 'oro_entityconfig_update')]
-    #[Template]
-    public function updateAction(Request $request, $id)
+    #[Template('@OroEntityConfig/Config/update.html.twig')]
+    #[Acl(
+        id: 'oro_entityconfig_update',
+        type: 'entity',
+        class: EntityConfigModel::class,
+        permission: BasicPermission::EDIT
+    )]
+    public function newUpdateAction(Request $request, EntityConfigModel $entity)
     {
-        $entity  = $this->getConfigManager()
-            ->getEntityManager()
-            ->getRepository(EntityConfigModel::class)
-            ->find($id);
-
         $form = $this->createForm(
             ConfigType::class,
             null,
@@ -108,6 +110,16 @@ class ConfigController extends AbstractController
             'entity_count'  => $this->getRowCount($entity),
             'link'          => $this->getRowCountLink($entity),
         ];
+    }
+
+    public function updateAction(Request $request, $id)
+    {
+        $entity  = $this->getConfigManager()
+            ->getEntityManager()
+            ->getRepository(EntityConfigModel::class)
+            ->find($id);
+
+        return $this->updateAction($request, $entity);
     }
 
     /**
@@ -172,6 +184,12 @@ class ConfigController extends AbstractController
      * @return array|RedirectResponse
      */
     #[Route(path: '/field/update/{id}', name: 'oro_entityconfig_field_update')]
+    #[Acl(
+        id: 'oro_entityconfig_field_update',
+        type: 'entity',
+        class: FieldConfigModel::class,
+        permission: BasicPermission::EDIT
+    )]
     #[Template]
     public function fieldUpdateAction(FieldConfigModel $fieldConfigModel)
     {
