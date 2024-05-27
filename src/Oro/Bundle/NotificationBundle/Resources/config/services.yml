@@ -177,6 +177,8 @@ services:
             - '@oro_notification.manager.email_notification_sender'
             - '@logger'
             - '@oro_email.provider.localized_template'
+        calls:
+            - [setNotificationSettings, ['@oro_notification.model.notification_settings']]
 
     oro_notification.manager.email_notification_sender:
         class: Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender

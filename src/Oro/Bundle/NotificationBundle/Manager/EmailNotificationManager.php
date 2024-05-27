@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Manager;
 
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Model\SenderAwareInterface;
 use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
@@ -24,6 +26,9 @@ class EmailNotificationManager
     /** @var LocalizedTemplateProvider */
     private $localizedTemplateProvider;
 
+    /** @var NotificationSettings */
+    private $notificationSettings;
+
     /**
      * EmailNotificationManager constructor.
      */
@@ -35,6 +40,11 @@ class EmailNotificationManager
         $this->emailNotificationSender = $emailNotificationSender;
         $this->logger = $logger;
         $this->localizedTemplateProvider = $localizedTemplateProvider;
+    }
+
+    public function setNotificationSettings(NotificationSettings $notificationSettings): void
+    {
+        $this->notificationSettings = $notificationSettings;
     }
 
     /**
@@ -75,9 +85,7 @@ class EmailNotificationManager
         LoggerInterface $logger = null
     ): void {
         try {
-            $sender = $notification instanceof SenderAwareInterface
-                ? $notification->getSender()
-                : null;
+            $sender = $this->getSender($notification);
 
             $templateCollection = $this->localizedTemplateProvider->getAggregated(
                 $notification->getRecipients(),
@@ -111,5 +119,22 @@ class EmailNotificationManager
 
             throw new NotificationSendException($notification);
         }
+    }
+
+    private function getSender(TemplateEmailNotificationInterface $notification): From
+    {
+        $sender = null;
+        if ($notification instanceof SenderAwareInterface) {
+            $sender = $notification->getSender();
+        }
+
+        if ($sender === null) {
+            $scope = $notification->getEntity();
+            $sender = $scope
+                ? $this->notificationSettings->getSenderByScopeEntity($scope)
+                : $this->notificationSettings->getSender();
+        }
+
+        return $sender;
     }
 }
