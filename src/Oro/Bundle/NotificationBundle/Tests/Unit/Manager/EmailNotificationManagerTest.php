@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -36,6 +37,9 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizedTemplateProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $localizedTemplateProvider;
 
+    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $notificationSettings;
+
     /** @var EmailNotificationManager */
     private $manager;
 
@@ -44,16 +48,20 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
         $this->emailNotificationSender = $this->createMock(EmailNotificationSender::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->localizedTemplateProvider = $this->createMock(LocalizedTemplateProvider::class);
+        $this->notificationSettings = $this->createMock(NotificationSettings::class);
 
         $this->manager = new EmailNotificationManager(
             $this->emailNotificationSender,
             $this->logger,
             $this->localizedTemplateProvider
         );
+
+        $this->manager->setNotificationSettings($this->notificationSettings);
     }
 
     public function testProcessSingle(): void
     {
+        $sender = From::emailAddress('no-reply@example.com');
         $entity = new User();
         $englishRecipient = (new User())->setEmail('english@mail.com');
         $frenchRecipient1 = (new User())->setEmail('french1@mail.com');
@@ -92,13 +100,15 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
         $expectedEnglishNotification = new TemplateEmailNotification(
             new EmailTemplateCriteria(self::TEMPLATE_NAME),
             [$englishRecipient],
-            $entity
+            $entity,
+            $sender
         );
 
         $expectedFrenchNotification = new TemplateEmailNotification(
             new EmailTemplateCriteria(self::TEMPLATE_NAME),
             [$frenchRecipient1, $frenchRecipient2],
-            $entity
+            $entity,
+            $sender
         );
 
         $this->emailNotificationSender->expects($this->exactly(2))
@@ -107,6 +117,11 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
                 [$expectedEnglishNotification, $englishEmailTemplateModel],
                 [$expectedFrenchNotification, $frenchEmailTemplateModel]
             );
+
+        $this->notificationSettings
+            ->expects($this->once())
+            ->method('getSenderByScopeEntity')
+            ->willReturn($sender);
 
         $this->manager->processSingle($notification, []);
     }
@@ -188,6 +203,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess(): void
     {
+        $sender = From::emailAddress('some@mail.com');
         $recipient = (new User())->setEmail('english@mail.com');
 
         $notification1 = new TemplateEmailNotification(new EmailTemplateCriteria(self::TEMPLATE_NAME), [$recipient]);
@@ -229,8 +245,18 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $expectedNotification1 = new TemplateEmailNotification($notification1->getTemplateCriteria(), [$recipient]);
-        $expectedNotification2 = new TemplateEmailNotification($notification2->getTemplateCriteria(), [$recipient]);
+        $expectedNotification1 = new TemplateEmailNotification(
+            $notification1->getTemplateCriteria(),
+            [$recipient],
+            null,
+            $sender
+        );
+        $expectedNotification2 = new TemplateEmailNotification(
+            $notification2->getTemplateCriteria(),
+            [$recipient],
+            null,
+            $sender
+        );
 
         $this->emailNotificationSender->expects($this->exactly(2))
             ->method('send')
@@ -238,6 +264,11 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
                 [$expectedNotification1, $emailTemplateModel1],
                 [$expectedNotification2, $emailTemplateModel2]
             );
+
+        $this->notificationSettings
+            ->expects($this->exactly(2))
+            ->method('getSender')
+            ->willReturn($sender);
 
         $this->manager->process([$notification1, $notification2], null, ['some' => true]);
     }
