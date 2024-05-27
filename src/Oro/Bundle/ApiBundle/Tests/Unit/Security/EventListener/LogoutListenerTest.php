@@ -78,7 +78,7 @@ class LogoutListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->listener->onLogout($event);
 
-        self::assertEquals(new RedirectResponse($uri, 302), $event->getResponse());
+        self::assertSame($response, $event->getResponse());
     }
 
     public function testGetSubscribedEvents(): void
