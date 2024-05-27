@@ -141,7 +141,10 @@ class EmailNotificationManager implements LoggerAwareInterface
         }
 
         if ($sender === null) {
-            $sender = $this->notificationSettings->getSender();
+            $scope = $notification->getEntity();
+            $sender = $scope
+                ? $this->notificationSettings->getSenderByScopeEntity($scope)
+                : $this->notificationSettings->getSender();
         }
 
         return $sender;
