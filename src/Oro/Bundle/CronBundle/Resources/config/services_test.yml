@@ -10,6 +10,10 @@ services:
         tags:
             - { name: console.command }
 
+    Oro\Bundle\CronBundle\Tests\Functional\Stub\TestCronCommandWithArbitraryName:
+        tags:
+            - { name: console.command }
+
     Oro\Bundle\CronBundle\Tests\Functional\Stub\LazyTestCronCommand:
         tags:
             - { name: console.command }

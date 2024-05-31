@@ -329,7 +329,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         DependencyInjectionUtil::findDefinition($container, self::FILTER_OPERATOR_REGISTRY_SERVICE_ID)
             ?->replaceArgument(0, $config['filter_operators']);
         DependencyInjectionUtil::findDefinition($container, self::REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID)
-            ?->replaceArgument(1, $config['filter_operators']);
+            ?->replaceArgument(0, $config['filter_operators']);
     }
 
     private function registerConfigExtensions(ContainerBuilder $container, array $config): void

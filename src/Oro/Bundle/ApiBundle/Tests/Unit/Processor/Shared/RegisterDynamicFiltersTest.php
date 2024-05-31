@@ -70,7 +70,6 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     {
         return new RestFilterValueAccessor(
             $request,
-            '(!|<|>|%21|%3C|%3E)?(=|%3D)|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(\*|~|\^|\$|%2A|%7E|%5E|%24)',
             [FilterOperator::EQ => '=', FilterOperator::NEQ => '!=']
         );
     }
@@ -586,7 +585,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category']);
         $primaryEntityFilters = $this->getFiltersConfig();
 
-        $request = $this->getRequest('filter[category.name]!=test');
+        $request = $this->getRequest('filter[category.name][neq]=test');
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -623,7 +622,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'groups']);
         $primaryEntityFilters = $this->getFiltersConfig();
 
-        $request = $this->getRequest('filter[groups.name]!=test');
+        $request = $this->getRequest('filter[groups.name][neq]=test');
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')

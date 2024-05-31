@@ -22,18 +22,14 @@ class SearchTest extends RestJsonApiTestCase
     {
         parent::setUp();
 
-        // do the reindex because by some unknown reasons the search index is empty
+        // do the reindex because by some unknown reasons the search index is empty or missed
         // after upgrade from old application version
-        self::reindex(User::class);
-        self::reindex(BusinessUnit::class);
+        self::reindex();
     }
 
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
-
-        self::clearIndex(User::class);
-        self::clearIndex(BusinessUnit::class);
     }
 
     private static function filterResponseContent(Response $response): array

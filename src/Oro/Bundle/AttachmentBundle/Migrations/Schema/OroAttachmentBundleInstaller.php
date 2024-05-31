@@ -13,7 +13,7 @@ class OroAttachmentBundleInstaller implements Installation
      */
     public function getMigrationVersion(): string
     {
-        return 'v1_11';
+        return 'v1_12';
     }
 
     /**

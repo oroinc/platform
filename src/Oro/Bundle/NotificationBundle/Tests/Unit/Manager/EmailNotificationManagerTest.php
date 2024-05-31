@@ -71,7 +71,7 @@ class EmailNotificationManagerTest extends TestCase
         $sender = From::emailAddress('no-reply@example.com');
         $this->notificationSettings
             ->expects(self::once())
-            ->method('getSender')
+            ->method('getSenderByScopeEntity')
             ->willReturn($sender);
 
         $englishEmailModel = (new EmailModel())

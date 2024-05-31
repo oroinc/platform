@@ -151,7 +151,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testNotEqualFilter(array $filter, array $expectedRows)
     {
         $key = key($filter);
-        $filter = [sprintf('filter[%s]!', $key) => $filter[$key]];
+        $filter = [sprintf('filter[%s][neq]', $key) => $filter[$key]];
 
         // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
         // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
@@ -568,7 +568,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => ['fieldText' => ['operators' => ['=']]]]]
+            ['filters' => ['fields' => ['fieldText' => ['operators' => ['eq']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -591,14 +591,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => ['fieldText' => ['operators' => ['!=']]]]]
+            ['filters' => ['fields' => ['fieldText' => ['operators' => ['neq']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
         $key = key($filter);
-        $filter = [sprintf('filter[%s]!', $key) => $filter[$key]];
+        $filter = [sprintf('filter[%s][neq]', $key) => $filter[$key]];
 
         $response = $this->cget(['entity' => $entityType], $filter);
 
@@ -610,7 +610,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
      */
     public function testExistsFilter(string $filterFieldName, array $expectedRows)
     {
-        $filter = ['filters' => sprintf('filter[%s]*true', $filterFieldName)];
+        $filter = ['filters' => sprintf('filter[%s][exists]=true', $filterFieldName)];
 
         // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
         // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
@@ -661,7 +661,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
-        $filter = ['filters' => sprintf('filter[%s]*1', $filterFieldName)];
+        $filter = ['filters' => sprintf('filter[%s][exists]=1', $filterFieldName)];
 
         $response = $this->cget(['entity' => $entityType], $filter);
 
@@ -703,7 +703,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
-        $filter = ['filters' => sprintf('filter[%s]*yes', $filterFieldName)];
+        $filter = ['filters' => sprintf('filter[%s][exists]=yes', $filterFieldName)];
 
         $response = $this->cget(['entity' => $entityType], $filter);
 
@@ -826,7 +826,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
      */
     public function testNotExistsFilter(string $filterFieldName, array $expectedRows)
     {
-        $filter = ['filters' => sprintf('filter[%s]*false', $filterFieldName)];
+        $filter = ['filters' => sprintf('filter[%s][exists]=false', $filterFieldName)];
 
         // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
         // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
@@ -871,7 +871,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
-        $filter = ['filters' => sprintf('filter[%s]*0', $filterFieldName)];
+        $filter = ['filters' => sprintf('filter[%s][exists]=0', $filterFieldName)];
 
         $response = $this->cget(['entity' => $entityType], $filter);
 
@@ -901,7 +901,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
-        $filter = ['filters' => sprintf('filter[%s]*no', $filterFieldName)];
+        $filter = ['filters' => sprintf('filter[%s][exists]=no', $filterFieldName)];
 
         $response = $this->cget(['entity' => $entityType], $filter);
 
@@ -1016,7 +1016,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->prepareExpectedRows($expectedRows, $entityType);
 
         $key = key($filter);
-        $filter = ['filters' => sprintf('filter[%s]!*%s', $key, urlencode($filter[$key]))];
+        $filter = ['filters' => sprintf('filter[%s][neq_or_null]=%s', $key, urlencode($filter[$key]))];
 
         $response = $this->cget(['entity' => $entityType], $filter);
 
@@ -1128,13 +1128,13 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testContainsFilterShouldBeDisabledByDefault()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $response = $this->cget(['entity' => $entityType], ['filter[fieldString]~' => 'test'], [], false);
+        $response = $this->cget(['entity' => $entityType], ['filter[fieldString][contains]' => 'test'], [], false);
 
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "contains" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][contains]']
             ],
             $response
         );
@@ -1143,13 +1143,13 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testNotContainsFilterShouldBeDisabledByDefault()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $response = $this->cget(['entity' => $entityType], ['filter[fieldString]!~' => 'test'], [], false);
+        $response = $this->cget(['entity' => $entityType], ['filter[fieldString][not_contains]' => 'test'], [], false);
 
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "not_contains" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][not_contains]']
             ],
             $response
         );
@@ -1158,13 +1158,13 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testStartsWithFilterShouldBeDisabledByDefault()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $response = $this->cget(['entity' => $entityType], ['filter[fieldString]^' => 'test'], [], false);
+        $response = $this->cget(['entity' => $entityType], ['filter[fieldString][starts_with]' => 'test'], [], false);
 
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "starts_with" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][starts_with]']
             ],
             $response
         );
@@ -1173,13 +1173,18 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testNotStartsWithFilterShouldBeDisabledByDefault()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $response = $this->cget(['entity' => $entityType], ['filter[fieldString]!^' => 'test'], [], false);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[fieldString][not_starts_with]' => 'test'],
+            [],
+            false
+        );
 
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "not_starts_with" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][not_starts_with]']
             ],
             $response
         );
@@ -1188,13 +1193,13 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testEndsWithFilterShouldBeDisabledByDefault()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $response = $this->cget(['entity' => $entityType], ['filter[fieldString]$' => 'test'], [], false);
+        $response = $this->cget(['entity' => $entityType], ['filter[fieldString][ends_with]' => 'test'], [], false);
 
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "ends_with" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][ends_with]']
             ],
             $response
         );
@@ -1203,13 +1208,13 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testNotEndsWithFilterShouldBeDisabledByDefault()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $response = $this->cget(['entity' => $entityType], ['filter[fieldString]!$' => 'test'], [], false);
+        $response = $this->cget(['entity' => $entityType], ['filter[fieldString][not_ends_with]' => 'test'], [], false);
 
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "not_ends_with" is not supported.',
-                'source' => ['parameter' => 'filter[fieldString]']
+                'source' => ['parameter' => 'filter[fieldString][not_ends_with]']
             ],
             $response
         );
@@ -1251,11 +1256,11 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testContainsFilter(array $filter, array $expectedRows)
     {
         $filterFieldName = key($filter);
-        $filter = ['filters' => sprintf('filter[%s]~%s', $filterFieldName, $filter[$filterFieldName])];
+        $filter = ['filters' => sprintf('filter[%s][contains]=%s', $filterFieldName, $filter[$filterFieldName])];
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['~']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['contains']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1276,7 +1281,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['~']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['contains']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1313,11 +1318,11 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testNotContainsFilter(array $filter, array $expectedRows)
     {
         $filterFieldName = key($filter);
-        $filter = ['filters' => sprintf('filter[%s]!~%s', $filterFieldName, $filter[$filterFieldName])];
+        $filter = ['filters' => sprintf('filter[%s][not_contains]=%s', $filterFieldName, $filter[$filterFieldName])];
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['!~']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['not_contains']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1338,7 +1343,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['!~']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['not_contains']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1374,11 +1379,11 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testStartsWithFilter(array $filter, array $expectedRows)
     {
         $filterFieldName = key($filter);
-        $filter = ['filters' => sprintf('filter[%s]^%s', $filterFieldName, $filter[$filterFieldName])];
+        $filter = ['filters' => sprintf('filter[%s][starts_with]=%s', $filterFieldName, $filter[$filterFieldName])];
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['^']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['starts_with']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1399,7 +1404,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['^']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['starts_with']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1436,11 +1441,11 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testNotStartsWithFilter(array $filter, array $expectedRows)
     {
         $filterFieldName = key($filter);
-        $filter = ['filters' => sprintf('filter[%s]!^%s', $filterFieldName, $filter[$filterFieldName])];
+        $filter = ['filters' => sprintf('filter[%s][not_starts_with]=%s', $filterFieldName, $filter[$filterFieldName])];
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['!^']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['not_starts_with']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1497,11 +1502,11 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testEndsWithFilter(array $filter, array $expectedRows)
     {
         $filterFieldName = key($filter);
-        $filter = ['filters' => sprintf('filter[%s]$%s', $filterFieldName, $filter[$filterFieldName])];
+        $filter = ['filters' => sprintf('filter[%s][ends_with]=%s', $filterFieldName, $filter[$filterFieldName])];
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['$']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['ends_with']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1559,11 +1564,11 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testNotEndsWithFilter(array $filter, array $expectedRows)
     {
         $filterFieldName = key($filter);
-        $filter = ['filters' => sprintf('filter[%s]!$%s', $filterFieldName, $filter[$filterFieldName])];
+        $filter = ['filters' => sprintf('filter[%s][not_ends_with]=%s', $filterFieldName, $filter[$filterFieldName])];
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['!$']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['not_ends_with']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1584,7 +1589,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->appendEntityConfig(
             TestAllDataTypes::class,
-            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['!$']]]]]
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['not_ends_with']]]]]
         );
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1756,7 +1761,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->getEntityManager()->flush();
         $this->getEntityManager()->clear();
 
-        $filter = 'filter%5BfieldString%5D%3DTest+String%402';
+        $filter = 'filter%5BfieldString%5D=Test+String%402';
         $expectedRows = [['id' => '<toString(@TestItem2->id)>']];
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -1770,7 +1775,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function testFilterAlternativeSyntaxWithUrlEncodedQueryString()
+    public function testFilterWithOperatorWithUrlEncodedQueryString()
     {
         /** @var TestAllDataTypes $entity */
         $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getReference('TestItem2')->id);
@@ -1778,7 +1783,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->getEntityManager()->flush();
         $this->getEntityManager()->clear();
 
-        $filter = 'filter%5BfieldString%5D%5Beq%5D%3DTest+String%402';
+        $filter = 'filter%5BfieldString%5D%5Beq%5D=Test+String%402';
         $expectedRows = [['id' => '<toString(@TestItem2->id)>']];
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);

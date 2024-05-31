@@ -33,8 +33,7 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
         self::assertStringContainsString('Processing command "oro:cron:test:usual": setting up schedule.', $result);
         self::assertStringContainsString('Processing command "oro:cron:test:lazy": setting up schedule.', $result);
         self::assertStringContainsString(
-            'Processing command "oro:cron:test:no_schedule_definition":'
-            . ' Skipping, the command does not implement CronCommandScheduleDefinitionInterface.',
+            'Processing command "test:cron:command:with:arbitrary:name": setting up schedule.',
             $result
         );
 

@@ -9,6 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
+use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -39,6 +41,12 @@ class ConfigFieldGridController extends AbstractController
         name: 'oro_entityextend_field_create',
         requirements: ['id' => '\d+'],
         defaults: ['id' => 0]
+    )]
+    #[Acl(
+        id: 'oro_entityextend_field_create',
+        type: 'entity',
+        class: EntityConfigModel::class,
+        permission: BasicPermission::EDIT
     )]
     #[Template]
     public function createAction(Request $request, EntityConfigModel $entityConfigModel)
@@ -72,6 +80,12 @@ class ConfigFieldGridController extends AbstractController
         name: 'oro_entityextend_field_update',
         requirements: ['id' => '\d+'],
         defaults: ['id' => 0]
+    )]
+    #[Acl(
+        id: 'oro_entityextend_field_update',
+        type: 'entity',
+        class: EntityConfigModel::class,
+        permission: BasicPermission::EDIT
     )]
     #[Template('@OroEntityConfig/Config/fieldUpdate.html.twig')]
     public function updateAction(Request $request, EntityConfigModel $entity)
