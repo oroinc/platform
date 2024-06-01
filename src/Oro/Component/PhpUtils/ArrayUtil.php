@@ -7,9 +7,6 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Provides various kind of functions for working with arrays
- * example: ArrayUtil::sortBy provides stable sorting alternative to native php functions
- * see methods documentation for more details
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ArrayUtil
