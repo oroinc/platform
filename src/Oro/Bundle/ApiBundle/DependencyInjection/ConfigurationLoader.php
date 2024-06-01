@@ -15,7 +15,6 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass as CacheConfiguration;
 use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
 use Oro\Component\Config\Cache\ChainConfigCacheState;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -419,25 +418,26 @@ class ConfigurationLoader
      */
     private function sortByRequestTypeExpression(array $items): array
     {
-        ArrayUtil::sortBy(
-            $items,
-            true,
-            function ($item) {
-                $result = 0;
-                $expression = $item[1];
-                if ($expression) {
-                    $result = 100;
-                    $aspects = explode('&', $expression);
-                    foreach ($aspects as $aspect) {
-                        $result += $this->getRequestTypeAspectRank($aspect);
-                    }
-                }
-
-                return $result;
-            }
-        );
+        usort($items, function (array $a, array $b) {
+            return -($this->getRequestTypeRank($a[1]) <=> $this->getRequestTypeRank($b[1]));
+        });
 
         return $items;
+    }
+
+    private function getRequestTypeRank(?string $requestTypeExpression): int
+    {
+        if (!$requestTypeExpression) {
+            return 0;
+        }
+
+        $result = 100;
+        $aspects = explode('&', $requestTypeExpression);
+        foreach ($aspects as $aspect) {
+            $result += $this->getRequestTypeAspectRank($aspect);
+        }
+
+        return $result;
     }
 
     private function getRequestTypeAspectRank(string $aspect): int
