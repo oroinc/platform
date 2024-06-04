@@ -113,7 +113,7 @@ class JsLogSubscriber implements EventSubscriberInterface
 
         foreach ($content as $item) {
             $time = isset($item['timestamp'])
-                ? '@'.round($item['timestamp']/1000)
+                ? '@'.round($item['timestamp'] / 1000)
                 : 'now';
             $dateTime = new \DateTime($time);
             $level = isset($item['level'])

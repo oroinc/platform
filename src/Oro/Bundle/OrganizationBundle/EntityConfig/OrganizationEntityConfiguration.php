@@ -28,7 +28,7 @@ class OrganizationEntityConfiguration implements EntityConfigInterface
                     'selective' => []
                 ])
                 ->prototype('variable')->end()
-                ->defaultValue(['all'=> true, 'selective'=> []])
+                ->defaultValue(['all' => true, 'selective' => []])
             ->end()
         ;
     }

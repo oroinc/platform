@@ -16,7 +16,7 @@ class ConsumerHeartbeatTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->driver = $this->createMock(StateDriverInterface::class);
-        $this->consumerHeartbeat= new ConsumerHeartbeat($this->driver, 15);
+        $this->consumerHeartbeat = new ConsumerHeartbeat($this->driver, 15);
     }
 
     public function testTick()

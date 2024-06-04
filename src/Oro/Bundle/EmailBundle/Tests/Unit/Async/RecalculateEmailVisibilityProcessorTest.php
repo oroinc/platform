@@ -291,11 +291,11 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
             RecalculateEmailVisibilityChunkTopic::getName(),
             [
                 [
-                    'jobId'=> $job1Id,
+                    'jobId' => $job1Id,
                     'ids'  => $expected1Data
                 ],
                 [
-                    'jobId'=> $job2Id,
+                    'jobId' => $job2Id,
                     'ids'  => $expected2Data,
                 ]
             ]

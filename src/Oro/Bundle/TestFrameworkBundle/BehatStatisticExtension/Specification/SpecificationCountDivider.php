@@ -42,7 +42,7 @@ class SpecificationCountDivider implements SpecificationDividerInterface
         $count = count($array);
         $chunks = array_chunk($array, $divider);
 
-        if (0 === $count%$divider) {
+        if (0 === $count % $divider) {
             return $chunks;
         }
 
@@ -51,7 +51,7 @@ class SpecificationCountDivider implements SpecificationDividerInterface
         }
 
         $tail = array_merge(array_pop($chunks), array_pop($chunks));
-        $tailChunks = array_chunk($tail, round(count($tail)/2));
+        $tailChunks = array_chunk($tail, round(count($tail) / 2));
 
         array_push($chunks, $tailChunks[0], $tailChunks[1]);
 

@@ -31,7 +31,7 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
             'only path' => [
                 [
                     'class' => FileDriver::class,
-                    'options'=> [
+                    'options' => [
                         'file_path' => 'file/path',
                     ],
                 ],
@@ -39,7 +39,7 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
             'path and some options' => [
                 [
                     'class' => FileDriver::class,
-                    'options'=> [
+                    'options' => [
                         'file_path' => 'file/path',
                         'unknown_option' => 'value',
                     ],
@@ -50,7 +50,7 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDriverShouldReturnExistingInstanceOfDriver(): void
     {
-        $factory = $this->getDriverFactory(['options'=> ['file_path' => 'file/path']]);
+        $factory = $this->getDriverFactory(['options' => ['file_path' => 'file/path']]);
 
         $driver = $factory->getDriver();
 

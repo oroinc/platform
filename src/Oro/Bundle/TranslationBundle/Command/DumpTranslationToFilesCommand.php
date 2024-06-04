@@ -51,7 +51,7 @@ class DumpTranslationToFilesCommand extends Command
             ->addOption(
                 'locale',
                 'l',
-                InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'The locale names for which the translations should be dumped'
             )
             ->addOption(

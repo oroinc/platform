@@ -48,7 +48,7 @@ class MoneyValueProperty extends AbstractProperty
             $value = null;
             $this->logger->error(
                 'Can\'t get value by name key.',
-                ['exception'=> $e]
+                ['exception' => $e]
             );
         }
 

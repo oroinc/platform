@@ -15,7 +15,7 @@ class CommentItem extends Element
         self::assertNotNull($actions, 'Comment actions dropdown not found');
 
         // BAP-11448. PhantomJs not handle mouseOver on this element
-//        $actions->mouseOver();
+        //        $actions->mouseOver();
         $this->getDriver()->executeJsOnXpath($actions->getXpath(), '{{ELEMENT}}.click()');
 
         $this->clickLink($title);

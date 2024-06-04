@@ -25,11 +25,11 @@ class FieldsDescriptionHelper
     private const UPDATED_AT_DESCRIPTION = 'The date and time of the last update of the resource record.';
     private const OWNER_DESCRIPTION = 'An owner record represents the ownership capabilities of the record.';
     private const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm,'
-    . ' company or another organization to which the users belong.';
+        . ' company or another organization to which the users belong.';
     private const ENUM_NAME_DESCRIPTION = 'The human readable name of the option.';
     private const ENUM_DEFAULT_DESCRIPTION = 'Determines if this option is selected by default for new records.';
     private const ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked.'
-    . ' First appears the option with the higher number of the priority.';
+        . ' First appears the option with the higher number of the priority.';
 
     private EntityDescriptionProvider $entityDescriptionProvider;
     private TranslatorInterface $translator;

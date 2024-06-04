@@ -22,7 +22,7 @@ class ImapTest extends \PHPUnit\Framework\TestCase
         $protocolImap = $this->createMock(ImapProtocol::class);
         $protocolImap->expects(self::once())
             ->method('select')
-            ->willReturn(['uidvalidity'=>'']);
+            ->willReturn(['uidvalidity' => '']);
         $protocolImap->expects(self::once())
             ->method('fetch')
             ->willReturn($ids);
@@ -53,7 +53,7 @@ class ImapTest extends \PHPUnit\Framework\TestCase
         $protocolImap = $this->createMock(ImapProtocol::class);
         $protocolImap->expects(self::once())
             ->method('select')
-            ->willReturn(['uidvalidity'=>'']);
+            ->willReturn(['uidvalidity' => '']);
         $protocolImap->expects(self::once())
             ->method('fetch')
             ->willReturn($ids);
@@ -74,7 +74,7 @@ class ImapTest extends \PHPUnit\Framework\TestCase
         $protocolImap = $this->createMock(ImapProtocol::class);
         $protocolImap->expects(self::once())
             ->method('select')
-            ->willReturn(['uidvalidity'=>'']);
+            ->willReturn(['uidvalidity' => '']);
         $protocolImap->expects(self::once())
             ->method('fetch')
             ->willReturn($ids);

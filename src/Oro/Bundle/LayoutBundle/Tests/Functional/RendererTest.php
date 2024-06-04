@@ -190,7 +190,7 @@ class RendererTest extends LayoutTestCase
                 'form',
                 'content',
                 'form_fields',
-                ['form'=> '=data["form"]']
+                ['form' => '=data["form"]']
             )
             // test 'visible' option
             ->add('invisible_container', 'root', 'head', ['visible' => false])

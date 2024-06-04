@@ -108,7 +108,7 @@ class OriginTransformer implements DataTransformerInterface
     {
         $repository = $this->em->getRepository($this->className);
 
-        return $repository->findOneBy(['owner'=> $owner]);
+        return $repository->findOneBy(['owner' => $owner]);
     }
 
     /**

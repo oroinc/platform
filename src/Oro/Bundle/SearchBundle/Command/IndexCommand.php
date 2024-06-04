@@ -38,7 +38,7 @@ class IndexCommand extends Command
             ->addArgument('class', InputArgument::REQUIRED, 'Entity to reindex (FQCN or short name)')
             ->addArgument(
                 'identifiers',
-                InputArgument::REQUIRED|InputArgument::IS_ARRAY,
+                InputArgument::REQUIRED | InputArgument::IS_ARRAY,
                 'IDs of the entities to reindex'
             )
             ->setDescription('Updates search index for specified entities.')

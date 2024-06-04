@@ -63,7 +63,7 @@ class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
                 'value' => new \DateTime('now')
             ],
             'decimal' => [
-                'value'=> 1.1
+                'value' => 1.1
             ]
         ];
     }

@@ -197,10 +197,10 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
             }
         }
 
-        $fullCacheItem ??=$this->cache->getItem(self::FULL_CACHE_KEY_PREFIX . $securityType);
+        $fullCacheItem ??= $this->cache->getItem(self::FULL_CACHE_KEY_PREFIX . $securityType);
         $fullCacheItem->set($data);
         $this->cache->save($fullCacheItem);
-        $shortCacheItem ??=$this->cache->getItem(self::SHORT_CACHE_KEY_PREFIX . $securityType);
+        $shortCacheItem ??= $this->cache->getItem(self::SHORT_CACHE_KEY_PREFIX . $securityType);
         $shortCacheItem->set($shortData);
         $this->cache->save($shortCacheItem);
         $this->localCache[$securityType] = $data;

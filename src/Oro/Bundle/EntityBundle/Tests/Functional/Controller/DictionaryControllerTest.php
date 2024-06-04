@@ -34,9 +34,9 @@ class DictionaryControllerTest extends WebTestCase
 
         $this->client->request(
             'POST',
-            $this->getUrl('oro_dictionary_value', ['dictionary'=>'Oro_Bundle_AddressBundle_Entity_Country']),
+            $this->getUrl('oro_dictionary_value', ['dictionary' => 'Oro_Bundle_AddressBundle_Entity_Country']),
             [
-                'keys'=>['US','UM']
+                'keys' => ['US','UM']
             ]
         );
         $result = $this->client->getResponse();
