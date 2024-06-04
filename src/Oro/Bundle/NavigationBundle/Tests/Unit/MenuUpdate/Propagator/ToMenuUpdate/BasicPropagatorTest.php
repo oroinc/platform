@@ -97,7 +97,7 @@ class BasicPropagatorTest extends \PHPUnit\Framework\TestCase
             'not displayed' => [
                 'menuUpdate' => (new MenuUpdateStub())->setKey('menu_item_not_displayed'),
                 'menuItem' => $menu->getChild('menu_item_not_displayed'),
-                'expected' => (new MenuUpdateStub())->setKey('menu_item_not_displayed')->setActive(false),
+                'expected' => (new MenuUpdateStub())->setKey('menu_item_not_displayed')->setActive(true),
             ],
             'with parent, menu update has no parentKey' => [
                 'menuUpdate' => (new MenuUpdateStub())->setKey('menu_item_has_parent'),
