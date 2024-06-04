@@ -142,7 +142,7 @@ class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
             ],
             'string options keys' => [
                 'options' => [
-                    'destination' =>'dest1',
+                    'destination' => 'dest1',
                     'entity' => new PropertyPath('original'),
                     'attribute' => new PropertyPath('result')
                 ]

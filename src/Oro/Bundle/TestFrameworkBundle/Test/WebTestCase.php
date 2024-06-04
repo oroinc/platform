@@ -1125,7 +1125,10 @@ abstract class WebTestCase extends BaseWebTestCase
         $message = $message ? $message . PHP_EOL : '';
         $message .= sprintf('Failed asserting response has header "Content-Type: %s":', $contentType);
         $message .= PHP_EOL . $response->headers;
-        self::assertEqualsIgnoringCase($contentType, $response->headers->get('Content-Type'), $message);
+        $actualContentType = strtolower($response->headers->get('Content-Type'));
+        $expectedContentType = strtolower($contentType);
+
+        self::assertTrue(($actualContentType === $expectedContentType), $message);
     }
 
     /**

@@ -203,13 +203,13 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
             'button_title',
             $workflowConfiguration[WorkflowConfiguration::NODE_TRANSITIONS]['starting_point_transition']
         );
-        $variables =& $workflowConfiguration[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+        $variables = & $workflowConfiguration[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
         self::assertArrayNotHasKey(
             'label',
             $variables[WorkflowConfiguration::NODE_VARIABLES]['var1']
         );
 
-        $transitionDefs =& $workflowConfiguration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS];
+        $transitionDefs = & $workflowConfiguration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS];
         self::assertArrayHasKey(
             'message',
             $transitionDefs['second_point_transition_definition']['conditions']['@and'][0]['@equal']

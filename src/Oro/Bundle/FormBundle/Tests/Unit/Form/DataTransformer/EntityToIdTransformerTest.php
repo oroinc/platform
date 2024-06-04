@@ -113,7 +113,7 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
 
         $repository = $this->createMock(EntityRepository::class);
 
-        $self= $this;
+        $self = $this;
         $callback = function ($pRepository, $pId) use ($self, $repository, $entity) {
             $self->assertEquals($repository, $pRepository);
             $self->assertEquals(1, $pId);

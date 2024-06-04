@@ -173,6 +173,6 @@ class DoctrineAclCacheProvider
 
     private function getCacheClassRepresentation(string $entityClass): string
     {
-        return substr($entityClass, strrpos($entityClass, '\\') +1);
+        return substr($entityClass, strrpos($entityClass, '\\') + 1);
     }
 }

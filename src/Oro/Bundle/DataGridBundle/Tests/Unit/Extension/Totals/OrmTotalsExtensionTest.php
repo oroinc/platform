@@ -92,7 +92,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
                     'type' => 'orm'
                 ],
                 'totals' => [
-                    'total'=>[
+                    'total' => [
                         'extends' => 'wrong_total_row',
                         'columns' => [
                             'name' => [
@@ -168,7 +168,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
                     'type' => 'orm'
                 ],
                 'totals' => [
-                    'total'=>[
+                    'total' => [
                         'extends' => 'grand_total',
                         'per_page' => true,
                         'hide_if_one_page' => true,
@@ -207,7 +207,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
                 ['id' => 9, 'name' => 'test9', 'wonCount' => 3],
                 ['id' => 10, 'name' => 'test10', 'wonCount' => 2],
             ],
-            'options' =>[
+            'options' => [
                 'totalRecords' => 14
             ]
         ]);

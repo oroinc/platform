@@ -26,7 +26,7 @@ class UpdateSchemaController implements Controller
      * List of model namespaces
      * @var StatisticModelInterface[]
      */
-    private $models =[];
+    private $models = [];
 
     /**
      * @param Connection $connection

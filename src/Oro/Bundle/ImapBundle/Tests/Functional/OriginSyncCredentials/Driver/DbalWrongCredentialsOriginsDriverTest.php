@@ -60,7 +60,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         $emailOriginId = 12;
         $ownerId = 23;
 
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $emailOriginId, 'owner_id' => $ownerId]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => $emailOriginId, 'owner_id' => $ownerId]);
 
         $this->logger->expects($this->once())
             ->method('notice')
@@ -93,7 +93,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         $em->persist($origin);
         $em->flush();
 
-        $doctrine->getConnection()->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $origin->getId()]);
+        $doctrine->getConnection()->insert('oro_imap_wrong_creds_origin', ['origin_id' => $origin->getId()]);
 
         $this->assertEquals([$origin], $this->driver->getAllOrigins());
     }
@@ -120,8 +120,8 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         $em->flush();
 
         $connection = $doctrine->getConnection();
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $userOrigin->getId(), 'owner_id' => 21]);
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $systemOrigin->getId()]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => $userOrigin->getId(), 'owner_id' => 21]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => $systemOrigin->getId()]);
 
         $this->assertEquals([$userOrigin], $this->driver->getAllOriginsByOwnerId(21));
     }
@@ -143,8 +143,8 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         $em->flush();
 
         $connection = $doctrine->getConnection();
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $userOrigin->getId(), 'owner_id' => 21]);
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $systemOrigin->getId()]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => $userOrigin->getId(), 'owner_id' => 21]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => $systemOrigin->getId()]);
 
         $this->assertEquals([$systemOrigin], $this->driver->getAllOriginsByOwnerId());
     }
@@ -152,8 +152,8 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
     public function testDeleteOrigin()
     {
         $connection = $this->getContainer()->get('doctrine')->getConnection();
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> 52, 'owner_id' => 21]);
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> 45]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => 52, 'owner_id' => 21]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => 45]);
 
         $this->logger->expects($this->once())
             ->method('debug')
@@ -176,8 +176,8 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
     public function testDeleteAllOrigins()
     {
         $connection = $this->getContainer()->get('doctrine')->getConnection();
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> 52, 'owner_id' => 21]);
-        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> 45]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => 52, 'owner_id' => 21]);
+        $connection->insert('oro_imap_wrong_creds_origin', ['origin_id' => 45]);
 
         $this->logger->expects($this->once())
             ->method('debug')

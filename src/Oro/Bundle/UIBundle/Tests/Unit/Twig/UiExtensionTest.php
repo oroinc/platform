@@ -769,7 +769,7 @@ class UiExtensionTest extends TestCase
                     'subblocks' => [
                         [
                             'title' => '',
-                            'useSpan'=>false,
+                            'useSpan' => false,
                             'data' => $additionalData,
                         ],
                     ],

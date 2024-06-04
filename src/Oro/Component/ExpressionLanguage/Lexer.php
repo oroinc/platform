@@ -87,12 +87,12 @@ class Lexer
                 // operators
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
                 $cursor += \strlen($match[0]);
-            // [CUSTOM LINES]
+                // [CUSTOM LINES]
             } elseif (preg_match('/\=/A', $expression, $match, 0, $cursor)) {
                 // "=" operator
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
                 $cursor += \strlen($match[0]);
-            // [/CUSTOM LINES]
+                // [/CUSTOM LINES]
             } elseif (false !== strpos('.,?:', $expression[$cursor])) {
                 // punctuation
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);

@@ -46,7 +46,7 @@ class TextTypeCastTest extends \PHPUnit\Framework\TestCase
                 'value' => 1
             ],
             'decimal' => [
-                'value'=> 1.1
+                'value' => 1.1
             ]
         ];
     }

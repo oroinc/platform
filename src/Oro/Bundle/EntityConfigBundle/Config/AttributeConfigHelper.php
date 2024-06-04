@@ -16,7 +16,7 @@ class AttributeConfigHelper
 
     public function __construct(AttributeProvider $attributeProvider)
     {
-        $this->attributeProvider= $attributeProvider;
+        $this->attributeProvider = $attributeProvider;
     }
 
     /**

@@ -139,7 +139,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
             sprintf('--env=%s', $this->kernel->getEnvironment()),
         ];
 
-        for ($i=0; $i < ($this->countConsumers - count($this->processes)); $i++) {
+        for ($i = 0; $i < ($this->countConsumers - count($this->processes)); $i++) {
             $process = new Process($command);
 
             $process->start(function ($type, $buffer) use ($filesystem, $logDir) {

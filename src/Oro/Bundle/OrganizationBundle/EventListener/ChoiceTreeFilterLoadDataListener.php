@@ -21,7 +21,7 @@ class ChoiceTreeFilterLoadDataListener
     public function fillData(ChoiceTreeFilterLoadDataEvent $event): void
     {
         if ($event->getClassName() === BusinessUnit::class) {
-            $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id'=> $event->getValues()]);
+            $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id' => $event->getValues()]);
             $data = [];
             /** @var BusinessUnit $entity */
             foreach ($entities as $entity) {
@@ -38,12 +38,12 @@ class ChoiceTreeFilterLoadDataListener
 
     protected function getPath(BusinessUnit $businessUnit, array $path): array
     {
-        array_unshift($path, ['name'=> $businessUnit->getName()]);
+        array_unshift($path, ['name' => $businessUnit->getName()]);
         $owner = $businessUnit->getOwner();
         if ($owner) {
             $path = $this->getPath($owner, $path);
         } else {
-            array_unshift($path, ['name'=> $businessUnit->getOrganization()->getName()]);
+            array_unshift($path, ['name' => $businessUnit->getOrganization()->getName()]);
         }
 
         return $path;

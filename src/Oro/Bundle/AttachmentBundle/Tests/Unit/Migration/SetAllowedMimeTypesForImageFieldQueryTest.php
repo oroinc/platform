@@ -55,7 +55,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
             ->method('fetchAssociative')
             ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn([
-                'data' =>'data persisted serialized',
+                'data' => 'data persisted serialized',
                 'id' => 56
             ]);
         $this->connection->expects(self::once())
@@ -127,7 +127,7 @@ testType2'
             ->method('fetchAssociative')
             ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn([
-                'data' =>'data persisted serialized',
+                'data' => 'data persisted serialized',
                 'id' => 16
             ]);
         $this->connection->expects(self::once())

@@ -57,7 +57,7 @@ class ChoiceTreeFilterType extends AbstractType
                 'show_filter'      => false,
                 'autocomplete_url' => '',
                 'className' => '',
-                'data'=> array()
+                'data' => array()
             )
         )->setRequired(
             array(

@@ -29,7 +29,7 @@ class ColorUtils
         foreach ($colors as $color) {
             $shades[] = $color;
             for ($i = 1; $i <= $numberOfShades; $i++) {
-                $shades[] = static::shadeColor($color, $i*$shadePercent);
+                $shades[] = static::shadeColor($color, $i * $shadePercent);
             }
         }
 

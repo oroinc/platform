@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  */
-#[Attribute(Attribute::TARGET_PROPERTY|Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD)]
 class PercentRange extends Constraint
 {
     public const FRACTIONAL     = 'fractional';

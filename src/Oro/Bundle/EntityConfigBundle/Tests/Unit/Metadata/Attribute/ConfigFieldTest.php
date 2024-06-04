@@ -85,7 +85,7 @@ class ConfigFieldTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
-                    'mode' =>ConfigModel::MODE_READONLY,
+                    'mode' => ConfigModel::MODE_READONLY,
                     'routeName' => 'test_route_name',
                     'routeView' => 'test_route_view',
                 ]

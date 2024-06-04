@@ -71,7 +71,7 @@ class OroMainContext extends MinkContext implements
         '^(?:|I )should see .+ error message$|' .
         '^(?:|I )should see success message with number of records were deleted$|' .
         '^(?:|I )should see Schema updated flash message$' .
-    '/';
+        '/';
 
     private ?Stopwatch $stopwatch = null;
     private bool $debug = false;

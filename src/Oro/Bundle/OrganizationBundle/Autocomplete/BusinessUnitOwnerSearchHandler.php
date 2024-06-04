@@ -43,7 +43,7 @@ class BusinessUnitOwnerSearchHandler extends SearchHandler
      */
     protected function getPath($businessUnit, $path)
     {
-        array_unshift($path, ['name'=> $businessUnit->getName()]);
+        array_unshift($path, ['name' => $businessUnit->getName()]);
 
         $owner = $businessUnit->getOwner();
         if ($owner) {

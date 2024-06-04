@@ -170,7 +170,7 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
                     )
                 );
                 if (null !== $this->logger) {
-                    $this->logger->error('Error occurred during enum options save', ['exception'=> $e]);
+                    $this->logger->error('Error occurred during enum options save', ['exception' => $e]);
                 }
             }
         } else {

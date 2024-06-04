@@ -572,7 +572,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             } elseif (\is_object($result[self::VALUE])) {
                 $result[self::REF] = $result[self::VALUE];
             }
-        // customization start
+            // customization start
         } elseif (null !== $index
             && is_array($zval[self::VALUE])
             && !array_key_exists($index, $zval[self::VALUE])
@@ -687,7 +687,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             if (isset($zval[self::REF])) {
                 $result[self::REF] = &$object->$property;
             }
-        // customization start
+            // customization start
         } elseif ($object instanceof \ArrayAccess) {
             if (isset($object[$property])) {
                 $result[self::VALUE] = $object[$property];
@@ -705,7 +705,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             if (isset($zval[self::REF])) {
                 $result[self::REF] = &$value;
             }
-        //customization end
+            //customization end
         } elseif (!$ignoreInvalidProperty) {
             throw new NoSuchPropertyException(
                 sprintf(

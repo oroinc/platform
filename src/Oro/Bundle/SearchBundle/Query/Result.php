@@ -95,7 +95,7 @@ class Result extends ArrayCollection
      */
     public function toSearchResultData()
     {
-        $resultData =[
+        $resultData = [
             'records_count' => $this->getRecordsCount(),
             'data' => [],
             'count' => $this->count(),

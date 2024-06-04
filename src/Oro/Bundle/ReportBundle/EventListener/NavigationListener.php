@@ -121,7 +121,7 @@ class NavigationListener
                 'label' => $entityLabel,
                 'uri'   => '#',
                 // after divider, all entities will be added in EntityName:ASC order
-                'extras'=> ['position' => 20]
+                'extras' => ['position' => 20]
             ]);
             $entityItem = $reportItem->getChild($entityItemName);
         }

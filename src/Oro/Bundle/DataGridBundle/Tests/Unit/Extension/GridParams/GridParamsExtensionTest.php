@@ -73,7 +73,7 @@ class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
         return [
             'with grid params' => [
                 'parameters' => [
-                    ParameterBag::MINIFIED_PARAMETERS => ['i' => '1', 'p' => '25', 's'=> ['test_field' => '1']],
+                    ParameterBag::MINIFIED_PARAMETERS => ['i' => '1', 'p' => '25', 's' => ['test_field' => '1']],
                     ParameterBag::ADDITIONAL_PARAMETERS => [],
                     'class_name' => 'Extend\Entity\Test'
                 ],
@@ -81,7 +81,7 @@ class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             'without grid params' => [
                 'parameters' => [
-                    ParameterBag::MINIFIED_PARAMETERS => ['i' => '1', 'p' => '25', 's'=> ['test_field' => '1']],
+                    ParameterBag::MINIFIED_PARAMETERS => ['i' => '1', 'p' => '25', 's' => ['test_field' => '1']],
                     ParameterBag::ADDITIONAL_PARAMETERS => [],
                 ],
                 'gridParams' => []
