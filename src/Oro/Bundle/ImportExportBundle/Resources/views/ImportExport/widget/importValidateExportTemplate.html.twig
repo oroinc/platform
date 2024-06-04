@@ -139,7 +139,7 @@
                                                             'page-component-options': {
                                                                 'view': 'oroimportexport/js/app/views/export-template-button-view',
                                                                 'exportTemplateProcessor': alias,
-                                                                'exportTemplateJob': config.exportTemplateJob|default(null),
+                                                                'exportTemplateJob': config.exportTemplateJobName|default(null),
                                                                 'routeOptions': options|default({})
                                                             }|json_encode
                                                         }
@@ -164,7 +164,7 @@
                                                     'page-component-options': {
                                                         'view': 'oroimportexport/js/app/views/export-template-button-view',
                                                         'exportTemplateProcessor': config.exportTemplateProcessorAlias,
-                                                        'exportTemplateJob': config.exportTemplateJob|default(null),
+                                                        'exportTemplateJob': config.exportTemplateJobName|default(null),
                                                         'routeOptions': options|default({})
                                                     }|json_encode
                                                 }
