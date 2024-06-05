@@ -50,7 +50,7 @@ class ArrayPagerTest extends \PHPUnit\Framework\TestCase
             'priceListName' => 'A'
         ];
 
-        for ($i = 1; $i<=$rowsCount; $i++) {
+        for ($i = 1; $i <= $rowsCount; $i++) {
             $arraySource[] = $rowData;
         }
 

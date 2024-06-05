@@ -26,7 +26,7 @@ class DebugEmailTemplateCommand extends Command
      * @var string
      */
     protected static $defaultDescription = 'Displays a list of current email templates '
-    . 'for an application or an exact template';
+        . 'for an application or an exact template';
 
     private DoctrineHelper $doctrineHelper;
 

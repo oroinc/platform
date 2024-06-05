@@ -57,14 +57,14 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
                 'option' => ['random_id' => true],
                 'expectedVars' => [
                     'id'    => self::ID,
-                    'attr'  => ['data-ftid'=> self::ID]
+                    'attr'  => ['data-ftid' => self::ID]
                 ]
             ],
             'without random hash' => [
                 'view'   => $this->createView(['id' => self::ID]),
                 'option' => ['random_id' => false],
                 'expectedVars' => [
-                    'id'=> self::ID
+                    'id' => self::ID
                 ]
             ],
             'without id' => [
@@ -80,7 +80,7 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
                     'attr'      => ['data-name' => 'form__camel-case-name']
                 ]
             ],
-            'with snake case name'=>  [
+            'with snake case name' =>  [
                 'view'   => $this->createView(['name' => 'snake_case_name']),
                 'option' => ['random_id' => false],
                 'expectedVars' => [
@@ -88,7 +88,7 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
                     'attr'      => ['data-name' => 'form__snake-case-name']
                 ]
             ],
-            'with name and parent'=>  [
+            'with name and parent' =>  [
                 'view'   => $this->createView(['name' => 'formname'], true),
                 'option' => ['random_id' => false],
                 'expectedVars' => [

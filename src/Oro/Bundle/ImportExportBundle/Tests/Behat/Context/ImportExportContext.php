@@ -895,7 +895,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $importSubmitButton = $this->createElement('ImportModalImportFileButton');
 
         if (false === $importSubmitButton->isIsset()) {
-            $mainImportButton =$this->createElement('MainImportFileButton');
+            $mainImportButton = $this->createElement('MainImportFileButton');
             self::assertNotNull($mainImportButton, 'Main import button was not found');
             $mainImportButton->click();
             $this->waitForAjax();

@@ -266,7 +266,7 @@ HELP
      */
     protected function buildCommand(InputInterface $input, OutputInterface $output): array
     {
-        $command= ['run', 'webpack', '--'];
+        $command = ['run', 'webpack', '--'];
 
         if ($input->getOption('hot')) {
             $command[] = '--hot';

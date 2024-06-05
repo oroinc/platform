@@ -57,7 +57,7 @@ class Decode extends BaseDecode
         if (!$strict) {
             $parts = explode(': ', $firstline, 2);
             if (count($parts) != 2) {
-                $message = substr($message, strpos($message, $EOL)+1);
+                $message = substr($message, strpos($message, $EOL) + 1);
             }
         }
 
@@ -65,13 +65,13 @@ class Decode extends BaseDecode
         // default is set new line
         if (strpos($message, $EOL . $EOL)) {
             [$headers, $body] = explode($EOL.$EOL, $message, 2);
-        // next is the standard new line
+            // next is the standard new line
         } elseif ($EOL != "\r\n" && strpos($message, "\r\n\r\n")) {
             [$headers, $body] = explode("\r\n\r\n", $message, 2);
-        // next is the other "standard" new line
+            // next is the other "standard" new line
         } elseif ($EOL != "\n" && strpos($message, "\n\n")) {
             [$headers, $body] = explode("\n\n", $message, 2);
-        // at last resort find anything that looks like a new line
+            // at last resort find anything that looks like a new line
         } else {
             ErrorHandler::start(E_NOTICE | E_WARNING);
             [$headers, $body] = preg_split("%([\r\n]+)\\1%U", $message, 2);

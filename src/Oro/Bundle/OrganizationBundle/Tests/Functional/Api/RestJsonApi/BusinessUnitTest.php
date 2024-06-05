@@ -54,7 +54,7 @@ class BusinessUnitTest extends RestJsonApiTestCase
                         'owner' => [
                             'data' => [
                                 'type' => 'businessunits',
-                                'id' =>'<toString(@business_unit->id)>'
+                                'id' => '<toString(@business_unit->id)>'
                             ]
                         ]
                     ]
@@ -117,7 +117,7 @@ class BusinessUnitTest extends RestJsonApiTestCase
                     'owner' => [
                         'data' => [
                             'type' => 'businessunits',
-                            'id' =>'<toString(@business_unit->id)>'
+                            'id' => '<toString(@business_unit->id)>'
                         ]
                     ]
                 ]

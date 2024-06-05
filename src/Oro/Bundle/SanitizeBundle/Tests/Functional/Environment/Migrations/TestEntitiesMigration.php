@@ -48,7 +48,7 @@ class TestEntitiesMigration implements
             'notnull' => false,
             'oro_options' => [
                 'sanitize' => [
-                    'rule'=> 'digits_mask',
+                    'rule' => 'digits_mask',
                     'rule_options' => ['mask' => '1 800 XXX-XXX-XXXX']
                 ]
             ]

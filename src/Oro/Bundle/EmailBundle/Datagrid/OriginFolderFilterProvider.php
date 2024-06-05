@@ -139,7 +139,7 @@ class OriginFolderFilterProvider
                     'id' => $origin->getId(),
                     'active' => $origin->isActive(),
                 ];
-                $i=1;
+                $i = 1;
                 foreach ($folders as $folder) {
                     if ($extended) {
                         $results[$mailbox]['folder'][$i]['id'] = $folder->getId();

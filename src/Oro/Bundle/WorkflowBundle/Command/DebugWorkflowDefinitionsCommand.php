@@ -207,7 +207,7 @@ HELP
         unset($item);
 
         if (isset($config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS])) {
-            $variableDefinitions =& $config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+            $variableDefinitions = & $config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
             foreach ($variableDefinitions[WorkflowConfiguration::NODE_VARIABLES] as &$item) {
                 unset($item['label'], $item['options']['form_options']['tooltip']);
             }

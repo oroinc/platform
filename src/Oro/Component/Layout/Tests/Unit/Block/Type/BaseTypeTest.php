@@ -78,7 +78,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
             'label'              => 'Test Label',
             'label_attr'         => ['test_label_attr' => 'test_label_attr_val'],
             'translation_domain' => 'test_translation_domain',
-            'additional_block_prefixes'=> ['additional_prefix_1', 'additional_prefix_2']
+            'additional_block_prefixes' => ['additional_prefix_1', 'additional_prefix_2']
         ];
 
         $view = $this->getBlockBuilder(BaseType::NAME, $options)

@@ -32,7 +32,7 @@ class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->storage = $this->createMock(EntityPaginationStorage::class);
-        $this->paginationManager =$this->createMock(EntityPaginationManager::class);
+        $this->paginationManager = $this->createMock(EntityPaginationManager::class);
 
         $this->listener = new EntityPaginationListener($this->doctrineHelper, $this->storage, $this->paginationManager);
     }

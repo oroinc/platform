@@ -99,7 +99,7 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
                     // Register related class in methods to allow __toString
                     if (!empty($getter[self::RELATED_ENTITY])) {
                         if (!array_key_exists(self::METHODS, $configuration)) {
-                            $configuration[self::METHODS]= [];
+                            $configuration[self::METHODS] = [];
                         }
                         $relatedClass = $getter[self::RELATED_ENTITY];
                         if (!array_key_exists($relatedClass, $configuration[self::METHODS])) {

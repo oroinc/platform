@@ -33,7 +33,7 @@ class DebugEmailTemplateCompileCommand extends Command
      * @var string
      */
     protected static $defaultDescription = 'Renders an email template.'
-    . ' Optionally, sends a compiled email to the email address specified in the "recipient" option.';
+        . ' Optionally, sends a compiled email to the email address specified in the "recipient" option.';
 
     private DoctrineHelper $doctrineHelper;
 

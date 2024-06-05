@@ -23,7 +23,7 @@ class AttributeGroupsTabsOptionsProviderTest extends \PHPUnit\Framework\TestCase
             AttributeGroup::class,
             [
                 'id' => 1,
-                'code'=> 'first_code',
+                'code' => 'first_code',
                 'labels' => new ArrayCollection([(new LocalizedFallbackValue())->setString('One')])
             ]
         );
@@ -32,7 +32,7 @@ class AttributeGroupsTabsOptionsProviderTest extends \PHPUnit\Framework\TestCase
             AttributeGroup::class,
             [
                 'id' => 2,
-                'code'=> 'second_code',
+                'code' => 'second_code',
                 'labels' => new ArrayCollection([(new LocalizedFallbackValue())->setString('Two')])
             ]
         );

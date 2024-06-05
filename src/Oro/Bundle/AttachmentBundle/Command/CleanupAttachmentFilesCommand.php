@@ -31,14 +31,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 abstract class CleanupAttachmentFilesCommand extends Command implements SignalableCommandInterface
 {
     private const FILE_REMOVED = 'The attachment file "{fileName}" has been removed'
-    . ' because it does not have linked attachment entity in the database.';
+        . ' because it does not have linked attachment entity in the database.';
     private const FILE_REMOVE_FAILED = 'The attachment file "{fileName}"'
-    . ' does not have linked attachment entity in the database but removing this file failed.';
+        . ' does not have linked attachment entity in the database but removing this file failed.';
     private const FILE_TO_BE_REMOVED = 'The attachment file "{fileName}" should be removed'
-    . ' because it does not have linked attachment entity in the database.';
+        . ' because it does not have linked attachment entity in the database.';
     private const MISSING_FILE = 'The attachment entity with ID = {entityId}'
-    . ' (entity: {parentEntityClass}, field: {parentEntityFieldName})'
-    . ' is linked to the file "{fileName}" but this file does not exist.';
+        . ' (entity: {parentEntityClass}, field: {parentEntityFieldName})'
+        . ' is linked to the file "{fileName}" but this file does not exist.';
 
     private const COLLECT_FILES_REPORTING_BATCH_SIZE = 50000;
     private const CHECK_FILES_REPORTING_BATCH_SIZE = 50000;

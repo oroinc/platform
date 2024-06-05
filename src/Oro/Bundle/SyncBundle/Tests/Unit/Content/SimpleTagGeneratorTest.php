@@ -27,7 +27,7 @@ class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
         return [
             'simple array given'                          => [['name' => 'tagSimpleName'], true],
             'given array with name and params'            => [['name' => 'tagSimpleName', 'params' => ['das']], true],
-            'given array with name and params and nested' =>[
+            'given array with name and params and nested' => [
                 ['name' => 'tagSimpleName', 'params' => ['das'], 'children' => ['some nested data']],
                 true
             ],

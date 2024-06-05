@@ -87,7 +87,7 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
                     $childrenOptions[$locale][$child] = $localeChildOptions + $childOptions;
                 }
             }
-        // General options for all locales
+            // General options for all locales
         } else {
             foreach ($options['locales'] as $locale) {
                 $childrenOptions[$locale][$child] = $childOptions;
