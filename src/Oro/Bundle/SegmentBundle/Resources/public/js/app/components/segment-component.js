@@ -230,7 +230,7 @@ define(function(require) {
             let data;
             if (value) {
                 data = this.dataProvider.pathToEntityChainSafely(
-                    this.groupingDynamicEntityFieldsCollection.extractName(value)
+                    this.getResolvedValueForFormatChoice(value)
                 );
 
                 if (opts.func) {
@@ -244,6 +244,20 @@ define(function(require) {
             }
 
             return data ? template(data) : value;
+        },
+
+        /**
+         * Get resolved column value by conditions
+         *
+         * @param {string} value
+         * @returns {string}
+         */
+        getResolvedValueForFormatChoice(value) {
+            if (this.groupingDynamicEntityFieldsCollection) {
+                return this.groupingDynamicEntityFieldsCollection.extractName(value);
+            }
+
+            return value;
         },
 
         /**
