@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
@@ -21,18 +22,18 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->configuration = DatagridConfiguration::create([]);
     }
 
-    public function testGetOrmQueryForUndefinedDatasourceType()
+    public function testGetOrmQueryForUndefinedDatasourceType(): void
     {
         self::assertInstanceOf(OrmQueryConfiguration::class, $this->configuration->getOrmQuery());
     }
 
-    public function testGetOrmQueryForOrmDatasourceType()
+    public function testGetOrmQueryForOrmDatasourceType(): void
     {
         $this->configuration->setDatasourceType(OrmDatasource::TYPE);
         self::assertInstanceOf(OrmQueryConfiguration::class, $this->configuration->getOrmQuery());
     }
 
-    public function testGetOrmQueryForNotOrmDatasourceType()
+    public function testGetOrmQueryForNotOrmDatasourceType(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The expected data grid source type is "orm". Actual source type is "another".');
@@ -41,7 +42,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->configuration->getOrmQuery();
     }
 
-    public function testIsOrmDatasource()
+    public function testIsOrmDatasource(): void
     {
         // the datasource type is not set
         self::assertFalse($this->configuration->isOrmDatasource());
@@ -53,7 +54,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->configuration->isOrmDatasource());
     }
 
-    public function testDatasourceType()
+    public function testDatasourceType(): void
     {
         // test initial value
         self::assertNull($this->configuration->getDatasourceType());
@@ -63,7 +64,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $this->configuration->getDatasourceType());
     }
 
-    public function testExtendedEntityClassName()
+    public function testExtendedEntityClassName(): void
     {
         // test initial value
         self::assertNull($this->configuration->getExtendedEntityClassName());
@@ -79,13 +80,13 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getAclResourceDataProvider
      */
-    public function testGetAclResource(array $params, bool $expected)
+    public function testGetAclResource(array $params, bool $expected): void
     {
         $this->configuration->merge($params);
         $this->assertEquals($expected, $this->configuration->getAclResource());
     }
 
-    public function getAclResourceDataProvider(): array
+    public static function getAclResourceDataProvider(): array
     {
         return [
             [
@@ -110,13 +111,13 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isDatasourceSkipAclApplyDataProvider
      */
-    public function testIsDatasourceSkipAclApply(array $params, bool $expected)
+    public function testIsDatasourceSkipAclApply(array $params, bool $expected): void
     {
         $this->configuration->merge($params);
         $this->assertEquals($expected, $this->configuration->isDatasourceSkipAclApply());
     }
 
-    public function isDatasourceSkipAclApplyDataProvider(): array
+    public static function isDatasourceSkipAclApplyDataProvider(): array
     {
         return [
             [
@@ -144,7 +145,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         string $select = null,
         array $sorter = [],
         array $filter = []
-    ) {
+    ): void {
         $this->configuration->addColumn(
             $name,
             $definition,
@@ -157,7 +158,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $configArray);
     }
 
-    public function testAddColumnWithoutName()
+    public function testAddColumnWithoutName(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('DatagridConfiguration::addColumn: name should not be empty');
@@ -165,7 +166,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->configuration->addColumn(null, []);
     }
 
-    public function testUpdateLabelWithoutName()
+    public function testUpdateLabelWithoutName(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('DatagridConfiguration::updateLabel: name should not be empty');
@@ -173,7 +174,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->configuration->updateLabel(null, 'label1');
     }
 
-    public function testUpdateLabel()
+    public function testUpdateLabel(): void
     {
         $this->configuration->updateLabel('testColumn', 'label1');
 
@@ -208,7 +209,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddSelect()
+    public function testAddSelect(): void
     {
         $this->configuration->getOrmQuery()->addSelect('testColumn');
 
@@ -223,7 +224,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testJoinTable()
+    public function testJoinTable(): void
     {
         $this->configuration->getOrmQuery()->addLeftJoin('rootAlias.association', 'joinAlias');
 
@@ -238,7 +239,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveColumn()
+    public function testRemoveColumn(): void
     {
         $this->configuration->addColumn('testColumn', ['param' => 123], null, ['param' => 123], ['param' => 123]);
 
@@ -253,7 +254,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($configArray['filters']['columns']);
     }
 
-    public function testIsDatagridExtendedFrom()
+    public function testIsDatagridExtendedFrom(): void
     {
         self::assertFalse($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
 
@@ -270,7 +271,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
     }
 
-    public function testAddProperty()
+    public function testAddProperty(): void
     {
         $this->configuration->addProperty('name', ['definition']);
         $configArray = $this->configuration->toArray();
@@ -287,7 +288,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function addColumnDataProvider(): array
+    public static function addColumnDataProvider(): array
     {
         return [
             'all data supplied'         => [
@@ -341,6 +342,190 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
                 'name'       => 'testColumn1',
                 'definition' => [],
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider moveColumnBeforeDataProvider
+     */
+    public function testMoveColumnBefore(array $columns, string $name, string $targetName, array $expectedColumns): void
+    {
+        $this->configuration->offsetSetByPath('[columns]', $columns);
+        $this->configuration->moveColumnBefore($name, $targetName);
+        self::assertSame($expectedColumns, $this->configuration->offsetGetByPath('[columns]'));
+    }
+
+    public static function moveColumnBeforeDataProvider(): array
+    {
+        return [
+            [
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']],
+                'column3',
+                'column2',
+                ['column1' => ['param' => '1'], 'column3' => ['param' => '3'], 'column2' => ['param' => '2']]
+            ],
+            [
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']],
+                'column3',
+                'column1',
+                ['column3' => ['param' => '3'], 'column1' => ['param' => '1'], 'column2' => ['param' => '2']]
+            ],
+            [
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']],
+                'column5',
+                'column2',
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']]
+            ],
+            [
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']],
+                'column3',
+                'column5',
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']]
+            ],
+            [
+                ['column1' => null, 'column2' => null, 'column3' => null],
+                'column3',
+                'column2',
+                ['column1' => null, 'column3' => null, 'column2' => null]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider moveColumnAfterDataProvider
+     */
+    public function testMoveColumnAfter(array $columns, string $name, string $targetName, array $expectedColumns): void
+    {
+        $this->configuration->offsetSetByPath('[columns]', $columns);
+        $this->configuration->moveColumnAfter($name, $targetName);
+        self::assertSame($expectedColumns, $this->configuration->offsetGetByPath('[columns]'));
+    }
+
+    public static function moveColumnAfterDataProvider(): array
+    {
+        return [
+            [
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']],
+                'column1',
+                'column2',
+                ['column2' => ['param' => '2'], 'column1' => ['param' => '1'], 'column3' => ['param' => '3']]
+            ],
+            [
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']],
+                'column1',
+                'column3',
+                ['column2' => ['param' => '2'], 'column3' => ['param' => '3'], 'column1' => ['param' => '1']]
+            ],
+            [
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']],
+                'column5',
+                'column2',
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']]
+            ],
+            [
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']],
+                'column3',
+                'column5',
+                ['column1' => ['param' => '1'], 'column2' => ['param' => '2'], 'column3' => ['param' => '3']]
+            ],
+            [
+                ['column1' => null, 'column2' => null, 'column3' => null],
+                'column1',
+                'column2',
+                ['column2' => null, 'column1' => null, 'column3' => null]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider moveFilterBeforeDataProvider
+     */
+    public function testMoveFilterBefore(array $filters, string $name, string $targetName, array $expectedFilters): void
+    {
+        $this->configuration->offsetSetByPath('[filters][columns]', $filters);
+        $this->configuration->moveFilterBefore($name, $targetName);
+        self::assertSame($expectedFilters, $this->configuration->offsetGetByPath('[filters][columns]'));
+    }
+
+    public static function moveFilterBeforeDataProvider(): array
+    {
+        return [
+            [
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']],
+                'filter3',
+                'filter2',
+                ['filter1' => ['param' => '1'], 'filter3' => ['param' => '3'], 'filter2' => ['param' => '2']]
+            ],
+            [
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']],
+                'filter3',
+                'filter1',
+                ['filter3' => ['param' => '3'], 'filter1' => ['param' => '1'], 'filter2' => ['param' => '2']]
+            ],
+            [
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']],
+                'filter5',
+                'filter2',
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']]
+            ],
+            [
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']],
+                'filter3',
+                'filter5',
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']]
+            ],
+            [
+                ['filter1' => null, 'filter2' => null, 'filter3' => null],
+                'filter3',
+                'filter2',
+                ['filter1' => null, 'filter3' => null, 'filter2' => null]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider moveFilterAfterDataProvider
+     */
+    public function testMoveFilterAfter(array $filters, string $name, string $targetName, array $expectedFilters): void
+    {
+        $this->configuration->offsetSetByPath('[filters][columns]', $filters);
+        $this->configuration->moveFilterAfter($name, $targetName);
+        self::assertSame($expectedFilters, $this->configuration->offsetGetByPath('[filters][columns]'));
+    }
+
+    public static function moveFilterAfterDataProvider(): array
+    {
+        return [
+            [
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']],
+                'filter1',
+                'filter2',
+                ['filter2' => ['param' => '2'], 'filter1' => ['param' => '1'], 'filter3' => ['param' => '3']]
+            ],
+            [
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']],
+                'filter1',
+                'filter3',
+                ['filter2' => ['param' => '2'], 'filter3' => ['param' => '3'], 'filter1' => ['param' => '1']]
+            ],
+            [
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']],
+                'filter5',
+                'filter2',
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']]
+            ],
+            [
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']],
+                'filter3',
+                'filter5',
+                ['filter1' => ['param' => '1'], 'filter2' => ['param' => '2'], 'filter3' => ['param' => '3']]
+            ],
+            [
+                ['filter1' => null, 'filter2' => null, 'filter3' => null],
+                'filter1',
+                'filter2',
+                ['filter2' => null, 'filter1' => null, 'filter3' => null]
+            ]
         ];
     }
 }

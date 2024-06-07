@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -45,6 +46,8 @@ class BuildQuery implements ProcessorInterface
                 $associationQuery = $associationField->getAssociationQuery();
                 if (null !== $associationQuery) {
                     $query = clone $associationQuery;
+                } elseif (ConfigUtil::IGNORE_PROPERTY_PATH === $associationField->getPropertyPath()) {
+                    return;
                 }
             }
         }

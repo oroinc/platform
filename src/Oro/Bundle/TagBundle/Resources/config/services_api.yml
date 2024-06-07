@@ -77,7 +77,16 @@ services:
         tags:
             - { name: oro.api.processor, action: customize_loaded_data, collection: true }
 
-    oro_tag.api.update_tags_association_query:
+    oro_tag.api.build_tags_subresource_query:
+        class: Oro\Bundle\TagBundle\Api\Processor\BuildTagsSubresourceQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_tag.helper.taggable_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, class: Oro\Bundle\TagBundle\Entity\Tag, association: tags, priority: -90 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, class: Oro\Bundle\TagBundle\Entity\Tag, association: tags, priority: -90 }
+
+    oro_tag.api.add_parent_entity_id_to_tags_subresource_query:
         class: Oro\Bundle\TagBundle\Api\Processor\AddParentEntityIdToTagsSubresourceQuery
         arguments:
             - '@oro_tag.helper.taggable_helper'
