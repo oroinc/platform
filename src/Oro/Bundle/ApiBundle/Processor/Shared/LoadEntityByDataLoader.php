@@ -78,10 +78,8 @@ class LoadEntityByDataLoader implements ProcessorInterface
     ): ?array {
         $initialQb = clone $qb;
         $result = $this->loadData($qb, $config, $normalizationContext);
-        if (empty($result)) {
-            // use a query without ACL protection to check if an entity exists in DB
-            $this->prepareNotAclProtectedQueryBuilder($initialQb);
-            $notAclProtectedData = $initialQb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+        if (!$result) {
+            $notAclProtectedData = $this->loadNotAclProtectedData($initialQb);
             if ($notAclProtectedData) {
                 throw new AccessDeniedException('No access to the entity.');
             }
@@ -105,12 +103,15 @@ class LoadEntityByDataLoader implements ProcessorInterface
         return $data;
     }
 
-    private function prepareNotAclProtectedQueryBuilder(QueryBuilder $qb): void
+    private function loadNotAclProtectedData(QueryBuilder $qb): ?array
     {
-        $entityClass = $this->entityClassResolver->getEntityClass(QueryBuilderUtil::getSingleRootEntity($qb));
-        $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+        $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass(
+            $this->entityClassResolver->getEntityClass(QueryBuilderUtil::getSingleRootEntity($qb))
+        );
         if (\count($idFieldNames) !== 0) {
             $qb->select(QueryBuilderUtil::getSingleRootAlias($qb) . '.' . reset($idFieldNames));
         }
+
+        return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 }
