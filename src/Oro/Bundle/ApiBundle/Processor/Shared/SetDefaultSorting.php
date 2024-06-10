@@ -66,10 +66,6 @@ class SetDefaultSorting implements ProcessorInterface
         if (!$orderBy) {
             $idFieldNames = $config->getIdentifierFieldNames();
             foreach ($idFieldNames as $fieldName) {
-                $field = $config->getField($fieldName);
-                if (null !== $field) {
-                    $fieldName = $field->getPropertyPath($fieldName);
-                }
                 if ($this->isSorterEnabled($fieldName, $configOfSorters)) {
                     $orderBy[$fieldName] = Criteria::ASC;
                 }
@@ -79,15 +75,12 @@ class SetDefaultSorting implements ProcessorInterface
         return $orderBy;
     }
 
-    protected function isSorterEnabled(
-        string $fieldName,
-        ?SortersConfig $configOfSorters,
-        bool $byPropertyPath = true
-    ): bool {
+    protected function isSorterEnabled(string $fieldName, ?SortersConfig $configOfSorters): bool
+    {
         if (null === $configOfSorters) {
             return false;
         }
-        $sorter = $configOfSorters->findField($fieldName, $byPropertyPath);
+        $sorter = $configOfSorters->findField($fieldName);
         if (null === $sorter) {
             return false;
         }
