@@ -7,7 +7,7 @@ namespace Oro\Bundle\ApiBundle\Exception;
  * Or in other words, the filtering by the requested field is enabled,
  * but it does not support the requested operator.
  */
-class InvalidFilterOperatorException extends RuntimeException
+class InvalidFilterOperatorException extends RuntimeException implements ValidationExceptionInterface
 {
     private string $operator;
 

@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
  * This exception is thrown when the key of a self identifiable filter is not valid.
  * @see \Oro\Bundle\ApiBundle\Filter\SelfIdentifiableFilterInterface
  */
-class InvalidFilterValueKeyException extends RuntimeException
+class InvalidFilterValueKeyException extends RuntimeException implements ValidationExceptionInterface
 {
     private FilterValue $filterValue;
 

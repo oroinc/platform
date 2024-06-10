@@ -13,9 +13,12 @@ use Oro\Component\Config\Common\ConfigObject;
 /**
  * This class represents read & parsed datagrid configuration.
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DatagridConfiguration extends ConfigObject
 {
+    private const COLUMNS_PATH = '[columns]';
+    private const FILTERS_PATH = '[filters][columns]';
     const COLUMN_PATH = '[columns][%s]';
     const SORTER_PATH = '[sorters][columns][%s]';
     const FILTER_PATH = '[filters][columns][%s]';
@@ -423,5 +426,73 @@ class DatagridConfiguration extends ConfigObject
             }
         }
         return false;
+    }
+
+    /**
+     * Changes a priority of a column by moving it before a specified target column.
+     */
+    public function moveColumnBefore(string $name, string $targetName): void
+    {
+        $this->moveBefore($name, $targetName, self::COLUMNS_PATH);
+    }
+
+    /**
+     * Changes a priority of a column by moving it after a specified target column.
+     */
+    public function moveColumnAfter(string $name, string $targetName): void
+    {
+        $this->moveAfter($name, $targetName, self::COLUMNS_PATH);
+    }
+
+    /**
+     * Changes a priority of a filter by moving it before a specified target filter.
+     */
+    public function moveFilterBefore(string $name, string $targetName): void
+    {
+        $this->moveBefore($name, $targetName, self::FILTERS_PATH);
+    }
+
+    /**
+     * Changes a priority of a filter by moving it after a specified target filter.
+     */
+    public function moveFilterAfter(string $name, string $targetName): void
+    {
+        $this->moveAfter($name, $targetName, self::FILTERS_PATH);
+    }
+
+    private function moveBefore(string $name, string $targetName, string $sectionPath): void
+    {
+        $section = $this->offsetGetByPath($sectionPath);
+        if (\array_key_exists($name, $section) && \array_key_exists($targetName, $section)) {
+            $updatedSection = [];
+            foreach ($section as $key => $value) {
+                if ($key === $name) {
+                    continue;
+                }
+                if ($key === $targetName) {
+                    $updatedSection[$name] = $section[$name];
+                }
+                $updatedSection[$key] = $value;
+            }
+            $this->offsetSetByPath($sectionPath, $updatedSection);
+        }
+    }
+
+    private function moveAfter(string $name, string $targetName, string $sectionPath): void
+    {
+        $section = $this->offsetGetByPath($sectionPath);
+        if (\array_key_exists($name, $section) && \array_key_exists($targetName, $section)) {
+            $updatedSection = [];
+            foreach ($section as $key => $value) {
+                if ($key === $name) {
+                    continue;
+                }
+                $updatedSection[$key] = $value;
+                if ($key === $targetName) {
+                    $updatedSection[$name] = $section[$name];
+                }
+            }
+            $this->offsetSetByPath($sectionPath, $updatedSection);
+        }
     }
 }
