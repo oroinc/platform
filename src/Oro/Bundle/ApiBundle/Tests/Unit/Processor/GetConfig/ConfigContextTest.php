@@ -147,6 +147,30 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->get('extra'));
     }
 
+    public function testSetExtra()
+    {
+        self::assertSame([], $this->context->getExtras());
+        self::assertSame([], $this->context->get('extra'));
+        self::assertFalse($this->context->hasExtra('test'));
+        self::assertFalse($this->context->has('test'));
+
+        $extra = new TestConfigExtra('test', ['test_attr' => 'val1']);
+        $this->context->setExtra($extra);
+        self::assertSame([$extra], $this->context->getExtras());
+        self::assertSame(['test'], $this->context->get('extra'));
+        self::assertTrue($this->context->hasExtra('test'));
+        self::assertTrue($this->context->has('test_attr'));
+        self::assertEquals('val1', $this->context->get('test_attr'));
+
+        $extra = new TestConfigExtra('test', ['test_attr' => 'val2']);
+        $this->context->setExtra($extra);
+        self::assertSame([$extra], $this->context->getExtras());
+        self::assertSame(['test'], $this->context->get('extra'));
+        self::assertTrue($this->context->hasExtra('test'));
+        self::assertTrue($this->context->has('test_attr'));
+        self::assertEquals('val2', $this->context->get('test_attr'));
+    }
+
     public function testGetPropagableExtras()
     {
         self::assertSame([], $this->context->getPropagableExtras());

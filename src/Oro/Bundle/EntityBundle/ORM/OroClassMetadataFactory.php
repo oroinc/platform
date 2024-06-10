@@ -13,7 +13,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Adds the following features to the Doctrine's ClassMetadataFactory:
- * * a possibility to mark the factory disconnected to be able to to memory usage optimization
+ * * a possibility to mark the factory disconnected to be able to memory usage optimization
  *   of the message queue consumer
  * * a memory cache for the result value of isTransient() method
  * * a possibility to profile ORM metadata related methods

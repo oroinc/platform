@@ -7,11 +7,11 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildQuery;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var BuildQuery */
-    private $processor;
+    private BuildQuery $processor;
 
     protected function setUp(): void
     {
@@ -116,6 +116,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         $parentConfig = new EntityDefinitionConfig();
         $associationField = $parentConfig->addField('testAssociation');
         $associationField->setTargetClass($className);
+        $associationField->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
         $associationField->setAssociationQuery($associationQuery);
 
         $this->context->setClassName($className);
@@ -132,6 +133,24 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
             $query->getDQL()
         );
         self::assertNotSame($associationQuery, $query);
+    }
+
+    public function testProcessManageableEntityAndComputedAssociationWithoutAssociationQuery()
+    {
+        $className = Entity\User::class;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $associationField = $parentConfig->addField('testAssociation');
+        $associationField->setTargetClass($className);
+        $associationField->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->context->setClassName($className);
+        $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setAssociationName('testAssociation');
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasQuery());
     }
 
     public function testProcessManageableEntityAndNotComputedAssociation()
