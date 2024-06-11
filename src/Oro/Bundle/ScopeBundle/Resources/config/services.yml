@@ -66,9 +66,10 @@ services:
 
     oro_scope.twig.extension.scope:
         class: Oro\Bundle\ScopeBundle\Twig\ScopeExtension
-        public: false
         arguments:
             - '@property_accessor'
+        calls:
+            - [setScopeManager, ['@oro_scope.scope_manager']]
         tags:
             - { name: twig.extension }
 
