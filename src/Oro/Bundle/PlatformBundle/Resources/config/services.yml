@@ -198,3 +198,13 @@ services:
     oro_platform.attribute_reader:
         class: 'Oro\Component\PhpUtils\Attribute\Reader\AttributeReader'
         public: true
+
+    oro_platform.provider.usage_stats.usage_stats_provider_registry:
+        class: Oro\Bundle\PlatformBundle\Provider\UsageStats\UsageStatsProviderRegistry
+        arguments:
+            - [] # providers. They are set by Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UsageStatsCompilerPass
+
+    oro_platform.provider.usage_stats.usage_stats_provider:
+        class: Oro\Bundle\PlatformBundle\Provider\UsageStats\UsageStatsProvider
+        arguments:
+            - '@oro_platform.provider.usage_stats.usage_stats_provider_registry'

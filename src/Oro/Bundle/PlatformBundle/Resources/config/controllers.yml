@@ -9,6 +9,8 @@ services:
             - '%oro_platform.composer.installed_json%'
 
     Oro\Bundle\PlatformBundle\Controller\PlatformController:
-       arguments:
-           - '@oro_platform.provider.package.with_license_info'
-           - '@oro_platform.provider.deployment_variables'
+        arguments:
+            - '@oro_platform.provider.package.with_license_info'
+            - '@oro_platform.provider.deployment_variables'
+        calls:
+            - [setUsageStatsProvider, ['@oro_platform.provider.usage_stats.usage_stats_provider']]

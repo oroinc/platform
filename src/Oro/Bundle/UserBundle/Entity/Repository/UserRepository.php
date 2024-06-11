@@ -18,7 +18,14 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
      * @param bool|null $enabled
      * @return int
      */
-    public function getUsersCount($enabled = null)
+    public function getUsersCount($enabled = null): int
+    {
+        $queryBuilder = $this->getUsersCountQueryBuilder($enabled);
+
+        return (int)$queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    public function getUsersCountQueryBuilder(?bool $enabled = null): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('user')
             ->select('COUNT(user.id) as usersCount');
@@ -28,7 +35,7 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
                 ->setParameter('enabled', $enabled);
         }
 
-        return (int)$queryBuilder->getQuery()->getSingleScalarResult();
+        return $queryBuilder;
     }
 
     /**
