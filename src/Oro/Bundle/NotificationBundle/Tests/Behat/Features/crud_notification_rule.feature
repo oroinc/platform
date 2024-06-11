@@ -1,4 +1,3 @@
-@regression
 @ticket-BAP-21510
 
 Feature: Crud notification rule

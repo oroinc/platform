@@ -632,3 +632,11 @@ services:
         class: Oro\Bundle\NavigationBundle\Provider\MenuNamesProvider
         arguments:
             - '@oro_navigation.configuration.provider'
+
+    oro_navigation.provider.route_title:
+        class: Oro\Bundle\NavigationBundle\Provider\RouteTitleProvider
+        arguments:
+            - '@oro_navigation.title_reader.registry'
+            - '@oro_navigation.title_translator'
+            - '@oro_navigation.title_service'
+

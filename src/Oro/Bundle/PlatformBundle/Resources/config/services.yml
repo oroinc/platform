@@ -193,3 +193,8 @@ services:
             - '@oro_config.manager'
             - '@logger'
         abstract: true
+
+    oro_platform.validator.constraints.when:
+        class: Oro\Bundle\PlatformBundle\Validator\Constraints\WhenValidator
+        arguments:
+            - '@validator.expression_language'

@@ -30,3 +30,7 @@
     // stylelint-disable-next-line declaration-no-important
     transition: none !important;
 }
+
+.ellipsis {
+    @include ellipsis;
+}
