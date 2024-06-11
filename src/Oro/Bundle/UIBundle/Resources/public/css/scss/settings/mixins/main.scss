@@ -9,6 +9,13 @@
 @import 'validation-failed';
 @import 'gradient-pattern';
 
+// Ellipsis text
+@mixin ellipsis() {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 // Helper to clear inner floats
 @mixin clearfix() {
     &::after {
