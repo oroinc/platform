@@ -32,9 +32,9 @@ class UserRepositoryTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference(LoadUserData::SIMPLE_USER);
 
-        $this->assertEquals($user, $this->getRepository()->findUserByEmail(strtoupper($user->getEmail()), true));
-        $this->assertEquals($user, $this->getRepository()->findUserByEmail(ucfirst($user->getEmail()), true));
-        $this->assertEquals($user, $this->getRepository()->findUserByEmail($user->getEmail(), true));
+        self::assertEquals($user, $this->getRepository()->findUserByEmail(strtoupper($user->getEmail()), true));
+        self::assertEquals($user, $this->getRepository()->findUserByEmail(ucfirst($user->getEmail()), true));
+        self::assertEquals($user, $this->getRepository()->findUserByEmail($user->getEmail(), true));
     }
 
     public function testFindUserByEmailInsensitive(): void
@@ -44,16 +44,16 @@ class UserRepositoryTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference(LoadUserData::SIMPLE_USER);
 
-        $this->assertTrue(null === $this->getRepository()->findUserByEmail(strtoupper($user->getEmail()), false));
-        $this->assertTrue(null === $this->getRepository()->findUserByEmail(ucfirst($user->getEmail()), false));
-        $this->assertEquals($user, $this->getRepository()->findUserByEmail($user->getEmail(), false));
+        self::assertTrue(null === $this->getRepository()->findUserByEmail(strtoupper($user->getEmail()), false));
+        self::assertTrue(null === $this->getRepository()->findUserByEmail(ucfirst($user->getEmail()), false));
+        self::assertEquals($user, $this->getRepository()->findUserByEmail($user->getEmail(), false));
     }
 
     public function testFindLowercaseDuplicatedEmails(): void
     {
         $this->loadFixtures([LoadUsersWithSameEmailInLowercase::class]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [LoadUsersWithSameEmailInLowercase::EMAIL],
             $this->getRepository()->findLowercaseDuplicatedEmails(10)
         );
@@ -99,6 +99,42 @@ class UserRepositoryTest extends WebTestCase
         $actual = $this->getRepository()->findIdsByOrganizations([$organization]);
         sort($actual);
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
+    }
+
+    public function testGetUsersCount(): void
+    {
+        $this->loadFixtures([LoadUserData::class]);
+
+        /** @var User $user */
+        $user = $this->getReference(LoadUserData::SIMPLE_USER);
+        $user->setEnabled(false);
+        self::getContainer()->get('oro_user.manager')->updateUser($user);
+
+        self::assertEquals(4, $this->getRepository()->getUsersCount());
+
+        self::assertEquals(3, $this->getRepository()->getUsersCount(true));
+    }
+
+    public function testGetUsersCountQueryBuilder(): void
+    {
+        $this->loadFixtures([LoadUserData::class]);
+
+        /** @var User $user */
+        $user = $this->getReference(LoadUserData::SIMPLE_USER);
+        $user->setEnabled(false);
+        self::getContainer()->get('oro_user.manager')->updateUser($user);
+
+        $result = $this->getRepository()->getUsersCountQueryBuilder()
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        self::assertEquals(4, $result);
+
+        $result = $this->getRepository()->getUsersCountQueryBuilder(true)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        self::assertEquals(3, $result);
     }
 }

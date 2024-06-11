@@ -3,24 +3,22 @@
 namespace Oro\Bundle\ScopeBundle\Twig;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
  * Provides a Twig function to determine if the entity scope is empty:
  *   - oro_scope_is_empty
+ *   - oro_scope_entities
  */
-class ScopeExtension extends AbstractExtension
+class ScopeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
-    private $propertyAccessor;
-
-    public function __construct(PropertyAccessorInterface $propertyAccessor)
+    public function __construct(private readonly ContainerInterface $container)
     {
-        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -29,7 +27,8 @@ class ScopeExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('oro_scope_is_empty', [$this, 'isScopesEmpty'])
+            new TwigFunction('oro_scope_is_empty', [$this, 'isScopesEmpty']),
+            new TwigFunction('oro_scope_entities', [$this, 'getScopeEntities']),
         ];
     }
 
@@ -41,11 +40,24 @@ class ScopeExtension extends AbstractExtension
 
         $scope = $scopes->first();
         foreach ($scopeEntities as $fieldName => $class) {
-            if (!empty($this->propertyAccessor->getValue($scope, $fieldName))) {
+            if (!empty($this->container->get(PropertyAccessorInterface::class)->getValue($scope, $fieldName))) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    public function getScopeEntities(string $scopeType): array
+    {
+        return $this->container->get(ScopeManager::class)->getScopeEntities($scopeType);
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return [
+            PropertyAccessorInterface::class,
+            ScopeManager::class,
+        ];
     }
 }

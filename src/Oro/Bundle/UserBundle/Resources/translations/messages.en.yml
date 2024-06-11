@@ -464,5 +464,9 @@ oro:
         login_source:
             default: Default
             impersonation: Impersonation
+
+        usage_stats:
+            users.label: 'Back-Office Users'
+
     scope:
         user.label: User

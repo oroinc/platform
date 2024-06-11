@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Handler;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
-use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
+use Oro\Bundle\FormBundle\Form\Handler\FormWithAjaxReloadHandler;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,16 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class EmailNotificationHandler implements FormHandlerInterface
 {
-    use  RequestHandlerTrait;
-
-    const WITHOUT_SAVING_KEY = 'reloadWithoutSaving';
-
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(private FormWithAjaxReloadHandler $formWithAjaxReloadHandler)
     {
-        $this->registry = $registry;
     }
 
     /**
@@ -35,31 +26,10 @@ class EmailNotificationHandler implements FormHandlerInterface
             throw new \InvalidArgumentException('Argument data should be instance of EmailNotification entity');
         }
 
-        $form->setData($data);
-
-        if ($this->isApplicable($request)) {
-            $this->submitPostPutRequest($form, $request);
-
-            if ($form->isValid()) {
-                $manager = $this->registry->getManagerForClass(EmailNotification::class);
-                $manager->persist($data);
-                $manager->flush();
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param Request $request
-     * @return bool
-     */
-    private function isApplicable(Request $request)
-    {
-        $methods = [Request::METHOD_POST, Request::METHOD_PUT];
-
-        return in_array($request->getMethod(), $methods, true) && $request->get(self::WITHOUT_SAVING_KEY) === null;
+        return $this->formWithAjaxReloadHandler->process(
+            $data,
+            $form,
+            $request
+        );
     }
 }

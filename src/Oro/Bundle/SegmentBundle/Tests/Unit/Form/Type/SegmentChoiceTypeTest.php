@@ -3,26 +3,24 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
+class SegmentChoiceTypeTest extends TestCase
 {
     private const ENTITY_CLASS = 'TestEntityClass';
 
-    /** @var SegmentChoiceType */
-    private $formType;
+    private SegmentChoiceType $formType;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
+    private ManagerRegistry|MockObject $doctrine;
 
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
+    private AclHelper|MockObject $aclHelper;
 
     protected function setUp(): void
     {
@@ -32,28 +30,26 @@ class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new SegmentChoiceType($this->doctrine, $this->aclHelper);
     }
 
-    public function testConfigureOptions(): void
+    public function testConfigureOptionsWhenNotEntityChoices(): void
     {
         $expectedOptions = [
             'placeholder' => 'oro.segment.form.segment_choice.placeholder',
             'entityClass' => 'TestEntityClass',
+            'entityChoices' => false,
             'choices' => ['First Segment' => 1, 'Second Segment' => 5],
+            'choice_label' => '',
+            'choice_value' => '',
         ];
 
         $repo = $this->createMock(SegmentRepository::class);
-        $repo->expects($this->once())
+        $repo->expects(self::once())
             ->method('findByEntity')
             ->with($this->aclHelper, self::ENTITY_CLASS)
             ->willReturn(['First Segment' => 1, 'Second Segment' => 5]);
-        $manager = $this->createMock(ObjectManager::class);
-        $manager->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(Segment::class)
             ->willReturn($repo);
-        $this->doctrine->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(Segment::class)
-            ->willReturn($manager);
 
         $resolver = new OptionsResolver();
         $resolver->setDefault('choices', []);
@@ -61,14 +57,50 @@ class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
 
         $resolvedOptions = $resolver->resolve(['entityClass' => self::ENTITY_CLASS]);
         foreach ($resolver->getDefinedOptions() as $option) {
-            $this->assertArrayHasKey($option, $expectedOptions);
-            $this->assertArrayHasKey($option, $resolvedOptions);
-            $this->assertEquals($expectedOptions[$option], $resolvedOptions[$option]);
+            self::assertArrayHasKey($option, $expectedOptions);
+            self::assertArrayHasKey($option, $resolvedOptions);
+            self::assertEquals($expectedOptions[$option], $resolvedOptions[$option]);
+        }
+    }
+
+    public function testConfigureOptionsWhenEntityChoices(): void
+    {
+        $segment1 = (new Segment())->setName('First Segment');
+        $segment2 = (new Segment())->setName('Second Segment');
+        $expectedOptions = [
+            'placeholder' => 'oro.segment.form.segment_choice.placeholder',
+            'entityClass' => 'TestEntityClass',
+            'entityChoices' => true,
+            'choices' => [1 => $segment1, 5 => $segment2],
+            'choice_label' => 'name',
+            'choice_value' => 'id',
+        ];
+
+        $repo = $this->createMock(SegmentRepository::class);
+        $repo->expects(self::once())
+            ->method('findSegmentsByEntity')
+            ->with($this->aclHelper, self::ENTITY_CLASS)
+            ->willReturn([1 => $segment1, 5 => $segment2]);
+
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
+            ->with(Segment::class)
+            ->willReturn($repo);
+
+        $resolver = new OptionsResolver();
+        $resolver->setDefault('choices', []);
+        $this->formType->configureOptions($resolver);
+
+        $resolvedOptions = $resolver->resolve(['entityClass' => self::ENTITY_CLASS, 'entityChoices' => true]);
+        foreach ($resolver->getDefinedOptions() as $option) {
+            self::assertArrayHasKey($option, $expectedOptions);
+            self::assertArrayHasKey($option, $resolvedOptions);
+            self::assertEquals($expectedOptions[$option], $resolvedOptions[$option]);
         }
     }
 
     public function testGetParent(): void
     {
-        $this->assertEquals(ChoiceType::class, $this->formType->getParent());
+        self::assertEquals(ChoiceType::class, $this->formType->getParent());
     }
 }

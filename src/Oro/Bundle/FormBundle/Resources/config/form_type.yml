@@ -404,3 +404,10 @@ services:
             - '@oro_entity.tools.entity_state_checker'
         tags:
             - { name: validator.constraint_validator }
+
+    oro_form.ajax_reload_handler:
+        class: Oro\Bundle\FormBundle\Form\Handler\FormWithAjaxReloadHandler
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_form.form.handler, alias: ajax_reload_form_handler }
