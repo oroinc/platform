@@ -42,6 +42,21 @@ class AssociationsWithCustomQueryTest extends RestJsonApiTestCase
                         'id'            => '<toString(@magazine2->id)>',
                         'relationships' => [
                             'customArticles'    => [
+                                'data' => [
+                                    ['type' => 'testapicustomarticles', 'id' => '<toString(@article1->id)>'],
+                                    ['type' => 'testapicustomarticles', 'id' => '<toString(@article2->id)>']
+                                ]
+                            ],
+                            'customBestArticle' => [
+                                'data' => ['type' => 'testapicustomarticles', 'id' => '<toString(@article2->id)>']
+                            ]
+                        ]
+                    ],
+                    [
+                        'type'          => 'testapicustommagazines',
+                        'id'            => '<toString(@magazine3->id)>',
+                        'relationships' => [
+                            'customArticles'    => [
                                 'data' => []
                             ],
                             'customBestArticle' => [

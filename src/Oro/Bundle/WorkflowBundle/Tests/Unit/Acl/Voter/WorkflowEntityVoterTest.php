@@ -206,7 +206,7 @@ class WorkflowEntityVoterTest extends TestCase
         ?int $entityIdentifier = null,
         array $aclIdentities = []
     ) {
-        $entityAclRepository =$this->createMock(WorkflowEntityAclRepository::class);
+        $entityAclRepository = $this->createMock(WorkflowEntityAclRepository::class);
         $entityAclRepository->expects($this->any())
             ->method('getWorkflowEntityAcls')
             ->willReturn($entityAcls);

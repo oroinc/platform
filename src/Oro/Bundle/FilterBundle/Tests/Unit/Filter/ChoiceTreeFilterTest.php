@@ -55,7 +55,7 @@ class ChoiceTreeFilterTest extends OrmTestCase
         $this->initMockFormFactory();
 
         $params = [
-            'options' =>[
+            'options' => [
                 'lazy' => true
             ]
         ];

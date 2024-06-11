@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Exception;
 /**
  * This exception is thrown when the requested filter is not valid by some reasons.
  */
-class InvalidFilterException extends RuntimeException
+class InvalidFilterException extends RuntimeException implements ValidationExceptionInterface
 {
     /**
      * @param string $message

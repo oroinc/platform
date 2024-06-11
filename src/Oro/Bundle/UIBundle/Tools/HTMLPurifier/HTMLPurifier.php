@@ -85,7 +85,7 @@ class HTMLPurifier extends \HTMLPurifier implements TranslatorAwareInterface
         }
 
         $html = \HTMLPurifier_Encoder::convertFromUTF8($html, $config, $context);
-        $this->context =& $context;
+        $this->context = & $context;
 
         return $html;
     }

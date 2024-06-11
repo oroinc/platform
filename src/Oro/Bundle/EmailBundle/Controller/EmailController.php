@@ -153,7 +153,7 @@ class EmailController extends AbstractController
                     $maxEmailsDisplay,
                     null
                 )),
-                'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
+                'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
             ];
         }
 

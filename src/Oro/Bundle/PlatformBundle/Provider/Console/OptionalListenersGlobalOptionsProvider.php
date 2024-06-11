@@ -30,7 +30,7 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
             new InputOption(
                 self::DISABLE_OPTIONAL_LISTENERS,
                 null,
-                InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 \sprintf(
                     '"<comment>all</comment>" or run <info>%s</info> to see available',
                     OptionalListenersCommand::getDefaultName(),

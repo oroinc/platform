@@ -800,7 +800,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $toBeUpdated = [];
         $toBeDeleted = [];
-        for ($i = 0; $i < 100; $i ++) {
+        for ($i = 0; $i < 100; $i++) {
             $toBeUpdated[$i] = new TestAuditDataOwner();
             $toBeUpdated[$i]->setStringProperty('aString');
             $em->persist($toBeUpdated[$i]);
@@ -812,7 +812,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         self::getMessageCollector()->clear();
 
-        for ($i = 0; $i < 100; $i ++) {
+        for ($i = 0; $i < 100; $i++) {
             $toBeUpdated[$i]->setStringProperty('anotherString');
             $em->remove($toBeUpdated[$i]);
 

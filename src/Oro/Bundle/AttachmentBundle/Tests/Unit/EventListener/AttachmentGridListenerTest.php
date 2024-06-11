@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestGridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -22,9 +23,22 @@ class AttachmentGridListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new AttachmentGridListener(['entityId']);
     }
 
+    private function getGridConfiguration(): DatagridConfiguration
+    {
+        return DatagridConfiguration::create([
+            'source' => [
+                'type'  => 'orm',
+                'query' => [
+                    'select' => ['attachment'],
+                    'from'   => [['table' => Attachment::class, 'alias' => 'attachment']]
+                ]
+            ]
+        ]);
+    }
+
     public function testOnBuildBefore()
     {
-        $gridConfig = new TestGridConfiguration();
+        $gridConfig = $this->getGridConfiguration();
 
         $parameters = new ParameterBag([AttachmentGridListener::GRID_PARAM_FIELD_NAME => 'testField']);
         $datagrid = $this->createMock(DatagridInterface::class);
@@ -49,7 +63,7 @@ class AttachmentGridListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnBuildBeforeWhichTableName()
     {
-        $gridConfig = new TestGridConfiguration();
+        $gridConfig = $this->getGridConfiguration();
 
         $parameters = new ParameterBag([
             AttachmentGridListener::GRID_PARAM_FIELD_NAME => 'testField',

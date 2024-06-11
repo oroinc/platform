@@ -330,7 +330,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
             try {
                 return $closure();
             } catch (DbalDriverException $driverException) {
-                $try ++;
+                $try++;
                 sleep(1);
             }
         } while ($try < 3);

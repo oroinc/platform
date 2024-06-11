@@ -36,10 +36,6 @@ class SetDefaultSorting extends BaseSetDefaultSorting
 
         $enabled = true;
         foreach ($idFieldNames as $fieldName) {
-            $field = $config->getField($fieldName);
-            if (null !== $field) {
-                $fieldName = $field->getPropertyPath($fieldName);
-            }
             if (!$this->isSorterEnabled($fieldName, $configOfSorters)) {
                 $enabled = false;
                 break;

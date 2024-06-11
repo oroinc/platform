@@ -71,7 +71,7 @@ class EmailModelBuilderHelper
         $this->emailAddressHelper = $emailAddressHelper;
         $this->entityNameResolver = $entityNameResolver;
         $this->tokenAccessor = $tokenAccessor;
-        $this->emailAddressManager= $emailAddressManager;
+        $this->emailAddressManager = $emailAddressManager;
         $this->entityManager = $entityManager;
         $this->emailCacheManager = $emailCacheManager;
         $this->twig = $twig;

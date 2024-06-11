@@ -67,7 +67,7 @@ class CleanupCommand extends Command implements
 
         $count = $qb->getQuery()->getSingleScalarResult();
 
-        return ($count>0);
+        return ($count > 0);
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */

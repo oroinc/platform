@@ -260,7 +260,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->extension->onSubmit($event);
 
         $expectedData = [
-            'extend'=> [
+            'extend' => [
                 'is_serialized' => $isSerialized
             ]
         ];

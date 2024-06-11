@@ -275,7 +275,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
 
         // source data
         $workflowDefinition = $this->createWorkflowDefinition($configuration);
-        $attributes =$this->expectsAttributeAssembleCalls($workflowDefinition, $configuration);
+        $attributes = $this->expectsAttributeAssembleCalls($workflowDefinition, $configuration);
         $steps = $this->expectStepAssemblerCalls($configuration, $attributes);
         $transitions = $this->expectTransitionAssemblerCalls($configuration, $steps);
         $this->expectTranslatorCalls();

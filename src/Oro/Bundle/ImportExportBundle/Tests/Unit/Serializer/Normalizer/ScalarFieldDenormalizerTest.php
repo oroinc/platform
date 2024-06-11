@@ -177,7 +177,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function denormalizeProvider(): array
     {
-        $biggerThanIntMax = str_repeat('9', (strlen(PHP_INT_MAX) +1));
+        $biggerThanIntMax = str_repeat('9', (strlen(PHP_INT_MAX) + 1));
         $biggerThanIntMaxInScientificValue = '9e' . (strlen(PHP_INT_MAX) + 1);
 
         $biggerThanFloatMax = str_repeat('9', (strlen(PHP_INT_MAX) * 100));

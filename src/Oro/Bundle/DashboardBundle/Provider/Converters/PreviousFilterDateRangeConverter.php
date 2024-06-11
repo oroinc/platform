@@ -65,7 +65,7 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                 } else {
                     // shift to previous range
                     $interval = $start->diff($end);
-                    $start= $start->sub($interval);
+                    $start = $start->sub($interval);
                     $end = $end->sub($interval);
                 }
 

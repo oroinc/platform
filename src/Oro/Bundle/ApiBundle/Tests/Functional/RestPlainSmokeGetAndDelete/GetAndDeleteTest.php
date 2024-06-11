@@ -32,6 +32,9 @@ class GetAndDeleteTest extends RestPlainApiTestCase
                 'GET',
                 $this->getUrl($this->getListRouteName(), ['entity' => $entityType, 'limit' => 1])
             );
+            if ($response->getStatusCode() === 400) {
+                $response = $this->request('GET', $this->getUrl($this->getListRouteName(), ['entity' => $entityType]));
+            }
             self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
 
             $id = $this->getFirstEntityId($entityClass, self::jsonToArray($response->getContent()));

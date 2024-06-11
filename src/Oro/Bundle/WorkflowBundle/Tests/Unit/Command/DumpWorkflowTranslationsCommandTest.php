@@ -125,13 +125,13 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
         $this->workflowTranslationHelper->expects($this->any())
             ->method('generateDefinitionTranslations')
             ->willReturn([
-                'wf1.definition1.label'=>'definition1.label.locale1',
-                'wf1.step1.label'=>'step1.label.locale1',
-                'wf1.step2.label'=>'step2.label.defaultLocale',
-                'wf1.step3.label'=>'',
-                'wf1.attribute1.label'=>'attribute1.label.locale1',
-                'wf1.transition1.label'=>'transition1.label.locale1',
-                'wf1.transition1.message'=>'transition1.message.locale1',
+                'wf1.definition1.label' => 'definition1.label.locale1',
+                'wf1.step1.label' => 'step1.label.locale1',
+                'wf1.step2.label' => 'step2.label.defaultLocale',
+                'wf1.step3.label' => '',
+                'wf1.attribute1.label' => 'attribute1.label.locale1',
+                'wf1.transition1.label' => 'transition1.label.locale1',
+                'wf1.transition1.message' => 'transition1.message.locale1',
             ]);
 
         $this->output->expects($this->once())

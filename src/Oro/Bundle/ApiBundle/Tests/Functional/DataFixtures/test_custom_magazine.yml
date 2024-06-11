@@ -9,4 +9,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomMagazine:
         articles: ['@article1', '@article2', '@article3']
         bestArticle: '@article1'
     magazine2:
+        name: 'Magazine 1'
+        articles: ['@article1', '@article2']
+        bestArticle: '@article2'
+    magazine3:
         name: 'Magazine 2'

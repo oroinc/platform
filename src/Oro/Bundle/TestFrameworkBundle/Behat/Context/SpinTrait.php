@@ -34,7 +34,7 @@ trait SpinTrait
             if ($spinDelay < 1000000) {
                 usleep($spinDelay);
             } else {
-                sleep($spinDelay/1000000);
+                sleep($spinDelay / 1000000);
             }
             $time -= microtime(true) - $start;
         }
