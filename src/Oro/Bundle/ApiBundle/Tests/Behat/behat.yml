@@ -22,3 +22,8 @@ oro_behat_extension:
       selector: '.label.label-info:contains("Renewing")'
     Published Label:
       selector: '.label.label-success:contains("Published")'
+
+    Add Server URL Button:
+      selector: 'a.btn.add-list-item'
+    Server URL 1:
+      selector: "input[name='oro_openapi_specification[serverUrls][0]']"

@@ -128,6 +128,7 @@ class OpenApiSpecificationController
         $newEntity->setView($entity->getView());
         $newEntity->setFormat($entity->getFormat());
         $newEntity->setEntities($entity->getEntities());
+        $newEntity->setServerUrls($entity->getServerUrls());
 
         return $this->updateHandlerFacade->update(
             $newEntity,
