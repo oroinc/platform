@@ -22,7 +22,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
      */
     public function getMigrationVersion(): string
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
@@ -121,6 +121,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
         $table->addColumn('view', 'string', ['length' => 100]);
         $table->addColumn('format', 'string', ['length' => 20]);
         $table->addColumn('entities', 'simple_array', ['comment' => '(DC2Type:simple_array)', 'notnull' => false]);
+        $table->addColumn('server_urls', 'simple_array', ['comment' => '(DC2Type:simple_array)', 'notnull' => false]);
         $table->addColumn('specification', 'text', ['notnull' => false]);
         $table->addColumn('specification_created_at', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
