@@ -117,6 +117,10 @@ class CreateOpenApiSpecificationMessageProcessor implements MessageProcessorInte
         if ($entities) {
             $options['entities'] = $entities;
         }
+        $serverUrls = $entity->getServerUrls();
+        if ($serverUrls) {
+            $options['server_urls'] = $serverUrls;
+        }
         try {
             return $this->openApiRenderer->render($entity->getView(), $entity->getFormat(), $options);
         } catch (\Throwable $e) {

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication\Authenticator;
 
-use Exception;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -112,7 +111,7 @@ class UsernamePasswordOrganizationAuthenticator extends FormLoginAuthenticator
     {
         try {
             return $passport->getUser();
-        } catch (Exception $exception) {
+        } catch (\Exception $e) {
             return null;
         }
     }

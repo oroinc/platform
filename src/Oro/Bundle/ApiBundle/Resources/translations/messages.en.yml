@@ -91,6 +91,9 @@ oro:
             entities:
                 label: Entities
                 description: The list of entities for which the OpenAPI specification should be created.
+            server_urls:
+                label: Server URLs
+                description: The list of server URLs that should be added to the OpenAPI specification.
             specification:
                 label: Specification
                 description: The created OpenAPI specification.
@@ -124,7 +127,7 @@ oro:
                     label: Clone
                     tooltip: Create a new OpenAPI specification based on the existing request
                 copy_public_url_to_clipboard_button:
-                    label: 'Copy Public URL to Clipboard'
+                    label: Copy Public URL to Clipboard
             statuses:
                 creating: Creating
                 created: Created

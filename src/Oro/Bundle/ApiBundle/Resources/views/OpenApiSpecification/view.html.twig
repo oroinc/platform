@@ -146,6 +146,7 @@
                 {{ UI.renderProperty('oro.api.openapispecification.format.label'|trans, entity.format|oro_open_api_format) }}
                 {{ UI.renderProperty('oro.api.openapispecification.view.label'|trans, entity.view|oro_open_api_view) }}
                 {{ UI.renderHtmlProperty('oro.api.openapispecification.entities.label'|trans, entity.entities|oro_open_api_entities(entity.view)) }}
+                {{ UI.renderHtmlProperty('oro.api.openapispecification.server_urls.label'|trans, entity.serverUrls|default([])|join('<br />')) }}
             </div>
         </div>
     {%- endset -%}
