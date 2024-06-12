@@ -17,7 +17,7 @@ class OroNotificationBundleInstaller implements Installation
      */
     public function getMigrationVersion(): string
     {
-        return 'v1_7';
+        return 'v1_7_1';
     }
 
     /**
