@@ -21,3 +21,13 @@ Oro\Bundle\ApiBundle\Entity\OpenApiSpecification:
             - NotBlank: ~
         owner:
             - NotBlank: ~
+        entities:
+            - All:
+                  - NotBlank: ~
+        serverUrls:
+            - All:
+                - NotBlank: ~
+                - Url: ~
+                - Regex:
+                      pattern: '/^[^\,]+$/'
+                      message: oro.api.openapi_server_url.regex

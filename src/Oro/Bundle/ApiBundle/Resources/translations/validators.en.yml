@@ -17,5 +17,7 @@ oro:
             entity_does_not_exist: 'The entity does not exist.'
         new_entity_in_includes: "Creation a new include entity that can lead to a circular dependency is forbidden."
         openapi_public_slug:
-            regex: "OpenAPI specification slug should contain only alphabetic symbols, underscore, hyphen and numbers."
+            regex: "This value should contain only alphabetic symbols, underscore, hyphen and numbers."
             duplicate: "OpenAPI specification with this slug already exists."
+        openapi_server_url:
+            regex: "This value should not contain commas."

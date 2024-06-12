@@ -68,9 +68,13 @@ class OpenApiRenderer
     {
         $previousServers = $api->servers;
         try {
-            $serverUrl = $options['server_url'] ?? null;
-            if ($serverUrl) {
-                $api->servers = [$this->createServer($api, $serverUrl)];
+            $serverUrls = $options['server_urls'] ?? null;
+            if ($serverUrls) {
+                $api->servers = [];
+                foreach ($serverUrls as $serverUrl) {
+                    /** @noinspection UnsupportedStringOffsetOperationsInspection */
+                    $api->servers[] = $this->createServer($api, $serverUrl);
+                }
             }
 
             return $formatter->format($api);

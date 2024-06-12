@@ -4,3 +4,12 @@
         <div class="description-container" style="display: none;"></div>
     </div>
 {% endblock %}
+
+{% block _oro_openapi_specification_serverUrls_entry_widget %}
+    <div {{ block('widget_container_attributes') }}>
+        <div class="float-holder">
+            {{ form_widget(form) }}
+            {{ form_errors(form) }}
+        </div>
+    </div>
+{% endblock %}

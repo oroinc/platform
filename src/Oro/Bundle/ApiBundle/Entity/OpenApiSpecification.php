@@ -80,6 +80,9 @@ class OpenApiSpecification
     #[ORM\Column(name: 'entities', type: Types::SIMPLE_ARRAY, nullable: true)]
     private ?array $entities = null;
 
+    #[ORM\Column(name: 'server_urls', type: Types::SIMPLE_ARRAY, nullable: true)]
+    private ?array $serverUrls = null;
+
     #[ORM\Column(name: 'specification', type: Types::TEXT, nullable: true)]
     private ?string $specification = null;
 
@@ -275,7 +278,37 @@ class OpenApiSpecification
      */
     public function setEntities(?array $entities): self
     {
+        if (null !== $entities && !$entities) {
+            $entities = null;
+        }
         $this->entities = $entities;
+
+        return $this;
+    }
+
+    /**
+     * Gets the list of server URLs that should be added to the OpenAPI specification.
+     *
+     * @return string[]|null
+     */
+    public function getServerUrls(): ?array
+    {
+        return $this->serverUrls;
+    }
+
+    /**
+     * Sets the list of server URLs that should be added to the OpenAPI specification.
+     *
+     * @param string[]|null $serverUrls
+     *
+     * @return self
+     */
+    public function setServerUrls(?array $serverUrls): self
+    {
+        if (null !== $serverUrls && !$serverUrls) {
+            $serverUrls = null;
+        }
+        $this->serverUrls = $serverUrls;
 
         return $this;
     }

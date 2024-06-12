@@ -55,7 +55,12 @@ class OpenApiDumpCommand extends Command
             )
             ->addOption('title', '', InputOption::VALUE_REQUIRED, 'The title of the specification')
             ->addOption('no-validation', '', InputOption::VALUE_NONE, 'Skip validation of the specification')
-            ->addOption('server-url', '', InputOption::VALUE_REQUIRED, 'The URL where live API is served')
+            ->addOption(
+                'server-url',
+                '',
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'The URLs where live API is served'
+            )
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps API documentation in OpenAPI format.
@@ -177,9 +182,9 @@ HELP
         if ($title) {
             $options['title'] = $title;
         }
-        $serverUrl = $input->getOption('server-url');
-        if ($serverUrl) {
-            $options['server_url'] = $serverUrl;
+        $serverUrls = $input->getOption('server-url');
+        if ($serverUrls) {
+            $options['server_urls'] = $serverUrls;
         }
 
         return $options;

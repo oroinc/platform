@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Form\Type;
 
 use Oro\Bundle\ApiBundle\Entity\OpenApiSpecification;
 use Oro\Bundle\ApiBundle\Provider\OpenApiChoicesProvider;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType as UiCollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -51,6 +52,13 @@ class OpenApiSpecificationCloneType extends AbstractType
                 'label'      => 'oro.api.openapispecification.entities.label',
                 'view_field' => 'view',
                 'required'   => false
+            ])
+            ->add('serverUrls', UiCollectionType::class, [
+                'label'                => 'oro.api.openapispecification.server_urls.label',
+                'entry_type'           => TextType::class,
+                'show_form_when_empty' => false,
+                'handle_primary'       => false,
+                'required'             => false
             ]);
     }
 
