@@ -52,7 +52,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
                     $entities = [];
                 }
             }
-            if ($itemsCount % static::BATCH_SIZE > 0) {
+            if ($itemsCount % self::BATCH_SIZE > 0) {
                 $this->saveActivityLists($manager, $provider, $entities, $ownerField, $organizationField);
             }
         }
