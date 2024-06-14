@@ -50,6 +50,10 @@ class SegmentDatagridConfigurationQueryDesigner extends AbstractQueryDesigner
      */
     public function getDefinition()
     {
+        if (null === $this->segment->getId()) {
+            return $this->segment->getDefinition();
+        }
+
         if (null === $this->preparedDefinition) {
             $definition = QueryDefinitionUtil::decodeDefinition($this->segment->getDefinition());
 
