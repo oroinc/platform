@@ -133,6 +133,10 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
                 $aliases = array_merge($aliases, $this->getUsedTableAliases($wherePart, $replace));
             }
         } else {
+            if ($where instanceof Expr\Composite && $where->getParts()[0] instanceof Expr\Func) {
+                $replace = false;
+            }
+
             $where = (string)$where;
 
             if ($replace) {
