@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -15,7 +15,6 @@ use Oro\Component\Testing\Unit\EntityTrait;
 class LocalizationTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
-    use EntityTrait;
 
     public function testAccessors(): void
     {
@@ -35,14 +34,12 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function getLanguageCode(): void
+    public function testLanguageCode(): void
     {
         $localization = new Localization();
-
         self::assertNull($localization->getLanguageCode());
 
         $localization->setLanguage((new Language())->setCode('test'));
-
         self::assertEquals('test', $localization->getLanguageCode());
     }
 
@@ -84,17 +81,17 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
 
     public function testTitleAccessors(): void
     {
-        $entity = $this->getEntity(Localization::class, ['id' => 1]);
+        $entity = $this->getLocalization(1);
         self::assertEmpty($entity->getTitles()->toArray());
 
         $defaultTitle = $this->createLocalizedValue('default', true);
         $firstTitle = $this->createLocalizedValue('test1');
-        $secondTitleLocalization = $this->getEntity(Localization::class, ['id' => 2]);
+        $secondTitleLocalization = $this->getLocalization(2);
         $secondTitle = $this->createLocalizedValue('test2', false, $secondTitleLocalization);
 
-        $parentLocalization = $this->getEntity(Localization::class, ['id' => 3]);
+        $parentLocalization = $this->getLocalization(3);
 
-        $localization = $this->getEntity(Localization::class, ['id' => 4]);
+        $localization = $this->getLocalization(4);
         $localization->setParentLocalization($parentLocalization);
         $withParentTitle = $this->createLocalizedValue('testParent', false, $parentLocalization);
 
@@ -178,10 +175,7 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
     public function testGetHierarchy(): void
     {
         $parentLocalizationId = 42;
-        $parentLocalization = $this->getEntity(
-            \Oro\Bundle\LocaleBundle\Entity\Localization::class,
-            ['id' => $parentLocalizationId]
-        );
+        $parentLocalization = $this->getLocalization($parentLocalizationId);
         $localization = new Localization();
         $localization->setParentLocalization($parentLocalization);
 
@@ -196,49 +190,43 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $localization->getChildrenIds($withOwnId));
     }
 
-    public function getChildrenIdsDataProvider(): \Generator
+    public function getChildrenIdsDataProvider(): array
     {
-        $localization = $this->getEntity(
-            Localization::class,
-            [
-                'id' => 42,
-                'childLocalizations' => [
-                    $this->getEntity(
-                        Localization::class,
-                        [
-                            'id' => 105,
-                            'childLocalizations' => [
-                                $this->getEntity(Localization::class, ['id' => 110])
-                            ]
-                        ]
-                    ),
-                    $this->getEntity(Localization::class, ['id' => 120])
-                ]
+        $localization = $this->getLocalization(42);
+        $childLocalization1 = $this->getLocalization(105);
+        $childLocalization1->addChildLocalization($this->getLocalization(110));
+        $localization->addChildLocalization($childLocalization1);
+        $localization->addChildLocalization($this->getLocalization(120));
+
+        return [
+            'empty localization without own id' => [
+                'localization' => new Localization(),
+                'withOwnId' => false,
+                'expected' => []
+            ],
+            'empty localization with own id' => [
+                'localization' => new Localization(),
+                'withOwnId' => true,
+                'expected' => []
+            ],
+            'localization without own id' => [
+                'localization' => $localization,
+                'withOwnId' => false,
+                'expected' => [105, 110, 120]
+            ],
+            'localization with own id' => [
+                'localization' => $localization,
+                'withOwnId' => true,
+                'expected' => [42, 105, 110, 120]
             ]
-        );
-
-        yield 'empty localization without own id' => [
-            'localization' => $this->getEntity(Localization::class),
-            'withOwnId' => false,
-            'expected' => []
         ];
+    }
 
-        yield 'empty localization with own id' => [
-            'localization' => $this->getEntity(Localization::class),
-            'withOwnId' => true,
-            'expected' => []
-        ];
+    private function getLocalization(int $id): Localization
+    {
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
 
-        yield 'localization without own id' => [
-            'localization' => $localization,
-            'withOwnId' => false,
-            'expected' => [105, 110, 120]
-        ];
-
-        yield 'localization with own id' => [
-            'localization' => $localization,
-            'withOwnId' => true,
-            'expected' => [42, 105, 110, 120]
-        ];
+        return $localization;
     }
 }
