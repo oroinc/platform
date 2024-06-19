@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
 use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ImportExportBundle\Exception\FileSizeExceededException;
 use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
@@ -182,6 +183,32 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->expects(self::once())
             ->method('deleteFile')
             ->with('test1.csv');
+
+        $this->exportHandler->exportResultFileMerge($jobName, $processorType, $outputFormat, $files);
+    }
+
+    public function testExportResultFileMergeThrowsFileSizeExceededExceptionWhenUsedMemoryMoreThenExist(): void
+    {
+        $jobName = 'job-name';
+        $processorType = 'export';
+        $outputFormat = 'csv';
+        $files = ['test1.csv', 'test2.csv'];
+
+        $writer = $this->createMock(FileStreamWriter::class);
+        $this->writerChain->expects(self::once())
+            ->method('getWriter')
+            ->willReturn($writer);
+
+        $reader = $this->createMock(AbstractFileReader::class);
+        $this->readerChain->expects(self::once())
+            ->method('getReader')
+            ->willReturn($reader);
+
+        $this->fileManager->expects(self::any())
+            ->method('getFileSize')
+            ->willReturn(160000000000000);
+
+        $this->expectException(FileSizeExceededException::class);
 
         $this->exportHandler->exportResultFileMerge($jobName, $processorType, $outputFormat, $files);
     }
