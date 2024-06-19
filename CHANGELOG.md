@@ -34,6 +34,11 @@ The current file describes significant changes in the code that may affect the u
 #### EntityBundle
 * Changed `\Oro\Bundle\EntityBundle\Provider\EntityNameProvider` to make it work with enum fields.
 
+### Removed
+
+#### EntityBundle
+* Removed **activity_support** configuration option from **dictionary** entity config scope. Consider replacing it with **collapsed_associations** configuration option of QueryDesignerBundle when it is used for your entity.
+
 ## Changes in the Platform package versions
 
 - [6.0.0](#600-2024-03-30)

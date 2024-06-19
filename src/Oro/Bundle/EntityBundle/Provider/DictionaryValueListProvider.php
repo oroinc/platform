@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 /**
@@ -34,7 +33,7 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
 
         $groups = $this->configManager->getEntityConfig('grouping', $className)->get('groups');
 
-        return $groups && \in_array(GroupingScope::GROUP_DICTIONARY, $groups, true);
+        return $groups && \in_array('dictionary', $groups, true);
     }
 
     /**
@@ -104,7 +103,7 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
         $entityConfigs = $this->configManager->getConfigs('grouping', null, true);
         foreach ($entityConfigs as $entityConfig) {
             $groups = $entityConfig->get('groups');
-            if ($groups && \in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
+            if ($groups && \in_array('dictionary', $groups, true)) {
                 $result[] = $entityConfig->getId()->getClassName();
             }
         }

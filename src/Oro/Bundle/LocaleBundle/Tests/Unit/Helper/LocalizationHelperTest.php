@@ -7,13 +7,12 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
-use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\FallbackTrait;
+use Oro\Component\Testing\ReflectionUtil;
 
 class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    use FallbackTrait;
-
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationManager;
 
@@ -29,6 +28,27 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $this->currentLocalizationProvider = $this->createMock(LocalizationProviderInterface::class);
 
         $this->helper = new LocalizationHelper($this->localizationManager, $this->currentLocalizationProvider);
+    }
+
+    private function getLocalization(int $id): Localization
+    {
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+
+        return $localization;
+    }
+
+    private function getLocalizedFallbackValue(
+        string $value,
+        ?string $fallback,
+        ?Localization $localization
+    ): LocalizedFallbackValue {
+        $localizedFallbackValue = new LocalizedFallbackValue();
+        $localizedFallbackValue->setString($value);
+        $localizedFallbackValue->setFallback($fallback);
+        $localizedFallbackValue->setLocalization($localization);
+
+        return $localizedFallbackValue;
     }
 
     public function testGetCurrentLocalization()
@@ -55,7 +75,28 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLocalizedValue()
     {
-        $this->assertFallbackValue($this->helper, 'getLocalizedValue');
+        $localization1 = $this->getLocalization(1);
+        $localization2 = $this->getLocalization(2);
+        $localization2->setParentLocalization($localization1);
+        $localization3 = $this->getLocalization(3);
+        $localization3->setParentLocalization($localization2);
+
+        $value1 = $this->getLocalizedFallbackValue('value1', FallbackType::NONE, null);
+        $value2 = $this->getLocalizedFallbackValue('value2', FallbackType::NONE, $localization1);
+        $value3 = $this->getLocalizedFallbackValue('value3', FallbackType::PARENT_LOCALIZATION, $localization2);
+        $value4 = $this->getLocalizedFallbackValue('value4', FallbackType::SYSTEM, $localization3);
+
+        $values = new ArrayCollection([$value1, $value2, $value3, $value4]);
+
+        // test 'FallbackType::NONE'
+        $this->assertEquals($value2, $this->helper->getLocalizedValue($values, $localization1));
+        // test 'FallbackType::PARENT_LOCALIZATION;
+        $this->assertEquals($value2, $this->helper->getLocalizedValue($values, $localization2));
+        // test 'FallbackType::SYSTEM;
+        $this->assertEquals($value1, $this->helper->getLocalizedValue($values, $localization3));
+
+        $badValues = new ArrayCollection([$value1, $value1]);
+        $this->helper->getLocalizedValue($badValues, $localization1);
     }
 
     public function testGetFirstNonEmptyLocalizedValueForDefaultString()

@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -104,7 +103,7 @@ class DictionaryEntityNameProvider implements EntityNameProviderInterface
 
         $groups = $this->configManager->getEntityConfig('grouping', $className)->get('groups');
 
-        return !empty($groups) && \in_array(GroupingScope::GROUP_DICTIONARY, $groups, true);
+        return !empty($groups) && \in_array('dictionary', $groups, true);
     }
 
     private function hasField(string $className, string $fieldName): bool

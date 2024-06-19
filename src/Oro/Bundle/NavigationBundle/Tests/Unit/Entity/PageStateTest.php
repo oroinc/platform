@@ -4,12 +4,10 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NavigationBundle\Entity\PageState;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 
 class PageStateTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     public function testUser()
     {
         $item = new PageState();
@@ -48,9 +46,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
     public function testData()
     {
         $item = new PageState();
-        $data = \json_encode([
-            ['key' => 'val', 'key2' => 'val2'],
-        ]);
+        $data = 'test data';
 
         $item->setData($data);
 
@@ -59,10 +55,11 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
 
     public function testDoPrePersist()
     {
-        $user = $this->getEntity(User::class, ['id' => 123]);
         $item = new PageState();
         $pageId = 'SomeId';
         $userId = 123;
+        $user = new User();
+        ReflectionUtil::setId($user, $userId);
 
         $item->setPageId($pageId);
         $item->setUser($user);

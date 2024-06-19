@@ -20,7 +20,7 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
      */
     public function getMigrationVersion(): string
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**

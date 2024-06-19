@@ -13,6 +13,9 @@ trusted_data:
             findEntityId:
                 entityClass: true
                 fieldName: true
+        Oro\Bundle\EntityBundle\Provider\DictionaryEntityDataProvider:
+            getValuesBySearchQuery:
+                searchField: true
     properties:
         Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler:
             searchEntities:
@@ -23,8 +26,6 @@ trusted_data:
             enable:
                 tableName: true
     safe_methods:
-        Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager:
-            getEntityIdentifierFieldName: true
         Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper:
             getTableName: true
         Oro\Bundle\EntityBundle\ORM\DoctrineHelper:
@@ -39,6 +40,8 @@ trusted_data:
         Oro\Bundle\EntityBundle\ORM\TriggerDriver\AbstractDriver:
             getSqlDisable: true
             getSqlEnable: true
+        Oro\Bundle\EntityBundle\Provider\DictionaryEntityDataProvider:
+            getEntityIdentifierFieldName: true
     check_methods_safety:
         Oro\Bundle\EntityBundle\Provider\EntityNameResolver:
             prepareNameDQL: [0]

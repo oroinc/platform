@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager;
+use Oro\Bundle\EntityBundle\Provider\DictionaryEntityDataProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
@@ -19,15 +19,15 @@ class EnumFilter extends BaseMultiChoiceFilter
     private const CLASS_KEY = 'class';
     private const ENUM_CODE_KEY = 'enum_code';
 
-    protected DictionaryApiEntityManager $dictionaryApiEntityManager;
+    private DictionaryEntityDataProvider $dictionaryEntityDataProvider;
 
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        DictionaryApiEntityManager $dictionaryApiEntityManager
+        DictionaryEntityDataProvider $dictionaryEntityDataProvider
     ) {
         parent::__construct($factory, $util);
-        $this->dictionaryApiEntityManager = $dictionaryApiEntityManager;
+        $this->dictionaryEntityDataProvider = $dictionaryEntityDataProvider;
     }
 
     /**
@@ -58,11 +58,11 @@ class EnumFilter extends BaseMultiChoiceFilter
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
-        if ($metadata[self::CLASS_KEY]) {
-            $this->dictionaryApiEntityManager->setClass($this->resolveMetadataClass($metadata));
-            $metadata['initialData'] = $this->dictionaryApiEntityManager->findValueByPrimaryKey(
-                $this->getForm()->get('value')->getData()
-            );
+        if (isset($metadata[self::CLASS_KEY])) {
+            $ids = $this->getForm()->get('value')->getData();
+            $metadata['initialData'] = $ids
+                ? $this->dictionaryEntityDataProvider->getValuesByIds($metadata[self::CLASS_KEY], $ids)
+                : [];
         }
 
         return $metadata;
@@ -74,17 +74,6 @@ class EnumFilter extends BaseMultiChoiceFilter
     public function prepareData(array $data): array
     {
         return $data;
-    }
-
-    private function resolveMetadataClass(array $metadata): string
-    {
-        if (\array_key_exists(self::CLASS_KEY, $metadata)
-            && str_starts_with($metadata[self::CLASS_KEY], ExtendHelper::ENTITY_NAMESPACE)
-        ) {
-            return $metadata[self::CLASS_KEY];
-        }
-
-        return $this->dictionaryApiEntityManager->resolveEntityClass($metadata[self::CLASS_KEY], true);
     }
 
     /**

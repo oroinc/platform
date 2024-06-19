@@ -6,3 +6,9 @@ oro_entity:
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             full: [ name ]
             short: [ name ]
+
+oro_query_designer:
+    collapsed_associations:
+        Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+            virtual_fields: [ id ]
+            search_fields: [ name ]

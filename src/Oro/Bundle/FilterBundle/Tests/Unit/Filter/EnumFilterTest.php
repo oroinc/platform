@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
-use Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager;
+use Oro\Bundle\EntityBundle\Provider\DictionaryEntityDataProvider;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EnumFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -11,6 +11,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 
 class EnumFilterTest extends OrmTestCase
@@ -18,22 +19,25 @@ class EnumFilterTest extends OrmTestCase
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
+    /** @var DictionaryEntityDataProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $dictionaryEntityDataProvider;
+
     /** @var EnumFilter */
     private $filter;
 
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
-        $dictionaryApiEntityManager = $this->createMock(DictionaryApiEntityManager::class);
+        $this->dictionaryEntityDataProvider = $this->createMock(DictionaryEntityDataProvider::class);
 
         $this->filter = new EnumFilter(
             $this->formFactory,
             new FilterUtility(),
-            $dictionaryApiEntityManager
+            $this->dictionaryEntityDataProvider
         );
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->filter->init('test', []);
 
@@ -45,7 +49,7 @@ class EnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithNullValue()
+    public function testInitWithNullValue(): void
     {
         $this->filter->init('test', ['null_value' => ':empty:']);
 
@@ -57,7 +61,7 @@ class EnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithClass()
+    public function testInitWithClass(): void
     {
         $this->filter->init('test', ['class' => 'Test\EnumValue']);
 
@@ -69,7 +73,7 @@ class EnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithEnumCode()
+    public function testInitWithEnumCode(): void
     {
         $this->filter->init('test', ['enum_code' => 'test_enum']);
 
@@ -88,7 +92,113 @@ class EnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testGetForm()
+    public function testGetMetadata(): void
+    {
+        $entityClass = \stdClass::class;
+        $ids = ['item1'];
+        $initialValues = [['id' => 'item1', 'value' => 'item1', 'text' => 'Item 1']];
+
+        $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => 'field', 'class' => $entityClass]);
+
+        $childFormView = new FormView();
+        $childFormView->vars['choices'] = [];
+
+        $formView = new FormView();
+        $formView->children['type'] = $childFormView;
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::once())
+            ->method('createView')
+            ->willReturn($formView);
+        $valueFormField = $this->createMock(FormInterface::class);
+        $form->expects(self::once())
+            ->method('get')
+            ->with('value')
+            ->willReturn($valueFormField);
+        $valueFormField->expects(self::once())
+            ->method('getData')
+            ->willReturn($ids);
+
+        $this->formFactory->expects(self::once())
+            ->method('create')
+            ->with(
+                EnumFilterType::class,
+                [],
+                ['csrf_protection' => false, 'class' => $entityClass]
+            )
+            ->willReturn($form);
+
+        $this->dictionaryEntityDataProvider->expects(self::once())
+            ->method('getValuesByIds')
+            ->with($entityClass, $ids)
+            ->willReturn($initialValues);
+
+        self::assertEquals(
+            [
+                'name' => 'test',
+                'label' => 'Test',
+                'choices' => [],
+                'type' => 'dictionary',
+                'lazy' => false,
+                'class' => $entityClass,
+                'initialData' => $initialValues
+            ],
+            $this->filter->getMetadata()
+        );
+    }
+
+    public function testGetMetadataWhenNoIds(): void
+    {
+        $entityClass = \stdClass::class;
+
+        $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => 'field', 'class' => $entityClass]);
+
+        $childFormView = new FormView();
+        $childFormView->vars['choices'] = [];
+
+        $formView = new FormView();
+        $formView->children['type'] = $childFormView;
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::once())
+            ->method('createView')
+            ->willReturn($formView);
+        $valueFormField = $this->createMock(FormInterface::class);
+        $form->expects(self::once())
+            ->method('get')
+            ->with('value')
+            ->willReturn($valueFormField);
+        $valueFormField->expects(self::once())
+            ->method('getData')
+            ->willReturn(null);
+
+        $this->formFactory->expects(self::once())
+            ->method('create')
+            ->with(
+                EnumFilterType::class,
+                [],
+                ['csrf_protection' => false, 'class' => $entityClass]
+            )
+            ->willReturn($form);
+
+        $this->dictionaryEntityDataProvider->expects(self::never())
+            ->method('getValuesByIds');
+
+        self::assertEquals(
+            [
+                'name' => 'test',
+                'label' => 'Test',
+                'choices' => [],
+                'type' => 'dictionary',
+                'lazy' => false,
+                'class' => $entityClass,
+                'initialData' => []
+            ],
+            $this->filter->getMetadata()
+        );
+    }
+
+    public function testGetForm(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -103,7 +213,7 @@ class EnumFilterTest extends OrmTestCase
     /**
      * @dataProvider filterProvider
      */
-    public function testBuildComparisonExpr(int $filterType, string $expected)
+    public function testBuildComparisonExpr(int $filterType, string $expected): void
     {
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder()
@@ -115,19 +225,13 @@ class EnumFilterTest extends OrmTestCase
             ->setConstructorArgs([$qb])
             ->getMock();
 
-        $fieldName = 'o.testField';
-        $parameterName = 'param1';
-
-        $expr = ReflectionUtil::callMethod(
+        $qb->where(ReflectionUtil::callMethod(
             $this->filter,
             'buildComparisonExpr',
-            [$ds, $filterType, $fieldName, $parameterName]
-        );
+            [$ds, $filterType, 'o.testField', 'param1']
+        ));
 
-        $qb->where($expr);
-        $result = $qb->getDQL();
-
-        self::assertSame($expected, $result);
+        self::assertSame($expected, $qb->getDQL());
     }
 
     public function filterProvider(): array
@@ -148,13 +252,13 @@ class EnumFilterTest extends OrmTestCase
             [
                 DictionaryFilterType::TYPE_IN,
                 'SELECT o.id FROM Stub:TestOrder o WHERE o.testField IN(:param1)'
-            ],
+            ]
         ];
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
-        $data = [];
+        $data = ['key' => 'value'];
         self::assertSame($data, $this->filter->prepareData($data));
     }
 }
