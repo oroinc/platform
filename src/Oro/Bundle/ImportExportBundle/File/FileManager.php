@@ -218,4 +218,15 @@ class FileManager
             ? $sanitizedFileContent
             : '';
     }
+
+    public function getFileSize(string $fileName): int
+    {
+        $filePath = $this->getFilePath($fileName);
+
+        if (!$this->isFileExist($filePath)) {
+            return 0;
+        }
+
+        return filesize($filePath);
+    }
 }
