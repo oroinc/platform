@@ -41,7 +41,7 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_entity.manager.dictionary.api'
+            - '@oro_entity.dictionary_entity_data_provider'
         tags:
             - { name: oro_search.extension.search_filter.filter, type: enum }
 

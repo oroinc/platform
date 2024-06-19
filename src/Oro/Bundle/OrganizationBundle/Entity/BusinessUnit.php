@@ -28,8 +28,6 @@ use Oro\Bundle\UserBundle\Entity\User;
     routeView: 'oro_business_unit_view',
     routeCreate: 'oro_business_unit_create',
     defaultValues: [
-        'grouping' => ['groups' => ['dictionary']],
-        'dictionary' => ['search_fields' => ['name'], 'virtual_fields' => ['id'], 'activity_support' => true],
         'entity' => ['icon' => 'fa-building-o'],
         'ownership' => [
             'owner_type' => 'BUSINESS_UNIT',

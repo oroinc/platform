@@ -6,7 +6,6 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Configuration;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationProvider;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\ConfigurationProviderStub;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
 
@@ -14,12 +13,11 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var ConfigurationProvider */
-    private $configurationProvider;
+    private ConfigurationProvider $configurationProvider;
 
     protected function setUp(): void
     {
-        $this->configurationProvider = new ConfigurationProviderStub(
+        $this->configurationProvider = new ConfigurationProvider(
             $this->getTempFile('QueryDesignerConfigurationProvider'),
             false,
             new Configuration(['string', 'integer', 'number', 'boolean'])

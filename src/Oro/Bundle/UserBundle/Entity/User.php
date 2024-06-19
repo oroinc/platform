@@ -50,13 +50,6 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
     routeView: 'oro_user_view',
     defaultValues: [
         'entity' => ['icon' => 'fa-user'],
-        'grouping' => ['groups' => ['dictionary']],
-        'dictionary' => [
-            'virtual_fields' => ['id'],
-            'search_fields' => ['firstName', 'lastName'],
-            'representation_field' => 'fullName',
-            'activity_support' => true
-        ],
         'ownership' => [
             'owner_type' => 'BUSINESS_UNIT',
             'owner_field_name' => 'owner',

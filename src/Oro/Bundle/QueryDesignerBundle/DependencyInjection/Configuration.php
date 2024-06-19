@@ -8,8 +8,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const CONDITIONS_GROUP_MERGE_SAME_ENTITY_CONDITIONS = 'conditions_group_merge_same_entity_conditions';
-
     /**
      * {@inheritDoc}
      */
@@ -18,10 +16,41 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('oro_query_designer');
         $rootNode = $treeBuilder->getRootNode();
 
+        $rootNode
+            ->children()
+                ->arrayNode('collapsed_associations')
+                    ->info(
+                        'The configuration of entities whose associations can be used in the query designer'
+                        . ' without expanding their fields.'
+                    )
+                    ->example([
+                        'Acme\AppBundle\Entity\User' => [
+                            'virtual_fields' => ['id'],
+                            'search_fields' => ['firstName', 'lastName']
+                        ]
+                    ])
+                    ->useAttributeAsKey('class')
+                    ->arrayPrototype()
+                        ->children()
+                            ->arrayNode('virtual_fields')
+                                ->performNoDeepMerging()
+                                ->cannotBeEmpty()
+                                ->prototype('scalar')->cannotBeEmpty()->end()
+                            ->end()
+                            ->arrayNode('search_fields')
+                                ->performNoDeepMerging()
+                                ->cannotBeEmpty()
+                                ->prototype('scalar')->cannotBeEmpty()->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
         SettingsBuilder::append(
             $rootNode,
             [
-                self::CONDITIONS_GROUP_MERGE_SAME_ENTITY_CONDITIONS => ['type' => 'boolean', 'value' => true]
+                'conditions_group_merge_same_entity_conditions' => ['type' => 'boolean', 'value' => true]
             ]
         );
 

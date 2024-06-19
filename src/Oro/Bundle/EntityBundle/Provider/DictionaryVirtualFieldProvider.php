@@ -3,12 +3,10 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Inflector\Inflector;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -27,6 +25,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     private array $virtualFieldQueries = [];
     private ?array $dictionaries = null;
     private Inflector $inflector;
+    private array $additionalDictionaries = [];
 
     public function __construct(
         ConfigManager $configManager,
@@ -40,6 +39,14 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         $this->translator = $translator;
         $this->cache = $cache;
         $this->inflector = $inflector;
+    }
+
+    /**
+     * Registers an entity as a dictionary when it is not marked as a dictionary in entity config.
+     */
+    public function registerDictionary(string $entityClass, array $virtualFieldNames): void
+    {
+        $this->additionalDictionaries[$entityClass] = $virtualFieldNames;
     }
 
     /**
@@ -85,29 +92,21 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         $this->cache->clear();
     }
 
-    /**
-     * Makes sure virtual fields for the given entity were loaded
-     *
-     * @param string $className
-     */
-    private function ensureVirtualFieldsInitialized($className)
+    private function ensureVirtualFieldsInitialized(string $className): void
     {
         if (isset($this->virtualFields[$className])) {
             return;
         }
 
         $em = $this->getManagerForClass($className);
-        if (!$em) {
+        if (null === $em) {
             return;
         }
 
         $this->virtualFields[$className] = $this->loadVirtualFields($em->getClassMetadata($className));
     }
 
-    /**
-     * @param string $className
-     */
-    private function ensureVirtualFieldQueriesInitialized($className)
+    private function ensureVirtualFieldQueriesInitialized(string $className): void
     {
         if (isset($this->virtualFieldQueries[$className])) {
             return;
@@ -127,7 +126,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
      *
      * @return array [virtualFieldName => [targetClass, associationName, fieldName, combinedLabel], ...]
      */
-    private function loadVirtualFields(ClassMetadata $metadata)
+    private function loadVirtualFields(ClassMetadata $metadata): array
     {
         $this->ensureDictionariesInitialized();
 
@@ -137,7 +136,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
             $targetClass = $associationMapping['targetEntity'];
             if (isset($this->dictionaries[$targetClass])) {
                 $fieldNames = $this->dictionaries[$targetClass];
-                $combinedLabel = count($fieldNames) > 1;
+                $combinedLabel = \count($fieldNames) > 1;
                 foreach ($fieldNames as $fieldName) {
                     $name = $this->inflector->tableize(sprintf('%s_%s', $associationName, $fieldName));
                     $result[$name] = [$targetClass, $associationName, $fieldName, $combinedLabel];
@@ -154,7 +153,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
      *
      * @return array [virtualFieldName => query, ...]
      */
-    private function loadVirtualFieldQueries($className, array $virtualFields)
+    private function loadVirtualFieldQueries(string $className, array $virtualFields): array
     {
         $result = [];
         /** @var EntityManagerInterface $em */
@@ -175,10 +174,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                     ],
                     'join'   => [
                         'left' => [
-                            [
-                                'join'  => 'entity.' . $associationName,
-                                'alias' => 'target'
-                            ]
+                            ['join'  => 'entity.' . $associationName, 'alias' => 'target']
                         ]
                     ]
                 ]
@@ -188,10 +184,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         return $result;
     }
 
-    /**
-     * Makes sure metadata for dictionary entities were loaded
-     */
-    private function ensureDictionariesInitialized()
+    private function ensureDictionariesInitialized(): void
     {
         if (null === $this->dictionaries) {
             $this->dictionaries = $this->cache->get('dictionaries', function () {
@@ -203,17 +196,17 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     /**
      * @return array [class name => [field name, ...], ...]
      */
-    private function loadDictionaries()
+    private function loadDictionaries(): array
     {
         $result = [];
         $configs = $this->configManager->getConfigs('grouping');
         foreach ($configs as $config) {
             $groups = $config->get('groups');
-            if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
+            if ($groups && \in_array('dictionary', $groups, true)) {
                 $className = $config->getId()->getClassName();
                 $fieldNames = $this->configManager->getEntityConfig('dictionary', $className)
                     ->get('virtual_fields', false, []);
-                if (empty($fieldNames)) {
+                if (!$fieldNames) {
                     $metadata = $this->getManagerForClass($className)->getClassMetadata($className);
                     $allFieldNames = $metadata->getFieldNames();
                     foreach ($allFieldNames as $fieldName) {
@@ -225,20 +218,19 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                 $result[$className] = $fieldNames;
             }
         }
+        foreach ($this->additionalDictionaries as $className => $virtualFieldNames) {
+            $result[$className] = $virtualFieldNames;
+        }
 
         return $result;
     }
 
-    /**
-     * @param EntityManagerInterface $em
-     * @param string                 $className
-     * @param string                 $associationName
-     * @param string                 $labelKey
-     *
-     * @return string
-     */
-    private function resolveLabel(EntityManagerInterface $em, $className, $associationName, $labelKey)
-    {
+    private function resolveLabel(
+        EntityManagerInterface $em,
+        string $className,
+        string $associationName,
+        string $labelKey
+    ): string {
         $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $labelKey);
         if ($this->translator->trans($label) === $label) {
             $metadata = $em->getClassMetadata($className);
@@ -255,18 +247,11 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         return $label;
     }
 
-    /**
-     * Gets doctrine entity manager for the given class
-     *
-     * @param string $className
-     *
-     * @return EntityManager|null
-     */
-    private function getManagerForClass($className)
+    private function getManagerForClass(string $className): ?EntityManagerInterface
     {
         try {
             return $this->doctrine->getManagerForClass($className);
-        } catch (\ReflectionException $ex) {
+        } catch (\ReflectionException $e) {
             // ignore not found exception
         }
 

@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -51,9 +50,7 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Dictionary';
 
-        $groupingConfig = $this->getEntityConfig($className, [
-            'groups' => [GroupingScope::GROUP_DICTIONARY, 'another']
-        ]);
+        $groupingConfig = $this->getEntityConfig($className, ['groups' => ['dictionary', 'another']]);
 
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -250,7 +247,7 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetSupportedEntityClasses(): void
     {
         $configs = [
-            $this->getEntityConfig('Test\Dictionary', ['groups' => [GroupingScope::GROUP_DICTIONARY, 'another']]),
+            $this->getEntityConfig('Test\Dictionary', ['groups' => ['dictionary', 'another']]),
             $this->getEntityConfig('Test\NotDictionary', []),
             $this->getEntityConfig('Test\NotDictionaryWithGroups', ['groups' => ['another']])
         ];

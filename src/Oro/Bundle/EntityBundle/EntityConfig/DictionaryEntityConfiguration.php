@@ -31,9 +31,6 @@ class DictionaryEntityConfiguration implements EntityConfigInterface
                 ->info('`string` specifies the representation field used to render titles for search items in the ' .
                     'reports filter.')
             ->end()
-            ->node('activity_support', 'normalized_boolean')
-                ->info('`boolean` enables the “activity_support” functionality.')
-            ->end()
         ;
     }
 }
