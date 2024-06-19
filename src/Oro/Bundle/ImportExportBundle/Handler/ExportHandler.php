@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
+use Oro\Bundle\ImportExportBundle\Exception\FileSizeExceededException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -11,6 +12,7 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
+use Oro\Component\PhpUtils\PhpIniUtil;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -138,23 +140,19 @@ class ExportHandler extends AbstractHandler
         $fileName = FileManager::generateFileName($processorType, $outputFormat);
         $localFilePath = FileManager::generateTmpFilePath($fileName);
 
-        $writer = $this->writerChain->getWriter($outputFormat);
-        if (!$writer instanceof FileStreamWriter) {
-            throw new LogicException('Writer must be instance of FileStreamWriter');
-        }
-
-        $reader = $this->readerChain->getReader($outputFormat);
-        if (!$reader instanceof AbstractFileReader) {
-            throw new LogicException('Reader must be instance of AbstractFileReader');
-        }
-
-        $this->batchFileManager->setWriter($writer);
-        $this->batchFileManager->setReader($reader);
+        $this->batchFileManager->setWriter($this->getWriter($outputFormat));
+        $this->batchFileManager->setReader($this->getReader($outputFormat));
 
         $localFiles = [];
 
         try {
+            $memoryLimit = (int)PhpIniUtil::parseBytes(ini_get('memory_limit'));
+            $filesSize = $this->getFilesSize($files);
+            $this->checkDiskSpace($files, $localFilePath);
+
             foreach ($files as $file) {
+                $this->checkMemoryLimit($filesSize, $memoryLimit);
+
                 try {
                     $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
                 } catch (FileNotFound $e) {
@@ -173,6 +171,9 @@ class ExportHandler extends AbstractHandler
             foreach ($files as $file) {
                 $this->fileManager->deleteFile($file);
             }
+        } catch (FileSizeExceededException $exception) {
+            $this->removeUnusedChunks($files);
+            throw $exception;
         } catch (\Exception $exception) {
             throw new RuntimeException('Cannot merge export files into single summary file', 0, $exception);
         } finally {
@@ -183,6 +184,57 @@ class ExportHandler extends AbstractHandler
         }
 
         return $fileName;
+    }
+
+    private function getReader($outputFormat): AbstractFileReader
+    {
+        $reader = $this->readerChain->getReader($outputFormat);
+        if (!$reader instanceof AbstractFileReader) {
+            throw new LogicException('Reader must be instance of AbstractFileReader');
+        }
+
+        return $reader;
+    }
+
+    private function getWriter($outputFormat): FileStreamWriter
+    {
+        $writer = $this->writerChain->getWriter($outputFormat);
+        if (!$writer instanceof FileStreamWriter) {
+            throw new LogicException('Writer must be instance of FileStreamWriter');
+        }
+
+        return $writer;
+    }
+
+    private function checkMemoryLimit(int $filesSize, $memoryLimit): void
+    {
+        if ($memoryLimit > 0 && $filesSize > ($memoryLimit - memory_get_usage(true))) {
+            throw new FileSizeExceededException("Total size of import files exceeds current memory limit!");
+        }
+    }
+
+    private function checkDiskSpace(array $files, string $localFilePath): void
+    {
+        $folderSizeLimit = (int)disk_free_space(dirname($localFilePath));
+
+        $filesSize = $this->getFilesSize($files);
+
+        if ($filesSize > $folderSizeLimit) {
+            throw new FileSizeExceededException("Total size of import files exceeds current disk space!");
+        }
+    }
+
+    private function getFilesSize(array $files): int
+    {
+        return array_sum(array_map([$this->fileManager, 'getFileSize'], $files));
+    }
+
+    private function removeUnusedChunks($files): void
+    {
+        foreach ($files as $file) {
+            $fullPath = $this->fileManager->getFilePath($file);
+            @unlink($fullPath);
+        }
     }
 
     /**
