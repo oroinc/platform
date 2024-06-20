@@ -116,7 +116,7 @@ class EmailNotificationTypeListenerTest extends TestCase
 
     private function assertEventFieldUpdated()
     {
-        $choices =['test_1', 'test2'];
+        $choices = ['test_1', 'test2'];
         $config = $this->createMock(FormConfigInterface::class);
         $config->expects($this->once())
             ->method('getOption')

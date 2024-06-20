@@ -44,18 +44,18 @@ class SetDefaultPaging implements ProcessorInterface
         }
 
         $filterNames = $this->filterNamesRegistry->getFilterNames($context->getRequestType());
-        $filters = $context->getFilters();
-        $this->addPageSizeFilter($filterNames->getPageSizeFilterName(), $filters, $pageSize);
-        $this->addPageNumberFilter($filterNames->getPageNumberFilterName(), $filters);
+        $filterCollection = $context->getFilters();
+        $this->addPageSizeFilter($filterNames->getPageSizeFilterName(), $filterCollection, $pageSize);
+        $this->addPageNumberFilter($filterNames->getPageNumberFilterName(), $filterCollection);
     }
 
-    private function addPageNumberFilter(string $filterName, FilterCollection $filters): void
+    private function addPageNumberFilter(string $filterName, FilterCollection $filterCollection): void
     {
         /**
          * "page number" filter must be added after "page size" filter because it depends on this filter
          * @see \Oro\Bundle\ApiBundle\Filter\PageNumberFilter::apply
          */
-        $pageNumberFilter = $filters->get($filterName);
+        $pageNumberFilter = $filterCollection->get($filterName);
         if (null === $pageNumberFilter) {
             $pageNumberFilter = new PageNumberFilter(
                 DataType::UNSIGNED_INTEGER,
@@ -64,15 +64,15 @@ class SetDefaultPaging implements ProcessorInterface
             );
         } else {
             // remove "page number" filter to make sure that it is added after "page size" filter
-            $filters->remove($filterName);
+            $filterCollection->remove($filterName);
         }
-        $filters->add($filterName, $pageNumberFilter, false);
+        $filterCollection->add($filterName, $pageNumberFilter, false);
     }
 
-    private function addPageSizeFilter(string $filterName, FilterCollection $filters, ?int $pageSize): void
+    private function addPageSizeFilter(string $filterName, FilterCollection $filterCollection, ?int $pageSize): void
     {
-        if (!$filters->has($filterName)) {
-            $filters->add(
+        if (!$filterCollection->has($filterName)) {
+            $filterCollection->add(
                 $filterName,
                 new PageSizeFilter(
                     DataType::INTEGER,

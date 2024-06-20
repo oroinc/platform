@@ -515,7 +515,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id', 'organization')
         );
 
-        $token =$this->createMock(UsernamePasswordOrganizationToken::class);
+        $token = $this->createMock(UsernamePasswordOrganizationToken::class);
 
         $this->assertTrue($this->extension->decideIsGranting(1, $object, $token));
     }
@@ -552,7 +552,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             }
         }
 
-        $token =$this->createMock(UsernamePasswordOrganizationToken::class);
+        $token = $this->createMock(UsernamePasswordOrganizationToken::class);
         $token->expects($this->any())
             ->method('getOrganization')
             ->willReturn($organization);

@@ -54,10 +54,14 @@ class HandleFieldsFilter implements ProcessorInterface
             return;
         }
 
-        $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
-        if (!$filterValues) {
+        $allFilterValues = $context->getFilterValues()->getGroup($filterGroupName);
+        if (!$allFilterValues) {
             // filtering of fields was not requested
             return;
+        }
+        $filterValues = [];
+        foreach ($allFilterValues as $values) {
+            $filterValues[] = end($values);
         }
 
         $fields = $this->processFilterValues($filterValues, $filterGroupName, $requestType, $context);

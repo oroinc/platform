@@ -595,7 +595,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected boolean value. Given "%s".', implode(',', $ids)),
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][exists]']
             ],
             $response
         );
@@ -612,7 +612,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected boolean value. Given "%s".', implode(',', $ids)),
-                'source' => ['parameter' => 'filter[biM2M]']
+                'source' => ['parameter' => 'filter[biM2M][exists]']
             ],
             $response
         );
@@ -629,7 +629,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected boolean value. Given "%s..%s".', $ids[0], $ids[1]),
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][exists]']
             ],
             $response
         );
@@ -646,7 +646,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected boolean value. Given "%s..%s".', $ids[0], $ids[1]),
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][exists]']
             ],
             $response
         );
@@ -663,7 +663,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected boolean value. Given "%s..%s".', $ids[0], $ids[1]),
-                'source' => ['parameter' => 'filter[biM2M]']
+                'source' => ['parameter' => 'filter[biM2M][exists]']
             ],
             $response
         );
@@ -680,7 +680,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected boolean value. Given "%s..%s".', $ids[0], $ids[1]),
-                'source' => ['parameter' => 'filter[biM2M]']
+                'source' => ['parameter' => 'filter[biM2M][exists]']
             ],
             $response
         );
@@ -1036,7 +1036,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "contains" is not supported.',
-                'source' => ['parameter' => 'filter[enumField]']
+                'source' => ['parameter' => 'filter[enumField][contains]']
             ],
             $response
         );
@@ -1052,7 +1052,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "contains" is not supported.',
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][contains]']
             ],
             $response
         );
@@ -1147,7 +1147,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected integer value. Given "%s".', implode(',', $ids)),
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][contains]']
             ],
             $response
         );
@@ -1240,7 +1240,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected integer value. Given "%s..%s".', $ids[0], $ids[1]),
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][contains]']
             ],
             $response
         );
@@ -1257,7 +1257,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected integer value. Given "%s..%s".', $ids[0], $ids[1]),
-                'source' => ['parameter' => 'filter[biM2M]']
+                'source' => ['parameter' => 'filter[biM2M][contains]']
             ],
             $response
         );
@@ -1273,7 +1273,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "not_contains" is not supported.',
-                'source' => ['parameter' => 'filter[enumField]']
+                'source' => ['parameter' => 'filter[enumField][not_contains]']
             ],
             $response
         );
@@ -1289,7 +1289,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The operator "not_contains" is not supported.',
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][not_contains]']
             ],
             $response
         );
@@ -1393,7 +1393,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected integer value. Given "%s".', implode(',', $ids)),
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][not_contains]']
             ],
             $response
         );
@@ -1451,7 +1451,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected integer value. Given "%s..%s".', $ids[0], $ids[1]),
-                'source' => ['parameter' => 'filter[biM2O]']
+                'source' => ['parameter' => 'filter[biM2O][not_contains]']
             ],
             $response
         );
@@ -1468,7 +1468,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => sprintf('Expected integer value. Given "%s..%s".', $ids[0], $ids[1]),
-                'source' => ['parameter' => 'filter[biM2M]']
+                'source' => ['parameter' => 'filter[biM2M][not_contains]']
             ],
             $response
         );

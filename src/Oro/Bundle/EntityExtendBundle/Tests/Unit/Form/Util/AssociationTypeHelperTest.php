@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -14,18 +13,14 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
     /** @var AssociationTypeHelper */
     private $typeHelper;
 
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
 
-        $this->typeHelper = new AssociationTypeHelper($this->configManager, $this->entityClassResolver);
+        $this->typeHelper = new AssociationTypeHelper($this->configManager);
     }
 
     public function testIsDictionaryNoConfig()
@@ -90,47 +85,6 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
             [['some_group'], false],
             [['dictionary'], true],
             [['some_group', 'dictionary'], true],
-        ];
-    }
-
-    /**
-     * @dataProvider isActivitySupport
-     */
-    public function testIsActivitySupport(bool $dictionaryOptions, bool $expected)
-    {
-        $className = 'Test\Entity';
-
-        $config = $this->createMock(Config::class);
-        $config->expects($this->once())
-            ->method('get')
-            ->with('activity_support')
-            ->willReturn($dictionaryOptions);
-
-        $configProvider = $this->createMock(ConfigProvider::class);
-        $this->configManager->expects($this->once())
-            ->method('getProvider')
-            ->with('dictionary')
-            ->willReturn($configProvider);
-        $configProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($className)
-            ->willReturn(true);
-        $configProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($className)
-            ->willReturn($config);
-
-        $this->assertEquals(
-            $expected,
-            $this->typeHelper->isSupportActivityEnabled($className)
-        );
-    }
-
-    public function isActivitySupport(): array
-    {
-        return [
-            [true, true],
-            [false, false],
         ];
     }
 

@@ -78,7 +78,7 @@ class AssociationManager
     {
         $target = $this->doctrineHelper->getEntityRepository($targetClass)->find($targetId);
         $countNewAssociations = 0;
-        $emails =$this->emailManager->findEmailsByIds($ids);
+        $emails = $this->emailManager->findEmailsByIds($ids);
         foreach ($emails as $email) {
             $result = $this->activityManager->addActivityTarget($email, $target);
             if ($result) {

@@ -115,7 +115,7 @@ PHP_FILE;
             [
                 'debug',
                 'Compile the layout expression.',
-                ['expression' =>'data["a"]->b(args)']
+                ['expression' => 'data["a"]->b(args)']
             ],
             [
                 'error',
@@ -125,7 +125,7 @@ PHP_FILE;
             [
                 'debug',
                 'Compile the layout expression.',
-                ['expression' =>'constant("' . ClassWithConstant::class . '::TEST")']
+                ['expression' => 'constant("' . ClassWithConstant::class . '::TEST")']
             ],
             [
                 'info',

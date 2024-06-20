@@ -35,7 +35,7 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
         $this->codeWithout = 'fr_FR';
         $this->codeNew = 'de_DE';
         $this->codeOld = 'es_ES';
-        $this->codedFilesBased= 'ua_UA';
+        $this->codedFilesBased = 'ua_UA';
 
         $this->languageWithoutTranslations = (new Language())->setCode($this->codeWithout)->setInstalledBuildDate($now);
         $this->languageWithNewTranslations = (new Language())->setCode($this->codeNew)->setInstalledBuildDate($now);

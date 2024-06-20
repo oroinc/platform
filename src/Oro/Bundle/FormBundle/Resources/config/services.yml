@@ -114,3 +114,10 @@ services:
             - '@translator'
         tags:
             - { name: validator.constraint_validator, alias: oro_form.validator_constraints.unique_entity }
+
+    oro_form.form.event_listener.disable_fields:
+        class: Oro\Bundle\FormBundle\Form\EventListener\DisableFieldsEventSubscriber
+        arguments:
+            - !service
+                class: Oro\Component\ExpressionLanguage\ExpressionLanguage
+            - '@property_accessor'

@@ -249,6 +249,32 @@ class ConfigContext extends ApiContext
     }
 
     /**
+     * Adds or replaces a request for some configuration data.
+     */
+    public function setExtra(ConfigExtraInterface $extra): void
+    {
+        $existingExtraKey = null;
+        $extraName = $extra->getName();
+        $keys = array_keys($this->extras);
+        foreach ($keys as $key) {
+            if ($this->extras[$key]->getName() === $extraName) {
+                $existingExtraKey = $key;
+                break;
+            }
+        }
+
+        $extra->configureContext($this);
+        if (null === $existingExtraKey) {
+            $names = $this->get(self::EXTRA);
+            $names[] = $extraName;
+            $this->set(self::EXTRA, $names);
+            $this->extras[] = $extra;
+        } else {
+            $this->extras[$existingExtraKey] = $extra;
+        }
+    }
+
+    /**
      * Removes a request for some configuration data.
      */
     public function removeExtra(string $extraName): void

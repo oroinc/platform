@@ -491,8 +491,16 @@ services:
         tags:
             - { name: nelmio_api_doc.extractor.handler }
 
-    Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager:
-        alias: oro_entity.manager.dictionary.api
+    oro_entity.dictionary_entity_data_provider:
+        class: Oro\Bundle\EntityBundle\Provider\DictionaryEntityDataProvider
+        arguments:
+            - '@doctrine'
+            - '@oro_entity.dictionary_value_list_provider'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity.entity_class_name_helper'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_security.acl_helper'
+            - '@oro_entity.query_hint_resolver'
 
     oro_entity.manager.dictionary.api:
         class: Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager
@@ -501,9 +509,6 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_entity.dictionary_value_list_provider'
-            - '@oro_entity_config.config_manager'
-            - '@oro_entity.entity_name_resolver'
-            - '@oro_security.acl_helper'
 
     oro_entity.manager.entity_field_manager:
         class: Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager

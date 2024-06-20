@@ -18,6 +18,7 @@ class BuildCriteria implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContextInterface $context): void
     {
@@ -34,28 +35,30 @@ class BuildCriteria implements ProcessorInterface
             return;
         }
 
-        /** @var FilterInterface[] $filters */
-        $filters = $context->getFilters();
-        $filterValues = $context->getFilterValues();
+        $filterCollection = $context->getFilters();
+        $filterValueAccessor = $context->getFilterValues();
 
         /**
-         * it is important to iterate by $filters, not by $filterValues,
+         * it is important to iterate by $filterCollection, not by $filterValueAccessor,
          * because the order of filters is matter,
          * e.g. "page size" filter should be processed before "page number" filter
          * @see \Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultPaging::addPageNumberFilter
          */
-        foreach ($filters as $filterKey => $filter) {
-            if ($filterValues->has($filterKey)) {
-                $filterValue = $filterValues->get($filterKey);
-                try {
-                    $filter->apply($criteria, $filterValue);
-                } catch (\Exception $e) {
-                    $error = null === $filterValue || !$filterValue->getSourceKey()
-                        ? Error::createByException($e)
-                        : Error::createValidationError(Constraint::FILTER)
-                            ->setInnerException($e)
-                            ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()));
-                    $context->addError($error);
+        /** @var FilterInterface $filter */
+        foreach ($filterCollection as $filterKey => $filter) {
+            if ($filterValueAccessor->has($filterKey)) {
+                $filterValues = $filterValueAccessor->get($filterKey);
+                foreach ($filterValues as $filterValue) {
+                    try {
+                        $filter->apply($criteria, $filterValue);
+                    } catch (\Exception $e) {
+                        $error = null === $filterValue || !$filterValue->getSourceKey()
+                            ? Error::createByException($e)
+                            : Error::createValidationError(Constraint::FILTER)
+                                ->setInnerException($e)
+                                ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()));
+                        $context->addError($error);
+                    }
                 }
             } elseif ($filter instanceof StandaloneFilterWithDefaultValue) {
                 $filter->apply($criteria);

@@ -74,7 +74,7 @@ class LoadEntitiesBySearchText implements ProcessorInterface
 
         $maxResults = $criteria->getMaxResults();
         $searchResult = $this->searchIndexer->simpleSearch(
-            $context->getFilterValues()->get('searchText')?->getValue(),
+            $context->getFilterValues()->getOne('searchText')?->getValue(),
             $criteria->getFirstResult(),
             (null !== $maxResults && $context->getConfig()->getHasMore()) ? $maxResults + 1 : $maxResults,
             array_values($entities)

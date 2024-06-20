@@ -165,6 +165,7 @@ define(function(require) {
             }, this);
 
             tinyMCE.init(_.extend({
+                license_key: 'gpl',
                 target: this.el,
                 setup: function(editor) {
                     editor.on('keydown', function(e) {

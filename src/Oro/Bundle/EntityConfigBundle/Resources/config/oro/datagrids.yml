@@ -96,7 +96,8 @@ datagrids:
                 frontend_type: html
                 type: twig
                 template: '@OroEntityConfig/Config/fieldType.html.twig'
-
+        properties:
+            id: ~
         actions:
             # @TODO check why those actions dont have ACL
             update:

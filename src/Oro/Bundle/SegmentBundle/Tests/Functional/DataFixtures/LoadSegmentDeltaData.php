@@ -31,7 +31,7 @@ class LoadSegmentDeltaData extends AbstractFixture implements DependentFixtureIn
                 'sorting' => '',
             ],
         ],
-        'filters' =>[
+        'filters' => [
             [
                 'columnName' => 'name',
                 'criterion' => [

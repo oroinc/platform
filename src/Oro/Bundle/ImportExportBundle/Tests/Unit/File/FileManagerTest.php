@@ -355,4 +355,54 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         self::assertFalse($this->fileManager->isFileExist($fileName));
     }
+
+    public function testFileSizeWhichNotExist(): void
+    {
+        $fileName = 'test.txt';
+        $filePath = '/tmp/test.txt';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFilePath')
+            ->with($fileName)
+            ->willReturn($filePath);
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('hasFile')
+            ->with($filePath)
+            ->willReturn(false);
+
+        self::assertEquals(0, $this->fileManager->getFileSize($fileName));
+    }
+
+    /**
+     * @dataProvider filesDataProvider
+     */
+    public function testFileSizeWhichExist(string $content, int $expectedSize): void
+    {
+        $fileName = 'test.txt';
+        $filePath = '/tmp/test.txt';
+
+        file_put_contents($filePath, $content);
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFilePath')
+            ->with($fileName)
+            ->willReturn($filePath);
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('hasFile')
+            ->with($filePath)
+            ->willReturn(true);
+
+        self::assertFileExists($filePath);
+        self::assertEquals($expectedSize, $this->fileManager->getFileSize($fileName));
+    }
+
+    public function filesDataProvider(): array
+    {
+        return [
+            ['Some Content', 12],
+            ['', 0]
+        ];
+    }
 }

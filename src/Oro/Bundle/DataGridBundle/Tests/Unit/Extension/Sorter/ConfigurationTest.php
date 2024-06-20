@@ -41,7 +41,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'default' => [],
                     'toolbar_sorting' => false,
                     'disable_default_sorting' => true,
-                    'disable_not_selected_option'=> true
+                    'disable_not_selected_option' => true
                 ]
             ]
         ];

@@ -22,16 +22,16 @@ class LoadTestResourceWithoutIdentifierData implements ProcessorInterface
         $resultName = 'test';
 
         // test that it is possible to add a filter for "get" action for resources without identifier
-        $filters = $context->getFilters();
-        $filterValues = $context->getFilterValues();
+        $filterCollection = $context->getFilters();
+        $filterValueAccessor = $context->getFilterValues();
         $filterKeys = [
             AddFiltersToResourceWithoutIdentifier::FILTER1_KEY,
             AddFiltersToResourceWithoutIdentifier::FILTER2_KEY
         ];
         foreach ($filterKeys as $filterKey) {
-            if ($filters->has($filterKey)) {
-                $filterValue = $filterValues->get($filterKey);
-                if (null !== $filterValue) {
+            if ($filterCollection->has($filterKey)) {
+                $filterValues = $filterValueAccessor->get($filterKey);
+                foreach ($filterValues as $filterValue) {
                     $val = $filterValue->getValue();
                     if ($val instanceof \DateTime) {
                         $val = $val->format('j/n/Y');

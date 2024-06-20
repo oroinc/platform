@@ -10,11 +10,9 @@ use Oro\Bundle\EmailBundle\Event\EmailUserAdded;
  */
 class UpdateVisibilityForNewEmailUserListener
 {
-    private EmailAddressVisibilityManager $emailAddressVisibilityManager;
-
-    public function __construct(EmailAddressVisibilityManager $emailAddressVisibilityManager)
-    {
-        $this->emailAddressVisibilityManager = $emailAddressVisibilityManager;
+    public function __construct(
+        private EmailAddressVisibilityManager $emailAddressVisibilityManager
+    ) {
     }
 
     public function onEmailUserAdded(EmailUserAdded $event): void

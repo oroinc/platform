@@ -1,0 +1,18 @@
+/* @theme: default; */
+
+@mixin bar-separator(
+    $bar-separator-display: inline-flex,
+    $bar-separator-justify-content: center,
+    $bar-separator-text-align: center,
+    $bar-separator-content: '|',
+    $bar-separator-width: spacing('base'),
+    $bar-separator-color: get-color('text', 'secondary'),
+
+) {
+    display: $bar-separator-display;
+    justify-content: $bar-separator-justify-content;
+    width: $bar-separator-width;
+    color: $bar-separator-color;
+    text-align: $bar-separator-text-align;
+    content: $bar-separator-content;
+}

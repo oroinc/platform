@@ -404,6 +404,17 @@
     &.table-fixed {
         table-layout: fixed;
     }
+
+    &.table-condensed {
+        line-height: 1.1;
+
+        thead {
+            th {
+                padding-top: $table-tbody-td-offset;
+                padding-bottom: $table-tbody-td-offset;
+            }
+        }
+    }
 }
 
 .td-expander {

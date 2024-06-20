@@ -105,6 +105,7 @@ dynamic-imports:
         - jquery.cookie
         - oro/block-widget
         - oroui/js/app/components/ajax-button
+        - oroui/js/app/components/post-button
         - oroui/js/app/components/app-loading-bar-component
         - oroui/js/app/components/app-loading-mask-component
         - oroui/js/app/components/hidden-redirect-component

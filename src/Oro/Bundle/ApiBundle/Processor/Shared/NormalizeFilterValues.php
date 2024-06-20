@@ -67,29 +67,31 @@ class NormalizeFilterValues implements ProcessorInterface
         $metadata = $this->context->getMetadata();
         $filters = $this->context->getFilters();
         $filterValues = $this->context->getFilterValues()->getAll();
-        foreach ($filterValues as $filterKey => $filterValue) {
+        foreach ($filterValues as $filterKey => $filterValues) {
             if ($filters->has($filterKey)) {
                 $filter = $filters->get($filterKey);
                 if ($filter instanceof StandaloneFilter && !$filter instanceof SpecialHandlingFilterInterface) {
-                    try {
-                        $value = $this->normalizeFilterValue(
-                            $requestType,
-                            $filter,
-                            $filterKey,
-                            $filterValue->getValue(),
-                            $filterValue->getOperator(),
-                            $metadata
-                        );
-                        $filterValue->setValue($value);
-                    } catch (\Exception $e) {
-                        $this->context->addError(
-                            $this->createFilterError($filterKey, $filterValue)->setInnerException($e)
-                        );
+                    foreach ($filterValues as $filterValue) {
+                        try {
+                            $value = $this->normalizeFilterValue(
+                                $requestType,
+                                $filter,
+                                $filterKey,
+                                $filterValue->getValue(),
+                                $filterValue->getOperator(),
+                                $metadata
+                            );
+                            $filterValue->setValue($value);
+                        } catch (\Exception $e) {
+                            $this->context->addError(
+                                $this->createFilterError($filterKey, $filterValue)->setInnerException($e)
+                            );
+                        }
                     }
                 }
             } else {
                 $this->context->addError(
-                    $this->createFilterError($filterKey, $filterValue)->setDetail('The filter is not supported.')
+                    $this->createFilterError($filterKey, $filterValues[0])->setDetail('The filter is not supported.')
                 );
             }
         }

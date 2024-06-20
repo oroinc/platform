@@ -8,7 +8,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
-use Oro\Component\PhpUtils\ArrayUtil;
 
 class WorkflowDefinitionControllerTest extends WebTestCase
 {
@@ -131,8 +130,12 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertArrayHasKey('updated_at', $result);
         unset($result['created_at'], $result['updated_at']);
 
-        ArrayUtil::sortBy($expectedResult['steps'], false, 'step_order');
-        ArrayUtil::sortBy($result['steps'], false, 'step_order');
+        usort($expectedResult['steps'], function (array $a, array $b) {
+            return $a['step_order'] <=> $b['step_order'];
+        });
+        usort($result['steps'], function (array $a, array $b) {
+            return $a['step_order'] <=> $b['step_order'];
+        });
         $this->assertEquals($expectedResult, $result);
     }
 

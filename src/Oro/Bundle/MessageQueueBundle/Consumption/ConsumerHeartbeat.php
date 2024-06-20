@@ -48,6 +48,6 @@ class ConsumerHeartbeat
             return false;
         }
 
-        return !(($currentTime->getTimestamp() - $lastAliveTime->getTimestamp())/60 >= $this->updatePeriod);
+        return !(($currentTime->getTimestamp() - $lastAliveTime->getTimestamp()) / 60 >= $this->updatePeriod);
     }
 }

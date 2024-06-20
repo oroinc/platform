@@ -8,13 +8,14 @@ class DictionaryControllerTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
     }
 
-    public function testSearch()
+    public function testGetValuesBySearchQuery(): void
     {
-        $expectedJson = '{"results":[{"id":"UM","value":"UM","text":"United States Minor Outlying Islands"},
-        {"id":"US","value":"US","text":"United States"}]}';
+        $expectedJson = '{"results":['
+            . '{"id":"UM","value":"UM","text":"United States Minor Outlying Islands"},'
+            . '{"id":"US","value":"US","text":"United States"}]}';
 
         $this->client->request(
             'POST',
@@ -23,25 +24,39 @@ class DictionaryControllerTest extends WebTestCase
         );
         $result = $this->client->getResponse();
 
-        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        self::assertJsonResponseStatusCodeEquals($result, 200);
         $this->assertJsonStringEqualsJsonString($expectedJson, $result->getContent());
     }
 
-    public function testLoadValue()
+    public function testGetValuesByIds(): void
     {
-        $expectedJson = '{"results":[{"id":"UM","value":"UM","text":"United States Minor Outlying Islands"},
-        {"id":"US","value":"US","text":"United States"}]}';
+        $expectedJson = '{"results":['
+            . '{"id":"UM","value":"UM","text":"United States Minor Outlying Islands"},'
+            . '{"id":"US","value":"US","text":"United States"}]}';
 
         $this->client->request(
             'POST',
-            $this->getUrl('oro_dictionary_value', ['dictionary'=>'Oro_Bundle_AddressBundle_Entity_Country']),
-            [
-                'keys'=>['US','UM']
-            ]
+            $this->getUrl('oro_dictionary_value', ['dictionary' => 'Oro_Bundle_AddressBundle_Entity_Country']),
+            ['keys' => ['US', 'UM']]
         );
         $result = $this->client->getResponse();
 
-        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        self::assertJsonResponseStatusCodeEquals($result, 200);
+        $this->assertJsonStringEqualsJsonString($expectedJson, $result->getContent());
+    }
+
+    public function testGetValuesByIdsWhenProvidedIdsIsEmptyString(): void
+    {
+        $expectedJson = '{"results":[]}';
+
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_dictionary_value', ['dictionary' => 'Oro_Bundle_AddressBundle_Entity_Country']),
+            ['keys' => '']
+        );
+        $result = $this->client->getResponse();
+
+        self::assertJsonResponseStatusCodeEquals($result, 200);
         $this->assertJsonStringEqualsJsonString($expectedJson, $result->getContent());
     }
 }

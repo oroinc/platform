@@ -10,17 +10,14 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RestFilterValueAccessorFactory
 {
-    private string $operatorPattern;
     /** @var string[] [operator name => operator, ...] */
     private array $operators;
 
     /**
-     * @param string   $operatorPattern
      * @param string[] $operators
      */
-    public function __construct(string $operatorPattern, array $operators)
+    public function __construct(array $operators)
     {
-        $this->operatorPattern = $operatorPattern;
         $this->operators = $operators;
     }
 
@@ -29,10 +26,6 @@ class RestFilterValueAccessorFactory
      */
     public function create(Request $request): FilterValueAccessorInterface
     {
-        return new RestFilterValueAccessor(
-            $request,
-            $this->operatorPattern,
-            $this->operators
-        );
+        return new RestFilterValueAccessor($request, $this->operators);
     }
 }

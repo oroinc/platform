@@ -49,6 +49,101 @@ oro:
                 label: Summary
                 description: The summary statistics of the asynchronous operation.
 
+        openapispecification:
+            entity_label: OpenAPI Specification
+            entity_plural_label: OpenAPI Specifications
+            entity_description: Represents OpenAPI specification.
+            entity_grid_all_view_label: All OpenAPI Specifications
+
+            id:
+                label: ID
+                description: The unique identifier of the OpenAPI specification.
+            status:
+                label: Status
+                description: "The processing status of the OpenAPI specification. Possible values: `creating`, `created`, `failed`, `renewing`."
+            published:
+                label: Published
+                description: A flag indicates whether the OpenAPI specification has been already published.
+            owner:
+                label: Requested By
+                description: A user who requested the OpenAPI specification.
+            organization:
+                label: Organization
+                description: An organization the OpenAPI specification belongs to.
+            created_at:
+                label: Created At
+                description: The date and time when the entity was created.
+            updated_at:
+                label: Updated At
+                description: The date and time when the entity was last updated.
+            name:
+                label: Name
+                description: The name of the OpenAPI specification.
+            public_slug:
+                label: Public Slug
+                description: Specify the URL slug for downloading the OpenAPI specification without authorization. Leave this blank if unauthorized access is not permitted.
+            view:
+                label: API Type (View)
+                description: The API type for which the OpenAPI specification should be created.
+            format:
+                label: Format
+                description: The format in which the OpenAPI specification should be created.
+            entities:
+                label: Entities
+                description: The list of entities for which the OpenAPI specification should be created.
+            server_urls:
+                label: Server URLs
+                description: The list of server URLs that should be added to the OpenAPI specification.
+            specification:
+                label: Specification
+                description: The created OpenAPI specification.
+            specification_created_at:
+                label: Specification Created At
+                description: The date and time when the OpenAPI specification was created or renewed.
+
+        open_api:
+            specification:
+                requested_message: The request for creation of OpenAPI specification has been accepted for processing.
+                saved_message: The OpenAPI specification saved.
+                renew_requested_message: The request for renew of OpenAPI specification has been accepted for processing.
+                published_private_message: The OpenAPI specification has been published. From now on, it cannot be changed.
+                published_public_message: The OpenAPI specification has been published. From now on, it cannot be changed and it is available to download without authorization.
+                request_button:
+                    label: Request Specification
+                    tooltip: Create a request for creation of OpenAPI specification
+                download_button:
+                    label: Download
+                    tooltip: Download OpenAPI specification
+                renew_button:
+                    label: Renew
+                    tooltip: Create a request for renew OpenAPI specification
+                publish_private_button:
+                    label: Publish
+                    tooltip: Publish OpenAPI specification. After the specification is published it cannot be changed.
+                publish_public_button:
+                    label: Publish
+                    tooltip: Publish OpenAPI specification. After the specification is published it cannot be changed and will be available to download without authorization.
+                clone_button:
+                    label: Clone
+                    tooltip: Create a new OpenAPI specification based on the existing request
+                copy_public_url_to_clipboard_button:
+                    label: Copy Public URL to Clipboard
+            statuses:
+                creating: Creating
+                created: Created
+                failed: Failed
+                renewing: Renewing
+                published: Published
+            formats:
+                json: JSON
+                json-pretty: JSON (Pretty)
+                yaml: YAML
+            views:
+                rest_json_api:
+                    label: Back-Office API
+                    description: JSON:API for back-office resources.
+            entity: Entity
+
         system_configuration:
             groups:
                 web_api_settings:
@@ -61,3 +156,6 @@ oro:
             web_api:
                 label: Back-Office API
                 description: Enables the back-office API feature for the application.
+            manage_openapi_specifications:
+                label: OpenAPI Specifications Management
+                description: Enables creating and managing OpenAPI specifications.

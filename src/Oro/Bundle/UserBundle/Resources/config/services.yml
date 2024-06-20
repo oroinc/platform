@@ -612,3 +612,11 @@ services:
             - '@oro_security.orm.ownership_sql_walker_builder'
         tags:
             - { name: oro_security.acl_helper.condition }
+
+    oro_user.provider.users_usage_stats_provider:
+        class: Oro\Bundle\UserBundle\Provider\UsersUsageStatsProvider
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_organization.organization_restriction_provider'
+        tags:
+            - { name: oro_platform.usage_stats_provider, priority: 90 }

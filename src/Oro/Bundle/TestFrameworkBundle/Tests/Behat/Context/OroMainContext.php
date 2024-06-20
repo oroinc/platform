@@ -71,7 +71,7 @@ class OroMainContext extends MinkContext implements
         '^(?:|I )should see .+ error message$|' .
         '^(?:|I )should see success message with number of records were deleted$|' .
         '^(?:|I )should see Schema updated flash message$' .
-    '/';
+        '/';
 
     private ?Stopwatch $stopwatch = null;
     private bool $debug = false;
@@ -1361,31 +1361,6 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
-    }
-
-    /**
-     * Click on button in hamburger menu
-     * Example: When I click "Category 1" in hamburger menu
-     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" in hamburger menu$/
-     */
-    public function pressButtonInHamburgerMenu($button)
-    {
-        $mainMenuTrigger = $this->createElement('Main Menu Button');
-        $sidebarMainMenuPopup = $this->createElement('Sidebar Main Menu Popup');
-        if ($mainMenuTrigger->isIsset() && !$sidebarMainMenuPopup->isIsset()) {
-            $mainMenuTrigger->click();
-        }
-
-        $this->spin(function () use ($button) {
-            try {
-                $this->pressButtonInModalWindow($button);
-                return true;
-            } catch (NoSuchElement $exception) {
-                return false;
-            }
-
-            return true;
-        }, 5);
     }
 
     /**

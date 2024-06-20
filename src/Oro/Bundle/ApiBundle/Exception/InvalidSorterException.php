@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Exception;
 /**
  * This exception is thrown when the requested sorter is not valid by some reasons.
  */
-class InvalidSorterException extends RuntimeException
+class InvalidSorterException extends RuntimeException implements ValidationExceptionInterface
 {
     public function __construct(string $message)
     {

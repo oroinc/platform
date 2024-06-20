@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Proxy;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -65,6 +66,10 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
      */
     public function getAssociationValue($entity, string $associationName)
     {
+        if ($entity instanceof Proxy && !$entity->__isInitialized()) {
+            $entity->__load();
+        }
+
         return $this->getEntityMetadata(ClassUtils::getClass($entity))
             ->getFieldValue($entity, $associationName);
     }

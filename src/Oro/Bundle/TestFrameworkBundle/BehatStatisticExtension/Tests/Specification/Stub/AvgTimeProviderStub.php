@@ -31,6 +31,6 @@ class AvgTimeProviderStub implements AvgTimeProviderInterface
      */
     public function getAverageTime()
     {
-        return round(array_sum($this->timeTable)/count($this->timeTable));
+        return round(array_sum($this->timeTable) / count($this->timeTable));
     }
 }

@@ -103,7 +103,7 @@ class EmailUserVirtualRelationsProviderTest extends \PHPUnit\Framework\TestCase
                     'relation_type' => 'manyToMany',
                     'related_entity_name' => User::class,
                     'target_join_alias' => 'target_field',
-                    'query' =>[
+                    'query' => [
                         'join' => [
                             'left' => [
                                 [

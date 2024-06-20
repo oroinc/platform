@@ -4,21 +4,13 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 class FileTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
-    use EntityTrait;
-
-    private File $entity;
-
-    protected function setUp(): void
-    {
-        $this->entity = new File();
-    }
 
     public function testAccessors(): void
     {
@@ -41,51 +33,51 @@ class FileTest extends \PHPUnit\Framework\TestCase
             ['externalUrl', 'example.org/file/path']
         ];
 
-        self::assertPropertyAccessors($this->entity, $properties);
+        self::assertPropertyAccessors(new File(), $properties);
     }
 
     public function testPrePersists(): void
     {
         $testDate = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        $this->entity->prePersist();
-        $this->entity->preUpdate();
+        $entity = new File();
+        $entity->prePersist();
+        $entity->preUpdate();
 
-        self::assertEquals($testDate->format('Y-m-d'), $this->entity->getCreatedAt()->format('Y-m-d'));
-        self::assertEquals($testDate->format('Y-m-d'), $this->entity->getUpdatedAt()->format('Y-m-d'));
+        self::assertEquals($testDate->format('Y-m-d'), $entity->getCreatedAt()->format('Y-m-d'));
+        self::assertEquals($testDate->format('Y-m-d'), $entity->getUpdatedAt()->format('Y-m-d'));
     }
 
     public function testEmptyFile(): void
     {
-        self::assertNull($this->entity->isEmptyFile());
-        $this->entity->setEmptyFile(true);
-        self::assertTrue($this->entity->isEmptyFile());
+        $entity = new File();
+        self::assertNull($entity->isEmptyFile());
+        $entity->setEmptyFile(true);
+        self::assertTrue($entity->isEmptyFile());
     }
 
     public function testToString(): void
     {
-        $this->entity->setFilename('file.doc');
-        self::assertEquals('file.doc', $this->entity->__toString());
+        $entity = new File();
+        $entity->setFilename('file.doc');
+        self::assertEquals('file.doc', $entity->__toString());
 
-        $this->entity->setOriginalFilename('original.doc');
-        self::assertEquals('file.doc (original.doc)', $this->entity->__toString());
+        $entity->setOriginalFilename('original.doc');
+        self::assertEquals('file.doc (original.doc)', $entity->__toString());
     }
 
     public function testSerialize(): void
     {
-        self::assertSame([null, null, $this->entity->getUuid(), null, null, null], $this->entity->__serialize());
+        $entity = new File();
+        self::assertSame([null, null, $entity->getUuid(), null, null, null], $entity->__serialize());
 
-        $file = $this->getEntity(
-            File::class,
-            [
-                'id' => 1,
-                'filename' => 'sample_filename',
-                'uuid' => 'test-uuid',
-                'externalUrl' => 'http://example.org/image.png',
-                'originalFilename' => 'original-filename.png',
-                'mimeType' => 'image/png',
-            ]
-        );
+        $file = new File();
+        ReflectionUtil::setId($file, 1);
+        $file->setUuid('test-uuid');
+        $file->setFilename('sample_filename');
+        $file->setExternalUrl('http://example.org/image.png');
+        $file->setOriginalFilename('original-filename.png');
+        $file->setMimeType('image/png');
         self::assertEquals(
             [1, 'sample_filename', 'test-uuid', 'http://example.org/image.png', 'original-filename.png', 'image/png'],
             $file->__serialize()
@@ -94,7 +86,8 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
     public function testUnserialize(): void
     {
-        $this->entity->__unserialize([
+        $entity = new File();
+        $entity->__unserialize([
             1,
             'sample_filename',
             'test-uuid',
@@ -102,7 +95,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
             'original-filename.png',
             'image/png'
         ]);
-        $data = serialize($this->entity);
+        $data = serialize($entity);
         /** @var File $entity */
         $entity = unserialize($data);
         self::assertSame('sample_filename', $entity->getFilename());
@@ -115,17 +108,12 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
     public function testClone(): void
     {
-        /** @var File $file */
-        $file = $this->getEntity(
-            File::class,
-            [
-                'id' => 1,
-                'uuid' => 'sample-uuid',
-                'parentEntityClass' => \stdClass::class,
-                'parentEntityFieldName' => 'sampleField',
-                'parentEntityId' => 1,
-            ]
-        );
+        $file = new File();
+        ReflectionUtil::setId($file, 1);
+        $file->setUuid('sample-uuid');
+        $file->setParentEntityClass(\stdClass::class);
+        $file->setParentEntityFieldName('sampleField');
+        $file->setParentEntityId(1);
 
         $clonedFile = clone $file;
 

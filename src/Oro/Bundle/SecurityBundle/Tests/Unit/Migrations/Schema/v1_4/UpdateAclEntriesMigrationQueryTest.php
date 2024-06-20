@@ -20,9 +20,9 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
     private const UPDATE_QUERY = 'UPDATE acl_entries SET mask = :mask WHERE id = :id';
     private const DELETE_QUERY = 'DELETE FROM acl_entries WHERE id IN (:ids)';
     private const INSERT_QUERY = 'INSERT INTO acl_entries (class_id, object_identity_id, security_identity_id,'
-    . ' ace_order, mask, granting, granting_strategy, audit_success, audit_failure)'
-    . ' VALUES (:class_id, :object_identity_id, :security_identity_id,'
-    . ' :ace_order, :mask, :granting, :granting_strategy, :audit_success, :audit_failure)';
+        . ' ace_order, mask, granting, granting_strategy, audit_success, audit_failure)'
+        . ' VALUES (:class_id, :object_identity_id, :security_identity_id,'
+        . ' :ace_order, :mask, :granting, :granting_strategy, :audit_success, :audit_failure)';
 
     private const UPDATE_ORDER_QUERY = 'UPDATE acl_entries SET ace_order = :ace_order WHERE id = :id';
 

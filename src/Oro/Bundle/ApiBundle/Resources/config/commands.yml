@@ -70,5 +70,13 @@ services:
     Oro\Bundle\ApiBundle\Command\OpenApiDumpCommand:
         arguments:
             - '@oro_api.api_doc.open_api.renderer'
+            - '@oro_api.open_api_choices_provider'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\OpenApiScheduleRenewCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
         tags:
             - { name: console.command }

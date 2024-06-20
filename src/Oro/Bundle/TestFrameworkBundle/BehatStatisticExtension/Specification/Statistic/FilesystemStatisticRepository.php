@@ -37,7 +37,7 @@ class FilesystemStatisticRepository implements StatisticRepositoryInterface, Obj
         $this->featureDuration = json_decode(file_get_contents($file), true);
 
         if ($this->featureDuration) {
-            $this->averageFeatureTime = (int) round(array_sum($this->featureDuration)/count($this->featureDuration));
+            $this->averageFeatureTime = (int) round(array_sum($this->featureDuration) / count($this->featureDuration));
         }
     }
 

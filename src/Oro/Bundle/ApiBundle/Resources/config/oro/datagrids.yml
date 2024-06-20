@@ -1,0 +1,209 @@
+datagrids:
+    openapi-specifications-grid:
+        acl_resource: oro_openapi_specification_view
+        source:
+            type: orm
+            query:
+                select:
+                    - entity.id
+                    - CONCAT_WS(' ', owner.firstName, owner.lastName) as ownerName
+                    - entity.name
+                    - entity.publicSlug
+                    - entity.view
+                    - entity.format
+                    - entity.createdAt
+                    - entity.status
+                    - entity.published
+                    - entity.specificationCreatedAt
+                    - IDENTITY(entity.organization) AS organizationId
+                from:
+                    - { table: 'Oro\Bundle\ApiBundle\Entity\OpenApiSpecification', alias: entity }
+                join:
+                    inner:
+                        - { join: entity.owner, alias: owner }
+        columns:
+            name:
+                label: oro.api.openapispecification.name.label
+            publicSlug:
+                label: oro.api.openapispecification.public_slug.label
+                frontend_type: html
+                type: twig
+                template: '@OroApi/OpenApiSpecification/Datagrid/publicSlug.html.twig'
+            view:
+                label: oro.api.openapispecification.view.label
+                frontend_type: select
+                choices: "@oro_api.open_api_choices_provider->getAvailableViewChoices"
+                translatable_options: false
+            format:
+                label: oro.api.openapispecification.format.label
+                frontend_type: select
+                choices: "@oro_api.open_api_choices_provider->getAvailableFormatChoices"
+                translatable_options: false
+            ownerName:
+                label: oro.api.openapispecification.owner.label
+            createdAt:
+                label: oro.api.openapispecification.created_at.label
+                frontend_type: datetime
+            status:
+                label: oro.api.openapispecification.status.label
+                frontend_type: html
+                type: twig
+                template: '@OroApi/OpenApiSpecification/Datagrid/status.html.twig'
+            specificationCreatedAt:
+                label: oro.api.openapispecification.specification_created_at.label
+                frontend_type: datetime
+        sorters:
+            columns:
+                name:
+                    data_name: entity.name
+                publicSlug:
+                    data_name: entity.publicSlug
+                view:
+                    data_name: entity.view
+                format:
+                    data_name: entity.format
+                ownerName:
+                    data_name: ownerName
+                createdAt:
+                    data_name: entity.createdAt
+                status:
+                    data_name: entity.status
+                specificationCreatedAt:
+                    data_name: entity.specificationCreatedAt
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                name:
+                    type: string
+                    data_name: entity.name
+                publicSlug:
+                    type: string
+                    data_name: entity.publicSlug
+                    renderable: false
+                view:
+                    type: choice
+                    data_name: entity.view
+                    options:
+                        field_options:
+                            multiple: true
+                            choices: "@oro_api.open_api_choices_provider->getAvailableViewChoices"
+                            translatable_options: false
+                format:
+                    type: choice
+                    data_name: entity.format
+                    options:
+                        field_options:
+                            multiple: true
+                            choices: "@oro_api.open_api_choices_provider->getAvailableFormatChoices"
+                            translatable_options: false
+                owner:
+                    type: choice-tree
+                    label: oro.api.openapispecification.owner.label
+                    data_name: entity.owner
+                    autocomplete_alias: assigned_to_organization_users
+                    renderedPropertyName: fullName
+                    className: 'Oro\Bundle\UserBundle\Entity\User'
+                    renderable: false
+                createdAt:
+                    type: datetime
+                    data_name: entity.createdAt
+                    renderable: false
+                status:
+                    type: oro_openapi_specification_status
+                    data_name: entity.status
+                    options:
+                        field_options:
+                            multiple: true
+                            choices: "@oro_api.open_api_choices_provider->getAvailableStatusChoices"
+                            translatable_options: false
+                specificationCreatedAt:
+                    type: datetime
+                    data_name: entity.specificationCreatedAt
+        properties:
+            id: ~
+            owner: ~
+            download_link:
+                type: url
+                route: oro_openapi_specification_download
+                params: [ id ]
+            renew_link:
+                type: url
+                route: oro_openapi_specification_renew
+                params: [ id ]
+            publish_link:
+                type: url
+                route: oro_openapi_specification_publish
+                params: [ id ]
+            view_link:
+                type: url
+                route: oro_openapi_specification_view
+                params: [ id ]
+            update_link:
+                type: url
+                route: oro_openapi_specification_update
+                params: [ id ]
+            clone_link:
+                type: url
+                route: oro_openapi_specification_clone
+                params: [ id ]
+            delete_link:
+                type: url
+                route: oro_openapi_specification_delete
+                params: [ id ]
+        actions:
+            download:
+                type: navigate
+                acl_resource: oro_openapi_specification_view
+                label: oro.api.open_api.specification.download_button.label
+                icon: download
+                link: download_link
+                launcherOptions:
+                    className: 'no-hash'
+                    attributes:
+                        target: _blank
+            renew:
+                type: ajax
+                acl_resource: oro_openapi_specification_create
+                label: oro.api.open_api.specification.renew_button.label
+                icon: refresh
+                link: renew_link
+            publish:
+                type: ajax
+                acl_resource: oro_openapi_specification_create
+                label: oro.api.open_api.specification.publish_public_button.label
+                icon: share-square-o
+                link: publish_link
+            view:
+                type: navigate
+                acl_resource: oro_openapi_specification_view
+                label: oro.grid.action.view
+                icon: eye
+                link: view_link
+                rowAction: true
+            update:
+                type: navigate
+                acl_resource: oro_openapi_specification_update
+                label: oro.grid.action.update
+                icon: edit
+                link: update_link
+            clone:
+                type: navigate
+                acl_resource: oro_openapi_specification_create
+                label: oro.api.open_api.specification.clone_button.label
+                icon: files-o
+                link: clone_link
+            delete:
+                type: delete
+                acl_resource: oro_openapi_specification_delete
+                label: oro.grid.action.delete
+                icon: trash
+                link: delete_link
+        action_configuration: ['@oro_api.open_api_specification_datagrid_helper', getActionsVisibility]
+        options:
+            entity_pagination: true
+            gridViews:
+                allLabel: oro.api.openapispecification.entity_grid_all_view_label
+        mass_actions:
+            delete:
+                disabled: true

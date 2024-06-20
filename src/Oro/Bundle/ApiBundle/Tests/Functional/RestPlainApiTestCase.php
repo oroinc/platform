@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class RestPlainApiTestCase extends RestApiTestCase
 {
+    protected const JSON_MEDIA_TYPE = 'application/json';
     protected const JSON_CONTENT_TYPE = 'application/json';
 
     protected function setUp(): void
@@ -44,10 +45,20 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         array $server = [],
         string $content = null
     ): Response {
+        $contentTypeHeaderValue = $server['CONTENT_TYPE'] ?? null;
         $this->checkTwigState();
         $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
         $this->checkCsrfHeader($server);
+
+        if (!\array_key_exists('HTTP_ACCEPT', $server)) {
+            $server['HTTP_ACCEPT'] = self::JSON_MEDIA_TYPE;
+        }
+        if ('POST' === $method || 'PATCH' === $method || 'DELETE' === $method) {
+            $server['CONTENT_TYPE'] = $contentTypeHeaderValue ?? self::JSON_CONTENT_TYPE;
+        } elseif (isset($server['CONTENT_TYPE'])) {
+            unset($server['CONTENT_TYPE']);
+        }
 
         $this->client->request(
             $method,

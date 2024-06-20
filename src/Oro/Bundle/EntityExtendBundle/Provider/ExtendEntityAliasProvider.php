@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Provider;
 
 use Doctrine\Inflector\Inflector;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\DuplicateEntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
@@ -55,7 +54,7 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
 
         // check for dictionaries
         $groups = $this->configManager->getEntityConfig('grouping', $entityClass)->get('groups');
-        if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
+        if (!empty($groups) && \in_array('dictionary', $groups, true)) {
             // delegate aliases generation to default provider
             return null;
         }

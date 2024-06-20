@@ -12,6 +12,18 @@ oro_rest_api_doc_resource:
     requirements:
         view: '[\w-]+'
 
+oro_api_openapi_specification:
+    resource: "@OroApiBundle/Controller/OpenApiSpecificationController.php"
+    type: annotation
+
+oro_api_download_openapi_specification:
+    resource: "@OroApiBundle/Controller/DownloadOpenApiSpecificationController.php"
+    type: annotation
+
+oro_api_download_public_openapi_specification:
+    resource: "@OroApiBundle/Controller/DownloadPublicOpenApiSpecificationController.php"
+    type: annotation
+
 # * GET method: returns an entity of the given type by its identifier
 # * DELETE method: deletes an entity of the given type by its identifier
 # * PATCH method: updates the specified fields of the given entity

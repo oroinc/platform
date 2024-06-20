@@ -568,7 +568,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('addError');
         $this->logger->expects($this->once())
             ->method('error')
-            ->with('Error occurred during enum options save', ['exception'=> $exception]);
+            ->with('Error occurred during enum options save', ['exception' => $exception]);
 
         $this->subscriber->postSubmit($event);
     }

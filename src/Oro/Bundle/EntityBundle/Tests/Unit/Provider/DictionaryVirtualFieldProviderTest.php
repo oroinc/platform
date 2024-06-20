@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -38,7 +37,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->cache = $this->createMock(AbstractAdapter::class);
 
-        $doctrine->expects($this->any())
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($this->em);
 
@@ -49,9 +48,10 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             $this->cache,
             (new InflectorFactory())->build()
         );
+        $this->provider->registerDictionary('Acme\TestBundle\Entity\RegisteredDictionary', ['id']);
     }
 
-    public function testDictionaryWithOneExplicitlyDeclaredVirtualFields()
+    public function testDictionaryWithOneExplicitlyDeclaredVirtualFields(): void
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
@@ -65,15 +65,14 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->initialize($entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['test_rel_name'],
             $this->provider->getVirtualFields($entityClassName)
         );
-        $this->assertEquals(
-            true,
+        self::assertTrue(
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'select' => [
                     'expr' => 'target.name',
@@ -91,7 +90,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDictionaryWithTwoExplicitlyDeclaredVirtualFields()
+    public function testDictionaryWithTwoExplicitlyDeclaredVirtualFields(): void
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
@@ -105,20 +104,18 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->initialize($entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['test_rel_id', 'test_rel_name'],
             $this->provider->getVirtualFields($entityClassName)
         );
-        $this->assertEquals(
-            true,
+        self::assertTrue(
             $this->provider->isVirtualField($entityClassName, 'test_rel_id')
         );
-        $this->assertEquals(
-            true,
+        self::assertTrue(
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'select' => [
                     'expr' => 'target.id',
@@ -135,7 +132,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_id')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'select' => [
                     'expr' => 'target.name',
@@ -153,7 +150,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDictionaryWithOneVirtualField()
+    public function testDictionaryWithOneVirtualField(): void
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
@@ -167,16 +164,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->initialize($entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['test_rel_name'],
             $this->provider->getVirtualFields($entityClassName)
         );
-        $this->assertEquals(
-            true,
+        self::assertTrue(
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'select' => [
                     'expr' => 'target.name',
@@ -194,7 +190,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDictionaryWithSeveralVirtualFields()
+    public function testDictionaryWithSeveralVirtualFields(): void
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
@@ -208,24 +204,21 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->initialize($entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['test_rel_code', 'test_rel_label'],
             $this->provider->getVirtualFields($entityClassName)
         );
-        $this->assertEquals(
-            false,
+        self::assertFalse(
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
-        $this->assertEquals(
-            true,
+        self::assertTrue(
             $this->provider->isVirtualField($entityClassName, 'test_rel_code')
         );
-        $this->assertEquals(
-            true,
+        self::assertTrue(
             $this->provider->isVirtualField($entityClassName, 'test_rel_label')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'select' => [
                     'expr' => 'target.code',
@@ -242,7 +235,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_code')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'select' => [
                     'expr' => 'target.label',
@@ -260,7 +253,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCachedDictionaries()
+    public function testCachedDictionaries(): void
     {
         $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
 
@@ -272,22 +265,22 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('get')
             ->with('dictionaries')
             ->willReturn(['Acme\TestBundle\Entity\Dictionary3' => ['name']]);
 
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method('getConfigs');
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method('getEntityConfig');
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClassName)
             ->willReturn($entityMetadata);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'select' => [
                     'expr' => 'target.name',
@@ -305,56 +298,96 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('clear');
 
         $this->provider->clearCache();
+    }
+
+    public function testRegisteredDictionary(): void
+    {
+        $entityClassName = 'Acme\TestBundle\Entity\TestEntity';
+
+        $entityMetadata = new ClassMetadata($entityClassName);
+        $entityMetadata->associationMappings = [
+            'testRel' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Acme\TestBundle\Entity\RegisteredDictionary'
+            ]
+        ];
+
+        $this->initialize($entityMetadata);
+
+        self::assertEquals(
+            ['test_rel_id'],
+            $this->provider->getVirtualFields($entityClassName)
+        );
+        self::assertTrue(
+            $this->provider->isVirtualField($entityClassName, 'test_rel_id')
+        );
+        self::assertEquals(
+            [
+                'select' => [
+                    'expr' => 'target.id',
+                    'label' => 'acme.test.testentity.test_rel.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\RegisteredDictionary'
+                ],
+                'join' => [
+                    'left' => [
+                        ['join' => 'entity.testRel', 'alias' => 'target']
+                    ]
+                ]
+            ],
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_id')
+        );
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function initialize(ClassMetadata $metadata)
+    private function initialize(ClassMetadata $metadata): void
     {
         $this->cache->expects(self::once())
             ->method('get')
             ->with('dictionaries')
             ->willReturn([
-                    'Acme\TestBundle\Entity\Dictionary1' => ['name'],
-                    'Acme\TestBundle\Entity\Dictionary2' => ['id', 'name'],
-                    'Acme\TestBundle\Entity\Dictionary3' => ['name'],
-                    'Acme\TestBundle\Entity\Dictionary4' => ['code', 'label']
+                'Acme\TestBundle\Entity\Dictionary1' => ['name'],
+                'Acme\TestBundle\Entity\Dictionary2' => ['id', 'name'],
+                'Acme\TestBundle\Entity\Dictionary3' => ['name'],
+                'Acme\TestBundle\Entity\Dictionary4' => ['code', 'label'],
+                'Acme\TestBundle\Entity\RegisteredDictionary' => ['id']
             ]);
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getConfigs')
             ->with('grouping')
             ->willReturn([
                 $this->createEntityConfig(
                     'grouping',
                     'Acme\TestBundle\Entity\Dictionary1',
-                    ['groups' => [GroupingScope::GROUP_DICTIONARY]]
+                    ['groups' => ['dictionary']]
                 ),
                 $this->createEntityConfig(
                     'grouping',
                     'Acme\TestBundle\Entity\Dictionary2',
-                    ['groups' => [GroupingScope::GROUP_DICTIONARY]]
+                    ['groups' => ['dictionary']]
                 ),
                 $this->createEntityConfig(
                     'grouping',
                     'Acme\TestBundle\Entity\Dictionary3',
-                    ['groups' => [GroupingScope::GROUP_DICTIONARY]]
+                    ['groups' => ['dictionary']]
                 ),
                 $this->createEntityConfig(
                     'grouping',
                     'Acme\TestBundle\Entity\Dictionary4',
-                    ['groups' => [GroupingScope::GROUP_DICTIONARY]]
+                    ['groups' => ['dictionary']]
                 )
             ]);
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getEntityConfig')
             ->with('dictionary')
             ->willReturnCallback(function ($scope, $class) {
@@ -371,7 +404,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
                 }
             });
 
-        $this->em->expects($this->any())
+        $this->em->expects(self::any())
             ->method('getClassMetadata')
             ->willReturnCallback(function ($class) use ($metadata) {
                 switch ($class) {
@@ -397,10 +430,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     private function createEntityConfig(string $scope, string $className, array $values = []): Config
     {
-        $config = new Config(new EntityConfigId($scope, $className));
-        $config->setValues($values);
-
-        return $config;
+        return new Config(new EntityConfigId($scope, $className), $values);
     }
 
     private function createDictionaryMetadata(
