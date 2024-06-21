@@ -531,6 +531,8 @@ services:
         class: Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener
         arguments:
             - '@doctrine'
+        calls:
+            - [setQueryCacheProvider, ['@oro_security.acl_query.cache_provider']]
         tags:
             - { name: kernel.event_listener, event: oro_translation.invalidate_translation_cache, method: onInvalidateTranslationCache }
 

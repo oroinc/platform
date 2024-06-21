@@ -10,6 +10,8 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * Listener that clears the doctrine query caches if user roles list was changed.
+ * @deprecated The 'oro_security.roles_change_listener' service was removed. The listener now processed in scope of
+ * CustomerUserDoctrineAclCacheListener.
  */
 class RolesChangeListener
 {
@@ -34,6 +36,7 @@ class RolesChangeListener
 
     public function onFlush(OnFlushEventArgs $args): void
     {
+        return;
         if ($this->isCacheOutdated || !$this->securityClasses) {
             return;
         }

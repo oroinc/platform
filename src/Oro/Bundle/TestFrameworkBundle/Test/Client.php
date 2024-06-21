@@ -291,7 +291,14 @@ class Client extends BaseClient
                 <body>%s%s%s</body>
             </html>';
 
-        return sprintf($html, $title, $title, $flashMessages, $content['beforeContentAddition'], $content['content']);
+        return sprintf(
+            $html,
+            $title,
+            $title,
+            $flashMessages,
+            $content['beforeContentAddition'] ?? '',
+            $content['content'] ?? ''
+        );
     }
 
     public function mergeServerParameters(array $server)

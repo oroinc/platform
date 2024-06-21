@@ -69,10 +69,11 @@ class AclCache implements AclCacheInterface
     {
         $key = $this->getDataKeyByIdentity($oid);
         $sidKey = $this->getSidKey($sids);
+        $cacheKey = $key . '_' . $sidKey;
 
-        $data = $this->cache->fetch($key);
-        if (false !== $data && array_key_exists($sidKey, $data)) {
-            return $this->unserializeAcl($data[$sidKey]);
+        $data = $this->cache->fetch($cacheKey);
+        if (false !== $data) {
+            return $this->unserializeAcl($data);
         }
 
         return null;
@@ -90,14 +91,18 @@ class AclCache implements AclCacheInterface
 
         $key = $this->getDataKeyByIdentity($acl->getObjectIdentity());
         $sidKey = $this->getSidKey($sids);
+        $itemKey = $key . '_' . $sidKey;
 
-        $data = $this->cache->fetch($key);
-        if (false === $data) {
-            $data = [];
+        $this->cache->save($itemKey, \serialize($acl));
+
+        $sidsItem =  $this->cache->fetch($key);
+        if (false === $sidsItem) {
+            $sidsItem = [];
         }
-        $data[$sidKey] = serialize($acl);
-
-        $this->cache->save($key, $data);
+        if (!\array_key_exists($sidKey, $sidsItem)) {
+            $sidsItem[$sidKey] = true;
+            $this->cache->save($key, $sidsItem);
+        }
     }
 
     /**
@@ -112,6 +117,14 @@ class AclCache implements AclCacheInterface
         $key = $this->getDataKeyByIdentity($oid);
         if (!$this->cache->contains($key)) {
             return;
+        }
+
+        $sidsItems =  $this->cache->fetch($key);
+        if (false === $sidsItems) {
+            $sidsItems = [];
+        }
+        foreach (array_keys($sidsItems) as $batchSidItem) {
+            $this->cache->delete($key . '_' . $batchSidItem);
         }
 
         $this->cache->delete($key);
@@ -140,8 +153,8 @@ class AclCache implements AclCacheInterface
      */
     private function getDataKeyByIdentity(ObjectIdentityInterface $oid)
     {
-        return md5($oid->getType()).sha1($oid->getType())
-            .'_'.md5($oid->getIdentifier()).sha1($oid->getIdentifier());
+        return md5($oid->getType())
+            .'_'.md5($oid->getIdentifier());
     }
 
     /**

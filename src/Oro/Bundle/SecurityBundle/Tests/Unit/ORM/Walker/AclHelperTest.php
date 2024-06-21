@@ -1,12 +1,14 @@
 <?php
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContext;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContextFactory;
@@ -30,8 +32,17 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $accessRuleExecutor;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Cache  */
+    private $cache;
+
     protected function setUp(): void
     {
+        $this->cache = $this->createMock(Cache::class);
+        $aclQueryCacheProvider = $this->createMock(DoctrineAclCacheProvider::class);
+        $aclQueryCacheProvider->expects(self::once())
+            ->method('getCurrentUserCache')
+            ->willReturn($this->cache);
+
         $this->em = $this->createMock(EntityManager::class);
         $configuration = $this->createMock(Configuration::class);
         $this->em->expects($this->any())
@@ -47,6 +58,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new AclHelper(
             new AccessRuleWalkerContextFactory($this->tokenStorage, $this->accessRuleExecutor)
         );
+        $this->helper->setQueryCacheProvider($aclQueryCacheProvider);
     }
 
     public function testApplyToQueryWithDefaultConfiguration()
@@ -61,6 +73,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
 
         $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', null);
         $this->assertEquals($context, $hints['oro_access_rule.context']);
+        $this->assertSame($this->cache, $query->getQueryCacheDriver());
     }
 
     public function testApplyToQueryWithDefaultConfigurationAndToken()
@@ -86,6 +99,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
             $org->getId()
         );
         $this->assertEquals($context, $hints['oro_access_rule.context']);
+        $this->assertSame($this->cache, $query->getQueryCacheDriver());
     }
 
     public function testApplyToQueryWithDefaultConfigurationAndTokenWithOrganizationButWithoutUserObject()
@@ -116,6 +130,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
             $org->getId()
         );
         $this->assertEquals($context, $hints['oro_access_rule.context']);
+        $this->assertSame($this->cache, $query->getQueryCacheDriver());
     }
 
     public function testApplyToQueryWithCustomOptions()
@@ -131,5 +146,6 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $context->setOption('option1', true);
         $context->setOption('option2', [3, 2, 1]);
         $this->assertEquals($context, $hints['oro_access_rule.context']);
+        $this->assertSame($this->cache, $query->getQueryCacheDriver());
     }
 }

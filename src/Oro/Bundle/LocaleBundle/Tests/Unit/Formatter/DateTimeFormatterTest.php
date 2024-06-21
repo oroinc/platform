@@ -578,6 +578,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     protected function getPattern($locale, $dateType, $timeType)
     {
         $localeFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);
-        return $localeFormatter->getPattern();
+
+        // replace non-breaking spaces with spaces
+        return str_replace("\xE2\x80\xAF", ' ', $localeFormatter->getPattern());
     }
 }

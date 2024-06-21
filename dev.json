@@ -122,6 +122,7 @@
         "brick/math": "~0.9.2",
         "phpdocumentor/reflection-docblock": "5.2.*",
         "php-http/httplug-bundle": "~1.20.0",
+        "php-http/discovery": "1.19.0",
         "salsify/json-streaming-parser": "8.2.*",
         "myclabs/deep-copy": "1.10.*",
         "oro/redis-config": "4.2.x-dev"
