@@ -1,4 +1,13 @@
 entity_config:
+    entity_management:
+        entity:
+            items:
+                enabled:
+                    options:
+                        value_type: boolean
+                        default_value: true
+                        translatable: false
+                        indexed: true
     entity_config:
         entity:
             items:

@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\Tagging;
@@ -74,6 +76,45 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
         $this->assertEquals($expectedDql, $countQb->getQuery()->getDQL());
         // Check that Optimized DQL can be converted to SQL
         $this->assertNotEmpty($countQb->getQuery()->getSQL());
+    }
+
+    public function testGetCountMultiFieldQueryBuilder()
+    {
+        $expectedDql = 'SELECT t1.id FROM ' . JobExecution::class
+            . ' t1 LEFT JOIN t1.jobInstance t2 WHERE t2 IN('
+            . 'SELECT filter__gpnpmultiEnum2 FROM '
+            .  JobInstance::class . ' filter__gpnpmultiEnum2 INNER JOIN '
+            . 'filter__gpnpmultiEnum2.MultiSelectField filter__gpnpmultiEnum3_rel WHERE '
+            . 'filter__gpnpmultiEnum3_rel IN(:?1))';
+
+        $queryBuilder = (new QueryBuilder($this->em))
+            ->select(array('t1.email as c1', 't1.id'))
+            ->from(JobExecution::class, 't1')
+            ->leftJoin('t1.jobInstance', 't2')
+            ->where(
+                $this->em->getExpressionBuilder()->in(
+                    't2',
+                    $this->em->createQueryBuilder()
+                        ->select('filter__gpnpmultiEnum2')
+                        ->from(JobInstance::class, 'filter__gpnpmultiEnum2')
+                        ->join('filter__gpnpmultiEnum2.MultiSelectField', 'filter__gpnpmultiEnum3_rel')
+                        ->where(
+                            $this->em->getExpressionBuilder()->in(
+                                'filter__gpnpmultiEnum3_rel',
+                                ':?1'
+                            )
+                        )
+                        ->setParameter(1, 5)
+                        ->getDQL()
+                )
+            );
+
+        $optimizer = new CountQueryBuilderOptimizer();
+        $optimizer->setRelationHelper($this->relationHelper);
+        $countQb = $optimizer->getCountQueryBuilder($queryBuilder);
+
+        $this->assertInstanceOf(QueryBuilder::class, $countQb);
+        $this->assertEquals($expectedDql, $countQb->getQuery()->getDQL());
     }
 
     /**

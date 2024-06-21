@@ -70,20 +70,18 @@ class ConfigController extends AbstractController
 
     /**
      * @Route("/update/{id}", name="oro_entityconfig_update")
-     * @Template()
-     *
-     * @param Request $request
-     * @param string  $id
+     * @Template("@OroEntityConfig/Config/update.html.twig")
+     * @Acl(
+     *     id="oro_entityconfig_update",
+     *     type="entity",
+     *     class="OroEntityConfigBundle:EntityConfigModel",
+     *     permission="EDIT"
+     * )
      *
      * @return array|RedirectResponse
      */
-    public function updateAction(Request $request, $id)
+    public function newUpdateAction(Request $request, EntityConfigModel $entity)
     {
-        $entity  = $this->getConfigManager()
-            ->getEntityManager()
-            ->getRepository(EntityConfigModel::class)
-            ->find($id);
-
         $form = $this->createForm(
             ConfigType::class,
             null,
@@ -110,6 +108,17 @@ class ConfigController extends AbstractController
             'entity_count'  => $this->getRowCount($entity),
             'link'          => $this->getRowCountLink($entity),
         ];
+    }
+
+    /** @deprecated */
+    public function updateAction(Request $request, $id)
+    {
+        $entity = $this->getConfigManager()
+            ->getEntityManager()
+            ->getRepository(EntityConfigModel::class)
+            ->find($id);
+
+        return $this->newUpdateAction($request, $entity);
     }
 
     /**
@@ -164,6 +173,12 @@ class ConfigController extends AbstractController
 
     /**
      * @Route("/field/update/{id}", name="oro_entityconfig_field_update")
+     * @Acl(
+     *     id="oro_entityconfig_update_field",
+     *     type="entity",
+     *     class="OroEntityConfigBundle:FieldConfigModel",
+     *     permission="EDIT"
+     * )
      * @Template()
      *
      * @param FieldConfigModel $fieldConfigModel
