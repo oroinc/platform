@@ -1160,6 +1160,10 @@ class OroMainContext extends MinkContext implements
         }
         for ($i = 0; $i < 2; $i++) {
             try {
+                $btnNodeElement = $this->getSession()->getPage()->findButton($button);
+                if ($btnNodeElement) {
+                    $this->scrollToXpath($btnNodeElement->getXpath());
+                }
                 parent::pressButton($button);
                 break;
             } catch (ElementNotFoundException $e) {
@@ -2864,7 +2868,13 @@ JS;
     public function iScrollToElement($elementName)
     {
         $element = $this->elementFactory->createElement($elementName);
-        $xpath = addslashes($element->getXpath());
+        $this->scrollToXpath($element->getXpath());
+        $element->focus();
+    }
+
+    public function scrollToXpath(string $xpath): void
+    {
+        $xpath = addslashes(str_replace("\n", '', $xpath));
         $javascipt = <<<JS
 (function() {
     document
@@ -2874,7 +2884,6 @@ JS;
 })()
 JS;
         $this->getSession()->getDriver()->evaluateScript($javascipt);
-        $element->focus();
     }
 
     /**
