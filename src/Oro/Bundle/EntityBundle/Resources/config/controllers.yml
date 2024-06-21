@@ -3,10 +3,8 @@ services:
         public: true
 
     Oro\Bundle\EntityBundle\Controller\DictionaryController:
-        calls:
-            - ['setContainer', ['@Psr\Container\ContainerInterface']]
-        tags:
-            - { name: container.service_subscriber }
+        arguments:
+            - '@oro_entity.dictionary_entity_data_provider'
 
     Oro\Bundle\EntityBundle\Controller\EntitiesController:
         calls:

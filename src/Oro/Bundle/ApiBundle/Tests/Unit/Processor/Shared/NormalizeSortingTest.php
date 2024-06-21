@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit\Processor\Shared;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Config\Config;

@@ -8,27 +8,43 @@
     {% endif %}
 {% endmacro %}
 
-{% macro renderRestrictionsViewGrid(scopeEntities, scopes) %}
+{% macro renderRestrictionsViewGrid(scopeEntities, scopes, extraData = []) %}
     <div class="grid-container">
         <table class="grid grid-main-container table table-bordered table-condensed table-fixed table-hover">
             <thead>
-                <tr>
-                    {% for entityClass in scopeEntities %}
-                        <th><span>{{ oro_entity_config_value(entityClass, 'label')|trans }}</span></th>
-                    {% endfor %}
-                </tr>
+                {{ _self.renderRestrictionsViewGridHead(scopeEntities, extraData|first|keys) }}
             </thead>
             <tbody>
-            {% for scope in scopes %}
-                <tr>
-                    {% for fieldName, entityClass in scopeEntities %}
-                        <td>
-                            {{ attribute(scope, fieldName) ? : 'Any'|trans }}
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
+                {{ _self.renderRestrictionsViewGridRows(scopeEntities, scopes, extraData) }}
             </tbody>
         </table>
     </div>
+{% endmacro %}
+
+{% macro renderRestrictionsViewGridHead(scopeEntities, extraColumns = []) %}
+    <tr>
+        {% for entityClass in scopeEntities %}
+            <th><span>{{ oro_entity_config_value(entityClass, 'label')|trans }}</span></th>
+        {% endfor %}
+        {% for extraColumn in extraColumns %}
+            <th><span>{{ extraColumn }}</span></th>
+        {% endfor %}
+    </tr>
+{% endmacro %}
+
+{% macro renderRestrictionsViewGridRows(scopeEntities, scopes, extraData = []) %}
+    {% for key, scope in scopes %}
+        <tr>
+            {% for fieldName, entityClass in scopeEntities %}
+                <td>
+                    {{ attribute(scope, fieldName) ? : 'Any'|trans }}
+                </td>
+            {% endfor %}
+            {% for extraDataValue in extraData[key] ?? [] %}
+                <td>
+                    {{ extraDataValue != '' ? extraDataValue : 'Any'|trans }}
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
 {% endmacro %}

@@ -20,8 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractConfigType extends BaseAbstractConfigType
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    protected ConfigManager $configManager;
 
     public function __construct(ConfigTypeHelper $typeHelper, ConfigManager $configManager)
     {

@@ -2,16 +2,6 @@ api:
     entities:
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             documentation_resource: '@OroOrganizationBundle/Resources/doc/api/business_unit.md'
-            disable_meta_properties: false # set manually because this entity is marked as a dictionary
-            actions:
-                delete:
-                    exclude: false # set manually because this entity is marked as a dictionary
-                delete_list:
-                    exclude: false # set manually because this entity is marked as a dictionary
-                create:
-                    exclude: false # set manually because this entity is marked as a dictionary
-                update:
-                    exclude: false # set manually because this entity is marked as a dictionary
 
         Oro\Bundle\OrganizationBundle\Entity\Organization:
             documentation_resource: '@OroOrganizationBundle/Resources/doc/api/organization.md'

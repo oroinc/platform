@@ -11,6 +11,14 @@
 {% block content_data %}
     {% import _self as systeminfo %}
 
+    {% set usageStatsSection %}
+        <div class="row-fluid">
+            <div class="responsive-block package-list">
+                {{ systeminfo.usageStats(usageStats) }}
+            </div>
+        </div>
+    {% endset %}
+
     {% set deploymentSection %}
         <div class="row-fluid">
             <div class="responsive-block package-list">
@@ -34,11 +42,18 @@
 
     {% set dataBlocks = [
         {
+            'title': 'oro.platform.application_usage'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [usageStatsSection]}
+            ]
+        },
+        {
             'title': 'oro.platform.deployment_variables'|trans,
             'class': 'active',
             'subblocks': [
-            {'data' : [deploymentSection]}
-        ]
+                {'data' : [deploymentSection]}
+            ]
         },
         {
             'title': 'oro.platform.packages'|trans,
@@ -92,6 +107,25 @@
             <div class="responsive-block">
                 {% for variable in variables %}
                     {{ UI.renderProperty(variable.label|trans, variable.value|default('N/A')) }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro usageStats(stats) %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    <div class="widget-content">
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {% for stat in stats %}
+                    {{ UI.renderProperty(
+                        stat.title|trans,
+                        stat.value|default('N/A'),
+                        null,
+                        null,
+                        {tooltipHTML: UI.tooltip(stat.tooltip)}
+                    ) }}
                 {% endfor %}
             </div>
         </div>

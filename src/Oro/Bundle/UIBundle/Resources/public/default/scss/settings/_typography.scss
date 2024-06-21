@@ -63,6 +63,28 @@ $theme-fonts: (
         ),
         'formats': ('woff2', 'woff')
     ),
+    'secondary': (
+        'family': 'Bitter',
+        'variants': (
+            (
+                    'path': '#{$global-url}/orofrontend/default/fonts/bitter/Bitter-SemiBold',
+                    'weight': 600,
+                    'style': normal
+            ),
+        ),
+        'formats': ('woff2', 'woff')
+    ),
+    'code': (
+          'family': 'DM Mono',
+          'variants': (
+              (
+                      'path': '#{$global-url}/orofrontend/default/fonts/dm-mono/DMMono-Regular',
+                      'weight': 400,
+                      'style': normal
+              ),
+          ),
+          'formats': ('woff2', 'woff')
+    ),
     'font-awesome': (
         'family': 'FontAwesome',
         'variants': (
@@ -110,7 +132,9 @@ $font-weights: (
 ) !default;
 
 // Fonts families
-$base-font: get-font-name('main'),'helvetica', arial, sans-serif !default;
+$base-font: get-font-name('main'), 'helvetica', arial, sans-serif !default;
+$secondary-font: get-font-name('secondary'), 'times new roman', serif !default;
+$code-font: get-font-name('code'), 'courier', monospace !default;
 $base-font-masked: get-font-name('only-bullets'), 'helvetica', arial, sans-serif !default;
 
 // include in assets

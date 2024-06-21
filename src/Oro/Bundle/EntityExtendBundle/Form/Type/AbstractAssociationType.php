@@ -14,13 +14,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractAssociationType extends AbstractConfigType
 {
-    /** @var AssociationTypeHelper */
-    protected $typeHelper;
+    protected AssociationTypeHelper $associationTypeHelper;
 
-    public function __construct(AssociationTypeHelper $typeHelper, ConfigManager $configManager)
+    public function __construct(AssociationTypeHelper $associationTypeHelper, ConfigManager $configManager)
     {
-        parent::__construct($typeHelper, $configManager);
-        $this->typeHelper = $typeHelper;
+        parent::__construct($associationTypeHelper, $configManager);
+        $this->associationTypeHelper = $associationTypeHelper;
     }
 
     /**
@@ -50,10 +49,7 @@ abstract class AbstractAssociationType extends AbstractConfigType
         $configId  = $options['config_id'];
         $className = $configId->getClassName();
 
-        if (!empty($className)
-            && $this->typeHelper->isDictionary($className)
-            && !$this->typeHelper->isSupportActivityEnabled($className)
-        ) {
+        if ($className && $this->associationTypeHelper->isDictionary($className)) {
             return true;
         }
 

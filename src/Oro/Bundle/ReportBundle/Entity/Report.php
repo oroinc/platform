@@ -304,7 +304,7 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = $this->createdAt;
+        $this->updatedAt = clone $this->createdAt;
     }
 
     /**

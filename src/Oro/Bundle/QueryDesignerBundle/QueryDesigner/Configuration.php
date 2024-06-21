@@ -14,18 +14,18 @@ class Configuration implements ConfigurationInterface
     public const ROOT_NODE_NAME = 'query_designer';
 
     /** @var string[] */
-    private $filterTypes;
+    private array $filterTypes;
 
     /**
      * @param string[] $filterTypes
      */
-    public function __construct($filterTypes)
+    public function __construct(array $filterTypes)
     {
         $this->filterTypes = $filterTypes;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -42,15 +42,10 @@ class Configuration implements ConfigurationInterface
         return $builder;
     }
 
-    /**
-     * Filters configuration tree
-     *
-     * @return NodeDefinition
-     */
-    private function getFiltersConfigTree()
+    private function getFiltersConfigTree(): NodeDefinition
     {
         $builder = new TreeBuilder('filters');
-        $node    = $builder->getRootNode();
+        $node = $builder->getRootNode();
 
         $node->useAttributeAsKey('name')
             ->prototype('array')
@@ -119,15 +114,10 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    /**
-     * Grouping configuration tree
-     *
-     * @return NodeDefinition
-     */
-    private function getGroupingConfigTree()
+    private function getGroupingConfigTree(): NodeDefinition
     {
         $builder = new TreeBuilder('grouping');
-        $node    = $builder->getRootNode();
+        $node = $builder->getRootNode();
 
         $node->ignoreExtraKeys()
             ->children()
@@ -151,15 +141,10 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    /**
-     * Converters configuration tree
-     *
-     * @return NodeDefinition
-     */
-    private function getConvertersConfigTree()
+    private function getConvertersConfigTree(): NodeDefinition
     {
         $builder = new TreeBuilder('converters');
-        $node    = $builder->getRootNode();
+        $node = $builder->getRootNode();
 
         $node->useAttributeAsKey('name')
             ->prototype('array')
@@ -226,15 +211,10 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    /**
-     * Aggregators configuration tree
-     *
-     * @return NodeDefinition
-     */
-    private function getAggregatorsConfigTree()
+    private function getAggregatorsConfigTree(): NodeDefinition
     {
         $builder = new TreeBuilder('aggregates');
-        $node    = $builder->getRootNode();
+        $node = $builder->getRootNode();
 
         $node->useAttributeAsKey('name')
             ->prototype('array')

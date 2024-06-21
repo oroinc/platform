@@ -76,7 +76,6 @@ services:
         public: false
         arguments:
             - '@oro_entity_config.config_manager'
-            - '@oro_entity.orm.entity_class_resolver'
 
     oro_entity_extend.type.association_choice:
         class: Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
