@@ -18,9 +18,11 @@ use Symfony\Component\HttpFoundation\Request;
  * * key=value, where "=" is an operator; see $this->operators to find a list of supported operators
  * * key[operator name]=value, where "operator name" can be "eq", "neq", etc.; see $this->operatorNameMap
  *                             to find a map between operators and their names
+ * * group[key]=value
+ * * group[key][operator name]=value
+ *
  * Examples:
- * * /api/users?filter[name]!=John
- * * /api/users?filter[name][neq]=John
+ * * /api/users?filter[firstName]=John&filter[lastName][neq]=Doe
  * * /api/users?page[number]=10&sort=name
  *
  * Filter syntax for the request body:
@@ -34,6 +36,15 @@ use Symfony\Component\HttpFoundation\Request;
  *      'filter' => [
  *          'name' => ['neq' => 'John']
  *      ],
+ *      'sort' => 'name'
+ *  ]
+ * </code>
+ *
+ * Also the filter syntax similar to the filter syntax for the query string is allowed for the request body.
+ * Example:
+ * <code>
+ *  [
+ *      'filter[name][neq]' => 'John',
  *      'sort' => 'name'
  *  ]
  * </code>
@@ -184,7 +195,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
             return;
         }
 
-        $requestBody = $this->request->request->all();
+        $requestBody = $this->normalizeRequestBody($this->request->request->all());
         foreach ($requestBody as $group => $val) {
             if (\is_array($val)) {
                 if ($this->isValueWithOperator($val)) {
@@ -212,6 +223,57 @@ class RestFilterValueAccessor extends FilterValueAccessor
                 $this->addParsed($group, $group, $group, $group, $val);
             }
         }
+    }
+
+    private function normalizeRequestBody(array $requestBody): array
+    {
+        $result = [];
+        foreach ($requestBody as $name => $val) {
+            $parts = $this->splitRequestBodyParamName($name);
+            if (\count($parts) > 1) {
+                $name1 = array_shift($parts);
+                if (!isset($result[$name1])) {
+                    $result[$name1] = [];
+                } elseif (!\is_array($result[$name1]) || !ArrayUtil::isAssoc($result[$name1])) {
+                    $result[$name1] = [self::DEFAULT_OPERATOR => $result[$name1]];
+                }
+                $item = &$result[$name1];
+                $lastPart = array_pop($parts);
+                foreach ($parts as $part) {
+                    if (!isset($item[$part])) {
+                        $item[$part] = [];
+                    }
+                    $item = &$item[$part];
+                }
+                if (\array_key_exists($lastPart, $this->operatorNameMap)) {
+                    $item[$lastPart] = $val;
+                } else {
+                    $item[$lastPart] = [self::DEFAULT_OPERATOR => $val];
+                }
+            } else {
+                $result[$name] = $val;
+            }
+        }
+
+        return $result;
+    }
+
+    private function splitRequestBodyParamName(string $name): array
+    {
+        $startPos = strpos($name, '[');
+        if (false === $startPos || !str_ends_with($name, ']')) {
+            return [$name];
+        }
+
+        $name1 = substr($name, 0, $startPos);
+        $parts = explode('][', substr($name, $startPos + 1, -1));
+        foreach ($parts as $part) {
+            if (str_contains($part, '[') || str_contains($part, ']')) {
+                return [$name];
+            }
+        }
+
+        return array_merge([$name1], $parts);
     }
 
     private function isValueWithOperator(array $value): bool
