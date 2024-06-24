@@ -84,4 +84,18 @@ class OpenApiSpecificationTest extends \PHPUnit\Framework\TestCase
         $entity->preUpdate();
         self::assertNotSame($previousUpdatedAt, $entity->getUpdatedAt());
     }
+
+    public function testSetEmptyArrayToEntities(): void
+    {
+        $entity = new OpenApiSpecification();
+        $entity->setEntities([]);
+        self::assertNull($entity->getEntities());
+    }
+
+    public function testSetEmptyArrayToServerUrls(): void
+    {
+        $entity = new OpenApiSpecification();
+        $entity->setServerUrls([]);
+        self::assertNull($entity->getServerUrls());
+    }
 }

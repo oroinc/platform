@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\DuplicateEntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
@@ -255,7 +254,7 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         $enumConfig = new Config(new EntityConfigId('enum', $entityClass));
         $groupingConfig = new Config(
             new EntityConfigId('grouping', $entityClass),
-            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
+            ['groups' => ['dictionary']]
         );
 
         $this->configManager->expects(self::once())

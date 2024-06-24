@@ -4,12 +4,10 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\LoggerBundle\Entity\LogEntry;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class LogEntryTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
-    use EntityTrait;
 
     public function testProperties()
     {

@@ -15,8 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractConfigType extends AbstractType
 {
-    /** @var ConfigTypeHelper */
-    private $typeHelper;
+    protected ConfigTypeHelper $typeHelper;
 
     public function __construct(ConfigTypeHelper $typeHelper)
     {

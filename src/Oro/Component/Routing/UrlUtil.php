@@ -15,7 +15,7 @@ class UrlUtil
      * The returned path is always starts with a slash character,
      * except both the path and the base URL are empty strings, in this case the result is an empty string as well.
      *
-     * @param string $path    The path to check
+     * @param string $path The path to check
      * @param string $baseUrl The root path, including the script filename (e.g. index.php) if one exists,
      *                        from which a HTTP request is executed
      *
@@ -60,7 +60,7 @@ class UrlUtil
      * The returned path is always starts with a slash character,
      * except both the path and the base URL are empty strings, in this case the result is an empty string as well.
      *
-     * @param string $path    The path to check
+     * @param string $path The path to check
      * @param string $baseUrl The root path, including the script filename (e.g. index.php) if one exists,
      *                        from which a HTTP request is executed
      *
@@ -97,6 +97,58 @@ class UrlUtil
         }
 
         return self::normalizePath($path);
+    }
+
+    public static function isAbsoluteUrl(string $url): bool
+    {
+        return str_contains($url, '://') || str_starts_with($url, '//');
+    }
+
+    public static function getHttpHost(string $url): string
+    {
+        $urlParts = parse_url($url);
+        $scheme = $urlParts['scheme'] ?? '';
+        $port = $urlParts['port'] ?? '';
+        $host = $urlParts['host'] ?? '';
+        if (('http' === $scheme && 80 == $port) || ('https' === $scheme && 443 == $port)) {
+            return $urlParts['host'];
+        }
+
+        if ($host !== '' && $port !== '') {
+            return $host . ':' . $port;
+        }
+
+        if ($host !== '') {
+            return $host;
+        }
+
+        return '';
+    }
+
+    public static function addQueryParameters(string $url, array $extraParameters, bool $override = false): string
+    {
+        $urlParts = parse_url($url);
+        $queryString = $urlParts['query'] ?? '';
+        $fragment = $urlParts['fragment'] ?? '';
+        $queryParameters = [];
+        parse_str($queryString, $queryParameters);
+
+        if ($override) {
+            $queryParameters = array_merge($queryParameters, $extraParameters);
+        } else {
+            $queryParameters += $extraParameters;
+        }
+
+        $url = str_replace(['?' . $queryString, '#' . $fragment], '', $url);
+        if ($queryParameters) {
+            $url .= '?' . http_build_query($queryParameters);
+        }
+
+        if ($fragment) {
+            $url .= '#' . $fragment;
+        }
+
+        return $url;
     }
 
     /**

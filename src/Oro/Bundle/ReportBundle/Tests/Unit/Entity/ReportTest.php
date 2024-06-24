@@ -6,15 +6,14 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Entity\ReportType;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class ReportTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
-    use EntityTrait;
 
-    public function testProperties(): void
+    public function testSettersAndGetters(): void
     {
         $properties = [
             ['id', 123],
@@ -22,62 +21,58 @@ class ReportTest extends \PHPUnit\Framework\TestCase
             ['description', 'test_description'],
             ['type', new ReportType('test_type')],
             ['entity', \stdClass::class],
-            ['owner', new BusinessUnit()],
             ['definition', 'test_definition'],
             ['chartOptions', ['test' => 'data']],
+            ['owner', new BusinessUnit()],
+            ['organization', new Organization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
-            ['organization', new Organization()],
         ];
 
         $this->assertPropertyAccessors(new Report(), $properties);
     }
 
+    public function testPrePersist(): void
+    {
+        $entity = new Report();
+        $entity->beforeSave();
+        $this->assertInstanceOf(\DateTime::class, $entity->getCreatedAt());
+        $this->assertEquals($entity->getCreatedAt(), $entity->getUpdatedAt());
+        $this->assertNotSame($entity->getCreatedAt(), $entity->getUpdatedAt());
+    }
+
+    public function testPreUpdate(): void
+    {
+        $entity = new Report();
+        $entity->beforeUpdate();
+        $this->assertInstanceOf(\DateTime::class, $entity->getUpdatedAt());
+    }
+
     public function testClone(): void
     {
-        /** @var Report $entity */
-        $entity = $this->getEntity(
-            Report::class,
-            [
-                'id' => 123,
-                'name' => 'test_name',
-                'description' => 'test_description',
-                'type' => new ReportType('test_type'),
-                'entity' => \stdClass::class,
-                'owner' => new BusinessUnit(),
-                'definition' => 'test_definition',
-                'chartOptions' => ['test' => 'data'],
-                'createdAt' => new \DateTime(),
-                'updatedAt' => new \DateTime(),
-                'organization' => new Organization(),
-            ]
-        );
+        $entity = new Report();
+        ReflectionUtil::setId($entity, 123);
+        $entity->setName('test_name');
+        $entity->setDescription('test_description');
+        $entity->setType(new ReportType('test_type'));
+        $entity->setEntity(\stdClass::class);
+        $entity->setDefinition('test_definition');
+        $entity->setChartOptions(['test' => 'data']);
+        $entity->setOwner(new BusinessUnit());
+        $entity->setOrganization(new Organization());
+        $entity->beforeSave();
 
-        $this->assertNotEmpty($entity->getId());
-        $this->assertNotEmpty($entity->getName());
-        $this->assertNotEmpty($entity->getDescription());
-        $this->assertNotEmpty($entity->getType());
-        $this->assertNotEmpty($entity->getEntity());
-        $this->assertNotEmpty($entity->getOwner());
-        $this->assertNotEmpty($entity->getDefinition());
-        $this->assertNotEmpty($entity->getChartOptions());
-        $this->assertNotEmpty($entity->getCreatedAt());
-        $this->assertNotEmpty($entity->getUpdatedAt());
-        $this->assertNotEmpty($entity->getOrganization());
-
-        /** @var Report $newEntity */
-        $newEntity = clone $entity;
-
-        $this->assertNull($newEntity->getId());
-        $this->assertSame($entity->getName(), $newEntity->getName());
-        $this->assertSame($entity->getDescription(), $newEntity->getDescription());
-        $this->assertSame($entity->getType(), $newEntity->getType());
-        $this->assertSame($entity->getEntity(), $newEntity->getEntity());
-        $this->assertSame($entity->getOwner(), $newEntity->getOwner());
-        $this->assertSame($entity->getDefinition(), $newEntity->getDefinition());
-        $this->assertSame($entity->getChartOptions(), $newEntity->getChartOptions());
-        $this->assertNull($newEntity->getCreatedAt());
-        $this->assertNull($newEntity->getUpdatedAt());
-        $this->assertSame($entity->getOrganization(), $newEntity->getOrganization());
+        $clonedEntity = clone $entity;
+        $this->assertNull($clonedEntity->getId());
+        $this->assertSame($entity->getName(), $clonedEntity->getName());
+        $this->assertSame($entity->getDescription(), $clonedEntity->getDescription());
+        $this->assertSame($entity->getType(), $clonedEntity->getType());
+        $this->assertSame($entity->getEntity(), $clonedEntity->getEntity());
+        $this->assertSame($entity->getDefinition(), $clonedEntity->getDefinition());
+        $this->assertSame($entity->getChartOptions(), $clonedEntity->getChartOptions());
+        $this->assertSame($entity->getOwner(), $clonedEntity->getOwner());
+        $this->assertSame($entity->getOrganization(), $clonedEntity->getOrganization());
+        $this->assertNull($clonedEntity->getCreatedAt());
+        $this->assertNull($clonedEntity->getUpdatedAt());
     }
 }

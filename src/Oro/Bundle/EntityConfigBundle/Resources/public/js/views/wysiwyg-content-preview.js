@@ -21,7 +21,7 @@ const WysiwygContentPreview = BaseView.extend({
      * @param {Object} e
      */
     onClick(e) {
-        if (e.target.getAttribute('href') === null) {
+        if (e.currentTarget.getAttribute('href') === null) {
             return;
         }
 

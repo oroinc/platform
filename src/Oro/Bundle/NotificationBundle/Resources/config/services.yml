@@ -21,7 +21,7 @@ services:
     oro_notification.form.handler.email_notification:
         class: Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler
         arguments:
-            - '@doctrine'
+            - '@oro_form.ajax_reload_handler'
         tags:
             - { name: oro_form.form.handler, alias: oro_notification.form.handler.email_notification }
 

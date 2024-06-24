@@ -38,6 +38,8 @@ doctrine:
                 cast:           Oro\ORM\Query\AST\Functions\Cast
                 array_contains: Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\ArrayContains
                 json_agg:       Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\JsonAgg
+                string_to_array: Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\StringToArray
+                anyof: Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\AnyOf
 
 fos_rest:
     exception:

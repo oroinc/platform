@@ -88,3 +88,9 @@ oro_entity:
         Oro\Bundle\UserBundle\Entity\Role:
             full: [ label ]
             short: [ label ]
+
+oro_query_designer:
+    collapsed_associations:
+        Oro\Bundle\UserBundle\Entity\User:
+            virtual_fields: [ id ]
+            search_fields: [ firstName, lastName ]

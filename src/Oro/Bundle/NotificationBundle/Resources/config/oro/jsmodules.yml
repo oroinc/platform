@@ -1,3 +1,0 @@
-dynamic-imports:
-    commons:
-        - oronotification/js/app/views/email-notification-form-view

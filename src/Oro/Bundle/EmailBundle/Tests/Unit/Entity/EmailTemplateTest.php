@@ -7,13 +7,12 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class EmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
-    use EntityTrait;
 
     public function testConstruct(): void
     {
@@ -54,8 +53,8 @@ class EmailTemplateTest extends \PHPUnit\Framework\TestCase
     public function testClone(): void
     {
         $template = new EmailTemplate('original_name', 'original content', EmailTemplateInterface::TYPE_TEXT, true);
+        ReflectionUtil::setId($template, 42);
         $template->setIsEditable(false);
-        $this->setValue($template, 'id', 42);
 
         $originalLocalization = new EmailTemplateTranslation();
         $template->addTranslation($originalLocalization);

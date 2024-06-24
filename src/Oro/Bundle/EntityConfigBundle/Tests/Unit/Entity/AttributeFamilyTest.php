@@ -8,12 +8,11 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
     use EntityTestCaseTrait;
 
     public function testProperties()
@@ -45,10 +44,12 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
     public function testAttributeGroupCollection()
     {
         $entity = new AttributeFamily();
-        $group = (new AttributeGroup())->setCode('group_code');
-        $group2 = (new AttributeGroup())->setCode('group_code');
-        $this->setValue($group, 'id', 1);
-        $this->setValue($group2, 'id', 2);
+        $group = new AttributeGroup();
+        ReflectionUtil::setId($group, 1);
+        $group->setCode('group_code');
+        $group2 = new AttributeGroup();
+        ReflectionUtil::setId($group2, 2);
+        $group2->setCode('group_code');
 
         $attributeGroups = new ArrayCollection(['group_code' => $group]);
         $entity->setAttributeGroups($attributeGroups);
@@ -77,22 +78,21 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHash()
     {
-        /** @var AttributeGroup $group1 */
-        $group1 = $this->getEntity(AttributeGroup::class, ['id' => 1]);
-        $group1->addAttributeRelation($this->getEntity(AttributeGroupRelation::class, ['id' => 1]));
-        $group1->addAttributeRelation($this->getEntity(AttributeGroupRelation::class, ['id' => 2]));
+        $group1 = new AttributeGroup();
+        ReflectionUtil::setId($group1, 1);
+        $groupRelation1 = new AttributeGroupRelation();
+        ReflectionUtil::setId($groupRelation1, 1);
+        $groupRelation2 = new AttributeGroupRelation();
+        ReflectionUtil::setId($groupRelation2, 2);
+        $group1->addAttributeRelation($groupRelation1);
+        $group1->addAttributeRelation($groupRelation2);
 
-        /** @var AttributeGroup $group2 */
-        $group2 = $this->getEntity(AttributeGroup::class, ['id' => 2]);
-        $attributeGroups = new ArrayCollection([$group1, $group2]);
-        /** @var AttributeFamily $entity */
-        $entity = $this->getEntity(
-            AttributeFamily::class,
-            [
-                'id' => 1,
-                'attribute_groups' => $attributeGroups,
-            ]
-        );
+        $group2 = new AttributeGroup();
+        ReflectionUtil::setId($group2, 2);
+
+        $entity = new AttributeFamily();
+        ReflectionUtil::setId($entity, 1);
+        $entity->setAttributeGroups(new ArrayCollection([$group1, $group2]));
 
         $result[1] = [
             [

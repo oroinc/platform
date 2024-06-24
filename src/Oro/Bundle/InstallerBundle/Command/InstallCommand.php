@@ -20,7 +20,6 @@ use Oro\Bundle\LocaleBundle\Command\LocalizationOptionsCommandTrait;
 use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
 use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
 use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
-use Oro\Bundle\PricingProBundle\DependencyInjection\Configuration as CurrencyProConfig;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
@@ -510,16 +509,6 @@ HELP
 
             if ($currentCurrency !== $currency) {
                 $configManager->set($currencyConfigKey, $currency);
-
-                $configManager->set(
-                    CurrencyProConfig::getConfigKeyByName(CurrencyProConfig::DEFAULT_CURRENCY),
-                    $currency
-                );
-
-                $configManager->set(
-                    CurrencyProConfig::getConfigKeyByName(CurrencyProConfig::ENABLED_CURRENCIES),
-                    [$currency]
-                );
             }
         }
         $configManager->flush();

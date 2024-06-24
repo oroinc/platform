@@ -4,56 +4,61 @@ namespace Oro\Bundle\FormBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
+use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * Removes empty collection elements and sets the first non-empty item as primary.
+ * Removes empty items and sets an item as primary when the collection contains only one item.
  */
 class CollectionTypeSubscriber implements EventSubscriberInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents(): array
     {
-        return array(
-            FormEvents::POST_SUBMIT => 'postSubmit',
+        return [
+            FormEvents::SUBMIT => 'submit',
             FormEvents::PRE_SUBMIT  => 'preSubmit'
-        );
+        ];
     }
 
     /**
-     * Removes empty collection elements.
-     */
-    public function postSubmit(FormEvent $event)
-    {
-        /** @var Collection $items */
-        $items = $event->getData();
-
-        if (!$items || !$items instanceof Collection) {
-            return;
-        }
-
-        foreach ($items as $item) {
-            if ($item instanceof EmptyItem && $item->isEmpty()) {
-                $items->removeElement($item);
-            }
-        }
-    }
-
-    /**
-     * Remove empty items to prevent validation.
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function preSubmit(FormEvent $event)
+    public function submit(FormEvent $event): void
     {
         $items = $event->getData();
+        if ($items instanceof Collection) {
+            foreach ($items as $item) {
+                if ($item instanceof EmptyItem && $item->isEmpty()) {
+                    $items->removeElement($item);
+                }
+            }
+        } elseif (\is_array($items)) {
+            $toRemoveKeys = [];
+            foreach ($items as $key => $item) {
+                if (!\is_array($item) && !$item) {
+                    $toRemoveKeys[] = $key;
+                }
+            }
+            foreach ($toRemoveKeys as $key) {
+                unset($items[$key]);
+            }
+            $event->setData($items);
+        }
+    }
 
-        if (!$items || !is_array($items)) {
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function preSubmit(FormEvent $event): void
+    {
+        $items = $event->getData();
+        if (!$items || !\is_array($items)) {
             return;
         }
 
@@ -61,41 +66,33 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $notEmptyItems = array();
+        $notEmptyItems = [];
         $hasPrimary = false;
-
-        // Remove empty items
         foreach ($items as $index => $item) {
             if (!$this->isArrayEmpty($item)) {
-                $hasPrimary = $hasPrimary || (array_key_exists('primary', $item) && $item['primary']);
                 $notEmptyItems[$index] = $item;
+                if (!$hasPrimary && \array_key_exists('primary', $item) && $item['primary']) {
+                    $hasPrimary = true;
+                }
             }
         }
-
-        $items = $notEmptyItems;
-
-        // Set first non empty item for new item as primary
-        if ($items && !$hasPrimary && count($items) == 1) {
-            $items[current(array_keys($items))]['primary'] = true;
+        if ($notEmptyItems && !$hasPrimary && \count($notEmptyItems) === 1) {
+            $notEmptyItems[current(array_keys($notEmptyItems))]['primary'] = true;
         }
-
-        $event->setData($items);
+        $event->setData($notEmptyItems);
     }
 
-    /**
-     * @param FormEvent $event
-     *
-     * @return bool
-     */
-    protected function hasPrimaryBehaviour(FormEvent $event)
+    private function hasPrimaryBehaviour(FormEvent $event): bool
     {
-        if (!$event->getForm()->getConfig()->getOption('handle_primary')) {
+        $form = $event->getForm();
+        if (!$form->getConfig()->getOption('handle_primary')) {
             return false;
         }
+
         /** @var FormInterface $child */
-        foreach ($event->getForm() as $child) {
+        foreach ($form as $child) {
             $dataClass = $child->getConfig()->getDataClass();
-            if ($dataClass && !in_array('Oro\\Bundle\\FormBundle\\Entity\\PrimaryItem', class_implements($dataClass))) {
+            if ($dataClass && !is_subclass_of($dataClass, PrimaryItem::class)) {
                 return false;
             }
         }
@@ -103,16 +100,10 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
         return true;
     }
 
-    /**
-     * Check if array is empty
-     *
-     * @param array $array
-     * @return bool
-     */
-    protected function isArrayEmpty($array)
+    private function isArrayEmpty(array $array): bool
     {
         foreach ($array as $val) {
-            if (is_array($val)) {
+            if (\is_array($val)) {
                 if (!$this->isArrayEmpty($val)) {
                     return false;
                 }

@@ -18,7 +18,12 @@ Feature: OpenAPI Specification Management
       | API Type (View) | Back-Office API               |
       | Entities        | [Address Type, Business Unit] |
     Then I should see "JSON:API for back-office resources."
-    When I press "Save and Close"
+    When click "Add Server URL Button"
+    And I type "invalid url" in "Server URL 1"
+    And I press "Save and Close"
+    Then I should see "This value is not a valid URL."
+    When I type "http://example.com" in "Server URL 1"
+    And I press "Save and Close"
     Then I should see "The request for creation of OpenAPI specification has been accepted for processing." flash message
     And I should see OpenAPI specification with:
       | Name            | Public Specification 1      |
@@ -27,6 +32,7 @@ Feature: OpenAPI Specification Management
       | Format          | YAML                        |
       | API Type (View) | Back-Office API             |
       | Entities        | Address Type; Business Unit |
+      | Server URLs     | http://example.com          |
     And I should see a "Creating Label" element
     When I wait for "Public Specification 1" OpenAPI specification status changed to "created"
     And I reload the page

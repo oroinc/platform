@@ -1,6 +1,7 @@
 oro:
     platform:
         system_info: System Information
+        application_usage: Application Usage
         packages: Packages
         deployment_variables: Deployment
         environment:

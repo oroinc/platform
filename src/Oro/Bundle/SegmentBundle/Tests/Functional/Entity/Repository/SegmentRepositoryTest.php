@@ -56,7 +56,35 @@ class SegmentRepositoryTest extends WebTestCase
             $staticSegmentWithSegmentFilter->getName() => $staticSegmentWithSegmentFilter->getId(),
             $segmentWithFilter1->getName() => $segmentWithFilter1->getId(),
             $segmentWithFilter2->getName() => $segmentWithFilter2->getId(),
-            $segmentWithFilter3->getName() => $segmentWithFilter3->getId()
+            $segmentWithFilter3->getName() => $segmentWithFilter3->getId(),
+        ], $result);
+    }
+
+    public function testFindSegmentsByEntity(): void
+    {
+        $result = $this->getSegmentRepository()->findSegmentsByEntity(
+            $this->getAclHelper(),
+            WorkflowAwareEntity::class
+        );
+
+        $dynamicSegment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC);
+        $dynamicSegmentWithFilter = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        $staticSegment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
+        $staticSegmentWithFilter = $this->getSegment(LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING);
+        $staticSegmentWithSegmentFilter = $this->getSegment(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
+        $segmentWithFilter1 = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER1);
+        $segmentWithFilter2 = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER);
+        $segmentWithFilter3 = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS);
+
+        self::assertEquals([
+            $dynamicSegment->getId() => $dynamicSegment,
+            $dynamicSegmentWithFilter->getId() => $dynamicSegmentWithFilter,
+            $staticSegment->getId() => $staticSegment,
+            $staticSegmentWithFilter->getId() => $staticSegmentWithFilter,
+            $staticSegmentWithSegmentFilter->getId() => $staticSegmentWithSegmentFilter,
+            $segmentWithFilter1->getId() => $segmentWithFilter1,
+            $segmentWithFilter2->getId() => $segmentWithFilter2,
+            $segmentWithFilter3->getId() => $segmentWithFilter3,
         ], $result);
     }
 }
