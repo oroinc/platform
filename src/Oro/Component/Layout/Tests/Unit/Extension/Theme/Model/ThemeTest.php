@@ -5,127 +5,134 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ThemeTest extends \PHPUnit\Framework\TestCase
+class ThemeTest extends TestCase
 {
-    /** @var Theme */
-    private $theme;
+    private Theme $theme;
 
     protected function setUp(): void
     {
         $this->theme = new Theme('test');
     }
 
-    public function testGetNameAndConstructor()
+    public function testGetNameAndConstructor(): void
     {
-        $this->assertEquals('test', $this->theme->getName());
+        self::assertEquals('test', $this->theme->getName());
     }
 
-    public function testDirectoryMethods()
+    public function testDirectoryMethods(): void
     {
-        $this->assertNotEmpty($this->theme->getDirectory());
-        $this->assertEquals('test', $this->theme->getDirectory());
+        self::assertNotEmpty($this->theme->getDirectory());
+        self::assertEquals('test', $this->theme->getDirectory());
 
         $this->theme->setDirectory('base');
-        $this->assertEquals('base', $this->theme->getDirectory());
+        self::assertEquals('base', $this->theme->getDirectory());
     }
 
-    public function testLabelMethods()
+    public function testLabelMethods(): void
     {
-        $this->assertNull($this->theme->getLabel());
+        self::assertNull($this->theme->getLabel());
         $this->theme->setLabel('Oro Base theme');
-        $this->assertEquals('Oro Base theme', $this->theme->getLabel());
+        self::assertEquals('Oro Base theme', $this->theme->getLabel());
     }
 
-    public function testIconMethods()
+    public function testIconMethods(): void
     {
-        $this->assertNull($this->theme->getIcon());
+        self::assertNull($this->theme->getIcon());
         $this->theme->setIcon('icon.ico');
-        $this->assertEquals('icon.ico', $this->theme->getIcon());
+        self::assertEquals('icon.ico', $this->theme->getIcon());
     }
 
-    public function testLogoMethods()
+    public function testLogoMethods(): void
     {
-        $this->assertNull($this->theme->getLogo());
+        self::assertNull($this->theme->getLogo());
         $this->theme->setLogo('logo.png');
-        $this->assertEquals('logo.png', $this->theme->getLogo());
+        self::assertEquals('logo.png', $this->theme->getLogo());
     }
 
-    public function testImagePlaceholdersMethods()
+    public function testImagePlaceholdersMethods(): void
     {
-        $this->assertEmpty($this->theme->getImagePlaceholders());
+        self::assertEmpty($this->theme->getImagePlaceholders());
         $this->theme->setImagePlaceholders(['test' => '/test/url.png']);
-        $this->assertEquals(['test' => '/test/url.png'], $this->theme->getImagePlaceholders());
+        self::assertEquals(['test' => '/test/url.png'], $this->theme->getImagePlaceholders());
     }
 
     public function testRtlSupport(): void
     {
-        $this->assertFalse($this->theme->isRtlSupport());
+        self::assertFalse($this->theme->isRtlSupport());
         $this->theme->setRtlSupport(true);
-        $this->assertTrue($this->theme->isRtlSupport());
+        self::assertTrue($this->theme->isRtlSupport());
     }
 
-    public function testScreenshotMethods()
+    public function testSvgIconsSupport(): void
     {
-        $this->assertNull($this->theme->getScreenshot());
+        self::assertFalse($this->theme->isSvgIconsSupport());
+        $this->theme->setSvgIconsSupport(true);
+        self::assertTrue($this->theme->isSvgIconsSupport());
+    }
+
+    public function testScreenshotMethods(): void
+    {
+        self::assertNull($this->theme->getScreenshot());
         $this->theme->setScreenshot('screenshot.png');
-        $this->assertEquals('screenshot.png', $this->theme->getScreenshot());
+        self::assertEquals('screenshot.png', $this->theme->getScreenshot());
     }
 
-    public function testGroupsMethods()
+    public function testGroupsMethods(): void
     {
-        $this->assertEmpty($this->theme->getGroups());
+        self::assertEmpty($this->theme->getGroups());
 
         $this->theme->setGroups(['test']);
-        $this->assertSame(['test'], $this->theme->getGroups());
-        $this->assertTrue($this->theme->hasGroup('test'));
-        $this->assertFalse($this->theme->hasGroup('another_test'));
+        self::assertSame(['test'], $this->theme->getGroups());
+        self::assertTrue($this->theme->hasGroup('test'));
+        self::assertFalse($this->theme->hasGroup('another_test'));
     }
 
-    public function testParentThemeMethods()
+    public function testParentThemeMethods(): void
     {
-        $this->assertNull($this->theme->getParentTheme());
+        self::assertNull($this->theme->getParentTheme());
 
         $this->theme->setParentTheme('base');
-        $this->assertEquals('base', $this->theme->getParentTheme());
+        self::assertEquals('base', $this->theme->getParentTheme());
     }
 
-    public function testDescriptionMethods()
+    public function testDescriptionMethods(): void
     {
-        $this->assertNull($this->theme->getDescription());
+        self::assertNull($this->theme->getDescription());
 
         $this->theme->setDescription('test');
-        $this->assertEquals('test', $this->theme->getDescription());
+        self::assertEquals('test', $this->theme->getDescription());
     }
 
-    public function testAddPageTemplate()
+    public function testAddPageTemplate(): void
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
 
-        $this->assertEquals(
+        self::assertEquals(
             new ArrayCollection(['key_route_name' => $pageTemplate]),
             $this->theme->getPageTemplates()
         );
     }
 
-    public function testAddPageTemplateForce()
+    public function testAddPageTemplateForce(): void
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
         $newPageTemplate = new PageTemplate('NewLabel', 'key', 'route_name');
         $this->theme->addPageTemplate($newPageTemplate, true);
 
-        $this->assertEquals(
+        self::assertEquals(
             new ArrayCollection(['key_route_name' => $newPageTemplate]),
             $this->theme->getPageTemplates()
         );
     }
 
-    public function testAddPageTemplateAlreadyExists()
+    public function testAddPageTemplateAlreadyExists(): void
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
@@ -133,74 +140,74 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
         $newPageTemplate->setDescription('Description');
         $this->theme->addPageTemplate($newPageTemplate);
 
-        $this->assertCount(1, $this->theme->getPageTemplates());
-        $this->assertEquals(
+        self::assertCount(1, $this->theme->getPageTemplates());
+        self::assertEquals(
             new ArrayCollection(['key_route_name' => $pageTemplate->setDescription('Description')]),
             $this->theme->getPageTemplates()
         );
     }
 
-    public function testGetPageTemplate()
+    public function testGetPageTemplate(): void
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
 
-        $this->assertEquals($pageTemplate, $this->theme->getPageTemplate('key', 'route_name'));
+        self::assertEquals($pageTemplate, $this->theme->getPageTemplate('key', 'route_name'));
     }
 
-    public function testGetPageTemplateWithWrongKey()
+    public function testGetPageTemplateWithWrongKey(): void
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
 
-        $this->assertFalse($this->theme->getPageTemplate('key1', 'route_name'));
+        self::assertFalse($this->theme->getPageTemplate('key1', 'route_name'));
     }
 
-    public function testGetPageTemplateWithWrongRouteName()
+    public function testGetPageTemplateWithWrongRouteName(): void
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
 
-        $this->assertFalse($this->theme->getPageTemplate('key', 'route_name1'));
+        self::assertFalse($this->theme->getPageTemplate('key', 'route_name1'));
     }
 
-    public function testGetPageTemplateDisabled()
+    public function testGetPageTemplateDisabled(): void
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $pageTemplate->setEnabled(false);
         $this->theme->addPageTemplate($pageTemplate);
 
-        $this->assertFalse($this->theme->getPageTemplate('key', 'route_name'));
+        self::assertFalse($this->theme->getPageTemplate('key', 'route_name'));
     }
 
-    public function testConfigMethods()
+    public function testConfigMethods(): void
     {
         $config = [
             'key' => 'value',
         ];
 
-        $this->assertEquals([], $this->theme->getConfig());
+        self::assertEquals([], $this->theme->getConfig());
         $this->theme->setConfig($config);
-        $this->assertEquals($config, $this->theme->getConfig());
-        $this->assertEquals($config['key'], $this->theme->getConfigByKey('key'));
-        $this->assertEquals('default value', $this->theme->getConfigByKey('unknown key', 'default value'));
+        self::assertEquals($config, $this->theme->getConfig());
+        self::assertEquals($config['key'], $this->theme->getConfigByKey('key'));
+        self::assertEquals('default value', $this->theme->getConfigByKey('unknown key', 'default value'));
         $this->theme->setConfigByKey('unknown key', 'unknown value');
-        $this->assertEquals('unknown value', $this->theme->getConfigByKey('unknown key', 'default value'));
+        self::assertEquals('unknown value', $this->theme->getConfigByKey('unknown key', 'default value'));
     }
 
-    public function testAddPageTemplateTitle()
+    public function testAddPageTemplateTitle(): void
     {
         $this->theme->addPageTemplateTitle('some_route', 'Some title');
-        $this->assertEquals('Some title', $this->theme->getPageTemplateTitle('some_route'));
+        self::assertEquals('Some title', $this->theme->getPageTemplateTitle('some_route'));
     }
 
-    public function testGetNotExistingPageTemplateTitle()
+    public function testGetNotExistingPageTemplateTitle(): void
     {
         $this->theme->addPageTemplateTitle('some_route', 'Some title');
-        $this->assertEquals(null, $this->theme->getPageTemplateTitle('not_existing_route'));
+        self::assertNull($this->theme->getPageTemplateTitle('not_existing_route'));
     }
 
-    public function testGetPageTemplateTitles()
+    public function testGetPageTemplateTitles(): void
     {
         $expected = [
             'some_route' => 'Some route',
@@ -210,6 +217,6 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
         $this->theme->addPageTemplateTitle('some_route', 'Some route');
         $this->theme->addPageTemplateTitle('some_other_route', 'Some other route');
         $this->theme->addPageTemplateTitle('some_other_route', 'Some other route');
-        $this->assertEquals($expected, $this->theme->getPageTemplateTitles());
+        self::assertEquals($expected, $this->theme->getPageTemplateTitles());
     }
 }

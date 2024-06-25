@@ -48,6 +48,7 @@ class ThemeConfigurationTest extends TestCase
             'icon'                => 'test.ico',
             'image_placeholders'  => ['placeholder' => '/path/to/test.img'],
             'rtl_support'         => true,
+            'svg_icons_support'   => true,
             'logo'                => 'test_logo.jpg',
             'screenshot'          => 'test_screenshot.jpg',
             'extra_js_builds'     => [],
