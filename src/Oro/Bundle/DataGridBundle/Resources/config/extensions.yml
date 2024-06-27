@@ -140,7 +140,6 @@ services:
             - '@oro_locale.formatter.number'
             - '@oro_locale.formatter.date_time'
             - '@oro_security.acl_helper'
-            - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_datagrid.extension }
 
