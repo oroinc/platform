@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -11,10 +10,12 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier as OutputResultModifier;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -39,6 +40,8 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
+    protected ?DoctrineHelper $doctrineHelper = null;
+
     /** @var array */
     protected $groupParts = [];
 
@@ -52,6 +55,11 @@ class OrmTotalsExtension extends AbstractExtension
         $this->numberFormatter   = $numberFormatter;
         $this->dateTimeFormatter = $dateTimeFormatter;
         $this->aclHelper         = $aclHelper;
+    }
+
+    public function setDoctrineHelper(DoctrineHelper $doctrineHelper): void
+    {
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -141,7 +149,7 @@ class OrmTotalsExtension extends AbstractExtension
     public function getPriority()
     {
         // should visit after all extensions
-        return -250;
+        return -PHP_INT_MAX;
     }
 
     /**
@@ -292,16 +300,17 @@ class OrmTotalsExtension extends AbstractExtension
             }
         };
 
-        $queryBuilder = clone $this->masterQB;
-        $queryBuilder
-            ->select($totalQueries)
-            ->resetDQLParts(['groupBy', 'having']);
+        $qb = clone $this->masterQB;
+        if (!$perPage) {
+            $qb->setFirstResult(null)->setMaxResults(null);
+        }
+        $this->addPageLimits($qb, $pageData, $perPage);
+        $qb->select($totalQueries);
+        $qb->resetDQLParts(['groupBy', 'having', 'orderBy']);
 
-        $this->addPageLimits($queryBuilder, $pageData, $perPage);
+        QueryBuilderUtil::removeUnusedParameters($qb);
 
-        QueryBuilderUtil::removeUnusedParameters($queryBuilder);
-
-        $query = $queryBuilder->getQuery();
+        $query = $qb->getQuery();
 
         if (!$skipAclWalkerCheck) {
             $query = $this->aclHelper->apply($query);
@@ -315,42 +324,25 @@ class OrmTotalsExtension extends AbstractExtension
         return array_shift($resultData);
     }
 
-    /**
-     * Add "in" expression as page limit to query builder
-     *
-     * @param QueryBuilder $dataQueryBuilder
-     * @param ResultsObject $pageData
-     * @param bool $perPage
-     */
     protected function addPageLimits(QueryBuilder $dataQueryBuilder, ResultsObject $pageData, $perPage)
     {
-        $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
+        $rootAlias = QueryBuilderUtil::getSingleRootAlias($dataQueryBuilder);
+        $rootEntity = QueryBuilderUtil::getSingleRootEntity($dataQueryBuilder);
+        $identifier = $this->doctrineHelper->getSingleEntityIdentifierFieldName($rootEntity);
+        $field = QueryBuilderUtil::getField($rootAlias, $identifier);
+        $alias = '_identifier';
 
-        if (!$perPage) {
-            $queryBuilder = clone $this->masterQB;
-            $data = $queryBuilder
-                ->getQuery()
-                ->setFirstResult(null)
-                ->setMaxResults(null)
-                ->getScalarResult();
-        } else {
-            $data = $pageData->getData();
-        }
-        foreach ($rootIdentifiers as $idx => $identifier) {
-            $ids = \array_column($data, $identifier['alias']);
+        $clonedQb = clone $dataQueryBuilder;
+        $clonedQb->addSelect(sprintf('GROUP_CONCAT(%s) as %s', $field, $alias));
 
-            $field = isset($identifier['entityAlias'])
-                ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
-                : $identifier['fieldAlias'];
+        $clonedQuery = $clonedQb->getQuery();
+        $clonedQuery->setHint(OutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, true);
+        $result = $clonedQuery->getArrayResult();
 
-            $filteredIds = array_filter($ids);
-            if (empty($filteredIds)) {
-                continue;
-            }
+        $ids = array_reduce($result, fn ($accum, $data) => array_merge($accum, explode(',', $data[$alias])), []);
 
-            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, ':ids' . $idx));
-            $dataQueryBuilder->setParameter('ids' . $idx, $ids);
-        }
+        $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, ':identifiers'));
+        $dataQueryBuilder->setParameter(':identifiers', array_unique($ids));
     }
 
     /**
