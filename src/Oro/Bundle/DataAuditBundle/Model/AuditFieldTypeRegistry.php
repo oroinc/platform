@@ -65,6 +65,7 @@ class AuditFieldTypeRegistry
         'binary' => false,
         'blob' => false,
         'crypted_string' => false,
+        'crypted_text' => false,
         'wysiwyg' => 'text',
     ];
 

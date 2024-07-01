@@ -8,8 +8,9 @@ use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProvider;
 use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\EmailProcessor;
 use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\EmailGuesser;
 use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper;
+use PHPUnit\Framework\TestCase;
 
-class EmailGuesserTest extends \PHPUnit\Framework\TestCase
+class EmailGuesserTest extends TestCase
 {
     private const DUMMY_CLASS_NAME = 'DummyClass';
 

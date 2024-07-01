@@ -58,6 +58,9 @@ class TestEntitiesMigration implements
             'length' => 255,
             'comment' => '(DC2Type:crypted_string)'
         ]);
+        $table->addColumn('text_secret', 'text', [
+            'comment' => '(DC2Type:crypted_text)'
+        ]);
         $table->addColumn('state_data', 'array', ['comment' => '(DC2Type:array)']);
 
         $table->setPrimaryKey(['id']);
