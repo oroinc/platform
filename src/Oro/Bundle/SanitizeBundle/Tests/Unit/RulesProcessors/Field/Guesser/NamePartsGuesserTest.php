@@ -14,7 +14,6 @@ use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Md5Processor;
 
 class NamePartsGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    private const DUMMY_CLASS_NAME = 'DummyClass';
     private const WRONG_FIELD_NAME = 'not_name_field';
 
     private ?Md5Processor $md5ProcessorMock = null;

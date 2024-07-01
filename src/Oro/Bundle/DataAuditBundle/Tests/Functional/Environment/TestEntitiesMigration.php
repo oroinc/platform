@@ -38,6 +38,8 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Create oro_test_dataaudit_owner table
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function createTestDataAuditOwnerTable(Schema $schema)
     {
@@ -59,6 +61,11 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
             'crypted_string_property',
             'crypted_string',
             ['notnull' => false, 'comment' => '(DC2Type:crypted_string)']
+        );
+        $table->addColumn(
+            'crypted_text_property',
+            'crypted_text',
+            ['notnull' => false, 'comment' => '(DC2Type:crypted_text)']
         );
         $table->addColumn('currency_property', 'currency', ['notnull' => false, 'comment' => '(DC2Type:currency)']);
         $table->addColumn('date_property', 'date', ['notnull' => false, 'comment' => '(DC2Type:date)']);

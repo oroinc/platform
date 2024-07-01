@@ -21,10 +21,22 @@ The current file describes significant changes in the code that may affect the u
 * Added new twig function `oro_theme_configuration_value` that returns theme configuration option value.
 * Added theme configuration definition for configuration section into `\Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration`.
 
+#### AttachmentBundle
+* Added new `\Oro\Bundle\AttachmentBundle\Form\Type\ContentFileType` form type that saves content from the uploaded file but does not save file in the system.
+
+#### SecurityBundle
+* Added new `\Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedTextType` doctrine type that stores text data in crypted format.
+
+#### ApiBundle
+* Added new `crypted_text` doctrine type as a data type to `api_doc_data_types` and `open_api` sections of ORO API configuration.
+
 ### Changed
 
 #### EntityBundle
 * Changed `\Oro\Bundle\EntityBundle\Provider\EntityNameProvider` to make it work with enum fields.
+
+#### SanitizeBundle
+* Updated sanitize logic, it takes into account a new `crypted_text` doctrine type now.
 
 ## Changes in the Platform package versions
 
