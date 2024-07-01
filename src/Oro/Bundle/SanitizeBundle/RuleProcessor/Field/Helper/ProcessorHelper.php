@@ -66,7 +66,7 @@ class ProcessorHelper
 
     public function isStringField(string $fieldName, ClassMetadata $metadata): bool
     {
-        $types = ['string', 'text', 'crypted_string'];
+        $types = ['string', 'text', 'crypted_string', 'crypted_text'];
 
         return in_array($this->getFieldType($fieldName, $metadata), $types, true);
     }

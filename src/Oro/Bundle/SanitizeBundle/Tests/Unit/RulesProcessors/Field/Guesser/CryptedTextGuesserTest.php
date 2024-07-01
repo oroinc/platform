@@ -5,20 +5,21 @@ namespace Oro\Bundle\SanitizeBundle\Tests\Unit\RulesProcessors\Field\Guesser;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProvider;
-use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\CryptedStringGuesser;
+use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\CryptedTextGuesser;
 use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper;
 use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Md5Processor;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class CryptedStringGuesserTest extends TestCase
+final class CryptedTextGuesserTest extends TestCase
 {
     private const DUMMY_CLASS_NAME = 'DummyClass';
     private const DUMMY_FIELD_NAME = 'dummyField';
 
-    private ?Md5Processor $md5ProcessorMock = null;
-    private ?ClassMetadata $classMetadataMock = null;
-    private ?ConfigManager $configManagerMock = null;
-    private ?ExtendEntityMetadataProvider $extendEntityMetadataProvider = null;
+    private Md5Processor&MockObject $md5ProcessorMock;
+    private ClassMetadata&MockObject $classMetadataMock;
+    private ConfigManager&MockObject $configManagerMock;
+    private ExtendEntityMetadataProvider&MockObject $extendEntityMetadataProvider;
     private ?ProcessorHelper $processorHelper = null;
 
     protected function setUp(): void
@@ -32,7 +33,7 @@ class CryptedStringGuesserTest extends TestCase
 
     public function testSuccessfulGuess(): void
     {
-        $cryptedStringGuesser = new CryptedStringGuesser($this->md5ProcessorMock, $this->processorHelper);
+        $cryptedTextGuesser = new CryptedTextGuesser($this->md5ProcessorMock, $this->processorHelper);
 
         $this->classMetadataMock
             ->expects(self::once())
@@ -47,17 +48,17 @@ class CryptedStringGuesserTest extends TestCase
             ->expects(self::once())
             ->method('getFieldMapping')
             ->with(self::DUMMY_FIELD_NAME)
-            ->willReturn(['type' => 'crypted_string']);
+            ->willReturn(['type' => 'crypted_text']);
 
         self::assertEquals(
-            $cryptedStringGuesser->guessProcessor(self::DUMMY_FIELD_NAME, $this->classMetadataMock),
+            $cryptedTextGuesser->guessProcessor(self::DUMMY_FIELD_NAME, $this->classMetadataMock),
             $this->md5ProcessorMock
         );
     }
 
     public function testWrongTypeGuess(): void
     {
-        $cryptedStringGuesser = new CryptedStringGuesser($this->md5ProcessorMock, $this->processorHelper);
+        $cryptedTextGuesser = new CryptedTextGuesser($this->md5ProcessorMock, $this->processorHelper);
 
         $this->classMetadataMock
             ->expects(self::once())
@@ -72,8 +73,8 @@ class CryptedStringGuesserTest extends TestCase
             ->expects(self::once())
             ->method('getFieldMapping')
             ->with(self::DUMMY_FIELD_NAME)
-            ->willReturn(['type' => 'not_crypted_string']);
+            ->willReturn(['type' => 'not_crypted_text']);
 
-        self::assertNull($cryptedStringGuesser->guessProcessor(self::DUMMY_FIELD_NAME, $this->classMetadataMock));
+        self::assertNull($cryptedTextGuesser->guessProcessor(self::DUMMY_FIELD_NAME, $this->classMetadataMock));
     }
 }

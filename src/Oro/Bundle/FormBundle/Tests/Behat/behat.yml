@@ -68,3 +68,5 @@ oro_behat_extension:
     TypeableInput:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TypeableInput
 
+    AdditionalToolbarItemsWysiwygButton:
+      selector: '[aria-label="Reveal or hide additional toolbar items"]'

@@ -55,6 +55,9 @@ class TestSanitizable implements
     #[ORM\Column(name: 'secret', type: "crypted_string", length: 255, nullable: false)]
     protected ?string $secret = null;
 
+    #[ORM\Column(name: 'text_secret', type: "crypted_text", nullable: false)]
+    protected ?string $textSecret = null;
+
     #[ORM\Column(name: 'state_data', type: "array")]
     protected ?array $stateData = null;
 
@@ -253,6 +256,18 @@ class TestSanitizable implements
     public function getSecret()
     {
         return $this->secret;
+    }
+
+    public function setTextSecret(string $textSecret): self
+    {
+        $this->textSecret = $textSecret;
+
+        return $this;
+    }
+
+    public function getTextSecret(): ?string
+    {
+        return $this->textSecret;
     }
 
     /**
