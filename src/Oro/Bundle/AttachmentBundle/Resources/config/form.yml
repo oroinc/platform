@@ -92,3 +92,13 @@ services:
             - '@oro_attachment.provider.multiple_files_constraints'
         tags:
             - { name: form.type, alias: oro_attachment_multi_file }
+
+    oro_attachment.type.content_file_type:
+        class: Oro\Bundle\AttachmentBundle\Form\Type\ContentFileType
+        arguments:
+            - '@oro_attachment.data_transformer.content_file_data_transformer'
+        tags:
+            - { name: form.type }
+
+    oro_attachment.data_transformer.content_file_data_transformer:
+        class: Oro\Bundle\AttachmentBundle\Form\DataTransformer\ContentFileDataTransformer

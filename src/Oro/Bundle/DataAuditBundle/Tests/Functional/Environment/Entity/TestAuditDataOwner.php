@@ -167,6 +167,14 @@ class TestAuditDataOwner implements
     /**
      * @var string
      *
+     * @ORM\Column(name="crypted_text_property", type="crypted_text", nullable=true)
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     */
+    private $cryptedTextProperty;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="currency_property", type="currency", nullable=true)
      * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
@@ -670,6 +678,22 @@ class TestAuditDataOwner implements
     public function setCryptedStringProperty($cryptedStringProperty)
     {
         $this->cryptedStringProperty = $cryptedStringProperty;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCryptedTextProperty()
+    {
+        return $this->cryptedTextProperty;
+    }
+
+    /**
+     * @param string $cryptedTextProperty
+     */
+    public function setCryptedTextProperty($cryptedTextProperty)
+    {
+        $this->cryptedTextProperty = $cryptedTextProperty;
     }
 
     /**

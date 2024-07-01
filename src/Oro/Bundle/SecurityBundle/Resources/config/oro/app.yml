@@ -14,6 +14,7 @@ doctrine:
     dbal:
         types:
             crypted_string: Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType
+            crypted_text: Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedTextType
 
 nelmio_security:
     # prevents framing of the entire site

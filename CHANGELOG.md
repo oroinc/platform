@@ -29,6 +29,7 @@ The current file describes significant changes in the code that may affect the u
 
 #### ApiBundle
 * Added the ability to specify `\Symfony\Component\Validator\Constraints\GroupSequence` in validation groups of API config via nested arrays.
+* Added new `crypted_text` doctrine type as a data type to `api_doc_data_types` and `open_api` sections of ORO API configuration.
 
 #### FormBundle
 * Added the chain of constraint converters to `\Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverter` with basic implementation in `\Oro\Bundle\FormBundle\Form\Extension\JsValidation\GenericConstraintConverter`.
@@ -40,6 +41,12 @@ The current file describes significant changes in the code that may affect the u
 
 #### DataGridBundle
 * Added postponed delete entities logic to `\Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionHandler`.
+
+#### AttachmentBundle
+* Added new `\Oro\Bundle\AttachmentBundle\Form\Type\ContentFileType` form type that saves content from the uploaded file but does not save file in the system.
+
+#### SecurityBundle
+* Added new `\Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedTextType` doctrine type that stores text data in crypted format.
 
 ### Deprecated
 

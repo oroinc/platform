@@ -245,6 +245,20 @@ class DataAuditTest extends WebTestCase
         $this->assertStoredAuditCount(0);
     }
 
+    public function testCryptedText()
+    {
+        $owner = new TestAuditDataOwner();
+        $owner->setCryptedTextProperty('text');
+
+        $em = $this->saveOwnerAndClearMessages($owner);
+
+        $owner->setCryptedTextProperty('text2');
+        $em->flush();
+
+        $this->processMessages();
+        $this->assertStoredAuditCount(0);
+    }
+
     public function testCurrency()
     {
         $owner = new TestAuditDataOwner();
