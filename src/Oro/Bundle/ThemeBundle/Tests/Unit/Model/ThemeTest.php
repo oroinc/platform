@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ThemeBundle\Model\Theme;
+use PHPUnit\Framework\TestCase;
 
-class ThemeTest extends \PHPUnit\Framework\TestCase
+class ThemeTest extends TestCase
 {
-    /** @var Theme */
-    private $theme;
+    private Theme $theme;
 
     protected function setUp(): void
     {
