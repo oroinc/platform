@@ -6,9 +6,7 @@
                 <div data-filters-items>
                     <% if (!obj.outerHintContainer) { %>
                     <div class="filter-items-hint">
-                        <button type="button"
-                                class="btn btn--outlined btn--no-padding btn--text reset-filter-button"
-                        >
+                        <button type="button" class="btn btn--flat reset-filter-button">
                             <%= oroui.renderIcon({name: 'close'}) %>
                             <%- _.__('oro.filter.reset.label') %>
                         </button>
@@ -49,7 +47,7 @@
                 </div>
                 <div class="filter-items-hint">
                     <button type="button"
-                            class="btn btn--outlined btn--no-padding btn--text reset-filter-button"
+                            class="btn btn--flat reset-filter-button"
                     >
                         <%= oroui.renderIcon({name: 'close'}) %>
                         <%- _.__('oro.filter.reset.label') %>
