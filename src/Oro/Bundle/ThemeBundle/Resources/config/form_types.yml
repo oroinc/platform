@@ -44,6 +44,21 @@ services:
       arguments:
           - '@assets.packages'
 
+  oro_theme.form.number_builder:
+      class: Oro\Bundle\ThemeBundle\Form\Configuration\NumberBuilder
+      arguments:
+          - '@assets.packages'
+
+  oro_theme.form.integer_builder:
+      class: Oro\Bundle\ThemeBundle\Form\Configuration\IntegerBuilder
+      arguments:
+          - '@assets.packages'
+
+  oro_theme.form.text_builder:
+      class: Oro\Bundle\ThemeBundle\Form\Configuration\TextBuilder
+      arguments:
+          - '@assets.packages'
+
   oro_theme.form.configuration_child_provider:
       class: Oro\Bundle\ThemeBundle\Form\Provider\ConfigurationBuildersProvider
       arguments:

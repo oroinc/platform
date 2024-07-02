@@ -6,14 +6,16 @@ use Oro\Bundle\ThemeBundle\Model\Theme;
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 use Oro\Bundle\ThemeBundle\Twig\ThemeExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
+class ThemeExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private ThemeRegistry|\PHPUnit\Framework\MockObject\MockObject $themeRegistry;
+    private ThemeRegistry|MockObject $themeRegistry;
 
-    private Theme|\PHPUnit\Framework\MockObject\MockObject $theme;
+    private Theme|MockObject $theme;
 
     private ThemeExtension $extension;
 
