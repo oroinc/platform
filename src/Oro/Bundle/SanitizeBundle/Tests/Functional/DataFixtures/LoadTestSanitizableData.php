@@ -25,6 +25,7 @@ class LoadTestSanitizableData extends AbstractFixture
             ->setPhone('1111-222')
             ->setPhoneSecond('3333-444')
             ->setSecret('secret')
+            ->setTextSecret('text secret')
             ->setStateData(['key' => 'value']);
         $testSanitizable->email_third = 'john.redison.third@example.com';
         $testSanitizable->first_custom_field = 'sample string';

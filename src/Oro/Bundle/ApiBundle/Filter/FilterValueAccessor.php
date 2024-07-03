@@ -9,6 +9,8 @@ use Oro\Component\PhpUtils\QueryStringUtil;
  */
 class FilterValueAccessor implements FilterValueAccessorInterface
 {
+    protected const DEFAULT_OPERATOR = 'eq';
+
     /** @var array|null [filter key => [FilterValue, ...] */
     private ?array $parameters = null;
     /** @var array [group name => [filter key => [FilterValue, ...], ...], ...] */
@@ -167,7 +169,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
                         $path = $group . '[' . implode('][', explode('.', $path)) . ']';
                     }
                     $operator = $value->getOperator();
-                    if ('eq' !== $operator) {
+                    if (self::DEFAULT_OPERATOR !== $operator) {
                         $path .= '[' . $operator . ']';
                     }
                     $params[$path] = $value->getSourceValue();
@@ -211,7 +213,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     protected function normalizeOperator(?string $operator): string
     {
         if (!$operator) {
-            $operator = 'eq';
+            $operator = self::DEFAULT_OPERATOR;
         }
 
         return $operator;

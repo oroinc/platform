@@ -2526,12 +2526,11 @@ JS;
     }
 
     /**
-     * @Then /^(?:|I )should see "(?P<title>[\w\s]*)" button$/
+     * @Then /^(?:|I )should see "(?P<title>[^"]+)" button$/
      */
     public function iShouldSeeButton($title)
     {
         $button = $this->getPage()->findButton($title);
-
         if ($button) {
             return;
         }
@@ -2543,6 +2542,19 @@ JS;
         }
 
         self::fail(sprintf('Could not find button with "%s" title', $title));
+    }
+
+    /**
+     * @Then /^(?:|I )should not see "(?P<title>[^"]+)" button/
+     */
+    public function iShouldNotSeeButton($title)
+    {
+        $button = $this->getPage()->findButton($title);
+        if (!$button) {
+            return;
+        }
+
+        self::fail(sprintf('There is the button with "%s" title', $title));
     }
 
     /**

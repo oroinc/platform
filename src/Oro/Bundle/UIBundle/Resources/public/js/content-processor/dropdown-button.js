@@ -146,7 +146,7 @@ define(function(require, exports, module) {
                     'data-placement': 'bottom-end',
                     'data-inherit-parent-width': 'loosely'
                 }, this.options.moreButtonAttrs))
-                .addClass('btn btn--icon dropdown-toggle btn-more-actions')
+                .addClass('btn dropdown-toggle btn-more-actions')
                 .addClass(this.options.decoreClass || '')
                 .append(this.options.moreLabel);
 

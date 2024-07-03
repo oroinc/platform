@@ -48,6 +48,7 @@ class ThemeFactory implements ThemeFactoryInterface
             'logo_small',
             'image_placeholders',
             'rtl_support',
+            'svg_icons_support',
             'directory',
             'groups',
             'description',
