@@ -142,6 +142,11 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
                 ['needs_environment' => true]
             ),
             new TwigFunction(
+                'oro_form_additional_data_rows',
+                [$this, 'renderAdditionalDataRows'],
+                ['needs_environment' => true]
+            ),
+            new TwigFunction(
                 'oro_view_process',
                 [$this, 'processView'],
                 ['needs_environment' => true]
@@ -247,6 +252,25 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
                         ]
                     ]
             ];
+        }
+
+        return $additionalData;
+    }
+
+    public function renderAdditionalDataRows(
+        TwigEnvironment $environment,
+        FormView $form,
+        array $additionalData = []
+    ): array {
+        foreach ($form->children as $child) {
+            if (empty($child->vars['extra_field']) || $child->isRendered()) {
+                continue;
+            }
+
+            $additionalData[$child->vars['name']] = $environment->render(
+                '@OroUI/form_row.html.twig',
+                ['child' => $child]
+            );
         }
 
         return $additionalData;
