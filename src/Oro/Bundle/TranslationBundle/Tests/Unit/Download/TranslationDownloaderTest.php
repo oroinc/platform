@@ -18,6 +18,7 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\Reader\TranslationReader;
@@ -76,6 +77,9 @@ YAML
     /** @var TranslationDownloader */
     private $downloader;
 
+    /** @var EventDispatcherInterface|MockObject */
+    private $eventDispatcher;
+
     protected function setUp(): void
     {
         $this->translationServiceAdapter = $this->createMock(TranslationServiceAdapterInterface::class);
@@ -83,6 +87,7 @@ YAML
         $this->jsTranslationDumper  = $this->createMock(JsTranslationDumper::class);
         $this->databasePersister = $this->createMock(DatabasePersister::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $translationReader = new TranslationReader();
         $translationReader->addLoader('yml', new YamlFileLoader());
@@ -95,6 +100,7 @@ YAML
             $this->databasePersister,
             $this->doctrine
         );
+        $this->downloader->setEventDispatcher($this->eventDispatcher);
     }
 
     protected function tearDown(): void

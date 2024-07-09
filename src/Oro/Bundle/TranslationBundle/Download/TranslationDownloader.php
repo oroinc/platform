@@ -9,11 +9,13 @@ use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Event\AfterCatalogueInitialize;
 use Oro\Bundle\TranslationBundle\Exception\TranslationDatabasePersisterException;
 use Oro\Bundle\TranslationBundle\Exception\TranslationDownloaderException;
 use Oro\Bundle\TranslationBundle\Exception\TranslationServiceAdapterException;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Reader\TranslationReader;
@@ -29,6 +31,7 @@ class TranslationDownloader
     private TranslationReader $translationReader;
     private DatabasePersister $databasePersister;
     private ManagerRegistry $doctrine;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         TranslationServiceAdapterInterface $translationServiceAdapter,
@@ -44,6 +47,11 @@ class TranslationDownloader
         $this->translationReader = $translationReader;
         $this->databasePersister = $translationDatabasePersister;
         $this->doctrine = $doctrine;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -226,6 +234,10 @@ class TranslationDownloader
 
         try {
             $this->databasePersister->persist($languageCode, $catalog->all());
+            $this->eventDispatcher->dispatch(
+                new AfterCatalogueInitialize($catalog),
+                AfterCatalogueInitialize::NAME
+            );
         } catch (\Exception $e) {
             // This conversion may be removed after the database persister is refactored
             // to throw proper exception type on its own.
