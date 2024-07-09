@@ -11,12 +11,15 @@ use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationProvider;
 use Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizer;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationErrorCollection;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
+class DebugTranslatorTest extends TestCase
 {
     use TempDirExtension;
 
@@ -43,22 +46,40 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
+    private string $cacheDir;
+
+    private DebugTranslator $translator;
+
+    private ContainerInterface|MockObject $container;
+
+    private EventDispatcherInterface|MockObject $eventDispatcher;
+
+    protected function setUp(): void
+    {
+        $this->cacheDir = $this->getTempDir('debug_translator');
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+    }
+
     private function getTranslator(array $fallbackLocales = []): DebugTranslator
     {
-        $cacheDir = $this->getTempDir('debug_translator');
-
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects(self::atLeastOnce())
+        $this
+            ->container
+            ->expects(self::atLeastOnce())
             ->method('get')
             ->with('loader')
             ->willReturn($this->getLoader());
+        $this
+            ->eventDispatcher
+            ->expects(self::atLeastOnce())
+            ->method('dispatch');
 
         $translator = new DebugTranslator(
-            $container,
+            $this->container,
             new MessageFormatter(),
             'en',
             ['loader' => ['loader']],
-            ['resource_files' => [], 'cache_dir' => $cacheDir]
+            ['resource_files' => [], 'cache_dir' => $this->cacheDir]
         );
 
         $translator->setStrategyProvider($this->getStrategyProvider($fallbackLocales));
@@ -69,6 +90,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
             new DynamicTranslationLoaderStub(),
             $this->createMock(DynamicTranslationCache::class)
         ));
+        $translator->setEventDispatcher($this->eventDispatcher);
 
         $translator->addResource('loader', 'foo.fr.loader', 'fr');
         $translator->addResource('loader', 'foo.en.loader', 'en');
@@ -81,9 +103,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects(self::any())
             ->method('load')
-            ->willReturnCallback(function ($resource, $locale) {
-                return $this->getCatalogue($locale, $this->messages[$locale]);
-            });
+            ->willReturnCallback(fn ($resource, $locale) => $this->getCatalogue($locale, $this->messages[$locale]));
 
         return $loader;
     }
