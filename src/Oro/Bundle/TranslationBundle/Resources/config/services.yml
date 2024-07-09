@@ -7,6 +7,7 @@ services:
             - '@translation.reader'
             - '@oro_translation.database_translation.persister'
             - '@doctrine'
+            - '@event_dispatcher'
         lazy: true
 
     Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider:

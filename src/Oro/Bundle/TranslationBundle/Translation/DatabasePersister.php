@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -142,9 +141,6 @@ class DatabasePersister
         $needUpdate = false;
         foreach ($domains as $domain => $messages) {
             foreach ($messages as $key => $value) {
-                if (\strlen($key) > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
-                    continue;
-                }
                 if (!isset($translationKeys[$domain][$key])) {
                     $sqlData[] = sprintf('(%s, %s)', $connection->quote($domain), $connection->quote($key));
                     $translationKeys[$domain][$key] = 1;

@@ -31,3 +31,11 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+
+    oro_address.listener.translator_catalogue:
+        class: Oro\Bundle\AddressBundle\EventListener\TranslatorCatalogueListener
+        lazy: true
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_translation.after_catalogue_initialize, method: onAfterCatalogueInit }
