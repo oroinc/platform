@@ -10,6 +10,20 @@ trusted_data:
         Oro\Bundle\TranslationBundle\Api\Repository\TranslationQueryModifier:
             addComputedFields:
                 languageCode: true
+        Oro\Bundle\TranslationBundle\Entity\Repository\AbstractTranslationRepository:
+            doUpdateDefaultTranslations:
+                className: true
+                updateData: true
+                criteria: true
+            doUpdateTranslations:
+                sql: true
+            doGetAllIdentities:
+                className: true
+    safe_methods:
+        Oro\Bundle\TranslationBundle\Entity\Repository\AbstractTranslationRepository:
+            doUpdateDefaultTranslations: true
+            doUpdateTranslations: true
+            doGetAllIdentities: true
     safe_static_methods:
         Oro\Bundle\TranslationBundle\EventListener\UpdateTranslatableDictionariesListener:
             getTranslationEntityTable: true

@@ -17,6 +17,8 @@ use Oro\Bundle\TranslationBundle\Exception\TranslationDownloaderException;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\Reader\TranslationReader;
@@ -58,23 +60,26 @@ YAML
         'escaping "double" quotes' => 'escaping "double" quotes',
     ];
 
-    /** @var TranslationServiceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslationServiceAdapterInterface|MockObject */
     private $translationServiceAdapter;
 
-    /** @var TranslationMetricsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslationMetricsProviderInterface|MockObject */
     private $translationMetricsProvider;
 
-    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var JsTranslationDumper|MockObject */
     private $jsTranslationDumper;
 
-    /** @var DatabasePersister|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DatabasePersister|MockObject */
     private $databasePersister;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|MockObject */
     private $doctrine;
 
     /** @var TranslationDownloader */
     private $downloader;
+
+    /** @var EventDispatcherInterface|MockObject */
+    private $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -83,6 +88,7 @@ YAML
         $this->jsTranslationDumper  = $this->createMock(JsTranslationDumper::class);
         $this->databasePersister = $this->createMock(DatabasePersister::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $translationReader = new TranslationReader();
         $translationReader->addLoader('yml', new YamlFileLoader());
@@ -95,6 +101,7 @@ YAML
             $this->databasePersister,
             $this->doctrine
         );
+        $this->downloader->setEventDispatcher($this->eventDispatcher);
     }
 
     protected function tearDown(): void

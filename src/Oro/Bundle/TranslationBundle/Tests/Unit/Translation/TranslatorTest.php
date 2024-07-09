@@ -14,6 +14,7 @@ use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -90,6 +91,11 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ->with('loader')
             ->willReturn($this->getLoader(self::MESSAGES));
 
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher
+            ->expects(self::atLeastOnce())
+            ->method('dispatch');
+
         $translator = new Translator(
             $container,
             new MessageFormatter(),
@@ -103,6 +109,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $translator->setMessageCatalogueSanitizer($this->messageCatalogueSanitizer);
         $translator->setSanitizationErrorCollection($this->sanitizationErrorCollection);
         $translator->setDynamicTranslationProvider($this->getDynamicTranslationProvider([]));
+        $translator->setEventDispatcher($eventDispatcher);
 
         $translator->addResource('loader', 'foo.fr.loader', 'fr');
         $translator->addResource('loader', 'foo.en.loader', 'en');
@@ -118,9 +125,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects(self::any())
             ->method('load')
-            ->willReturnCallback(function ($resource, $locale) use ($messages) {
-                return $this->getCatalogue($locale, $messages[$locale]);
-            });
+            ->willReturnCallback(fn ($resource, $locale) => $this->getCatalogue($locale, $messages[$locale]));
 
         return $loader;
     }

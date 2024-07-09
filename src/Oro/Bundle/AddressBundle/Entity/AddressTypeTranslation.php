@@ -11,7 +11,7 @@ use Oro\Bundle\LocaleBundle\Entity\AbstractTranslation;
  * @ORM\Table(name="oro_address_type_translation", indexes={
  *      @ORM\Index(name="address_type_translation_idx", columns={"locale", "object_class", "field", "foreign_key"})
  * })
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeTranslationRepository")
  */
 class AddressTypeTranslation extends AbstractTranslation
 {

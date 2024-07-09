@@ -11,7 +11,7 @@ use Oro\Bundle\LocaleBundle\Entity\AbstractTranslation;
  * @ORM\Table(name="oro_dictionary_region_trans", indexes={
  *      @ORM\Index(name="region_translation_idx", columns={"locale", "object_class", "field", "foreign_key"})
  * })
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionTranslationRepository")
  */
 class RegionTranslation extends AbstractTranslation
 {
