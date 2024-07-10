@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * Oro FormBundle DI Extension
+ */
 class OroFormExtension extends Extension
 {
     /**
@@ -23,6 +26,7 @@ class OroFormExtension extends Extension
         $loader->load('form_type.yml');
         $loader->load('importexport.yml');
         $loader->load('services.yml');
+        $loader->load('services_captcha.yml');
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
         $loader->load('commands.yml');
