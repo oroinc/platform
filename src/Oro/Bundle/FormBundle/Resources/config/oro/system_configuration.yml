@@ -3,6 +3,22 @@ system_configuration:
         wysiwyg_settings:
             title: oro.form.system_configuration.groups.wysiwyg_settings.title
 
+        captcha_settings:
+            icon: fa-shield
+            title: oro.form.system_configuration.groups.captcha_settings.title
+
+        captcha_general:
+            title: oro.form.system_configuration.groups.captcha_general.title
+
+        captcha_recaptcha:
+            title: oro.form.system_configuration.groups.captcha_recaptcha.title
+
+        captcha_hcaptcha:
+            title: oro.form.system_configuration.groups.captcha_hcaptcha.title
+
+        captcha_turnstile:
+            title: oro.form.system_configuration.groups.captcha_turnstile.title
+
     fields:
         oro_form.wysiwyg_enabled:
             data_type: boolean
@@ -12,6 +28,93 @@ system_configuration:
                 label: oro.form.system_configuration.fields.wysiwyg_enabled.label
                 tooltip: oro.form.system_configuration.fields.wysiwyg_enabled.tooltip
                 required: false
+
+        oro_form.enabled_captcha:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            options:
+                label: oro.form.system_configuration.fields.enabled_captcha.label
+                required: false
+        oro_form.captcha_service:
+            data_type: string
+            type: Oro\Bundle\FormBundle\Form\Type\CaptchaServiceSelectType
+            options:
+                label: oro.form.system_configuration.fields.captcha_service.label
+                required: true
+                constraints:
+                    -
+                        NotBlank: ~
+        oro_form.captcha_protected_forms:
+            data_type: array
+            type: Oro\Bundle\FormBundle\Form\Type\CaptchaProtectedFormSelectType
+            options:
+                label: oro.form.system_configuration.fields.captcha_protected_forms.label
+                required: false
+        oro_form.recaptcha_public_key:
+            data_type: string
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
+            search_type: text
+            options:
+                label: oro.form.system_configuration.fields.recaptcha_public_key.label
+                required: false
+        oro_form.recaptcha_private_key:
+            data_type: string
+            type: Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType
+            search_type: text
+            options:
+                label: oro.form.system_configuration.fields.recaptcha_private_key.label
+                required: false
+                resettable: true
+        oro_form.recaptcha_minimal_allowed_score:
+            data_type: double
+            type: Symfony\Component\Form\Extension\Core\Type\NumberType
+            search_type: text
+            options:
+                label: oro.form.system_configuration.fields.recaptcha_minimal_allowed_score.label
+                required: true
+                scale: 2
+                constraints:
+                    -
+                        NotBlank: ~
+                    -
+                        Range:
+                            min: 0
+                            max: 1
+                    -
+                        Type:
+                            type: double
+
+        oro_form.hcaptcha_public_key:
+            data_type: string
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
+            search_type: text
+            options:
+                label: oro.form.system_configuration.fields.hcaptcha_public_key.label
+                required: false
+        oro_form.hcaptcha_private_key:
+            data_type: string
+            type: Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType
+            search_type: text
+            options:
+                label: oro.form.system_configuration.fields.hcaptcha_private_key.label
+                required: false
+                resettable: true
+
+        oro_form.turnstile_public_key:
+            data_type: string
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
+            search_type: text
+            options:
+                label: oro.form.system_configuration.fields.turnstile_public_key.label
+                required: false
+        oro_form.turnstile_private_key:
+            data_type: string
+            type: Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType
+            search_type: text
+            options:
+                label: oro.form.system_configuration.fields.turnstile_private_key.label
+                required: false
+                resettable: true
 
     tree:
         system_configuration:
@@ -24,6 +127,29 @@ system_configuration:
                                     wysiwyg_settings:
                                         children:
                                             - oro_form.wysiwyg_enabled
+                    integrations:
+                        children:
+                            captcha_settings:
+                                children:
+                                    captcha_general:
+                                        children:
+                                            - oro_form.enabled_captcha
+                                            - oro_form.captcha_service
+                                            - oro_form.captcha_protected_forms
+                                    captcha_recaptcha:
+                                        children:
+                                            - oro_form.recaptcha_public_key
+                                            - oro_form.recaptcha_private_key
+                                            - oro_form.recaptcha_minimal_allowed_score
+                                    captcha_hcaptcha:
+                                        children:
+                                            - oro_form.hcaptcha_public_key
+                                            - oro_form.hcaptcha_private_key
+                                    captcha_turnstile:
+                                        children:
+                                            - oro_form.turnstile_public_key
+                                            - oro_form.turnstile_private_key
+
         user_configuration:
             platform:
                 children:

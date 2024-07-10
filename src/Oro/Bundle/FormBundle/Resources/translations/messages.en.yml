@@ -264,10 +264,35 @@ oro:
         system_configuration:
             groups:
                 wysiwyg_settings.title: 'WYSIWYG settings'
+                captcha_settings.title: 'CAPTCHA Settings'
+                captcha_general.title: 'General'
+                captcha_recaptcha.title: 'Google reCAPTCHA'
+                captcha_hcaptcha.title: 'hCaptcha'
+                captcha_turnstile.title: 'Cloudflare Turnstile'
             fields:
                 wysiwyg_enabled:
                     label: 'Enable WYSIWYG editor'
                     tooltip: 'Select the option to enable the WYSIWYG editor for all text fields.'
+                enabled_captcha:
+                    label: 'Enable CAPTCHA protection'
+                captcha_service:
+                    label: 'CAPTCHA service'
+                captcha_protected_forms:
+                    label: 'Protect Forms'
+                recaptcha_public_key:
+                    label: 'Site key'
+                recaptcha_private_key:
+                    label: 'Secret key'
+                recaptcha_minimal_allowed_score:
+                    label: 'Minimal allowed score'
+                hcaptcha_public_key:
+                    label: 'Site key'
+                hcaptcha_private_key:
+                    label: 'Secret key'
+                turnstile_public_key:
+                    label: 'Site key'
+                turnstile_private_key:
+                    label: 'Secret key'
         oro_duration.tooltip: >
             Encodings supported:<ul>
             <li>#:#:# (e.g. '1:30:0' or '90:00')</li>
@@ -279,3 +304,10 @@ oro:
             value:
                 new_window: New Window
                 same_window: Same Window
+
+oro_form:
+    captcha:
+        service_name:
+            recaptcha: Google reCAPTCHA
+            hcaptcha: hCaptcha
+            turnstile: Cloudflare Turnstile
