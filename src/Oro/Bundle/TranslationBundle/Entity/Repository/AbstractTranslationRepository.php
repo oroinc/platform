@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 use Doctrine\DBAL\Types\Types;
 use Gedmo\Translatable\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Abstract Gedmo translation repository for translation dictionaries.
@@ -63,10 +64,11 @@ abstract class AbstractTranslationRepository extends TranslationRepository imple
                     $params[] = $value;
                 }
 
+                $valuesPlaceholder = implode(', ', array_fill(0, count($data), '(?, ?, ?, ?, ?)'));
                 $sql = sprintf(
                     'INSERT INTO %s (foreign_key, locale, object_class, field, content) VALUES %s',
                     $tableName,
-                    implode(', ', array_fill(0, count($data), '(?, ?, ?, ?, ?)'))
+                    $valuesPlaceholder
                 );
 
                 $connection->executeQuery($sql, $params);
@@ -84,7 +86,7 @@ abstract class AbstractTranslationRepository extends TranslationRepository imple
     {
         $alias = 'entity';
         $result = $this->_em->createQueryBuilder()
-            ->select(sprintf('%s.%s', $alias, $identityField))
+            ->select(QueryBuilderUtil::getField($alias, $identityField))
             ->from($className, $alias)
             ->getQuery()
             ->getScalarResult();
@@ -106,16 +108,13 @@ abstract class AbstractTranslationRepository extends TranslationRepository imple
         $alias = 'entity';
         $connection = $this->_em->getConnection();
         $connection->beginTransaction();
-        $select = [
-            sprintf('%s.%s', $alias, $valueFieldName),
-            sprintf('%s.%s', $alias, $criteriaFieldName)
-        ];
 
         try {
             $qb = $this->_em->createQueryBuilder();
-            $qb->select(...$select)
+            $criteriaField = QueryBuilderUtil::getField($alias, $criteriaFieldName);
+            $qb->select(QueryBuilderUtil::getField($alias, $valueFieldName), $criteriaField)
                 ->from($className, $alias)
-                ->where($qb->expr()->in(end($select), ':param'))
+                ->where($qb->expr()->in($criteriaField, ':param'))
                 ->setParameter('param', array_keys($data));
 
             $result = $qb->getQuery()->getArrayResult();

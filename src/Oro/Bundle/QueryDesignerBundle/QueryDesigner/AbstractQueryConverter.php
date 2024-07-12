@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Provides a base functionality to convert a query definition created by the query designer to another format.
@@ -515,7 +516,7 @@ abstract class AbstractQueryConverter
     {
         return $this->context()->hasVirtualColumnExpression($columnName)
             ? $this->context()->getVirtualColumnExpression($columnName)
-            : sprintf('%s.%s', $tableAlias, $fieldName);
+            : QueryBuilderUtil::getField($tableAlias, $fieldName);
     }
 
     /**
