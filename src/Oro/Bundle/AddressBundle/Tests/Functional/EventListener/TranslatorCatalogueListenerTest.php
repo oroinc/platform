@@ -103,16 +103,26 @@ class TranslatorCatalogueListenerTest extends WebTestCase
         ));
 
         /** @var AddressTypeTranslation $addressTypeTranslation */
-        $addressTypeTranslation = $this->addressTypeTranslationRepository->findOneBy(['foreignKey' => 'billing']);
+        $addressTypeTranslation = $this->addressTypeTranslationRepository->findOneBy([
+            'content' => 'Nieuwe facturering'
+        ]);
+        self::assertNotNull($addressTypeTranslation);
         self::assertEquals('de_DE', $addressTypeTranslation->getLocale());
-        self::assertEquals('Nieuwe facturering', $addressTypeTranslation->getContent());
+        self::assertEquals('billing', $addressTypeTranslation->getForeignKey());
+        self::assertEquals(AddressType::class, $addressTypeTranslation->getObjectClass());
+
         /** @var CountryTranslation $countryTranslation */
-        $countryTranslation = $this->countryTranslationRepository->findOneBy(['foreignKey' => 'AD']);
+        $countryTranslation = $this->countryTranslationRepository->findOneBy(['content' => 'Nieuw Andorra']);
+        self::assertNotNull($countryTranslation);
         self::assertEquals('de_DE', $countryTranslation->getLocale());
-        self::assertEquals('Nieuw Andorra', $countryTranslation->getContent());
+        self::assertEquals('AD', $countryTranslation->getForeignKey());
+        self::assertEquals(Country::class, $countryTranslation->getObjectClass());
+
         /** @var RegionTranslation $regionTranslation */
-        $regionTranslation = $this->regionTranslationRepository->findOneBy(['foreignKey' => 'BF-08']);
+        $regionTranslation = $this->regionTranslationRepository->findOneBy(['content' => 'Nieuwe regio BF-08']);
+        self::assertNotNull($regionTranslation);
         self::assertEquals('de_DE', $regionTranslation->getLocale());
-        self::assertEquals('Nieuwe regio BF-08', $regionTranslation->getContent());
+        self::assertEquals('BF-08', $regionTranslation->getForeignKey());
+        self::assertEquals(Region::class, $regionTranslation->getObjectClass());
     }
 }
