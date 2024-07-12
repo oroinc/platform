@@ -27,6 +27,7 @@ trusted_data:
             getEntityIdentifierFieldName: true
         Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper:
             getTableName: true
+            getColumns: true
         Oro\Bundle\EntityBundle\ORM\DoctrineHelper:
             getSingleEntityIdentifier: true
             getEntityIdentifierFieldNames: true

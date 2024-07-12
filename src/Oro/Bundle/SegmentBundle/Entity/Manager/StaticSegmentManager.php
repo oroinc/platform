@@ -13,6 +13,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Runs static repository restriction query and stores it state into snapshot entity
@@ -199,6 +200,8 @@ class StaticSegmentManager
         array $types,
         Segment $segment
     ): void {
+        QueryBuilderUtil::checkIdentifier($fieldToSelect);
+
         $stmt = $connection->executeQuery($selectSql, $values, $types);
         $insertValues = [];
         $isIntegerId = $fieldToSelect === 'integer_entity_id';
