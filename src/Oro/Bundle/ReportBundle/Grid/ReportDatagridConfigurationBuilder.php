@@ -38,6 +38,9 @@ class ReportDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
         $config->offsetSetByPath('[source][acl_resource]', 'oro_report_view');
         $this->enableExportIfApplicable($config);
         $config->offsetSetByPath(EntityPaginationExtension::ENTITY_PAGINATION_PATH, true);
+        if (!in_array('HINT_TRANSLATABLE', $config->offsetGetByPath('[source][hints]', []))) {
+            $config->offsetAddToArrayByPath('[source][hints]', ['HINT_TRANSLATABLE']);
+        }
 
         $this->dateGroupingBuilder->applyDateGroupingFilterIfRequired($config, $this->source);
 
