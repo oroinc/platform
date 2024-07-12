@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateHtmlEscapedTypeMigration;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Updates html_escaped columns to text type
@@ -89,6 +90,9 @@ class UpdateHtmlEscapedTypePreMigrationListener
 
     private function changeColumn(Connection $connection, string $tableName, string $fieldName): void
     {
+        QueryBuilderUtil::checkIdentifier($tableName);
+        QueryBuilderUtil::checkField($fieldName);
+
         $isColumnExistsQuery = <<<SQL
             SELECT COLUMN_NAME FROM information_schema.COLUMNS
             WHERE TABLE_NAME = :tableName AND COLUMN_NAME = :fieldName

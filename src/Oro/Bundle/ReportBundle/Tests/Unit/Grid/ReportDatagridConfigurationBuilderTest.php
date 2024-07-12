@@ -138,6 +138,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'type' => 'orm',
                 'acl_resource' => 'oro_report_view',
+                'hints' => ['HINT_TRANSLATABLE']
             ],
             'options' => ['export' => true, 'entity_pagination' => true],
         ];

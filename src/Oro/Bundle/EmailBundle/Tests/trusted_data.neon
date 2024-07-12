@@ -35,6 +35,12 @@ trusted_data:
             applySentFilter:
                 dql: true
     safe_methods:
+        Oro\Bundle\EmailBundle\Sync\NotificationAlertManager:
+            getTableName: true
+        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressVisibilityManager:
+            getEmailVisibilityTableName: true
+        Oro\Bundle\EmailBundle\Api\Repository\EmailOriginRepository:
+            getDiscriminatorColumnName: true
         Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager:
             getEmailAddressProxyClass: true
         Oro\Bundle\EmailBundle\Filter\ChoiceMessageTypeFilter:
