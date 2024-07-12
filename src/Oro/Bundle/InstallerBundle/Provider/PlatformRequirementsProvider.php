@@ -116,7 +116,6 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->addImageProcessorsRequirement($collection, ProcessorHelper::JPEGOPTIM);
         $this->addImageProcessorsRequirement($collection, ProcessorHelper::PNGQUANT);
 
-        $this->addPathWritableRequirement($collection, 'public/media');
         $this->addPathWritableRequirement($collection, 'var/data');
 
         if (function_exists('iconv')) {
