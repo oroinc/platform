@@ -116,7 +116,6 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->addImageProcessorsRequirement($collection, ProcessorHelper::JPEGOPTIM);
         $this->addImageProcessorsRequirement($collection, ProcessorHelper::PNGQUANT);
 
-        $this->addPathWritableRequirement($collection, 'public/media');
         $this->addPathWritableRequirement($collection, 'public/bundles');
         $this->addPathWritableRequirement($collection, 'var/data');
         $this->addPathWritableRequirement($collection, 'public/js');
