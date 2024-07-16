@@ -223,7 +223,7 @@ services:
             - '%kernel.project_dir%'
             - '%oro_navigation.js_routing_filename_prefix%'
         tags:
-            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+            - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate, priority: -10 }
 
     oro_navigation.listener.js_routing_route_collection_listener:
         class: Oro\Bundle\NavigationBundle\EventListener\JsRoutingRouteCollectionListener
