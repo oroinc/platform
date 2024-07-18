@@ -6,15 +6,11 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use PHPUnit\Framework\TestCase;
 
-class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
+class ThemeFactoryTest extends TestCase
 {
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
-
-    /** @var ThemeFactory */
-    private $factory;
+    private ThemeFactory $factory;
 
     protected function setUp(): void
     {
@@ -28,11 +24,11 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
      * @param array  $definition
      * @param mixed  $expectedResult
      */
-    public function testCreate($name, array $definition, $expectedResult)
+    public function testCreate($name, array $definition, $expectedResult): void
     {
         $result = $this->factory->create($name, $definition);
 
-        $this->assertEquals($expectedResult, $result);
+        self::assertEquals($expectedResult, $result);
     }
 
     public function themeDefinitionDataProvider(): array
@@ -45,6 +41,7 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
         $fullDefinition->setLogoSmall('oro-black-logo-small.png');
         $fullDefinition->setImagePlaceholders(['no_image' => 'some/test/route.png']);
         $fullDefinition->setRtlSupport(true);
+        $fullDefinition->setSvgIconsSupport(true);
         $fullDefinition->setScreenshot('oro-black-screenshot.png');
         $fullDefinition->setLabel('Oro Black Theme');
         $fullDefinition->setDirectory('OroBlack');
@@ -106,6 +103,7 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
                     'logo_small' => 'oro-black-logo-small.png',
                     'image_placeholders' => ['no_image'   => 'some/test/route.png'],
                     'rtl_support' => true,
+                    'svg_icons_support' => true,
                     'directory'  => 'OroBlack',
                     'description' => 'description',
                     'config' => $config

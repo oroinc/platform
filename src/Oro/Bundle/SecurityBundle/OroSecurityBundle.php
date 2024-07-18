@@ -15,6 +15,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationF
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationHttpBasicFactory;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationRememberMeFactory;
 use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
+use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedTextType;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
@@ -30,7 +31,9 @@ class OroSecurityBundle extends Bundle
     {
         parent::boot();
 
-        CryptedStringType::setCrypter($this->container->get('oro_security.encoder.repetitive_crypter'));
+        $crypter = $this->container->get('oro_security.encoder.repetitive_crypter');
+        CryptedStringType::setCrypter($crypter);
+        CryptedTextType::setCrypter($crypter);
     }
 
     /**

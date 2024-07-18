@@ -55,6 +55,15 @@
             }
         }
 
+        @if map.has-key($states, 'focus-visible') {
+            &:focus-visible {
+                @include render-var-properties(
+                    map.get($states, 'focus-visible'),
+                    '#{$var-prefix}-#{$theme-key}-focus-visible'
+                );
+            }
+        }
+
         @if map.has-key($states, 'active') {
             &:active {
                 @include render-var-properties(

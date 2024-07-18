@@ -195,6 +195,8 @@ oro_api:
         config_object: object
         crypted_string: string
         crypted_string[]: array of strings
+        crypted_text: string
+        crypted_text[]: array of strings
 
     api_doc_cache:
         excluded_features: [ web_api ]
@@ -223,6 +225,7 @@ oro_api:
             time: [string, {format: time, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeTime::REQUIREMENT}]
             dateinterval: [string, {format: dateinterval}]
             crypted_string: [string, {format: crypted}]
+            crypted_text: [string, {format: crypted}]
         data_type_aliases:
             nestedObject: object
             json: object

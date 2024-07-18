@@ -5,8 +5,9 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\Model;
 use Oro\Bundle\ThemeBundle\Exception\ThemeNotFoundException;
 use Oro\Bundle\ThemeBundle\Model\Theme;
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
+use PHPUnit\Framework\TestCase;
 
-class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
+class ThemeRegistryTest extends TestCase
 {
     private const THEME_SETTINGS = [
         'foo' => [

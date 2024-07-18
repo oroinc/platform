@@ -18,8 +18,48 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             [
                 'settings' => [
                     'resolved' => true,
-                    'wysiwyg_enabled' => [
+                    Configuration::WYSIWYG_ENABLED => [
                         'value' => true,
+                        'scope' => 'app'
+                    ],
+                    Configuration::ENABLED_CAPTCHA => [
+                        'value' => false,
+                        'scope' => 'app'
+                    ],
+                    Configuration::CAPTCHA_SERVICE => [
+                        'value' => 'recaptcha',
+                        'scope' => 'app'
+                    ],
+                    Configuration::CAPTCHA_PROTECTED_FORMS => [
+                        'value' => [],
+                        'scope' => 'app'
+                    ],
+                    Configuration::RECAPTCHA_PUBLIC_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::RECAPTCHA_PRIVATE_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::RECAPTCHA_MINIMAL_ALLOWED_SCORE => [
+                        'value' => '0.5',
+                        'scope' => 'app'
+                    ],
+                    Configuration::HCAPTCHA_PUBLIC_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::HCAPTCHA_PRIVATE_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::TURNSTILE_PUBLIC_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::TURNSTILE_PRIVATE_KEY => [
+                        'value' => '',
                         'scope' => 'app'
                     ]
                 ],
@@ -77,8 +117,48 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             [
                 'settings' => [
                     'resolved' => true,
-                    'wysiwyg_enabled' => [
+                    Configuration::WYSIWYG_ENABLED => [
                         'value' => true,
+                        'scope' => 'app'
+                    ],
+                    Configuration::ENABLED_CAPTCHA => [
+                        'value' => false,
+                        'scope' => 'app'
+                    ],
+                    Configuration::CAPTCHA_SERVICE => [
+                        'value' => 'recaptcha',
+                        'scope' => 'app'
+                    ],
+                    Configuration::CAPTCHA_PROTECTED_FORMS => [
+                        'value' => [],
+                        'scope' => 'app'
+                    ],
+                    Configuration::RECAPTCHA_PUBLIC_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::RECAPTCHA_PRIVATE_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::RECAPTCHA_MINIMAL_ALLOWED_SCORE => [
+                        'value' => '0.5',
+                        'scope' => 'app'
+                    ],
+                    Configuration::HCAPTCHA_PUBLIC_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::HCAPTCHA_PRIVATE_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::TURNSTILE_PUBLIC_KEY => [
+                        'value' => '',
+                        'scope' => 'app'
+                    ],
+                    Configuration::TURNSTILE_PRIVATE_KEY => [
+                        'value' => '',
                         'scope' => 'app'
                     ]
                 ],

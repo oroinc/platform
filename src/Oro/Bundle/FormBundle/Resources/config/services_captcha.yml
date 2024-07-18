@@ -1,0 +1,106 @@
+services:
+    oro_form.captcha.service_registry:
+        class: Oro\Bundle\FormBundle\Captcha\CaptchaServiceRegistry
+        arguments:
+            - '@oro_config.manager'
+            - !tagged_iterator { tag: 'oro_form.captcha_service', index_by: 'alias' }
+
+    oro_form.captcha.recaptcha_client_factory:
+        class: Oro\Bundle\FormBundle\Captcha\ReCaptchaClientFactory
+
+    oro_form.captcha.recaptcha_service:
+        class: Oro\Bundle\FormBundle\Captcha\ReCaptchaService
+        arguments:
+            - '@oro_form.captcha.recaptcha_client_factory'
+            - '@oro_config.manager'
+            - '@request_stack'
+            - '@oro_security.encoder.default'
+        tags:
+            - { name: oro_form.captcha_service, alias: 'recaptcha' }
+
+    oro_form.captcha.http_client:
+        class: 'GuzzleHttp\Client'
+        public: false
+        lazy: true
+
+    oro_form.captcha.recaptcha_compatible_service:
+        abstract: true
+        class: Oro\Bundle\FormBundle\Captcha\AbstractReCaptchaCompatibleService
+        arguments:
+            - '@oro_form.captcha.http_client'
+            - '@logger'
+            - '@oro_config.manager'
+            - '@oro_security.encoder.default'
+            - '@request_stack'
+
+    oro_form.captcha.hcaptcha_service:
+        class: Oro\Bundle\FormBundle\Captcha\HCaptchaService
+        parent: oro_form.captcha.recaptcha_compatible_service
+        tags:
+            - { name: oro_form.captcha_service, alias: 'hcaptcha' }
+
+    oro_form.captcha.turnstile_service:
+        class: Oro\Bundle\FormBundle\Captcha\TurnstileCaptchaService
+        parent: oro_form.captcha.recaptcha_compatible_service
+        tags:
+            - { name: oro_form.captcha_service, alias: 'turnstile' }
+
+    oro_form.captcha.settings_provider:
+        class: Oro\Bundle\FormBundle\Captcha\CaptchaSettingsProvider
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_form.captcha.service_registry'
+
+    oro_form.captcha.protected_forms_registry:
+        class: Oro\Bundle\FormBundle\Captcha\CaptchaProtectedFormsRegistry
+        arguments:
+            - !tagged_iterator { tag: 'oro_form.captcha_protected', index_by: 'form_name' }
+
+    oro_form.captcha.form_extension:
+        class: Oro\Bundle\FormBundle\Form\Extension\CaptchaExtension
+        arguments:
+            - '@oro_form.captcha.settings_provider'
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
+    oro_form.captcha.recaptcha_form_type:
+        class: Oro\Bundle\FormBundle\Form\Type\ReCaptchaType
+        arguments:
+            - '@oro_form.captcha.recaptcha_service'
+        tags:
+            - { name: form.type, alias: oro_recaptcha_token }
+
+    oro_form.captcha.hcaptcha_form_type:
+        class: Oro\Bundle\FormBundle\Form\Type\HCaptchaType
+        arguments:
+            - '@oro_form.captcha.hcaptcha_service'
+        tags:
+            - { name: form.type, alias: oro_hcaptcha_token }
+
+    oro_form.captcha.turnstile_form_type:
+        class: Oro\Bundle\FormBundle\Form\Type\TurnstileCaptchaType
+        arguments:
+            - '@oro_form.captcha.turnstile_service'
+        tags:
+            - { name: form.type, alias: oro_turnstile_token }
+
+    oro_form.captcha.captcha_protected_form_select_type:
+        class: Oro\Bundle\FormBundle\Form\Type\CaptchaProtectedFormSelectType
+        arguments:
+            - '@oro_form.captcha.protected_forms_registry'
+        tags:
+            - { name: form.type, alias: oro_captcha_protected_form_select }
+
+    oro_form.captcha.captcha_service_select_type:
+        class: Oro\Bundle\FormBundle\Form\Type\CaptchaServiceSelectType
+        arguments:
+            - '@oro_form.captcha.service_registry'
+        tags:
+            - { name: form.type, alias: oro_captcha_service_select }
+
+    oro_form.validator_constraints.is_captcha_verified:
+        class: Oro\Bundle\FormBundle\Validator\Constraints\IsCaptchaVerifiedValidator
+        arguments:
+            - '@oro_form.captcha.service_registry'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_form.validator_constraints.is_captcha_verified }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 use Oro\Bundle\NavigationBundle\Event\JsRoutingDumpListener;
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -24,7 +24,7 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new JsRoutingDumpListener($this->assetVersionManager);
     }
 
-    private function getEvent(string $commandName): ConsoleCommandEvent
+    private function getEvent(string $commandName): ConsoleTerminateEvent
     {
         $command = $this->createMock(Command::class);
         $command->expects(self::once())
@@ -39,23 +39,23 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
         $output->expects(self::never())
             ->method(self::anything());
 
-        return new ConsoleCommandEvent($command, $input, $output);
+        return new ConsoleTerminateEvent($command, $input, $output, 0);
     }
 
-    public function testOnConsoleCommandForUnsupportedCommand(): void
+    public function testOnConsoleTerminateForUnsupportedCommand(): void
     {
         $this->assetVersionManager->expects(self::never())
             ->method('updateAssetVersion');
 
-        $this->listener->onConsoleCommand($this->getEvent('test'));
+        $this->listener->onConsoleTerminate($this->getEvent('test'));
     }
 
-    public function testOnConsoleCommandForSupportedCommand(): void
+    public function testOnConsoleTerminateForSupportedCommand(): void
     {
         $this->assetVersionManager->expects(self::once())
             ->method('updateAssetVersion')
             ->with('routing');
 
-        $this->listener->onConsoleCommand($this->getEvent('fos:js-routing:dump'));
+        $this->listener->onConsoleTerminate($this->getEvent('fos:js-routing:dump'));
     }
 }

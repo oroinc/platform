@@ -72,6 +72,13 @@ services:
         tags:
             - { name: layout.context_configurator }
 
+    oro_layout.layout_context_configurator.svg_icons_support:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\SvgIconsSupportContextConfigurator
+        arguments:
+            - '@oro_layout.theme_manager'
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.theme_extension:
         class: Oro\Component\Layout\Extension\Theme\ThemeExtension
         arguments:
