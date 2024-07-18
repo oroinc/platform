@@ -1270,6 +1270,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $filterItem->open();
         $filterItem->selectType($type);
+        $this->waitForAjax();
         $filterItem->setFilterValue($value);
         $filterItem->submit();
     }

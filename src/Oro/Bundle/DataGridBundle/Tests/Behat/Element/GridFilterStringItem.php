@@ -21,6 +21,19 @@ class GridFilterStringItem extends AbstractGridFilterItem
             return;
         }
 
+        $typeSelect = $this->find(
+            'xpath',
+            sprintf(
+                './/*[contains(concat(" ",normalize-space(@class)," ")," choice-filter ")]//%s',
+                sprintf('label[starts-with(normalize-space(),"%s")]', $filterType)
+            ) . '//input[@data-choice-value-select]'
+        );
+
+        if (null !== $typeSelect) {
+            $typeSelect->click();
+            return;
+        }
+
         /* Else try choice filterType in bootstrap dropdown */
         $typeSelect = $this->find('css', 'div.choice-filter div.btn-group .dropdown-toggle');
         if (null === $typeSelect) {
@@ -50,7 +63,15 @@ class GridFilterStringItem extends AbstractGridFilterItem
     {
         $elem = $this->getElement('Chosen Select Option');
 
-        return $elem->getText();
+        if ($elem !== null) {
+            return $elem->getText();
+        }
+
+        $elem = $this->getElement('Chosen Select Radio Option');
+
+        if ($elem !== null) {
+            return $elem->getParent()->getText();
+        }
     }
 
     /**

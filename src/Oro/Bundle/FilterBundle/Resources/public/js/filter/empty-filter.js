@@ -181,6 +181,10 @@ define([
             this._handleEmptyFilter();
         },
 
+        getType() {
+            return this.$(this.criteriaValueSelectors.type).val();
+        },
+
         /**
          * Handle empty filter selection
          *
@@ -189,7 +193,7 @@ define([
         _handleEmptyFilter: function() {
             const container = this.$(this.criteriaSelector);
             const item = container.find(this.criteriaValueSelectors.value);
-            const type = container.find(this.criteriaValueSelectors.type).val();
+            const type = this.getType();
             const button = container.find(this.updateSelector);
             const query = item.val();
 
@@ -227,7 +231,7 @@ define([
         },
 
         _updateValueFieldVisibility: function() {
-            const type = this.$(this.criteriaValueSelectors.type).val();
+            const type = this.getType();
             const $field = this.$(this.criteriaValueSelectors.value);
 
             if (this.isEmptyType(type)) {

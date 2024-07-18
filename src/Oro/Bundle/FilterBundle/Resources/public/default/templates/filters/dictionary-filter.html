@@ -1,23 +1,10 @@
 <div class="choice-filter" data-dictionary-filter-template>
-    <div class="filter-select-oro-wrapper">
-        <select name="<%- name %>" class="select select--full oro-select2" data-choice-value-select
-            <% if (_.isMobile()) { %>
-                data-skip-input-widgets
-            <% } %>
-            aria-label="<%- choiceAriaLabel %>"
-        >
-            <% _.each(choices, function (option) { %>
-                <option value="<%- option.value %>"
-
-                    <% if (option.value == selectedChoice) { %>
-                        selected="selected"
-                    <% } %>
-                >
-                    <%- option.label %>
-                </option>
-            <% }); %>
-        </select>
-    </div>
+    <% let orofilter = _.macros('orofilter') %>
+    <%= orofilter.selectCondition({
+        choices: choices,
+        choiceAriaLabel: choiceAriaLabel,
+        selectedChoice: selectedChoice
+    }) %>
     <div class="value-field-frame">
         <input type="hidden"
            name="select-values-autocomplete"

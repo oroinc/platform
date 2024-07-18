@@ -195,7 +195,7 @@ define(function(require) {
                 return;
             }
             // update class of criteria dropdown
-            const type = this.$(this.criteriaValueSelectors.type).val();
+            const type = this.getType();
             const isEmptyType = this.isEmptyType(type);
             this.$('.filter-criteria').toggleClass('empty-type', isEmptyType);
             if (!isEmptyType && this.autoClose !== false) {
