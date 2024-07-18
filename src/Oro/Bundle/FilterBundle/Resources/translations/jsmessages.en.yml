@@ -120,3 +120,6 @@ oro:
         updateButton:
             aria_label: 'Apply {{ label }}'
             text: 'Apply'
+        clearFilterButton:
+            aria_label: 'Clear {{ label }}'
+            text: 'Clear filter'

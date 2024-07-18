@@ -44,6 +44,11 @@
 
         <div class="filter-action-row">
             <button type="button"
+                data-role="clear-filter"
+                class="btn btn--flat filter-clear hidden"
+                aria-label="<%- clearFilterButtonAriaLabel %>"
+            ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+            <button type="button"
                 class="btn filter-update"
                 aria-label="<%- updateButtonAriaLabel %>"
             ><%- _.__("oro.filter.updateButton.text") %></button>
