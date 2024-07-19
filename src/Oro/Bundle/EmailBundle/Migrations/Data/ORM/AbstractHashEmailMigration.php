@@ -42,7 +42,7 @@ abstract class AbstractHashEmailMigration extends AbstractEmailFixture
 
         return $manager->getRepository(EmailTemplate::class)->findOneBy([
             'name' => $template['params']['name'],
-            'entityName' => $template['params']['entityName'] ?? ''
+            'entityName' => $template['params']['entityName'] ?? null,
         ]);
     }
 

@@ -14,32 +14,27 @@ use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Mailer\Envelope\EmailOriginAwareEnvelope;
 use Oro\Bundle\EmailBundle\Sender\EmailFactory;
 use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
+class EmailModelSenderTest extends TestCase
 {
-    /** @var MailerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $mailer;
+    private MailerInterface|MockObject $mailer;
 
-    /** @var EmbeddedImagesInEmailModelHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $embeddedImagesHandler;
+    private EmbeddedImagesInEmailModelHandler|MockObject $embeddedImagesHandler;
 
-    /** @var EmailFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $symfonyEmailFactory;
+    private EmailFactory|MockObject $symfonyEmailFactory;
 
-    /** @var EmailUserFromEmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailUserFromEmailModelBuilder;
+    private EmailUserFromEmailModelBuilder|MockObject $emailUserFromEmailModelBuilder;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
 
-    /** @var EntityListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailEntityListener;
+    private EntityListener|MockObject $emailEntityListener;
 
-    /** @var EmailModelSender */
-    private $emailModelSender;
+    private EmailModelSender $emailModelSender;
 
     protected function setUp(): void
     {
@@ -327,5 +322,96 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($event);
 
         self::assertEquals($emailUser, $this->emailModelSender->send($emailModel, $emailOrigin, true));
+    }
+
+    /**
+     * @dataProvider getSendAddDoctypeWhenHtmlTypeDataProvider
+     */
+    public function testSendAddDoctypeWhenHtmlType(?string $content, ?string $expectedContent): void
+    {
+        $emailModel = (new EmailModel())
+            ->setType('html')
+            ->setBody($content);
+        $symfonyEmail = (new SymfonyEmail())
+            ->from('sender@example.org')
+            ->to('recipient@example.org')
+            ->date(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $messageId = 'sample/message/id@example.org';
+        $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
+
+        $this->embeddedImagesHandler->expects(self::once())
+            ->method('handleEmbeddedImages')
+            ->with($emailModel);
+
+        $this->symfonyEmailFactory->expects(self::once())
+            ->method('createFromEmailModel')
+            ->with($emailModel)
+            ->willReturn($symfonyEmail);
+
+        $this->mailer->expects(self::once())
+            ->method('send')
+            ->with($symfonyEmail);
+
+        $email = new EmailEntity();
+        $emailUser = (new EmailUser())
+            ->setEmail($email);
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
+            ->method('createFromEmailModel')
+            ->with($emailModel, '<' . $messageId . '>', $symfonyEmail->getDate())
+            ->willReturn($emailUser);
+
+        $this->emailUserFromEmailModelBuilder->expects(self::never())
+            ->method('setEmailOrigin');
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
+            ->method('addActivityEntities')
+            ->with($emailUser, $emailModel->getContexts());
+
+        $this->emailEntityListener->expects(self::never())
+            ->method('skipUpdateActivities');
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
+            ->method('persistAndFlush');
+
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with($event, EmailBodyAdded::NAME)
+            ->willReturn($event);
+
+        self::assertEquals($emailUser, $this->emailModelSender->send($emailModel));
+        self::assertEquals($expectedContent, $emailModel->getBody());
+    }
+
+    public function getSendAddDoctypeWhenHtmlTypeDataProvider(): array
+    {
+        $content = '<p>Bar</p>';
+        $doctype = '<!DOCTYPE HTML>';
+        $notDoctype = '!DOCTYPE HTML';
+        $doctypeHtml5 = '<!DOCTYPE html>' . $content;
+        $doctypeHTML5 = '<!DOCTYPE HTML>' . $content;
+        $doctypeHTML4 = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
+            . $content;
+        $doctypeXHTML10 = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" '
+            . '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">' . $content;
+        $doctypeXHTML11 = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" '
+            . '"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">' . $content;
+        $doctypeInTheMiddle = $content . '<!DOCTYPE HTML>' . $content;
+        $doctypeInTheEnd = $content . '<!DOCTYPE HTML>';
+
+        return [
+            [$content, '<!DOCTYPE HTML>' . $content],
+            [$doctypeInTheMiddle, '<!DOCTYPE HTML>' . $doctypeInTheMiddle],
+            [$doctypeInTheEnd, '<!DOCTYPE HTML>' . $doctypeInTheEnd],
+            [$notDoctype, '<!DOCTYPE HTML>' . $notDoctype],
+            [null, null],
+            [$doctype, $doctype],
+            [$doctypeHtml5, $doctypeHtml5],
+            [$doctypeHTML5, $doctypeHTML5],
+            [$doctypeHTML4, $doctypeHTML4],
+            [$doctypeXHTML10, $doctypeXHTML10],
+            [$doctypeXHTML11, $doctypeXHTML11],
+        ];
     }
 }
