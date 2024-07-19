@@ -112,6 +112,10 @@ class EmailTypeTest extends WebTestCase
                 'wysiwyg_options' => [
                     'valid_elements' => null,
                     'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullscreen']),
+                    'extended_valid_elements' => 'style[type|media],'
+                        . 'td[background|align|style|class|colspan|width|valign|height],'
+                        . 'span[style]',
+                    'custom_elements' => 'style'
                 ],
             ]
         );

@@ -1,3 +1,6 @@
+include:
+  - '@OroLocaleBundle:GermanLocalization.yml'
+
 Oro\Bundle\EmailBundle\Entity\EmailTemplate:
   contact:
     organization: '@organization'
@@ -37,3 +40,35 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
     type: 'txt'
     subject: 'Non-entity Related Template'
     content: 'Non-entity Related Template Content'
+
+  order_confirmation_email_parent:
+    organization: '@organization'
+    owner: '@admin'
+    is_system: 0
+    name: 'order_confirmation_email_parent'
+    entity_name: 'Oro\\Bundle\\OrderBundle\\Entity\\Order'
+    type: 'html'
+    subject: 'Default Parent Subject'
+    content: "{% extends oro_get_email_template('base_storefront') %} 
+              {% block content %}
+                Default Parent Content
+                {% block child %}
+                    Default Child Content
+                {% endblock child %}
+              {% endblock content %}"
+
+Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation:
+  parent_germany_translation:
+    template: '@order_confirmation_email_parent'
+    localization: '@localization_german'
+    subject_fallback: false
+    subject: 'German Parent Subject'
+    content_fallback: false
+    content: "{% extends oro_get_email_template('base_storefront') %} 
+              {% block content %}
+                German Parent Content
+                {% block child %}
+                    German Child Content
+                {% endblock child %}
+              {% endblock content %}"
+
