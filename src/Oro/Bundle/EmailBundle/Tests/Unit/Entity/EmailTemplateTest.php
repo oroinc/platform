@@ -76,6 +76,22 @@ class EmailTemplateTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($clone, $clonedLocalization->getTemplate());
     }
 
+    public function testParse(): void
+    {
+        $template = <<<TEXT
+            @subject = value1
+            @parameter = value2
+
+            Demo content @400,500 = value3
+            This line is required!
+        TEXT;
+
+        $parseResult = EmailTemplate::parseContent($template);
+
+        self::assertEquals("Demo content @400,500 = value3\n    This line is required!", $parseResult['content']);
+        self::assertEquals(['subject' => 'value1', 'parameter' => 'value2'], $parseResult['params']);
+    }
+
     public function testToString(): void
     {
         $template = new EmailTemplate('template_name');
