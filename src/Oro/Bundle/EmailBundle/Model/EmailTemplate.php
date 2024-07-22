@@ -58,7 +58,7 @@ class EmailTemplate implements EmailTemplateInterface
     {
         $params = [];
 
-        if (preg_match_all('#(?:\{\#\s*)?@(?P<name>.+?)\s?=\s?(?P<value>.*?)(?:\s*\#\})?\n#i', $content, $matches)) {
+        if (preg_match_all('#(?:\{\#\s*)?@(?P<name>\w+?)\s?=\s?(?P<value>.*?)(?:\s*\#\})?\n#i', $content, $matches)) {
             foreach ($matches[0] as $i => $match) {
                 $name = trim($matches['name'][$i]);
                 $value = trim($matches['value'][$i]);
