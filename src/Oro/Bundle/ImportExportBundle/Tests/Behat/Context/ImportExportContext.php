@@ -773,8 +773,9 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     {
         $importSubmitButton = $this->openImportModalAndReturnImportSubmitButton();
         $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
+        $this->getDriver()->waitForAjax();
         $this->createElement('ActiveImportStrategyField')->selectOption($strategy);
-
+        $this->getDriver()->waitForAjax();
         $importSubmitButton->press();
         $this->getDriver()->waitForAjax(240000);
     }
