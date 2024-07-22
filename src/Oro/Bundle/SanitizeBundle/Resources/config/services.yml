@@ -29,6 +29,13 @@ services:
         tags:
             - { name: 'oro_sanitize.field_rule.processor.guesser' }
 
+    Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\CryptedTextGuesser:
+        arguments:
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Md5Processor'
+            - '@Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper'
+        tags:
+            - { name: 'oro_sanitize.field_rule.processor.guesser' }
+
     Oro\Bundle\SanitizeBundle\RuleProcessor\Field\JsonBuildPairsPostProcessor:
         arguments:
             - '@doctrine'

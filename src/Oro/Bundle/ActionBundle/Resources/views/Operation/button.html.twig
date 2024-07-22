@@ -41,12 +41,12 @@
             {% if app.request.attributes.get('_layout')|default(false) == false and params.buttonOptions.icon is defined or params.buttonOptions.iCss is defined %}
                 <span class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text" aria-hidden="true"></span>
             {% endif %}
-            {# Rendering svg icons for frontstore #}
+            {# Rendering icons for storefront #}
             {% if app.request.attributes.get('_layout')|default(false) and params.frontendOptions.options.icon is defined %}
                 {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
                 {{ renderIcon.icon({
                     name: params.frontendOptions.options.icon,
-                    extraClass: params.frontendOptions.options.iconSize is defined ? params.frontendOptions.options.iconSize ? ''
+                    extraClass: params.frontendOptions.options.iconSize is defined ? params.frontendOptions.options.iconSize : ''
                 }) }}
             {% endif %}
             {% if not noLinkLabel %}

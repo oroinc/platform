@@ -12,3 +12,6 @@ trusted_data:
             getEntityChoices:
                 select: true
                 entity: true
+    safe_methods:
+        Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager:
+            getTableName: true

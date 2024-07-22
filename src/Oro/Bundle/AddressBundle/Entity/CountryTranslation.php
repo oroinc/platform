@@ -4,12 +4,13 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\AddressBundle\Entity\Repository\CountryTranslationRepository;
 use Oro\Bundle\LocaleBundle\Entity\AbstractTranslation;
 
 /**
  * Represent Gedmo translation dictionary for Country entity.
  */
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: CountryTranslationRepository::class)]
 #[ORM\Table(name: 'oro_dictionary_country_trans')]
 #[ORM\Index(columns: ['locale', 'object_class', 'field', 'foreign_key'], name: 'country_translation_idx')]
 class CountryTranslation extends AbstractTranslation

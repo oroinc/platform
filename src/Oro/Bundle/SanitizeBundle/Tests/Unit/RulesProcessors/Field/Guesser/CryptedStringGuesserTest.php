@@ -8,8 +8,9 @@ use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProvider;
 use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Guesser\CryptedStringGuesser;
 use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Helper\ProcessorHelper;
 use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\Md5Processor;
+use PHPUnit\Framework\TestCase;
 
-class CryptedStringGuesserTest extends \PHPUnit\Framework\TestCase
+class CryptedStringGuesserTest extends TestCase
 {
     private const DUMMY_CLASS_NAME = 'DummyClass';
     private const DUMMY_FIELD_NAME = 'dummyField';
