@@ -103,13 +103,14 @@ class ConfigurableImportStrategyHelperTest extends WebTestCase
         $family2 = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_2);
         $familyNormalized = new AttributeFamily();
         $familyNormalized->setCode($family2->getCode());
+        $familyNormalized->addLabel($family2->getLabel());
 
         $this->helper->importEntity($family1, $familyNormalized, ['attributeGroups']);
 
         $this->assertTrue(
             $this->logger->hasRecord(
                 [
-                    'message' => 'Property initialized but not changed during import.',
+                    'message' => 'Property changed during import.',
                     'context' => [
                         'databaseEntityClass' => AttributeFamily::class,
                         'propertyName' => 'labels',
@@ -118,6 +119,7 @@ class ConfigurableImportStrategyHelperTest extends WebTestCase
                 LogLevel::DEBUG
             )
         );
+
         $this->assertFalse(
             $this->logger->hasRecord(
                 [
