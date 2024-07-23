@@ -29,6 +29,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Helper methods for import strategies.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImportStrategyHelper
 {
@@ -276,9 +278,17 @@ class ImportStrategyHelper
                 continue;
             }
 
-            $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
-            $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
+            $this->processImportedEntityProperty($basicEntity, $importedEntity, $propertyName);
         }
+    }
+
+    protected function processImportedEntityProperty(
+        object $targetEntity,
+        object $sourceEntity,
+        string $property
+    ): void {
+        $importedValue = $this->fieldHelper->getObjectValue($sourceEntity, $property);
+        $this->fieldHelper->setObjectValue($targetEntity, $property, $importedValue);
     }
 
     /**
