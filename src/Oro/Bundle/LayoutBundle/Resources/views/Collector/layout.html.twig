@@ -80,9 +80,7 @@
         }
 
         .tree-menu {
-            width: calc(100% - 770px);
             position: relative;
-            float: left;
         }
 
         .tree-menu li {
@@ -102,26 +100,28 @@
 
         .tree-menu-wrapper {
             overflow: auto;
+            padding-top: 24px;
+        }
+
+        .tree-details-tab {
+            display: grid;
+            grid-template-columns: 50% auto;
+            gap: 16px;
         }
 
         .tree-details-container {
-            margin-left: calc(100% - 750px);
             padding: 0;
             border: none;
-            width: 750px;
-        }
-
-        .tree-details-container.fixed {
-            position: fixed;
-            top: 5px;
-            right: 15px;
-            height: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
         }
 
         #tree-menu ul {
             margin-left: 20px;
+        }
+
+        .tree-menu ul {
+            width: max-content;
+            min-width: calc(100% - 40px);
+            margin-top: 0;
         }
 
         .tree ul .tree-inner {
@@ -131,7 +131,9 @@
         }
 
         .expand-all {
-            position: relative;
+            position: absolute;
+            right: 30px;
+            top: 0;
             text-align: right;
             z-index: 1;
         }
@@ -168,6 +170,14 @@
             text-decoration: line-through;
         }
 
+        .theme-dark .tree .tree-inner:not(.active):hover {
+            background: var(--gray-500);
+        }
+
+        .theme-dark .tree-menu:after {
+            background: linear-gradient(to left, #3e3e3e 0%, rgba(249, 249, 249, 0) 100%);
+        }
+
         @media screen and (max-width: 1100px) {
             .tree-menu {
                 width: 100%;
@@ -179,16 +189,13 @@
                 margin-left: 0;
                 padding-top: 20px;
             }
-
-            .tree-details-container.fixed {
-                position: static;
-                overflow: visible;
-                max-height: inherit;
-            }
         }
 
         .tree-details {
             overflow: auto;
+            position: sticky;
+            top: 0;
+            max-height: 100vh;
         }
 
         .block-option-value code {
@@ -234,12 +241,12 @@
                                     Layout Tree
                                     <span class="badge">{{ layout_data.count }} blocks</span>
                                 </h3>
-                                <div class="tab-content">
+                                <div class="tab-content tree-details-tab">
                                     {% if layout_data.views|length %}
                                         <div id="tree-menu-{{ hash }}" class="tree tree-menu">
                                             <div class="tree-menu-wrapper">
                                                 <div class="expand-all">
-                                                    <a id="expand-all-{{ hash }}" href="#" data-collapsed-title="Collapse All">Expand All</a>
+                                                    <a id="expand-all-{{ hash }}" href="#" type="button" data-collapsed-title="Collapse All">Expand All</a>
                                                 </div>
                                                 <ul>
                                                     {% for viewId, viewData in layout_data.views %}
@@ -298,7 +305,7 @@
                             var states = {};
 
                             var isCollapsed = function (button) {
-                                return Sfjs.hasClass(button, 'closed');
+                                return button.classList.contains('closed');
                             };
 
                             var isExpanded = function (button) {
@@ -314,8 +321,8 @@
                                 }
 
                                 if (isCollapsed(button)) {
-                                    Sfjs.removeClass(button, 'closed');
-                                    Sfjs.removeClass(target, 'hidden');
+                                    button.classList.remove('closed');
+                                    target.classList.remove('hidden');
 
                                     states[targetId] = 1;
                                     storage.setItem(STORAGE_KEY, states);
@@ -331,8 +338,8 @@
                                 }
 
                                 if (isExpanded(button)) {
-                                    Sfjs.addClass(button, 'closed');
-                                    Sfjs.addClass(target, 'hidden');
+                                    button.classList.add('closed');
+                                    target.classList.add('hidden');
 
                                     states[targetId] = 0;
                                     storage.setItem(STORAGE_KEY, states);
@@ -340,7 +347,7 @@
                             };
 
                             var toggle = function (button) {
-                                if (Sfjs.hasClass(button, 'closed')) {
+                                if (button.classList.contains('closed')) {
                                     expand(button);
                                 } else {
                                     collapse(button);
@@ -367,8 +374,8 @@
                                     }
 
                                     // correct the initial state of the button
-                                    if (Sfjs.hasClass(target, 'hidden')) {
-                                        Sfjs.addClass(buttons[i], 'closed');
+                                    if (target.classList.contains('hidden')) {
+                                        buttons[i].classList.add('closed');
                                     }
 
                                     // attach listener for expanding/collapsing the target
@@ -434,15 +441,15 @@
                                 }
 
                                 if (activeTab) {
-                                    Sfjs.removeClass(activeTab, 'active');
+                                    activeTab.classList.remove('active');
                                 }
 
                                 if (activeTarget) {
-                                    Sfjs.addClass(activeTarget, 'hidden');
+                                    activeTarget.classList.add('hidden');
                                 }
 
-                                Sfjs.addClass(tab, 'active');
-                                Sfjs.removeClass(target, 'hidden');
+                                tab.classList.add('active');
+                                target.classList.remove('hidden');
 
                                 activeTab = tab;
                                 activeTarget = target;
@@ -459,7 +466,7 @@
 
                                     clickHandler(tabs[i], select);
 
-                                    Sfjs.addClass(target, 'hidden');
+                                    target.classList.add('hidden');
                                 }
 
                                 select(tabs[0]);
@@ -474,8 +481,13 @@
                         var tabTarget = new TabView();
                         var storage = new JsonStorage(sessionStorage);
                         var toggler = new Toggler(storage);
+                        var flushElementListeners = function(element) {
+                            element.replaceWith(element.cloneNode(true));
+                        };
+
                         var clickHandler = function (element, callback) {
-                            Sfjs.addEventListener(element, 'click', function (e) {
+                            flushElementListeners(element);
+                            element.addEventListener('click', function (e) {
                                 if (!e) {
                                     e = window.event;
                                 }
@@ -526,21 +538,12 @@
                                 storage.setItem(STORAGE_KEY, !isExpanded);
                             };
 
-                            clickHandler(target, toggleAll);
+                            target.addEventListener('click', event => {
+                                event.preventDefault();
+                                event.stopPropagation();
 
-                            function fitDetailsContainer() {
-                                var container = document.getElementById('tree-details-container-{{ hash }}');
-
-                                if (window.scrollY > 375) {
-                                    Sfjs.addClass(document.getElementById('tree-details-container-{{ hash }}'), 'fixed');
-                                    container.style.maxHeight = window.innerHeight - container.offsetTop + 'px';
-                                } else {
-                                    Sfjs.removeClass(document.getElementById('tree-details-container-{{ hash }}'), 'fixed');
-                                    container.style.maxHeight = '';
-                                }
-                            }
-                            window.addEventListener('scroll', fitDetailsContainer);
-                            fitDetailsContainer();
+                                toggleAll();
+                            });
                         })();
                     }());
                 </script>
@@ -559,7 +562,7 @@
         <div class="tree-inner{% if data.visible == false %} underline{% endif %}"
              data-tab-target-id="{{ data.id }}-{{ hash }}-details">
             {% if data.children is not empty %}
-                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-{{ hash }}-children" href="#"><span
+                <a type="button" class="toggle-button" data-toggle-target-id="{{ data.id }}-{{ hash }}-children"><span
                             class="toggle-icon"></span></a>
             {% else %}
                 <div class="toggle-icon empty"></div>
