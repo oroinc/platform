@@ -27,6 +27,9 @@ dynamic-imports:
         - oroform/js/app/components/inline-editable-view-component
         - oroform/js/app/components/select-create-inline-type-async-component
         - oroform/js/app/components/select-create-inline-type-component
+        - oroform/js/app/components/captcha-turnstile-component
+        - oroform/js/app/components/captcha-hcaptcha-component
+        - oroform/js/app/components/captcha-recaptcha-component
         - oroform/js/app/views/checkbox-view
         - oroform/js/app/views/color-table-view
         - oroform/js/app/views/editor/date-editor-view

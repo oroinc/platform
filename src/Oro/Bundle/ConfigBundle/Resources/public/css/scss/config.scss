@@ -92,6 +92,10 @@
             .control-subgroup {
                 margin-right: $content-padding-medium;
             }
+
+            :is(.control-subgroup .choice-widget-expanded__item label) {
+                margin-top: $content-padding-small;
+            }
         }
     }
 

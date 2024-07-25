@@ -163,7 +163,8 @@
     "suggest": {
         "ext-imap": "To improve parsing of email headers.",
         "ext-soap": "To enable SOAP API calls.",
-        "ext-tidy": "To improve parsing of email content."
+        "ext-tidy": "To improve parsing of email content.",
+        "google/recaptcha": "To improve Google reCAPTCHA v3 service communication."
     },
     "repositories": {
         "oro": {

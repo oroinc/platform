@@ -3,23 +3,84 @@
 namespace Oro\Bundle\FormBundle\DependencyInjection;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Oro FormBundle Configuration
+ */
 class Configuration implements ConfigurationInterface
 {
+    public const ROOT_NODE = 'oro_form';
+    public const WYSIWYG_ENABLED = 'wysiwyg_enabled';
+    public const ENABLED_CAPTCHA = 'enabled_captcha';
+    public const CAPTCHA_SERVICE = 'captcha_service';
+    public const CAPTCHA_PROTECTED_FORMS = 'captcha_protected_forms';
+
+    public const RECAPTCHA_PUBLIC_KEY = 'recaptcha_public_key';
+    public const RECAPTCHA_PRIVATE_KEY = 'recaptcha_private_key';
+    public const RECAPTCHA_MINIMAL_ALLOWED_SCORE = 'recaptcha_minimal_allowed_score';
+
+    public const HCAPTCHA_PUBLIC_KEY = 'hcaptcha_public_key';
+    public const HCAPTCHA_PRIVATE_KEY = 'hcaptcha_private_key';
+
+    public const TURNSTILE_PUBLIC_KEY = 'turnstile_public_key';
+    public const TURNSTILE_PRIVATE_KEY = 'turnstile_private_key';
+
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder('oro_form');
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE);
         $rootNode = $treeBuilder->getRootNode();
 
         SettingsBuilder::append(
             $rootNode,
             [
-                'wysiwyg_enabled' => ['value' => true, 'type' => 'bool'],
+                self::WYSIWYG_ENABLED => ['value' => true, 'type' => 'bool'],
+                self::ENABLED_CAPTCHA => [
+                    'value' => false,
+                    'type' => 'boolean'
+                ],
+                self::CAPTCHA_SERVICE => [
+                    'value' => 'recaptcha',
+                    'type' => 'string'
+                ],
+                self::CAPTCHA_PROTECTED_FORMS => [
+                    'value' => [],
+                    'type' => 'array'
+                ],
+                self::RECAPTCHA_PUBLIC_KEY => [
+                    'value' => '',
+                    'type' => 'string'
+                ],
+                self::RECAPTCHA_PRIVATE_KEY => [
+                    'value' => '',
+                    'type' => 'string'
+                ],
+                self::RECAPTCHA_MINIMAL_ALLOWED_SCORE => [
+                    'value' => '0.5',
+                    'type' => 'integer'
+                ],
+                self::HCAPTCHA_PUBLIC_KEY => [
+                    'value' => '',
+                    'type' => 'string'
+                ],
+                self::HCAPTCHA_PRIVATE_KEY => [
+                    'value' => '',
+                    'type' => 'string'
+                ],
+                self::TURNSTILE_PUBLIC_KEY => [
+                    'value' => '',
+                    'type' => 'string'
+                ],
+                self::TURNSTILE_PRIVATE_KEY => [
+                    'value' => '',
+                    'type' => 'string'
+                ]
             ]
         );
 
@@ -86,5 +147,10 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         return $treeBuilder;
+    }
+
+    public static function getConfigKey(string $key): string
+    {
+        return TreeUtils::getConfigKey(self::ROOT_NODE, $key);
     }
 }
