@@ -5,6 +5,9 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException;
 
+/**
+ * ActionGroup service interface. ActionGroups are services that contain common logic used by actions and workflows.
+ */
 interface ActionGroupInterface
 {
     /**

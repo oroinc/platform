@@ -7,6 +7,9 @@ use Oro\Component\Action\Model\AbstractAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactoryInterface as ConditionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * Action service assembler.
+ */
 class ActionAssembler extends AbstractAssembler
 {
     const PARAMETERS_KEY = 'parameters';

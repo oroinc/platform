@@ -355,6 +355,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->cannotBeEmpty()
                     ->end()
                     ->arrayNode('conditional_steps_to')
+                        ->useAttributeAsKey('step_name')
                         ->prototype('variable')
                         ->end()
                     ->end()

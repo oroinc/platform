@@ -5,6 +5,9 @@ namespace Oro\Component\Action\Event;
 use Oro\Component\Action\Model\AbstractStorage;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event for extendable action.
+ */
 class ExtendableActionEvent extends Event
 {
     public const NAME = 'extendable_action';

@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 
 /**
- * The provider for workflow related security metadata.
+ * The provider for a workflow related security metadata.
  */
 class WorkflowAclMetadataProvider
 {

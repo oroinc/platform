@@ -4,6 +4,9 @@ namespace Oro\Component\Action\Model;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
 
+/**
+ * Processes extendable condition errors.
+ */
 interface ExtendableConditionEventErrorsProcessorInterface
 {
     public function getPreparedErrors(

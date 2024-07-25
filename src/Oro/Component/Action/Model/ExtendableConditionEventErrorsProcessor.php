@@ -6,6 +6,9 @@ use Oro\Component\Action\Event\ExtendableConditionEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Processes extendable condition errors.
+ */
 class ExtendableConditionEventErrorsProcessor implements ExtendableConditionEventErrorsProcessorInterface
 {
     public function __construct(

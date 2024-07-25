@@ -12,6 +12,9 @@ use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
+/**
+ * Service that represents ActionGroup created based on YAML definition.
+ */
 class ActionGroup implements ActionGroupInterface
 {
     private ActionFactoryInterface $actionFactory;
@@ -20,7 +23,7 @@ class ActionGroup implements ActionGroupInterface
     private ParametersResolver $parametersResolver;
     private ActionGroupDefinition $definition;
 
-    /** @var array|Parameter[] */
+    /** @var array<string,Parameter>|null */
     private ?array $parameters = null;
 
     public function __construct(
@@ -61,7 +64,7 @@ class ActionGroup implements ActionGroupInterface
         if ($config = $this->definition->getConditions()) {
             $conditions = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $config);
             if ($conditions instanceof ConfigurableCondition) {
-                return $conditions->evaluate($data, $errors);
+                return (bool)$conditions->evaluate($data, $errors);
             }
         }
 
@@ -78,6 +81,9 @@ class ActionGroup implements ActionGroupInterface
         }
     }
 
+    /**
+     * @return array<string,Parameter>
+     */
     public function getParameters(): array
     {
         if ($this->parameters === null) {

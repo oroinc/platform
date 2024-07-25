@@ -23,6 +23,11 @@ class EventDispatcher
         $this->disabledEvents[$eventName] = true;
     }
 
+    public function restoreDisabledEvent(string $eventName): void
+    {
+        unset($this->disabledEvents[$eventName]);
+    }
+
     public function dispatch(
         WorkflowItemAwareEvent $event,
         string $eventName,

@@ -8,6 +8,9 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupInterface;
 use Oro\Bundle\ActionBundle\Model\Parameter;
 use Oro\Component\Action\Exception\InvalidParameterException;
 
+/**
+ * ActionGroup Parameters Resolver.
+ */
 class ParametersResolver
 {
     /** @var array */
@@ -81,11 +84,13 @@ class ParametersResolver
         foreach ($actionGroup->getParameters() as $parameter) {
             $parameterName = $parameter->getName();
 
-            $snakeCaseParameterName = $this->asSnakeCase($parameterName);
             if ($data->offsetExists($parameterName)) {
                 $values[$parameterName] = $data->offsetGet($parameterName);
-            } elseif ($checkSnakeCase && $data->offsetExists($snakeCaseParameterName)) {
-                $values[$parameterName] = $data->offsetGet($snakeCaseParameterName);
+            } elseif ($checkSnakeCase) {
+                $snakeCaseParameterName = $this->asSnakeCase($parameterName);
+                if ($data->offsetExists($snakeCaseParameterName)) {
+                    $values[$parameterName] = $data->offsetGet($snakeCaseParameterName);
+                }
             }
         }
 
@@ -208,7 +213,7 @@ class ParametersResolver
     /**
      * @see \Symfony\Bundle\MakerBundle\Str::asTwigVariable
      */
-    public function asSnakeCase(string $parameterName): string
+    private function asSnakeCase(string $parameterName): string
     {
         $parameterName = trim($parameterName);
         $parameterName = preg_replace('/[^a-zA-Z0-9_]/', '_', $parameterName);

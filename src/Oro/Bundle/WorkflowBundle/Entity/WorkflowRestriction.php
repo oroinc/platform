@@ -9,8 +9,6 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
 
 /**
  * Represents an entity restriction used in workflows.
- *
- *
  */
 #[ORM\Entity(repositoryClass: WorkflowRestrictionRepository::class)]
 #[ORM\Table(name: 'oro_workflow_restriction')]

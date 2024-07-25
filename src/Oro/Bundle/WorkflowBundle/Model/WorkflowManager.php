@@ -21,7 +21,8 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Handles logic for getting workflow, transitions, workflow items as well as all other related actions
+ * Handles logic for getting workflow, transitions, workflow items as well as all other related actions.
+ *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -351,12 +352,12 @@ class WorkflowManager implements LoggerAwareInterface
      * @throws InvalidTransitionException
      * @throws WorkflowException
      */
-    public function transit(WorkflowItem $workflowItem, $transition, Collection $errors = null)
+    public function transit(WorkflowItem $workflowItem, string|Transition $transition, Collection $errors = null)
     {
         $this->transitWorkflow($workflowItem, $transition, $errors, self::METHOD_TRANSIT);
     }
 
-    public function transitWithoutChecks(WorkflowItem $workflowItem, $transition): void
+    public function transitWithoutChecks(WorkflowItem $workflowItem, string|Transition $transition): void
     {
         $this->transitWorkflow($workflowItem, $transition, null, self::METHOD_TRANSIT_WITHOUT_ANY_CHECKS);
     }

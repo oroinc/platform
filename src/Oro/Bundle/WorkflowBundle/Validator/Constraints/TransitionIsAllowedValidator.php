@@ -10,6 +10,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validate that workflow transition is allowed.
+ */
 class TransitionIsAllowedValidator extends ConstraintValidator
 {
     const ALIAS = 'oro_workflow_transition_is_allowed';

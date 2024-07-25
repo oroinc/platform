@@ -14,6 +14,7 @@ use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -47,7 +48,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         $this->transitionServiceLocator = $transitionServiceLocator;
     }
 
-    public function assemble(array $configuration, iterable $steps, iterable $attributes): Collection
+    public function assemble(array $configuration, array|Collection $steps, array|Collection $attributes): Collection
     {
         $transitionsConfiguration = $this->getOption(
             $configuration,
@@ -95,13 +96,16 @@ class TransitionAssembler extends BaseAbstractAssembler
         string $name,
         array $options,
         array $definition,
-        iterable $steps,
-        iterable $attributes
+        array|Collection $steps,
+        array|Collection $attributes
     ): Transition {
         $transitionServiceName = $this->getOption($options, 'transition_service', null);
         $transitionService = null;
         if ($transitionServiceName) {
             $transitionService = $this->transitionServiceLocator->get($transitionServiceName);
+            if ($transitionService instanceof ResetInterface) {
+                $transitionService->reset();
+            }
         }
 
         $this->assertOptions($options, array('step_to'));
@@ -177,7 +181,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         return empty($conditions) ? $newCondition : ['@and' => [$newCondition, $conditions]];
     }
 
-    protected function assembleFormOptions(array $options, iterable $attributes, string $transitionName): array
+    protected function assembleFormOptions(array $options, array|Collection $attributes, string $transitionName): array
     {
         $formOptions = $this->getOption($options, 'form_options', []);
 
@@ -256,7 +260,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         Transition $transition,
         array $options,
         string $stepToName,
-        iterable $steps
+        array|Collection $steps
     ): void {
         if (empty($options['conditional_steps_to'])) {
             return;

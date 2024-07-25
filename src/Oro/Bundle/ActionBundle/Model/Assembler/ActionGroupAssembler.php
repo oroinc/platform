@@ -9,6 +9,9 @@ use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
+/**
+ * ActionGroup service assembler. Assembles action group based on a configuration.
+ */
 class ActionGroupAssembler extends AbstractAssembler
 {
     private ActionFactoryInterface $actionFactory;
