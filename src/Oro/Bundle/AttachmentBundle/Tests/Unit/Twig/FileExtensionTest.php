@@ -6,8 +6,10 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\FilesTemplateProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
@@ -16,26 +18,27 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileExtensionTest extends \PHPUnit\Framework\TestCase
+class FileExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     private const FILE_ID = 42;
 
-    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
+    private AttachmentManager|MockObject $attachmentManager;
 
-    private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-        $pictureSourcesProvider;
+    private PictureSourcesProviderInterface|MockObject $pictureSourcesProvider;
 
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
+    private ConfigManager|MockObject $configManager;
 
-    private FileTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject $fileTitleProvider;
+    private FileTitleProviderInterface|MockObject $fileTitleProvider;
 
     private FileExtension $extension;
 
@@ -55,14 +58,16 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
             ->add(ConfigManager::class, $this->configManager)
             ->add(ManagerRegistry::class, $managerRegistry)
             ->add(FileTitleProviderInterface::class, $this->fileTitleProvider)
+            ->add(FilesTemplateProvider::class, new FilesTemplateProvider())
+            ->add(ImagesTemplateProvider::class, new ImagesTemplateProvider())
             ->getContainer($this);
 
         $this->extension = new FileExtension($serviceLocator);
 
-        $this->file = new TestFile();
-        $this->file->setId(self::FILE_ID);
-        $this->file->setFilename('name.pdf');
-        $this->file->setOriginalFilename('original-name.pdf');
+        $this->file = (new TestFile())
+            ->setId(self::FILE_ID)
+            ->setFilename('name.pdf')
+            ->setOriginalFilename('original-name.pdf');
 
         $fileRepo = $this->createMock(EntityRepository::class);
         $managerRegistry
@@ -369,7 +374,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         File $file,
         int $width = 16,
         int $height = 16
-    ): Environment|\PHPUnit\Framework\MockObject\MockObject {
+    ): Environment|MockObject {
         $environment = $this->createMock(Environment::class);
         $environment->expects(self::once())
             ->method('render')

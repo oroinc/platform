@@ -209,5 +209,13 @@ define(function(require) {
         return null;
     };
 
+    _.getThemeSpriteMetadata = function() {
+        if ('themeSpriteMetadata' in config) {
+            return config.themeSpriteMetadata;
+        }
+
+        return null;
+    };
+
     return _;
 });

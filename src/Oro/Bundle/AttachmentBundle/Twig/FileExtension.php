@@ -7,8 +7,12 @@ use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\FilesTemplateProvider;
+use Oro\Bundle\AttachmentBundle\Provider\FilesTemplateProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProvider;
+use Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -28,13 +32,13 @@ use Twig\TwigFunction;
 class FileExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     private const DEFAULT_THUMB_SIZE = 16;
-    private const FILES_TEMPLATE = '@OroAttachment/Twig/file.html.twig';
-    private const IMAGES_TEMPLATE = '@OroAttachment/Twig/image.html.twig';
 
     private ContainerInterface $container;
     private ?AttachmentManager $attachmentManager = null;
     private ?PictureSourcesProviderInterface $pictureSourcesProvider = null;
     private ?ConfigManager $configManager = null;
+    private ?FilesTemplateProviderInterface $filesTemplateProvider = null;
+    private ?ImagesTemplateProviderInterface $imagesTemplateProvider = null;
 
     public function __construct(ContainerInterface $container)
     {
@@ -141,7 +145,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         }
 
         return $environment->render(
-            self::FILES_TEMPLATE,
+            $this->getFilesTemplateProvider()->getTemplate(),
             [
                 'iconClass' => $this->getAttachmentManager()->getAttachmentIconClass($file),
                 'url' => $url,
@@ -175,7 +179,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         }
 
         return $environment->render(
-            self::IMAGES_TEMPLATE,
+            $this->getImagesTemplateProvider()->getTemplate(),
             [
                 'file' => $file,
                 'width' => $width,
@@ -332,6 +336,8 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             PropertyAccessorInterface::class,
             FileTitleProviderInterface::class,
             CacheManager::class,
+            FilesTemplateProvider::class,
+            ImagesTemplateProvider::class,
         ];
     }
 
@@ -365,5 +371,23 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     private function getDoctrine(): ManagerRegistry
     {
         return $this->container->get(ManagerRegistry::class);
+    }
+
+    private function getFilesTemplateProvider(): FilesTemplateProviderInterface
+    {
+        if (null === $this->filesTemplateProvider) {
+            $this->filesTemplateProvider = $this->container->get(FilesTemplateProvider::class);
+        }
+
+        return $this->filesTemplateProvider;
+    }
+
+    private function getImagesTemplateProvider(): ImagesTemplateProviderInterface
+    {
+        if (null === $this->imagesTemplateProvider) {
+            $this->imagesTemplateProvider = $this->container->get(ImagesTemplateProvider::class);
+        }
+
+        return $this->imagesTemplateProvider;
     }
 }

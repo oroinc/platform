@@ -6,12 +6,6 @@
 } %>
 
 <%
-    if (obj.iconClassName) {
-        obj.iconClassName = obj.iconClassName.replace(/^fa-/, '');
-    }
-    if (obj.icon) {
-        obj.icon = obj.icon.replace(/^fa-/, '');
-    }
     const actionClassNames = typeof obj.actionClassNames === 'string' ? obj.actionClassNames.split(' ') : [];
     actionClassNames.push('action btn');
     if (className) {
