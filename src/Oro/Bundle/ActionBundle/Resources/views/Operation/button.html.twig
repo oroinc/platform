@@ -46,7 +46,7 @@
                 {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
                 {{ renderIcon.icon({
                     name: params.frontendOptions.options.icon,
-                    extraClass: params.frontendOptions.options.iconSize is defined ? params.frontendOptions.options.iconSize ? ''
+                    extraClass: params.frontendOptions.options.iconSize is defined ? params.frontendOptions.options.iconSize : ''
                 }) }}
             {% endif %}
             {% if not noLinkLabel %}

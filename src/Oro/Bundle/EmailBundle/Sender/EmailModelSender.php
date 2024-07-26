@@ -20,6 +20,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class EmailModelSender
 {
+    protected const DOCTYPE_REGEX = '/^<!DOCTYPE.*>/i';
+    protected const DOCTYPE = '<!DOCTYPE HTML>';
+
     private MailerInterface $mailer;
     private EmbeddedImagesInEmailModelHandler $embeddedImagesInEmailModelHandler;
     private EmailFactory $symfonyEmailFactory;
@@ -55,6 +58,8 @@ class EmailModelSender
             // Extracts embedded images from email body and adds them as attachments.
             $this->embeddedImagesInEmailModelHandler->handleEmbeddedImages($emailModel);
         }
+
+        $this->handleDoctype($emailModel);
 
         $symfonyEmail = $this->symfonyEmailFactory->createFromEmailModel($emailModel);
 
@@ -99,5 +104,24 @@ class EmailModelSender
         $this->eventDispatcher->dispatch($event, EmailBodyAdded::NAME);
 
         return $emailUser;
+    }
+
+    /**
+     * Adds DOCTYPE if not specified
+     *
+     * @param EmailModel $emailModel
+     *
+     * @return void
+     */
+    protected function handleDoctype(EmailModel $emailModel): void
+    {
+        if ($emailModel->getType() !== 'html') {
+            return;
+        }
+
+        $content = $emailModel->getBody();
+        if ($content && !preg_match(self::DOCTYPE_REGEX, trim($content))) {
+            $emailModel->setBody(self::DOCTYPE . $content);
+        }
     }
 }

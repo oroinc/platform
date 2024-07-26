@@ -31,6 +31,13 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class EmailType extends AbstractType
 {
+    private const WYSIWYG_VALID_ELEMENTS = [
+        'style[type|media]',
+        'td[background|align|style|class|colspan|width|valign|height]',
+        'span[style]'
+    ];
+    private const WYSIWYG_CUSTOM_ELEMENTS = ['style'];
+
     private AuthorizationCheckerInterface $authorizationChecker;
 
     private TokenAccessorInterface $tokenAccessor;
@@ -282,6 +289,8 @@ class EmailType extends AbstractType
         return [
             'valid_elements' => null, //all elements are valid
             'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullscreen']),
+            'extended_valid_elements' => implode(',', self::WYSIWYG_VALID_ELEMENTS),
+            'custom_elements' => implode(',', self::WYSIWYG_CUSTOM_ELEMENTS)
         ];
     }
 }

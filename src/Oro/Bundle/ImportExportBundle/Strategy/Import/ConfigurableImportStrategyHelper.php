@@ -12,141 +12,158 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ *
  * Helper methods for import strategies with performance improvements:
  * - Do not override collections fully to make UoW faster
  * - Compare DateTimes by values
- * - Handle different scalar types, most of data are strings in imported data but different types in the DB.
+ * - Handle different scalar types, most of the data are strings in imported data but different types in the DB.
  */
 class ConfigurableImportStrategyHelper extends ImportStrategyHelper
 {
     use LoggerAwareTrait;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    private ?EventDispatcherInterface $eventDispatcher = null;
 
-    /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function importEntity($databaseEntity, $importedEntity, array $excludedProperties = [])
+    public function importEntity($databaseEntity, $importedEntity, array $excludedProperties = []): void
     {
-        $databaseEntityClass = $this->verifyClass($databaseEntity, $importedEntity);
-
-        $entityProperties = $this->getEntityPropertiesByClassName($databaseEntityClass);
-        $importedEntityProperties = array_diff($entityProperties, $excludedProperties);
-        $classMetadata = $this
-            ->getEntityManager($databaseEntityClass)
-            ->getClassMetadata($databaseEntityClass);
-
-        foreach ($importedEntityProperties as $propertyName) {
-            // we should not overwrite deleted fields
-            if ($this->isDeletedField($databaseEntityClass, $propertyName)) {
-                continue;
-            }
-
-            $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
-            $databaseValue = $this->fieldHelper->getObjectValue($databaseEntity, $propertyName);
-
-            if ($classMetadata->hasAssociation($propertyName)
-                && $classMetadata->getAssociationMapping($propertyName)['type'] & ClassMetadataInfo::TO_MANY) {
-                /** @var Collection $importedValue */
-                if (!$importedValue instanceof Collection) {
-                    $importedValue = $this->fieldHelper->getObjectValueWithReflection($importedEntity, $propertyName);
-                }
-
-                $this->fieldHelper->setObjectValue($databaseEntity, $propertyName, $importedValue->toArray());
-                if ($databaseValue instanceof PersistentCollection && $databaseValue->isDirty()) {
-                    $this->logger->debug(
-                        'Property changed during import.',
-                        [
-                            'databaseEntityClass' => $databaseEntityClass,
-                            'propertyName' => $propertyName,
-                        ]
-                    );
-                } elseif ($databaseValue instanceof PersistentCollection && $databaseValue->isInitialized()) {
-                    $this->logger->debug(
-                        'Property initialized but not changed during import.',
-                        [
-                            'databaseEntityClass' => $databaseEntityClass,
-                            'propertyName' => $propertyName,
-                        ]
-                    );
-                }
-
-                continue;
-            }
-
-            if ($classMetadata->hasAssociation($propertyName)
-                && $classMetadata->getAssociationMapping($propertyName)['type'] & ClassMetadataInfo::TO_ONE) {
-                if ($importedValue !== $databaseValue) {
-                    $this->fieldHelper->setObjectValue($databaseEntity, $propertyName, $importedValue);
-                    $this->logger->debug(
-                        'Property changed during import.',
-                        [
-                            'databaseEntityClass' => $databaseEntityClass,
-                            'propertyName' => $propertyName,
-                            'databaseValue' => serialize($this->getIdentifierValues($databaseValue)),
-                            'importedValue' => serialize($this->getIdentifierValues($importedValue)),
-                        ]
-                    );
-                }
-
-                continue;
-            }
-
-            if ($importedValue instanceof \DateTimeInterface || $databaseValue instanceof \DateTimeInterface) {
-                if ($importedValue != $databaseValue) {
-                    $this->fieldHelper->setObjectValue($databaseEntity, $propertyName, $importedValue);
-                    $this->logger->debug(
-                        'Property changed during import.',
-                        [
-                            'databaseEntityClass' => $databaseEntityClass,
-                            'propertyName' => $propertyName,
-                            'databaseValue' => serialize($databaseValue),
-                            'importedValue' => serialize($importedValue),
-                        ]
-                    );
-                }
-
-                continue;
-            }
-
-            if ((null !== $importedValue && null !== $databaseValue)
-                && $importedValue !== $databaseValue
-                && $importedValue == $databaseValue
-                && gettype($importedValue) !== gettype($databaseValue)
-            ) {
-                $this->logger->debug(
-                    'Property not changed during import, but type does not match.',
-                    [
-                        'databaseEntityClass' => $databaseEntityClass,
-                        'propertyName' => $propertyName,
-                        'databaseValue' => serialize($databaseValue),
-                        'importedValue' => serialize($importedValue),
-                    ]
-                );
-
-                continue;
-            }
-
-            if ($importedValue !== $databaseValue) {
-                $this->fieldHelper->setObjectValue($databaseEntity, $propertyName, $importedValue);
-                $this->logger->debug(
-                    'Property changed during import.',
-                    [
-                        'databaseEntityClass' => $databaseEntityClass,
-                        'propertyName' => $propertyName,
-                        'databaseValue' => serialize($databaseValue),
-                        'importedValue' => serialize($importedValue),
-                    ]
-                );
-            }
-        }
+        parent::importEntity($databaseEntity, $importedEntity, $excludedProperties);
 
         if ($databaseEntity instanceof DenormalizedPropertyAwareInterface) {
             $databaseEntity->updateDenormalizedProperties();
         }
+    }
+
+    protected function processImportedEntityProperty(
+        object $targetEntity,
+        object $sourceEntity,
+        string $property
+    ): void {
+        $className = ClassUtils::getClass($targetEntity);
+        $metadata = $this->getEntityManager($className)->getClassMetadata($className);
+        $targetValue = $this->fieldHelper->getObjectValue($targetEntity, $property);
+        $sourceValue = $this->fieldHelper->getObjectValue($sourceEntity, $property);
+
+        if ($metadata->hasAssociation($property)) {
+            if ($metadata->getAssociationMapping($property)['type'] & ClassMetadataInfo::TO_MANY) {
+                $this->processToManyProperty($targetEntity, $targetValue, $sourceEntity, $sourceValue, $property);
+            }
+
+            if ($metadata->getAssociationMapping($property)['type'] & ClassMetadataInfo::TO_ONE) {
+                $this->processToOneProperty($targetEntity, $targetValue, $sourceValue, $property);
+            }
+
+            return;
+        }
+
+        if ($sourceValue instanceof \DateTimeInterface || $targetValue instanceof \DateTimeInterface) {
+            $this->processDateTimeProperty($targetEntity, $targetValue, $sourceValue, $property);
+
+            return;
+        }
+
+        if ((null !== $sourceValue && null !== $targetValue)
+            && $sourceValue !== $targetValue
+            && $sourceValue == $targetValue
+            && gettype($sourceValue) !== gettype($targetValue)
+        ) {
+            $this->processPropertyWithDifferentTypes($targetEntity, $targetValue, $sourceValue, $property);
+
+            return;
+        }
+
+        if ($sourceValue !== $targetValue) {
+            $this->processPropertyWithDifferentValues($targetEntity, $targetValue, $sourceValue, $property);
+        }
+    }
+
+    private function processToManyProperty(
+        object $targetEntity,
+        mixed $targetValue,
+        object $sourceEntity,
+        mixed $sourceValue,
+        string $property
+    ): void {
+        if (!$sourceValue instanceof Collection) {
+            $sourceValue = $this->fieldHelper->getObjectValueWithReflection($sourceEntity, $property);
+        }
+
+        $this->fieldHelper->setObjectValue($targetEntity, $property, $sourceValue->toArray());
+
+        if ($targetValue instanceof PersistentCollection && $targetValue->isDirty()) {
+            $this->log($targetEntity, null, null, $property, 'Property changed during import.');
+        } elseif ($targetValue instanceof PersistentCollection && $targetValue->isInitialized()) {
+            $this->log($targetEntity, null, null, $property, 'Property initialized but not changed during import.');
+        }
+    }
+
+    private function processToOneProperty(
+        object $targetEntity,
+        mixed $targetValue,
+        mixed $sourceValue,
+        string $property
+    ): void {
+        if ($sourceValue === $targetValue) {
+            return;
+        }
+
+        $this->fieldHelper->setObjectValue($targetEntity, $property, $sourceValue);
+        $targetIdentifiers = $this->getIdentifierValues($targetValue);
+        $sourceIdentifiers = $this->getIdentifierValues($sourceValue);
+        $message = 'Property changed during import.';
+        $this->log($targetEntity, $targetIdentifiers, $sourceIdentifiers, $property, $message);
+    }
+
+    private function processDateTimeProperty(
+        object $targetEntity,
+        mixed $targetValue,
+        mixed $sourceValue,
+        string $property
+    ): void {
+        if ($sourceValue == $targetValue) {
+            return;
+        }
+
+        $this->fieldHelper->setObjectValue($targetEntity, $property, $sourceValue);
+        $message = 'Property changed during import.';
+        $this->log($targetEntity, $targetValue, $sourceValue, $property, $message);
+    }
+
+    private function processPropertyWithDifferentTypes(
+        object $targetEntity,
+        mixed $targetValue,
+        mixed $sourceValue,
+        string $property
+    ): void {
+        $message = 'Property not changed during import, but type does not match.';
+        $this->log($targetEntity, $targetValue, $sourceValue, $property, $message);
+    }
+
+    private function processPropertyWithDifferentValues(
+        object $targetEntity,
+        mixed $targetValue,
+        mixed $sourceValue,
+        string $property
+    ): void {
+        $this->fieldHelper->setObjectValue($targetEntity, $property, $sourceValue);
+        $message = 'Property changed during import.';
+        $this->log($targetEntity, $targetValue, $sourceValue, $property, $message);
+    }
+
+    private function log(
+        object $targetEntity,
+        mixed $targetValue,
+        mixed $sourceValue,
+        string $property,
+        string $message
+    ): void {
+        $className = ClassUtils::getClass($targetEntity);
+        $context = ['databaseEntityClass' => $className, 'propertyName' => $property];
+        if ($targetValue || $sourceValue) {
+            $context += ['databaseValue' => serialize($targetValue), 'importedValue' => serialize($sourceValue)];
+        }
+
+        $this->logger->debug($message, $context);
     }
 
     private function getIdentifierValues($object)

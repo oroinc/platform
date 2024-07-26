@@ -774,7 +774,6 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $importSubmitButton = $this->openImportModalAndReturnImportSubmitButton();
         $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
         $this->createElement('ActiveImportStrategyField')->selectOption($strategy);
-
         $importSubmitButton->press();
         $this->getDriver()->waitForAjax(240000);
     }
@@ -1019,15 +1018,21 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
 
     private function closeFlashMessages()
     {
-        $flashMessages = $this->findAllElements('Flash Message');
-        foreach ($flashMessages as $flashMessage) {
-            if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+        do {
+            try {
+                $messages = $this->findAllElements('Flash Message');
+                if (!count($messages)) {
+                    break;
+                }
+                $flashMessage = reset($messages);
                 /** @var NodeElement $closeButton */
                 $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
-                if ($closeButton && $closeButton->isValid() && $closeButton->isVisible()) {
+
+                if ($closeButton && $closeButton->isVisible() && $closeButton->isValid()) {
                     $closeButton->press();
                 }
+            } catch (\Exception $e) {
             }
-        }
+        } while ($this->findAllElements('Flash Message'));
     }
 }

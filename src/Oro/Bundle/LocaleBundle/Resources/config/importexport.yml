@@ -29,3 +29,8 @@ services:
             - 'Oro\Bundle\LocaleBundle\Entity\Localization'
         tags:
             - { name: oro_importexport.normalizer, priority: -5 }
+
+    oro_locale.importexport.strategy.import.fallback_configurable_import_strategy_helper:
+        class: Oro\Bundle\LocaleBundle\ImportExport\Strategy\Import\FallbackConfigurableImportStrategyHelper
+        parent: oro_importexport.strategy.configurable_import_strategy_helper
+        decorates: oro_importexport.strategy.configurable_import_strategy_helper
