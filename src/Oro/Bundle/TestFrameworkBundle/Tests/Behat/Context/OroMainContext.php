@@ -1160,6 +1160,8 @@ class OroMainContext extends MinkContext implements
      *
      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )click '(?P<button>(?:[^']|\\')*)'$/
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function pressButton($button)
     {
@@ -2716,7 +2718,7 @@ JS;
         self::assertTrue(
             $childElement->isIsset(),
             sprintf(
-                'Element "%s" not found inside iframe',
+                'Element "%s" not found inside iframe %s',
                 $childElementName,
                 $iframeName
             )
@@ -2724,7 +2726,7 @@ JS;
         self::assertTrue(
             $childElement->isVisible(),
             sprintf(
-                'Element "%s" found inside iframe, but it\'s not visible',
+                'Element "%s" found inside iframe %s, but it\'s not visible',
                 $childElementName,
                 $iframeName
             )

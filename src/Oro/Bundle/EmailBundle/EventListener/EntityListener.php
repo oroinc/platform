@@ -49,6 +49,7 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
     private array $updatedEmailAddresses = [];
     /** @var string[] */
     private array $processedAddresses = [];
+    private bool $flushing = false;
 
     public function __construct(
         MessageProducerInterface $producer,
@@ -114,6 +115,10 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         if (!$this->enabled) {
             return;
         }
+        if ($this->flushing) {
+            return;
+        }
+        $this->flushing = true;
 
         $em = $event->getObjectManager();
         if ($this->newEmails) {
@@ -154,6 +159,8 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
             $emailAddressVisibilityManager->collectEmailAddresses($this->processedAddresses);
             $this->processedAddresses = [];
         }
+
+        $this->flushing = false;
     }
 
     public function postRemove(LifecycleEventArgs $args): void

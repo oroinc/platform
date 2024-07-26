@@ -102,6 +102,8 @@ class ParametersResolver
      * @param Parameter $parameter
      * @param string $message
      * @return string|true Error message or null
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function isValidType($value, $parameter, &$message)
     {

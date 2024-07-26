@@ -28,6 +28,7 @@ use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @mixin OroWorkflowBundle_Entity_WorkflowItem
  */

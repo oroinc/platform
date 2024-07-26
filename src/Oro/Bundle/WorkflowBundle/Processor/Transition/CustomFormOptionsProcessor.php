@@ -7,6 +7,9 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Processes transition form, executes form_init actions.
+ */
 class CustomFormOptionsProcessor implements ProcessorInterface
 {
     public function __construct(
