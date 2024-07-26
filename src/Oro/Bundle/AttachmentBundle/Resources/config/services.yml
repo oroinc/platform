@@ -160,7 +160,6 @@ services:
 
     oro_attachment.twig.file_extension:
         class: 'Oro\Bundle\AttachmentBundle\Twig\FileExtension'
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -458,7 +457,6 @@ services:
 
     oro_attachment.provider.file_icon:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileIconProvider'
-        public: false
         arguments:
             - '%oro_attachment.files%'
 
@@ -819,3 +817,15 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\AttachmentBundle\Entity\Attachment }
+
+    oro_attachment.provider.files_template_provider:
+        class: Oro\Bundle\AttachmentBundle\Provider\FilesTemplateProvider
+
+    Oro\Bundle\AttachmentBundle\Provider\FilesTemplateProvider:
+        alias: oro_attachment.provider.files_template_provider
+
+    oro_attachment.provider.images_template_provider:
+        class: Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProvider
+
+    Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProvider:
+        alias: oro_attachment.provider.images_template_provider

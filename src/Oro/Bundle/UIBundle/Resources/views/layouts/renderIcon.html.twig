@@ -5,7 +5,15 @@
     {% set layoutContext = get_layout_context() %}
     {% set theme = layoutContext.theme %}
     {% set basePath = app.request.basePath|trim %}
-    {{- asset(basePath ~ '/build/' ~ theme ~ '/svg-icons/theme-icons.svg') -}}
+    {% set themIconFilename = oro_is_rtl_mode() ? 'theme-icons.rtl.svg' : 'theme-icons.svg' %}
+    {{- asset(basePath ~ '/build/' ~ theme ~ '/svg-icons/' ~ themIconFilename) -}}
+{%- endmacro -%}
+
+{%- macro getThemeSpriteMetadata() -%}
+    {% set layoutContext = get_layout_context() %}
+    {% set theme = layoutContext.theme %}
+    {% set basePath = app.request.basePath|trim %}
+    {{- asset(basePath ~ '/build/' ~ theme ~ '/svg-icons/icons-metadata.json') -}}
 {%- endmacro -%}
 
 {#

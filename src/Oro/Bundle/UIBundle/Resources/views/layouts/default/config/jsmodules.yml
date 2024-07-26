@@ -51,6 +51,7 @@ app-modules:
 #    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
     - oroui/js/app/modules/swipeable-module
     - oroui/js/app/modules/template-macros-module
+    - oroui/js/app/modules/svg-sprite-module
     - oroui/js/app/modules/viewport-module
     - oroui/js/app/modules/widgets-module
     - oroui/js/extend/scriptjs
