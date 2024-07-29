@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
-use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenUserOrganizationException;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -85,27 +87,53 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPreReceivedShouldRejectMessageIfSecurityTokenCannotBeDeserialized(): void
     {
-        $this->expectException(InvalidSecurityTokenException::class);
-        $serializedToken = 'serialized';
-
         $message = new Message();
-        $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => $serializedToken]);
+        $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => 'serialized']);
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessage($message);
         $context->setLogger($this->logger);
 
-        $this->tokenSerializer->expects(self::once())
+        $this->tokenSerializer
+            ->expects(self::once())
             ->method('deserialize')
-            ->with($serializedToken)
-            ->willReturn(null);
-        $this->tokenStorage->expects(self::never())
+            ->willThrowException(new InvalidTokenUserOrganizationException('Exception message'));
+        $this->tokenStorage
+            ->expects(self::never())
             ->method('setToken');
-        $this->logger->expects(self::once())
+        $this->logger
+            ->expects(self::once())
             ->method('error')
-            ->with('Security token is invalid');
+            ->with('Exception message');
 
         $this->extension->onPreReceived($context);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
+    }
+
+    public function testOnPreReceivedShouldThrowExceptionIfSecurityTokenCannotBeDeserialized(): void
+    {
+        $this->expectException(InvalidTokenSerializationException::class);
+        $message = new Message();
+        $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => 'serialized']);
+
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setMessage($message);
+        $context->setLogger($this->logger);
+
+        $this->tokenSerializer
+            ->expects(self::once())
+            ->method('deserialize')
+            ->willThrowException(new InvalidTokenSerializationException('Exception message'));
+        $this->tokenStorage
+            ->expects(self::never())
+            ->method('setToken');
+        $this->logger
+            ->expects(self::once())
+            ->method('error')
+            ->with('Exception message');
+
+        $this->extension->onPreReceived($context);
+        $this->assertEquals(null, $context->getStatus());
     }
 
     public function testOnPreReceivedShouldDoNothingIdMessageDoesNotContainSecurityToken(): void
