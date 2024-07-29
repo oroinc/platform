@@ -5,6 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareJobExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -118,8 +119,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($token);
         $this->tokenSerializer->expects(self::once())
             ->method('serialize')
-            ->with(self::identicalTo($token))
-            ->willReturn(null);
+            ->willThrowException(new InvalidTokenSerializationException('Exception message.'));
 
         $this->jobManager->expects(self::never())
             ->method('saveJob');

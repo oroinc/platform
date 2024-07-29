@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Security;
 
-use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -46,12 +46,21 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
         // and checks whether the consumer continues to work after an unsuccessful deserialization of the token
         self::sendMessage(BasicMessageTestTopic::getName(), ['message' => 'message']);
 
-        $this->expectException(InvalidSecurityTokenException::class);
-        $this->expectExceptionMessage('Security token is invalid');
+        $this->expectException(InvalidTokenSerializationException::class);
+        $this->expectExceptionMessage('An error occurred while deserializing the token.');
 
         self::consume(1);
 
         self::consume(1);
+    }
+
+    public function testWithInvalidUserAndOrganization(): void
+    {
+        $serializedToken = 'organizationId=100;userId=50;userClass=Oro\\Bundle\\UserBundle\\Entity\\User;roles=';
+        $sentMessage = self::sendMessage(BasicMessageTestTopic::getName(), $this->createMessage($serializedToken));
+        self::consume();
+
+        self::assertProcessedMessageStatus(MessageProcessorInterface::REJECT, $sentMessage);
     }
 
     private function createMessage(string $serializedToken = ''): Message

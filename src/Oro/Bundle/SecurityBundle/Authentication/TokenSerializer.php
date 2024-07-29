@@ -6,6 +6,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -15,18 +17,11 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class TokenSerializer implements TokenSerializerInterface
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(private ManagerRegistry $doctrine)
     {
-        $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize(TokenInterface $token)
+    public function serialize(TokenInterface $token): string
     {
         if ($token instanceof OrganizationAwareTokenInterface) {
             $user = $token->getUser();
@@ -41,24 +36,13 @@ class TokenSerializer implements TokenSerializerInterface
             }
         }
 
-        return null;
+        throw new InvalidTokenSerializationException('An error occurred during token serialization.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deserialize($value)
+    public function deserialize(string $value): TokenInterface
     {
-        if (!$value) {
-            return null;
-        }
-
         $unpacked = $this->unpack($value);
-        if (null === $unpacked) {
-            return null;
-        }
-
-        list($organizationId, $userId, $userClass, $roles) = $unpacked;
+        [$organizationId, $userId, $userClass, $roles] = $unpacked;
 
         return $this->createToken($organizationId, $userId, $userClass, $roles);
     }
@@ -75,45 +59,22 @@ class TokenSerializer implements TokenSerializerInterface
 
     /**
      * @param string $value organizationId=int;userId=int;userClass=string;roles=string,...
-     *
-     * @return array|null [organizationId, userId, userClass, roles]
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function unpack($value)
+    private function unpack(string $value): array
     {
-        $result = null;
         $elements = $this->unpackElements($value);
         if (count($elements) === 4) {
-            $organizationId = null;
-            $userId = null;
-            $userClass = null;
-            $roles = null;
-            if (array_key_exists('organizationId', $elements)) {
-                $organizationId = (int)$elements['organizationId'];
-            }
-            if (array_key_exists('userId', $elements)) {
-                $userId = (int)$elements['userId'];
-            }
-            if (array_key_exists('userClass', $elements)) {
-                $userClass = $elements['userClass'];
-            }
-            if (array_key_exists('roles', $elements)) {
-                $roles = explode(',', $elements['roles']);
-            }
+            $defaultElements = ['organizationId' => null, 'userId' => null, 'userClass' => null, 'roles' => null];
+            [$organizationId, $userId, $userClass, $roles] = array_values(array_merge($defaultElements, $elements));
             if (null !== $organizationId && null !== $userId && null !== $userClass && null !== $roles) {
-                $result = [$organizationId, $userId, $userClass, $roles];
+                return [(int)$organizationId, (int)$userId, $userClass, explode(',', $roles)];
             }
         }
 
-        return $result;
+        throw new InvalidTokenSerializationException('An error occurred while deserializing the token.');
     }
 
-    /**
-     * @param string $value
-     *
-     * @return array
-     */
-    private function unpackElements($value)
+    private function unpackElements(string $value): array
     {
         $elements = [];
         $parts = explode(';', $value);
@@ -129,15 +90,7 @@ class TokenSerializer implements TokenSerializerInterface
         return $elements;
     }
 
-    /**
-     * @param int      $organizationId
-     * @param int      $userId
-     * @param string   $userClass
-     * @param string[] $roles
-     *
-     * @return TokenInterface|null
-     */
-    private function createToken($organizationId, $userId, $userClass, array $roles)
+    private function createToken(int $organizationId, int $userId, string $userClass, array $roles): TokenInterface
     {
         $organization = $this->doctrine->getRepository(Organization::class)->find($organizationId);
 
@@ -145,7 +98,7 @@ class TokenSerializer implements TokenSerializerInterface
         $user = $this->doctrine->getRepository($userClass)->find($userId);
 
         if (null === $organization || null === $user) {
-            return null;
+            throw new InvalidTokenUserOrganizationException('An error occurred while creating a token.');
         }
 
         $roleObjects = [];
