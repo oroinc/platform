@@ -9,12 +9,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 class DateTimeTypeCast extends AbstractTypeCastingHandler
 {
-    /**
-     * @param mixed $value
-     *
-     * @return object|\DateTime
-     */
-    public function castValue($value)
+    public function castValue(mixed $value): mixed
     {
         if ($this->isSupported($value)) {
             return $value;

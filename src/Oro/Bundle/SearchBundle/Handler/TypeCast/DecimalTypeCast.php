@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Handler\TypeCast;
 
+use Brick\Math\BigDecimal;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 /**
@@ -9,15 +10,10 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 class DecimalTypeCast extends AbstractTypeCastingHandler
 {
-    /**
-     * @param mixed $value
-     *
-     * @return object|float
-     */
-    public function castValue($value)
+    public function castValue(mixed $value): mixed
     {
         if ($this->isSupported($value)) {
-            return (float)$value;
+            return BigDecimal::of($value)->toFloat();
         }
 
         return parent::castValue($value);
@@ -25,7 +21,7 @@ class DecimalTypeCast extends AbstractTypeCastingHandler
 
     public function isSupported($value): bool
     {
-        return is_double($value) || is_int($value);
+        return is_numeric($value);
     }
 
     public static function getType(): string

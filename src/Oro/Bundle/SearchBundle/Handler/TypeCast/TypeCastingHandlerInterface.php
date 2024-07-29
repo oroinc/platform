@@ -8,11 +8,9 @@ namespace Oro\Bundle\SearchBundle\Handler\TypeCast;
 interface TypeCastingHandlerInterface
 {
     /**
-     * @param mixed $value
-     *
-     * @return mixed
+     * Cast a value to a specified type.
      */
-    public function castValue($value);
+    public function castValue(mixed $value): mixed;
 
     /**
      * Will return boolean true if the typecasting handler can cast the value, and false otherwise.
