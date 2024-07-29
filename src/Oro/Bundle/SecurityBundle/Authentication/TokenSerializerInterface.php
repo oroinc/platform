@@ -21,9 +21,9 @@ interface TokenSerializerInterface
      *
      * @param TokenInterface $token
      *
-     * @return string|null
+     * @return string
      */
-    public function serialize(TokenInterface $token);
+    public function serialize(TokenInterface $token): string;
 
     /**
      * Converts the given string to a security token that represents
@@ -31,7 +31,7 @@ interface TokenSerializerInterface
      *
      * @param string $value
      *
-     * @return TokenInterface|null
+     * @return TokenInterface
      */
-    public function deserialize($value);
+    public function deserialize(string $value): TokenInterface;
 }

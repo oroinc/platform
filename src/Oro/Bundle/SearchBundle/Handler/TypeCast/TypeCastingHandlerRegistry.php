@@ -10,7 +10,7 @@ class TypeCastingHandlerRegistry
     /**
      * @var TypeCastingHandlerInterface[]
      */
-    private $handlers;
+    private array $handlers;
 
     public function __construct(\Traversable $handlers)
     {
