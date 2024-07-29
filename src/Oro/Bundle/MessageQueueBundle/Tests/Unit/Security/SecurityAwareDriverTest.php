@@ -5,6 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityTokenProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
@@ -149,8 +150,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
             ->willReturn($token);
         $this->tokenSerializer->expects(self::once())
             ->method('serialize')
-            ->with(self::identicalTo($token))
-            ->willReturn(null);
+            ->willThrowException(new InvalidTokenSerializationException('Exception message.'));
 
         $this->driver->expects(self::once())
             ->method('send')
@@ -201,8 +201,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
             ->method('getToken');
         $this->tokenSerializer->expects(self::once())
             ->method('serialize')
-            ->with(self::identicalTo($token))
-            ->willReturn(null);
+            ->willThrowException(new InvalidTokenSerializationException('Exception message.'));
 
         $this->driver->expects(self::once())
             ->method('send')

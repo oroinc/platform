@@ -8,6 +8,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializer;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -29,9 +31,10 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
 
     public function testSerializeForUnsupportedToken()
     {
+        $this->expectException(InvalidTokenSerializationException::class);
         $token = $this->createMock(TokenInterface::class);
 
-        self::assertNull($this->tokenSerializer->serialize($token));
+        $this->tokenSerializer->serialize($token);
     }
 
     public function testSerializeForTokenWithoutUser()
@@ -40,7 +43,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $organization->setId(1);
         $token = new OrganizationToken($organization);
 
-        self::assertNull($this->tokenSerializer->serialize($token));
+        $this->expectException(InvalidTokenSerializationException::class);
+        $this->tokenSerializer->serialize($token);
     }
 
     public function testSerializeForTokenWithUnsupportedUser()
@@ -50,7 +54,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $token = new OrganizationToken($organization);
         $token->setUser('user');
 
-        self::assertNull($this->tokenSerializer->serialize($token));
+        $this->expectException(InvalidTokenSerializationException::class);
+        $this->tokenSerializer->serialize($token);
     }
 
     public function testSerializeForSupportedTokenWithoutRoles()
@@ -137,13 +142,13 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
      */
     public function testDeserializeUnsupportedToken(?string $value)
     {
-        self::assertNull($this->tokenSerializer->deserialize($value));
+        $this->expectException(InvalidTokenSerializationException::class);
+        $this->tokenSerializer->deserialize($value);
     }
 
     public function unsupportedTokenProvider(): array
     {
         return [
-            [null],
             [''],
             ['organizationId=1'],
             ['organizationId=1;userId=123'],
@@ -179,12 +184,9 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
             ->with(123)
             ->willReturn(null);
 
-        /** @var ImpersonationToken $token */
-        $token = $this->tokenSerializer->deserialize(
-            'organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_1,ROLE_2'
-        );
-
-        self::assertNull($token);
+        $this->expectException(InvalidTokenUserOrganizationException::class);
+        $value = 'organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_1,ROLE_2';
+        $this->tokenSerializer->deserialize($value);
     }
 
     public function testDeserializeSupportedTokenForDeletedOrganization()
@@ -209,11 +211,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
             ->with(123)
             ->willReturn($user);
 
-        /** @var ImpersonationToken $token */
-        $token = $this->tokenSerializer->deserialize(
-            'organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_1,ROLE_2'
-        );
-
-        self::assertNull($token);
+        $this->expectException(InvalidTokenUserOrganizationException::class);
+        $value = 'organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_1,ROLE_2';
+        $this->tokenSerializer->deserialize($value);
     }
 }

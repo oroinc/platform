@@ -57,9 +57,10 @@ class SecurityAwareDriver implements DriverInterface
                 $token = $properties[self::PARAMETER_SECURITY_TOKEN];
                 if ($token instanceof TokenInterface) {
                     unset($properties[self::PARAMETER_SECURITY_TOKEN]);
-                    $serializedToken = $this->tokenSerializer->serialize($token);
-                    if (null !== $serializedToken) {
+                    try {
+                        $serializedToken = $this->tokenSerializer->serialize($token);
                         $properties[self::PARAMETER_SECURITY_TOKEN] = $serializedToken;
+                    } catch (\Exception $exception) {
                     }
                     $message->setProperties($properties);
                 }
@@ -68,10 +69,11 @@ class SecurityAwareDriver implements DriverInterface
             // add the current token if it exists
             $token = $this->tokenProvider->getToken();
             if ($token instanceof TokenInterface) {
-                $serializedToken = $this->tokenSerializer->serialize($token);
-                if (null !== $serializedToken) {
+                try {
+                    $serializedToken = $this->tokenSerializer->serialize($token);
                     $properties[self::PARAMETER_SECURITY_TOKEN] = $serializedToken;
                     $message->setProperties($properties);
+                } catch (\Exception $exception) {
                 }
             }
         }
