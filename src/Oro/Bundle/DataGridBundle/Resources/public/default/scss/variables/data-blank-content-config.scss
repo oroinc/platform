@@ -1,3 +1,7 @@
 /* @theme: default; */
 
-$datagrid-blank-content-color: get-color('neutral', 'grey2') !default;
+$datagrid-blank-content-color: get-color('text', 'disabled') !default;
+$datagrid-blank-content-vertical-align: middle !default;
+$datagrid-blank-content-height: 2px !default;
+$datagrid-blank-content-width: 16px !default;
+$datagrid-blank-content-radius: 2px !default;

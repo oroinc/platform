@@ -8,46 +8,37 @@
     }
 
     .table-bordered & {
+        white-space: $datagrid-header-cell-white-space;
         border-width: $datagrid-header-cell-border-width;
     }
 
     &.sortable {
+        &:hover {
+            background-color: $datagrid-header-cell-sortable-background-color-hover;
+        }
+
         .sortable-icon {
-            position: relative;
-
             display: none;
-            height: $datagrid-header-cell-link-font-size;
+            width: $datagrid-header-cell-sortable-icon-size;
+            height: $datagrid-header-cell-sortable-icon-size;
+            margin-bottom: $datagrid-header-cell-sortable-icon-offset;
 
-            &::before {
-                position: absolute;
-                top: $datagrid-header-cell-link-font-size * .5;
-                left: $datagrid-header-cell-sortable-icon-left;
-
-                content: '';
-
-                border-right: $datagrid-header-cell-sortable-icon-size solid transparent;
-                border-left: $datagrid-header-cell-sortable-icon-size solid transparent;
-            }
+            background: $datagrid-header-cell-sortable-icon;
         }
     }
 
     &.ascending {
         .sortable-icon {
             display: inline-block;
-
-            &::before {
-                border-top: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
-            }
+            vertical-align: middle;
         }
     }
 
     &.descending {
         .sortable-icon {
             display: inline-block;
-
-            &::before {
-                border-bottom: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
-            }
+            transform: rotate(180deg);
+            vertical-align: middle;
         }
     }
 
@@ -56,31 +47,20 @@
         padding: $datagrid-header-cell-action-column-offset-inner;
 
         text-align: $datagrid-header-cell-action-column-text-align;
-
-        &:empty,
-        &--disabled {
-            &::before {
-                height: 10px;
-
-                display: inline-block;
-                vertical-align: middle;
-
-                font-size: $base-font-size--m;
-                line-height: 0;
-
-                color: $datagrid-header-cell-action-column-disabled-color;
-
-                content: '...';
-            }
-        }
     }
 
-    &__link {
+    &__label {
         font-size: $datagrid-header-cell-link-font-size;
         line-height: $datagrid-header-cell-link-line-height;
         font-weight: $datagrid-header-cell-link-font-weight;
         color: $datagrid-header-cell-link-color;
         position: $datagrid-header-cell-link-position;
+        opacity: $datagrid-header-cell-link-opacity;
+        text-transform: uppercase;
+    }
+
+    &__link {
+        text-decoration: none;
 
         &:hover,
         &:focus,

@@ -36,6 +36,15 @@ const viewportManager = {
     },
 
     /**
+     * Get applicable breakpoint name from the list
+     * @param {Array} mediaTypes
+     * @returns {string}|void 0
+     */
+    getApplicableBreakpointName(mediaTypes) {
+        return mediaTypes.find(mediaType => this.isApplicable([mediaType]));
+    },
+
+    /**
      * @param {HTMLElement} [context]
      * @param {Function} [callback]
      * @returns {any}

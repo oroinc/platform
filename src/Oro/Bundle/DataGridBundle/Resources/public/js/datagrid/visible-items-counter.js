@@ -1,9 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'backbone',
+    'oroui/js/app/views/base/view',
     'tpl-loader!orodatagrid/templates/datagrid/visible-items-counter.html'
-], function($, _, Backbone, template) {
+], function($, _, BaseView, template) {
     'use strict';
 
     /**
@@ -12,7 +12,7 @@ define([
      * @class   orodatagrid.datagrid.VisibleItemsCounter
      * @extends Backbone.View
      */
-    const VisibleItemsCounter = Backbone.View.extend({
+    const VisibleItemsCounter = BaseView.extend({
         /** @property */
         enabled: true,
 
@@ -91,6 +91,16 @@ define([
             return this;
         },
 
+        getTemplateData() {
+            const {state} = this.collection;
+
+            return {
+                disabled: !this.enabled || !state.totalRecords,
+                state: {length: this.collection.length, ...state},
+                transTemplate: this.transTemplate
+            };
+        },
+
         /**
          * Render pagination
          *
@@ -104,12 +114,7 @@ define([
                 return this;
             }
 
-            this.$el.empty();
-            this.$el.html(this.template({
-                disabled: !this.enabled || !state.totalRecords,
-                state: _.extend({length: this.collection.length}, state),
-                transTemplate: this.transTemplate
-            }));
+            VisibleItemsCounter.__super__.render.call(this);
 
             if (this.hidden) {
                 this.$el.hide();
