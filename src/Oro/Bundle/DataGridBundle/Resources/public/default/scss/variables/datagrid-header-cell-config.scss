@@ -1,22 +1,26 @@
 /* @theme: default; */
-$datagrid-header-cell-border-width: 1px 0 !default;
+@use 'sass:string';
 
-$datagrid-header-cell-mass-action-offset-inner: 0 (spacing('sm') + 2px) 0 !default;
+$datagrid-header-cell-border-width: 1px 0 !default;
+$datagrid-header-cell-white-space: nowrap;
+
+$datagrid-header-cell-sortable-background-color-hover: get-var-color('neutral', 'grey2') !default;
+$datagrid-header-cell-mass-action-offset-inner: 0 4px 0 !default;
 
 $datagrid-header-cell-action-column-width: 50px !default;
 $datagrid-header-cell-action-column-text-align: right !default;
 $datagrid-header-cell-action-column-offset-inner: $datagrid-header-cell-mass-action-offset-inner !default;
-$datagrid-header-cell-action-column-disabled-color: get-color('neutral', 'grey2') !default;
 
-$datagrid-header-cell-link-font-size: $base-font-size !default;
+$datagrid-header-cell-link-font-size: 12px !default;
 $datagrid-header-cell-link-font-weight: font-weight('semi-bold') !default;
 $datagrid-header-cell-link-line-height: 1 !default;
-$datagrid-header-cell-link-color: get-color('neutral', 'dark') !default;
+$datagrid-header-cell-link-color: get-color('text', 'secondary') !default;
+$datagrid-header-cell-link-opacity: .8 !default;
 $datagrid-header-cell-link-position: relative !default;
 $datagrid-header-cell-link-hover-color: get-color('neutral', 'dark') !default;
 $datagrid-header-cell-link-hover-text-decoration: none !default;
 
-$datagrid-header-cell-sortable-icon-color: get-color('neutral', 'dark') !default;
-$datagrid-header-cell-sortable-icon-size: 4px !default;
-
-$datagrid-header-cell-sortable-icon-left: spacing('xs') !default;
+$datagrid-header-cell-sortable-icon-color: $datagrid-header-cell-link-color !default;
+$datagrid-header-cell-sortable-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path fill="#{str-replace(string.unquote('#{$datagrid-header-cell-sortable-icon-color}'), '#', '%23')}" d="M8.47142 2.86193C8.21108 2.60158 7.78896 2.60158 7.52862 2.86193L2.86195 7.52859C2.6016 7.78894 2.6016 8.21105 2.86195 8.4714C3.1223 8.73175 3.54441 8.73175 3.80476 8.4714L7.33335 4.94281V12.6667C7.33335 13.0349 7.63183 13.3333 8.00002 13.3333C8.36821 13.3333 8.66669 13.0349 8.66669 12.6667V4.94281L12.1953 8.4714C12.4556 8.73175 12.8777 8.73175 13.1381 8.4714C13.3984 8.21105 13.3984 7.78894 13.1381 7.52859L8.47142 2.86193Z"/></svg>') !default;
+$datagrid-header-cell-sortable-icon-size: 16px !default;
+$datagrid-header-cell-sortable-icon-offset: 2px !default;

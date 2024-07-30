@@ -86,6 +86,10 @@ define(function(require) {
                 const Component = this.componentConstructor;
                 this.component = new Component(this.componentOptions);
             }
+            const tooltip = this.$('.dropdown-toggle').data('tooltip');
+            if (typeof tooltip === 'object') {
+                this.$('.dropdown-toggle').tooltip(tooltip);
+            }
             return this;
         },
 

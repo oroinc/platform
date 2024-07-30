@@ -40,7 +40,9 @@ define(function(require) {
                 actions.push(action);
             }, this);
 
-            this.actionsPanel = new ActionsPanel({actions: actions, el: options._sourceElement});
+            this.actionsPanel = new ActionsPanel({
+                actions: actions, el: options._sourceElement, collection: this.grid.collection
+            });
             this.actionsPanel.render();
 
             this.listenTo(this.grid.collection, 'backgrid:refresh', function() {

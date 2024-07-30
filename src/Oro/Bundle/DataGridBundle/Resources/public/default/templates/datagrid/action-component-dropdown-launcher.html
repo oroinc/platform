@@ -28,7 +28,7 @@
 %>
 <div class="<%- wrapperClassName %> dropdown">
     <a href="#" class="<%- actionClassNames.join(' ') %>"
-       title="<%- title %>"
+       title="<%- _.__(title) %>"
        role="button" id="<%- togglerId %>" data-toggle="dropdown"
        aria-haspopup="true" aria-expanded="false"
        <% if (launcherMode == 'icon-only' && obj.ariaLabel) { %> aria-label="<%- ariaLabel %>" <% } %>
@@ -37,11 +37,11 @@
             <%= renderLauncherIcon(obj) %>
             <% if (obj.entityName) { %>
                 <span class="action-label">
-                    <%- label %>
+                    <%- _.__(label) %>
                     <span class="entity-name"><%- obj.entityName %></span>
                 </span>
             <% } else { %>
-                <%- label %>
+                <%- _.__(label) %>
             <% } %>
         <% } else if (launcherMode == 'icon-only') { %>
             <%= renderLauncherIcon(obj) %>
@@ -51,11 +51,11 @@
             <% } %>
             <% if (obj.entityName) { %>
                 <span class="action-label">
-                    <%- label %>
+                    <%- _.__(label) %>
                     <span class="entity-name"><%- obj.entityName %></span>
                 </span>
             <% } else { %>
-                <%- label %>
+                <%- _.__(label) %>
             <% } %>
         <% } %>
     </a>

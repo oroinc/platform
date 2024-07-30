@@ -55,6 +55,14 @@
     <% } %>
 {% endblock %}
 
+{% block __datagrid_toolbar__datagrid_mass_actions_panel_widget %}
+    {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
+
+    <% if (toolbarPosition != 'bottom') { %>
+        <div class="actions-panel" data-grid-mass-actions-panel=""></div>
+    <% } %>
+{% endblock %}
+
 {% block __datagrid_toolbar__datagrid_toolbar_pagination_widget %}
     {% set attr = attr|merge({
         class: attr.class|default('') ~ " pagination pagination-centered",
