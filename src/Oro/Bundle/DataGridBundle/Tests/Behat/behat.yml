@@ -201,6 +201,12 @@ oro_behat_extension:
     MassActionButton:
       selector: '.grid-header-row .action-column .dropdown button'
 
+    Toolbar Mass Actions:
+      selector: '.toolbar-mass-actions'
+
+    Responsive Dropdown Action:
+      selector: 'div.dropdown.responsive-dropdown'
+
     PageSize:
       selector: 'div.page-size'
 

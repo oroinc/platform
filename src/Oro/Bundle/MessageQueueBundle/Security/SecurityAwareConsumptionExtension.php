@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Security;
 
-use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
+use Oro\Bundle\SecurityBundle\Exception\InvalidTokenUserOrganizationException;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -13,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  * that is contained in a current message.
  * This provides an ability to process a message in the same security context
  * as a process that sent the message.
- * Also the "security_agnostic_processors" option can be used to disable changing the security context
+ * Also, the "security_agnostic_processors" option can be used to disable changing the security context
  * for some processors.
  * For details see {@link https://doc.oroinc.com/master/backend/mq/security-context/}.
  */
@@ -47,12 +49,22 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
         // and if so, switch to the requested context
         $serializedToken = $context->getMessage()->getProperty(SecurityAwareDriver::PARAMETER_SECURITY_TOKEN);
         if ($serializedToken) {
-            $token = $this->tokenSerializer->deserialize($serializedToken);
-            if (null === $token) {
-                $exception = new InvalidSecurityTokenException();
+            try {
+                $token = $this->tokenSerializer->deserialize($serializedToken);
+            } catch (InvalidTokenUserOrganizationException $exception) {
+                // The data for the token is invalid, but this does not prevent the consumer from executing.
+                // For example, a user was deleted before we started performing actions on them with the consumer, etc.
+                $context->getLogger()->error($exception->getMessage());
+                $context->setStatus(MessageProcessorInterface::REJECT);
+
+                return;
+            } catch (InvalidTokenSerializationException $exception) {
+                // We expect that the token cannot be created and this error will prevent it from being used by
+                // the consumer.
                 $context->getLogger()->error($exception->getMessage());
                 throw $exception;
             }
+
             $context->getLogger()->debug('Set security token');
             $this->tokenStorage->setToken($token);
         }

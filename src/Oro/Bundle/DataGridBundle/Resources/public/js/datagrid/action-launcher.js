@@ -178,12 +178,26 @@ define(function(require, exports, module) {
                 data.entityName = this.action.entityName;
             }
 
+            if (!data.className) {
+                data.className = this.action.className;
+            }
+
             if (!data.ariaLabel && this.action.ariaLabel) {
                 data.ariaLabel = this.action.ariaLabel;
             }
 
             if (!data.attributes && this.action.attributes) {
                 data.attributes = {...this.action.attributes};
+            }
+
+            if (data.attributes) {
+                data.attributes = Object.fromEntries(
+                    Object.entries(data.attributes).map(attr => {
+                        if (_.isObject(attr[1])) {
+                            attr[1] = JSON.stringify(attr[1]);
+                        }
+                        return attr;
+                    }));
             }
 
             if (!data.ariaLabel && this.allowDefaultAriaLabel) {
@@ -193,7 +207,7 @@ define(function(require, exports, module) {
             if (!data.title) {
                 const entityName = typeof data.entityName === 'string' ? data.entityName.trim() : '';
 
-                data.title = `${data.label.trim()} ${entityName}`.trim();
+                data.title = data.label ? `${data.label.trim()} ${entityName}`.trim() : entityName;
             }
 
             if (!data.launcherMode) {

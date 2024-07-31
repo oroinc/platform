@@ -18,6 +18,8 @@ define([
         /** @property */
         template: template,
 
+        autoFillInput: true,
+
         /** @property */
         events: {
             'blur [data-grid-pagination-trigger-input]': 'onChangePageByInput',
@@ -52,9 +54,11 @@ define([
             const collection = this.collection;
             const state = collection.state;
 
-            if (_.isNaN(pageIndex)) {
+            if (_.isNaN(pageIndex) && this.autoFillInput) {
                 $(e.target).val(state.currentPage);
                 return;
+            } else if (_.isNaN(pageIndex) && !this.autoFillInput) {
+                pageIndex = state.currentPage;
             }
 
             pageIndex = state.firstPage === 0 ? pageIndex - 1 : pageIndex;
@@ -77,9 +81,7 @@ define([
          *
          * @return Array.<Object> an array of page handle objects hashes
          */
-        makeHandles: function() {
-            const handles = [];
-
+        makeHandles: function(handles = []) {
             handles.push({
                 type: 'input'
             });

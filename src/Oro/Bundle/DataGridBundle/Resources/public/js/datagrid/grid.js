@@ -116,6 +116,11 @@ define(function(require) {
         selectState: null,
 
         /**
+         * @property {Array[string]}
+         */
+        resettableFields: ['filters', 'gridView', 'pageSize'],
+
+        /**
          * Generates default properties
          *
          * @returns {Object}
@@ -469,11 +474,9 @@ define(function(require) {
          * @returns {boolean} TRUE if values are not equal, otherwise - FALSE
          */
         stateIsResettable: function(previousState, state) {
-            const fields = ['filters', 'gridView', 'pageSize'];
-
             return !tools.isEqualsLoosely(
-                _.pick(previousState, fields),
-                _.pick(state, fields)
+                _.pick(previousState, this.resettableFields),
+                _.pick(state, this.resettableFields)
             );
         },
 
@@ -830,7 +833,7 @@ define(function(require) {
             if (!this.refreshAction) {
                 this.refreshAction = new RefreshCollectionAction({
                     datagrid: this,
-                    launcherOptions: this.actionOptions.refreshAction.launcherOptions,
+                    ...this.actionOptions.refreshAction,
                     order: 100
                 });
 
@@ -866,12 +869,12 @@ define(function(require) {
             if (!this.resetAction) {
                 this.resetAction = new ResetCollectionAction({
                     datagrid: this,
-                    launcherOptions: this.actionOptions.resetAction.launcherOptions,
+                    ...this.actionOptions.resetAction,
                     order: 200
                 });
 
-                this.listenTo(mediator, 'datagrid:doReset:' + this.name, _.debounce(function() {
-                    if (this.$el.is(':visible')) {
+                this.listenTo(mediator, 'datagrid:doReset:' + this.name, _.debounce(function(ignoreVisibility) {
+                    if (ignoreVisibility || this.$el.is(':visible')) {
                         this.resetAction.execute();
                     }
                 }, 100, true));
@@ -1165,7 +1168,11 @@ define(function(require) {
                 return this.toolbars[placement];
             }
 
-            const toolbarOptions = _.extend(this.toolbarOptions, {el: this.$(this.selectors.toolbars[placement])});
+            const toolbarOptions = _.extend(this.toolbarOptions, {
+                el: this.$(this.selectors.toolbars[placement]),
+                position: placement
+
+            });
             this.toolbars[placement] = this._createToolbar(toolbarOptions);
 
             return this.toolbars[placement];

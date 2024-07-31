@@ -28,6 +28,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
+use WebDriver\Exception\NoSuchElement;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -2398,8 +2399,34 @@ TEXT;
     public function iResetGrid($gridName = null)
     {
         $grid = $this->getGrid($gridName);
+
         $refreshButton = $grid->getElement($grid->getMappedChildElementName('GridToolbarActionReset'));
-        $refreshButton->click();
+
+        if ($refreshButton && $refreshButton->isIsset()) {
+            return $refreshButton->click();
+        }
+
+        $this->spin(function () use ($grid) {
+            try {
+                $refreshButton = $this->getPage()->find(
+                    'css',
+                    sprintf(
+                        'div[data-group^="external-toolbar-%s"] .reset-action',
+                        $grid->getAttribute('data-page-component-name')
+                    )
+                );
+
+                if ($refreshButton && $refreshButton->isVisible()) {
+                    $refreshButton->click();
+                }
+
+                return true;
+            } catch (NoSuchElement $exception) {
+                return false;
+            }
+
+            return true;
+        });
     }
 
     /**

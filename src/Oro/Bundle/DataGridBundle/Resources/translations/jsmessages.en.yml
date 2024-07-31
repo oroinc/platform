@@ -53,7 +53,7 @@
 "oro.datagrid.pagination.totalRecords": "Total of {{ totalRecords }} records"
 "oro.datagrid.pagination.totalRecordsPlural": "{1}Total of {{ totalRecords }} record|]1,Inf[Total of {{ totalRecords }} records"
 "oro.datagrid.pagination.totalRecordsShort": "{{ totalRecords }} total records"
-"oro.datagrid.pagination.totalRecordsShortPlural": "{1}<strong>{{ totalRecords }}</strong> product|]1,Inf[<strong>{{ totalRecords }}</strong> products"
+"oro.datagrid.pagination.totalRecordsShortPlural": "{1}product|]1,Inf[products"
 "oro.datagrid.pagination.totalRecordsLong": "{1}{{ minRangeThreshold }}-{{ maxRangeThreshold }} of {{ totalRecords }} product|]1,Inf[{{ minRangeThreshold }}-{{ maxRangeThreshold }} of {{ totalRecords }} products"
 oro.datagrid.extension.export.label: "Export Grid"
 oro.datagrid.extension.export.tooltip: "With this button you will export the content of the grid as it appears to you, with filters and sorting applied. All pages will be exported."
