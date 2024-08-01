@@ -8,6 +8,7 @@ use Oro\Bundle\AddressBundle\Entity\CountryTranslation;
 use Oro\Bundle\AddressBundle\Entity\RegionTranslation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\AbstractTranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterface;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueInitialize;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogueInterface;
@@ -33,11 +34,15 @@ class TranslatorCatalogueListener
 
     private function updateTranslations(MessageCatalogueInterface $catalogue, string $className, string $prefix)
     {
+        if (!in_array('entities', $catalogue->getDomains())) {
+            return;
+        }
         /** @var AbstractTranslationRepository $repository */
         $repository = $this->getRepository($className);
+        $translationRepository = $this->registry->getRepository(Translation::class);
 
         $ids = $repository->getAllIdentities();
-        $translations = $repository->findDomainTranslations($catalogue->getLocale(), 'entities');
+        $translations = $translationRepository->findDomainTranslations($catalogue->getLocale(), 'entities');
         $translations = array_combine(
             array_column($translations, 'key'),
             array_column($translations, 'value')
@@ -62,7 +67,6 @@ class TranslatorCatalogueListener
             $repository->updateDefaultTranslations($data);
         } else {
             $repository->updateTranslations($data, $catalogue->getLocale());
-            $catalogue->add($translations, 'entities');
         }
     }
 

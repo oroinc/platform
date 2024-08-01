@@ -47,6 +47,14 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_translation.database_translation.loader:
+        class: Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader
+        public: true
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: translation.loader, alias: oro_database_translation }
+
     oro_translation.cacheable_dynamic_translation_loader:
         class: Oro\Bundle\TranslationBundle\Translation\CacheableDynamicTranslationLoader
         decorates: oro_translation.dynamic_translation_loader
