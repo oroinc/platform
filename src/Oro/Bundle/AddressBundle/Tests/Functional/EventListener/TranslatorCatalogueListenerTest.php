@@ -125,4 +125,31 @@ class TranslatorCatalogueListenerTest extends WebTestCase
         self::assertEquals('BF-08', $regionTranslation->getForeignKey());
         self::assertEquals(Region::class, $regionTranslation->getObjectClass());
     }
+
+    public function testOnAfterCatalogueDumpUpdateTranslationsWithUnknownDomain(): void
+    {
+        $this->listener->onAfterCatalogueInit(new AfterCatalogueInitialize(
+            new MessageCatalogue('de', [
+                'unknown' => [
+                    'address_type.billing' => 'Nieuwe facturering',
+                    'country.AD' => 'Nieuw Andorra',
+                    'region.BF-08' => 'Nieuwe regio BF-08'
+                ],
+            ])
+        ));
+
+        /** @var AddressTypeTranslation $addressTypeTranslation */
+        $addressTypeTranslation = $this->addressTypeTranslationRepository->findOneBy([
+            'content' => 'Nieuwe facturering'
+        ]);
+        self::assertNull($addressTypeTranslation);
+
+        /** @var CountryTranslation $countryTranslation */
+        $countryTranslation = $this->countryTranslationRepository->findOneBy(['content' => 'Nieuw Andorra']);
+        self::assertNull($countryTranslation);
+
+        /** @var RegionTranslation $regionTranslation */
+        $regionTranslation = $this->regionTranslationRepository->findOneBy(['content' => 'Nieuwe regio BF-08']);
+        self::assertNull($regionTranslation);
+    }
 }

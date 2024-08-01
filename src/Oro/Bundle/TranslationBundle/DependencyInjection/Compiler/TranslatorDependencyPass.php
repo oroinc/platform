@@ -43,10 +43,6 @@ class TranslatorDependencyPass implements CompilerPassInterface
             ->addMethodCall(
                 'setDynamicTranslationProvider',
                 [new Reference('oro_translation.dynamic_translation_provider')]
-            )
-            ->addMethodCall(
-                'setEventDispatcher',
-                [new Reference('event_dispatcher')]
             );
     }
 }
