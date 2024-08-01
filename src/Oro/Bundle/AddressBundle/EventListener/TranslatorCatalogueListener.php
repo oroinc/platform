@@ -33,6 +33,9 @@ class TranslatorCatalogueListener
 
     private function updateTranslations(MessageCatalogueInterface $catalogue, string $className, string $prefix)
     {
+        if (!in_array('entities', $catalogue->getDomains())) {
+            return;
+        }
         /** @var AbstractTranslationRepository $repository */
         $repository = $this->getRepository($className);
 
@@ -62,7 +65,6 @@ class TranslatorCatalogueListener
             $repository->updateDefaultTranslations($data);
         } else {
             $repository->updateTranslations($data, $catalogue->getLocale());
-            $catalogue->add($translations, 'entities');
         }
     }
 

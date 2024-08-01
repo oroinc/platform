@@ -54,7 +54,7 @@ class TranslatorCatalogueListenerTest extends TestCase
     {
         $this->getRepositoryCallsTest();
         $this->getRepositoryAllIdentitiesCallsTest();
-        $this->messageCatalogueCallsTest(Translator::DEFAULT_LOCALE);
+        $this->messageCatalogueCallsTest(Translator::DEFAULT_LOCALE, ['entities']);
         $this->updateDefaultTranslationsCallsTest();
 
         $event = new AfterCatalogueInitialize($this->messageCatalogue);
@@ -65,7 +65,7 @@ class TranslatorCatalogueListenerTest extends TestCase
     {
         $this->getRepositoryCallsTest();
         $this->getRepositoryAllIdentitiesCallsTest();
-        $this->messageCatalogueCallsTest('de');
+        $this->messageCatalogueCallsTest('de', ['entities']);
         $this->updateTranslationsCallsTest('de');
 
         $event = new AfterCatalogueInitialize($this->messageCatalogue);
@@ -83,6 +83,12 @@ class TranslatorCatalogueListenerTest extends TestCase
             ->willReturn($this->entityManager);
 
         $this
+            ->messageCatalogue
+            ->expects(self::once())
+            ->method('getDomains')
+            ->willReturn(['entities']);
+
+        $this
             ->entityManager
             ->expects(self::any())
             ->method('getRepository')
@@ -95,6 +101,28 @@ class TranslatorCatalogueListenerTest extends TestCase
             TranslationRepositoryInterface::class,
             get_class($repo)
         ));
+        $this->listener->onAfterCatalogueInit($event);
+    }
+
+    public function testOnAfterCatalogueDumpUpdateUnknownDomain(): void
+    {
+        $this
+            ->messageCatalogue
+            ->expects(self::any())
+            ->method('getDomains')
+            ->willReturn(['unknown']);
+
+        $this
+            ->managerRegistry
+            ->expects(self::never())
+            ->method('getManagerForClass');
+
+        $this
+            ->entityManager
+            ->expects(self::never())
+            ->method('getRepository');
+
+        $event = new AfterCatalogueInitialize($this->messageCatalogue);
         $this->listener->onAfterCatalogueInit($event);
     }
 
@@ -212,8 +240,14 @@ class TranslatorCatalogueListenerTest extends TestCase
             ], $locale);
     }
 
-    private function messageCatalogueCallsTest(string $locale): void
+    private function messageCatalogueCallsTest(string $locale, array $domains = []): void
     {
+        $this
+            ->messageCatalogue
+            ->expects(self::any())
+            ->method('getDomains')
+            ->willReturn($domains);
+
         $this
             ->messageCatalogue
             ->expects(self::any())

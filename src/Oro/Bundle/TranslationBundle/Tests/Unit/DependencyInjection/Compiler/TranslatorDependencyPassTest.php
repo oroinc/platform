@@ -46,10 +46,6 @@ class TranslatorDependencyPassTest extends \PHPUnit\Framework\TestCase
                     'setDynamicTranslationProvider',
                     [new Reference('oro_translation.dynamic_translation_provider')]
                 ],
-                [
-                    'setEventDispatcher',
-                    [new Reference('event_dispatcher')]
-                ],
             ],
             $translator->getMethodCalls()
         );

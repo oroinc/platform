@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Oro\Bundle\CacheBundle\Provider\MemoryCache;
-use Oro\Bundle\TranslationBundle\Event\AfterCatalogueInitialize;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Psr\Container\ContainerInterface;
@@ -343,7 +342,9 @@ class Translator extends BaseTranslator
 
         $locales = $this->strategyProvider->getAllFallbackLocales($strategy);
         foreach ($locales as $locale) {
-            $this->newTranslator($locale, $options)->loadCatalogues();
+            $translator = $this->newTranslator($locale, $options);
+            $translator->addResource('oro_database_translation', 'orm', $locale, 'entities');
+            $translator->loadCatalogues();
         }
         $this->moveCatalogueFiles($options['cache_dir'], $cacheDir);
         $this->dynamicTranslationProvider->warmUp($locales);
@@ -358,7 +359,6 @@ class Translator extends BaseTranslator
         $translator->setMessageCatalogueSanitizer($this->catalogueSanitizer);
         $translator->setSanitizationErrorCollection($this->sanitizationErrorCollection);
         $translator->setDynamicTranslationProvider($this->dynamicTranslationProvider);
-        $translator->setEventDispatcher($this->eventDispatcher);
 
         return $translator;
     }
@@ -503,11 +503,6 @@ class Translator extends BaseTranslator
         } else {
             $this->catalogues[$locale] = new MessageCatalogue($locale);
         }
-
-        $this->eventDispatcher->dispatch(
-            new AfterCatalogueInitialize($this->catalogues[$locale]),
-            AfterCatalogueInitialize::NAME
-        );
     }
 
     private function getCatalogueCachePath(string $locale): string
