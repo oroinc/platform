@@ -1572,8 +1572,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $hints = array_filter(
             array_map(
                 function ($item) {
-                    $label = trim($this->createElement('FrontendGridFilterHintLabel', $item)->getText());
+                    $labelElement = $this->createElement('FrontendGridFilterHintLabel', $item);
                     $text = trim($this->createElement('FrontendGridFilterHint', $item)->getText());
+
+                    if (!$labelElement->isIsset()) {
+                        return $text;
+                    }
+
+                    $label = trim($labelElement->getText());
 
                     return $label && $text ? sprintf('%s %s', $label, $text) : '';
                 },

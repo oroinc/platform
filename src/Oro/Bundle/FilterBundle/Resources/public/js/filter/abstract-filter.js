@@ -122,6 +122,8 @@ define(function(require, exports, module) {
          */
         outerHintContainer: void 0,
 
+        HintView: FilterHint,
+
         /**
          * @inheritdoc
          */
@@ -137,7 +139,7 @@ define(function(require, exports, module) {
          */
         initialize: function(options) {
             const opts = _.pick(options || {}, 'renderable', 'visible', 'placeholder', 'showLabel', 'label',
-                'templateSelector', 'templateTheme', 'template', 'renderMode', 'outerHintContainer');
+                'templateSelector', 'templateTheme', 'template', 'renderMode', 'outerHintContainer', 'HintView');
             _.extend(this, opts);
 
             this._defineTemplate();
@@ -155,7 +157,11 @@ define(function(require, exports, module) {
 
             AbstractFilter.__super__.initialize.call(this, options);
 
-            const hintView = new FilterHint({
+            this.initHint();
+        },
+
+        initHint() {
+            const hintView = new this.HintView({
                 filter: this
             });
 
