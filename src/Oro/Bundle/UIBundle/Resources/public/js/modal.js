@@ -252,7 +252,7 @@ define(function(require, exports, module) {
 
             // Adjust the modal and backdrop z-index; for dealing with multiple modals
             const numModalViews = ModalView.count;
-            const $backdrop = $('.modal-backdrop:eq(' + numModalViews + ')');
+            const $backdrop = $('.modal-backdrop').eq(numModalViews);
             const backdropIndex = parseInt($backdrop.css('z-index'), 10);
             const elIndex = parseInt($backdrop.css('z-index'), 10) + 1;
 
@@ -281,7 +281,7 @@ define(function(require, exports, module) {
 
             // Focus OK button
             if (this.options.focusOk) {
-                this.$('.ok').focus();
+                this.$('.ok').trigger('focus');
             }
 
             this.hasOpenModal = true;

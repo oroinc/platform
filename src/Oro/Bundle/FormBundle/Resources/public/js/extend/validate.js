@@ -220,7 +220,7 @@ define(function(require, exports, module) {
 
         if ($elem.is('.select2[type=hidden]') || $elem.is('select.select2')) {
             $elem.parent().find('input.select2-focusser')
-                .focus()
+                .trigger('focus')
                 .trigger('focusin');
         } else if (!$elem.filter(':visible').length && $firstValidationError.length) {
             $firstValidationError[0].scrollIntoView({block: 'center'});

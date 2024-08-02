@@ -234,7 +234,7 @@ define(function(require) {
          *                         or last
          */
         focus: function(atEnd) {
-            this.$('input[name=value]').setCursorToEnd().focus();
+            this.$('input[name=value]').setCursorToEnd().trigger('focus');
         },
 
         /**

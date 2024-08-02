@@ -104,7 +104,7 @@ define(function(require) {
             this.initQueryTypeConverter();
 
             this.form = this.$storage.parents('form');
-            this.form.submit(this.onBeforeSubmit.bind(this));
+            this.form.on('submit', this.onBeforeSubmit.bind(this));
 
             return promise;
         },
@@ -149,7 +149,7 @@ define(function(require) {
 
                     confirm.on('ok', handleEntityChange);
                     confirm.on('cancel', function() {
-                        $entityChoice.val(oldVal).change();
+                        $entityChoice.val(oldVal).trigger('change');
                     });
                     confirm.open();
                 } else {

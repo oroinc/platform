@@ -108,7 +108,7 @@ define(function(require) {
                 e.stopImmediatePropagation();
             });
 
-            $currentView.submit();
+            $currentView.trigger('submit');
         },
 
         _onVariableClick: function(field, value) {

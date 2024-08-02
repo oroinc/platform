@@ -90,7 +90,7 @@ define(function(require) {
                 delete this._isSelection;
             },
             'focus .select2-choice': function() {
-                this.$('.select2-focusser').focus();
+                this.$('.select2-focusser').trigger('focus');
             }
         },
 

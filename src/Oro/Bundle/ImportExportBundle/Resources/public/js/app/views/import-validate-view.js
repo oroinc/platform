@@ -52,12 +52,12 @@ define(function(require) {
                 });
 
                 confirm.on('ok', function() {
-                    $form.submit();
+                    $form.trigger('submit');
                 });
 
                 confirm.open();
             } else {
-                $form.submit();
+                $form.trigger('submit');
             }
         },
 
@@ -65,7 +65,7 @@ define(function(require) {
             const $form = this.getCurrentlyActiveTabContent().find('form');
 
             $form.find('input[name=isValidateJob]').val(true);
-            $form.submit();
+            $form.trigger('submit');
         },
 
         onWidgetLoad: function(widget) {

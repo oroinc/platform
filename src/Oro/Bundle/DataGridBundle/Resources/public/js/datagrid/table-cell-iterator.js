@@ -10,7 +10,7 @@ class TableCellIterator {
         }
 
         this.$table = $table;
-        this.setCurrentCell($table.find('[aria-colindex]:first'));
+        this.setCurrentCell($table.find('[aria-colindex]').first());
     }
 
     setCurrentCell($cell) {
@@ -46,7 +46,7 @@ class TableCellIterator {
     }
 
     prev() {
-        const $cell = this.$cell.prevAll('[aria-colindex]:visible:first');
+        const $cell = this.$cell.prevAll('[aria-colindex]:visible').first();
         if ($cell.length) {
             this.setCurrentCell($cell);
         }
@@ -54,7 +54,7 @@ class TableCellIterator {
     }
 
     next() {
-        const $cell = this.$cell.nextAll('[aria-colindex]:visible:first');
+        const $cell = this.$cell.nextAll('[aria-colindex]:visible').first();
         if ($cell.length) {
             this.setCurrentCell($cell);
         }
@@ -62,7 +62,7 @@ class TableCellIterator {
     }
 
     firstInRow() {
-        const $cell = this.$row.find('[aria-colindex]:visible:first');
+        const $cell = this.$row.find('[aria-colindex]:visible').first();
         if (!this.$cell.is($cell)) {
             this.setCurrentCell($cell);
         }
@@ -70,7 +70,7 @@ class TableCellIterator {
     }
 
     lastInRow() {
-        const $cell = this.$row.find('[aria-colindex]:visible:last');
+        const $cell = this.$row.find('[aria-colindex]:visible').last();
         if (!this.$cell.is($cell)) {
             this.setCurrentCell($cell);
         }

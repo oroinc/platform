@@ -275,7 +275,7 @@ define(function(require) {
             }
 
             if (field.length) {
-                field.insertAtCursor(variable).focus();
+                field.insertAtCursor(variable).trigger('focus');
                 mediator.trigger('email-variable-view:click-variable', field, variable);
             } else {
                 mediator.execute('showFlashMessage', 'error',

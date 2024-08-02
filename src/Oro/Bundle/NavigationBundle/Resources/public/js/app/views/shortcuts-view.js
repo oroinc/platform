@@ -152,7 +152,7 @@ define(function(require) {
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
                         this.select();
-                        this.$element.focus();
+                        this.$element.trigger('focus');
                     }
                 }
             });
@@ -195,7 +195,7 @@ define(function(require) {
                 if (!dataItem.dialog) {
                     mediator.execute('redirectTo', {url: dataItem.url}, {redirect: true});
                 } else {
-                    $input.parent().find('li.active > a').click();
+                    $input.parent().find('li.active > a').trigger('click');
                 }
             }
         },

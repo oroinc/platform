@@ -30,7 +30,7 @@ define(function(require) {
                 'data-scroll-focus': ''
             }).one('blur', function() {
                 $(this).removeAttr('data-scroll-focus tabindex');
-            }).focus();
+            }).trigger('focus');
         }
     }
 

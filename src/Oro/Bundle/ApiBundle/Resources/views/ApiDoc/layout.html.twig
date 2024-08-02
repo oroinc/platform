@@ -116,7 +116,7 @@
                     setTimeout(function() {
                         $('body,html').scrollTop(elem.position().top);
                     });
-                    elem.find('.toggler').click();
+                    elem.find('.toggler').trigger('click');
                     var section = elem.parents('.section').first();
                     if (section) {
                         section.addClass('active');

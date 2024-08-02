@@ -339,7 +339,7 @@ $.extend($.datepicker.constructor.prototype, {
     _attachments($input, inst) {
         $input
             .off('click', this._showDatepicker)
-            .click(this._showDatepicker);
+            .on('click', this._showDatepicker);
         original._attachments.call(this, $input, inst);
     },
 

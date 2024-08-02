@@ -34,7 +34,7 @@ define(function(require) {
                     $(that._element).has(event.target).length
                 ) {
                     $(document).off(Event.FOCUSIN);
-                    that._element.focus();
+                    that._element.trigger('focus');
                     $(document).on(Event.FOCUSIN, safeSetFocus);
                 }
             });

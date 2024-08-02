@@ -136,7 +136,7 @@ define([
         },
 
         updateDropdownScroll: function($toggle) {
-            const $scrollable = $toggle.find('.dropdown-menu-wrapper__scrollable:first');
+            const $scrollable = $toggle.find('.dropdown-menu-wrapper__scrollable').first();
             if (!$scrollable.length) {
                 return;
             }
@@ -146,7 +146,7 @@ define([
             const $scrollableParent = $scrollable.parent();
 
             // reset styles to recalc it
-            const scrollableHeight = $scrollable.children(':first').outerHeight();
+            const scrollableHeight = $scrollable.children().first().outerHeight();
             $scrollable.css('max-height', scrollableHeight + 'px');
             $scrollableParent.css('margin-top', 0);
 
@@ -181,7 +181,7 @@ define([
 
         updateDropdownChildAlign: function($node) {
             const limit = this.calculateMenuPosition(this.$el);
-            const $innerDropdown = $node.find('.dropdown-menu:first');
+            const $innerDropdown = $node.find('.dropdown-menu').first();
             const $innerDropdownChildren = $innerDropdown.children('.dropdown');
             let isDropdownChildrenOutside = false;
 
@@ -197,7 +197,7 @@ define([
             }
 
             _.each($innerDropdownChildren, function(element) {
-                if (this.calculateMenuPosition($(element).find('.dropdown-menu:first')) > limit) {
+                if (this.calculateMenuPosition($(element).find('.dropdown-menu').first()) > limit) {
                     isDropdownChildrenOutside = true;
                 }
             }, this);
@@ -221,7 +221,7 @@ define([
         },
 
         updateDropdownChildPosition: function($toggle) {
-            const $child = $toggle.children('.dropdown-menu-wrapper__child:first');
+            const $child = $toggle.children('.dropdown-menu-wrapper__child').first();
 
             if (!$child.length) {
                 return;
@@ -325,7 +325,7 @@ define([
                 this.routeMatchedMenuItemsCache[route] = match;
                 if (match.length > 1) {
                     match = _.find(match, function(el) {
-                        const link = $(el).find('a[href]:first')[0];
+                        const link = $(el).find('a[href]').get(0);
                         return link ? mediator.execute('compareUrl', link.pathname) : false;
                     });
                 }

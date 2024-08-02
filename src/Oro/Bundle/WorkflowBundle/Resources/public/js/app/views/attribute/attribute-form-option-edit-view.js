@@ -122,7 +122,7 @@ define(function(require) {
             this.labelEl = this.form.find('[name=label]');
             this.requiredEl = this.form.find('[name=required]');
 
-            this.resetBtn.click(this.resetForm.bind(this));
+            this.resetBtn.on('click', this.resetForm.bind(this));
 
             this.$el.append(this.form);
             // since we have no async operation right here but there is one in subview `deferredRender` promise

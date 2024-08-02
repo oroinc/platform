@@ -38,7 +38,7 @@ define(function(require) {
             e.preventDefault();
 
             widgetManager.getWidgetInstanceByAlias(this.widgetAlias, function(widget) {
-                widget.form.submit();
+                widget.form.trigger('submit');
             });
         },
 

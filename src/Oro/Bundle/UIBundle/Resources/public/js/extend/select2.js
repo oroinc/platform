@@ -307,7 +307,7 @@ define(function(require) {
             // the submitted options.
             const option = $(this.select).children('[value="' + $.escapeSelector(data.id) + '"]');
             option.detach();
-            $(this.select).append(option).change();
+            $(this.select).append(option).trigger('change');
 
             if (!this.triggerSelect(data)) { return; }
 
@@ -717,7 +717,7 @@ define(function(require) {
 
             // @todo BAP-3928, remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
-                this.focusser.focus();
+                this.focusser.trigger('focus');
             }
 
             toggleAriaSelected.call(this);
@@ -733,7 +733,7 @@ define(function(require) {
             this.selection.data('select2-data', data);
 
             container.empty();
-            if (data !== null && data !== []) {
+            if (data !== null) {
                 formatted = this.opts.formatSelection(data, container, this.opts.escapeMarkup);
             }
             if (formatted !== undefined) {
@@ -832,7 +832,7 @@ define(function(require) {
                     document.activeElement === this.body().get(0)
                 ) {
                     window.setTimeout(this.bind(function() {
-                        this.search.focus();
+                        this.search.trigger('focus');
                     }), 0);
                 }
             }));

@@ -150,7 +150,7 @@ const NavigationMenuView = BaseView.extend({
      * @param {function} callback
      */
     registerKey(keyCode, callback) {
-        if ($.isNumeric(keyCode) && typeof callback === 'function') {
+        if (typeof keyCode === 'number' && typeof callback === 'function') {
             this._keysMap[keyCode] = callback;
         }
     },
@@ -201,7 +201,7 @@ const NavigationMenuView = BaseView.extend({
             return false;
         }
 
-        return $menu.width() === $menu.children(':first').width();
+        return $menu.width() === $menu.children().first().width();
     },
 
     /**

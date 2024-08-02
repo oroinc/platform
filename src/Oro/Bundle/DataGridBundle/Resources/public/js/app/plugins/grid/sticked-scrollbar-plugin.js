@@ -105,11 +105,11 @@ define(function(require) {
                 $document: $(document),
                 $grid: this.grid.$grid,
                 $scrollableContainer: this.grid.$grid.closest('.scrollable-container'),
-                $container: this.grid.$grid.parents('.grid-scrollable-container:first'),
-                $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]:first'),
-                $oroTabs: this.grid.$grid.parents('.oro-tabs:first'),
-                $collapsible: this.grid.$grid.parents('.collapse:first'),
-                $thead: this.grid.$grid.find('thead:first')
+                $container: this.grid.$grid.parents('.grid-scrollable-container').first(),
+                $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]').first(),
+                $oroTabs: this.grid.$grid.parents('.oro-tabs').first(),
+                $collapsible: this.grid.$grid.parents('.collapse').first(),
+                $thead: this.grid.$grid.find('thead').first()
             };
         },
 

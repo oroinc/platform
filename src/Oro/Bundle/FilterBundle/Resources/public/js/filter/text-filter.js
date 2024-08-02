@@ -463,7 +463,7 @@ define(function(require, exports, module) {
         },
 
         _focusCriteriaValue() {
-            this.getCriteriaValueFieldToFocus().focus().select();
+            this.getCriteriaValueFieldToFocus().trigger('focus').trigger('select');
         },
 
         /**

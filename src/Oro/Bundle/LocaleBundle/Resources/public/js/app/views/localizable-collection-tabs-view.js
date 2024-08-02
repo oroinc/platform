@@ -118,10 +118,10 @@ define(function(require) {
             this.$el.find(this.options.selectors.itemValue).find('.tox-tinymce').each(function() {
                 tinyMCE.get(self.getValueEl(self.getItemEl(this)).attr('id'))
                     .on('change', function() {
-                        $(this.targetElm).change();
+                        $(this.targetElm).trigger('change');
                     })
                     .on('keyup', function() {
-                        $(this.targetElm).change();
+                        $(this.targetElm).trigger('change');
                     });
             });
 
@@ -129,7 +129,7 @@ define(function(require) {
                 .on('focus', function(e) {
                     $(e.currentTarget).data('prevValue', e.currentTarget.value);
                 })
-                .change(this.switchFallbackTypeEvent.bind(this));
+                .on('change', this.switchFallbackTypeEvent.bind(this));
         },
 
         /**
@@ -265,7 +265,7 @@ define(function(require) {
                 }
             });
             if (isChanged) {
-                $toValue.filter(':first').change();
+                $toValue.first().trigger('change');
             }
         },
 

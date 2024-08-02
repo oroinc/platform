@@ -198,7 +198,7 @@
             "numeral": "2.0.6",
             "jquery-form": "4.3.0",
             "fuse.js": "6.6.2",
-            "jquery": "3.5.*",
+            "jquery": "3.7.*",
             "jquery-ui": "1.13.*",
             "backbone": "1.4.*",
             "underscore": "1.13.*",

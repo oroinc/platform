@@ -181,17 +181,17 @@ define(function (require) {
             var title = this.minimizedEl.find('.ui-dialog-title');
             title.disableSelection().attr('title', title.text());
             var self = this;
-            this.minimizedEl.find('.ui-dialog-titlebar').dblclick(function() {
-                self.uiDialogTitlebar.dblclick();
+            this.minimizedEl.find('.ui-dialog-titlebar').on('dblclick', function() {
+                self.uiDialogTitlebar.trigger('dblclick');
             });
             // Proxy events to original window
             var buttons = ['close', 'maximize', 'restore'];
             for (var i = 0; i < buttons.length; i++) {
                 var btnClass = '.ui-dialog-titlebar-' + buttons[i];
-                this.minimizedEl.find(btnClass).click(
+                this.minimizedEl.find(btnClass).on('click',
                     function(btnClass) {
                         return function() {
-                            widget.find(btnClass).click();
+                            widget.find(btnClass).trigger('click');
                             return false;
                         }
                     }(btnClass));
@@ -425,16 +425,16 @@ define(function (require) {
                     button = $(button);
                     button
                     .attr('role', 'button')
-                    .mouseover(function() {
+                    .on('mouseover', function() {
                         $(this).addClass('ui-state-hover');
                     })
-                    .mouseout(function() {
+                    .on('mouseout', function() {
                         $(this).removeClass('ui-state-hover');
                     })
-                    .focus(function() {
+                    .on('focus', function() {
                         $(this).addClass('ui-state-focus');
                     })
-                    .blur(function() {
+                    .on('blur', function() {
                         $(this).removeClass('ui-state-focus');
                     });
                     this._buttons[type] = button;
@@ -446,21 +446,21 @@ define(function (require) {
 
             this._buttons.maximize
             .toggle(this.options.allowMaximize)
-            .click(function (e) {
+            .on('click', function (e) {
                 e.preventDefault();
                 self.maximize();
             });
 
             this._buttons.minimize
             .toggle(this.options.allowMinimize)
-            .click(function (e) {
+            .on('click', function (e) {
                 e.preventDefault();
                 self.minimize();
             });
 
             this._buttons.restore
             .hide()
-            .click(function (e) {
+            .on('click', function (e) {
                 e.preventDefault();
                 self.restore();
             });
@@ -468,7 +468,7 @@ define(function (require) {
             // other titlebar behaviors
             this.uiDialogTitlebar
             // on-dblclick-titlebar : maximize/minimize/collapse/restore
-            .dblclick(function (evt) {
+            .on('dblclick', function (evt) {
                 if (self.options.dblclick && self.options.dblclick.length) {
                     if (self.state() !== 'normal') {
                         self.restore();
@@ -478,7 +478,7 @@ define(function (require) {
                 }
             })
             // avoid text-highlight when double-click
-            .select(function () {
+            .on('select', function () {
                 return false;
             });
 

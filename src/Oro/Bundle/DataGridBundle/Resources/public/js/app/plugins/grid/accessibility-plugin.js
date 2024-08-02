@@ -216,7 +216,7 @@ const AccessibilityPlugin = BasePlugin.extend({
                 if ($dropdownMenu.length) {
                     // it might be dropdown-menu close, therefore move focus back to dropdown toggler button
                     const $toggler = $dropdownMenu.parent().find('[data-toggle="dropdown"]');
-                    this.focusElement($toggler.is(':tabbable') ? $toggler : $toggler.find(':tabbable:first'));
+                    this.focusElement($toggler.is(':tabbable') ? $toggler : $toggler.find(':tabbable').first());
                 } else if (!this.suspended && !this._isDocumentClick) {
                     // cell content might been deleting, therefore schedule a restore for the current cell
                     this._lastIndex = this.iterator.index;
@@ -320,7 +320,7 @@ const AccessibilityPlugin = BasePlugin.extend({
                         // to pass the check for `clickPermit` in GridRow
                         $target.trigger('mousedown');
                         $target.trigger('mouseup');
-                        $target.click();
+                        $target.trigger('click');
                     }
                     e.preventDefault();
                 }
@@ -377,7 +377,7 @@ const AccessibilityPlugin = BasePlugin.extend({
         }
 
         if (!$elem.is(document.activeElement)) {
-            $elem.focus();
+            $elem.trigger('focus');
         }
     },
 
@@ -453,7 +453,7 @@ const AccessibilityPlugin = BasePlugin.extend({
 
     _resetCurrent() {
         const current = this.iterator;
-        this.iterator.setCurrentCell(this.$table.find('[aria-colindex]:visible:first'));
+        this.iterator.setCurrentCell(this.$table.find('[aria-colindex]:visible').first());
 
         if (this.$table.find('[aria-colindex]:not(th)').length) {
             while (

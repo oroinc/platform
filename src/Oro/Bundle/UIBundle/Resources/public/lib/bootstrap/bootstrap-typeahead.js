@@ -45,7 +45,7 @@ define(['jquery'], function($) {
             var val = this.$menu.find('.active').attr('data-value')
             this.$element
                 .val(this.updater(val))
-                .change()
+                .trigger('change')
             return this.hide()
         }
 
@@ -280,7 +280,7 @@ define(['jquery'], function($) {
             e.stopPropagation()
             e.preventDefault()
             this.select()
-            this.$element.focus()
+            this.$element.trigger('focus')
         }
 
         , mouseenter: function (e) {

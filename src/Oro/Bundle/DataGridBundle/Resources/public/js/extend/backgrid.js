@@ -196,7 +196,7 @@ define(function(require) {
         } else if (e.type === 'change') {
             const val = formatter.toRaw($el.prop('checked'), model);
             model.set(column.get('name'), val);
-            $el.focus();
+            $el.trigger('focus');
         }
     };
 

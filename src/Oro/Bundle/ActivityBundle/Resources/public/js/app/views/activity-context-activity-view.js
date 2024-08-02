@@ -111,7 +111,7 @@ define([
                 const $view = $(view);
                 self.$containerContextTargets.append($view);
 
-                $view.find('[data-role="delete-item"]').click(function() {
+                $view.find('[data-role="delete-item"]').on('click', function() {
                     $view.fadeOut();
                     model.destroy({
                         success: function(model, response) {

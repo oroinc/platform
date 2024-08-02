@@ -98,7 +98,7 @@ define(function(require) {
 
             $(form).find('[type="text"]').each((index, element) => {
                 $(element).attr('value', '');
-                $(element).val('').change();
+                $(element).val('').trigger('change');
             });
         },
 
@@ -139,7 +139,7 @@ define(function(require) {
                 this._triggerContentLoadEvents();
             }
 
-            this.$el.find('.fallback-status, .fa-language').bind('click', () => {
+            this.$el.find('.fallback-status, .fa-language').on('click', () => {
                 this.resetDialogPosition();
             });
         },

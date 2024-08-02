@@ -21,7 +21,7 @@ define(function(require) {
             const $spy = $(this);
 
             if (tools.isDesktop()) {
-                $spy.find('.responsive-section:last').each(function() {
+                $spy.find('.responsive-section').last().each(function() {
                     const $section = $(this);
                     const titleHeight = $section.find('.scrollspy-title:visible').outerHeight();
                     $section.css('min-height', 'calc(100% + ' + (titleHeight || 0) + 'px)');

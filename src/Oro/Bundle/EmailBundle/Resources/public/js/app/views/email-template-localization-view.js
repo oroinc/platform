@@ -154,7 +154,7 @@ define(function(require) {
                     editor.setContent(content);
                 });
 
-                this.fields[fieldName].$input.change();
+                this.fields[fieldName].$input.trigger('change');
             }
         },
 

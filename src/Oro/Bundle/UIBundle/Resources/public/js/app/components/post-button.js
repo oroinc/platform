@@ -3,7 +3,7 @@ import __ from 'orotranslation/js/translator';
 import mediator from 'oroui/js/mediator';
 
 export default function(options) {
-    options._sourceElement.click(function(e) {
+    options._sourceElement.on('click', function(e) {
         e.preventDefault();
         mediator.execute('showLoading');
         $.post({

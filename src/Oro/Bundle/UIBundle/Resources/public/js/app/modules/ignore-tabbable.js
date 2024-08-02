@@ -26,7 +26,7 @@ const onFocusin = event => {
             : manageFocus.getFirstTabbable(tabbables);
 
         if (nextTabbable) {
-            $(nextTabbable).focus();
+            $(nextTabbable).trigger('focus');
             if (nextTabbable.nodeName.toLowerCase() === 'input' && typeof nextTabbable.select !== 'undefined') {
                 nextTabbable.select();
             }
@@ -36,7 +36,7 @@ const onFocusin = event => {
         }
     }
 
-    $receivingFocus.blur();
+    $receivingFocus.trigger('blur');
 };
 
 document.addEventListener('focusin', onFocusin, true);

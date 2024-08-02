@@ -497,7 +497,7 @@ define(function(require) {
         },
 
         _onCriteriaListMousedown: function() {
-            $(':focus').blur();
+            $(':focus').trigger('blur');
         },
 
         _onCriteriaGrab: function(e, ui) {

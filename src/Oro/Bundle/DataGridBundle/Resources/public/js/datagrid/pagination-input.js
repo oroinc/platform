@@ -2,8 +2,7 @@ define([
     'tpl-loader!orodatagrid/templates/datagrid/pagination-input.html',
     'jquery',
     'underscore',
-    './pagination',
-    'jquery.numeric'
+    './pagination'
 ], function(template, $, _, Pagination) {
     'use strict';
 
@@ -91,7 +90,7 @@ define([
          */
         render: function() {
             PaginationInput.__super__.render.call(this);
-            this.$('input').numeric({decimal: false, negative: false});
+            this.$('input');
             return this;
         }
     });

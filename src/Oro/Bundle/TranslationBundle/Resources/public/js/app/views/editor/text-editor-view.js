@@ -26,7 +26,7 @@ define(function(require) {
          * @inheritdoc
          */
         focus: function(atEnd) {
-            this.$('[name=value]').setCursorToEnd().focus();
+            this.$('[name=value]').setCursorToEnd().trigger('focus');
             this.updateButtonsOffset();
         },
 
