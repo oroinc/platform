@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
-use Doctrine\DBAL\Types\Types;
 use Gedmo\Translatable\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -149,23 +148,6 @@ abstract class AbstractTranslationRepository extends TranslationRepository imple
         string $languageCode,
         string $domain
     ): array {
-        $qb = $this->_em->createQueryBuilder()
-            ->from(Translation::class, 't');
-        $qb->distinct()
-            ->select('k.key, t.value')
-            ->join('t.language', 'l')
-            ->join('t.translationKey', 'k')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('l.code', ':code'),
-                    $qb->expr()->gt('t.scope', ':scope'),
-                    $qb->expr()->eq('k.domain', ':domain')
-                )
-            )
-            ->setParameter('code', $languageCode, Types::STRING)
-            ->setParameter('domain', $domain, Types::STRING)
-            ->setParameter('scope', Translation::SCOPE_SYSTEM, Types::INTEGER);
-
-        return $qb->getQuery()->getArrayResult();
+        return $this->_em->getRepository(Translation::class)->findDomainTranslations($languageCode, $domain);
     }
 }

@@ -14,7 +14,6 @@ use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -52,13 +51,10 @@ class DebugTranslatorTest extends TestCase
 
     private ContainerInterface|MockObject $container;
 
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-
     protected function setUp(): void
     {
         $this->cacheDir = $this->getTempDir('debug_translator');
         $this->container = $this->createMock(ContainerInterface::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
     private function getTranslator(array $fallbackLocales = []): DebugTranslator
@@ -67,18 +63,14 @@ class DebugTranslatorTest extends TestCase
             ->container
             ->expects(self::atLeastOnce())
             ->method('get')
-            ->with('loader')
+            ->with('oro_database_translation')
             ->willReturn($this->getLoader());
-        $this
-            ->eventDispatcher
-            ->expects(self::atLeastOnce())
-            ->method('dispatch');
 
         $translator = new DebugTranslator(
             $this->container,
             new MessageFormatter(),
             'en',
-            ['loader' => ['loader']],
+            ['oro_database_translation' => ['oro_database_translation']],
             ['resource_files' => [], 'cache_dir' => $this->cacheDir]
         );
 
@@ -90,10 +82,9 @@ class DebugTranslatorTest extends TestCase
             new DynamicTranslationLoaderStub(),
             $this->createMock(DynamicTranslationCache::class)
         ));
-        $translator->setEventDispatcher($this->eventDispatcher);
 
-        $translator->addResource('loader', 'foo.fr.loader', 'fr');
-        $translator->addResource('loader', 'foo.en.loader', 'en');
+        $translator->addResource('oro_database_translation', 'orm.en.oro_database_translation', 'en');
+        $translator->addResource('oro_database_translation', 'orm.fr.oro_database_translation', 'fr');
 
         return $translator;
     }
