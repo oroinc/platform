@@ -100,7 +100,7 @@ define(function(require) {
 
                 iframe.one('load', function() {
                     confirmModal._hideLoading();
-                    $currentView.removeAttr('target');
+                    $currentView.attr('target', null);
                     $currentView.attr('action', formAction);
                 });
 
@@ -108,7 +108,7 @@ define(function(require) {
                 e.stopImmediatePropagation();
             });
 
-            $currentView.submit();
+            $currentView.trigger('submit');
         },
 
         _onVariableClick: function(field, value) {

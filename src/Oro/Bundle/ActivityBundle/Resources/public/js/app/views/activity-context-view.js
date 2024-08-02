@@ -58,7 +58,7 @@ define(function(require) {
                 }
 
                 dropdown.append($view);
-                dropdown.find('.dropdown-item:last').click(function() {
+                dropdown.find('.dropdown-item:last').on('click', function() {
                     self.currentTargetClass(model.attributes.className);
                     dropdown.find('> .dropdown-item').each(function() {
                         $(this).removeClass('active');

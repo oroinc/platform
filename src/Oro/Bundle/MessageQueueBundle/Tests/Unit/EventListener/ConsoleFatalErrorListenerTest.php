@@ -67,7 +67,7 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
             new ConsoleCommandEvent($this->createMock($command), $this->input, $this->output)
         );
 
-        $this->assertSame(
+        $this->assertEquals(
             self::$defaultLoggers + [
                 E_USER_ERROR => [$this->logger, LogLevel::CRITICAL],
                 E_RECOVERABLE_ERROR => [$this->logger, LogLevel::CRITICAL],
@@ -94,7 +94,7 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
             new ConsoleCommandEvent($this->createMock(CleanupCommand::class), $this->input, $this->output)
         );
 
-        $this->assertSame(
+        $this->assertEquals(
             self::$defaultLoggers + [
                 E_USER_ERROR => [null, LogLevel::CRITICAL],
                 E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],

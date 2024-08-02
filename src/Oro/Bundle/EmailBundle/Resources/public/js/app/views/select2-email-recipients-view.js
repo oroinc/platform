@@ -158,7 +158,7 @@ define(function(require) {
                 $el.one('change', e => {
                     $el.inputWidget('search', e.removed.text);
                 });
-                $choice.find('.select2-search-choice-close').click();
+                $choice.find('.select2-search-choice-close').trigger('click');
             });
         },
 

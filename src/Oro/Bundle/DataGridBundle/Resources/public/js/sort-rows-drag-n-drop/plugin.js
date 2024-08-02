@@ -315,7 +315,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     onMouseDown(e) {
         // set focus to table element, in order to properly handle keyDown and keyUp events (e.g. ESC key press)
-        this.main.$grid.focus({
+        this.main.$grid.get(0).focus({
             preventScroll: true
         });
 

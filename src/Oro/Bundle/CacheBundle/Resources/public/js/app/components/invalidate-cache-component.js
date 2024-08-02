@@ -57,18 +57,18 @@ define(function(require) {
         onRemoveInvalidationClick: function() {
             $(this.invalidateAt).val('');
             $(this.invalidateNow).val('');
-            $(this.form).submit();
+            $(this.form).trigger('submit');
         },
 
         onSelectChange: function() {
             const value = $(this.invalidateType).val();
             if (value === 'immediate') {
                 $(this.invalidateNow).val(1);
-                $(this.$elem).find('tr>td:gt(1)').hide();
+                $(this.$elem).find('tr > td').slice(2).hide();
                 $(this.removeInvalidationButton).hide();
             } else if (value === 'scheduled') {
                 $(this.invalidateNow).val('');
-                $(this.$elem).find('tr>td:gt(1)').show();
+                $(this.$elem).find('tr > td').slice(2).show();
                 this.toggleRemoveInvalidationVisibility();
             }
         },

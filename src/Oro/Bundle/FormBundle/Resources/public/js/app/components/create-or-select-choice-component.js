@@ -110,7 +110,7 @@ define(function(require) {
                 return;
             }
 
-            this.$mode.val(mode).change();
+            this.$mode.val(mode).trigger('change');
         },
 
         /**
@@ -163,9 +163,9 @@ define(function(require) {
                 const newVal = self._getCleanValue($el);
                 $el.val(newVal);
                 if ($el.is('textarea')) {
-                    $el.text(newVal).change();
+                    $el.text(newVal).trigger('change');
                 } else {
-                    $el.change();
+                    $el.trigger('change');
                 }
             });
 
@@ -225,13 +225,13 @@ define(function(require) {
                     $modifiedField = this.$newEntity.find(
                         '[name$="' + inputName + '"][value="' + $element.val() + '"]'
                     );
-                    $modifiedField.prop('checked', $element.is(':checked')).change();
+                    $modifiedField.prop('checked', $element.is(':checked')).trigger('change');
                 } else {
                     const editor = tinyMCE.get($modifiedField.attr('id'));
                     if (editor) {
                         editor.setContent($element.val());
                     } else {
-                        $modifiedField.val($element.val()).change();
+                        $modifiedField.val($element.val()).trigger('change');
                     }
                 }
             });

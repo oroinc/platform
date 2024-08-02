@@ -104,12 +104,24 @@ define(function(require) {
             this.element.find('.accordion').removeClass('accordion collapsed');
             this.element.find('.accordion-body')
                 .removeClass('accordion-body collapse show')
-                .removeAttr('id style role aria-labelledby')
+                .attr({
+                    'id': null,
+                    'style': null,
+                    'role': null,
+                    'aria-labelledby': null
+                })
                 .addClass('dropdown-menu');
             this.element.find('.accordion-group').removeClass('accordion-group').addClass('dropdown');
             this.element.find('.accordion-toggle')
                 .removeClass('accordion-toggle collapsed')
-                .removeAttr('id data-toggle data-target data-parent aria-controls aria-expanded');
+                .attr({
+                    'id': null,
+                    'data-toggle': null,
+                    'data-target': null,
+                    'data-parent': null,
+                    'aria-controls': null,
+                    'aria-expanded': null
+                });
             this.element.find('.accordion-heading').removeClass('accordion-heading');
         },
 

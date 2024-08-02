@@ -16,6 +16,7 @@ module.exports = Promise.all(
     const Application = require('oroui/js/app/application');
     const routes = require('oroui/js/app/routes');
     const promises = require('app-modules').default;
+
     promises.push($.when($.ready));
 
     return Promise.all(promises).then(() => {

@@ -45,7 +45,7 @@ define(function(require) {
             if (typeof y === 'undefined' || y === false) {
                 y = cell.y;
             }
-            if (!_.isArray(this.cells[y][x]) || cell.x === x && cell.y === y) {
+            if (!Array.isArray(this.cells[y][x]) || cell.x === x && cell.y === y) {
                 return false;
             }
             const place = this.cells[cell.y][cell.x];

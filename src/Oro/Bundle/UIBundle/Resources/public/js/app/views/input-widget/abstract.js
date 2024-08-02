@@ -95,7 +95,8 @@ define(function(require) {
             this.$el.data('inputWidget', this)
                 .attr('data-bound-input-widget', this.widgetFunctionName || 'no-name');
             if (!this.widgetFunction && this.widgetFunctionName) {
-                this.widgetFunction = this.$el[this.widgetFunctionName].bind(this.$el);
+                const widgetFunction = this.$el[this.widgetFunctionName];
+                this.widgetFunction = widgetFunction.bind(this.$el);
             }
 
             if (this.containerClassSuffix) {
@@ -116,7 +117,7 @@ define(function(require) {
             this.disposeWidget();
 
             this.$el.removeData('inputWidget')
-                .removeAttr('data-bound-input-widget');
+                .attr('data-bound-input-widget', null);
             delete this.$container;
 
             return AbstractInputWidgetView.__super__.dispose.call(this);

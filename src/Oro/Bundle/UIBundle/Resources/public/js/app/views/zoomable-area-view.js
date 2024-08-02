@@ -48,7 +48,7 @@ define(function(require) {
             _.extend(this, _.pick(options, 'scrollHintContainerClass', 'scrollHintLabel', 'scrollHintDelay'));
 
             ZoomAreaView.__super__.initialize.call(this, options);
-            this.$zoomedElement = this.$el.find('>*:first');
+            this.$zoomedElement = this.$el.children().first();
             if (!this.model) {
                 const initialValues = {
                     zoomLevel: 1,

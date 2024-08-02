@@ -98,7 +98,7 @@ define(function(require) {
         },
 
         uploadNewClick: function() {
-            this.$('input.input-upload-new').click();
+            this.$('input.input-upload-new').trigger('click');
         },
 
         filterChange: function(event) {

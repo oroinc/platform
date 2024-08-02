@@ -152,7 +152,7 @@ define(function(require) {
             if (option.length) {
                 // Need this timeout to deffer Change call because it causes some delay and it may be visible on UI
                 setTimeout(function() {
-                    $(option).prop('selected', isSelected).change();
+                    $(option).prop('selected', isSelected).trigger('change');
                 }, 1);
             }
         },

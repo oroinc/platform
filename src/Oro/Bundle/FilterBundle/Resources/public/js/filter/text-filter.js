@@ -392,7 +392,7 @@ define(function(require, exports, module) {
             this.$(this.criteriaSelector)
                 .removeClass('criteria-visible')
                 .addClass('criteria-hidden')
-                .removeAttr('tabindex');
+                .attr('tabindex', null);
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             this.trigger('hideCriteria', this);
             setTimeout(() => {
@@ -463,7 +463,7 @@ define(function(require, exports, module) {
         },
 
         _focusCriteriaValue() {
-            this.getCriteriaValueFieldToFocus().focus().select();
+            this.getCriteriaValueFieldToFocus().trigger('focus').trigger('select');
         },
 
         /**

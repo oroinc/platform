@@ -1,4 +1,4 @@
-/*!
+/*
  * jQuery Extended Dialog 2.0
  *
  * Copyright (c) 2013 Oro Inc
@@ -12,14 +12,14 @@
  *   jQuery UI Dialog 1.10.2
  *
  */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var config = require('module-config').default(module.id);
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    let config = require('module-config').default(module.id);
     require('jquery-ui/widgets/dialog');
 
     config = $.extend(true, {}, {
@@ -67,7 +67,7 @@ define(function (require) {
                 '.dropdown-menu, .ui-multiselect-menu').length;
         },
 
-        _create: function () {
+        _create: function() {
             this._super();
             this._verifySettings();
 
@@ -87,7 +87,7 @@ define(function (require) {
 
         _limitTo: function() {
             if (this.options.limitTo === 'viewport') {
-                return this._limitToEl = $(document.documentElement)
+                return this._limitToEl = $(document.documentElement);
             } else if (this.options.limitTo) {
                 return this._limitToEl = $(this.options.limitTo);
             }
@@ -104,7 +104,7 @@ define(function (require) {
             this._initializeState(this.options.state);
         },
 
-        _destroy: function () {
+        _destroy: function() {
             this._super();
 
             // remove custom handler
@@ -115,7 +115,7 @@ define(function (require) {
         _makeDraggable: function() {
             this._super();
             this.uiDialog.draggable('option', 'containment',
-                this.options.limitTo === 'viewport' ? 'window': this._limitTo());
+                this.options.limitTo === 'viewport' ? 'window' : this._limitTo());
         },
 
         close: function() {
@@ -136,7 +136,7 @@ define(function (require) {
             }
         },
 
-        state: function () {
+        state: function() {
             return this.options.state;
         },
 
@@ -156,12 +156,12 @@ define(function (require) {
             this._setOption('state', 'normal');
         },
 
-        _minimize: function () {
+        _minimize: function() {
             if (this.state() !== 'minimized') {
                 this._normalize();
             }
 
-            var widget = this.widget();
+            const widget = this.widget();
 
             this._trigger('beforeMinimize');
             this._saveSnapshot();
@@ -174,26 +174,28 @@ define(function (require) {
 
             // Make copy of widget to disable dialog events
             this.minimizedEl = widget.clone();
-            this.minimizedEl.css({'height': 'auto'});
+            this.minimizedEl.css({
+                height: 'auto'
+            });
             this.minimizedEl.find('.ui-dialog-content').remove();
             this.minimizedEl.find('.ui-resizable-handle').remove();
             // Add title attribute to be able to view full window title
-            var title = this.minimizedEl.find('.ui-dialog-title');
+            const title = this.minimizedEl.find('.ui-dialog-title');
             title.disableSelection().attr('title', title.text());
-            var self = this;
-            this.minimizedEl.find('.ui-dialog-titlebar').dblclick(function() {
-                self.uiDialogTitlebar.dblclick();
+            const self = this;
+            this.minimizedEl.find('.ui-dialog-titlebar').on('dblclick', function() {
+                self.uiDialogTitlebar.trigger('dblclick');
             });
             // Proxy events to original window
-            var buttons = ['close', 'maximize', 'restore'];
-            for (var i = 0; i < buttons.length; i++) {
-                var btnClass = '.ui-dialog-titlebar-' + buttons[i];
-                this.minimizedEl.find(btnClass).click(
+            const buttons = ['close', 'maximize', 'restore'];
+            for (const i = 0; i < buttons.length; i++) {
+                const btnClass = '.ui-dialog-titlebar-' + buttons[i];
+                this.minimizedEl.find(btnClass).on('click',
                     function(btnClass) {
                         return function() {
-                            widget.find(btnClass).click();
+                            widget.find(btnClass).trigger('click');
                             return false;
-                        }
+                        };
                     }(btnClass));
             }
             this.minimizedEl.show();
@@ -202,8 +204,8 @@ define(function (require) {
             return this;
         },
 
-        _collapse: function () {
-            var newHeight = this._getTitleBarHeight();
+        _collapse: function() {
+            const newHeight = this._getTitleBarHeight();
 
             this._trigger('beforeCollapse');
             this._saveSnapshot();
@@ -221,7 +223,7 @@ define(function (require) {
             return this;
         },
 
-        _maximize: function () {
+        _maximize: function() {
             if (this.state() !== 'maximized') {
                 this._normalize();
             }
@@ -237,7 +239,7 @@ define(function (require) {
             return this;
         },
 
-        _restore: function () {
+        _restore: function() {
             this._trigger('beforeRestore');
             // restore to normal
             this._restoreWithoutTriggerEvent();
@@ -264,8 +266,7 @@ define(function (require) {
                     position: 'fixed',
                     bottom: 0,
                     left: 0
-                })
-                .appendTo(document.body);
+                }).appendTo(document.body);
             }
             return this;
         },
@@ -276,14 +277,14 @@ define(function (require) {
                 this.options.minimizeTo = $('<div id="dialog-extend-fixed-container"></div>');
                 this.options.minimizeTo.addClass('ui-dialog-minimize-container');
                 this.options.minimizeTo
-                .css({
-                    position: _.isMobile() ? 'relative' : 'fixed',
-                    bottom: 1,
-                    left: this._limitTo().offset().left,
-                    zIndex: 9999
-                })
-                .hide()
-                .appendTo(this._appendTo());
+                    .css({
+                        position: _.isMobile() ? 'relative' : 'fixed',
+                        bottom: 1,
+                        left: this._limitTo().offset().left,
+                        zIndex: 9999
+                    })
+                    .hide()
+                    .appendTo(this._appendTo());
             }
         },
 
@@ -297,11 +298,11 @@ define(function (require) {
         _calculateNewMaximizedDimensions: function(onResizeCallback) {
             if (this._limitTo().is(':visible')) {
                 this._resizeTries = 0;
-                var newHeight = this._getContainerHeight();
-                var newWidth = this._limitTo().width();
+                const newHeight = this._getContainerHeight();
+                const newWidth = this._limitTo().width();
                 this._setOptions({
                     resizable: false,
-                    draggable : false,
+                    draggable: false,
                     height: newHeight,
                     width: newWidth,
                     position: {
@@ -317,7 +318,9 @@ define(function (require) {
             } else {
                 this._resizeTries++;
                 if (this._resizeTries < 100) {
-                    setTimeout(function() {this._calculateNewMaximizedDimensions(onResizeCallback);}.bind(this), 500);
+                    setTimeout(function() {
+                        this._calculateNewMaximizedDimensions(onResizeCallback);
+                    }.bind(this), 500);
                 } else {
                     this._resizeTries = 0;
                 }
@@ -327,7 +330,7 @@ define(function (require) {
         },
 
         _size: function() {
-            var cssProperties = _.pick(this.options, ['width', 'height', 'maxWidth', 'minWidth']);
+            const cssProperties = _.pick(this.options, ['width', 'height', 'maxWidth', 'minWidth']);
             this.uiDialog.css(cssProperties);
             if ( this.uiDialog.is( ':data(ui-resizable)' ) ) {
                 this.uiDialog.resizable( 'option', 'minHeight', this._minHeight() );
@@ -335,9 +338,9 @@ define(function (require) {
         },
 
         _moveToVisible: function() {
-            var $widget = this.widget();
+            const $widget = this.widget();
             if ($widget.length > 0) {
-                var offset = $widget.offset();
+                const offset = $widget.offset();
                 this._setOptions({
                     position: [offset.left, offset.top]
                 });
@@ -347,8 +350,8 @@ define(function (require) {
 
         _position: function() {
             // Need to show the dialog to get the actual offset in the position plugin
-            var isVisible = this.uiDialog.is(":visible");
-            var initialDisplay = this.uiDialog[0].style.display;
+            const isVisible = this.uiDialog.is(':visible');
+            const initialDisplay = this.uiDialog[0].style.display;
             if (!isVisible) {
                 this.uiDialog.show();
             }
@@ -363,7 +366,7 @@ define(function (require) {
         },
 
         _getContainerHeight: function() {
-            var heightDelta = 0;
+            let heightDelta = 0;
             if (this.options.maximizedHeightDecreaseBy) {
                 if (tools.isNumeric(this.options.maximizedHeightDecreaseBy)) {
                     heightDelta = this.options.maximizedHeightDecreaseBy;
@@ -375,68 +378,73 @@ define(function (require) {
             }
 
             // Maximize window to container, or to viewport in case when container is higher
-            var baseHeight = this._limitTo().height();
-            var visibleHeight = this.bottomLine.offset().top - this._limitTo().offset().top;
-            var currentHeight = baseHeight > visibleHeight ? visibleHeight : baseHeight;
+            const baseHeight = this._limitTo().height();
+            const visibleHeight = this.bottomLine.offset().top - this._limitTo().offset().top;
+            const currentHeight = baseHeight > visibleHeight ? visibleHeight : baseHeight;
             return currentHeight - heightDelta;
         },
 
-        _initButtons: function (el) {
-            var self = this;
+        _initButtons: function(el) {
+            const self = this;
             if (typeof el === 'undefined') {
                 el = this;
             }
             // start operation on titlebar
             // create container for buttons
-            var buttonPane = $('<div class="ui-dialog-titlebar-buttonpane"></div>').appendTo(this.uiDialogTitlebar);
+            const buttonPane = $('<div class="ui-dialog-titlebar-buttonpane"></div>').appendTo(this.uiDialogTitlebar);
             // move 'close' button to button-pane
             this._buttons = {};
             this.uiDialogTitlebarClose
-            .addClass(this.options.btnCloseClass)
-            // override some unwanted jquery-ui styles
-            .css({ 'position': 'static', 'top': 'auto', 'right': 'auto' })
-            .attr({
-                'title': this.options.closeText,
-                'aria-label': this.options.btnCloseAriaText
-            })
-            // change icon
-            .find('.ui-icon').removeClass('ui-icon-closethick').addClass(this.options.icons.close).end()
-            // move to button-pane
-            .appendTo(buttonPane)
-            .end();
-            this.uiDialogTitlebarClose.find('.ui-button-icon, .ui-button-icon-space').attr('aria-hidden', true)
+                .addClass(this.options.btnCloseClass)
+                // override some unwanted jquery-ui styles
+                .css({
+                    position: 'static',
+                    top: 'auto',
+                    right: 'auto'
+                })
+                .attr({
+                    'title': this.options.closeText,
+                    'aria-label': this.options.btnCloseAriaText
+                })
+                // change icon
+                .find('.ui-icon').removeClass('ui-icon-closethick').addClass(this.options.icons.close).end()
+                // move to button-pane
+                .appendTo(buttonPane)
+                .end();
+            this.uiDialogTitlebarClose.find('.ui-button-icon, .ui-button-icon-space').attr('aria-hidden', true);
 
             if (this.options.btnCloseIcon) {
-                this.uiDialogTitlebarClose.append(this.options.btnCloseIcon)
+                this.uiDialogTitlebarClose.append(this.options.btnCloseIcon);
             }
             // append other buttons to button-pane
-            var types =  ['maximize', 'restore', 'minimize'];
-            for (var key in types) {
+            const types = ['maximize', 'restore', 'minimize'];
+            for (const key in types) {
                 if (typeof types[key] === 'string') {
-                    var type = types[key];
-                    var button = this.options.icons[type];
+                    const type = types[key];
+                    let button = this.options.icons[type];
                     if (typeof this.options.icons[type] === 'string') {
-                        button = '<a class="ui-dialog-titlebar-' + type + ' ui-corner-all" href="#" title="'
-                            + _.escape(__(type)) + '"><span class="ui-icon ' + this.options.icons[type] + '">' + type + '</span></a>';
-
+                        button = `
+                        <a class="ui-dialog-titlebar-${type} ui-corner-all" href="#" title="${_.escape(__(type))}">
+                            <span class="ui-icon ${this.options.icons[type]}">${type}</span>
+                        </a>`;
                     } else {
                         button.addClass('ui-dialog-titlebar-' + type);
                     }
                     button = $(button);
                     button
-                    .attr('role', 'button')
-                    .mouseover(function() {
-                        $(this).addClass('ui-state-hover');
-                    })
-                    .mouseout(function() {
-                        $(this).removeClass('ui-state-hover');
-                    })
-                    .focus(function() {
-                        $(this).addClass('ui-state-focus');
-                    })
-                    .blur(function() {
-                        $(this).removeClass('ui-state-focus');
-                    });
+                        .attr('role', 'button')
+                        .on('mouseover', function() {
+                            $(this).addClass('ui-state-hover');
+                        })
+                        .on('mouseout', function() {
+                            $(this).removeClass('ui-state-hover');
+                        })
+                        .on('focus', function() {
+                            $(this).addClass('ui-state-focus');
+                        })
+                        .on('blur', function() {
+                            $(this).removeClass('ui-state-focus');
+                        });
                     this._buttons[type] = button;
                     buttonPane.append(button);
                 }
@@ -445,42 +453,42 @@ define(function (require) {
             this.uiDialogTitlebarClose.toggle(this.options.allowClose);
 
             this._buttons.maximize
-            .toggle(this.options.allowMaximize)
-            .click(function (e) {
-                e.preventDefault();
-                self.maximize();
-            });
+                .toggle(this.options.allowMaximize)
+                .on('click', function(e) {
+                    e.preventDefault();
+                    self.maximize();
+                });
 
             this._buttons.minimize
-            .toggle(this.options.allowMinimize)
-            .click(function (e) {
-                e.preventDefault();
-                self.minimize();
-            });
+                .toggle(this.options.allowMinimize)
+                .on('click', function(e) {
+                    e.preventDefault();
+                    self.minimize();
+                });
 
             this._buttons.restore
-            .hide()
-            .click(function (e) {
-                e.preventDefault();
-                self.restore();
-            });
+                .hide()
+                .on('click', function(e) {
+                    e.preventDefault();
+                    self.restore();
+                });
 
             // other titlebar behaviors
             this.uiDialogTitlebar
-            // on-dblclick-titlebar : maximize/minimize/collapse/restore
-            .dblclick(function (evt) {
-                if (self.options.dblclick && self.options.dblclick.length) {
-                    if (self.state() !== 'normal') {
-                        self.restore();
-                    } else {
-                        self[self.options.dblclick]();
+                // on-dblclick-titlebar : maximize/minimize/collapse/restore
+                .on('dblclick', function(evt) {
+                    if (self.options.dblclick && self.options.dblclick.length) {
+                        if (self.state() !== 'normal') {
+                            self.restore();
+                        } else {
+                            self[self.options.dblclick]();
+                        }
                     }
-                }
-            })
-            // avoid text-highlight when double-click
-            .select(function () {
-                return false;
-            });
+                })
+                // avoid text-highlight when double-click
+                .on('select', function() {
+                    return false;
+                });
 
             return this;
         },
@@ -498,15 +506,15 @@ define(function (require) {
             }
         },
 
-        _onBackspacePress: function (e) {
+        _onBackspacePress: function(e) {
             // prevents history navigation over backspace while dialog is opened
-            var exclude = ':button,:reset,:submit,:checkbox,:radio,select,[type=image],[type=file]';
+            const exclude = ':button,:reset,:submit,:checkbox,:radio,select,[type=image],[type=file]';
             if (this._isOpen && e.keyCode === 8 && !$(e.target).not(exclude).is(':input, [contenteditable]')) {
                 e.preventDefault();
             }
         },
 
-        _createTitlebar: function () {
+        _createTitlebar: function() {
             this._super();
             this.uiDialogTitlebar.disableSelection();
 
@@ -518,11 +526,11 @@ define(function (require) {
                 case 'transparent':
                     // remove title style
                     this.uiDialogTitlebar
-                    .css({
-                        'background-color': 'transparent',
-                        'background-image': 'none',
-                        'border': 0
-                    });
+                        .css({
+                            'background-color': 'transparent',
+                            'background-image': 'none',
+                            'border': 0
+                        });
                     break;
                 default:
                     $.error('jQuery.dialogExtend Error : Invalid <titlebar> value "' + this.options.titlebar + '"');
@@ -535,8 +543,8 @@ define(function (require) {
             return this;
         },
 
-        _restoreFromCollapsed: function () {
-            var original = this._loadSnapshot();
+        _restoreFromCollapsed: function() {
+            const original = this._loadSnapshot();
             // restore dialog
             this._setOptions({
                 resizable: original.config.resizable,
@@ -547,16 +555,16 @@ define(function (require) {
             return this;
         },
 
-        _restoreFromMaximized: function () {
-            var original = this._loadSnapshot(),
-                widget = this.widget().get(0),
-                widgetCSS = {
-                    'min-height': widget.style.minHeight,
-                    'border': widget.style.border,
-                    'position': _.isMobile() ? 'relative' : 'fixed',
-                    'left': this._getVisibleLeft(original.position.left, original.size.width),
-                    'top': this._getVisibleTop(original.position.top, original.size.height)
-                };
+        _restoreFromMaximized: function() {
+            const original = this._loadSnapshot();
+            const widget = this.widget().get(0);
+            const widgetCSS = {
+                'min-height': widget.style.minHeight,
+                'border': widget.style.border,
+                'position': _.isMobile() ? 'relative' : 'fixed',
+                'left': this._getVisibleLeft(original.position.left, original.size.width),
+                'top': this._getVisibleTop(original.position.top, original.size.height)
+            };
             // reset css props of widget to correct calculation non-content height in jquery-ui code
             this.widget().css({'min-height': '0', 'border': '0 none'});
 
@@ -567,7 +575,7 @@ define(function (require) {
                 height: original.size.height,
                 width: original.size.width,
                 maxHeight: original.size.maxHeight,
-                position: [ original.position.left, original.position.top ]
+                position: [original.position.left, original.position.top]
             });
 
             // adjust widget position
@@ -576,11 +584,11 @@ define(function (require) {
             return this;
         },
 
-        _restoreFromMinimized: function () {
+        _restoreFromMinimized: function() {
             this._removeMinimizedEl();
             this.widget().show();
 
-            var original = this._loadSnapshot();
+            const original = this._loadSnapshot();
 
             // Calculate position to be visible after maximize
             this.widget().css({
@@ -599,7 +607,7 @@ define(function (require) {
         },
 
         _getVisibleLeft: function(left, width) {
-            var containerWidth = this._limitTo().width();
+            const containerWidth = this._limitTo().width();
             if (left + width > containerWidth) {
                 return containerWidth - width;
             }
@@ -607,16 +615,16 @@ define(function (require) {
         },
 
         _getVisibleTop: function(top, height) {
-            var visibleTop = this.bottomLine.offset().top;
+            const visibleTop = this.bottomLine.offset().top;
             if (top + height > visibleTop) {
                 return visibleTop - height;
             }
             return top;
         },
 
-        _restoreWithoutTriggerEvent: function () {
-            var beforeState = this.state();
-            var method = '_restoreFrom' + beforeState.charAt(0).toUpperCase() + beforeState.slice(1);
+        _restoreWithoutTriggerEvent: function() {
+            const beforeState = this.state();
+            const method = '_restoreFrom' + beforeState.charAt(0).toUpperCase() + beforeState.slice(1);
             if (typeof this[method] === 'function') {
                 this[method]();
             } else {
@@ -626,7 +634,7 @@ define(function (require) {
             return this;
         },
 
-        _saveSnapshot: function () {
+        _saveSnapshot: function() {
             // remember all configs under normal state
             if (this.state() === 'normal') {
                 this._setOption('snapshot', this.snapshot());
@@ -646,7 +654,7 @@ define(function (require) {
                     width: this.options.width,
                     maxHeight: this.options.maxHeight
                 },
-                'position': this.widget().offset()
+                position: this.widget().offset()
             };
         },
 
@@ -659,7 +667,7 @@ define(function (require) {
                 this._initializeState(value);
             }
 
-            this._superApply(arguments);
+            this._superApply([key, value]);
 
             if (key === 'appendTo') {
                 this._initializeContainer();
@@ -686,23 +694,23 @@ define(function (require) {
 
         _initializeContainer: function() {
             // Fix parent position
-            var appendTo = this._appendTo();
+            const appendTo = this._appendTo();
             if (appendTo.css('position') === 'static') {
                 appendTo.css('position', 'relative');
             }
         },
 
-        _setState: function (state) {
-            var oldState = this.options.state;
+        _setState: function(state) {
+            const oldState = this.options.state;
             this.options.state = state;
             // toggle data state
             this.widget()
-            .removeClass('ui-dialog-normal ui-dialog-maximized ui-dialog-minimized ui-dialog-collapsed')
-            .addClass('ui-dialog-' + state);
+                .removeClass('ui-dialog-normal ui-dialog-maximized ui-dialog-minimized ui-dialog-collapsed')
+                .addClass('ui-dialog-' + state);
 
             // Trigger state change event
             if (!this.disableStateChangeTrigger) {
-                var snapshot = this._loadSnapshot();
+                let snapshot = this._loadSnapshot();
                 if (!snapshot && this.state() === 'normal') {
                     snapshot = this.snapshot();
                 }
@@ -716,26 +724,30 @@ define(function (require) {
             return this;
         },
 
-        _toggleButtons: function () {
+        _toggleButtons: function() {
             // show or hide buttons & decide position
             this._buttons.maximize
-            .toggle(this.state() !== 'maximized' && this.options.allowMaximize);
+                .toggle(this.state() !== 'maximized' && this.options.allowMaximize);
 
             this._buttons.minimize
-            .toggle(this.state() !== 'minimized' && this.options.allowMinimize);
+                .toggle(this.state() !== 'minimized' && this.options.allowMinimize);
 
             this._buttons.restore
-            .toggle(this.state() !== 'normal' && ( this.options.allowMaximize || this.options.allowMinimize ))
-            .css({ 'right': this.state() === 'maximized' ? '1.4em' : this.state() === 'minimized' ? !this.options.allowMaximize ? '1.4em' : '2.5em' : '-9999em' });
+                .toggle(this.state() !== 'normal' && ( this.options.allowMaximize || this.options.allowMinimize ))
+                .css({
+                    right: this.state() === 'maximized'
+                        ? '1.4em'
+                        : this.state() === 'minimized' ? !this.options.allowMaximize ? '1.4em' : '2.5em' : '-9999em'
+                });
 
             return this;
         },
 
-        _verifySettings: function () {
-            var self = this;
-            var checkOption = function(option, options) {
+        _verifySettings: function() {
+            const self = this;
+            const checkOption = function(option, options) {
                 if (self.options[option] && options.indexOf(self.options[option]) === -1) {
-                    $.error('jQuery.dialogExtend Error : Invalid <' + option + '> value "' + self.options[option] + '"');
+                    $.error(`jQuery.dialogExtend Error : Invalid <${option}> value "${self.options[option]}"`);
                     self.options[option] = false;
                 }
             };

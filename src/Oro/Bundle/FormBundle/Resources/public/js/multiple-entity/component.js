@@ -35,7 +35,7 @@ define(function(require) {
             const self = this;
             WidgetManager.getWidgetInstance(this.wid, function(widget) {
                 widget.getAction('select', 'adopted', function(selectBtn) {
-                    selectBtn.click(function() {
+                    selectBtn.on('click', function() {
                         const addedVal = $(self.addedVal).val();
                         const removedVal = $(self.removedVal).val();
                         const appendedIds = addedVal.length ? addedVal.split(',') : [];

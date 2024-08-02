@@ -265,7 +265,7 @@ define(function(require) {
 
             describe('after click event', () => {
                 beforeEach(async function() {
-                    $('#init-on').click();
+                    $('#init-on').trigger('click');
                     return $.when(...Object.values(manager.initPromises).map(({promise}) => promise));
                 });
 
@@ -357,7 +357,7 @@ define(function(require) {
 
             describe('after click event', () => {
                 beforeEach(async function() {
-                    $('#init-on').click();
+                    $('#init-on').trigger('click');
                     return $.when(...Object.values(manager.initPromises).map(({promise}) => promise));
                 });
 

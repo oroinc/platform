@@ -37,7 +37,7 @@ define(function(require) {
             const loadingMaskView = this.subview('loadingMaskView');
 
             loadingMaskView.show();
-            this.$el.removeAttr('data-skip-input-widgets');
+            this.$el.attr('data-skip-input-widgets', null);
 
             return this.initLayout().then(function() {
                 loadingMaskView.hide();

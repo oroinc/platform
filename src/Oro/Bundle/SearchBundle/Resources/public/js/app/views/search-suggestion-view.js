@@ -123,7 +123,7 @@ define(function(require) {
                 e.preventDefault();
             } else if (e.key === 'Enter') {
                 if (selectedModel) {
-                    this.$('[name=search]').blur();
+                    this.$('[name=search]').trigger('blur');
                     mediator.execute('redirectTo', {url: selectedModel.get('record_url')});
                 } else if (this.$('[name=search]').val().length === 0) {
                     e.preventDefault();

@@ -86,16 +86,233 @@ define(function(require) {
             });
         },
 
+        // Modified original _bindButtonEvents to avoid deprecated jQuery methods
+        _bindButtonEvents: function() {
+            const self = this;
+            const button = this.button;
+            function clickHandler() {
+                self[self._isOpen ? 'close' : 'open']();
+                return false;
+            }
+
+            // webkit doesn't like it when you click on the span :(
+            button
+                .find('span')
+                .on('click.multiselect', clickHandler);
+
+            // button events
+            button.on({
+                click: clickHandler,
+                keypress: function(e) {
+                    switch (e.which) {
+                        case 27: // esc
+                        case 38: // up
+                        case 37: // left
+                            self.close();
+                            break;
+                        case 39: // right
+                        case 40: // down
+                            self.open();
+                            break;
+                    }
+                },
+                mouseenter: function() {
+                    if (!button.hasClass('ui-state-disabled')) {
+                        $(this).addClass('ui-state-hover');
+                    }
+                },
+                mouseleave: function() {
+                    $(this).removeClass('ui-state-hover');
+                },
+                focus: function() {
+                    if (!button.hasClass('ui-state-disabled')) {
+                        $(this).addClass('ui-state-focus');
+                    }
+                },
+                blur: function() {
+                    $(this).removeClass('ui-state-focus');
+                }
+            });
+        },
+
+        // Modified original _bindHeaderEvents to avoid deprecated jQuery methods
+        _superBindHeaderEvents: function() {
+            const self = this;
+            // header links
+            this.header.on('click.multiselect', 'a', function(e) {
+                const $this = $(this);
+                if ($this.hasClass('ui-multiselect-close')) {
+                    self.close();
+                } else if ($this.hasClass('ui-multiselect-all')) {
+                    self.checkAll();
+                } else if ($this.hasClass('ui-multiselect-none')) {
+                    self.uncheckAll();
+                }
+                e.preventDefault();
+            }).on('keydown.multiselect', 'a', function(e) {
+                switch (e.which) {
+                    case 27:
+                        self.close();
+                        break;
+                    case 9:
+                        const $target = $(e.target);
+                        if (
+                            (
+                                e.shiftKey &&
+                                !$target.parent().prev().length &&
+                                !self.header.find('.ui-multiselect-filter').length
+                            ) ||
+                            (
+                                !$target.parent().next().length &&
+                                !self.labels.length &&
+                                !e.shiftKey
+                            )
+                        ) {
+                            self.close();
+                            e.preventDefault();
+                        }
+                        break;
+                }
+            });
+        },
+
         _bindHeaderEvents() {
-            const superResult = this._super();
+            this._superBindHeaderEvents();
 
-            this.header.undelegate('a', 'keydown.multiselect');
+            this.header.off('keydown.multiselect', 'a');
+        },
 
-            return superResult;
+        // Modified original _bindMenuEvents to avoid deprecated jQuery methods
+        _superBindMenuEvents: function() {
+            const self = this;
+            // optgroup label toggle support
+            this.menu.on('click.multiselect', '.ui-multiselect-optgroup a', function(e) {
+                e.preventDefault();
+
+                const $this = $(this);
+                const $inputs = $this.parent().find('input:visible:not(:disabled)');
+                const nodes = $inputs.get();
+                const label = $this.text();
+
+                // trigger event and bail if the return is false
+                if (self._trigger('beforeoptgrouptoggle', e, {inputs: nodes, label: label}) === false) {
+                    return;
+                }
+
+                // toggle inputs
+                self._toggleChecked(
+                    $inputs.filter(':checked').length !== $inputs.length,
+                    $inputs
+                );
+
+                self._trigger('optgrouptoggle', e, {
+                    inputs: nodes,
+                    label: label,
+                    checked: nodes.length ? nodes[0].checked : null
+                });
+            }).on('mouseenter.multiselect', 'label', function() {
+                if (!$(this).hasClass('ui-state-disabled')) {
+                    self.labels.removeClass('ui-state-hover');
+                    $(this).addClass('ui-state-hover').find('input').trigger('focus');
+                }
+            }).on('keydown.multiselect', 'label', function(e) {
+                if (e.which === 82) {
+                    // "r" key, often used for reload.
+                    return;
+                }
+                if (e.which > 111 && e.which < 124) {
+                    // Keyboard function keys.
+                    return;
+                }
+                e.preventDefault();
+                switch (e.which) {
+                    case 9: // tab
+                        if (e.shiftKey) {
+                            self.menu.find('.ui-state-hover').removeClass('ui-state-hover');
+                            self.header.find('li').last().find('a').trigger('focus');
+                        } else {
+                            self.close();
+                        }
+                        break;
+                    case 27: // esc
+                        self.close();
+                        break;
+                    case 38: // up
+                    case 40: // down
+                    case 37: // left
+                    case 39: // right
+                        self._traverse(e.which, this);
+                        break;
+                    case 13: // enter
+                    case 32:
+                        $(this).find('input').first().trigger('click');
+                        break;
+                    case 65:
+                        if (e.altKey) {
+                            self.checkAll();
+                        }
+                        break;
+                    case 85:
+                        if (e.altKey) {
+                            self.uncheckAll();
+                        }
+                        break;
+                }
+            }).on('click.multiselect', 'input[type="checkbox"], input[type="radio"]', function(e) {
+                const $this = $(this);
+                const val = this.value;
+                const optionText = $this.parent().find('span').text();
+                const checked = this.checked;
+                const tags = self.element.find('option');
+
+                // bail if this input is disabled or the event is cancelled
+                if (
+                    this.disabled || self._trigger('click', e, {
+                        value: val,
+                        text: optionText,
+                        checked: checked
+                    }) === false
+                ) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // make sure the input has focus. otherwise, the esc key
+                // won't close the menu after clicking an item.
+                $this.trigger('focus');
+
+                // toggle aria state
+                $this.prop('aria-selected', checked);
+
+                // change state on the original option tags
+                tags.each(function() {
+                    if (this.value === val) {
+                        this.selected = checked;
+                    } else if (!self.options.multiple) {
+                        this.selected = false;
+                    }
+                });
+
+                // some additional single select-specific logic
+                if (!self.options.multiple) {
+                    self.labels.removeClass('ui-state-active');
+                    $this.closest('label').toggleClass('ui-state-active', checked);
+
+                    // close menu
+                    self.close();
+                }
+
+                // fire change on the select box
+                self.element.trigger('change');
+
+                // setTimeout is to fix multiselect issue #14 and #47. caused by jQuery issue #3827
+                // http://bugs.jquery.com/ticket/3827
+                setTimeout(self.update.bind(self), 10);
+            });
         },
 
         _bindMenuEvents() {
-            const superResult = this._super();
+            this._superBindMenuEvents();
 
             // Fix for Firefox accidentally triggering click after focus change on space
             // https://github.com/medialize/ally.js/issues/162
@@ -107,7 +324,7 @@ define(function(require) {
                 delete this._allowFireEventBySpaceButton;
             });
             // Remove original keydown an event handler and attach new one based on original
-            this.menu.undelegate('label', 'keydown.multiselect');
+            this.menu.off('keydown.multiselect', 'label');
             this.menu.on(`keydown${this._namespaceID}`, 'label', e => {
                 switch (e.which) {
                     case KEY_CODES.TAB:
@@ -122,7 +339,7 @@ define(function(require) {
                         break;
                     case KEY_CODES.ENTER:
                         e.preventDefault();
-                        $(e.currentTarget).find('input').click();
+                        $(e.currentTarget).find('input').trigger('click');
                         break;
                     case KEY_CODES.SPACE:
                         this._allowFireEventBySpaceButton = true;
@@ -148,8 +365,66 @@ define(function(require) {
                     this.close();
                 }
             });
+        },
 
-            return superResult;
+        // Modified original open method to avoid deprecated jQuery methods
+        _superOpen: function(e) {
+            const self = this;
+            const button = this.button;
+            const menu = this.menu;
+            const speed = this.speed;
+            const o = this.options;
+            const args = [];
+
+            // bail if the multiselectopen event returns false, this widget is disabled, or is already open
+            if (this._trigger('beforeopen') === false || button.hasClass('ui-state-disabled') || this._isOpen) {
+                return;
+            }
+
+            const $container = menu.find('.ui-multiselect-checkboxes');
+            const effect = o.show;
+
+            // figure out opening effects/speeds
+            if (Array.isArray(o.show)) {
+                effect = o.show[0];
+                speed = o.show[1] || self.speed;
+            }
+
+            // if there's an effect, assume jQuery UI is in use
+            // build the arguments to pass to show()
+            if (effect) {
+                args = [effect, speed];
+            }
+
+            // set the scroll of the checkbox container
+            $container.scrollTop(0);
+
+            // show the menu, maybe with a speed/effect combo
+            $.fn.show.apply(menu, args);
+
+            this._resizeMenu();
+            // positon
+            this.position();
+
+            // select the first not disabled option or the filter input if available
+            const filter = this.header.find('.ui-multiselect-filter');
+            if (filter.length) {
+                filter.first().find('input').trigger('focus');
+            } else if (this.labels.length) {
+                this.labels
+                    .filter(':not(.ui-state-disabled)')
+                    .first()
+                    .trigger('mouseover')
+                    .trigger('mouseenter')
+                    .find('input')
+                    .trigger('focus');
+            } else {
+                this.header.find('a').first().trigger('focus');
+            }
+
+            button.addClass('ui-state-active');
+            this._isOpen = true;
+            this._trigger('open');
         },
 
         /**
@@ -167,7 +442,7 @@ define(function(require) {
                 }
                 this.refresh();
             }
-            this._superApply(args);
+            this._superOpen(args);
             if (!this.options.appendTo) {
                 this.menu.css('zIndex', '');
                 const zIndex = Math.max(...this.element.parents().add(this.menu).map(function() {
@@ -209,7 +484,7 @@ define(function(require) {
             mask.hide();
             this.button.attr('aria-expanded', false);
             this.$outerTrigger.attr('aria-expanded', false);
-            this.menu.removeAttr('tabindex');
+            this.menu.prop('tabindex', false);
 
             this.button.removeClass('ui-state-active');
 
@@ -234,7 +509,7 @@ define(function(require) {
             let args = [];
 
             // figure out opening effects/speeds
-            if ($.isArray(o.hide)) {
+            if (Array.isArray(o.hide)) {
                 effect = o.hide[0];
                 speed = o.hide[1] || this.speed;
             }
@@ -277,17 +552,17 @@ define(function(require) {
                 $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
                 if (activeElement) {
                     if (activeElement.id) {
-                        this.menu.find(`#${activeElement.id}`).focus();
+                        this.menu.find(`#${activeElement.id}`).trigger('focus');
                     } else if (this.menu.find(activeElement).length && !activeElement.disabled) {
-                        this.menu.find(activeElement).focus();
+                        this.menu.find(activeElement).trigger('focus');
                     } else {
-                        this.menu.focus();
+                        this.menu.trigger('focus');
                     }
 
                     // Fallback when activeElement was present but can't focused
                     // Keep focus inside menu
                     if (!this.menu[0].contains(document.activeElement)) {
-                        this.menu.focus();
+                        this.menu.trigger('focus');
                     }
                 }
 
@@ -297,6 +572,33 @@ define(function(require) {
             this.menu.find('.ui-multiselect-checkboxes').attr({
                 'aria-label': this.options.listAriaLabel ? this.options.listAriaLabel : null
             });
+        },
+
+        update(isDefault) {
+            const o = this.options;
+            const $inputs = this.inputs;
+            const $checked = $inputs.filter(':checked');
+            const numChecked = $checked.length;
+            let value;
+
+            if (numChecked === 0) {
+                value = o.noneSelectedText;
+            } else {
+                if (typeof o.selectedText === 'function') {
+                    value = o.selectedText.call(this, numChecked, $inputs.length, $checked.get());
+                } else if (/\d/.test(o.selectedList) && o.selectedList > 0 && numChecked <= o.selectedList) {
+                    value = $checked.map(function() {
+                        return $(this).next().text();
+                    }).get().join(o.selectedListSeparator);
+                } else {
+                    value = o.selectedText.replace('#', numChecked).replace('#', $inputs.length);
+                }
+            }
+
+            this._setButtonValue(value);
+            if (isDefault) {
+                this.button[0].defaultValue = value;
+            }
         },
 
         getChecked() {
@@ -346,6 +648,20 @@ define(function(require) {
             return !isMenu &&
                    !isButton &&
                    !isOuterTrigger;
+        },
+
+        destroy: function() {
+            // remove classes + data
+            $.Widget.prototype.destroy.call(this);
+            // unbind events
+            $(document).off(this._namespaceID);
+            $(this.element[0].form).off(this._namespaceID);
+
+            this.button.remove();
+            this.menu.remove();
+            this.element.show();
+
+            return this;
         },
 
         _destroy() {

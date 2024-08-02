@@ -106,7 +106,7 @@ define(function(require) {
             if (!this.model) {
                 this.$el.attr('data-non-valid', '');
             } else {
-                this.$el.removeAttr('data-non-valid');
+                this.$el.attr('data-non-valid', null);
                 this.$el.data({model: this.model});
             }
             this.renderCardActionsDropdown(this.cardActionsElementSelector);

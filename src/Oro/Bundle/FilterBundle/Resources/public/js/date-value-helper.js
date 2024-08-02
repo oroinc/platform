@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const moment = require('moment');
     const datetimeFormatter = require('orolocale/js/formatter/datetime');
 
     function DateValueHelper(dayFormats) {
         dayFormats = dayFormats || [datetimeFormatter.getDayFormat()];
-        dayFormats = _.isArray(dayFormats) ? dayFormats : [dayFormats];
+        dayFormats = Array.isArray(dayFormats) ? dayFormats : [dayFormats];
         dayFormats.push(datetimeFormatter.getBackendDayFormat());
 
         this.backendFormats = {};

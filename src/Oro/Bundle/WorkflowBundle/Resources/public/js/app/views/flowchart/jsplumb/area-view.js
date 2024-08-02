@@ -127,7 +127,7 @@ define(function(require) {
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
             const stepWithPosition = this.model.get('steps').find(function(step) {
                 const position = step.get('position');
-                return _.isArray(position) && position.length === 2;
+                return Array.isArray(position) && position.length === 2;
             });
             // if positions of step wasn't defined
             if (_.isUndefined(stepWithPosition)) {

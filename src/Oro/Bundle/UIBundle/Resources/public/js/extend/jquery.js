@@ -113,7 +113,7 @@ define(['jquery'], function($) {
             if ($autoFocus.length || $input.length) {
                 const $element = ($autoFocus.length ? $autoFocus : $input).first();
                 if ($element.isInViewPort()) {
-                    $element.setCursorToEnd().focus();
+                    $element.setCursorToEnd().trigger('focus');
                 }
             }
         },
@@ -204,7 +204,7 @@ define(['jquery'], function($) {
                 const currentAttrListener = this['on' + eventType];
 
                 if (currentAttrListener) {
-                    $this.bind(eventType, function(e) {
+                    $this.on(eventType, function(e) {
                         return currentAttrListener(e.originalEvent);
                     });
 

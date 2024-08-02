@@ -90,7 +90,7 @@ define(function(require) {
                 delete this._isSelection;
             },
             'focus .select2-choice': function() {
-                this.$('.select2-focusser').focus();
+                this.$('.select2-focusser').trigger('focus');
             }
         },
 
@@ -107,7 +107,7 @@ define(function(require) {
             if (options.key_type) {
                 this.keyType = options.key_type;
             } else {
-                if (_.isArray(options.choices)) {
+                if (Array.isArray(options.choices)) {
                     this.keyType = 'number';
                 }
             }
@@ -176,7 +176,7 @@ define(function(require) {
                 }
                 this.onGenericArrowKeydown(e);
             });
-            this.$('input.select2-input').bind('keydown' + this.eventNamespace(), e => {
+            this.$('input.select2-input').on('keydown' + this.eventNamespace(), e => {
                 // Due to this view can be already disposed in bound first handler,
                 // we have to check if it's disposed
                 if (!this.disposed && !this.isChanged()) {

@@ -53,7 +53,7 @@ define(function(require) {
         },
 
         onClear: function() {
-            this.$input.val('').focus().trigger('input');
+            this.$input.val('').trigger('focus').trigger('input');
         },
 
         /**

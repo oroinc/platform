@@ -80,7 +80,7 @@ define(function(require) {
      * @return {boolean} true if section was updated
      */
     function updateSection($section) {
-        const $cells = $section.find(SELECTORS.CELL + ':first').siblings().addBack();
+        const $cells = $section.find(SELECTORS.CELL).first().siblings().addBack();
         const sectionWidth = $section.outerWidth();
         const classNames = [getSizeClass(sectionWidth)];
         let hasBlocks = false;
@@ -114,7 +114,7 @@ define(function(require) {
      * @return {boolean} true if cell was updated
      */
     function updateCell($cell) {
-        const $blocks = $cell.find(SELECTORS.BLOCK + ':first').siblings().addBack();
+        const $blocks = $cell.find(SELECTORS.BLOCK).first().siblings().addBack();
         const classNames = [];
 
         if ($blocks.length === 0) {

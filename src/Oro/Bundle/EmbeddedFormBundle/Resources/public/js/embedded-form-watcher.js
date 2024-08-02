@@ -101,7 +101,7 @@ define(function(require) {
         },
 
         startWatching: function(forceDataLoading) {
-            $formTypeField.change(processFormTypeChange);
+            $formTypeField.on('change', processFormTypeChange);
 
             if (forceDataLoading) {
                 $formTypeField.trigger('change');

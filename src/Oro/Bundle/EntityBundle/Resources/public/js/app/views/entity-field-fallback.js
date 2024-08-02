@@ -71,7 +71,7 @@ define(function(require) {
         },
 
         enableElement: function($element) {
-            $element.removeAttr('disabled');
+            $element.prop('disabled', false);
             $element.parent().removeClass('disabled');
         }
     });

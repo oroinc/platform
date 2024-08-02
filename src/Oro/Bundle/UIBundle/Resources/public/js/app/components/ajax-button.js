@@ -30,7 +30,7 @@ define(function(require) {
                 mediator.execute('redirectTo', {url: redirect}, {redirect: true});
             },
             errorHandlerMessage: function(event, response) {
-                const responseText = $.parseJSON(response.responseText);
+                const responseText = JSON.parse(response.responseText);
                 return responseText.message ? responseText.message : __(errorMessage);
             },
             complete: function() {
@@ -42,6 +42,6 @@ define(function(require) {
     return function(additionalOptions) {
         _.extend(options, additionalOptions || {});
         const button = options._sourceElement;
-        button.click(onClick);
+        button.on('click', onClick);
     };
 });

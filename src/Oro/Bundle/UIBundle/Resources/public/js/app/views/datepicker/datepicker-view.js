@@ -267,7 +267,7 @@ define(function(require) {
          */
         getBackendFormattedValue: function() {
             const momentInstance = this.getFrontendMoment();
-            const format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
+            const format = Array.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
                 return momentInstance.utc().format(format);
             } else if (momentInstance === null) {

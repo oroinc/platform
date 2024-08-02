@@ -63,15 +63,15 @@ define(function(require, exports, module) {
         initialize: function(data) {
             this.urlRoot = routing.generate(this.route);
 
-            if (_.isArray(data.filters) && _.isEmpty(data.filters)) {
+            if (Array.isArray(data.filters) && _.isEmpty(data.filters)) {
                 this.set('filters', {});
             }
 
-            if (_.isArray(data.sorters) && _.isEmpty(data.sorters)) {
+            if (Array.isArray(data.sorters) && _.isEmpty(data.sorters)) {
                 this.set('sorters', {});
             }
 
-            if (_.isArray(data.appearanceData) && _.isEmpty(data.appearanceData)) {
+            if (Array.isArray(data.appearanceData) && _.isEmpty(data.appearanceData)) {
                 this.set('appearanceData', {});
             }
 

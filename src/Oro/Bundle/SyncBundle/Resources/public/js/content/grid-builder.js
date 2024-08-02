@@ -3,7 +3,7 @@ define(['underscore', '../content-manager'], function(_, ContentManager) {
 
     const methods = {
         initHandler: function(deferred, metadata) {
-            if (metadata.options && _.isArray(metadata.options.contentTags)) {
+            if (metadata.options && Array.isArray(metadata.options.contentTags)) {
                 ContentManager.tagContent(metadata.options.contentTags);
             }
         }

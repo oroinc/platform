@@ -171,9 +171,9 @@ define(function(require) {
 
                 const $input = $(input);
                 if (isRadio) {
-                    $input.click();
+                    $input.trigger('click');
                 } else {
-                    $input.val(savedInput).change();
+                    $input.val(savedInput).trigger('change');
                 }
             });
         },

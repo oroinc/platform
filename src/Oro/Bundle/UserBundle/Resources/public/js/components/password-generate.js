@@ -18,7 +18,7 @@ define(function(require) {
 
             this.togglePassword();
 
-            this.$el.click(this.togglePassword.bind(this));
+            this.$el.on('click', this.togglePassword.bind(this));
         },
 
         togglePassword: function() {

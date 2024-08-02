@@ -141,8 +141,8 @@ define(function(require) {
          * @private
          */
         _prepareCollections: function() {
-            let allTags = $.parseJSON($(this.options.fieldId).val());
-            if (!_.isArray(allTags)) {
+            let allTags = JSON.parse($(this.options.fieldId).val());
+            if (!Array.isArray(allTags)) {
                 allTags = [];
             }
 

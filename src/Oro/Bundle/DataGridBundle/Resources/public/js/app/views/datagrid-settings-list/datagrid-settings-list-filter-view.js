@@ -82,7 +82,7 @@ define(function(require) {
         onClearSearch: function(e) {
             e.preventDefault();
             e.stopPropagation();
-            this.$('[data-role="datagrid-settings-search"]').focus();
+            this.$('[data-role="datagrid-settings-search"]').trigger('focus');
             this.model.set('search', '');
 
             mediator.trigger('layout:reposition');
