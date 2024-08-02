@@ -35,7 +35,7 @@ define(function(require) {
             // simulate click on real link to check page state
             const $link = $('<a>').attr('href', url);
             this.$tree.before($link);
-            $link.click().remove();
+            $link.trigger('click').remove();
         },
 
         onSelect: function(e, selected) {

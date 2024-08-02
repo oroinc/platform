@@ -168,7 +168,7 @@ define(function(require) {
         parseRawValue: function(value) {
             if (_.isString(value)) {
                 value = JSON.parse(value);
-            } else if (_.isArray(value)) {
+            } else if (Array.isArray(value)) {
                 value = _.filter(value, function(item) {
                     return item !== '';
                 });
@@ -180,7 +180,7 @@ define(function(require) {
 
         getValue: function() {
             const value = this.$('select').val();
-            return _.isArray(value) ? value : [];
+            return Array.isArray(value) ? value : [];
         },
 
         getTemplateData: function() {
@@ -194,7 +194,7 @@ define(function(require) {
         isChanged: function() {
             const val = this.getValue();
             let old = this.getModelValue();
-            if (!_.isArray(old)) {
+            if (!Array.isArray(old)) {
                 old = old === 0 || old ? [old] : [];
             }
             return val.length !== old.length || _.difference(val, old).length > 0;

@@ -51,7 +51,7 @@ define(function(require) {
 
             const updateHandler = this.update.bind(this);
 
-            this.$chart.bind('update.' + this.cid, updateHandler);
+            this.$chart.on('update.' + this.cid, updateHandler);
 
             _.defer(updateHandler);
         },
@@ -62,7 +62,7 @@ define(function(require) {
          * @overrides
          */
         dispose: function() {
-            this.$chart.unbind('.' + this.cid);
+            this.$chart.off('.' + this.cid);
             delete this.$el;
             delete this.$chart;
             delete this.$legend;

@@ -59,7 +59,7 @@ define(function(require) {
             this.template = this.getTemplateFunction();
 
             this.listenTo(this.model, 'backgrid:select', function(model, checked) {
-                this.$(':checkbox').prop('checked', checked).change();
+                this.$(':checkbox').prop('checked', checked).trigger('change');
             });
         },
 
@@ -82,7 +82,7 @@ define(function(require) {
          */
         updateCheckbox: function(e) {
             if (this.$checkbox.get(0) !== e.target && !$(e.target).closest('label').length) {
-                this.$checkbox.prop('checked', !this.$checkbox.prop('checked')).change();
+                this.$checkbox.prop('checked', !this.$checkbox.prop('checked')).trigger('change');
             }
             e.stopPropagation();
         },

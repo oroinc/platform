@@ -155,7 +155,7 @@ define(function(require) {
             spyOn(collection, 'onActionFoo');
             collection.on('action:foo', collection.onActionFoo, collection);
 
-            $el.find('div').click();
+            $el.find('div').trigger('click');
 
             expect(collection.onActionFoo).toHaveBeenCalledWith(collection.at(0), $el.find('div').data());
         });
@@ -175,7 +175,7 @@ define(function(require) {
             spyOn(collection, 'onActionFoo');
             collection.on('action:foo', collection.onActionFoo, collection);
 
-            $el.find('div').click();
+            $el.find('div').trigger('click');
 
             expect(collection.onActionFoo).not.toHaveBeenCalled();
         });
@@ -196,7 +196,7 @@ define(function(require) {
 
             $el.itemsManagerTable(options);
 
-            $el.find('div').click();
+            $el.find('div').trigger('click');
 
             expect(options.barHandler).toHaveBeenCalledWith(collection.at(0), $el.find('div').data());
         });

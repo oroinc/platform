@@ -200,7 +200,7 @@ define(function(require, exports, module) {
             let focusTabbable = null;
 
             if (_.isMobile()) {
-                focusTabbable = $(this._menu).find(':tabbable:not("input")').eq(0);
+                focusTabbable = $(this._menu).find(':tabbable:not("input")').first();
             }
 
             // If it's an iOS safari need to fix issue with

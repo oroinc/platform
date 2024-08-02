@@ -38,7 +38,7 @@ define(function(require) {
                 const cellField = this.initialOptions.cell_field;
                 _.each(_.pick(this.initialOptions, 'value_field', 'currency_field'), function(entityField) {
                     const fieldErrors = _.result(errors.children, entityField);
-                    if (fieldErrors && _.isArray(fieldErrors.errors)) {
+                    if (fieldErrors && Array.isArray(fieldErrors.errors)) {
                         cellFieldErrors = cellFieldErrors.concat(fieldErrors.errors);
                         delete errors.children[entityField];
                     }
@@ -47,7 +47,7 @@ define(function(require) {
                     if (false === cellField in errors.children) {
                         errors.children[cellField] = {};
                     }
-                    if (!_.isArray(errors.children[cellField].errors)) {
+                    if (!Array.isArray(errors.children[cellField].errors)) {
                         errors.children[cellField].errors = [];
                     }
                     errors.children[cellField].errors = errors.children[cellField].errors.concat(cellFieldErrors);

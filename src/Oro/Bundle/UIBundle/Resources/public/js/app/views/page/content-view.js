@@ -29,8 +29,11 @@ define(function(require) {
                 'tabindex': 0,
                 'data-scroll-focus': ''
             }).one('blur', function() {
-                $(this).removeAttr('data-scroll-focus tabindex');
-            }).focus();
+                $(this).attr({
+                    'data-scroll-focus': null,
+                    'tabindex': null
+                });
+            }).trigger('focus');
         }
     }
 

@@ -94,7 +94,7 @@ define(function(require) {
             if (this.isCollapsed()) {
                 this.widgetContentContainer.attr('data-layout', 'separate');
                 this.listenToOnce(this, 'expand', () => {
-                    this.widgetContentContainer.removeAttr('data-layout');
+                    this.widgetContentContainer.attr('data-layout', null);
                     this.render();
                 });
             }

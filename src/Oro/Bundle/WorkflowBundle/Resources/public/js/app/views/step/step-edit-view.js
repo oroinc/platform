@@ -118,7 +118,7 @@ define(function(require) {
                         tabContent
                             .closest('.oro-tabs')
                             .find('[href="#' + tabContent.prop('id') + '"]')
-                            .click();
+                            .trigger('click');
                     }
                 }
             });

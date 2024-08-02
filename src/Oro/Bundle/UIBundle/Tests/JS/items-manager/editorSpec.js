@@ -103,7 +103,7 @@ define(function(require) {
             $el.find('#choice').val(3);
             $el.find('#desc').val('Description2');
 
-            $el.find('.save-button').click();
+            $el.find('.save-button').trigger('click');
 
             expect(collection.at(0).get('name')).toEqual('Name2');
             expect(collection.at(0).get('choice')).toEqual('3');
@@ -127,7 +127,7 @@ define(function(require) {
             $el.find('#choice').val(3);
             $el.find('#desc').val('Description2');
 
-            $el.find('.cancel-button').click();
+            $el.find('.cancel-button').trigger('click');
 
             expect(collection.at(0).get('name')).toEqual('Name');
             expect(collection.at(0).get('choice')).toEqual('2');
@@ -145,7 +145,7 @@ define(function(require) {
             $el.find('#choice').val(1);
             $el.find('#desc').val('Description');
 
-            $el.find('.add-button').click();
+            $el.find('.add-button').trigger('click');
 
             expect(collection.at(0).get('name')).toEqual('Name');
             expect(collection.at(0).get('choice')).toEqual('1');
@@ -163,7 +163,7 @@ define(function(require) {
             $el.find('#choice').val(1);
             $el.find('#desc').val('Description');
 
-            $el.find('.cancel-button').click();
+            $el.find('.cancel-button').trigger('click');
 
             expect(collection.length).toEqual(0);
         });
@@ -276,7 +276,7 @@ define(function(require) {
             $el.find('#choice').val(3);
             $el.find('#desc').val('Description2');
 
-            $el.find('.save-button').click();
+            $el.find('.save-button').trigger('click');
 
             expect(collection.at(0).get('name')).toEqual('Name22');
             expect(collection.at(0).get('choice')).toEqual('1');

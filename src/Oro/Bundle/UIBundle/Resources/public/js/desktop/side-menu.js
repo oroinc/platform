@@ -175,7 +175,8 @@ define(function(require) {
                 this.overlay
                     .setTitle(
                         $(event.currentTarget)
-                            .find('.title-level-1:first')
+                            .find('.title-level-1')
+                            .first()
                             .text()
                     )
                     .updateContent(

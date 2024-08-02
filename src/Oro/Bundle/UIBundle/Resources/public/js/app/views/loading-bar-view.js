@@ -100,7 +100,7 @@ define(function(require) {
                     return;
                 }
                 this.$el
-                    .removeAttr('style')
+                    .attr('style', null)
                     .removeClass('show');
                 if (callback) {
                     callback();

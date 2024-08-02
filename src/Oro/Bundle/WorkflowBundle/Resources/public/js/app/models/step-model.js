@@ -48,7 +48,7 @@ define(function(require) {
                 const allowedTransitionsAttr = this.get('allowed_transitions');
 
                 this.allowedTransitions = new TransitionCollection();
-                if (_.isArray(allowedTransitionsAttr)) {
+                if (Array.isArray(allowedTransitionsAttr)) {
                     _.each(
                         allowedTransitionsAttr,
                         function(transitionName) {

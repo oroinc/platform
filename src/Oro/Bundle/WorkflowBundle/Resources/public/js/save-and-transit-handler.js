@@ -54,6 +54,6 @@ define([
                 }
             }
         });
-        form.submit();
+        form.trigger('submit');
     };
 });

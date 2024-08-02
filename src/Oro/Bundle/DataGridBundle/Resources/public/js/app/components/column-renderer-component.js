@@ -63,7 +63,7 @@ define(function(Chaplin) {
         _getAttributesRaw: function(attributes) {
             let raw = '';
             _.each(attributes, function(value, name) {
-                raw += ' ' + name + '="' + (_.isArray(value) ? value.join(' ') : value) + '"';
+                raw += ' ' + name + '="' + (Array.isArray(value) ? value.join(' ') : value) + '"';
             });
             return raw.trim();
         }

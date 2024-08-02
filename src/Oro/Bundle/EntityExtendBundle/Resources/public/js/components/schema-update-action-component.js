@@ -49,7 +49,7 @@ define(function(require) {
                 confirmUpdate.on('ok', () => {
                     const progress = $('#progressbar').clone();
                     progress
-                        .removeAttr('id')
+                        .attr('id', null)
                         .find('h3').remove()
                         .end()
                         .find('[role="progressbar"]')

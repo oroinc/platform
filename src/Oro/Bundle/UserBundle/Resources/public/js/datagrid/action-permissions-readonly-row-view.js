@@ -46,7 +46,7 @@ define(function(require) {
             if (typeof fields === 'string') {
                 fields = JSON.parse(fields);
             }
-            if (!_.isArray(fields)) {
+            if (!Array.isArray(fields)) {
                 fields = _.values(fields);
             }
             if (fields.length) {

@@ -72,7 +72,7 @@ define(function(require) {
 
         it('check "setCurrentCell" method', function() {
             const $previousCell = tableCellIterator.$cell;
-            const $newCell = tableCellIterator.$row.find('[aria-colindex]:last');
+            const $newCell = tableCellIterator.$row.find('[aria-colindex]').last();
 
             tableCellIterator.setCurrentCell($newCell);
 

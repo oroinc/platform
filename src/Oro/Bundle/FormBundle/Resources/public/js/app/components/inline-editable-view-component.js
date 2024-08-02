@@ -242,7 +242,7 @@ define(function(require) {
                 }
             });
 
-            viewInstance.focus();
+            viewInstance.trigger('focus');
 
             this.listenTo(viewInstance, 'saveAction', this.saveCurrentCell);
             this.listenTo(viewInstance, 'saveAndExitAction', this.saveCurrentCellAndExit);
@@ -289,7 +289,7 @@ define(function(require) {
                 return true;
             }
             if (!this.editorView.isValid()) {
-                this.editorView.focus();
+                this.editorView.trigger('focus');
                 return false;
             }
             const wrapper = this.wrapper;

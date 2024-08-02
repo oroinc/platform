@@ -150,7 +150,7 @@ define([
             model.set('show', true);
 
             this.itemSelect.inputWidget('val', '');
-            this.itemSelect.change();
+            this.itemSelect.trigger('change');
         },
 
         _onAddAllClick: function() {
@@ -159,7 +159,7 @@ define([
             });
 
             this.itemSelect.inputWidget('val', '');
-            this.itemSelect.change();
+            this.itemSelect.trigger('change');
         },
 
         _toggleButtons: function() {

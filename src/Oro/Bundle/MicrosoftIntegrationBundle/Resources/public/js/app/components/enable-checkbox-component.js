@@ -20,11 +20,12 @@ define(function(require) {
                 .on('change.microsoft_enable_oauth', function() {
                     let disabled = false;
                     const $settings = options._sourceElement.closest('form[name="microsoft_settings"]');
-                    if ($.trim($settings.find('input[id*="client_id"]').val()).length === 0) {
+
+                    if ($settings.find('input[id*="client_id"]').val().trim().length === 0) {
                         disabled = true;
-                    } else if ($.trim($settings.find('input[id*="client_secret"]').val()).length === 0) {
+                    } else if ($settings.find('input[id*="client_secret"]').val().trim().length === 0) {
                         disabled = true;
-                    } else if ($.trim($settings.find('input[id*="tenant"]').val()).length === 0) {
+                    } else if ($settings.find('input[id*="tenant"]').val().trim().length === 0) {
                         disabled = true;
                     }
                     options._sourceElement.find('input[type=checkbox]:not(:checked)').prop('disabled', disabled);

@@ -129,8 +129,8 @@ define(function(require) {
             let $condition;
             beforeEach(function() {
                 $group = $('.condition-container [data-criteria=conditions-group]');
-                $matrix1 = $('.condition-container [data-criteria=matrix-condition]:first');
-                $matrix2 = $('.condition-container [data-criteria=matrix-condition]:last');
+                $matrix1 = $('.condition-container [data-criteria=matrix-condition]').first();
+                $matrix2 = $('.condition-container [data-criteria=matrix-condition]').last();
                 $condition = $('.condition-container [data-criteria=condition-item]');
             });
 
@@ -183,7 +183,7 @@ define(function(require) {
             let $condition;
             beforeEach(function() {
                 $group = $('.condition-container [data-criteria=conditions-group]');
-                $matrix2 = $('.condition-container [data-criteria=matrix-condition]:last');
+                $matrix2 = $('.condition-container [data-criteria=matrix-condition]').last();
                 $condition = $('.condition-container [data-criteria=condition-item]');
             });
 
@@ -228,7 +228,7 @@ define(function(require) {
             let condition;
             beforeEach(function() {
                 matrix = builderView.getConditionViewOfElement(
-                    $('.condition-container [data-criteria=matrix-condition]:first'));
+                    $('.condition-container [data-criteria=matrix-condition]').first());
                 condition = builderView.getConditionViewOfElement(
                     $('.condition-container [data-criteria=condition-item]'));
             });
@@ -260,8 +260,10 @@ define(function(require) {
             let operator1;
             let operator2;
             beforeEach(function() {
-                operator1 = builderView.getConditionViewOfElement($('.condition-container .condition-operator:first'));
-                operator2 = builderView.getConditionViewOfElement($('.condition-container .condition-operator:last'));
+                operator1 = builderView
+                    .getConditionViewOfElement($('.condition-container .condition-operator').first());
+                operator2 = builderView
+                    .getConditionViewOfElement($('.condition-container .condition-operator').last());
             });
 
             it('changes value of the operator before group', function() {

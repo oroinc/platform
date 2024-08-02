@@ -91,7 +91,7 @@ define(function(require) {
 
         function removeFromTop(dialog) {
             const $dialog = dialog.widget.dialog('instance').uiDialog;
-            $dialog.siblings('.ui-dialog:last').removeClass('ui-dialog-on-background');
+            $dialog.siblings('.ui-dialog').last().removeClass('ui-dialog-on-background');
         }
 
         mediator.on({

@@ -381,9 +381,11 @@ JS;
             $options['key'] = $charToKeyMap[$char];
         }
 
+        $options['bubbles'] = true;
+
         $event = 'keydown';
         $options = json_encode($options);
-        $script = 'Syn.trigger("' . $event . '", ' . $options . ', {{ELEMENT}})';
+        $script = '{{ELEMENT}}.dispatchEvent(new KeyboardEvent("' . $event . '", ' . $options . '))';
         $this->withSyn()->executeJsOnXpath($xpath, $script);
     }
 

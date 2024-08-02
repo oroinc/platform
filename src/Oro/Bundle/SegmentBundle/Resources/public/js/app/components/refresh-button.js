@@ -53,6 +53,6 @@ define(function(require) {
         _.extend(options, additionalOptions || {});
         const reloadRequired = Boolean(options.reloadRequired);
         const button = options._sourceElement;
-        button.click(_.partial(onClick, reloadRequired));
+        button.on('click', _.partial(onClick, reloadRequired));
     };
 });

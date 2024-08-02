@@ -41,7 +41,7 @@ define(function(require) {
         render: function() {
             FormLoadingView.__super__.render.call(this);
 
-            this.$el.removeAttr('data-skip-input-widgets');
+            this.$el.attr('data-skip-input-widgets', null);
             this.$el.addClass('lazy-loading');
 
             this.initLayout()

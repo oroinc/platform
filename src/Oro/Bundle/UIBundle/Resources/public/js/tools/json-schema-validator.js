@@ -28,7 +28,7 @@ export default {
                     this.checkAdditionalProperties(schema, value);
 
             case 'array':
-                return _.isArray(value) &&
+                return Array.isArray(value) &&
                     this.checkMinItems(schema, value) &&
                     this.checkMaxItems(schema, value) &&
                     this.checkUniqueItems(schema, value) &&
@@ -63,7 +63,7 @@ export default {
                 return value === null;
 
             default:
-                if (_.isArray(schema.type)) {
+                if (Array.isArray(schema.type)) {
                     return this.checkAnyOfType(schema, value);
                 } else if (!schema.type) {
                     return this.checkEnum(schema, value);
@@ -201,7 +201,7 @@ export default {
      * @returns {boolean}
      */
     checkItemsTuple(schema, value) {
-        return !schema.items || !_.isArray(schema.items) ||
+        return !schema.items || !Array.isArray(schema.items) ||
             (schema.additionalItems !== false || schema.items.length >= value.length) &&
             _.every(value, (val, i) => !schema.items[i] || this.validate(schema.items[i], val));
     },
@@ -276,6 +276,6 @@ export default {
      * @returns {boolean}
      */
     checkAnyOfType(schema, value) {
-        return !_.isArray(schema.type) || _.any(schema.type, type => this.validate({type: type}, value));
+        return !Array.isArray(schema.type) || _.any(schema.type, type => this.validate({type: type}, value));
     }
 };

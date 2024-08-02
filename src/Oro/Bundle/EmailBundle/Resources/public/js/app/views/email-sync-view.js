@@ -47,7 +47,7 @@ define(function(require) {
                 }.bind(this),
                 complete: function() {
                     $button.html(this.actionSync);
-                    $button.removeAttr('disabled');
+                    $button.prop('disabled', false);
                 }.bind(this)
             });
         }

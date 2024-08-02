@@ -108,7 +108,7 @@ define(function(require) {
             }
             this.domCache.body.val(value)
                 .setCursorPosition(cursorPosition)
-                .focus();
+                .trigger('focus');
         },
 
         onTemplateChange: function(e) {
@@ -197,7 +197,7 @@ define(function(require) {
             const $field = this.$('[data-ftid$="_email_' + field + '"]');
             $field.parents('.control-group.taggable-field').show();
             $field.parents('.controls').find('input.select2-input')
-                .unbind('focusout')
+                .off('focusout')
                 .on('focusout', e => {
                     setTimeout(() => {
                         if (!$field.val()) {
@@ -205,7 +205,7 @@ define(function(require) {
                         }
                     }, 200);
                 })
-                .focus();
+                .trigger('focus');
 
             this.$('[data-ftid$="_email_to"]')
                 .parents('.control-group.taggable-field')

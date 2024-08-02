@@ -75,7 +75,7 @@ define(function(require) {
 
                 if (isOpen) {
                     this.$('[data-role="description"]').slideUp(400, () => {
-                        this.$el.removeAttr('open');
+                        this.$el.attr('open', null);
                     });
                 } else {
                     this.$el.attr('open', true);

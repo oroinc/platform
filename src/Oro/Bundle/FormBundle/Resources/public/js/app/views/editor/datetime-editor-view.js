@@ -142,9 +142,9 @@ define(function(require) {
 
         focus: function(atEnd) {
             if (!atEnd) {
-                this.$('input.hasDatepicker').setCursorToEnd().focus();
+                this.$('input.hasDatepicker').setCursorToEnd().trigger('focus');
             } else {
-                this.$('input.timepicker-input').setCursorToEnd().focus();
+                this.$('input.timepicker-input').setCursorToEnd().trigger('focus');
             }
         },
 

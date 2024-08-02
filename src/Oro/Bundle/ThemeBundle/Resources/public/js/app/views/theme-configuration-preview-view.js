@@ -210,7 +210,7 @@ const ThemeConfigurationChangePreview = BaseView.extend({
             return;
         }
         preview.classList.remove('no-preview');
-        this.$('[data-toggle="collapse"]').removeAttr('disabled');
+        this.$('[data-toggle="collapse"]').prop('disabled', false);
         this.$('.collapse').collapse('show');
     },
 
