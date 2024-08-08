@@ -216,7 +216,7 @@ define(function(require, exports, module) {
         },
 
         processDatagridOptions: function(deferred, options) {
-            if (!_.isArray(options.metadata.plugins)) {
+            if (!Array.isArray(options.metadata.plugins)) {
                 options.metadata.plugins = [];
             }
 

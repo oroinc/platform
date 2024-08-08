@@ -35,7 +35,7 @@ const FullScreenPlugin = BasePlugin.extend({
     getCssHeightCalcExpression: function() {
         const documentHeight = scrollHelper.documentHeight();
         const availableHeight = mediator.execute('layout:getAvailableHeight',
-            this.main.$grid.parents('.grid-scrollable-container:first'));
+            this.main.$grid.parents('.grid-scrollable-container').first());
         return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
     },
 

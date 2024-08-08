@@ -199,7 +199,7 @@ define(function(require) {
             const isEmptyType = this.isEmptyType(type);
             this.$('.filter-criteria').toggleClass('empty-type', isEmptyType);
             if (!isEmptyType && this.autoClose !== false) {
-                this.$(this.criteriaValueSelectors.value).focus();
+                this.$(this.criteriaValueSelectors.value).trigger('focus');
             }
         },
 

@@ -21,7 +21,7 @@ define(function(require) {
 
         const urlParams = _.clone(options.urlParams) || {};
 
-        if (options.include && _.isArray(options.include)) {
+        if (options.include && Array.isArray(options.include)) {
             urlParams.include = options.include.join();
         }
 

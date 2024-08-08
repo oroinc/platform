@@ -71,7 +71,7 @@ define(function(require) {
                     this.$el.trigger('content:changed');
                 }
             });
-            $fileInput.click();
+            $fileInput.trigger('click');
         },
 
         guessFileIcon() {

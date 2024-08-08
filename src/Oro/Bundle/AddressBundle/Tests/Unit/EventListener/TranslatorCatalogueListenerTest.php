@@ -8,7 +8,9 @@ use Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeTranslationRepository;
 use Oro\Bundle\AddressBundle\Entity\Repository\CountryTranslationRepository;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionTranslationRepository;
 use Oro\Bundle\AddressBundle\EventListener\TranslatorCatalogueListener;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterface;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueInitialize;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -22,6 +24,8 @@ class TranslatorCatalogueListenerTest extends TestCase
     private ManagerRegistry|MockObject $managerRegistry;
 
     private EntityManagerInterface|MockObject $entityManager;
+
+    private TranslationRepository|MockObject $translationRepository;
 
     private AddressTypeTranslationRepository|MockObject $addressTypeTranslationRepository;
 
@@ -41,6 +45,7 @@ class TranslatorCatalogueListenerTest extends TestCase
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->translationRepository = $this->createMock(TranslationRepository::class);
         $this->addressTypeTranslationRepository = $this->createMock(AddressTypeTranslationRepository::class);
         $this->countryTranslationRepository = $this->createMock(CountryTranslationRepository::class);
         $this->regionTranslationRepository = $this->createMock(RegionTranslationRepository::class);
@@ -54,7 +59,7 @@ class TranslatorCatalogueListenerTest extends TestCase
     {
         $this->getRepositoryCallsTest();
         $this->getRepositoryAllIdentitiesCallsTest();
-        $this->messageCatalogueCallsTest(Translator::DEFAULT_LOCALE);
+        $this->messageCatalogueCallsTest(Translator::DEFAULT_LOCALE, ['entities']);
         $this->updateDefaultTranslationsCallsTest();
 
         $event = new AfterCatalogueInitialize($this->messageCatalogue);
@@ -65,7 +70,7 @@ class TranslatorCatalogueListenerTest extends TestCase
     {
         $this->getRepositoryCallsTest();
         $this->getRepositoryAllIdentitiesCallsTest();
-        $this->messageCatalogueCallsTest('de');
+        $this->messageCatalogueCallsTest('de', ['entities']);
         $this->updateTranslationsCallsTest('de');
 
         $event = new AfterCatalogueInitialize($this->messageCatalogue);
@@ -75,6 +80,19 @@ class TranslatorCatalogueListenerTest extends TestCase
     public function testOnAfterCatalogueDumpUpdateTranslationException(): void
     {
         $repo = new \stdClass();
+
+        $this
+            ->messageCatalogue
+            ->expects(self::once())
+            ->method('getDomains')
+            ->willReturn(['entities']);
+
+        $this
+            ->managerRegistry
+            ->expects(self::any())
+            ->method('getRepository')
+            ->with(Translation::class)
+            ->willReturn($this->translationRepository);
 
         $this
             ->managerRegistry
@@ -98,8 +116,42 @@ class TranslatorCatalogueListenerTest extends TestCase
         $this->listener->onAfterCatalogueInit($event);
     }
 
+    public function testOnAfterCatalogueDumpUpdateUnknownDomain(): void
+    {
+        $this
+            ->messageCatalogue
+            ->expects(self::any())
+            ->method('getDomains')
+            ->willReturn(['unknown']);
+
+        $this
+            ->managerRegistry
+            ->expects(self::never())
+            ->method('getRepository');
+
+        $this
+            ->managerRegistry
+            ->expects(self::never())
+            ->method('getManagerForClass');
+
+        $this
+            ->entityManager
+            ->expects(self::never())
+            ->method('getRepository');
+
+        $event = new AfterCatalogueInitialize($this->messageCatalogue);
+        $this->listener->onAfterCatalogueInit($event);
+    }
+
     private function getRepositoryCallsTest(): void
     {
+        $this
+            ->managerRegistry
+            ->expects(self::exactly(3))
+            ->method('getRepository')
+            ->with(Translation::class)
+            ->willReturn($this->translationRepository);
+
         $this
             ->managerRegistry
             ->expects(self::exactly(3))
@@ -121,6 +173,12 @@ class TranslatorCatalogueListenerTest extends TestCase
 
     private function getRepositoryAllIdentitiesCallsTest(): void
     {
+        $this
+            ->translationRepository
+            ->expects(self::exactly(3))
+            ->method('findDomainTranslations')
+            ->willReturn([]);
+
         $this
             ->addressTypeTranslationRepository
             ->expects(self::once())
@@ -212,8 +270,14 @@ class TranslatorCatalogueListenerTest extends TestCase
             ], $locale);
     }
 
-    private function messageCatalogueCallsTest(string $locale): void
+    private function messageCatalogueCallsTest(string $locale, array $domains = []): void
     {
+        $this
+            ->messageCatalogue
+            ->expects(self::any())
+            ->method('getDomains')
+            ->willReturn($domains);
+
         $this
             ->messageCatalogue
             ->expects(self::any())

@@ -66,7 +66,7 @@ define(function(require) {
          * @param {Boolean} data
          */
         onDefaultLocalizationUseParentScope: function(data) {
-            this.$useParent.prop('checked', data).change();
+            this.$useParent.prop('checked', data).trigger('change');
         },
 
         /**

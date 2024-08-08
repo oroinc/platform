@@ -66,7 +66,7 @@ define(function(require) {
             const select = this.$select;
             const selected = select.val();
 
-            select.find('option[value!=""]').remove().val('').change();
+            select.find('option[value!=""]').remove().val('').trigger('change');
 
             _.each(data, function(localization) {
                 select.append($('<option></option>').attr('value', localization.id).text(localization.label));
@@ -80,7 +80,7 @@ define(function(require) {
                 }
             }
 
-            select.change();
+            select.trigger('change');
         },
 
         onUseParentChange: function() {

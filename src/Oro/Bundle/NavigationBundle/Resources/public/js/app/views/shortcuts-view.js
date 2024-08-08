@@ -152,7 +152,7 @@ define(function(require) {
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
                         this.select();
-                        this.$element.focus();
+                        this.$element.trigger('focus');
                     }
                 }
             });
@@ -160,7 +160,7 @@ define(function(require) {
 
         source: function(query, process) {
             const self = this;
-            if (_.isArray(this.sourceUrl)) {
+            if (Array.isArray(this.sourceUrl)) {
                 process(this.sourceUrl);
                 this.render();
             } else if (!_.isUndefined(this.cache[query])) {
@@ -195,7 +195,7 @@ define(function(require) {
                 if (!dataItem.dialog) {
                     mediator.execute('redirectTo', {url: dataItem.url}, {redirect: true});
                 } else {
-                    $input.parent().find('li.active > a').click();
+                    $input.parent().find('li.active > a').trigger('click');
                 }
             }
         },

@@ -580,11 +580,11 @@ define(function(require) {
             const responseErrors = _.result(jqXHR.responseJSON, 'errors');
             if (responseErrors) {
                 _.each(responseErrors.children, function(item) {
-                    if (_.isArray(item.errors)) {
+                    if (Array.isArray(item.errors)) {
                         mediator.execute('showMessage', 'error', item.errors[0]);
                     }
                 });
-                if (_.isArray(responseErrors.errors)) {
+                if (Array.isArray(responseErrors.errors)) {
                     mediator.execute('showMessage', 'error', __(responseErrors.errors[0]));
                 }
                 fieldErrors = _.result(responseErrors.children, this.options.cell.column.get('name'));
@@ -594,13 +594,13 @@ define(function(require) {
                     fieldErrors = _.result(responseErrors.children, this.options.viewOptions.value_field_name);
                 }
 
-                if (fieldErrors && _.isArray(fieldErrors.errors)) {
+                if (fieldErrors && Array.isArray(fieldErrors.errors)) {
                     backendErrors = {value: __(fieldErrors.errors[0])};
-                } else if (_.isArray(responseErrors.errors)) {
+                } else if (Array.isArray(responseErrors.errors)) {
                     backendErrors = {value: __(responseErrors.errors[0])};
                 }
                 this.errorHolderView.setErrorMessages(backendErrors);
-            } else if (_.isArray(jqXHR.responseJSON)) {
+            } else if (Array.isArray(jqXHR.responseJSON)) {
                 const allErrors = _.chain(jqXHR.responseJSON)
                     .map(_.property('detail'))
                     .filter()

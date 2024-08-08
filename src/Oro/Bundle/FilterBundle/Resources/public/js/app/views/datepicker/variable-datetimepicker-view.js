@@ -44,7 +44,7 @@ define(function(require) {
             ) {
                 this.$frontTimeField.val('').attr('disabled', 'disabled');
             } else {
-                this.$frontTimeField.removeAttr('disabled');
+                this.$frontTimeField.prop('disabled', false);
             }
         },
 

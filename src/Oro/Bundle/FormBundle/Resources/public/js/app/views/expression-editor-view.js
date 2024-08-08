@@ -237,7 +237,7 @@ const ExpressionEditorView = BaseView.extend({
 
         dataSource.$widget = $('<div>').addClass('expression-editor-data-source')
             .html(this.dataSource[dataSourceKey]);
-        dataSource.$field = dataSource.$widget.find(':input[name]:first');
+        dataSource.$field = dataSource.$widget.find(':input[name]').first();
         dataSource.active = false;
 
         this._hideDataSource(dataSource);
@@ -249,7 +249,7 @@ const ExpressionEditorView = BaseView.extend({
 
             this.util.updateDataSourceValue(this.autocompleteData, $(e.currentTarget).val());
             this.$el.val(this.autocompleteData.expression)
-                .change();
+                .trigger('change');
 
             this.el.selectionStart = this.el.selectionEnd = this.autocompleteData.position;
         });
@@ -261,7 +261,7 @@ const ExpressionEditorView = BaseView.extend({
         this._hideDataSources();
 
         const dataSource = this.getDataSource(dataSourceKey);
-        dataSource.$field.val(dataSourceValue).change();
+        dataSource.$field.val(dataSourceValue).trigger('change');
 
         this._showDataSource(dataSource);
 

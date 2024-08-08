@@ -177,7 +177,7 @@ define(function(require) {
         },
 
         focus: function() {
-            this.$('input.hasDatepicker').setCursorToEnd().focus();
+            this.$('input.hasDatepicker').setCursorToEnd().trigger('focus');
         },
 
         onFocusout: function(e) {

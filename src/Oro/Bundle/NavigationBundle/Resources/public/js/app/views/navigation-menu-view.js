@@ -136,11 +136,11 @@ const NavigationMenuView = BaseView.extend({
         delete this._keysMap;
         delete this._searchData;
         delete this.$lastFocusedElementInRow;
-        this.$(this.options.tabbableElements).removeAttr('tabindex');
+        this.$(this.options.tabbableElements).attr('tabindex', null);
         this.$el
-            .removeAttr(MENU_BAR_ATTR)
+            .attr(MENU_BAR_ATTR, null)
             .removeClass(this.plainMenuClass);
-        this.$el.children(this.options.subMenus).removeAttr(MENU_BAR_ATTR);
+        this.$el.children(this.options.subMenus).attr(MENU_BAR_ATTR, null);
 
         NavigationMenuView.__super__.dispose.call(this);
     },
@@ -150,7 +150,7 @@ const NavigationMenuView = BaseView.extend({
      * @param {function} callback
      */
     registerKey(keyCode, callback) {
-        if ($.isNumeric(keyCode) && typeof callback === 'function') {
+        if (tools.isNumeric(keyCode) && typeof callback === 'function') {
             this._keysMap[keyCode] = callback;
         }
     },
@@ -201,7 +201,7 @@ const NavigationMenuView = BaseView.extend({
             return false;
         }
 
-        return $menu.width() === $menu.children(':first').width();
+        return $menu.width() === $menu.children().first().width();
     },
 
     /**
@@ -743,7 +743,7 @@ const NavigationMenuView = BaseView.extend({
             ) {
                 $el
                     .attr('aria-hidden', true)
-                    .removeAttr(MENU_ITEM_INDEX_ATTR)
+                    .attr(MENU_ITEM_INDEX_ATTR, null)
                     .removeClass(this.options.openClass);
             }
         });
@@ -1017,7 +1017,7 @@ const NavigationMenuView = BaseView.extend({
         if (event.type === 'show') {
             $menu.attr(MENU_ITEM_INDEX_ATTR, this.getIndexForElement($(event.relatedTarget)));
         } else if (event.type === 'hide') {
-            $menu.removeAttr(MENU_ITEM_INDEX_ATTR);
+            $menu.attr(MENU_ITEM_INDEX_ATTR, null);
         }
     },
 

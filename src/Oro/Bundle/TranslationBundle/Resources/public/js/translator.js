@@ -100,7 +100,7 @@ define(function(require, exports, module) {
         const checker = function(domain) {
             return dict.hasOwnProperty(domain ? domain + ':' + id : id);
         };
-        domains = _.union([undefined], _.isArray(domains) ? domains : [domains]);
+        domains = _.union([undefined], Array.isArray(domains) ? domains : [domains]);
         if (!_.some(domains, checker)) {
             window.console.error('Untranslated: %s', id);
             return false;

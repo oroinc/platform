@@ -92,7 +92,7 @@ define(function(require) {
             data.hasDefault = this.options.hasDefault;
             data.name = this.options.name;
             this.$el.append(this.template(data));
-            this.$el.find('a.entity-info').click(this.viewDetails.bind(this));
+            this.$el.find('a.entity-info').on('click', this.viewDetails.bind(this));
             this.toggleDefault();
             return this;
         }

@@ -24,7 +24,7 @@ define(function(require) {
                     '</div>' +
                 '</div>'
             );
-            $('.inline-editing-help-wrapper').click(function() {
+            $('.inline-editing-help-wrapper').on('click', function() {
                 $('.inline-editing-help-content').toggle();
             });
         },

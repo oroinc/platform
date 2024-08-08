@@ -88,7 +88,7 @@ define(function(require) {
          * @param {Function|Array} Constructor Plugin constructor or array of constructors
          */
         enable: function(Constructor) {
-            if (_.isArray(Constructor)) {
+            if (Array.isArray(Constructor)) {
                 _.each(Constructor, this.enable.bind(this));
                 return;
             }
@@ -110,7 +110,7 @@ define(function(require) {
          * @param {Function|Array} Constructor Plugin constructor or array of constructors
          */
         disable: function(Constructor) {
-            if (_.isArray(Constructor)) {
+            if (Array.isArray(Constructor)) {
                 _.each(Constructor, this.disable.bind(this));
                 return;
             }

@@ -459,12 +459,12 @@ define(function(require) {
             this.toggleHeaderCellHighlight(cell, highlight);
             if (highlight) {
                 if (!cell.disposed) {
-                    cell.$el.parent('tr:first').addClass('row-edit-mode');
+                    cell.$el.parent('tr').first().addClass('row-edit-mode');
                 }
                 this.lastHighlightedCell = cell;
             } else {
                 if (!cell.disposed) {
-                    cell.$el.parent('tr:first').removeClass('row-edit-mode');
+                    cell.$el.parent('tr').first().removeClass('row-edit-mode');
                 }
                 this.lastHighlightedCell = null;
             }

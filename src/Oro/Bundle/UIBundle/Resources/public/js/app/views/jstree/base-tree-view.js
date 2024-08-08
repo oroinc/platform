@@ -240,7 +240,7 @@ define(function(require) {
 
             const state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
             if (this.$searchField.length && state.search) {
-                this.$searchField.val(state.search).change();
+                this.$searchField.val(state.search).trigger('change');
             }
 
             this.openSelectedNode(!this.disabled);
@@ -385,12 +385,12 @@ define(function(require) {
                 this.onSearch(e);
                 const $results = this.$('a.jstree-search');
                 if ($results.length === 1 && this.isElementHasHandler($results)) {
-                    $results.click();
+                    $results.trigger('click');
                 }
             }
 
             e.preventDefault();
-            this.$searchField.focus();
+            this.$searchField.trigger('focus');
             return false;
         },
 
@@ -467,7 +467,7 @@ define(function(require) {
          */
         clearSearch: function() {
             this.$searchField.val('');
-            this.$searchField.change();
+            this.$searchField.trigger('change');
         },
 
         /**

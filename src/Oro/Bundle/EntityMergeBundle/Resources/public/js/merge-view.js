@@ -51,7 +51,7 @@ define(function(require) {
          */
         onEntitySelectAll: function(event) {
             const entityId = $(event.currentTarget).data('entity-key');
-            this.$('.entity-merge-field-choice[value="' + entityId + '"]').click();
+            this.$('.entity-merge-field-choice[value="' + entityId + '"]').trigger('click');
         },
 
         /**
@@ -79,7 +79,7 @@ define(function(require) {
          * @desc select radio button if column clicked
          */
         onColumnClick: function(event) {
-            $(event.currentTarget).find('.entity-merge-field-choice').click();
+            $(event.currentTarget).find('.entity-merge-field-choice').trigger('click');
         },
 
         /**
@@ -87,7 +87,7 @@ define(function(require) {
          * @desc All selected classes will have larger weight then not selected
          */
         resetViewState: function() {
-            this.$('input[type="radio"]:checked').click();
+            this.$('input[type="radio"]:checked').trigger('click');
         }
     });
 

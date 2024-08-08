@@ -113,7 +113,7 @@ define(function(require) {
 
         setFocus: function() {
             if (this.isOpen) {
-                this.$('[data-role="search"]').focus();
+                this.$('[data-role="search"]').trigger('focus');
             }
         },
 

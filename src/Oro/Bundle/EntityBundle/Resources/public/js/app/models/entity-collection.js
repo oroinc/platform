@@ -153,7 +153,7 @@ define(function(require) {
          */
         remove: function(models, options) {
             EntityCollection.__super__.remove.call(this, models, options);
-            models = _.isArray(models) ? models.slice() : [models];
+            models = Array.isArray(models) ? models.slice() : [models];
             _.each(models, function(model) {
                 registry.relieve(model, this);
             }, this);

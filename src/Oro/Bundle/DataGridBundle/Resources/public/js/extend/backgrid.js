@@ -131,7 +131,7 @@ define(function(require) {
                 value === void 0 ||
                 value === null ||
                 (_.isString(value) && value.trim().length === 0) ||
-                (_.isArray(value) && value.length === 0)
+                (Array.isArray(value) && value.length === 0)
             ) {
                 attrs['aria-label'] = __('oro.datagrid.cell.blank.aria_label');
                 attrs['data-blank-content'] = __('oro.datagrid.cell.blank.placeholder');
@@ -196,7 +196,7 @@ define(function(require) {
         } else if (e.type === 'change') {
             const val = formatter.toRaw($el.prop('checked'), model);
             model.set(column.get('name'), val);
-            $el.focus();
+            $el.trigger('focus');
         }
     };
 

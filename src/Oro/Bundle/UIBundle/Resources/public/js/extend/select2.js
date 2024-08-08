@@ -229,11 +229,11 @@ define(function(require) {
 
     function toUnAssignAriaAttributesForSelect() {
         this.opts.element
-            .removeAttr('aria-hidden')
+            .attr('aria-hidden', null)
             .off('validate-element');
 
         if (this._ariaLabelAdded) {
-            this.opts.element.removeAttr('aria-label');
+            this.opts.element.attr('aria-label', null);
         }
     }
 
@@ -307,7 +307,7 @@ define(function(require) {
             // the submitted options.
             const option = $(this.select).children('[value="' + $.escapeSelector(data.id) + '"]');
             option.detach();
-            $(this.select).append(option).change();
+            $(this.select).append(option).trigger('change');
 
             if (!this.triggerSelect(data)) { return; }
 
@@ -545,7 +545,7 @@ define(function(require) {
             }
 
             // move the global id to the correct dropdown
-            $('#select2-drop').removeAttr('id');
+            $('#select2-drop').attr('id', null);
             this.dropdown.attr('id', 'select2-drop');
             // show the elements
             mask.show();
@@ -568,11 +568,11 @@ define(function(require) {
             close.call(this);
             this.container.parent().removeClass(select2DropBelowClassName);
             // Remove previously auto generated name
-            this.search.removeAttr('name');
+            this.search.attr('name', null);
             this.selection.attr('aria-expanded', false);
             this.results.attr('aria-expanded', false);
             this.results.attr('aria-hidden', true);
-            this._activedescendantElements.removeAttr('aria-activedescendant');
+            this._activedescendantElements.attr('aria-activedescendant', null);
 
             if (this.opts.closeOnOverlap && !this.dropdownFixedMode) {
                 $(window).off('scroll.select2Overlaps');
@@ -604,7 +604,7 @@ define(function(require) {
                 }.bind(this))
                 .on('blur', function() {
                     // Remove previously auto generated name
-                    this.search.removeAttr('name');
+                    this.search.attr('name', null);
                 }.bind(this));
 
             this.opts.element
@@ -628,7 +628,7 @@ define(function(require) {
 
             this.breadcrumbs.off('.select2');
             // Remove previously auto generated name
-            this.search.removeAttr('name');
+            this.search.attr('name', null);
             delete this._activedescendantElements;
             destroy.call(this);
         };
@@ -670,8 +670,8 @@ define(function(require) {
             const $choiceClose = this.container.find('.select2-search-choice-close');
 
             if (this._enabled) {
-                this.selection.removeAttr('aria-disabled');
-                $choiceClose.removeAttr('aria-disabled');
+                this.selection.attr('aria-disabled', null);
+                $choiceClose.attr('aria-disabled', null);
             } else {
                 this.selection.attr('aria-disabled', true);
                 $choiceClose.attr('aria-disabled', true);
@@ -717,7 +717,7 @@ define(function(require) {
 
             // @todo BAP-3928, remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
-                this.focusser.focus();
+                this.focusser.trigger('focus');
             }
 
             toggleAriaSelected.call(this);
@@ -733,7 +733,7 @@ define(function(require) {
             this.selection.data('select2-data', data);
 
             container.empty();
-            if (data !== null && data !== []) {
+            if (data !== null) {
                 formatted = this.opts.formatSelection(data, container, this.opts.escapeMarkup);
             }
             if (formatted !== undefined) {
@@ -832,7 +832,7 @@ define(function(require) {
                     document.activeElement === this.body().get(0)
                 ) {
                     window.setTimeout(this.bind(function() {
-                        this.search.focus();
+                        this.search.trigger('focus');
                     }), 0);
                 }
             }));

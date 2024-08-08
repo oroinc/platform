@@ -397,7 +397,7 @@ define(function(require) {
         },
 
         _getCriteriaOfConditionValue: function(value) {
-            const criteria = value.criteria || (_.isArray(value) ? 'conditions-group' : 'condition-item');
+            const criteria = value.criteria || (Array.isArray(value) ? 'conditions-group' : 'condition-item');
             return criteria;
         },
 
@@ -497,7 +497,7 @@ define(function(require) {
         },
 
         _onCriteriaListMousedown: function() {
-            $(':focus').blur();
+            $(':focus').trigger('blur');
         },
 
         _onCriteriaGrab: function(e, ui) {
@@ -507,7 +507,7 @@ define(function(require) {
             $origin.data('clone', $clone);
             $clone
                 .data('origin', $origin)
-                .removeAttr('style')
+                .attr('style', null)
                 .insertAfter($origin);
             ui.helper.addClass(this.options.helperClass);
 
@@ -612,7 +612,8 @@ define(function(require) {
          * @protected
          */
         _isGroupOfAggregatedConditionItems: function(value) {
-            return _.isArray(value) && Boolean(_.findWhere(_.flatten(value), {criteria: 'aggregated-condition-item'}));
+            return Array.isArray(value) &&
+                Boolean(_.findWhere(_.flatten(value), {criteria: 'aggregated-condition-item'}));
         },
 
         /**

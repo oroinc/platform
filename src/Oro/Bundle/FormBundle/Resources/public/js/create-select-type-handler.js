@@ -44,7 +44,7 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
 
             const entityCreateBlock = $viewContainer.find('.entity-create-block');
             if (mode === 'create') {
-                entityCreateBlock.removeAttr('data-validation-ignore');
+                entityCreateBlock.attr('data-validation-ignore', null);
             } else {
                 entityCreateBlock.attr('data-validation-ignore', true);
             }

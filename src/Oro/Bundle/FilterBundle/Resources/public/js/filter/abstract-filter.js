@@ -449,7 +449,7 @@ define(function(require, exports, module) {
                         const $input = $(this);
                         if ($input.attr('value') === value) {
                             $input.prop('checked', true);
-                            $input.click();
+                            $input.trigger('click');
                         } else {
                             $input.prop('checked', false);
                         }

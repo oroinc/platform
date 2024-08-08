@@ -10,7 +10,7 @@ const LazyValidationCollectionView = BaseView.extend({
     },
 
     enableValidation(e) {
-        this.$(e.currentTarget).removeAttr('data-validation-ignore');
+        this.$(e.currentTarget).attr('data-validation-ignore', null);
     }
 });
 

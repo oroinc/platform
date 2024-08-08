@@ -47,7 +47,7 @@ define(function(require) {
          * Handles click on Ok button
          */
         onOk: function() {
-            this.$el.submit();
+            this.$el.trigger('submit');
         },
 
         /**

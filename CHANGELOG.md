@@ -16,6 +16,7 @@ The current file describes significant changes in the code that may affect the u
 #### UIBundle
 * Added new twig function `oro_is_string` that finds whether the given variable type is a string.
 * Added new twig `html_controls_after` variable for `form_row` widget that renders passed html content.
+* Removed jquery-numeric
 
 #### LayoutBundle
 * Added new twig function `oro_theme_configuration_value` that returns theme configuration option value.

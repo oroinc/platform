@@ -547,9 +547,9 @@ define(function(require) {
         _isDifferentFromInitialState: function(state) {
             const initialState = this._initialState;
 
-            if (_.isArray(state)) {
+            if (Array.isArray(state)) {
                 $.each(state, function(index, item) {
-                    if (_.isArray(item)) {
+                    if (Array.isArray(item)) {
                         item = $.grep(item, function(field) {
                             return _.isObject(field) && field.name.indexOf('temp-validation-name-') === -1;
                         });
@@ -559,7 +559,7 @@ define(function(require) {
             }
 
             const isSame = initialState && _.every(initialState, function(form, i) {
-                return _.isArray(state[i]) && _.every(form, function(field, j) {
+                return Array.isArray(state[i]) && _.every(form, function(field, j) {
                     return _.isObject(state[i][j]) &&
                         state[i][j].name === field.name && state[i][j].value === field.value;
                 });

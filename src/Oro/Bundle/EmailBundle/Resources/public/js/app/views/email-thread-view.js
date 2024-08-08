@@ -119,7 +119,7 @@ define(function(require) {
             const $target = $('>.dropdown-menu', e.currentTarget);
             const target = $target[0];
             const parentRect = this.el.getBoundingClientRect();
-            $target.removeAttr('data-uid').removeClass('fixed-width').css({
+            $target.attr('data-uid', null).removeClass('fixed-width').css({
                 width: '',
                 left: ''
             });

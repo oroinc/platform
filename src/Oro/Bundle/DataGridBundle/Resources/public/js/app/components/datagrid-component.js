@@ -543,11 +543,11 @@ define(function(require) {
         },
 
         fixState: function(state) {
-            if (_.isArray(state.filters) && _.isEmpty(state.filters)) {
+            if (Array.isArray(state.filters) && _.isEmpty(state.filters)) {
                 state.filters = {};
             }
 
-            if (_.isArray(state.sorters) && _.isEmpty(state.sorters)) {
+            if (Array.isArray(state.sorters) && _.isEmpty(state.sorters)) {
                 state.sorters = {};
             }
         },

@@ -439,7 +439,7 @@ define([
             if (options.parse) {
                 models = this.parse(models, options);
             }
-            const singular = !_.isArray(models);
+            const singular = !Array.isArray(models);
             models = singular ? (models ? [models] : []) : _.clone(models);
             let i;
             let l;
