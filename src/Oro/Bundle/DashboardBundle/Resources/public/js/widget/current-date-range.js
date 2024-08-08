@@ -69,7 +69,7 @@ define(function(require) {
 
                 for (const [relatedRangeSelector, relatedRangeValue] of Object.entries(relatedDateRangesData)) {
                     if (isDisableRelatedFields) {
-                        $(relatedRangeSelector).val(relatedRangeValue).change();
+                        $(relatedRangeSelector).val(relatedRangeValue).trigger('change');
                     }
 
                     $(relatedRangeSelector)

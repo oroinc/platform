@@ -298,7 +298,7 @@ define(function(require) {
             });
 
             modal.open();
-            modal.$el.find('[data-role="grid-view-input"]').focus();
+            modal.$el.find('[data-role="grid-view-input"]').trigger('focus');
 
             this.modal = modal;
         },

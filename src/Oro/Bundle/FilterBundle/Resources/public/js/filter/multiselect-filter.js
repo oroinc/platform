@@ -182,7 +182,7 @@ define(function(require) {
             const thisDOMValue = this._readDOMValue();
             return (
                 !_.isUndefined(thisDOMValue.value) &&
-                _.isArray(thisDOMValue.value) &&
+                Array.isArray(thisDOMValue.value) &&
                 !_.isEqual(this.value, thisDOMValue)
             );
         }

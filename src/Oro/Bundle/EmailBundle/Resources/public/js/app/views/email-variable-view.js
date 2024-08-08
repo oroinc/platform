@@ -150,10 +150,10 @@ define(function(require) {
                 // we cannot use 'show' method here because it adds 'display: block' inline style
                 // and as result both 'system' and 'entity' variables are visible in the 'system' section
                 if (!this._isVisible($tabEl)) {
-                    $tabEl.removeAttr('style');
+                    $tabEl.attr('style', null);
                 }
                 if (!this._isVisible($el)) {
-                    $el.removeAttr('style');
+                    $el.attr('style', null);
                 }
                 // add new content
                 $el.html(this._getEntityVariablesHtml(entityVars, entityLabel, path, pathLabels));
@@ -275,7 +275,7 @@ define(function(require) {
             }
 
             if (field.length) {
-                field.insertAtCursor(variable).focus();
+                field.insertAtCursor(variable).trigger('focus');
                 mediator.trigger('email-variable-view:click-variable', field, variable);
             } else {
                 mediator.execute('showFlashMessage', 'error',

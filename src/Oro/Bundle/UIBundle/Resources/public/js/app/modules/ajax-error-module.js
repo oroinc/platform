@@ -1,4 +1,4 @@
 import $ from 'jquery';
 import error from 'oroui/js/error';
 
-$(document).ajaxError(error.handle.bind(error));
+$(document).on('ajaxError', error.handle.bind(error));

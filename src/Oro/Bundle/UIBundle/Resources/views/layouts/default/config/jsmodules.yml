@@ -27,7 +27,6 @@ aliases:
     jquery.mousewheel$: jquery-mousewheel/jquery.mousewheel
     jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
     jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
-    jquery.numeric$: jquery-numeric/jquery.numeric
     jquery.select2$: '@oroinc/select2/select2'
     jquery.timepicker$: timepicker/jquery.timepicker
     jquery.uniform$: '@oroinc/jquery.uniform/src/js/jquery.uniform'
@@ -51,6 +50,7 @@ app-modules:
 #    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
     - oroui/js/app/modules/swipeable-module
     - oroui/js/app/modules/template-macros-module
+    - oroui/js/app/modules/svg-sprite-module
     - oroui/js/app/modules/viewport-module
     - oroui/js/app/modules/widgets-module
     - oroui/js/extend/scriptjs

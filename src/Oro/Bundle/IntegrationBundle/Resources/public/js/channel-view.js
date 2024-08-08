@@ -71,7 +71,7 @@ define([
             const $el = $(this.options.transportTypeSelector);
 
             if ($el.find('option').length < 2) {
-                $el.parents('.control-group:first').hide();
+                $el.parents('.control-group').first().hide();
             }
         },
 

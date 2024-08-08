@@ -234,7 +234,7 @@ define(function(require) {
          *                         or last
          */
         focus: function(atEnd) {
-            this.$('input[name=value]').setCursorToEnd().focus();
+            this.$('input[name=value]').setCursorToEnd().trigger('focus');
         },
 
         /**
@@ -410,7 +410,7 @@ define(function(require) {
             if (!this.isChanged()) {
                 this.$('[type=submit]').attr('disabled', 'disabled');
             } else {
-                this.$('[type=submit]').removeAttr('disabled');
+                this.$('[type=submit]').prop('disabled', false);
             }
         },
 

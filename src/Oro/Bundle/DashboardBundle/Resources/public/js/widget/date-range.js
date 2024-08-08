@@ -66,7 +66,7 @@ define(function(require) {
                 !value.value.start && !value.value.end
             ) {
                 const defaultTypeValue = this.getDefaultTypeValue();
-                this.domCache.$datePart.val(defaultTypeValue).change();
+                this.domCache.$datePart.val(defaultTypeValue).trigger('change');
             }
         },
 
@@ -75,7 +75,7 @@ define(function(require) {
             if (val === this.customChoice.value) {
                 val = this.domCache.$customPart.val();
             }
-            this.domCache.$dateTypeCriteriaValue.val(val).change();
+            this.domCache.$dateTypeCriteriaValue.val(val).trigger('change');
             this.applyValue();
         },
 

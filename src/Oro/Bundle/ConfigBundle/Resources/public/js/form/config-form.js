@@ -121,7 +121,7 @@ define(function(require) {
                     .prop('checked', true)
                     .attr('checked', true);
 
-                this.$el.find(':input').change();
+                this.$el.find(':input').trigger('change');
 
                 this.$el.find(':input').each(function() {
                     const $field = $(this);

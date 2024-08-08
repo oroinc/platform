@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Captcha\CaptchaServiceRegistry;
 use Oro\Bundle\FormBundle\Form\Type\CaptchaServiceSelectType;

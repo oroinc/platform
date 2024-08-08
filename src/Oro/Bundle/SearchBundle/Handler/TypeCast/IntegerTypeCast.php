@@ -10,12 +10,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 class IntegerTypeCast extends AbstractTypeCastingHandler
 {
-    /**
-     * @param integer|bool $value
-     *
-     * @return object|int
-     */
-    public function castValue($value)
+    public function castValue(mixed $value): mixed
     {
         if ($this->isSupported($value)) {
             return (int)$value;

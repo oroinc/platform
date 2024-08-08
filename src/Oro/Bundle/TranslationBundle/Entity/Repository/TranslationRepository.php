@@ -137,4 +137,34 @@ class TranslationRepository extends EntityRepository
 
         return $translations;
     }
+
+    /**
+     * @param string $languageCode
+     * @param string $domain
+     *
+     * @return array [['key' => '...', 'value' => '...'], ...]
+     */
+    public function findDomainTranslations(
+        string $languageCode,
+        string $domain
+    ): array {
+        $qb = $this->_em->createQueryBuilder()
+            ->from(Translation::class, 't');
+        $qb->distinct()
+            ->select('k.key, t.value')
+            ->join('t.language', 'l')
+            ->join('t.translationKey', 'k')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('l.code', ':code'),
+                    $qb->expr()->gt('t.scope', ':scope'),
+                    $qb->expr()->eq('k.domain', ':domain')
+                )
+            )
+            ->setParameter('code', $languageCode, Types::STRING)
+            ->setParameter('domain', $domain, Types::STRING)
+            ->setParameter('scope', Translation::SCOPE_SYSTEM, Types::INTEGER);
+
+        return $qb->getQuery()->getArrayResult();
+    }
 }

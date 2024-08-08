@@ -52,7 +52,7 @@ define([
                 params = pathDesc.params;
             }
         }
-        params = params ? _.isArray(params) ? params.slice() : _.extend({}, params) : {};
+        params = params ? Array.isArray(params) ? params.slice() : _.extend({}, params) : {};
         if (path !== null && path !== void 0) {
             path = path.replace(this.removeRoot, '');
             handler = this.findHandler(function(handler) {

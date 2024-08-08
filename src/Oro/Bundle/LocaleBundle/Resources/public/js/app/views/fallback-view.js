@@ -93,7 +93,7 @@ define(function(require) {
 
         renderSubviews: function() {
             this.initSubviews = false;
-            this.$(this.options.selectors.childItem).removeAttr('data-layout');
+            this.$(this.options.selectors.childItem).attr('data-layout', null);
 
             const self = this;
             this.getValueEl(this.$el).each(function() {
@@ -130,24 +130,24 @@ define(function(require) {
             const self = this;
 
             this.getValueEl(this.$el)
-                .change(this.cloneValueToChildrenEvent.bind(this))
-                .keyup(this.cloneValueToChildrenEvent.bind(this));
+                .on('change', this.cloneValueToChildrenEvent.bind(this))
+                .on('keyup', this.cloneValueToChildrenEvent.bind(this));
 
             this.$el.find(this.options.selectors.itemValue).find('.tox-tinymce').each(function() {
                 tinyMCE.get(self.getValueEl(self.getItemEl(this)).attr('id'))
                     .on('change', function() {
-                        $(this.targetElm).change();
+                        $(this.targetElm).trigger('change');
                     })
                     .on('keyup', function() {
-                        $(this.targetElm).change();
+                        $(this.targetElm).trigger('change');
                     });
             });
 
             this.getUseFallbackEl(this.$el)
-                .change(this.switchUseFallbackEvent.bind(this));
+                .on('change', this.switchUseFallbackEvent.bind(this));
 
             this.getFallbackEl(this.$el)
-                .change(this.switchFallbackTypeEvent.bind(this));
+                .on('change', this.switchFallbackTypeEvent.bind(this));
         },
 
         /**
@@ -299,7 +299,7 @@ define(function(require) {
             }
 
             if (enable) {
-                $element.removeAttr('disabled');
+                $element.prop('disabled', false);
 
                 if (editor) {
                     editor.mode.set('design');
@@ -328,7 +328,7 @@ define(function(require) {
             const $fallbackContainer = $fallback.inputWidget('getContainer');
 
             if (enable) {
-                $fallback.removeAttr('disabled');
+                $fallback.prop('disabled', false);
 
                 if ($fallbackContainer) {
                     $fallbackContainer.removeClass('disabled');
@@ -341,7 +341,7 @@ define(function(require) {
                 }
             }
 
-            $fallback.change();
+            $fallback.trigger('change');
         },
 
         /**
@@ -367,7 +367,7 @@ define(function(require) {
                 }
             });
             if (isChanged) {
-                $toValue.filter(':first').change();
+                $toValue.first().trigger('change');
             }
         },
 

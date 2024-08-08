@@ -268,7 +268,7 @@ define(function(require) {
                 let relation;
                 const data = value.data;
 
-                if (_.isArray(data)) {
+                if (Array.isArray(data)) {
                     params = _.extend({data: _.map(data, findData), association: name}, this.identifier);
                     relation = mediator.execute('getEntityRelationshipCollection', params, this);
                 } else if (_.isObject(data)) {

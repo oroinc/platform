@@ -89,7 +89,7 @@ if(jQuery) (function($) {
 
 				// Show the color picker
 				case 'show':
-					show( $(this).eq(0) );
+					show( $(this).first() );
 					return $(this);
 
 				// Get/set the hex color value
@@ -178,7 +178,7 @@ if(jQuery) (function($) {
                 input.after('<span class="minicolors-swatch minicolors-sprite"><span class="minicolors-swatch-color"></span></span>');
                 input.next('.minicolors-swatch').on('click', function(event) {
                     event.preventDefault();
-                    input.focus();
+                    input.trigger('focus');
                 });
             } else {
                 input

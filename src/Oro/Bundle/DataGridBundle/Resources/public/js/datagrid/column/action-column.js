@@ -49,7 +49,8 @@ define(function(require) {
             if (_.isEmpty(attrs.actions) && attrs.massActions.length) {
                 this.set('renderable', false);
             }
-            ActionColumn.__super__.initialize.call(this, attributes, options);
+
+            ActionColumn.__super__.initialize.call(this, attrs, options);
         }
     });
 

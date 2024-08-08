@@ -2,8 +2,8 @@ define([
     'tpl-loader!orodatagrid/templates/datagrid/page-size.html',
     'jquery',
     'underscore',
-    'backbone'
-], function(template, $, _, Backbone) {
+    'oroui/js/app/views/base/view'
+], function(template, $, _, BaseView) {
     'use strict';
 
     /**
@@ -11,9 +11,9 @@ define([
      *
      * @export  orodatagrid/js/datagrid/page-size
      * @class   orodatagrid.datagrid.PageSize
-     * @extends Backbone.View
+     * @extends BaseView
      */
-    const PageSize = Backbone.View.extend({
+    const PageSize = BaseView.extend({
         /** @property */
         template: template,
 

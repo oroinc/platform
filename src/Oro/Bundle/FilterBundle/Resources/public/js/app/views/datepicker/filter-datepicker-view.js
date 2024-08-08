@@ -124,7 +124,7 @@ const FilterDatePickerView = DatePickerView.extend({
         });
         this.$calendar.datepicker(widgetOptions);
         this.$calendar.addClass(widgetOptions.className)
-            .click(function(e) {
+            .on('click', function(e) {
                 e.stopImmediatePropagation();
             });
         this.$calendar.on(`keydown${this.eventNamespace()}`, this.closeOnEscape.bind(this));
@@ -171,7 +171,7 @@ const FilterDatePickerView = DatePickerView.extend({
      */
     close() {
         this.$dropdown.trigger('tohide');
-        this.$frontDateField.focus();
+        this.$frontDateField.trigger('focus');
         this.trigger('close', this);
     },
 

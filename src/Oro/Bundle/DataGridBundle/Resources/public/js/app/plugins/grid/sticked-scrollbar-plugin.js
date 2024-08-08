@@ -105,11 +105,11 @@ define(function(require) {
                 $document: $(document),
                 $grid: this.grid.$grid,
                 $scrollableContainer: this.grid.$grid.closest('.scrollable-container'),
-                $container: this.grid.$grid.parents('.grid-scrollable-container:first'),
-                $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]:first'),
-                $oroTabs: this.grid.$grid.parents('.oro-tabs:first'),
-                $collapsible: this.grid.$grid.parents('.collapse:first'),
-                $thead: this.grid.$grid.find('thead:first')
+                $container: this.grid.$grid.parents('.grid-scrollable-container').first(),
+                $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]').first(),
+                $oroTabs: this.grid.$grid.parents('.oro-tabs').first(),
+                $collapsible: this.grid.$grid.parents('.collapse').first(),
+                $thead: this.grid.$grid.find('thead').first()
             };
         },
 
@@ -192,14 +192,14 @@ define(function(require) {
         },
 
         attachScrollbar: function() {
-            this.domCache.$scrollbar.removeAttr('style');
+            this.domCache.$scrollbar.attr('style', null);
         },
 
         detachScrollbar: function() {
             const $scrollbar = this.domCache.$scrollbar;
             const containerWidth = this.domCache.$container.width();
             const containerLeftOffset = this.domCache.$container.offset().left;
-            $scrollbar.removeAttr('style');
+            $scrollbar.attr('style', null);
 
             $scrollbar.css({
                 'position': 'fixed',

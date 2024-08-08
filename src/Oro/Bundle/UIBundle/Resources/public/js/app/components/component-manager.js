@@ -127,7 +127,7 @@ define(function(require) {
                     // already initialized on another event (when init-on has several events at once click,focusin
                     return;
                 }
-                $initOnContainer.removeAttr('data-page-component-init-on');
+                $initOnContainer.attr('data-page-component-init-on', null);
                 const tempNS = _.uniqueId('.tempEventNS');
                 const oppositeEventName = oppositeEvent[event.type];
                 const $target = $(event.target);
@@ -205,7 +205,7 @@ define(function(require) {
                     if (shortcut) {
                         const dataUpdate = ComponentShortcutsManager.getComponentData(shortcut, elemData);
                         $elem
-                            .removeAttr(shortcut.dataAttr)
+                            .attr(shortcut.dataAttr, null)
                             .removeData(shortcut.dataKey)
                             .data(dataUpdate);
                     }
@@ -310,9 +310,9 @@ define(function(require) {
             $elem
                 .removeData('pageComponentModule')
                 .removeData('pageComponentOptions')
-                .removeAttr('data-page-component-module')
-                .removeAttr('data-page-component-options')
-                .removeAttr('data-page-component-init-on');
+                .attr('data-page-component-module', null)
+                .attr('data-page-component-options', null)
+                .attr('data-page-component-init-on', null);
         },
 
         /**

@@ -665,7 +665,7 @@ define(function(require) {
          * @param {String} content
          */
         setContent: function(content) {
-            const widgetContent = $(content).filter('.widget-content:first');
+            const widgetContent = $(content).filter('.widget-content').first();
 
             this.actionsEl = null;
             this.actions = {};
@@ -830,7 +830,7 @@ define(function(require) {
             }
 
             try {
-                return $.parseJSON(content);
+                return JSON.parse(content);
             } catch (e) {}
 
             return null;

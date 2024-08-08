@@ -2,8 +2,7 @@ define([
     'tpl-loader!orodatagrid/templates/datagrid/pagination-input.html',
     'jquery',
     'underscore',
-    './pagination',
-    'jquery.numeric'
+    './pagination'
 ], function(template, $, _, Pagination) {
     'use strict';
 
@@ -17,6 +16,8 @@ define([
     const PaginationInput = Pagination.extend({
         /** @property */
         template: template,
+
+        autoFillInput: true,
 
         /** @property */
         events: {
@@ -52,9 +53,11 @@ define([
             const collection = this.collection;
             const state = collection.state;
 
-            if (_.isNaN(pageIndex)) {
+            if (_.isNaN(pageIndex) && this.autoFillInput) {
                 $(e.target).val(state.currentPage);
                 return;
+            } else if (_.isNaN(pageIndex) && !this.autoFillInput) {
+                pageIndex = state.currentPage;
             }
 
             pageIndex = state.firstPage === 0 ? pageIndex - 1 : pageIndex;
@@ -77,9 +80,7 @@ define([
          *
          * @return Array.<Object> an array of page handle objects hashes
          */
-        makeHandles: function() {
-            const handles = [];
-
+        makeHandles: function(handles = []) {
             handles.push({
                 type: 'input'
             });
@@ -91,7 +92,7 @@ define([
          */
         render: function() {
             PaginationInput.__super__.render.call(this);
-            this.$('input').numeric({decimal: false, negative: false});
+            this.$('input');
             return this;
         }
     });

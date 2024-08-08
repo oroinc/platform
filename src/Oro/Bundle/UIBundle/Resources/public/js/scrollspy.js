@@ -21,7 +21,7 @@ define(function(require) {
             const $spy = $(this);
 
             if (tools.isDesktop()) {
-                $spy.find('.responsive-section:last').each(function() {
+                $spy.find('.responsive-section').last().each(function() {
                     const $section = $(this);
                     const titleHeight = $section.find('.scrollspy-title:visible').outerHeight();
                     $section.css('min-height', 'calc(100% + ' + (titleHeight || 0) + 'px)');
@@ -79,7 +79,7 @@ define(function(require) {
     scrollspy._replaceWithCollapse = function(container) {
         container.find('[data-spy="scroll"]').each(function() {
             const $spy = $(this);
-            $spy.removeAttr('data-spy').addClass('accordion');
+            $spy.attr('data-spy', null).addClass('accordion');
 
             $spy.find('.scrollspy-title').each(function(i) {
                 // first is opened, rest are closed

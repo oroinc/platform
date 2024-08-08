@@ -217,7 +217,7 @@ define(function(require) {
             }
         },
         setSelect2ValueById: function(self, config, element, callback, id) {
-            const ids = _.isArray(id) ? id.join(config.separator) : id;
+            const ids = Array.isArray(id) ? id.join(config.separator) : id;
             const handleResults = _.partial(self.handleResults, self, config, callback);
             const select2Obj = element.data('select2');
             const ajaxOptions = select2Obj.opts.ajax;
@@ -248,7 +248,7 @@ define(function(require) {
                 callback(data);
             } else {
                 const item = data.pop();
-                if (!_.isUndefined(item) && !_.isUndefined(item.children) && _.isArray(item.children)) {
+                if (!_.isUndefined(item) && !_.isUndefined(item.children) && Array.isArray(item.children)) {
                     callback(item.children.pop());
                 } else {
                     callback(item);

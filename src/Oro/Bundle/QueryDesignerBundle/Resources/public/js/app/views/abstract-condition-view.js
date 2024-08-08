@@ -82,7 +82,7 @@ define(function(require) {
             if (!selectedItem) {
                 this._removeFilter();
             } else if (choiceInputValue !== selectedItem.id) {
-                $(':focus').blur();
+                $(':focus').trigger('blur');
                 // reset current value on field change
                 this.setValue({});
                 this._renderFilter(selectedItem.id);

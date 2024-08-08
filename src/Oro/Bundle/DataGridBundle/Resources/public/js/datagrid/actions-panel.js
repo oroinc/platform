@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
-    const Backbone = require('backbone');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * Panel with action buttons
@@ -11,7 +11,7 @@ define(function(require) {
      * @class   orodatagrid.datagrid.ActionsPanel
      * @extends Backbone.View
      */
-    const ActionsPanel = Backbone.View.extend({
+    const ActionsPanel = BaseView.extend({
         /** @property String */
         className: 'btn-group',
 
@@ -91,6 +91,7 @@ define(function(require) {
         setActions: function(actions) {
             this.actions = [];
             this.launchers = [];
+            actions = _.sortBy(actions, 'order');
             _.each(actions, function(action) {
                 this.actions.push(action);
                 this.launchers.push(action.createLauncher());

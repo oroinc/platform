@@ -2,7 +2,7 @@ import BaseView from 'oroui/js/app/views/base/view';
 import template from 'tpl-loader!orodatagrid/templates/datagrid/pagination-info.html';
 
 const PaginationInfoView = BaseView.extend({
-    optionNames: BaseView.prototype.optionNames.concat(['collection']),
+    optionNames: BaseView.prototype.optionNames.concat(['collection', 'transTemplate']),
 
     autoRender: true,
 
@@ -25,7 +25,8 @@ const PaginationInfoView = BaseView.extend({
             maxRangeThreshold: currentPage * pageSize > totalRecords
                 ? totalRecords
                 : currentPage * pageSize,
-            totalRecords
+            totalRecords,
+            transTemplate: this.transTemplate
         };
     }
 });

@@ -126,7 +126,7 @@ define(function(require) {
 
                 mediator.trigger(this.eventToParent('localized-template:field-fallback'), fieldName);
             } else {
-                field.$input.removeAttr('disabled');
+                field.$input.prop('disabled', false);
 
                 this.operateWithEditor(fieldName, editor => {
                     editor.mode.set('design');
@@ -154,7 +154,7 @@ define(function(require) {
                     editor.setContent(content);
                 });
 
-                this.fields[fieldName].$input.change();
+                this.fields[fieldName].$input.trigger('change');
             }
         },
 

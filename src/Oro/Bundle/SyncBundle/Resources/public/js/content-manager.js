@@ -284,7 +284,7 @@ define([
          */
         tagContent: function(tags, callback) {
             const obj = {
-                tags: _.isArray(tags) ? tags : [tags]
+                tags: Array.isArray(tags) ? tags : [tags]
             };
             if (callback) {
                 obj.callback = callback;

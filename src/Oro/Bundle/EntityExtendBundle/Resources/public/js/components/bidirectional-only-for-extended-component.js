@@ -19,7 +19,7 @@ define(function(require) {
         initialize: function(options) {
             const targetEntityField = $('[data-name="field__target-entity"]');
             const bidirectionalField = $('[data-name="field__bidirectional"]');
-            targetEntityField.change(function() {
+            targetEntityField.on('change', function() {
                 if (_.indexOf(options.nonExtendedEntitiesClassNames, targetEntityField.val().trim()) !== -1) {
                     bidirectionalField.val('0').trigger('change');
                     bidirectionalField.select2('readonly', true);

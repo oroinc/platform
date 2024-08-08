@@ -97,7 +97,7 @@ define(function(require, exports, module) {
                 el: this.$el
             };
             _.each(this.options.elements, function(element, name) {
-                if (_.isArray(element)) {
+                if (Array.isArray(element)) {
                     this.$elements[name] = this.$elements[element[0]].find(element[1]);
                 } else {
                     this.$elements[name] = $(element);

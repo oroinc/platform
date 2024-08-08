@@ -30,6 +30,6 @@ define(function(require) {
     return function(additionalOptions) {
         _.extend(options, additionalOptions || {});
         const button = options._sourceElement;
-        button.click(onClick);
+        button.on('click', onClick);
     };
 });

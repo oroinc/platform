@@ -55,7 +55,7 @@ define(function(require) {
                 selection.addRange(range);
                 $textarea[0].setSelectionRange(0, textToCopy.length);
             } else {
-                $textarea.select();
+                $textarea.trigger('select');
             }
 
             try {

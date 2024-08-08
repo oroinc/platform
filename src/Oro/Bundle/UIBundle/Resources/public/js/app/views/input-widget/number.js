@@ -130,7 +130,7 @@ define(function(require) {
             if (this.pattern) {
                 this.$el.attr('pattern', this.pattern);
             } else {
-                this.$el.removeAttr('pattern');
+                this.$el.attr('pattern', null);
             }
         },
 

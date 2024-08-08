@@ -70,7 +70,7 @@ define(function(require) {
             let label;
             if (_.isString(option)) {
                 value = option;
-            } else if (_.isArray(option)) {
+            } else if (Array.isArray(option)) {
                 value = option[0];
                 label = option[1];
             } else if (_.isObject(option)) {
@@ -102,7 +102,7 @@ define(function(require) {
             });
             const $option = this.$('[data-value="' + escapedValue + '"]');
             this.$('.dropdown-menu li').removeClass('selected');
-            this.$('.dropdown-menu li [data-value]').removeAttr('aria-selected');
+            this.$('.dropdown-menu li [data-value]').attr('aria-selected', null);
             $option.closest('li').addClass('selected');
             $option.attr('aria-selected', 'true');
             this.$('.current-label').text($option.text());

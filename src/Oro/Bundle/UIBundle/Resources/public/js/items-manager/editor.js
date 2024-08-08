@@ -128,7 +128,7 @@ define(function(require) {
             const validator = this._getValidator();
             let result = true;
             if (validator) {
-                this.element.removeAttr('data-validation-ignore');
+                this.element.attr('data-validation-ignore', null);
                 if (elem) {
                     result = validator.element(elem);
                 } else {

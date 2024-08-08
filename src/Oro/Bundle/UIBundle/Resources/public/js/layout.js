@@ -135,7 +135,7 @@ define(function(require) {
                 .on(`shown${Popover.EVENT_KEY}`, e => {
                     const popover = $(e.target).data(Popover.DATA_KEY);
                     const $tip = $(popover.tip);
-                    const $tabbable = $tip.find(':tabbable').eq(0);
+                    const $tabbable = $tip.find(':tabbable').first();
 
                     if (!$tabbable.length) {
                         return;

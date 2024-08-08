@@ -29,7 +29,7 @@ define(function(require) {
 
         render: function() {
             if (this.$(this.switcherCheckbox).is(':checked')) {
-                this.$(this.allowEmptyCheckbox).removeAttr('disabled');
+                this.$(this.allowEmptyCheckbox).prop('disabled', false);
                 this.$(this.fieldSelect).inputWidget('disable', false);
             } else {
                 this.$(this.allowEmptyCheckbox).attr('disabled', true);

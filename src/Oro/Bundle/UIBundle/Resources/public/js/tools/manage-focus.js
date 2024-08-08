@@ -26,7 +26,7 @@ export default {
             $elToFocus = $(this.getFirstTabbable($container.find(':not([data-autofocus="false"]):tabbable').toArray()));
         }
 
-        $elToFocus.focus();
+        $elToFocus.trigger('focus');
     },
 
     /**
@@ -171,7 +171,7 @@ export default {
         }
 
         if (substitutionElement) {
-            $(substitutionElement).focus();
+            $(substitutionElement).trigger('focus');
             e.preventDefault();
         }
     }

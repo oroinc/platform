@@ -576,7 +576,7 @@ define(function(require) {
                 } else {
                     const initializeOptions = _.result($el.data('inputWidget'), 'initializeOptions');
 
-                    if (_.isArray(initializeOptions.data)) {
+                    if (Array.isArray(initializeOptions.data)) {
                         result = _.some(initializeOptions.data, function(item) {
                             const text = _.isString(item) ? item : item.text;
 
