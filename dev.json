@@ -63,7 +63,7 @@
         "symfony/security-guard": "~5.4.13",
         "symfony/security-http": "~5.4.31",
         "symfony/security-bundle": "~5.4.17",
-        "symfony/serializer": "5.4.38",
+        "symfony/serializer": "5.4.39",
         "symfony/templating": "~5.4.11",
         "symfony/translation": "5.4.22",
         "symfony/twig-bridge": "~5.4.31",
