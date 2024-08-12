@@ -51,6 +51,8 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_translation.manager.translation'
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     # Normalizer
     oro_translation.importexport.normalizer.translation:

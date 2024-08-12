@@ -9,6 +9,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TranslationWriterTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,6 +22,9 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
+    /** @var EventDispatcher */
+    private $eventDispatcher;
+
     /** @var TranslationWriter */
     private $writer;
 
@@ -29,6 +33,12 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->translationManager = $this->createMock(TranslationManager::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->eventDispatcher
+            ->expects($this->any())
+            ->method('getListeners')
+            ->willReturn([]);
+
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
@@ -36,6 +46,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->entityManager);
 
         $this->writer = new TranslationWriter($this->registry, $this->translationManager);
+        $this->writer->setEventDispatcher($this->eventDispatcher);
     }
 
     public function testWrite()
@@ -75,10 +86,12 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
                 $calls[] = 'saveTranslation';
             });
         $this->translationManager->expects($this->once())
-            ->method('flush')
+            ->method('flushWithoutDumpJsTranslations')
             ->with(true)
             ->willReturnCallback(function () use (&$calls) {
-                $calls[] = 'flush';
+                $calls[] = 'flushWithoutDumpJsTranslations';
+
+                return true;
             });
 
         $this->writer->write($items);
@@ -89,7 +102,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
                 'saveTranslation',
                 'saveTranslation',
                 'saveTranslation',
-                'flush',
+                'flushWithoutDumpJsTranslations',
                 'commit',
                 'clear'
             ],

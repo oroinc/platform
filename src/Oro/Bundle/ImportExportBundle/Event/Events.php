@@ -104,4 +104,9 @@ final class Events
      * Can be used to send extra messages before processing chunks.
      */
     const BEFORE_CREATING_IMPORT_CHUNK_JOBS = 'oro.import_export.before_import_chunks';
+
+    /**
+     * This event occurs after the import completes.
+     */
+    const FINISH_IMPORT = 'oro.import_export.finish_import';
 }
