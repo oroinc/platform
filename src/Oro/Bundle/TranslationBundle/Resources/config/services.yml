@@ -407,3 +407,11 @@ services:
         class: Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper
         arguments:
             - '%translator.default_path%'
+
+    oro_translation.event_listener.finish_import_listener:
+        class: Oro\Bundle\TranslationBundle\EventListener\FinishImportListener
+        arguments:
+            - '@oro_translation.js_dumper'
+            - '@oro_ui.dynamic_asset_version_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro.import_export.finish_import, method: onFinishImport }
