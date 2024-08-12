@@ -34,7 +34,6 @@ class ConsoleErrorSubscriberTest extends \PHPUnit\Framework\TestCase
         E_USER_DEPRECATED => [null, LogLevel::INFO],
         E_NOTICE => [null, LogLevel::WARNING],
         E_USER_NOTICE => [null, LogLevel::WARNING],
-        E_STRICT => [null, LogLevel::WARNING],
         E_WARNING => [null, LogLevel::WARNING],
         E_USER_WARNING => [null, LogLevel::WARNING],
         E_COMPILE_WARNING => [null, LogLevel::WARNING],
@@ -74,6 +73,7 @@ class ConsoleErrorSubscriberTest extends \PHPUnit\Framework\TestCase
                 E_PARSE => [$this->logger, LogLevel::CRITICAL],
                 E_ERROR => [$this->logger, LogLevel::CRITICAL],
                 E_CORE_ERROR => [$this->logger, LogLevel::CRITICAL],
+                E_STRICT => [null, LogLevel::WARNING],
             ],
             $this->handler->setLoggers([])
         );
