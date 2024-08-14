@@ -161,6 +161,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
             'scopes' => [
                 ['scope1' => 'value1'],
             ],
+            WorkflowConfiguration::METADATA => [
+                'some_key' => 'some_value'
+            ],
             WorkflowConfiguration::NODE_APPLICATIONS => [
                 CurrentApplicationProviderInterface::DEFAULT_APPLICATION,
                 'Some Extra Application'

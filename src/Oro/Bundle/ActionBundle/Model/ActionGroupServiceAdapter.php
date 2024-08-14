@@ -11,6 +11,8 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class ActionGroupServiceAdapter implements ActionGroupInterface
 {
+    public const RESULT_VALUE_KEY = '__result__';
+
     private ?array $parameters = null;
     private array $parameterNameToArgumentName = [];
     private array $argumentNameToParameterName = [];
@@ -38,6 +40,8 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
 
             if ($this->returnValueName) {
                 $result = [$this->returnValueName => $result];
+            } elseif (!$result instanceof ActionData && !is_array($result)) {
+                $result = [self::RESULT_VALUE_KEY => $result];
             }
 
             if (is_array($result)) {

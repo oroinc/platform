@@ -59,6 +59,10 @@ class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
         $workflowItem->expects($this->once())
             ->method('getData')
             ->willReturn($data);
+        $workflowItem->expects($this->once())
+            ->method('lock');
+        $workflowItem->expects($this->once())
+            ->method('unlock');
 
         $action = $this->createMock(ActionInterface::class);
 

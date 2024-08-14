@@ -12,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
+use Oro\Bundle\WorkflowBundle\Model\TransitionServiceInterface;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
@@ -900,5 +901,79 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+    }
+
+    public function testAssembleWithTransitionService()
+    {
+        $configuration = [
+            'transition_service' => 'some_service_id',
+            'acl_resource' => 'test_acl',
+            'acl_message' => 'test acl message',
+            'step_to' => 'target_step',
+            'is_start' => true,
+        ];
+
+        $steps = ['target_step' => $this->createMock(Step::class)];
+        $attributes = ['attribute' => $this->createMock(Attribute::class)];
+
+        $transitionService = $this->createMock(TransitionServiceInterface::class);
+        $this->serviceLocator->expects($this->once())
+            ->method('get')
+            ->with('some_service_id')
+            ->willReturn($transitionService);
+
+        $this->conditionFactory->expects($this->never())
+            ->method('create');
+
+        $this->actionFactory->expects($this->never())
+            ->method('create');
+
+        $this->formOptionsAssembler->expects($this->once())
+            ->method('assemble')
+            ->with([], $attributes, 'transition', 'test_transition')
+            ->willReturnArgument(0);
+
+        $transitions = $this->assembler->assemble(
+            [
+                'transitions' => [
+                    'test_transition' => $configuration,
+                ],
+                'transition_definitions' => self::$transitionDefinitions,
+                'variable_definitions' => [
+                    'variables' => []
+                ],
+            ],
+            $steps,
+            $attributes
+        );
+
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
+        $this->assertCount(1, $transitions);
+        $this->assertTrue($transitions->containsKey('test_transition'));
+
+        /** @var Transition $actualTransition */
+        $actualTransition = $transitions->get('test_transition');
+
+        $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+        $this->assertEquals(
+            WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE,
+            $actualTransition->getDisplayType(),
+            'Incorrect display type'
+        );
+
+        $this->assertEquals([], $actualTransition->getFrontendOptions(), 'Incorrect frontend_options');
+        $this->assertTrue($actualTransition->isStart(), 'Incorrect is_start');
+
+        $this->assertEquals(WorkflowTransitionType::class, $actualTransition->getFormType(), 'Incorrect form_type');
+        $this->assertEmpty($actualTransition->getFormOptions(), 'Incorrect form_options');
+
+        $this->assertTemplate('page', $configuration, $actualTransition);
+        $this->assertTemplate('dialog', $configuration, $actualTransition);
+
+        $this->assertNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
+        $this->assertNull($actualTransition->getCondition(), 'Incorrect condition');
+        $this->assertNull($actualTransition->getPreAction(), 'Incorrect preaction');
+        $this->assertNull($actualTransition->getAction(), 'Incorrect action');
     }
 }

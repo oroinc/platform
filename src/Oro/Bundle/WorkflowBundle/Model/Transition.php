@@ -327,8 +327,10 @@ class Transition
     /**
      * Get resolved step to.
      *
-     * If any matches of conditional steps to matches its condition then conditional step to will be returned.
-     * If none of conditional steps is resolved then the default step to will be returned if allowed.
+     * If any of conditional steps matches its condition then the conditional step to will be returned,
+     * default step_to is added to the list of conditional steps by TransitionAssembler, and it is checked in the loop
+     *
+     * If there are no conditional steps then the default step_to will be returned.
      */
     public function getResolvedStepTo(WorkflowItem $workflowItem): Step
     {

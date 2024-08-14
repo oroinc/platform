@@ -69,7 +69,8 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
                 ['initContextAttribute', 'testInitContextAttribute'],
                 ['message', 'test message'],
                 ['aclResource', 'test'],
-                ['aclMessage', 'acl_message_test']
+                ['aclMessage', 'acl_message_test'],
+                ['conditionalStepsTo', ['step1' => []]]
             ]
         );
     }
@@ -504,5 +505,67 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($formConfiguration['template'], $this->transition->getFormTemplate());
         self::assertEquals($formConfiguration['data_provider'], $this->transition->getFormDataProvider());
         self::assertEquals($formConfiguration['data_attribute'], $this->transition->getFormDataAttribute());
+    }
+
+    public function testStepToWithoutConditionalSteps()
+    {
+        $step1 = new Step();
+        $workflowItem = new WorkflowItem();
+
+        $this->transition->setName('transition1');
+        $this->transition->setStepTo($step1);
+
+        $this->assertSame($step1, $this->transition->getResolvedStepTo($workflowItem));
+    }
+
+    public function testStepToWithMatchedConditionalSteps()
+    {
+        $step1 = new Step();
+        $step1->setName('step1');
+        $step2 = new Step();
+        $step2->setName('step2');
+        $workflowItem = new WorkflowItem();
+
+        $this->transition->setName('transition1');
+        $this->transition->setStepTo($step1);
+
+        $expression = $this->createMock(ExpressionInterface::class);
+        $expression->expects($this->once())
+            ->method('evaluate')
+            ->with($workflowItem)
+            ->willReturn(true);
+        $this->transition->addConditionalStepTo($step2, $expression);
+
+        $this->assertSame($step2, $this->transition->getResolvedStepTo($workflowItem));
+    }
+
+    public function testStepToWithNotMatchedConditionalSteps()
+    {
+        $step1 = new Step();
+        $step1->setName('step1');
+        $step2 = new Step();
+        $step2->setName('step2');
+        $workflowItem = new WorkflowItem();
+
+        $this->transition->setName('transition1');
+        $this->transition->setStepTo($step1);
+
+        $dummyExpression = $this->createMock(ExpressionInterface::class);
+        $dummyExpression->expects($this->once())
+            ->method('evaluate')
+            ->with($workflowItem)
+            ->willReturn(false);
+        $expression = $this->createMock(ExpressionInterface::class);
+        $expression->expects($this->once())
+            ->method('evaluate')
+            ->with($workflowItem)
+            ->willReturn(false);
+        $this->transition->addConditionalStepTo($step2, $expression);
+        $this->transition->addConditionalStepTo($step1, $dummyExpression);
+
+        $this->expectException(ForbiddenTransitionException::class);
+        $this->expectExceptionMessage('Transition "transition1" is not allowed.');
+
+        $this->transition->getResolvedStepTo($workflowItem);
     }
 }

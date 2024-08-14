@@ -30,6 +30,7 @@ class CustomFormOptionsProcessor implements ProcessorInterface
         $workflowItem = $context->getWorkflowItem();
 
         if (array_key_exists('form_init', $transition->getFormOptions())) {
+            // Workflow item is locked here to prevent workflow transition during form_init actions call
             $workflowItem->lock();
             $this->formInitListener->executeInitAction($transition->getFormOptions()['form_init'], $workflowItem);
             $this->formInitListener->dispatchFormInitEvents($workflowItem, $transition);

@@ -9,13 +9,6 @@ use Oro\Component\Action\Event\ExtendableConditionEvent;
  */
 interface ExtendableConditionEventErrorsProcessorInterface
 {
-    public function getPreparedErrors(
-        ExtendableConditionEvent $event,
-        array|\ArrayAccess|null &$errorsCollection = null
-    ): array;
-
-    public function showErrors(iterable $errors, string $messageType): void;
-
     public function processErrors(
         ExtendableConditionEvent $event,
         bool $showErrors = false,

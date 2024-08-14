@@ -49,6 +49,9 @@ class FilterHandlerTest extends \PHPUnit\Framework\TestCase
                             'name' => 'test_transition',
                             'label' => 'Test Transition',
                             'step_to' => 'test_step',
+                            'conditional_step_to' => [
+                                'first_step' => []
+                            ],
                             'transition_definition' => 'test_transition_definition',
                             'display_type' => 'type',
                             'destination_page' => 'dest',
@@ -134,6 +137,7 @@ class FilterHandlerTest extends \PHPUnit\Framework\TestCase
                         [
                             'name' => 'test_transition',
                             'step_to' => 'test_step',
+                            'conditional_step_to' => ['first_step' => []],
                             'transition_definition' => 'test_transition_definition',
                             'display_type' => 'type',
                             'destination_page' => 'dest',

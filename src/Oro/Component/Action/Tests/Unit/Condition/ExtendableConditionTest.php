@@ -4,6 +4,8 @@ namespace Oro\Component\Action\Tests\Unit\Condition;
 
 use Oro\Component\Action\Condition\ExtendableCondition;
 use Oro\Component\Action\Event\ExtendableConditionEvent;
+use Oro\Component\Action\Event\ExtendableEventData;
+use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
 use Oro\Component\Action\Model\ExtendableConditionEventErrorsProcessorInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -11,6 +13,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
 {
     private EventDispatcherInterface|MockObject $eventDispatcher;
@@ -99,6 +104,62 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
+    }
+
+    public function testIsConditionAllowedEventDataInContext(): void
+    {
+        $data = ['key' => 'value'];
+        $options = [
+            'events' => ['test_event'],
+            'eventData' => $data
+        ];
+        $context = new ExtendableEventData([]);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('hasListeners')
+            ->willReturn(true);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new ExtendableConditionEvent(new ExtendableEventData($data)), 'test_event');
+
+        $this->extendableCondition->initialize($options);
+        $this->assertTrue($this->extendableCondition->isConditionAllowed($context));
+    }
+
+    public function testIsConditionAllowedWithActionDataStorageAwareInterface(): void
+    {
+        $options = ['events' => ['test_event']];
+        $context = $this->createMock(ActionDataStorageAwareInterface::class);
+        $dataStorage = new ExtendableEventData(['key' => 'value']);
+        $context->expects($this->once())
+            ->method('getActionDataStorage')
+            ->willReturn($dataStorage);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('hasListeners')
+            ->willReturn(true);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new ExtendableConditionEvent($dataStorage), 'test_event');
+
+        $this->extendableCondition->initialize($options);
+        $this->assertTrue($this->extendableCondition->isConditionAllowed($context));
+    }
+
+    public function testIsConditionAllowedWithAbstractStorage(): void
+    {
+        $options = ['events' => ['test_event']];
+        $context = new ExtendableEventData(['key' => 'value']);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('hasListeners')
+            ->willReturn(true);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new ExtendableConditionEvent($context), 'test_event');
+
+        $this->extendableCondition->initialize($options);
+        $this->assertTrue($this->extendableCondition->isConditionAllowed($context));
     }
 
     /**

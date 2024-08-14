@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Acl\Extension;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
@@ -25,14 +24,9 @@ class WorkflowAclMetadataProvider
     private const IS_START = 'is_start';
     private const IS_START_STEP = '_is_start';
 
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var FeatureChecker */
-    private $featureChecker;
-
-    /** @var array|null */
-    private $localCache;
+    private ManagerRegistry $doctrine;
+    private FeatureChecker $featureChecker;
+    private ?array $localCache = null;
 
     public function __construct(ManagerRegistry $doctrine, FeatureChecker $featureChecker)
     {
@@ -62,12 +56,10 @@ class WorkflowAclMetadataProvider
      */
     private function loadMetadata()
     {
-        $workflowRows = $this->getWorkflowEntityManager()
+        $workflowRows = $this->doctrine
+            ->getManagerForClass(WorkflowDefinition::class)
             ->getRepository(WorkflowDefinition::class)
-            ->createQueryBuilder('w')
-            ->select('w.name, w.label, w.configuration')
-            ->getQuery()
-            ->getArrayResult();
+            ->getWorkflowDefinitionsConfigs();
 
         $workflows = [];
         foreach ($workflowRows as $workflowRow) {
@@ -101,29 +93,30 @@ class WorkflowAclMetadataProvider
             if (!empty($stepConfig[self::ALLOWED_TRANSITIONS])) {
                 $order = $this->getAttribute($stepConfig, self::ORDER, 0);
                 foreach ($stepConfig[self::ALLOWED_TRANSITIONS] as $transitionName) {
-                    if (isset($transitions[$transitionName])) {
-                        $transitionConfig = $transitions[$transitionName];
+                    if (!isset($transitions[$transitionName])) {
+                        continue;
+                    }
+                    $transitionConfig = $transitions[$transitionName];
 
-                        $toSteps = array_keys(
-                            $this->getAttribute($transitionConfig, self::CONDITIONAL_STEPS_TO, [])
+                    $toSteps = array_keys(
+                        $this->getAttribute($transitionConfig, self::CONDITIONAL_STEPS_TO, [])
+                    );
+                    $toSteps[] = $this->getAttribute($transitionConfig, self::STEP_TO);
+
+                    $isStartStep = $this->getAttribute($stepConfig, self::IS_START_STEP, false);
+                    if ($isStartStep) {
+                        $addedStartTransitions[$transitionName] = true;
+                    }
+
+                    foreach ($toSteps as $toStep) {
+                        $result[$order][] = new FieldSecurityMetadata(
+                            $this->getTransitionIdentifier(
+                                $transitionName,
+                                $isStartStep ? null : $stepName,
+                                $toStep
+                            ),
+                            $this->getTransitionLabel($workflowConfig, $transitionName, $stepName, $toStep)
                         );
-                        $toSteps[] = $this->getAttribute($transitionConfig, self::STEP_TO);
-
-                        $isStartStep = $this->getAttribute($stepConfig, self::IS_START_STEP, false);
-                        if ($isStartStep) {
-                            $addedStartTransitions[$transitionName] = true;
-                        }
-
-                        foreach ($toSteps as $toStep) {
-                            $result[$order][] = new FieldSecurityMetadata(
-                                $this->getTransitionIdentifier(
-                                    $transitionName,
-                                    $isStartStep ? null : $stepName,
-                                    $toStep
-                                ),
-                                $this->getTransitionLabel($workflowConfig, $transitionName, $stepName, $toStep)
-                            );
-                        }
                     }
                 }
             }
@@ -263,14 +256,6 @@ class WorkflowAclMetadataProvider
         }
 
         return null;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    private function getWorkflowEntityManager()
-    {
-        return $this->doctrine->getManagerForClass(WorkflowDefinition::class);
     }
 
     /**

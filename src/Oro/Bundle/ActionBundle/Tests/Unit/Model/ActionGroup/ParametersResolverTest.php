@@ -26,6 +26,22 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         $this->resolver = new ParametersResolver();
     }
 
+    public function testResolveWithSnakeCase()
+    {
+        $actionData = new ActionData(['test_parameter' => 'value']);
+        $parameter = new Parameter('testParameter');
+        $parameter->setType('string');
+
+        $actionGroup = $this->createMock(ActionGroup::class);
+        $actionGroup->expects($this->atLeastOnce())
+            ->method('getParameters')
+            ->willReturn([$parameter]);
+
+        $this->resolver->resolve($actionData, $actionGroup, null, true);
+
+        $this->assertEquals(['test_parameter' => 'value'], $actionData->toArray());
+    }
+
     /**
      * @dataProvider resolveDataProvider
      */
