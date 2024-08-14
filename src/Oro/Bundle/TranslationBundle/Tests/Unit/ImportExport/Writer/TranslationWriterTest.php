@@ -46,7 +46,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->entityManager);
 
         $this->writer = new TranslationWriter($this->registry, $this->translationManager);
-        $this->writer->setEventDispatcher($this->eventDispatcher);
+        $this->writer->setDispatcher($this->eventDispatcher);
     }
 
     public function testWrite()

@@ -9,6 +9,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Event\InvalidateDynamicTranslationCacheEvent;
 use Oro\Bundle\TranslationBundle\EventListener\InvalidateDynamicJsTranslationListener;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -22,7 +23,7 @@ class TranslationWriter implements ItemWriterInterface
     /** @var TranslationManager */
     protected $translationManager;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     public function __construct(ManagerRegistry $registry, TranslationManager $translationManager)
@@ -31,7 +32,15 @@ class TranslationWriter implements ItemWriterInterface
         $this->translationManager = $translationManager;
     }
 
+    /**
+     * @deprecated, use {@see setDispatcher} instead.
+     */
     public function setEventDispatcher(EventDispatcher $eventDispatcher): self
+    {
+        return $this->setDispatcher($eventDispatcher);
+    }
+
+    public function setDispatcher(EventDispatcherInterface $eventDispatcher): self
     {
         $this->eventDispatcher = $eventDispatcher;
 
