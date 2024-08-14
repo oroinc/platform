@@ -18,6 +18,7 @@ services:
             - '@security.token_storage'
     Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic: ~
     Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic: ~
+    Oro\Bundle\ImportExportBundle\Async\Topic\FinishImportTopic: ~
     Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic:
         arguments:
             - '@oro_user.manager'
