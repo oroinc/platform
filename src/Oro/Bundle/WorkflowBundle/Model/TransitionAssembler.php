@@ -271,12 +271,13 @@ class TransitionAssembler extends BaseAbstractAssembler
         $stepsTo[$stepToName] = [];
 
         foreach ($stepsTo as $stepName => $conditionConfig) {
-            $conditionConfig = $this->addCondition(
-                $conditionConfig['conditions'],
+            $conditions = $conditionConfig['conditions'] ?? [];
+            $conditions = $this->addCondition(
+                $conditions,
                 $this->getStepAclCheckCondition($transition->getName(), $stepName)
             );
 
-            $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $conditionConfig);
+            $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $conditions);
             $transition->addConditionalStepTo($steps[$stepName], $condition);
         }
     }
