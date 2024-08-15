@@ -111,7 +111,7 @@ return [
                 'step_to' => 'first_step',
                 'conditional_steps_to' => [
                     'first_step' => [
-                        '@equals' => [1, 1]
+                        'conditions' => ['@equals' => [1, 1]]
                     ]
                 ],
                 'is_start' => true,
