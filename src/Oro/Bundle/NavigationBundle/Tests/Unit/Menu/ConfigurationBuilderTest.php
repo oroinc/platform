@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Knp\Menu\FactoryInterface;
@@ -9,24 +11,16 @@ use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MenuFactory */
-    private $factory;
-
-    /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $menuFactory;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var ConfigurationBuilder */
-    private $configurationBuilder;
+    private MenuFactory $factory;
+    private FactoryInterface|MockObject $menuFactory;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
+    private ConfigurationProvider|MockObject $configurationProvider;
+    private ConfigurationBuilder $configurationBuilder;
 
     protected function setUp(): void
     {
@@ -263,5 +257,30 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($options['items']);
         $menu = new MenuItem('navbar', $this->factory);
         $this->configurationBuilder->build($menu, [], 'navbar');
+    }
+
+    public function testWarningOption()
+    {
+        $warningText = 'Test Warning';
+        $tree = [
+            'navbarWithWarning' => [
+                'children' => [],
+                'warning' => $warningText
+            ],
+            'navbarWithoutWarning' => [
+                'children' => []
+            ]
+        ];
+
+        $this->configurationProvider->method('getMenuTree')->willReturn($tree);
+        $this->configurationProvider->method('getMenuItems')->willReturn([]);
+
+        $menu1 = new MenuItem('test', $this->factory);
+        $this->configurationBuilder->build($menu1, [], 'navbarWithWarning');
+        $this->assertEquals($warningText, $menu1->getExtra('warning'));
+
+        $menu2 = new MenuItem('test', $this->factory);
+        $this->configurationBuilder->build($menu2, [], 'navbarWithoutWarning');
+        $this->assertNull($menu2->getExtra('warning'));
     }
 }
