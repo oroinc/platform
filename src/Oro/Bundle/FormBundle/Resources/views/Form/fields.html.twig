@@ -243,6 +243,19 @@
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
 
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if warning is defined and warning -%}
+                {% import '@OroUI/macros.html.twig' as ui %}
+                {{ ui.tooltip(
+                    warning,
+                    {},
+                    null,
+                    false,
+                    null,
+                    null,
+                    true,
+                    'warning'
+                ) }}
+            {% endif %}
             {%- if tooltip is defined and tooltip -%}
                 {% import '@OroUI/macros.html.twig' as ui %}
                 {{ ui.tooltip(

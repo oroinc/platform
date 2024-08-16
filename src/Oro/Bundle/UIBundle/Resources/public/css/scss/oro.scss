@@ -786,6 +786,10 @@ span.validation-failed {
     color: $primary-700;
     font-size: $base-font-size;
     cursor: pointer;
+
+    &--warning {
+        color: $danger-light;
+    }
 }
 
 label .popover-body {

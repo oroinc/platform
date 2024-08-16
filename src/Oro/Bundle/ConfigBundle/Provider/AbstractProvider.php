@@ -509,7 +509,7 @@ abstract class AbstractProvider implements ProviderInterface
         $fieldDefinitionOptions = $fieldDefinition->getOptions();
         $options = array_intersect_key(
             $fieldDefinitionOptions,
-            array_flip(['label', 'required', 'block', 'subblock', 'tooltip', 'resettable'])
+            array_flip(['label', 'required', 'block', 'subblock', 'tooltip', 'warning', 'resettable'])
         );
         // pass only options needed to "value" form type
         $formType = $fieldDefinition->getType();
