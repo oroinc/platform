@@ -65,9 +65,7 @@ class ThemeConfiguration implements ConfigurationInterface
         $configurationTreeBuilder = new TreeBuilder('configuration');
         $configurationNode = $configurationTreeBuilder->getRootNode();
         $configurationNode->info(
-            <<<INFO
-Configuration that defines which parameters a storefront theme configurable by a store owner.
-INFO
+            'Configuration that defines which parameters a storefront theme configurable by a store owner.'
         );
         $configNode = $configTreeBuilder->getRootNode();
         $configNode->info('Layout theme additional config')->end();
@@ -107,7 +105,10 @@ INFO
                         ->info('Defines whether Theme supports RTL and additional *.rtl.css files have to be build')
                     ->end()
                     ->booleanNode('svg_icons_support')
-                        ->info('Defines whether Theme supports SVG icons')
+                        ->info(
+                            'Defines whether Theme supports SVG icons. '
+                            . 'Default value will be inherited from the parent themes if any, otherwise - false.'
+                        )
                     ->end()
                     ->scalarNode('directory')
                         ->info('The directory name where to look up for layout updates. By default theme identifier')

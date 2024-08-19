@@ -1,0 +1,3 @@
+label: Custom Theme Inheriting Default
+parent: default
+groups: [ commerce ]

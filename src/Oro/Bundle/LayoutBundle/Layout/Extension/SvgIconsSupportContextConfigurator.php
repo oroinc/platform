@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
+use Oro\Bundle\LayoutBundle\Provider\SvgIconsSupportProvider;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
@@ -13,13 +14,21 @@ use Symfony\Component\OptionsResolver\Options;
  */
 class SvgIconsSupportContextConfigurator implements ContextConfiguratorInterface
 {
+    private ?SvgIconsSupportProvider $svgIconsSupportProvider = null;
+
     public function __construct(private ThemeManager $themeManager)
     {
     }
 
+    public function setSvgIconsSupportProvider(?SvgIconsSupportProvider $svgIconsSupportProvider): void
+    {
+        $this->svgIconsSupportProvider = $svgIconsSupportProvider;
+    }
+
     public function configureContext(ContextInterface $context): void
     {
-        $context->getResolver()
+        $context
+            ->getResolver()
             ->setDefaults(
                 [
                     'is_svg_icons_support' => function (Options $options, $value) {
@@ -32,6 +41,10 @@ class SvgIconsSupportContextConfigurator implements ContextConfiguratorInterface
                         }
 
                         $themeName = $options->offsetGet('theme');
+                        if ($themeName && $this->svgIconsSupportProvider !== null) {
+                            return $this->svgIconsSupportProvider->isSvgIconsSupported($themeName);
+                        }
+
                         if (!$themeName || !$this->themeManager->hasTheme($themeName)) {
                             return false;
                         }

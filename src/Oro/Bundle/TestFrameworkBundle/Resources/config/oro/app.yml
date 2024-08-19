@@ -25,3 +25,9 @@ oro_test_framework:
     timeout: 600
     language: en
     formatting_code: en_US
+
+oro_layout:
+  enabled_themes:
+    - default
+    - custom
+    - custom_standalone
