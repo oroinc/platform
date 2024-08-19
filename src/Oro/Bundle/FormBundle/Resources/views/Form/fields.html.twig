@@ -761,7 +761,11 @@
         'data-page-component-module': 'oroui/js/app/components/view-component',
         'data-page-component-options': {'view': 'oroform/js/app/views/simple-color-picker-view'}|merge(configs)|json_encode
     }|merge(attr) %}
-    {% set type = 'hidden' %}
+
+    {% if not configs.show_input_control %}
+        {% set type = 'hidden' %}
+    {% endif %}
+
     {{ block('form_widget_simple') }}
 {% endblock %}
 
