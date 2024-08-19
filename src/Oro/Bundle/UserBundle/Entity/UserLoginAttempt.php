@@ -51,7 +51,7 @@ class UserLoginAttempt
     private ?string $userAgent;
 
     #[ORM\Column(name: 'context', type: Types::JSON, nullable: false)]
-    private ?array $context = null;
+    private array $context = [];
 
     public function getId(): string
     {
