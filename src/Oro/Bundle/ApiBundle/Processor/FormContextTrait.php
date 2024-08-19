@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormInterface;
  */
 trait FormContextTrait
 {
+    private mixed $requestId = null;
     private array $requestData = [];
     private bool $existing = false;
     private ?array $includedData = null;
@@ -24,6 +25,22 @@ trait FormContextTrait
     private ?FormInterface $form = null;
     private bool $skipFormValidation = false;
     private ?array $normalizedEntityConfigExtras = null;
+
+    /**
+     * Gets an identifier of an entity that was sent in the request.
+     */
+    public function getRequestId(): mixed
+    {
+        return $this->requestId;
+    }
+
+    /**
+     * Sets an identifier of an entity that was sent in the request.
+     */
+    public function setRequestId(mixed $requestId): void
+    {
+        $this->requestId = $requestId;
+    }
 
     /**
      * Returns request data.

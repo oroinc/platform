@@ -469,7 +469,6 @@ services:
             - '@oro_api.config_provider'
             - '@oro_api.metadata_provider'
             - '@oro_api.upsert_criteria_builder'
-            - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -45 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -45 }
@@ -1362,13 +1361,6 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: -30 }
 
-    oro_api.rest.set_http_response_status_code.accepted:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
-        arguments:
-            - 202 # HTTP_ACCEPTED
-        tags:
-            - { name: oro.api.processor, action: update_list, group: normalize_result, requestType: rest, priority: -30 }
-
     oro_api.rest.set_http_response_status_code.no_content:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
@@ -1543,7 +1535,6 @@ services:
             - { name: oro.api.processor, action: delete, group: normalize_result, priority: -50 }
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -50 }
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -50 }
-            - { name: oro.api.processor, action: update_list, group: normalize_result, collection: false, priority: -50 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: false, priority: -50 }
             - { name: oro.api.processor, action: delete_subresource, group: normalize_result, collection: false, priority: -50 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, collection: false, priority: -50 }

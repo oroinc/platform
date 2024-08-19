@@ -18,12 +18,12 @@ class ChunkSizeProviderCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $config = DependencyInjectionUtil::getConfig($container);
-        $batchApiConfig = $config['batch_api'];
+        $batchConfig = $config['batch_api'];
 
         $container->getDefinition('oro_api.batch.chunk_size_provider')
-            ->replaceArgument(0, $batchApiConfig['chunk_size'])
-            ->replaceArgument(1, $batchApiConfig['chunk_size_per_entity'])
-            ->replaceArgument(2, $batchApiConfig['included_data_chunk_size'])
-            ->replaceArgument(3, $batchApiConfig['included_data_chunk_size_per_entity']);
+            ->setArgument('$defaultChunkSize', $batchConfig['chunk_size'])
+            ->setArgument('$entityChunkSizes', $batchConfig['chunk_size_per_entity'])
+            ->setArgument('$defaultIncludedDataChunkSize', $batchConfig['included_data_chunk_size'])
+            ->setArgument('$entityIncludedDataChunkSizes', $batchConfig['included_data_chunk_size_per_entity']);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Handler;
 
+use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
 
 /**
@@ -13,26 +14,30 @@ class BatchUpdateResponse
     /** @var int[] */
     private array $processedItemStatuses;
     private BatchSummary $summary;
+    private BatchAffectedEntities $affectedEntities;
     private bool $hasUnexpectedErrors;
     private ?string $retryReason;
 
     /**
-     * @param array        $data
-     * @param int[]        $processedItemStatuses
-     * @param BatchSummary $summary
-     * @param bool         $hasUnexpectedErrors
-     * @param string|null  $retryReason
+     * @param array                 $data
+     * @param int[]                 $processedItemStatuses
+     * @param BatchSummary          $summary
+     * @param BatchAffectedEntities $affectedEntities
+     * @param bool                  $hasUnexpectedErrors
+     * @param string|null           $retryReason
      */
     public function __construct(
         array $data,
         array $processedItemStatuses,
         BatchSummary $summary,
+        BatchAffectedEntities $affectedEntities,
         bool $hasUnexpectedErrors,
         ?string $retryReason = null
     ) {
         $this->data = $data;
         $this->processedItemStatuses = $processedItemStatuses;
         $this->summary = $summary;
+        $this->affectedEntities = $affectedEntities;
         $this->hasUnexpectedErrors = $hasUnexpectedErrors;
         $this->retryReason = $retryReason;
     }
@@ -62,6 +67,14 @@ class BatchUpdateResponse
     public function getSummary(): BatchSummary
     {
         return $this->summary;
+    }
+
+    /**
+     * Gets entities affected by this batch operation.
+     */
+    public function getAffectedEntities(): BatchAffectedEntities
+    {
+        return $this->affectedEntities;
     }
 
     /**

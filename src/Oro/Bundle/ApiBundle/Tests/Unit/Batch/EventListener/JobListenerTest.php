@@ -191,7 +191,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($operationId, $callback) {
                 self::assertSame(
                     [
-                        'progress' => 0
+                        'progress' => 0.0
                     ],
                     $callback()
                 );
@@ -607,6 +607,85 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
                 self::assertSame([], $callback());
 
                 return false;
+            });
+
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
+    }
+
+    public function testMergeAffectedEntities()
+    {
+        $job = new Job();
+        $job->setId(123);
+        $job->setData(['api_operation_id' => 1]);
+        $job->setStatus(Job::STATUS_SUCCESS);
+
+        $childJob1 = new Job();
+        $childJob2 = new Job();
+        $childJob2->setData([
+            'affectedEntities' => [
+                'primary'  => [[1, 'item1', false]],
+                'included' => [['Test\Entity1', 1, 'include1', false]]
+            ]
+        ]);
+        $childJob3 = new Job();
+        $childJob3->setData([
+            'affectedEntities' => [
+                'primary'  => [[2, 'item2', true]],
+                'included' => [['Test\Entity1', 2, 'include2', true]]
+            ]
+        ]);
+        $childJob4 = new Job();
+        $childJob4->setData([
+            'affectedEntities' => [
+                'primary' => [[3, 'item3', false]]
+            ]
+        ]);
+        $job->addChildJob($childJob1);
+        $job->addChildJob($childJob2);
+        $job->addChildJob($childJob3);
+        $job->addChildJob($childJob4);
+
+        $operation = new AsyncOperation();
+        $operation->setJobId(123);
+        $operation->setStatus(AsyncOperation::STATUS_RUNNING);
+
+        $this->em->expects(self::once())
+            ->method('find')
+            ->with(AsyncOperation::class, 1)
+            ->willReturn($operation);
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'status'           => AsyncOperation::STATUS_SUCCESS,
+                        'progress'         => 1,
+                        'summary'          => [
+                            'aggregateTime' => 0,
+                            'readCount'     => 0,
+                            'writeCount'    => 0,
+                            'errorCount'    => 0,
+                            'createCount'   => 0,
+                            'updateCount'   => 0
+                        ],
+                        'hasErrors'        => false,
+                        'affectedEntities' => [
+                            'primary'  => [
+                                [1, 'item1', false],
+                                [2, 'item2', true],
+                                [3, 'item3', false]
+                            ],
+                            'included' => [
+                                ['Test\Entity1', 1, 'include1', false],
+                                ['Test\Entity1', 2, 'include2', true]
+                            ]
+                        ]
+                    ],
+                    $callback()
+                );
+
+                return true;
             });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));

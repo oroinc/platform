@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateHandler;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateResponse;
+use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\RetryHelper;
@@ -124,6 +125,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => ['testRequest'],
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -159,6 +161,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 [['key' => 'val1']],
                 [BatchUpdateItemStatus::NOT_PROCESSED],
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 true
             ));
 
@@ -189,6 +192,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => ['testRequest'],
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -224,6 +228,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 [],
                 [],
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -254,6 +259,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => ['testRequest'],
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -289,6 +295,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 [['key' => 'val1']],
                 [],
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -319,6 +326,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => ['testRequest'],
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -354,6 +362,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 [['key' => 'val1']],
                 [BatchUpdateItemStatus::NO_ERRORS],
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -384,6 +393,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => ['testRequest'],
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -424,6 +434,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 $rawItems,
                 $processedItemStatuses,
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -455,6 +466,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => $requestType,
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -495,6 +507,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 $rawItems,
                 $processedItemStatuses,
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -533,6 +546,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => $requestType,
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -573,6 +587,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 $rawItems,
                 $processedItemStatuses,
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -630,6 +645,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => $requestType,
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -670,6 +686,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 $rawItems,
                 $processedItemStatuses,
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -732,6 +749,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => $requestType,
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -775,6 +793,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 $rawItems,
                 $processedItemStatuses,
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -849,6 +868,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => ['testRequest'],
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -884,6 +904,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 [['key' => 'val1']],
                 [BatchUpdateItemStatus::NO_ERRORS],
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 
@@ -922,6 +943,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => ['testRequest'],
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => $fileIndex,
@@ -966,6 +988,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 [['key' => 'val1']],
                 [BatchUpdateItemStatus::NOT_PROCESSED],
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false,
                 'test retry reason'
             ));
@@ -1043,6 +1066,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'entityClass'       => 'Test\Entity',
             'requestType'       => ['testRequest'],
             'version'           => '1.1',
+            'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
             'fileIndex'         => 10,
@@ -1094,6 +1118,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 [['key' => 'val1']],
                 [BatchUpdateItemStatus::NO_ERRORS],
                 $this->createBatchSummaryFromArray($summaryData),
+                new BatchAffectedEntities(),
                 false
             ));
 

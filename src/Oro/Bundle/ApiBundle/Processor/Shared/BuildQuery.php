@@ -37,6 +37,11 @@ class BuildQuery implements ProcessorInterface
     {
         /** @var Context $context */
 
+        if ($context->hasResult()) {
+            // data already exist
+            return;
+        }
+
         $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if (!$entityClass) {
             // only manageable entities or resources based on manageable entities are supported

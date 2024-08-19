@@ -73,11 +73,13 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
                 'Products',
                 'Create or update a list of product records.'
                 . "\n\n"
-                . 'The request is processed asynchronously, and the details of the corresponding asynchronous operation'
+                . 'The request is processed asynchronously and the details of the corresponding asynchronous operation'
                 . "\nare returned in the response."
                 . "\n\n"
                 . '**Note:** *The server may process records in any order regardless of the order'
                 . "\nin which they are specified in the request.*"
+                . "\n\n"
+                . '**Note:** To process the request synchronously add ``X-Mode: sync`` header to the request.'
                 . "\n\n"
                 . 'The input data for each record is the same as for the API resources to create or update'
                 . "\na single product record."

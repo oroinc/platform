@@ -52,6 +52,30 @@ interface FileSplitterInterface
     public function setChunkSizePerSection(array $sizes): void;
 
     /**
+     * Gets the maximum number of chunks that can be created.
+     */
+    public function getChunkCountLimit(): ?int;
+
+    /**
+     * Sets the maximum number of chunks that can be created.
+     */
+    public function setChunkCountLimit(?int $limit): void;
+
+    /**
+     * Gets the maximum number of chunks that can be created for a specific first level sections.
+     *
+     * @return array [section name => limit, ...]
+     */
+    public function getChunkCountLimitPerSection(): array;
+
+    /**
+     * Sets the maximum number of chunks that can be created for a specific first level sections.
+     *
+     * @param array $limits [section name => limit, ...]
+     */
+    public function setChunkCountLimitPerSection(array $limits): void;
+
+    /**
      * Gets the template that should be used to build the name of a chunk file.
      */
     public function getChunkFileNameTemplate(): ?string;
@@ -70,6 +94,16 @@ interface FileSplitterInterface
      * Sets the name of a header section.
      */
     public function setHeaderSectionName(?string $name): void;
+
+    /**
+     * Gets the name of a section contains primary data.
+     */
+    public function getPrimarySectionName(): ?string;
+
+    /**
+     * Sets the name of a section contains primary data.
+     */
+    public function setPrimarySectionName(?string $name): void;
 
     /**
      * Gets names of sections to be split.

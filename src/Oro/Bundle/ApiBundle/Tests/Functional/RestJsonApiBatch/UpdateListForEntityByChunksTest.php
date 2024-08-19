@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiBatch;
 
+use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiUpdateListTestCase;
 
@@ -16,6 +17,17 @@ class UpdateListForEntityByChunksTest extends RestJsonApiUpdateListTestCase
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/update_list_for_entity_by_chunks.yml']);
     }
 
+    private function getDepartmentId(string $title): int
+    {
+        /** @var TestDepartment|null $department */
+        $department = $this->getEntityManager()->getRepository(TestDepartment::class)->findOneBy(['name' => $title]);
+        if (null === $department) {
+            throw new \RuntimeException(sprintf('The department "%s" not found.', $title));
+        }
+
+        return $department->getId();
+    }
+
     public function testUpdateEntitiesDelayedCreationOfChunkJobs(): void
     {
         // Decreasing batch size for several iterations
@@ -24,14 +36,14 @@ class UpdateListForEntityByChunksTest extends RestJsonApiUpdateListTestCase
         $updateListCreateChunkJobsMessageProcessor->setBatchSize(2);
 
         $entityType = $this->getEntityType(TestDepartment::class);
-        $this->processUpdateListDelayedCreationOfChunkJobs(
+        $operationId = $this->processUpdateListDelayedCreationOfChunkJobs(
             TestDepartment::class,
             [
                 'data' => $this->getRequestedData($entityType, 10),
             ]
         );
 
-        $response = $this->cget(['entity' => $entityType]);
+        $response = $this->cget(['entity' => $entityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => $this->getExpectedResponseData($entityType, 10),
@@ -39,6 +51,21 @@ class UpdateListForEntityByChunksTest extends RestJsonApiUpdateListTestCase
             $response
         );
         $this->assertResponseContains($responseContent, $response);
+
+        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
+        $summary = $operation->getSummary();
+        unset($summary['aggregateTime']);
+        self::assertSame(
+            [
+                'readCount'   => 10,
+                'writeCount'  => 10,
+                'errorCount'  => 0,
+                'createCount' => 0,
+                'updateCount' => 10
+            ],
+            $summary
+        );
+        self::assertSame($this->getAffectedEntities(10), $operation->getAffectedEntities());
     }
 
     private function getRequestedData(string $entityType, int $maxSize): array
@@ -68,5 +95,16 @@ class UpdateListForEntityByChunksTest extends RestJsonApiUpdateListTestCase
         }
 
         return $data;
+    }
+
+    private function getAffectedEntities(int $maxSize): array
+    {
+        $affectedEntities = [];
+        for ($i = 1; $i <= $maxSize; $i++) {
+            $departmentId = $this->getDepartmentId(sprintf('Updated Department %d', $i));
+            $affectedEntities['primary'][] = [$departmentId, (string)$departmentId, true];
+        }
+
+        return $affectedEntities;
     }
 }

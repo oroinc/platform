@@ -21,11 +21,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class ExtractEntityId implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
-        /** @var FormContext|SingleItemContext $context */
+        /** @var FormContext&SingleItemContext $context */
 
         if (null !== $context->getId()) {
             // an entity id is already set
@@ -41,6 +41,7 @@ class ExtractEntityId implements ProcessorInterface
         $data = $requestData[JsonApiDoc::DATA];
         if (\array_key_exists(JsonApiDoc::ID, $data)) {
             $context->setId($data[JsonApiDoc::ID]);
+            $context->setRequestId($data[JsonApiDoc::ID]);
         } else {
             $metadata = $context->getMetadata();
             if (null !== $metadata && !$metadata->hasIdentifierGenerator()) {

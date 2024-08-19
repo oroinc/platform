@@ -38,6 +38,7 @@ JSON;
         $resultFileContents = [];
         $splitter = new JsonPartialFileSplitter();
         $splitter->setChunkSize(2);
+        $splitter->setPrimarySectionName('data');
         // guard
         self::assertSame(-1, $splitter->getTimeout());
 
@@ -54,6 +55,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 2,
                 'targetFileFirstRecordOffset' => 4,
+                'processedChunkCounts'        => ['' => 2],
                 'listener'                    => [
                     'level'       => 0,
                     'objectLevel' => 0,
@@ -104,6 +106,7 @@ JSON;
         $resultFileContents = [];
         $splitter = new JsonPartialFileSplitter();
         $splitter->setChunkSize(2);
+        $splitter->setPrimarySectionName('data');
         $splitter->setHeaderSectionName('jsonapi');
         // guard
         self::assertSame(-1, $splitter->getTimeout());
@@ -122,6 +125,7 @@ JSON;
                 'headerSection'               => ['jsonapi' => ['version' => '1.0']],
                 'targetFileIndex'             => 2,
                 'targetFileFirstRecordOffset' => 4,
+                'processedChunkCounts'        => ['' => 2],
                 'listener'                    => [
                     'level'       => 0,
                     'objectLevel' => 0,
@@ -169,6 +173,7 @@ JSON;
         $resultFileContents = [];
         $splitter = new JsonPartialFileSplitter();
         $splitter->setChunkSize(2);
+        $splitter->setPrimarySectionName('data');
         $splitter->setTimeout(1000);
 
         $files = $this->splitFile($splitter, 'tmpFileName', $inputJson, $resultFileNames, $resultFileContents);
@@ -184,6 +189,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 2,
                 'targetFileFirstRecordOffset' => 4,
+                'processedChunkCounts'        => ['' => 2],
                 'listener'                    => [
                     'level'       => 0,
                     'objectLevel' => 0,
@@ -221,6 +227,7 @@ JSON;
     {
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
+        $splitter->setPrimarySectionName('data');
         $splitter->setTimeout(80);
 
         $this->runTestSplitWhenTimeoutExceededAfterEachObject(function (JsonPartialFileSplitterStub $splitter) {
@@ -261,6 +268,7 @@ JSON;
         // first iteration
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
+        $splitter->setPrimarySectionName('data');
         $splitter->setTimeout(80);
         $resultFileNames = [];
         $resultFileContents = [];
@@ -277,6 +285,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 1,
                 'targetFileFirstRecordOffset' => 1,
+                'processedChunkCounts'        => ['' => 1],
                 'listener'                    => [
                     'level'       => 2,
                     'objectLevel' => 1,
@@ -297,6 +306,7 @@ JSON;
         // second iteration
         /** @var JsonPartialFileSplitterStub $splitter */
         $splitter = $getNextSplitter($splitter);
+        $splitter->setPrimarySectionName('data');
         $resultFileNames = [];
         $resultFileContents = [];
         $files = $this->splitFile($splitter, 'tmpFileName', $inputJson, $resultFileNames, $resultFileContents);
@@ -312,6 +322,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 2,
                 'targetFileFirstRecordOffset' => 2,
+                'processedChunkCounts'        => ['' => 2],
                 'listener'                    => [
                     'level'       => 2,
                     'objectLevel' => 1,
@@ -332,6 +343,7 @@ JSON;
         // third iteration
         /** @var JsonPartialFileSplitterStub $splitter */
         $splitter = $getNextSplitter($splitter);
+        $splitter->setPrimarySectionName('data');
         $resultFileNames = [];
         $resultFileContents = [];
         $files = $this->splitFile($splitter, 'tmpFileName', $inputJson, $resultFileNames, $resultFileContents);
@@ -347,6 +359,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 3,
                 'targetFileFirstRecordOffset' => 3,
+                'processedChunkCounts'        => ['' => 3],
                 'listener'                    => [
                     'level'       => 2,
                     'objectLevel' => 1,
@@ -367,6 +380,7 @@ JSON;
         // last iteration
         /** @var JsonPartialFileSplitterStub $splitter */
         $splitter = $getNextSplitter($splitter);
+        $splitter->setPrimarySectionName('data');
         $resultFileNames = [];
         $resultFileContents = [];
         $files = $this->splitFile($splitter, 'tmpFileName', $inputJson, $resultFileNames, $resultFileContents);
@@ -382,6 +396,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 3,
                 'targetFileFirstRecordOffset' => 3,
+                'processedChunkCounts'        => ['' => 3],
                 'listener'                    => [
                     'level'       => 0,
                     'objectLevel' => 0,
@@ -457,6 +472,7 @@ JSON;
         // first iteration
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
+        $splitter->setPrimarySectionName('data');
         $splitter->setTimeout(140);
         $resultFileNames = [];
         $resultFileContents = [];
@@ -473,6 +489,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 2,
                 'targetFileFirstRecordOffset' => 2,
+                'processedChunkCounts'        => ['' => 2],
                 'listener'                    => [
                     'level'       => 2,
                     'objectLevel' => 1,
@@ -495,6 +512,7 @@ JSON;
         // second (last) iteration
         /** @var JsonPartialFileSplitterStub $splitter */
         $splitter = $getNextSplitter($splitter);
+        $splitter->setPrimarySectionName('data');
         $resultFileNames = [];
         $resultFileContents = [];
         $files = $this->splitFile($splitter, 'tmpFileName', $inputJson, $resultFileNames, $resultFileContents);
@@ -510,6 +528,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 3,
                 'targetFileFirstRecordOffset' => 3,
+                'processedChunkCounts'        => ['' => 3],
                 'listener'                    => [
                     'level'       => 0,
                     'objectLevel' => 0,
@@ -565,6 +584,7 @@ JSON;
         // first iteration
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
+        $splitter->setPrimarySectionName('data');
         $splitter->setHeaderSectionName('jsonapi');
         $splitter->setTimeout(140);
         $resultFileNames = [];
@@ -583,6 +603,7 @@ JSON;
                 'headerSection'               => ['jsonapi' => ['version' => '1.0']],
                 'targetFileIndex'             => 2,
                 'targetFileFirstRecordOffset' => 2,
+                'processedChunkCounts'        => ['' => 2],
                 'listener'                    => [
                     'level'       => 2,
                     'objectLevel' => 1,
@@ -606,6 +627,7 @@ JSON;
         $state = $splitter->getState();
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
+        $splitter->setPrimarySectionName('data');
         $splitter->setHeaderSectionName('jsonapi');
         $splitter->setTimeout(140);
         $splitter->setState($state);
@@ -625,6 +647,7 @@ JSON;
                 'headerSection'               => ['jsonapi' => ['version' => '1.0']],
                 'targetFileIndex'             => 3,
                 'targetFileFirstRecordOffset' => 3,
+                'processedChunkCounts'        => ['' => 3],
                 'listener'                    => [
                     'level'       => 0,
                     'objectLevel' => 0,
@@ -675,6 +698,7 @@ JSON;
 
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
+        $splitter->setPrimarySectionName('data');
         $splitter->setTimeout(140);
 
         // first iteration
@@ -693,6 +717,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 2,
                 'targetFileFirstRecordOffset' => 2,
+                'processedChunkCounts'        => ['' => 2],
                 'listener'                    => [
                     'level'       => 2,
                     'objectLevel' => 1,
@@ -728,6 +753,7 @@ JSON;
                 'sectionName'                 => 'data',
                 'targetFileIndex'             => 3,
                 'targetFileFirstRecordOffset' => 3,
+                'processedChunkCounts'        => ['' => 3],
                 'listener'                    => [
                     'level'       => 0,
                     'objectLevel' => 0,
@@ -758,6 +784,7 @@ JSON;
 
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
+        $splitter->setPrimarySectionName('data');
         $splitter->setTimeout(140);
 
         $this->splitWithException(
@@ -780,6 +807,7 @@ JSON;
 
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
+        $splitter->setPrimarySectionName('data');
         $splitter->setTimeout(140);
 
         // first iteration

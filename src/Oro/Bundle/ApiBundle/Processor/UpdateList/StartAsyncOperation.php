@@ -4,8 +4,12 @@ namespace Oro\Bundle\ApiBundle\Processor\UpdateList;
 
 use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic;
 use Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider;
+use Oro\Bundle\ApiBundle\Batch\SyncProcessingLimitProvider;
+use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 /**
@@ -17,15 +21,22 @@ class StartAsyncOperation implements ProcessorInterface
 
     private MessageProducerInterface $producer;
     private ChunkSizeProvider $chunkSizeProvider;
+    private SyncProcessingLimitProvider $syncProcessingLimitProvider;
 
-    public function __construct(MessageProducerInterface $producer, ChunkSizeProvider $chunkSizeProvider)
-    {
+    public function __construct(
+        MessageProducerInterface $producer,
+        ChunkSizeProvider $chunkSizeProvider,
+        SyncProcessingLimitProvider $syncProcessingLimitProvider
+    ) {
         $this->producer = $producer;
         $this->chunkSizeProvider = $chunkSizeProvider;
+        $this->syncProcessingLimitProvider = $syncProcessingLimitProvider;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function process(ContextInterface $context): void
     {
@@ -47,18 +58,32 @@ class StartAsyncOperation implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
+        $synchronousMode = $context->isSynchronousMode();
+        $chunkSize = $synchronousMode
+            ? $this->syncProcessingLimitProvider->getLimit($entityClass)
+            : $this->chunkSizeProvider->getChunkSize($entityClass);
+        $includedDataChunkSize = $synchronousMode
+            ? $this->syncProcessingLimitProvider->getIncludedDataLimit($entityClass)
+            : $this->chunkSizeProvider->getIncludedDataChunkSize($entityClass);
         $this->producer->send(
             UpdateListTopic::getName(),
-            [
+            new Message([
                 'operationId'           => $operationId,
                 'entityClass'           => $entityClass,
                 'requestType'           => $context->getRequestType()->toArray(),
                 'version'               => $context->getVersion(),
+                'synchronousMode'       => $synchronousMode,
                 'fileName'              => $targetFileName,
-                'chunkSize'             => $this->chunkSizeProvider->getChunkSize($entityClass),
-                'includedDataChunkSize' => $this->chunkSizeProvider->getIncludedDataChunkSize($entityClass)
-            ]
+                'chunkSize'             => $chunkSize,
+                'includedDataChunkSize' => $includedDataChunkSize
+            ], $synchronousMode ? MessagePriority::HIGH : MessagePriority::NORMAL)
         );
+        if ($synchronousMode
+            && $this->producer instanceof BufferedMessageProducer
+            && $this->producer->isBufferingEnabled()
+        ) {
+            $this->producer->flushBuffer();
+        }
 
         $context->setProcessed(self::OPERATION_NAME);
     }
