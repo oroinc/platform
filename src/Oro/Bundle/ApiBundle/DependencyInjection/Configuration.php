@@ -731,6 +731,9 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     private function appendBatchApiNode(NodeBuilder $node): void
     {
         $batchApiNode = $node
@@ -785,7 +788,7 @@ class Configuration implements ConfigurationInterface
                     . ' for a specific entity type and use the default chunk size for it.'
                 )
                 ->example([User::class => 10]);
-        $this->configureChunkSizePerEntity($chunkSizePerEntityNode);
+        $this->configureLimitPerEntity($chunkSizePerEntityNode);
 
         $includedDataChunkSizePerEntityNode = $batchApiNode
             ->arrayNode('included_data_chunk_size_per_entity')
@@ -797,10 +800,56 @@ class Configuration implements ConfigurationInterface
                     . ' for a specific entity type and use the default chunk size for it.'
                 )
                 ->example([User::class => 20]);
-        $this->configureChunkSizePerEntity($includedDataChunkSizePerEntityNode);
+        $this->configureLimitPerEntity($includedDataChunkSizePerEntityNode);
+
+        $batchApiNode
+            ->integerNode('sync_processing_wait_timeout')
+                ->info(
+                    'The maximum number of seconds that API waits for a synchronous batch API operation finished.'
+                    . ' If the operation is not finished within this time interval it is processed'
+                    . ' as an asynchronous operation.'
+                )
+                ->min(1) // 1 second
+                ->defaultValue(25) // 25 seconds
+            ->end()
+            ->integerNode('sync_processing_limit')
+                ->info('The default maximum number of entities that can be processed by synchronous batch API.')
+                ->min(1)
+                ->defaultValue(100)
+            ->end()
+            ->integerNode('sync_processing_included_data_limit')
+                ->info(
+                    'The default maximum number of included entities that can be processed by synchronous batch API.'
+                )
+                ->min(1)
+                ->defaultValue(50)
+            ->end();
+
+        $syncProcessingDataLimitPerEntityNode = $batchApiNode
+            ->arrayNode('sync_processing_limit_per_entity')
+                ->info(
+                    'The maximum number of entities of a specific type that can be processed by synchronous batch API.'
+                    . "\n"
+                    . 'The null value can be used to revert already configured limit'
+                    . ' for a specific entity type and use the default limit for it.'
+                )
+                ->example([User::class => 10]);
+        $this->configureLimitPerEntity($syncProcessingDataLimitPerEntityNode);
+
+        $syncProcessingIncludedDataLimitPerEntityNode = $batchApiNode
+            ->arrayNode('sync_processing_included_data_limit_per_entity')
+                ->info(
+                    'The maximum number of included entities that can be processed by synchronous batch API'
+                    . ' for a specific primary entity type.'
+                    . "\n"
+                    . 'The null value can be used to revert already configured limit'
+                    . ' for a specific entity type and use the default limit for it.'
+                )
+                ->example([User::class => 20]);
+        $this->configureLimitPerEntity($syncProcessingIncludedDataLimitPerEntityNode);
     }
 
-    private function configureChunkSizePerEntity(ArrayNodeDefinition $node): void
+    private function configureLimitPerEntity(ArrayNodeDefinition $node): void
     {
         $node
             ->useAttributeAsKey('name')

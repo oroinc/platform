@@ -14,12 +14,6 @@ class ChunkSizeProvider
     /** @var int[] [entity class => chunk size, ...] */
     private array $entityIncludedDataChunkSizes;
 
-    /**
-     * @param int   $defaultChunkSize
-     * @param int[] $entityChunkSizes
-     * @param int   $defaultIncludedDataChunkSize
-     * @param int[] $entityIncludedDataChunkSizes
-     */
     public function __construct(
         int $defaultChunkSize,
         array $entityChunkSizes,

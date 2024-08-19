@@ -26,7 +26,6 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\UpsertCriteriaBuilder;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
@@ -54,9 +53,6 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdTransformer;
 
-    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdHelper;
-
     /** @var NormalizeIncludedData */
     private $processor;
 
@@ -71,7 +67,6 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
-        $this->entityIdHelper = $this->createMock(EntityIdHelper::class);
 
         $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
         $entityIdTransformerRegistry->expects(self::any())
@@ -87,8 +82,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             $entityIdTransformerRegistry,
             $this->configProvider,
             $this->metadataProvider,
-            new UpsertCriteriaBuilder($this->valueNormalizer),
-            $this->entityIdHelper
+            new UpsertCriteriaBuilder($this->valueNormalizer)
         );
     }
 
@@ -141,15 +135,17 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessForAlreadyNormalizedIncludedData(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $includedData = [
-            ['data' => ['type' => 'testType', 'id' => 'testId']]
+            ['data' => ['type' => $type, 'id' => $id]]
         ];
         $normalizedType = 'Test\Class';
         $includedEntity = new \stdClass();
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -174,7 +170,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertSame($includedData, $this->context->getIncludedData());
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
@@ -216,9 +212,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessIncludedSectionExistInRequestData(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId']
+                ['type' => $type, 'id' => $id]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -226,7 +224,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -251,12 +249,12 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertEquals(
             [
-                ['data' => ['type' => 'testType', 'id' => 'testId']]
+                ['data' => ['type' => $type, 'id' => $id]]
             ],
             $this->context->getIncludedData()
         );
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
@@ -268,9 +266,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessForNewIncludedEntityOrObject(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId']
+                ['type' => $type, 'id' => $id]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -283,7 +283,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -308,7 +308,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
@@ -318,9 +318,10 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessForInvalidUpdateFlag(): void
     {
+        $type = 'testType';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => null]]
+                ['type' => $type, 'id' => 'testId', 'meta' => ['update' => null]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -330,7 +331,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
@@ -350,9 +351,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpdateFlagForExistingIncludedObject(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -387,11 +390,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setRequestData($requestData);
@@ -409,9 +412,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpdateFlagForExistingIncludedEntity(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -457,11 +462,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -471,7 +476,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $normalizedId);
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, true, ApiAction::UPDATE),
@@ -481,9 +486,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpdateFlagForExistingIncludedEntityWithCompositeId(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -529,11 +536,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -543,7 +550,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $normalizedId);
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, true, ApiAction::UPDATE),
@@ -553,9 +560,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpdateFlagForExistingIncludedEntityWhichDoesNotExistInDatabase(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -600,11 +609,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setRequestData($requestData);
@@ -622,9 +631,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpdateFlagWhenAccessToEntityDenied(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -670,11 +681,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -694,9 +705,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpdateFlagWhenSeveralEntitiesFound(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -741,11 +754,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -765,16 +778,17 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpdateFlagWhenIncludedEntityTypeIsUnknown(): void
     {
+        $type = 'testType';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+                ['type' => $type, 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
-            ->willThrowException(new EntityAliasNotFoundException('testType'));
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willThrowException(new EntityAliasNotFoundException($type));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
@@ -793,9 +807,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpdateFlagWhenNormalizationOfIncludedEntityIdFailed(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -828,11 +844,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willThrowException($exception);
 
         $this->context->setRequestData($requestData);
@@ -851,9 +867,10 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessForInvalidUpsertFlag(): void
     {
+        $type = 'testType';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => null]]
+                ['type' => $type, 'id' => 'testId', 'meta' => ['upsert' => null]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -863,7 +880,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
@@ -885,9 +902,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagAndUpsertOperationIsDisabled(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['upsert' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -924,11 +943,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -948,9 +967,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagByIdWhenItIsNotAllowed(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['upsert' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -986,11 +1007,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -1012,9 +1033,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagForExistingIncludedObject(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['upsert' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -1051,11 +1074,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setRequestData($requestData);
@@ -1073,9 +1096,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagForExistingIncludedEntity(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['upsert' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -1123,11 +1148,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -1137,7 +1162,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $normalizedId);
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, true, ApiAction::UPDATE),
@@ -1147,9 +1172,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagForExistingIncludedEntityWhichDoesNotExistInDatabase(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+                ['type' => $type, 'id' => $id, 'meta' => ['upsert' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -1201,11 +1228,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
-            ->with('testId', self::identicalTo($metadata))
+            ->with($id, self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
         $this->entityInstantiator->expects(self::once())
@@ -1220,7 +1247,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $normalizedId);
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
@@ -1230,9 +1257,10 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagBySpecifiedFieldWhenThisFieldCannotBeUsedToIdentifyEntity(): void
     {
+        $type = 'testType';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => ['field3']]]
+                ['type' => $type, 'id' => 'testId', 'meta' => ['upsert' => ['field3']]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -1262,7 +1290,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -1284,9 +1312,10 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagBySpecifiedFieldsWhenTheseFieldsCannotBeUsedToIdentifyEntity(): void
     {
+        $type = 'testType';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => ['field2', 'field3']]]
+                ['type' => $type, 'id' => 'testId', 'meta' => ['upsert' => ['field2', 'field3']]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -1316,7 +1345,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -1338,9 +1367,10 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagBySpecifiedFieldsWhenFindCriteriaCannotBeBuilt(): void
     {
+        $type = 'testType';
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => ['field1']]]
+                ['type' => $type, 'id' => 'testId', 'meta' => ['upsert' => ['field1']]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -1379,7 +1409,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -1401,11 +1431,13 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagBySpecifiedFieldsWhenEntityNotFound(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
                 [
-                    'type'       => 'testType',
-                    'id'         => 'testId',
+                    'type'       => $type,
+                    'id'         => $id,
                     'meta'       => ['upsert' => ['field1']],
                     'attributes' => ['field1' => 'val1', 'field2' => 'val2']
                 ]
@@ -1460,7 +1492,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                [$type, DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
                 ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
 
@@ -1476,7 +1508,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
@@ -1486,11 +1518,13 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagBySpecifiedFieldsWhenEntityFound(): void
     {
+        $type = 'testType';
+        $id = 'testId';
         $requestData = [
             'included' => [
                 [
-                    'type'       => 'testType',
-                    'id'         => 'testId',
+                    'type'       => $type,
+                    'id'         => $id,
                     'meta'       => ['upsert' => ['field1']],
                     'attributes' => ['field1' => 'val1', 'field2' => 'val2']
                 ]
@@ -1545,12 +1579,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                [$type, DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
                 ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
-
-        $this->entityIdHelper->expects(self::never())
-            ->method('getEntityIdentifier');
 
         $this->context->setClassName('Test\PrimaryClass');
         $this->context->setId('primaryId');
@@ -1559,92 +1590,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
-        self::assertSame($includedEntity, $addedIncludedEntity);
-        self::assertEquals(
-            new IncludedEntityData('/included/0', 0, true, ApiAction::CREATE),
-            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
-        );
-    }
-
-    public function testProcessWithUpsertFlagBySpecifiedFieldsWhenEntityFoundAndNoEntityIdInRequestData(): void
-    {
-        $requestData = [
-            'included' => [
-                [
-                    'type'       => 'testType',
-                    'meta'       => ['upsert' => ['field1']],
-                    'attributes' => ['field1' => 'val1', 'field2' => 'val2']
-                ]
-            ]
-        ];
-        $normalizedType = 'Test\Class';
-        $includedEntity = new \stdClass();
-        $includedEntityId = 123;
-
-        $fullConfig = new EntityDefinitionConfig();
-        $fullConfig->getUpsertConfig()->addFields(['field1']);
-        $fullConfig->getUpsertConfig()->addFields(['field2']);
-
-        $fullMetadata = new EntityMetadata('Test\Entity');
-        $fullMetadata->addField(new FieldMetadata('field1'))->setDataType('string');
-        $fullMetadata->addField(new FieldMetadata('field2'))->setDataType('string');
-
-        $this->doctrineHelper->expects(self::once())
-            ->method('resolveManageableEntityClass')
-            ->with($normalizedType)
-            ->willReturn($normalizedType);
-        $this->entityLoader->expects(self::once())
-            ->method('findEntityBy')
-            ->with(
-                $normalizedType,
-                ['field1' => 'normalizedVal1'],
-                self::identicalTo($fullConfig),
-                self::identicalTo($fullMetadata),
-                self::identicalTo($this->context->getRequestType())
-            )
-            ->willReturn($includedEntity);
-
-        $this->configProvider->expects(self::once())
-            ->method('getConfig')
-            ->with(
-                $normalizedType,
-                $this->context->getVersion(),
-                $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra($this->context->getAction())]
-            )
-            ->willReturn($this->getConfig($fullConfig));
-        $this->metadataProvider->expects(self::once())
-            ->method('getMetadata')
-            ->with(
-                $normalizedType,
-                $this->context->getVersion(),
-                $this->context->getRequestType(),
-                self::identicalTo($fullConfig)
-            )
-            ->willReturn($fullMetadata);
-
-        $requestType = $this->context->getRequestType();
-        $this->valueNormalizer->expects(self::exactly(2))
-            ->method('normalizeValue')
-            ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
-                ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
-            ]);
-
-        $this->entityIdHelper->expects(self::once())
-            ->method('getEntityIdentifier')
-            ->with(self::identicalTo($includedEntity), self::identicalTo($fullMetadata))
-            ->willReturn($includedEntityId);
-
-        $this->context->setClassName('Test\PrimaryClass');
-        $this->context->setId('primaryId');
-        $this->context->setRequestData($requestData);
-        $this->processor->process($this->context);
-
-        self::assertFalse($this->context->hasErrors());
-        self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $includedEntityId);
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
         self::assertSame($includedEntity, $addedIncludedEntity);
         self::assertEquals(
             new IncludedEntityData('/included/0', 0, true, ApiAction::CREATE),
@@ -1654,10 +1600,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagBySpecifiedFieldsWhenAccessToEntityDenied(): void
     {
+        $type = 'testType';
         $requestData = [
             'included' => [
                 [
-                    'type'       => 'testType',
+                    'type'       => $type,
                     'id'         => 'testId',
                     'meta'       => ['upsert' => ['field1']],
                     'attributes' => ['field1' => 'val1', 'field2' => 'val2']
@@ -1713,7 +1660,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                [$type, DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
                 ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
 
@@ -1734,10 +1681,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessWithUpsertFlagBySpecifiedFieldsWhenSeveralEntitiesFound(): void
     {
+        $type = 'testType';
         $requestData = [
             'included' => [
                 [
-                    'type'       => 'testType',
+                    'type'       => $type,
                     'id'         => 'testId',
                     'meta'       => ['upsert' => ['field1']],
                     'attributes' => ['field1' => 'val1', 'field2' => 'val2']
@@ -1792,7 +1740,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                [$type, DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
                 ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
 

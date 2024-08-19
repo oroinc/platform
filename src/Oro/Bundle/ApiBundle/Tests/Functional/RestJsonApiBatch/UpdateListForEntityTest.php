@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiBatch;
 
+use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiUpdateListTestCase;
@@ -23,10 +24,21 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/update_list_for_entity.yml']);
     }
 
+    private function getDepartmentId(string $title): int
+    {
+        /** @var TestDepartment|null $department */
+        $department = $this->getEntityManager()->getRepository(TestDepartment::class)->findOneBy(['name' => $title]);
+        if (null === $department) {
+            throw new \RuntimeException(sprintf('The department "%s" not found.', $title));
+        }
+
+        return $department->getId();
+    }
+
     public function testCreateEntities()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $this->processUpdateList(
+        $operationId = $this->processUpdateList(
             TestDepartment::class,
             [
                 'data' => [
@@ -42,7 +54,7 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             ]
         );
 
-        $response = $this->cget(['entity' => $entityType]);
+        $response = $this->cget(['entity' => $entityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
@@ -71,6 +83,29 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             $response
         );
         $this->assertResponseContains($responseContent, $response);
+
+        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
+        $summary = $operation->getSummary();
+        unset($summary['aggregateTime']);
+        self::assertSame(
+            [
+                'readCount'   => 2,
+                'writeCount'  => 2,
+                'errorCount'  => 0,
+                'createCount' => 2,
+                'updateCount' => 0
+            ],
+            $summary
+        );
+        self::assertSame(
+            [
+                'primary'  => [
+                    [$this->getDepartmentId('New Department 1'), null, false],
+                    [$this->getDepartmentId('New Department 2'), null, false]
+                ]
+            ],
+            $operation->getAffectedEntities()
+        );
     }
 
     public function testUpdateEntities()
@@ -186,7 +221,7 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             ]
         );
 
-        $response = $this->cget(['entity' => $entityType]);
+        $response = $this->cget(['entity' => $entityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [

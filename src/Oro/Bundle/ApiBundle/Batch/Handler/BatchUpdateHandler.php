@@ -41,6 +41,7 @@ class BatchUpdateHandler
             $context->getResult() ?? [],
             $context->getProcessedItemStatuses() ?? [],
             $context->getSummary(),
+            $context->getAffectedEntities(),
             $context->hasUnexpectedErrors(),
             $context->getRetryReason()
         );

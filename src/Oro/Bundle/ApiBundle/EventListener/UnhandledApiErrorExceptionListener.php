@@ -39,8 +39,13 @@ class UnhandledApiErrorExceptionListener implements ServiceSubscriberInterface
             return;
         }
 
-        /** @var RequestActionHandler $actionHandler */
-        $actionHandler = $this->container->get(RequestActionHandler::class);
-        $event->setResponse($actionHandler->handleUnhandledError($request, $event->getThrowable()));
+        $event->setResponse(
+            $this->getActionHandler()->handleUnhandledError($request, $event->getThrowable())
+        );
+    }
+
+    private function getActionHandler(): RequestActionHandler
+    {
+        return $this->container->get(RequestActionHandler::class);
     }
 }

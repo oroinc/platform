@@ -30,7 +30,10 @@ define([
       self.type = type;
 
       self.$select = $(select);
-      self.$select.hide();
+
+      if (!options.show_input_control) {
+          self.$select.hide();
+      }
 
       self.options = $.extend({}, $.fn.simplecolorpicker.defaults, options);
 

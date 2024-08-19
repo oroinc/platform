@@ -37,6 +37,7 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
                     'colors'               => [],
                     'empty_value'          => null,
                     'allow_custom_color'   => false,
+                    'show_input_control'   => false,
                     'custom_color_control' => null // hue, brightness, saturation, or wheel. defaults wheel
                 ]
             )
@@ -72,6 +73,8 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
         }
 
         $view->vars['allow_custom_color'] = $options['allow_custom_color'];
+        $view->vars['configs']['show_input_control'] = $options['show_input_control'];
+
         if ($options['allow_custom_color']) {
             $this->appendTheme($view->vars['configs'], 'with-custom-color');
             array_push(

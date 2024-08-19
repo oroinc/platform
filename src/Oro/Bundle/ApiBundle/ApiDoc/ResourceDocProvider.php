@@ -44,11 +44,13 @@ class ResourceDocProvider
             'documentation' => <<<MARKDOWN
 Create or update a list of {singular_name|lower} records.
 
-The request is processed asynchronously, and the details of the corresponding asynchronous operation
+The request is processed asynchronously and the details of the corresponding asynchronous operation
 are returned in the response.
 
 **Note:** *The server may process records in any order regardless of the order
 in which they are specified in the request.*
+
+**Note:** To process the request synchronously add ``X-Mode: sync`` header to the request.
 
 The input data for each record is the same as for the API resources to create or update
 a single {singular_name|lower} record.

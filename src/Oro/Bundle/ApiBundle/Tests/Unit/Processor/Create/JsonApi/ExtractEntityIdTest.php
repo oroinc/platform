@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class ExtractEntityIdTest extends FormProcessorTestCase
 {
-    /** @var ExtractEntityId */
-    private $processor;
+    private ExtractEntityId $processor;
 
     protected function setUp(): void
     {
@@ -35,6 +34,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals($entityId, $this->context->getId());
+        self::assertNull($this->context->getRequestId());
     }
 
     public function testProcessWhenEntityIdDoesNotExistInContext()
@@ -49,6 +49,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(456, $this->context->getId());
+        self::assertEquals($this->context->getId(), $this->context->getRequestId());
     }
 
     public function testProcessForEmptyRequestData()
@@ -59,6 +60,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getId());
+        self::assertNull($this->context->getRequestId());
     }
 
     public function testProcessForEmptyRequestDataWithoutEntityIdButEntityHasIdGenerator()
@@ -74,6 +76,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getId());
+        self::assertNull($this->context->getRequestId());
         self::assertFalse($this->context->hasErrors());
     }
 
@@ -90,6 +93,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getId());
+        self::assertNull($this->context->getRequestId());
         self::assertEquals(
             [
                 Error::createValidationError(Constraint::ENTITY_ID, 'The identifier is mandatory')

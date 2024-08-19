@@ -222,9 +222,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('process');
         $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects(self::once())
-            ->method('process')
-            ->with(self::identicalTo($context));
+        $processor10->expects(self::never())
+            ->method('process');
 
         $this->processor->process($context);
 
@@ -392,9 +391,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('process');
         $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects(self::once())
-            ->method('process')
-            ->with(self::identicalTo($context));
+        $processor10->expects(self::never())
+            ->method('process');
 
         $this->processor->process($context);
 
@@ -448,9 +446,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
                 $context->addError($error);
             });
-        $processor10->expects(self::once())
-            ->method('process')
-            ->with(self::identicalTo($context));
+        $processor10->expects(self::never())
+            ->method('process');
 
         $this->processor->process($context);
 
@@ -1004,7 +1001,6 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $context->setSoftErrorsHandling(true);
 
         $exception = new \Exception('test exception');
-        $authenticationException = new AuthenticationException('Access Denied');
 
         [$processor1, $processor10, $processor11] = $this->addProcessors([
             'processor1'  => 'group1',
@@ -1016,34 +1012,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('process')
             ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor10->expects(self::once())
-            ->method('process')
-            ->with(self::identicalTo($context))
-            ->willThrowException($authenticationException);
+        $processor10->expects(self::never())
+            ->method('process');
         $processor11->expects(self::never())
             ->method('process');
 
-        try {
-            $this->processor->process($context);
-        } catch (AuthenticationException $e) {
-            self::assertEquals($authenticationException->getMessage(), $e->getMessage());
-            if (null !== $logger) {
-                $logs = $logger->cleanLogs();
-                self::assertCount(1, $logs);
-                // remove log message context because here by some reasons PHPUnit hangs out
-                // comparing two exception objects if them are not equal
-                $loggedException = $logs[0][2]['exception'];
-                unset($logs[0][2]);
-                self::assertEquals(
-                    [
-                        ['error', 'An exception occurred in "processor1" processor.']
-                    ],
-                    $logs
-                );
-                self::assertInstanceOf(get_class($exception), $loggedException);
-                self::assertEquals($exception->getMessage(), $loggedException->getMessage());
-            }
-        }
+        $this->processor->process($context);
 
         $errors = $context->getErrors();
         self::assertCount(1, $errors);

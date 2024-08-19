@@ -10,6 +10,7 @@ use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
 
 /**
  * Synchronizes an asynchronous operation with the related MQ job.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JobListener
 {
@@ -22,6 +23,9 @@ class JobListener
     private const ERROR_COUNT = 'errorCount';
     private const CREATE_COUNT = 'createCount';
     private const UPDATE_COUNT = 'updateCount';
+    private const AFFECTED_ENTITIES = 'affectedEntities';
+    private const PRIMARY_ENTITIES = 'primary';
+    private const INCLUDED_ENTITIES = 'included';
 
     private ManagerRegistry $doctrine;
     private AsyncOperationManager $asyncOperationManager;
@@ -62,6 +66,9 @@ class JobListener
         return $job->isRoot() && null !== $job->getId();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function updateOperation(AsyncOperation $operation, Job $job): array
     {
         $data = [];
@@ -70,8 +77,11 @@ class JobListener
             $data['jobId'] = $jobId;
         }
         $progress = $job->getJobProgress();
-        if (null !== $progress && $progress >= 0 && $operation->getProgress() !== $progress) {
-            $data['progress'] = $progress;
+        if (null !== $progress) {
+            $progress = (float)$progress;
+            if ($progress >= 0 && $operation->getProgress() !== $progress) {
+                $data['progress'] = $progress;
+            }
         }
         $status = $this->getOperationStatus($job->getStatus());
         if ($status && $operation->getStatus() !== $status) {
@@ -81,9 +91,17 @@ class JobListener
                 $summary = $this->getTotalSummary($job, $operation);
                 $data['summary'] = $summary;
                 $data['hasErrors'] = ($summary[self::ERROR_COUNT] ?? 0) > 0;
+                $affectedEntities = $this->getTotalAffectedEntities($job, $operation);
+                if ($affectedEntities) {
+                    $data['affectedEntities'] = $affectedEntities;
+                }
             } elseif (AsyncOperation::STATUS_FAILED === $status) {
                 $data['summary'] = $this->getTotalSummary($job, $operation);
                 $data['hasErrors'] = true;
+                $affectedEntities = $this->getTotalAffectedEntities($job, $operation);
+                if ($affectedEntities) {
+                    $data['affectedEntities'] = $affectedEntities;
+                }
             }
         }
 
@@ -157,6 +175,52 @@ class JobListener
     {
         if (isset($toMerge[$itemName])) {
             $summary[$itemName] += $toMerge[$itemName];
+        }
+    }
+
+    private function getTotalAffectedEntities(Job $job, AsyncOperation $operation): array
+    {
+        $totalAffectedEntities = [];
+        $childJobs = $job->getChildJobs();
+        foreach ($childJobs as $childJob) {
+            $childJobData = $childJob->getData();
+            if (!\array_key_exists(self::AFFECTED_ENTITIES, $childJobData)) {
+                continue;
+            }
+            $chunkAffectedEntities = $childJobData[self::AFFECTED_ENTITIES];
+            if (!\is_array($chunkAffectedEntities)) {
+                continue;
+            }
+            self::mergeAffectedEntities($totalAffectedEntities, $chunkAffectedEntities);
+        }
+
+        $operationAffectedEntities = $operation->getAffectedEntities();
+        if ($operationAffectedEntities) {
+            self::mergeAffectedEntities($totalAffectedEntities, $operationAffectedEntities);
+        }
+
+        return $totalAffectedEntities;
+    }
+
+    private static function mergeAffectedEntities(array &$affectedEntities, array $toMerge): void
+    {
+        self::mergeAffectedEntitiesSection($affectedEntities, $toMerge, self::PRIMARY_ENTITIES);
+        self::mergeAffectedEntitiesSection($affectedEntities, $toMerge, self::INCLUDED_ENTITIES);
+    }
+
+    private static function mergeAffectedEntitiesSection(
+        array &$affectedEntities,
+        array $toMerge,
+        string $sectionName
+    ): void {
+        if (isset($toMerge[$sectionName])) {
+            if (isset($affectedEntities[$sectionName])) {
+                foreach ($toMerge[$sectionName] as $item) {
+                    $affectedEntities[$sectionName][] = $item;
+                }
+            } else {
+                $affectedEntities[$sectionName] = $toMerge[$sectionName];
+            }
         }
     }
 }

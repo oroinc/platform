@@ -8,6 +8,8 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
@@ -44,7 +46,7 @@ class SetTotalCountHeader implements ProcessorInterface
      */
     public function process(ContextInterface $context): void
     {
-        /** @var ListContext $context */
+        /** @var ListContext|GetRelationshipContext|GetSubresourceContext $context */
 
         if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
             // total count header is already set
@@ -57,15 +59,14 @@ class SetTotalCountHeader implements ProcessorInterface
             return;
         }
 
-        $totalCount = $this->getTotalCount($context);
+        $totalCount = $this->getTotalCount($context, $context->getTotalCountCallback());
         if (null !== $totalCount) {
             $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $totalCount);
         }
     }
 
-    private function getTotalCount(ListContext $context): ?int
+    private function getTotalCount(Context $context, ?callable $totalCountCallback): ?int
     {
-        $totalCountCallback = $context->getTotalCountCallback();
         if (null !== $totalCountCallback) {
             return $this->executeTotalCountCallback($totalCountCallback);
         }
@@ -96,7 +97,7 @@ class SetTotalCountHeader implements ProcessorInterface
         return $totalCount;
     }
 
-    private function calculateResultCount(ListContext $context): ?int
+    private function calculateResultCount(Context $context): ?int
     {
         if (!$context->hasResult()) {
             return null;

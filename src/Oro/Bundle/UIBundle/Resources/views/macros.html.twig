@@ -28,7 +28,7 @@
     </div>
 {% endmacro %}
 
-{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor, tooltip_translatable) %}
+{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor, tooltip_translatable, tooltip_type) %}
     {%- set tooltip = tooltip_raw -%}
     {%- if tooltip_translatable is not same as(false) -%}
         {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({})) %}
@@ -49,7 +49,11 @@
             %}
         {% endif %}
         {% set tooltip = '<div class="oro-popover-content">' ~ tooltip ~ '</div>' -%}
-        <i class="fa-info-circle tooltip-icon"
+        {% if tooltip_type is defined and tooltip_type %}
+            <i class="fa-{{ tooltip_type }} tooltip-icon tooltip-icon--{{ tooltip_type }}"
+        {% else %}
+            <i class="fa-info-circle tooltip-icon"
+        {% endif %}
            {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
            data-content="{{ tooltip }}"
            data-toggle="popover"></i>

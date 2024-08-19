@@ -48,7 +48,7 @@ class StoreRequestData implements ProcessorInterface
         if (!$this->fileManager->writeStreamToStorage(new ReadonlyResourceStream($requestData), $fileName, true)) {
             $context->setTargetFileName(null);
             $context->addError(
-                Error::createValidationError(Constraint::REQUEST_DATA, 'The request data should not be empty')
+                Error::createValidationError(Constraint::REQUEST_DATA, 'The request data should not be empty.')
             );
         }
 

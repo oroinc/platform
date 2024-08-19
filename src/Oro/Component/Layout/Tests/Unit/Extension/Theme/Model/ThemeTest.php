@@ -70,7 +70,7 @@ class ThemeTest extends TestCase
 
     public function testSvgIconsSupport(): void
     {
-        self::assertFalse($this->theme->isSvgIconsSupport());
+        self::assertNull($this->theme->isSvgIconsSupport());
         $this->theme->setSvgIconsSupport(true);
         self::assertTrue($this->theme->isSvgIconsSupport());
     }

@@ -25,7 +25,6 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\MetaOperationParser;
 use Oro\Bundle\ApiBundle\Util\UpsertCriteriaBuilder;
@@ -48,7 +47,6 @@ class NormalizeIncludedData implements ProcessorInterface
     private ConfigProvider $configProvider;
     private MetadataProvider $metadataProvider;
     private UpsertCriteriaBuilder $upsertCriteriaBuilder;
-    private EntityIdHelper $entityIdHelper;
     private ?FormContext $context = null;
     /** @var EntityDefinitionConfig[] */
     private array $entityConfig = [];
@@ -63,8 +61,7 @@ class NormalizeIncludedData implements ProcessorInterface
         EntityIdTransformerRegistry $entityIdTransformerRegistry,
         ConfigProvider $configProvider,
         MetadataProvider $metadataProvider,
-        UpsertCriteriaBuilder $upsertCriteriaBuilder,
-        EntityIdHelper $entityIdHelper
+        UpsertCriteriaBuilder $upsertCriteriaBuilder
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityInstantiator = $entityInstantiator;
@@ -74,7 +71,6 @@ class NormalizeIncludedData implements ProcessorInterface
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
         $this->upsertCriteriaBuilder = $upsertCriteriaBuilder;
-        $this->entityIdHelper = $entityIdHelper;
     }
 
     /**
@@ -82,7 +78,7 @@ class NormalizeIncludedData implements ProcessorInterface
      */
     public function process(ContextInterface $context): void
     {
-        /** @var FormContext|SingleItemContext $context */
+        /** @var FormContext&SingleItemContext $context */
 
         $includedData = $context->getIncludedData();
         if (null === $includedData) {
@@ -142,15 +138,11 @@ class NormalizeIncludedData implements ProcessorInterface
                 continue;
             }
             [$updateFlag, $upsertFlag] = $operationFlags;
-            $entityId = $data[JsonApiDoc::ID] ?? null;
-            if (null !== $entityId) {
-                $entityId = $this->resolveEntityId($entityClass, $entityId, $pointer, $updateFlag, $upsertFlag);
-            }
 
             $this->loadIncludedEntity(
                 $includedEntities,
                 $entityClass,
-                $entityId,
+                $data[JsonApiDoc::ID] ?? null,
                 $updateFlag,
                 $upsertFlag,
                 $data,
@@ -172,13 +164,18 @@ class NormalizeIncludedData implements ProcessorInterface
     private function loadIncludedEntity(
         IncludedEntityCollection $includedEntities,
         string $entityClass,
-        mixed $entityId,
+        mixed $entityIncludeId,
         ?bool $updateFlag,
         bool|array|null $upsertFlag,
         array $data,
         int $index,
         string $pointer
     ): void {
+        $entityId = $entityIncludeId;
+        if (null !== $entityId) {
+            $entityId = $this->resolveEntityId($entityClass, $entityId, $pointer, $updateFlag, $upsertFlag);
+        }
+
         $entity = null;
         $isExistingEntity = false;
         $targetAction = null;
@@ -215,9 +212,6 @@ class NormalizeIncludedData implements ProcessorInterface
                             if (null !== $entity) {
                                 $isExistingEntity = true;
                                 $targetAction = ApiAction::CREATE;
-                                if (null === $entityId) {
-                                    $entityId = $this->entityIdHelper->getEntityIdentifier($entity, $metadata);
-                                }
                             }
                         }
                     } else {
@@ -291,7 +285,7 @@ class NormalizeIncludedData implements ProcessorInterface
             $includedEntities->add(
                 $entity,
                 $entityClass,
-                $entityId,
+                $entityIncludeId,
                 new IncludedEntityData($pointer, $index, $isExistingEntity, $targetAction)
             );
         }

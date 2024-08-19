@@ -9,6 +9,8 @@ use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\JsonUtil;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -41,7 +43,7 @@ class UpdateListProcessingHelper
     {
         return array_intersect_key(
             $parentBody,
-            array_flip(['operationId', 'entityClass', 'requestType', 'version'])
+            array_flip(['operationId', 'entityClass', 'requestType', 'version', 'synchronousMode'])
         );
     }
 
@@ -215,7 +217,7 @@ class UpdateListProcessingHelper
         if (null !== $previousAggregateTime) {
             $body['aggregateTime'] = $previousAggregateTime;
         }
-        $this->producer->send(UpdateListCreateChunkJobsTopic::getName(), $body);
+        $this->producer->send(UpdateListCreateChunkJobsTopic::getName(), $this->createMessage($body));
     }
 
     public function sendMessageToStartChunkJobs(
@@ -233,7 +235,7 @@ class UpdateListProcessingHelper
         if (null !== $previousAggregateTime) {
             $body['aggregateTime'] = $previousAggregateTime;
         }
-        $this->producer->send(UpdateListStartChunkJobsTopic::getName(), $body);
+        $this->producer->send(UpdateListStartChunkJobsTopic::getName(), $this->createMessage($body));
     }
 
     public function sendProcessChunkMessage(
@@ -252,6 +254,14 @@ class UpdateListProcessingHelper
         if ($extraChunk) {
             $body['extra_chunk'] = true;
         }
-        $this->producer->send(UpdateListProcessChunkTopic::getName(), $body);
+        $this->producer->send(UpdateListProcessChunkTopic::getName(), $this->createMessage($body));
+    }
+
+    private function createMessage(array $body): Message
+    {
+        return new Message(
+            $body,
+            ($body['synchronousMode'] ?? false) ? MessagePriority::HIGH : MessagePriority::NORMAL
+        );
     }
 }

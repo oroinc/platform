@@ -50,10 +50,9 @@ abstract class AbstractConfigurationChildBuilder implements ConfigurationChildBu
         $builder
             ->get($option['name'])
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($option) {
-                $parentData = $event->getForm()->getParent()?->getData();
-                if (\array_key_exists('default', $option) &&
-                    !\array_key_exists($option['name'], $parentData)
-                ) {
+                $parentData = $event->getForm()->getParent()?->getData() ?? [];
+
+                if (\array_key_exists('default', $option) && !\array_key_exists($option['name'], $parentData)) {
                     $event->setData($option['default']);
                 }
             });

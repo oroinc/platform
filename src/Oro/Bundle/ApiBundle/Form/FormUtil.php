@@ -71,7 +71,7 @@ class FormUtil
     /**
      * Marks the given form as submitted.
      *
-     * @throws \LogicException the the form was already submitted
+     * @throws \LogicException the form was already submitted
      */
     public static function markAsSubmitted(FormInterface $form): void
     {

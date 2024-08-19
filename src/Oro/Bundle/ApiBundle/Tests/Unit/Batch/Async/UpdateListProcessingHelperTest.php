@@ -10,6 +10,8 @@ use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -48,7 +50,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCommonBody(): void
+    public function testGetCommonBodyForRequiredOptions(): void
     {
         self::assertEquals(
             [
@@ -62,7 +64,28 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
                 'entityClass' => 'Test\Entity',
                 'requestType' => ['test'],
                 'version'     => '1.1',
-                'another'     => 'another_val',
+                'another'     => 'another_val'
+            ])
+        );
+    }
+
+    public function testGetCommonBodyForRequiredAndOptionalOptions(): void
+    {
+        self::assertEquals(
+            [
+                'operationId'     => 123,
+                'entityClass'     => 'Test\Entity',
+                'requestType'     => ['test'],
+                'version'         => '1.1',
+                'synchronousMode' => true
+            ],
+            $this->helper->getCommonBody([
+                'operationId'     => 123,
+                'entityClass'     => 'Test\Entity',
+                'requestType'     => ['test'],
+                'version'         => '1.1',
+                'synchronousMode' => true,
+                'another'         => 'another_val'
             ])
         );
     }
@@ -428,14 +451,14 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with(
                 UpdateListCreateChunkJobsTopic::getName(),
-                [
+                new Message([
                     'operationId'          => 123,
                     'entityClass'          => 'Test\Entity',
                     'requestType'          => ['test'],
                     'version'              => '1.1',
                     'rootJobId'            => $rootJobId,
                     'chunkJobNameTemplate' => $chunkJobNameTemplate
-                ]
+                ], MessagePriority::NORMAL)
             );
 
         $this->helper->sendMessageToCreateChunkJobs(
@@ -466,7 +489,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with(
                 UpdateListCreateChunkJobsTopic::getName(),
-                [
+                new Message([
                     'operationId'          => 123,
                     'entityClass'          => 'Test\Entity',
                     'requestType'          => ['test'],
@@ -475,7 +498,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
                     'chunkJobNameTemplate' => $chunkJobNameTemplate,
                     'firstChunkFileIndex'  => $firstChunkFileIndex,
                     'aggregateTime'        => $previousAggregateTime
-                ]
+                ], MessagePriority::NORMAL)
             );
 
         $this->helper->sendMessageToCreateChunkJobs(
@@ -505,13 +528,13 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with(
                 UpdateListStartChunkJobsTopic::getName(),
-                [
+                new Message([
                     'operationId' => 123,
                     'entityClass' => 'Test\Entity',
                     'requestType' => ['test'],
                     'version'     => '1.1',
                     'rootJobId'   => $rootJobId
-                ]
+                ], MessagePriority::NORMAL)
             );
 
         $this->helper->sendMessageToStartChunkJobs(
@@ -540,7 +563,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with(
                 UpdateListStartChunkJobsTopic::getName(),
-                [
+                new Message([
                     'operationId'         => 123,
                     'entityClass'         => 'Test\Entity',
                     'requestType'         => ['test'],
@@ -548,7 +571,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
                     'rootJobId'           => $rootJobId,
                     'firstChunkFileIndex' => $firstChunkFileIndex,
                     'aggregateTime'       => $previousAggregateTime
-                ]
+                ], MessagePriority::NORMAL)
             );
 
         $this->helper->sendMessageToStartChunkJobs(
@@ -576,7 +599,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with(
                 UpdateListProcessChunkTopic::getName(),
-                [
+                new Message([
                     'operationId'       => 123,
                     'entityClass'       => 'Test\Entity',
                     'requestType'       => ['test'],
@@ -586,7 +609,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
                     'fileIndex'         => $chunkFile->getFileIndex(),
                     'firstRecordOffset' => $chunkFile->getFirstRecordOffset(),
                     'sectionName'       => $chunkFile->getSectionName()
-                ]
+                ], MessagePriority::NORMAL)
             );
 
         $this->helper->sendProcessChunkMessage($parentBody, $job, $chunkFile);
@@ -609,7 +632,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with(
                 UpdateListProcessChunkTopic::getName(),
-                [
+                new Message([
                     'operationId'       => 123,
                     'entityClass'       => 'Test\Entity',
                     'requestType'       => ['test'],
@@ -620,7 +643,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
                     'firstRecordOffset' => $chunkFile->getFirstRecordOffset(),
                     'sectionName'       => $chunkFile->getSectionName(),
                     'extra_chunk'       => true
-                ]
+                ], MessagePriority::NORMAL)
             );
 
         $this->helper->sendProcessChunkMessage($parentBody, $job, $chunkFile, true);

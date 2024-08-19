@@ -1103,6 +1103,16 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_api.async.delete_async_operation:
+        class: Oro\Bundle\ApiBundle\Async\DeleteAsyncOperationMessageProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_entity.delete_handler_registry'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: api }
+
     oro_api.batch.job_event_listener:
         class: Oro\Bundle\ApiBundle\Batch\EventListener\JobListener
         arguments:
@@ -1180,10 +1190,18 @@ services:
     oro_api.batch.chunk_size_provider:
         class: Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider
         arguments:
-            - 1 # injected the value of the "oro_api.batch_api.chunk_size" configuration option
-            - [] # injected the value of the "oro_api.batch_api.chunk_size_per_entity" configuration option
-            - 1 # injected the value of the "oro_api.batch_api.included_data_chunk_size" configuration option
-            - [] # injected the value of the "oro_api.batch_api.included_data_chunk_size_per_entity" configuration option
+            - !abstract '$defaultChunkSize defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ChunkSizeProviderCompilerPass'
+            - !abstract '$entityChunkSizes defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ChunkSizeProviderCompilerPass'
+            - !abstract '$defaultIncludedDataChunkSize defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ChunkSizeProviderCompilerPass'
+            - !abstract '$entityIncludedDataChunkSizes defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ChunkSizeProviderCompilerPass'
+
+    oro_api.batch.sync_processing_limit_provider:
+        class: Oro\Bundle\ApiBundle\Batch\SyncProcessingLimitProvider
+        arguments:
+            - !abstract '$defaultLimit defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SyncProcessingCompilerPass'
+            - !abstract '$entityLimits defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SyncProcessingCompilerPass'
+            - !abstract '$defaultIncludedDataLimit defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SyncProcessingCompilerPass'
+            - !abstract '$entityIncludedDataLimits defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SyncProcessingCompilerPass'
 
     oro_api.batch.file_splitter_registry:
         class: Oro\Bundle\ApiBundle\Batch\Splitter\FileSplitterRegistry
@@ -1196,6 +1214,7 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\Splitter\JsonPartialFileSplitter
         calls:
             - [ setHeaderSectionName, [ 'jsonapi' ] ]
+            - [ setPrimarySectionName, [ 'data' ] ]
             - [ setSectionNamesToSplit, [ ['data', 'included'] ] ]
             # it is replaced with a value returned by oro_api.batch.chunk_size_provider::getIncludedDataChunkSize()
             - [ setChunkSizePerSection, [ {'included': 1000} ] ]
