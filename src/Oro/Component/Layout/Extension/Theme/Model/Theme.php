@@ -29,8 +29,8 @@ class Theme
     /** @var bool */
     protected $rtlSupport = false;
 
-    /** @var bool */
-    protected $svgIconsSupport = false;
+    /** @var bool|null */
+    protected $svgIconsSupport = null;
 
     /** @var string */
     protected $logo;
@@ -146,12 +146,12 @@ class Theme
         $this->rtlSupport = $rtlSupport;
     }
 
-    public function isSvgIconsSupport(): bool
+    public function isSvgIconsSupport(): ?bool
     {
         return $this->svgIconsSupport;
     }
 
-    public function setSvgIconsSupport(bool $svgIconsSupport): void
+    public function setSvgIconsSupport(?bool $svgIconsSupport): void
     {
         $this->svgIconsSupport = $svgIconsSupport;
     }

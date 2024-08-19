@@ -345,3 +345,14 @@ services:
             - '%kernel.project_dir%'
         tags:
             - { name: oro_email.twig.email_template_loader, priority: 10 }
+
+    oro_layout.provider.svg_icons_support.cache:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_layout_svg_icons_support' }
+
+    oro_layout.provider.svg_icons_support:
+        class: 'Oro\Bundle\LayoutBundle\Provider\SvgIconsSupportProvider'
+        arguments:
+            - '@oro_layout.theme_manager'
+            - '@oro_layout.provider.svg_icons_support.cache'
