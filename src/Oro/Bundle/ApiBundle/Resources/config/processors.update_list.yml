@@ -11,6 +11,11 @@ services:
     # initialize
     #
 
+    oro_api.update_list.check_processing_mode:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\CheckProcessingMode
+        tags:
+            - { name: oro.api.processor, action: update_list, group:  initialize, priority: 200 }
+
     oro_api.update_list.initialize_config_extras:
         class: Oro\Bundle\ApiBundle\Processor\UpdateList\InitializeConfigExtras
         tags:
@@ -63,12 +68,27 @@ services:
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@oro_api.batch.chunk_size_provider'
+            - '@oro_api.batch.sync_processing_limit_provider'
         tags:
             - { name: oro.api.processor, action: update_list, group: save_data, priority: -10 }
 
     #
     # finalize
     #
+
+    oro_api.update_list.process_synchronous_operation:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\ProcessSynchronousOperation
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - !abstract '$waitTimeout defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SyncProcessingCompilerPass'
+            - '@oro_api.batch.error_manager'
+            - '@oro_api.batch.file_manager'
+            - '@oro_api.batch.sync_processing_limit_provider'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_api.action_processor_bag'
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: finalize, priority: 10 }
 
     oro_api.update_list.set_content_location_header:
         class: Oro\Bundle\ApiBundle\Processor\UpdateList\SetContentLocationHeader
@@ -97,9 +117,35 @@ services:
         tags:
             - { name: oro.api.processor, action: update_list, group: normalize_result, priority: 200 }
 
+    oro_api.update_list.set_http_response_status_code.synchronous_operation:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\SetSynchronousOperationHttpResponseStatusCode
+        tags:
+            - { name: oro.api.processor, action: update_list, group: normalize_result, requestType: rest, priority: -25 }
+
     oro_api.update_list.set_http_response_status_code:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
             - 202 # HTTP_ACCEPTED
         tags:
             - { name: oro.api.processor, action: update_list, group: normalize_result, requestType: rest, priority: -30 }
+
+    oro_api.update_list.build_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\BuildResultDocument
+        arguments:
+            - '@oro_api.error_completer_registry'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -50 }
+
+    oro_api.update_list.json_api.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\JsonApi\SetSynchronousOperationResultDocument
+        arguments:
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -135 }
+
+    oro_api.update_list.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\SetSynchronousOperationResultDocument
+        tags:
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -140 }

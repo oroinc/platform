@@ -24,17 +24,15 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
             'fileName' => 'foo.bar',
             'firstRecordOffset' => 1,
             'jobId' => 1,
-            'requestType' => [
-                'bar',
-                'baz',
-            ],
+            'requestType' => ['bar', 'baz'],
             'sectionName' => 'sectionFoo',
-            'version' => 'latest',
+            'version' => 'latest'
         ];
         $fullOptionsSet = array_merge(
             $requiredOptionsSet,
             [
-                'extra_chunk' => true,
+                'synchronousMode' => true,
+                'extra_chunk' => true
             ]
         );
 
@@ -44,14 +42,15 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                 'expectedBody' => array_merge(
                     $requiredOptionsSet,
                     [
-                        'extra_chunk' => false,
+                        'synchronousMode' => false,
+                        'extra_chunk' => false
                     ]
                 ),
             ],
             'full set of options' => [
                 'body' => $fullOptionsSet,
-                'expectedBody' => $fullOptionsSet,
-            ],
+                'expectedBody' => $fullOptionsSet
+            ]
         ];
     }
 
@@ -66,7 +65,7 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
                     '/The required options "entityClass", "fileIndex", "fileName", "firstRecordOffset", "jobId", '
-                        . '"operationId", "requestType", "sectionName", "version" are missing./',
+                        . '"operationId", "requestType", "sectionName", "version" are missing./'
             ],
             'wrong operationId type' => [
                 'body' => [
@@ -76,15 +75,12 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 'foo.bar',
                     'firstRecordOffset' => 1,
                     'jobId' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 'sectionFoo',
-                    'version' => 'latest',
+                    'version' => 'latest'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/'
             ],
             'wrong entityClass type' => [
                 'body' => [
@@ -94,15 +90,12 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 'foo.bar',
                     'firstRecordOffset' => 1,
                     'jobId' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 'sectionFoo',
-                    'version' => 'latest',
+                    'version' => 'latest'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "entityClass" with value 1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "entityClass" with value 1 is expected to be of type "string"/'
             ],
             'wrong fileIndex type' => [
                 'body' => [
@@ -112,15 +105,12 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 'foo.bar',
                     'firstRecordOffset' => 1,
                     'jobId' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 'sectionFoo',
-                    'version' => 'latest',
+                    'version' => 'latest'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "fileIndex" with value "1" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "fileIndex" with value "1" is expected to be of type "int"/'
             ],
             'wrong fileName type' => [
                 'body' => [
@@ -130,15 +120,12 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 1,
                     'firstRecordOffset' => 1,
                     'jobId' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 'sectionFoo',
-                    'version' => 'latest',
+                    'version' => 'latest'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "fileName" with value 1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "fileName" with value 1 is expected to be of type "string"/'
             ],
             'wrong firstRecordOffset type' => [
                 'body' => [
@@ -148,15 +135,12 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 'foo.bar',
                     'firstRecordOffset' => '1',
                     'jobId' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 'sectionFoo',
-                    'version' => 'latest',
+                    'version' => 'latest'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "firstRecordOffset" with value "1" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "firstRecordOffset" with value "1" is expected to be of type "int"/'
             ],
             'wrong jobId type' => [
                 'body' => [
@@ -166,15 +150,12 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 'foo.bar',
                     'firstRecordOffset' => 1,
                     'jobId' => '1',
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 'sectionFoo',
-                    'version' => 'latest',
+                    'version' => 'latest'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "jobId" with value "1" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "jobId" with value "1" is expected to be of type "int"/'
             ],
             'wrong requestType type' => [
                 'body' => [
@@ -186,11 +167,11 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'jobId' => 1,
                     'requestType' => 'bar',
                     'sectionName' => 'sectionFoo',
-                    'version' => 'latest',
+                    'version' => 'latest'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "requestType" with value "bar" is expected '
-                    . 'to be of type "string\[\]"/',
+                    . 'to be of type "string\[\]"/'
             ],
             'wrong sectionName type' => [
                 'body' => [
@@ -200,15 +181,12 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 'foo.bar',
                     'firstRecordOffset' => 1,
                     'jobId' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 1,
-                    'version' => 'latest',
+                    'version' => 'latest'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "sectionName" with value 1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "sectionName" with value 1 is expected to be of type "string"/'
             ],
             'wrong version type' => [
                 'body' => [
@@ -218,15 +196,28 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 'foo.bar',
                     'firstRecordOffset' => 1,
                     'jobId' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 'sectionFoo',
-                    'version' => 1.1,
+                    'version' => 1.1
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "version" with value 1.1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "version" with value 1.1 is expected to be of type "string"/'
+            ],
+            'wrong synchronousMode type' => [
+                'body' => [
+                    'operationId' => 1,
+                    'entityClass' => \stdClass::class,
+                    'fileIndex' => 1,
+                    'fileName' => 'foo.bar',
+                    'firstRecordOffset' => 1,
+                    'jobId' => 1,
+                    'requestType' => ['bar', 'baz'],
+                    'sectionName' => 'sectionFoo',
+                    'version' => 'latest',
+                    'synchronousMode' => 1
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' => '/The option "synchronousMode" with value 1 is expected to be of type "bool"/'
             ],
             'wrong extra_chunk type' => [
                 'body' => [
@@ -236,17 +227,14 @@ class UpdateListProcessChunkTopicTest extends AbstractTopicTestCase
                     'fileName' => 'foo.bar',
                     'firstRecordOffset' => 1,
                     'jobId' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'sectionName' => 'sectionFoo',
                     'version' => 'latest',
-                    'extra_chunk' => 1,
+                    'extra_chunk' => 1
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "extra_chunk" with value 1 is expected to be of type "bool"/',
-            ],
+                'exceptionMessage' => '/The option "extra_chunk" with value 1 is expected to be of type "bool"/'
+            ]
         ];
     }
 }

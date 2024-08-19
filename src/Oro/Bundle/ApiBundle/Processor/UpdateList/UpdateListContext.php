@@ -9,10 +9,11 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  */
 class UpdateListContext extends Context
 {
-    private ?string $targetFileName = null;
-    private ?int $operationId = null;
     /** @var resource|null */
     private $requestData = null;
+    private ?string $targetFileName = null;
+    private ?int $operationId = null;
+    private ?bool $synchronousMode = null;
 
     /**
      * Gets a resource contains request data.
@@ -64,5 +65,29 @@ class UpdateListContext extends Context
     public function setOperationId(?int $operationId): void
     {
         $this->operationId = $operationId;
+    }
+
+    /**
+     * Checks whether a flag indicates whether a batch operation should be processed in the synchronous mode is set.
+     */
+    public function hasSynchronousMode(): bool
+    {
+        return null !== $this->synchronousMode;
+    }
+
+    /**
+     * Indicates whether a batch operation should be processed in the synchronous mode.
+     */
+    public function isSynchronousMode(): bool
+    {
+        return (bool)$this->synchronousMode;
+    }
+
+    /**
+     * Sets a flag indicates whether a batch operation should be processed in the synchronous mode.
+     */
+    public function setSynchronousMode(?bool $synchronousMode): void
+    {
+        $this->synchronousMode = $synchronousMode;
     }
 }

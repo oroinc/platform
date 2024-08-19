@@ -9,6 +9,7 @@ use JsonStreamingParser\Listener\ListenerInterface;
 use JsonStreamingParser\Parser;
 use Oro\Bundle\ApiBundle\Batch\JsonUtil;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
+use Oro\Bundle\ApiBundle\Exception\ChunkLimitExceededFileSplitterException;
 use Oro\Bundle\ApiBundle\Exception\FileSplitterException;
 use Oro\Bundle\ApiBundle\Exception\ParsingErrorFileSplitterException;
 use Oro\Bundle\GaufretteBundle\FileManager;
@@ -17,6 +18,8 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 
 /**
  * Splits a JSON file to chunks.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class JsonFileSplitter implements FileSplitterInterface
 {
@@ -29,17 +32,23 @@ class JsonFileSplitter implements FileSplitterInterface
     /** @var int Internal counter of records in files that were saved during split operation */
     protected int $targetFileFirstRecordOffset = 0;
     private ?string $headerSectionName = null;
+    private ?string $primarySectionName = null;
     /** @var string[] */
     private array $sectionNamesToSplit = [];
     private int $chunkSize = 100;
     /** @var array [section name => chunk size, ...] */
     private array $chunkSizePerSection = [];
+    private ?int $chunkCountLimit = null;
+    /** @var array [section name => chunk size, ...] */
+    private array $chunkCountLimitPerSection = [];
     private ?string $chunkFileNameTemplate = null;
     private ?FileManager $destFileManager = null;
     /** @var array Internal buffer of parsed objects */
     private array $buffer = [];
     /** @var ChunkFile[] Chunk files that were saved during split operation */
     private array $targetFiles = [];
+    /** @var array [section key => the number of chunks, ...] */
+    private array $processedChunkCounts = [];
 
     /**
      * {@inheritDoc}
@@ -71,6 +80,38 @@ class JsonFileSplitter implements FileSplitterInterface
     public function setChunkSizePerSection(array $sizes): void
     {
         $this->chunkSizePerSection = $sizes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getChunkCountLimit(): ?int
+    {
+        return $this->chunkCountLimit;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setChunkCountLimit(?int $limit): void
+    {
+        $this->chunkCountLimit = $limit;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getChunkCountLimitPerSection(): array
+    {
+        return $this->chunkCountLimitPerSection;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setChunkCountLimitPerSection(array $limits): void
+    {
+        $this->chunkCountLimitPerSection = $limits;
     }
 
     /**
@@ -108,6 +149,22 @@ class JsonFileSplitter implements FileSplitterInterface
     /**
      * {@inheritDoc}
      */
+    public function getPrimarySectionName(): ?string
+    {
+        return $this->primarySectionName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setPrimarySectionName(?string $name): void
+    {
+        $this->primarySectionName = $name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getSectionNamesToSplit(): array
     {
         return $this->sectionNamesToSplit;
@@ -133,6 +190,8 @@ class JsonFileSplitter implements FileSplitterInterface
             $this->parseStream($stream);
 
             return $this->targetFiles;
+        } catch (ChunkLimitExceededFileSplitterException $e) {
+            throw $e;
         } catch (ParsingException $e) {
             throw new ParsingErrorFileSplitterException(
                 $fileName,
@@ -208,6 +267,8 @@ class JsonFileSplitter implements FileSplitterInterface
 
     protected function processItem(mixed $item): void
     {
+        $this->assertChunkCountLimitNotExceeded();
+
         if ($this->sectionName
             && !empty($this->sectionNamesToSplit)
             && !\in_array($this->sectionName, $this->sectionNamesToSplit, true)
@@ -236,6 +297,19 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
+     * @return array [section key => the number of chunks, ...]
+     */
+    protected function getProcessedChunkCounts(): array
+    {
+        return $this->processedChunkCounts;
+    }
+
+    protected function setProcessedChunkCounts(array $counts): void
+    {
+        $this->processedChunkCounts = $counts;
+    }
+
+    /**
      * Saves the buffer to a new chunk file
      */
     protected function saveChunk(): void
@@ -259,6 +333,9 @@ class JsonFileSplitter implements FileSplitterInterface
         $this->buffer = [];
         $this->targetFileIndex++;
         $this->targetFileFirstRecordOffset += $this->getChunkSizeForSection();
+        $processedChunkCountSectionKey = $this->getProcessedChunkCountSectionKey();
+        $this->processedChunkCounts[$processedChunkCountSectionKey] =
+            ($this->processedChunkCounts[$processedChunkCountSectionKey] ?? 0) + 1;
     }
 
     /**
@@ -320,5 +397,33 @@ class JsonFileSplitter implements FileSplitterInterface
             },
             $chunkFiles
         );
+    }
+
+    private function assertChunkCountLimitNotExceeded(): void
+    {
+        $processedChunkCountSectionKey = $this->getProcessedChunkCountSectionKey();
+        if (!$processedChunkCountSectionKey) {
+            $chunkCountLimit = $this->getChunkCountLimit();
+        } else {
+            $chunkCountLimits = $this->getChunkCountLimitPerSection();
+            $chunkCountLimit = $chunkCountLimits[$this->sectionName] ?? null;
+        }
+        if (null !== $chunkCountLimit
+            && isset($this->processedChunkCounts[$processedChunkCountSectionKey])
+            && $this->processedChunkCounts[$processedChunkCountSectionKey] >= $chunkCountLimit
+        ) {
+            throw new ChunkLimitExceededFileSplitterException(
+                $this->sectionName && $this->getPrimarySectionName() !== $this->sectionName
+                    ? $this->sectionName
+                    : null
+            );
+        }
+    }
+
+    private function getProcessedChunkCountSectionKey(): string
+    {
+        return !$this->sectionName || $this->getPrimarySectionName() === $this->sectionName
+            ? ''
+            : $this->sectionName;
     }
 }

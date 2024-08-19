@@ -20,18 +20,16 @@ class UpdateListStartChunkJobsTopicTest extends AbstractTopicTestCase
         $requiredOptionsSet = [
             'operationId' => 1,
             'entityClass' => \stdClass::class,
-            'requestType' => [
-                'bar',
-                'baz',
-            ],
+            'requestType' => ['bar', 'baz'],
             'version' => 'latest',
-            'rootJobId' => 1,
+            'rootJobId' => 1
         ];
         $fullOptionsSet = array_merge(
             $requiredOptionsSet,
             [
+                'synchronousMode' => true,
                 'firstChunkFileIndex' => 1,
-                'aggregateTime' => 1,
+                'aggregateTime' => 1
             ]
         );
 
@@ -41,15 +39,16 @@ class UpdateListStartChunkJobsTopicTest extends AbstractTopicTestCase
                 'expectedBody' => array_merge(
                     $requiredOptionsSet,
                     [
+                        'synchronousMode' => false,
                         'firstChunkFileIndex' => 0,
-                        'aggregateTime' => 0,
+                        'aggregateTime' => 0
                     ]
-                ),
+                )
             ],
             'full set of options' => [
                 'body' => $fullOptionsSet,
-                'expectedBody' => $fullOptionsSet,
-            ],
+                'expectedBody' => $fullOptionsSet
+            ]
         ];
     }
 
@@ -64,35 +63,29 @@ class UpdateListStartChunkJobsTopicTest extends AbstractTopicTestCase
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
                     '/The required options "entityClass", "operationId", "requestType", '
-                        . '"rootJobId", "version" are missing./',
+                        . '"rootJobId", "version" are missing./'
             ],
             'wrong operationId type' => [
                 'body' => [
                     'operationId' => '1',
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
-                    'rootJobId' => 1,
+                    'rootJobId' => 1
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/'
             ],
             'wrong entityClass type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
-                    'rootJobId' => 1,
+                    'rootJobId' => 1
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "entityClass" with value 1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "entityClass" with value 1 is expected to be of type "string"/'
             ],
             'wrong requestType type' => [
                 'body' => [
@@ -100,71 +93,71 @@ class UpdateListStartChunkJobsTopicTest extends AbstractTopicTestCase
                     'entityClass' => \stdClass::class,
                     'requestType' => 'bar',
                     'version' => 'latest',
-                    'rootJobId' => 1,
+                    'rootJobId' => 1
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "requestType" with value "bar" is expected '
-                    . 'to be of type "string\[\]"/',
+                    . 'to be of type "string\[\]"/'
             ],
             'wrong version type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 1,
-                    'rootJobId' => 1,
+                    'rootJobId' => 1
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "version" with value 1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "version" with value 1 is expected to be of type "string"/'
+            ],
+            'wrong synchronousMode type' => [
+                'body' => [
+                    'operationId' => 1,
+                    'entityClass' => \stdClass::class,
+                    'requestType' => ['bar', 'baz'],
+                    'version' => 'latest',
+                    'synchronousMode' => 1,
+                    'rootJobId' => 1
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' => '/The option "synchronousMode" with value 1 is expected to be of type "bool"/'
             ],
             'wrong rootJobId type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
-                    'rootJobId' => '1',
+                    'rootJobId' => '1'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "rootJobId" with value "1" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "rootJobId" with value "1" is expected to be of type "int"/'
             ],
             'wrong firstChunkFileIndex type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'rootJobId' => 1,
-                    'firstChunkFileIndex' => '1',
+                    'firstChunkFileIndex' => '1'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "firstChunkFileIndex" with value "1" is expected '
-                    . 'to be of type "int"/',
+                    . 'to be of type "int"/'
             ],
             'wrong aggregateTime type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'rootJobId' => 1,
-                    'aggregateTime' => '1',
+                    'aggregateTime' => '1'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "aggregateTime" with value "1" is expected to be of type "int"/',
-            ],
+                'exceptionMessage' => '/The option "aggregateTime" with value "1" is expected to be of type "int"/'
+            ]
         ];
     }
 }

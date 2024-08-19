@@ -88,6 +88,7 @@ class OroApiBundle extends Bundle
             'oro_api.association_access_exclusion_provider_registry',
             'oro_api.association_access_exclusion_provider'
         ));
+        $container->addCompilerPass(new Compiler\SyncProcessingCompilerPass());
         $container->addCompilerPass(new Compiler\ChunkSizeProviderCompilerPass());
         $container->addCompilerPass(new Compiler\CleanupAsyncOperationCompilerPass());
         $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(

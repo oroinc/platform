@@ -48,6 +48,9 @@ oro:
             summary:
                 label: Summary
                 description: The summary statistics of the asynchronous operation.
+            affected_entities:
+                label: Affected Entities
+                description: Entities affected by the asynchronous operation.
 
         openapispecification:
             entity_label: OpenAPI Specification

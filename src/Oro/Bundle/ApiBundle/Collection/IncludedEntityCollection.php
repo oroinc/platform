@@ -23,6 +23,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Sets the primary entity identifier.
+     * The $entityId is an identifier of an entity that was sent in the request.
      */
     public function setPrimaryEntityId(string $entityClass, mixed $entityId): void
     {
@@ -31,6 +32,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Checks whether the given class and id represents the primary entity.
+     * The $entityId is an identifier of an entity that was sent in the request.
      */
     public function isPrimaryEntity(string $entityClass, mixed $entityId): bool
     {
@@ -76,6 +78,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Adds an entity to the collection.
+     * The $entityId is an identifier of an entity that was sent in the request.
      */
     public function add(object $entity, string $entityClass, mixed $entityId, IncludedEntityData $data): void
     {
@@ -86,6 +89,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Removes an entity from the collection.
+     * The $entityId is an identifier of an entity that was sent in the request.
      */
     public function remove(string $entityClass, mixed $entityId): void
     {
@@ -121,6 +125,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Checks whether an entity exists in the collection.
+     * The $entityId is an identifier of an entity that was sent in the request.
      */
     public function contains(string $entityClass, mixed $entityId): bool
     {
@@ -129,6 +134,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Gets an entity.
+     * The $entityId is an identifier of an entity that was sent in the request.
      */
     public function get(string $entityClass, mixed $entityId): ?object
     {
@@ -157,6 +163,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Gets an identifier is associated with an object.
+     * It is an identifier that was sent in the request.
      */
     public function getId(object $object): mixed
     {

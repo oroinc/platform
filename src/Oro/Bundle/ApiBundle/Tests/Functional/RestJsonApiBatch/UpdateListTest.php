@@ -516,6 +516,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             ]
         ];
         $response = $this->cpatch(['entity' => $entityType], $data);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_ACCEPTED);
         self::assertSame(1, $this->getAsyncOperationCount());
 
         // check Content-Location header
@@ -566,6 +567,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                 'entityClass'           => $operation->getEntityClass(),
                 'requestType'           => $this->getRequestType()->toArray(),
                 'version'               => Version::LATEST,
+                'synchronousMode'       => false,
                 'fileName'              => $operation->getDataFileName(),
                 'chunkSize'             => $this->getChunkSizeProvider()
                     ->getChunkSize(TestDepartment::class),
@@ -609,6 +611,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             [],
             $data
         );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_ACCEPTED);
         self::assertSame(1, $this->getAsyncOperationCount());
 
         // check Content-Location header
@@ -648,6 +651,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                 'entityClass'           => $operation->getEntityClass(),
                 'requestType'           => $this->getRequestType()->toArray(),
                 'version'               => Version::LATEST,
+                'synchronousMode'       => false,
                 'fileName'              => $operation->getDataFileName(),
                 'chunkSize'             => $this->getChunkSizeProvider()
                     ->getChunkSize(TestDepartment::class),
@@ -718,7 +722,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'request data constraint',
-                'detail' => 'The request data should not be empty'
+                'detail' => 'The request data should not be empty.'
             ],
             $response
         );
@@ -755,6 +759,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                     'entityClass'       => $entityClass,
                     'requestType'       => $this->getRequestType()->toArray(),
                     'version'           => Version::LATEST,
+                    'synchronousMode'   => false,
                     'fileIndex'         => 0,
                     'firstRecordOffset' => 0,
                     'sectionName'       => 'data'
@@ -800,6 +805,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                     'entityClass'       => $entityClass,
                     'requestType'       => $this->getRequestType()->toArray(),
                     'version'           => Version::LATEST,
+                    'synchronousMode'   => false,
                     'fileIndex'         => 0,
                     'firstRecordOffset' => 0,
                     'sectionName'       => 'data'
@@ -809,6 +815,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                     'entityClass'       => $entityClass,
                     'requestType'       => $this->getRequestType()->toArray(),
                     'version'           => Version::LATEST,
+                    'synchronousMode'   => false,
                     'fileIndex'         => 1,
                     'firstRecordOffset' => $chunkSize,
                     'sectionName'       => 'data'

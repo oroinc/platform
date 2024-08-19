@@ -8,4 +8,5 @@ services:
     Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic: ~
     Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic: ~
     Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListFinishTopic: ~
+    Oro\Bundle\ApiBundle\Async\Topic\DeleteAsyncOperationTopic: ~
     Oro\Bundle\ApiBundle\Async\Topic\CreateOpenApiSpecificationTopic: ~
