@@ -1,11 +1,13 @@
 <div data-text-filter-template>
     <input class="input input--size-m input--full" type="text" name="value" value="" aria-label="<%- inputFieldAriaLabel %>">
     <div class="filter-action-row">
-        <button type="button"
-            data-role="clear-filter"
-            class="btn btn--flat filter-clear hidden"
-            aria-label="<%- clearFilterButtonAriaLabel %>"
-        ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+        <% if (allowClearButtonInFilter) { %>
+            <button type="button"
+                data-role="clear-filter"
+                class="btn btn--flat filter-clear hidden"
+                aria-label="<%- clearFilterButtonAriaLabel %>"
+            ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+        <% } %>
         <button type="button"
             class="btn btn--outlined filter-update"
             aria-label="<%- updateButtonAriaLabel %>"

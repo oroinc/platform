@@ -1,7 +1,7 @@
 /* @theme: default; */
 
 .ui-timepicker-wrapper {
-    z-index: z('dropdown') + 1;
+    z-index: z('fixed');
 
     max-height: 158px;
 
@@ -13,6 +13,10 @@
     padding-block: $ui-timepicker-list-padding-block;
 
     background: $ui-timepicker-list-background;
+
+    &.input-in-dialog-widget {
+        z-index: z('popup') + 1;
+    }
 }
 
 .ui-timepicker-list {

@@ -45,14 +45,16 @@
                     </select>
                     <% } %>
                 </div>
-                <div class="filter-items-hint">
-                    <button type="button"
-                            class="btn btn--flat reset-filter-button"
-                    >
-                        <%= oroui.renderIcon({name: 'close'}) %>
-                        <%- _.__('oro.filter.reset.label') %>
-                    </button>
-                </div>
+                <% if (!obj.outerHintContainer) { %>
+                    <div class="filter-items-hint">
+                        <button type="button"
+                                class="btn btn--flat reset-filter-button"
+                        >
+                            <%= oroui.renderIcon({name: 'close'}) %>
+                            <%- _.__('oro.filter.reset.label') %>
+                        </button>
+                    </div>
+                <% } %>
             </div>
         </div>
     <% } %>

@@ -558,9 +558,10 @@ define(function(require) {
                             return item ? item.text : item;
                         })
                         .filter(_.negate(_.isUndefined))
-                        .value();
+                        .value()
+                        .join(', ');
 
-                const hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
+                const hintValue = this.wrapHintValue ? (`"${hintRawValue}"`) : hintRawValue;
 
                 return (option ? option.label + ' ' : '') + hintValue;
             } else {
