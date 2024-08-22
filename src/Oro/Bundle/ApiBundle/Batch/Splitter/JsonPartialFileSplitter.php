@@ -56,9 +56,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     public function setState(array $data): void
     {
         $this->state = $data;
-        $this->headerSectionData = $this->state['headerSection'] ?? null;
-        $this->targetFileIndex = $this->state['targetFileIndex'] ?? 0;
-        $this->targetFileFirstRecordOffset = $this->state['targetFileFirstRecordOffset'] ?? 0;
+        $this->updateFromState();
     }
 
     /**
@@ -69,9 +67,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
         try {
             return parent::splitFile($fileName, $srcFileManager, $destFileManager);
         } finally {
-            $this->headerSectionData = $this->state['headerSection'] ?? null;
-            $this->targetFileIndex = $this->state['targetFileIndex'] ?? 0;
-            $this->targetFileFirstRecordOffset = $this->state['targetFileFirstRecordOffset'] ?? 0;
+            $this->updateFromState();
         }
     }
 
@@ -99,6 +95,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
             }
             $this->state['targetFileIndex'] = $this->targetFileIndex;
             $this->state['targetFileFirstRecordOffset'] = $this->targetFileFirstRecordOffset;
+            $this->state['processedChunkCounts'] = $this->getProcessedChunkCounts();
             $this->chunkStartTime = null;
             $this->chunkTime = 0;
             $this->chunkCount = 0;
@@ -163,5 +160,13 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
                 throw new TimeoutExceededFileSplitterException();
             }
         }
+    }
+
+    protected function updateFromState(): void
+    {
+        $this->headerSectionData = $this->state['headerSection'] ?? null;
+        $this->targetFileIndex = $this->state['targetFileIndex'] ?? 0;
+        $this->targetFileFirstRecordOffset = $this->state['targetFileFirstRecordOffset'] ?? 0;
+        $this->setProcessedChunkCounts($this->state['processedChunkCounts'] ?? []);
     }
 }

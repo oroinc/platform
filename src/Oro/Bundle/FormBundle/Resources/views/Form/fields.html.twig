@@ -243,6 +243,19 @@
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
 
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if warning is defined and warning -%}
+                {% import '@OroUI/macros.html.twig' as ui %}
+                {{ ui.tooltip(
+                    warning,
+                    {},
+                    null,
+                    false,
+                    null,
+                    null,
+                    true,
+                    'warning'
+                ) }}
+            {% endif %}
             {%- if tooltip is defined and tooltip -%}
                 {% import '@OroUI/macros.html.twig' as ui %}
                 {{ ui.tooltip(
@@ -748,7 +761,11 @@
         'data-page-component-module': 'oroui/js/app/components/view-component',
         'data-page-component-options': {'view': 'oroform/js/app/views/simple-color-picker-view'}|merge(configs)|json_encode
     }|merge(attr) %}
-    {% set type = 'hidden' %}
+
+    {% if not configs.show_input_control %}
+        {% set type = 'hidden' %}
+    {% endif %}
+
     {{ block('form_widget_simple') }}
 {% endblock %}
 

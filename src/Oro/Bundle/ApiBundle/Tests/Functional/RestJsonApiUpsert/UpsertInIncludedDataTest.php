@@ -711,6 +711,52 @@ class UpsertInIncludedDataTest extends RestJsonApiTestCase
         self::assertSame('Updated Item 1', $updatedEntity->name);
     }
 
+    public function testByConfiguredFieldWithUniqueConstraintAndIncludedEntityReferencesPrimaryEntity(): void
+    {
+        $entityType = $this->getEntityType(TestUniqueKeyIdentifier::class);
+        $data = [
+            'data'     => [
+                'type' => $entityType,
+                'id'   => '<toString(@test_unique_key_id3->id)>'
+            ],
+            'included' => [
+                [
+                    'type'          => $entityType,
+                    'id'            => 'include1',
+                    'meta'          => ['upsert' => ['key4']],
+                    'attributes'    => [
+                        'key1' => 'item 1',
+                        'key2' => 10,
+                        'key3' => 'item 1',
+                        'key4' => 10,
+                        'name' => 'Updated Item 1'
+                    ],
+                    'relationships' => [
+                        'children' => [
+                            'data' => [['type' => $entityType, 'id' => '<toString(@test_unique_key_id3->id)>']]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => '<toString(@test_unique_key_id3->id)>'],
+            $data
+        );
+
+        $updatedEntityId = $this->getReference('test_unique_key_id1')->id;
+
+        $expectedData = $data;
+        unset($expectedData['included'][0]['meta']);
+        $expectedData['data']['relationships']['parent']['data']['id'] = (string)$updatedEntityId;
+        $expectedData['included'][0]['id'] = (string)$updatedEntityId;
+        $this->assertResponseContains($expectedData, $response);
+
+        $updatedEntity = $this->getEntityManager()->find(TestUniqueKeyIdentifier::class, $updatedEntityId);
+        self::assertSame('Updated Item 1', $updatedEntity->name);
+    }
+
     public function testTryToByConfiguredFieldWithoutUniqueConstraintWhenSeveralEntitiesFound(): void
     {
         $entityType = $this->getEntityType(TestUniqueKeyIdentifier::class);

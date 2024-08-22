@@ -19,7 +19,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
      */
     public function getMigrationVersion(): string
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -58,6 +58,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
         $table->addColumn('elapsed_time', 'integer');
         $table->addColumn('has_errors', 'boolean', ['default' => false]);
         $table->addColumn('summary', 'json_array', ['comment' => '(DC2Type:json_array)', 'notnull' => false]);
+        $table->addColumn('affected_entities', 'json', ['comment' => '(DC2Type:json)', 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id'], 'IDX_F4BCF3999EB185F9');
         $table->addIndex(['organization_id'], 'IDX_F4BCF39932C8A3DE');

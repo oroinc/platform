@@ -13,10 +13,14 @@ class AsyncOperationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSetDataProvider
      */
-    public function testSetGet(string $property, mixed $value)
+    public function testSetGet(string $property, mixed $value, bool $allowNull = false)
     {
         $entity = new AsyncOperation();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+        if ($allowNull) {
+            self::assertNull($propertyAccessor->getValue($entity, $property));
+        }
 
         $propertyAccessor->setValue($entity, $property, $value);
         self::assertEquals($value, $propertyAccessor->getValue($entity, $property));
@@ -25,15 +29,17 @@ class AsyncOperationTest extends \PHPUnit\Framework\TestCase
     public function getSetDataProvider(): array
     {
         return [
-            'status'       => ['status', 'new'],
-            'progress'     => ['progress', 12.1],
-            'jobId'        => ['jobId', '45'],
-            'owner'        => ['owner', new User()],
-            'organization' => ['organization', new Organization()],
-            'hasErrors'    => ['hasErrors', true],
-            'dataFileName' => ['dataFileName', 'test_file'],
-            'entityClass'  => ['entityClass', 'Acme\DemoBundle\Entity\Test'],
-            'actionName'   => ['actionName', 'some_action']
+            'status'           => ['status', 'new'],
+            'progress'         => ['progress', 12.1, true],
+            'jobId'            => ['jobId', '45', true],
+            'owner'            => ['owner', new User(), true],
+            'organization'     => ['organization', new Organization(), true],
+            'hasErrors'        => ['hasErrors', true],
+            'dataFileName'     => ['dataFileName', 'test_file', true],
+            'entityClass'      => ['entityClass', 'Acme\DemoBundle\Entity\Test'],
+            'actionName'       => ['actionName', 'some_action'],
+            'summary'          => ['summary', ['key' => 'value'], true],
+            'affectedEntities' => ['affectedEntities', [['type' => 'entity', 'id' => 1]], true]
         ];
     }
 

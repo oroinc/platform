@@ -27,9 +27,20 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new FormContextStub($configProvider, $metadataProvider);
     }
 
+    public function testRequestId()
+    {
+        self::assertNull($this->context->getRequestId());
+
+        $requestId = 'test';
+        $this->context->setRequestId($requestId);
+        self::assertSame($requestId, $this->context->getRequestId());
+    }
+
     public function testRequestData()
     {
-        $requestData = [];
+        self::assertSame([], $this->context->getRequestData());
+
+        $requestData = ['key' => 'val'];
         $this->context->setRequestData($requestData);
         self::assertSame($requestData, $this->context->getRequestData());
     }

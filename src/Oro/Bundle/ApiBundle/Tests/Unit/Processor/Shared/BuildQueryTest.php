@@ -18,6 +18,9 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var FilterNamesRegistry|\PHPUnit\Framework\MockObject\MockObject */
@@ -33,6 +36,15 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
         $this->filterNamesRegistry = $this->createMock(FilterNamesRegistry::class);
 
         $this->processor = new BuildQuery($this->doctrineHelper, $this->filterNamesRegistry);
+    }
+
+    public function testProcessWhenDataAlreadyExist(): void
+    {
+        $this->context->setClassName('Test\Class');
+        $this->context->setResult(new \stdClass());
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getQuery());
     }
 
     public function testProcessForNotManageableEntity(): void

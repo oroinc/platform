@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ConfigurationBuilder implements BuilderInterface
 {
     public const MAX_NESTING_LEVEL = 'max_nesting_level';
+    public const WARNING = 'warning';
 
     const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
 
@@ -64,6 +65,7 @@ class ConfigurationBuilder implements BuilderInterface
             $this->setExtraFromConfig($menu, $treeData, 'scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE);
             $this->setExtraFromConfig($menu, $treeData, 'read_only', false);
             $this->setExtraFromConfig($menu, $treeData, self::MAX_NESTING_LEVEL, 0);
+            $this->setExtraFromConfig($menu, $treeData, static::WARNING, null);
 
             $existingNames[$alias] = true;
             $this->appendChildData($menu, $treeData['children'], $options, $existingNames);

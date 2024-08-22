@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiBatch;
 
+use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiUpdateListTestCase;
@@ -9,6 +10,7 @@ use Oro\Component\MessageQueue\Job\Job;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestCase
 {
@@ -16,6 +18,17 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
     {
         parent::setUp();
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/update_list_for_entity.yml']);
+    }
+
+    private function getDepartmentId(string $title): int
+    {
+        /** @var TestDepartment|null $department */
+        $department = $this->getEntityManager()->getRepository(TestDepartment::class)->findOneBy(['name' => $title]);
+        if (null === $department) {
+            throw new \RuntimeException(sprintf('The department "%s" not found.', $title));
+        }
+
+        return $department->getId();
     }
 
     private function getEmployeeId(string $name): int
@@ -36,7 +49,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
     {
         $departmentEntityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
-        $this->processUpdateList(
+        $operationId = $this->processUpdateList(
             TestDepartment::class,
             [
                 'data'     => [
@@ -84,7 +97,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ]
         );
 
-        $response = $this->cget(['entity' => $departmentEntityType]);
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
@@ -134,10 +147,20 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         $newEmployee1Id = $this->getEmployeeId('New Employee 1');
         $newEmployee2Id = $this->getEmployeeId('New Employee 2');
         $newEmployee3Id = $this->getEmployeeId('New Employee 3');
-        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name']);
+        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name', 'page[size]' => 10]);
         $this->assertResponseContains(
             [
                 'data' => [
+                    [
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee1->id)>',
+                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'relationships' => [
+                            'department' => [
+                                'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
+                            ]
+                        ]
+                    ],
                     [
                         'type'          => $employeeEntityType,
                         'id'            => (string)$newEmployee1Id,
@@ -171,6 +194,34 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                 ]
             ],
             $response
+        );
+
+        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
+        $summary = $operation->getSummary();
+        unset($summary['aggregateTime']);
+        self::assertSame(
+            [
+                'readCount'   => 2,
+                'writeCount'  => 2,
+                'errorCount'  => 0,
+                'createCount' => 2,
+                'updateCount' => 0
+            ],
+            $summary
+        );
+        self::assertSame(
+            [
+                'primary'  => [
+                    [$this->getDepartmentId('New Department 1'), null, false],
+                    [$this->getDepartmentId('New Department 2'), null, false]
+                ],
+                'included' => [
+                    [TestEmployee::class, $this->getEmployeeId('New Employee 1'), 'new_employee1', false],
+                    [TestEmployee::class, $this->getEmployeeId('New Employee 2'), 'new_employee2', false],
+                    [TestEmployee::class, $this->getEmployeeId('New Employee 3'), 'new_employee3', false]
+                ]
+            ],
+            $operation->getAffectedEntities()
         );
     }
 
@@ -230,7 +281,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ]
         );
 
-        $response = $this->cget(['entity' => $departmentEntityType]);
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
@@ -280,10 +331,20 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         $newEmployee1Id = $this->getEmployeeId('New Employee 1');
         $newEmployee2Id = $this->getEmployeeId('New Employee 2');
         $newEmployee3Id = $this->getEmployeeId('New Employee 3');
-        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name']);
+        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name', 'page[size]' => 10]);
         $this->assertResponseContains(
             [
                 'data' => [
+                    [
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee1->id)>',
+                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'relationships' => [
+                            'department' => [
+                                'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
+                            ]
+                        ]
+                    ],
                     [
                         'type'          => $employeeEntityType,
                         'id'            => (string)$newEmployee1Id,
@@ -320,6 +381,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testCreateEntitiesWithProcessedIncludedItemsButWithoutIncludedItemsOnSecondIteration()
     {
         $departmentEntityType = $this->getEntityType(TestDepartment::class);
@@ -361,7 +425,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ]
         );
 
-        $response = $this->cget(['entity' => $departmentEntityType]);
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
@@ -400,10 +464,20 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
 
         $newDepartment2Id = (int)$responseContent['data'][3]['id'];
         $newEmployee1Id = $this->getEmployeeId('New Employee 1');
-        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name']);
+        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name', 'page[size]' => 10]);
         $this->assertResponseContains(
             [
                 'data' => [
+                    [
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee1->id)>',
+                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'relationships' => [
+                            'department' => [
+                                'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
+                            ]
+                        ]
+                    ],
                     [
                         'type'          => $employeeEntityType,
                         'id'            => (string)$newEmployee1Id,
@@ -472,7 +546,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         }
         $this->processUpdateList(TestDepartment::class, $data);
 
-        $response = $this->cget(['entity' => $departmentEntityType]);
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent($expectedDepartments, $response);
         $this->assertResponseContains($responseContent, $response);
     }
@@ -486,10 +560,10 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $operationId = $this->sendUpdateListRequest(TestDepartment::class, [
-            'data' => [
+            'data'     => [
                 [
-                    'type' => $departmentEntityType,
-                    'attributes' => ['title' => 'New Department 1'],
+                    'type'          => $departmentEntityType,
+                    'attributes'    => ['title' => 'New Department 1'],
                     'relationships' => [
                         'staff' => [
                             'data' => [
@@ -499,8 +573,8 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                     ]
                 ],
                 [
-                    'type' => $departmentEntityType,
-                    'attributes' => ['title' => 'New Department 2'],
+                    'type'          => $departmentEntityType,
+                    'attributes'    => ['title' => 'New Department 2'],
                     'relationships' => [
                         'staff' => [
                             'data' => [
@@ -513,18 +587,18 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ],
             'included' => [
                 [
-                    'type' => $employeeEntityType,
-                    'id' => 'new_employee1',
+                    'type'       => $employeeEntityType,
+                    'id'         => 'new_employee1',
                     'attributes' => ['name' => 'New Employee 1']
                 ],
                 [
-                    'type' => $employeeEntityType,
-                    'id' => 'new_employee2',
+                    'type'       => $employeeEntityType,
+                    'id'         => 'new_employee2',
                     'attributes' => ['name' => 'New Employee 2']
                 ],
                 [
-                    'type' => $employeeEntityType,
-                    'id' => 'new_employee3',
+                    'type'       => $employeeEntityType,
+                    'id'         => 'new_employee3',
                     'attributes' => ['name' => null]
                 ]
             ]
@@ -554,16 +628,16 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
 
         $this->assertAsyncOperationError(
             [
-                'id' => $operationId . '-1-1',
+                'id'     => $operationId . '-1-1',
                 'status' => 400,
-                'title' => 'not blank constraint',
+                'title'  => 'not blank constraint',
                 'detail' => 'This value should not be blank.',
                 'source' => ['pointer' => '/included/2/attributes/name']
             ],
             $operationId
         );
 
-        $response = $this->cget(['entity' => $departmentEntityType]);
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
@@ -597,10 +671,20 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
 
         $newDepartment1Id = (int)$responseContent['data'][2]['id'];
         $newEmployee1Id = $this->getEmployeeId('New Employee 1');
-        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name']);
+        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name', 'page[size]' => 10]);
         $this->assertResponseContains(
             [
                 'data' => [
+                    [
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee1->id)>',
+                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'relationships' => [
+                            'department' => [
+                                'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
+                            ]
+                        ]
+                    ],
                     [
                         'type'          => $employeeEntityType,
                         'id'            => (string)$newEmployee1Id,
@@ -684,7 +768,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             $operationId
         );
 
-        $response = $this->cget(['entity' => $departmentEntityType]);
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
@@ -718,10 +802,20 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
 
         $newDepartment1Id = (int)$responseContent['data'][2]['id'];
         $newEmployee1Id = $this->getEmployeeId('New Employee 1');
-        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name']);
+        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name', 'page[size]' => 10]);
         $this->assertResponseContains(
             [
                 'data' => [
+                    [
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee1->id)>',
+                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'relationships' => [
+                            'department' => [
+                                'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
+                            ]
+                        ]
+                    ],
                     [
                         'type'          => $employeeEntityType,
                         'id'            => (string)$newEmployee1Id,
@@ -885,7 +979,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ]
         );
 
-        $response = $this->cget(['entity' => $departmentEntityType]);
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
@@ -935,10 +1029,20 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         $newEmployee3Id = $this->getEmployeeId('New Employee 3');
         $newEmployee4Id = $this->getEmployeeId('New Employee 4');
         $newEmployee5Id = $this->getEmployeeId('New Employee 5');
-        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name']);
+        $response = $this->cget(['entity' => $employeeEntityType], ['sort' => 'name', 'page[size]' => 10]);
         $this->assertResponseContains(
             [
                 'data' => [
+                    [
+                        'type'          => $employeeEntityType,
+                        'id'            => '<toString(@employee1->id)>',
+                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'relationships' => [
+                            'department' => [
+                                'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
+                            ]
+                        ]
+                    ],
                     [
                         'type'          => $employeeEntityType,
                         'id'            => (string)$newEmployee3Id,

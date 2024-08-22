@@ -7,8 +7,10 @@ use Oro\Bundle\ApiBundle\Batch\Encoder\DataEncoderRegistry;
 use Oro\Bundle\ApiBundle\Batch\FileLockManager;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateHandler;
+use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateRequest;
 use Oro\Bundle\ApiBundle\Batch\JsonUtil;
+use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\RetryHelper;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
@@ -144,6 +146,10 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             'createCount'   => $response->getSummary()->getCreateCount(),
             'updateCount'   => $response->getSummary()->getUpdateCount()
         ];
+        $affectedEntitiesData = $this->getAffectedEntitiesData($response->getAffectedEntities());
+        if ($affectedEntitiesData) {
+            $jobData['affectedEntities'] = $affectedEntitiesData;
+        }
         $job->setData($jobData);
 
         if ($response->isRetryAgain()) {
@@ -171,6 +177,11 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             return false;
         }
 
+        if ($body['synchronousMode'] && !$this->isAllItemsSuccessfullyProcessed($processedItemStatuses)) {
+            // in synchronous mode all items should be either completely succeed or fail together
+            return false;
+        }
+
         $result = true;
         if ($this->retryHelper->hasItemsToRetry($rawItems, $processedItemStatuses)) {
             $chunksToRetry = $this->retryHelper->getChunksToRetry($rawItems, $processedItemStatuses);
@@ -184,6 +195,21 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             $previousAggregateTime
         );
         $job->setData($jobData);
+
+        return $result;
+    }
+
+    private function getAffectedEntitiesData(BatchAffectedEntities $affectedEntities): array
+    {
+        $result = [];
+        $primaryEntities = $affectedEntities->getPrimaryEntities();
+        if ($primaryEntities) {
+            $result['primary'] = $primaryEntities;
+        }
+        $includedEntities = $affectedEntities->getIncludedEntities();
+        if ($includedEntities) {
+            $result['included'] = $includedEntities;
+        }
 
         return $result;
     }
@@ -341,5 +367,16 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         $this->fileManager->writeToStorage(JsonUtil::encode($data), $infoFileName);
 
         return $chunkCount;
+    }
+
+    private function isAllItemsSuccessfullyProcessed(array $processedItemStatuses): bool
+    {
+        foreach ($processedItemStatuses as $status) {
+            if (BatchUpdateItemStatus::NO_ERRORS !== $status) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
