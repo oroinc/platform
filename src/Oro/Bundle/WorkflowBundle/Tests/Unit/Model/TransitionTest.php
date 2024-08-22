@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
@@ -378,6 +379,29 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
             [true, false],
             [false, false]
         ];
+    }
+
+    public function testTransitLockedWorkflowItem(): void
+    {
+        $step = $this->getStep('currentStep', false, true);
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $workflowItem->expects($this->once())
+            ->method('isLocked')
+            ->willReturn(true);
+
+        $preCondition = $this->createMock(ExpressionInterface::class);
+        $condition = $this->createMock(ExpressionInterface::class);
+        $action = $this->createMock(ActionInterface::class);
+
+        $this->expectException(WorkflowException::class);
+        $this->expectExceptionMessage('Can not transit locked WorkflowItem. Transit is allowed only in "actions".');
+
+        $this->transition
+            ->setPreCondition($preCondition)
+            ->setCondition($condition)
+            ->setAction($action)
+            ->setStepTo($step)
+            ->transit($workflowItem);
     }
 
     private function getStep(string $name, bool $isFinal = false, bool $hasAllowedTransitions = true): Step

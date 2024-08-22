@@ -104,12 +104,18 @@ services:
             - '@oro_workflow.configuration.reader.yaml'
             - '@oro_workflow.configuration.workflow_config_finder.builder'
 
+    oro_workflow.configuration.import_filter.import_condition:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Import\ImportConditionFilter
+        arguments:
+            - '@service_container'
+
     oro_workflow.configuration.imports.processor:
         class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationImportsProcessor
         calls:
             - ['addImportProcessorFactory', ['@oro_workflow.configuration.import_processor_factory.file_resource']]
             - ['addImportProcessorFactory', ['@oro_workflow.configuration.import_processor_factory.workflow_file']]
             - ['addImportProcessorFactory', ['@oro_workflow.configuration.import_processor_factory.workflow_import_supervisor']]
+            - ['addImportFilter', ['@oro_workflow.configuration.import_filter.import_condition']]
 
     oro_workflow.configuration.provider.workflow_config:
         class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider
