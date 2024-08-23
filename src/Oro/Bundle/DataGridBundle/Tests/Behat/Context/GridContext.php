@@ -1595,7 +1595,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
                     return $label && $text ? sprintf('%s %s', $label, $text) : '';
                 },
-                $this->getGridFilters($gridName)->findAll('css', 'span.filter-criteria-hint-item')
+                $this->getGridFilters($gridName, false)->findAll('css', 'span.filter-criteria-hint-item')
             )
         );
 
@@ -2804,19 +2804,20 @@ TEXT;
 
     /**
      * @param string $gridName
+     * @param boolean $openFilters
      * @return GridFilters|Element
      */
-    private function getGridFilters($gridName)
+    private function getGridFilters($gridName, $openFilters = true)
     {
         $filters = $this->elementFactory->createElement($gridName . 'Filters');
         if (!$filters->isVisible()) {
             $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
-            if ($gridToolbarActions->isVisible()) {
+            if ($gridToolbarActions->isVisible() && $openFilters) {
                 $gridToolbarActions->getActionByTitle('Filter Toggle')->click();
             }
 
             $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
-            if ($filterState->isValid() && $filterState->isVisible()) {
+            if ($filterState->isValid() && $filterState->isVisible() && $openFilters) {
                 $filterState->click();
             }
         }
