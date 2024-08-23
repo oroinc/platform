@@ -4,6 +4,7 @@ return [
     'workflow_with_numeric_array' => [
             'entity' => 'Some\\Another\\Entity',
             'start_step' => 'step_a',
+            'metadata' => [],
             'steps' => [
                 'step_a' => [
                     'order' => 10,
@@ -39,6 +40,7 @@ return [
             'transitions' => [
                 'transition_one' => [
                     'step_to' => 'step_c',
+                    'conditional_steps_to' => [],
                     'transition_definition' => 'transition_one_definition',
                     'frontend_options' => [
                         'icon' => 'bar',

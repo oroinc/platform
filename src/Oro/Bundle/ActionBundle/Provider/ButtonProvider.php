@@ -131,7 +131,7 @@ class ButtonProvider
     private function processErrors(ArrayCollection $errors)
     {
         foreach ($errors as $error) {
-            $this->logger->error($error['message'], $error['parameters']);
+            $this->logger->error($error['message'], $error['parameters'] ?? []);
         }
     }
 }

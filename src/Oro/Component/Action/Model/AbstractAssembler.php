@@ -1,6 +1,6 @@
 <?php
 
-namespace  Oro\Component\Action\Model;
+namespace Oro\Component\Action\Model;
 
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Component\Action\Exception\AssemblerException;

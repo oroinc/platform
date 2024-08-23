@@ -50,6 +50,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const TRANSITION_DISPLAY_TYPE_DIALOG = 'dialog';
     const TRANSITION_DISPLAY_TYPE_PAGE = 'page';
 
+    public const METADATA = 'metadata';
+
     /**
      * @param array $configs
      *
@@ -114,6 +116,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->end()
             ->integerNode('priority')
                 ->defaultValue(0)
+            ->end()
+            ->arrayNode(self::METADATA)
+                ->prototype('variable')->end()
             ->end()
             ->arrayNode(WorkflowDefinition::CONFIG_SCOPES)
                 ->prototype('variable')->end()
@@ -349,6 +354,17 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->isRequired()
                         ->cannotBeEmpty()
                     ->end()
+                    ->arrayNode('conditional_steps_to')
+                        ->useAttributeAsKey('step_name')
+                        ->prototype('array')
+                            ->children()
+                                ->arrayNode('conditions')
+                                    ->prototype('variable')
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                     ->booleanNode('is_start')
                         ->defaultFalse()
                     ->end()
@@ -363,8 +379,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->scalarNode('acl_message')
                         ->defaultNull()
                     ->end()
+                    ->scalarNode('transition_service')
+                    ->end()
                     ->scalarNode('transition_definition')
-                        ->cannotBeEmpty()
                     ->end()
                     ->arrayNode('frontend_options')
                         ->prototype('variable')
@@ -443,6 +460,13 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                                 'Display type "page" require "form_options" to be set.'
                             );
                         }
+
+                        if (!empty($value['transition_definition']) && !empty($value['transition_service'])) {
+                            throw new WorkflowException(
+                                'Only one of "transition_definition" or "transition_service" should to be set.'
+                            );
+                        }
+
                         return $value;
                     })
                 ->end()

@@ -39,13 +39,18 @@ class ContextAccessor implements ContextAccessorInterface
     public function getValue($context, $value)
     {
         if ($value instanceof PropertyPathInterface) {
-            try {
-                return $this->getPropertyAccessor()->getValue($context, $value);
-            } catch (\Exception $e) {
-                return null;
-            }
+            return $this->getPropertyValue($context, $value);
         } else {
             return $value;
+        }
+    }
+
+    public function getPropertyValue($context, $property)
+    {
+        try {
+            return $this->getPropertyAccessor()->getValue($context, $property);
+        } catch (\Exception $e) {
+            return null;
         }
     }
 

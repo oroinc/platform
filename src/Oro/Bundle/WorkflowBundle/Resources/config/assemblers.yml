@@ -30,6 +30,8 @@ services:
             - '@oro_action.action_factory'
             - '@oro_workflow.form_options_configuration_assembler'
             - '@oro_workflow.resolver.transition_options_resolver'
+            - '@oro_workflow.event_dispatcher'
+            - !tagged_locator { tag: 'oro_workflow.transition_service' }
 
     Oro\Bundle\WorkflowBundle\Model\TransitionAssembler:
         alias: 'oro_workflow.transition_assembler'

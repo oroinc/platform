@@ -159,7 +159,7 @@
                     {% for transitionName in stepData.allowed_transitions %}
                         {% set currentTransition = entity.configuration.transitions[transitionName] %}
                         {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
-                        <li>
+                        <li class="transition-info">
                             <span>{{ currentTransition.label|trans({},'workflows') }}</span>
                             {% if (translateLinks) %}
                                 {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.transitions[transitionName].label) }}
@@ -167,6 +167,18 @@
                             <i class="fa-long-arrow-right"></i>
                             <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ toStep.label|trans({},'workflows') }}</span>
                         </li>
+
+                        {% for conditionalStepToName in currentTransition.conditional_steps_to|keys %}
+                            {% set conditionalToStep = entity.configuration.steps[conditionalStepToName] %}
+                            <li class="conditional-transition-info">
+                                <span>{{ currentTransition.label|trans({},'workflows') }}</span>
+                                {% if (translateLinks) %}
+                                    {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.transitions[transitionName].label) }}
+                                {% endif %}
+                                <i class="fa-question"></i><i class="fa-long-arrow-right"></i>
+                                <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ conditionalToStep.label|trans({},'workflows') }}</span>
+                            </li>
+                        {% endfor %}
                     {% endfor %}
                 </ul>
             {% endif %}

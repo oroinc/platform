@@ -3,6 +3,7 @@
 return [
     'with_split_parts' => [
         'entity' => 'Some\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_b' => [
                 'order' => 0,
@@ -16,6 +17,7 @@ return [
         'transitions' => [
             'start' => [
                 'step_to' => 'step_b',
+                'conditional_steps_to' => [],
                 'is_start' => true,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
@@ -61,6 +63,7 @@ return [
     ],
     'destination_of_split_parts' => [
         'entity' => 'Some\\Entity',
+        'metadata' => [],
         'steps' => [
             'step_a' => [
                 'order' => 0,
@@ -74,6 +77,7 @@ return [
         'transitions' => [
             'start' => [
                 'step_to' => 'step_a',
+                'conditional_steps_to' => [],
                 'is_start' => true,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,

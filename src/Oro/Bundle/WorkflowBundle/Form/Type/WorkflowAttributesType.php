@@ -135,13 +135,7 @@ class WorkflowAttributesType extends AbstractType
             $builder->addEventSubscriber($this->defaultValuesListener);
         }
 
-        if (!empty($options['form_init'])) {
-            $this->formInitListener->initialize(
-                $options['workflow_item'],
-                $options['form_init']
-            );
-            $builder->addEventSubscriber($this->formInitListener);
-        }
+        $builder->addEventSubscriber($this->formInitListener);
 
         if (!empty($options['attribute_fields'])) {
             $this->requiredAttributesListener->initialize(array_keys($options['attribute_fields']));
@@ -344,9 +338,9 @@ class WorkflowAttributesType extends AbstractType
             return array_map(function ($value) use ($context) {
                 return $this->resolveContextValue($context, $value);
             }, $option);
-        } else {
-            return $this->contextAccessor->getValue($context, $option);
         }
+
+        return $this->contextAccessor->getValue($context, $option);
     }
 
     /**

@@ -59,6 +59,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($definition1->getScopesConfig(), $definition2->getScopesConfig());
         $this->assertSame($definition1->getExclusiveActiveGroups(), $definition2->getExclusiveActiveGroups());
         $this->assertSame($definition1->getExclusiveRecordGroups(), $definition2->getExclusiveRecordGroups());
+        $this->assertSame($definition1->getMetadata(), $definition2->getMetadata());
     }
 
     /**
@@ -134,7 +135,8 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
             ->setStartStep($step2)
             ->setEntityAcls($entityAcls)
             ->setRestrictions($restrictions)
-            ->setApplications(['app1', 'app2']);
+            ->setApplications(['app1', 'app2'])
+            ->setMetadata(['test_key' => 'test_value']);
 
         return $definition;
     }

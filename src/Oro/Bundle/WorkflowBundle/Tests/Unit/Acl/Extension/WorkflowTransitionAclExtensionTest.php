@@ -13,11 +13,13 @@ use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionAclExtension;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -46,6 +48,9 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $optionsResolver;
 
+    /** @var EventDispatcher|MockObject */
+    private $eventDispatcher;
+
     /** @var WorkflowTransitionAclExtension */
     private $extension;
 
@@ -57,6 +62,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->decisionMaker = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
         $this->workflowManager = $this->createMock(WorkflowManager::class);
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
         $this->extension = new WorkflowTransitionAclExtension(
             $this->objectIdAccessor,
@@ -69,7 +75,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function createStartTransition(): Transition
     {
-        $transition = new Transition($this->optionsResolver);
+        $transition = new Transition($this->optionsResolver, $this->eventDispatcher);
         $transition->setStart(true);
 
         return $transition;

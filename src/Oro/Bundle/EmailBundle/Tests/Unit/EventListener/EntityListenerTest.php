@@ -254,6 +254,8 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->listener->onFlush(new OnFlushEventArgs($em));
         $this->listener->postFlush(new PostFlushEventArgs($em));
+        // Test that second flush will not trigger second round of processing
+        $this->listener->postFlush(new PostFlushEventArgs($em));
     }
 
     public function testPostFlushWhenEmailAddressDoesNotHaveOwner(): void

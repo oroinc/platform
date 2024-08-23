@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+/**
+ * Represents ActionGroup parameter.
+ */
 class Parameter
 {
     const NO_DEFAULT = INF;
@@ -17,6 +20,8 @@ class Parameter
 
     /* @var mixed */
     private $default = self::NO_DEFAULT;
+
+    private $allowsNull = false;
 
     /**
      * @param string $name
@@ -133,6 +138,18 @@ class Parameter
     public function isRequired()
     {
         return $this->default === self::NO_DEFAULT;
+    }
+
+    public function setAllowsNull(bool $allowsNull): self
+    {
+        $this->allowsNull = $allowsNull;
+
+        return $this;
+    }
+
+    public function isNullsAllowed(): bool
+    {
+        return $this->allowsNull;
     }
 
     /**

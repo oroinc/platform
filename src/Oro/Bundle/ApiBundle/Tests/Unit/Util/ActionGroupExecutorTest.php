@@ -73,6 +73,8 @@ class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($data, $errors) {
                 /** @var ArrayCollection $errors */
                 $errors->add(['message' => 'some_error', 'parameters' => []]);
+
+                return $data;
             });
 
         self::assertFalse(
@@ -101,6 +103,8 @@ class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($data, $errors) {
                 /** @var ArrayCollection $errors */
                 $errors->add(['message' => 'some_error', 'parameters' => []]);
+
+                return $data;
             });
 
         self::assertFalse(

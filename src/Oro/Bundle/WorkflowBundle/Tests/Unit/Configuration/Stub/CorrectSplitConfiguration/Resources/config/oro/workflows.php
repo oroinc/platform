@@ -16,6 +16,7 @@ return [
         'defaults' => [
             'active' => true,
         ],
+        'metadata' => [],
         'scopes' => [
             [
                 'scope1' => 'value1',
@@ -108,6 +109,7 @@ return [
         'transitions' => [
             'first_transition' => [
                 'step_to' => 'first_step',
+                'conditional_steps_to' => [],
                 'is_start' => true,
                 'is_hidden' => true,
                 'is_unavailable_hidden' => true,
@@ -184,6 +186,7 @@ return [
             'transition_with_form_options_configuration' =>
                 [
                     'step_to' => 'first_step',
+                    'conditional_steps_to' => [],
                     'transition_definition' => 'first_transition_definition',
                     'is_start' => false,
                     'is_hidden' => false,
@@ -213,6 +216,7 @@ return [
             'transition_with_form_options_configuration_defaults' =>
                 [
                     'step_to' => 'first_step',
+                    'conditional_steps_to' => [],
                     'transition_definition' => 'first_transition_definition',
                     'is_start' => false,
                     'is_hidden' => false,
@@ -288,6 +292,7 @@ return [
         'defaults' => [
             'active' => false,
         ],
+        'metadata' => [],
         'steps' => [
             'second_step' => [
                 'order' => 1,
@@ -303,6 +308,7 @@ return [
         'transitions' => [
             'second_transition' => [
                 'step_to' => 'second_step',
+                'conditional_steps_to' => [],
                 'is_start' => false,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,

@@ -3,20 +3,26 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormOptionsProcessor;
 use Oro\Component\Action\Action\ActionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
 {
+    private FormInitListener|MockObject $formInitListener;
+
     /** @var CustomFormOptionsProcessor */
     private $processor;
 
     protected function setUp(): void
     {
-        $this->processor = new CustomFormOptionsProcessor();
+        $this->formInitListener = $this->createMock(FormInitListener::class);
+
+        $this->processor = new CustomFormOptionsProcessor($this->formInitListener);
     }
 
     public function testSkipDefaultTransitionForms()
@@ -53,11 +59,12 @@ class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
         $workflowItem->expects($this->once())
             ->method('getData')
             ->willReturn($data);
+        $workflowItem->expects($this->once())
+            ->method('lock');
+        $workflowItem->expects($this->once())
+            ->method('unlock');
 
         $action = $this->createMock(ActionInterface::class);
-        $action->expects($this->once())
-            ->method('execute')
-            ->with($workflowItem);
 
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
@@ -69,6 +76,13 @@ class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
         $transition->expects($this->once())
             ->method('getFormDataAttribute')
             ->willReturn('formAttribute');
+
+        $this->formInitListener->expects($this->once())
+            ->method('executeInitAction')
+            ->with($action, $workflowItem);
+        $this->formInitListener->expects($this->once())
+            ->method('dispatchFormInitEvents')
+            ->with($workflowItem, $transition);
 
         $context = new TransitionContext();
         $context->setTransition($transition);

@@ -6,9 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 
+/**
+ * Workflow transition manager.
+ */
 class TransitionManager
 {
-    const DEFAULT_START_TRANSITION_NAME = '__start__';
+    public const DEFAULT_START_TRANSITION_NAME = '__start__';
 
     /**
      * @var Collection
