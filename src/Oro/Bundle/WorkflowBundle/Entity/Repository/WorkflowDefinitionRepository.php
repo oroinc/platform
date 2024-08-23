@@ -5,15 +5,27 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
+/**
+ * Repository for ORM Entity WorkflowDefinition.
+ */
 class WorkflowDefinitionRepository extends EntityRepository
 {
     const ACTIVE_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_active_workflow_definitions_cache';
     const ACTIVE_FOR_ENTITY_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_active_for_entity_workflow_definitions_cache';
     const ENTITY_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_entity_workflow_definitions_cache';
     const RELATED_ENTITY_CLASSES_CACHE_ID = 'oro_related_entity_classes_workflow_definitions_cache';
+
+    public function getWorkflowDefinitionsConfigs(): \Iterator
+    {
+        $qb = $this->createQueryBuilder('w')
+            ->select('w.name', 'w.label', 'w.configuration');
+
+        return new BufferedIdentityQueryResultIterator($qb);
+    }
 
     /**
      * @param string $relatedEntity

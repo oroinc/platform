@@ -8,13 +8,16 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -23,17 +26,17 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsResolver;
+    private TransitionOptionsResolver|MockObject $optionsResolver;
+    private EventDispatcher|MockObject $eventDispatcher;
 
-    /** @var Transition */
-    private $transition;
+    private Transition $transition;
 
     protected function setUp(): void
     {
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->transition = new Transition($this->optionsResolver);
+        $this->transition = new Transition($this->optionsResolver, $this->eventDispatcher);
     }
 
     public function testAccessors(): void
@@ -66,6 +69,9 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
                 ['initRoutes', ['TEST_ROUTE_1', 'TEST_ROUTE_2', 'TEST_ROUTE_3']],
                 ['initContextAttribute', 'testInitContextAttribute'],
                 ['message', 'test message'],
+                ['aclResource', 'test'],
+                ['aclMessage', 'acl_message_test'],
+                ['conditionalStepsTo', ['step1' => []]]
             ]
         );
     }
@@ -328,6 +334,12 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($currentStepEntity);
 
         $workflowItem = $this->createMock(WorkflowItem::class);
+        $workflowItem->expects($this->any())
+            ->method('getEntityId')
+            ->willReturn(42);
+        $workflowItem->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(\stdClass::class);
         $workflowItem->expects(self::once())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
@@ -367,6 +379,29 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
             [true, false],
             [false, false]
         ];
+    }
+
+    public function testTransitLockedWorkflowItem(): void
+    {
+        $step = $this->getStep('currentStep', false, true);
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $workflowItem->expects($this->once())
+            ->method('isLocked')
+            ->willReturn(true);
+
+        $preCondition = $this->createMock(ExpressionInterface::class);
+        $condition = $this->createMock(ExpressionInterface::class);
+        $action = $this->createMock(ActionInterface::class);
+
+        $this->expectException(WorkflowException::class);
+        $this->expectExceptionMessage('Can not transit locked WorkflowItem. Transit is allowed only in "actions".');
+
+        $this->transition
+            ->setPreCondition($preCondition)
+            ->setCondition($condition)
+            ->setAction($action)
+            ->setStepTo($step)
+            ->transit($workflowItem);
     }
 
     private function getStep(string $name, bool $isFinal = false, bool $hasAllowedTransitions = true): Step
@@ -494,5 +529,67 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($formConfiguration['template'], $this->transition->getFormTemplate());
         self::assertEquals($formConfiguration['data_provider'], $this->transition->getFormDataProvider());
         self::assertEquals($formConfiguration['data_attribute'], $this->transition->getFormDataAttribute());
+    }
+
+    public function testStepToWithoutConditionalSteps()
+    {
+        $step1 = new Step();
+        $workflowItem = new WorkflowItem();
+
+        $this->transition->setName('transition1');
+        $this->transition->setStepTo($step1);
+
+        $this->assertSame($step1, $this->transition->getResolvedStepTo($workflowItem));
+    }
+
+    public function testStepToWithMatchedConditionalSteps()
+    {
+        $step1 = new Step();
+        $step1->setName('step1');
+        $step2 = new Step();
+        $step2->setName('step2');
+        $workflowItem = new WorkflowItem();
+
+        $this->transition->setName('transition1');
+        $this->transition->setStepTo($step1);
+
+        $expression = $this->createMock(ExpressionInterface::class);
+        $expression->expects($this->once())
+            ->method('evaluate')
+            ->with($workflowItem)
+            ->willReturn(true);
+        $this->transition->addConditionalStepTo($step2, $expression);
+
+        $this->assertSame($step2, $this->transition->getResolvedStepTo($workflowItem));
+    }
+
+    public function testStepToWithNotMatchedConditionalSteps()
+    {
+        $step1 = new Step();
+        $step1->setName('step1');
+        $step2 = new Step();
+        $step2->setName('step2');
+        $workflowItem = new WorkflowItem();
+
+        $this->transition->setName('transition1');
+        $this->transition->setStepTo($step1);
+
+        $dummyExpression = $this->createMock(ExpressionInterface::class);
+        $dummyExpression->expects($this->once())
+            ->method('evaluate')
+            ->with($workflowItem)
+            ->willReturn(false);
+        $expression = $this->createMock(ExpressionInterface::class);
+        $expression->expects($this->once())
+            ->method('evaluate')
+            ->with($workflowItem)
+            ->willReturn(false);
+        $this->transition->addConditionalStepTo($step2, $expression);
+        $this->transition->addConditionalStepTo($step1, $dummyExpression);
+
+        $this->expectException(ForbiddenTransitionException::class);
+        $this->expectExceptionMessage('Transition "transition1" is not allowed.');
+
+        $this->transition->getResolvedStepTo($workflowItem);
     }
 }

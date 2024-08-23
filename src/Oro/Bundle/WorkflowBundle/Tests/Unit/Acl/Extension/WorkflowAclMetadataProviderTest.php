@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
@@ -13,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Acl\Extension\TransitionLabel;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadata;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowLabel;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 /**
@@ -40,15 +38,10 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function loadWorkflowExpectations()
+    private function assertGetWorkflowDefinitionsConfigsCall(array $result)
     {
         $em = $this->createMock(EntityManager::class);
-        $repo = $this->createMock(EntityRepository::class);
-        $qb = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(AbstractQuery::class);
+        $repo = $this->createMock(WorkflowDefinitionRepository::class);
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(WorkflowDefinition::class)
@@ -58,59 +51,58 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->with(WorkflowDefinition::class)
             ->willReturn($repo);
         $repo->expects(self::once())
-            ->method('createQueryBuilder')
-            ->with('w')
-            ->willReturn($qb);
-        $qb->expects(self::once())
-            ->method('select')
-            ->with('w.name, w.label, w.configuration')
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('getQuery')
-            ->willReturn($query);
-
-        return $query;
+            ->method('getWorkflowDefinitionsConfigs')
+            ->willReturn(new \ArrayIterator($result));
     }
 
     public function testGetMetadata()
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
-                'step1'     => ['allowed_transitions' => ['transition1'], 'label' => 'step 1'],
-                'next_step' => ['label' => 'next step']
+            'steps' => [
+                'step1' => ['allowed_transitions' => ['transition1', 'transition2'], 'label' => 'step 1'],
+                'next_step' => ['label' => 'next step'],
+                'final_step' => ['label' => 'final step'],
             ],
             'transitions' => [
-                'transition1' => ['label' => 'transition 1', 'step_to' => 'next_step']
+                'transition1' => ['label' => 'transition 1', 'step_to' => 'next_step'],
+                'transition2' => [
+                    'label' => 'transition 2',
+                    'step_to' => 'next_step',
+                    'conditional_steps_to' => ['final_step' => []]
+                ],
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
 
-        $expectedTransition = new FieldSecurityMetadata(
+        $expectedTransition1 = new FieldSecurityMetadata(
             'transition1|step1|next_step',
             new TransitionLabel('transition 1', 'next step', 'step 1')
+        );
+        $expectedTransition21 = new FieldSecurityMetadata(
+            'transition2|step1|final_step',
+            new TransitionLabel('transition 2', 'final step', 'step 1')
+        );
+        $expectedTransition22 = new FieldSecurityMetadata(
+            'transition2|step1|next_step',
+            new TransitionLabel('transition 2', 'next step', 'step 1')
         );
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
             new WorkflowLabel('workflow 1'),
             null,
-            [$expectedTransition]
+            [$expectedTransition1, $expectedTransition21, $expectedTransition22]
         );
         self::assertEquals(
             [$expectedMetadata],
@@ -127,8 +119,8 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
-                'step1'     => ['label' => 'step 1'],
+            'steps' => [
+                'step1' => ['label' => 'step 1'],
                 'next_step' => ['label' => 'next step']
             ],
             'transitions' => [
@@ -136,18 +128,13 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -169,8 +156,8 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
-                'step1'     => ['label' => 'step 1'],
+            'steps' => [
+                'step1' => ['label' => 'step 1'],
                 'next_step' => ['label' => 'next step']
             ],
             'transitions' => [
@@ -178,18 +165,13 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -215,7 +197,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
+            'steps' => [
                 'next_step' => ['label' => 'next step']
             ],
             'transitions' => [
@@ -223,18 +205,13 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -260,24 +237,19 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
+            'steps' => [
                 'step1' => ['allowed_transitions' => ['transition1'], 'label' => 'step 1']
             ],
             'transitions' => []
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -299,7 +271,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
+            'steps' => [
                 'step1' => ['allowed_transitions' => ['transition1'], 'label' => 'step 1']
             ],
             'transitions' => [
@@ -307,18 +279,13 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -344,7 +311,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
+            'steps' => [
                 'step1' => ['allowed_transitions' => ['transition1'], 'label' => 'step 1']
             ],
             'transitions' => [
@@ -352,18 +319,13 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -394,18 +356,13 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -422,18 +379,13 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $workflowName = 'workflow1';
         $workflowConfiguration = [];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -455,11 +407,11 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
-                'step1'     => [
+            'steps' => [
+                'step1' => [
                     'allowed_transitions' => ['start_transition'],
-                    'label'               => 'step 1',
-                    '_is_start'           => true
+                    'label' => 'step 1',
+                    '_is_start' => true
                 ],
                 'next_step' => ['label' => 'next step']
             ],
@@ -468,18 +420,13 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)
@@ -511,29 +458,24 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
-            'steps'       => [
-                'step1'     => ['allowed_transitions' => ['transition1'], 'label' => 'step 1', 'order' => 20],
-                'step2'     => ['allowed_transitions' => ['transition1'], 'label' => 'step 2', 'order' => 10],
+            'steps' => [
+                'step1' => ['allowed_transitions' => ['transition1'], 'label' => 'step 1', 'order' => 20],
+                'step2' => ['allowed_transitions' => ['transition1'], 'label' => 'step 2', 'order' => 10],
                 'next_step' => ['allowed_transitions' => ['transition1'], 'label' => 'next step']
             ],
             'transitions' => [
                 'start_transition' => ['label' => 'start transition', 'step_to' => 'next_step', 'is_start' => true],
-                'transition1'      => ['label' => 'transition 1', 'step_to' => 'next_step']
+                'transition1' => ['label' => 'transition 1', 'step_to' => 'next_step']
             ]
         ];
 
-        $query = $this->loadWorkflowExpectations();
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn(
-                [
-                    [
-                        'name'          => $workflowName,
-                        'label'         => 'workflow 1',
-                        'configuration' => $workflowConfiguration
-                    ]
-                ]
-            );
+        $this->assertGetWorkflowDefinitionsConfigsCall([
+            [
+                'name' => $workflowName,
+                'label' => 'workflow 1',
+                'configuration' => $workflowConfiguration
+            ]
+        ]);
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($workflowName)

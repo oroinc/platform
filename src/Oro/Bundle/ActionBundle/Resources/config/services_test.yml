@@ -3,6 +3,10 @@ services:
         alias: oro_action.configuration.provider
         public: true
 
+    oro_action.test.action_executor:
+        alias: oro_action.action_executor
+        public: true
+
     oro_action.tests.provider.button.extension:
         class: Oro\Bundle\ActionBundle\Tests\Functional\Environment\TestButtonProviderExtension
         public: true

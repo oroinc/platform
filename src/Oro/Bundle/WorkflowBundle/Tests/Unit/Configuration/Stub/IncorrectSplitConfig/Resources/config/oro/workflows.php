@@ -43,6 +43,7 @@ return [
         'transitions' => [
             'first_transition' => [
                 'step_to' => 'first_step',
+                'conditional_steps_to' => [],
                 'is_start' => true,
                 'is_hidden' => true,
                 'is_unavailable_hidden' => true,
@@ -113,6 +114,7 @@ return [
         'transitions' => [
             'second_transition' => [
                 'step_to' => 'second_step',
+                'conditional_steps_to' => [],
                 'is_start' => false,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,

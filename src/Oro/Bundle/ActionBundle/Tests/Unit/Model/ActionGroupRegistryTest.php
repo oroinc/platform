@@ -10,11 +10,13 @@ use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
+    private ConfigurationProviderInterface|MockObject $configurationProvider;
+    private ServiceProviderInterface|MockObject $actionGroupServiceLocator;
 
     /** @var ActionGroupRegistry */
     private $registry;
@@ -22,12 +24,14 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);
+        $this->actionGroupServiceLocator = $this->createMock(ServiceProviderInterface::class);
 
         $assembler = new ActionGroupAssembler(
             $this->createMock(ActionFactoryInterface::class),
             $this->createMock(ExpressionFactory::class),
             new ParameterAssembler(),
-            $this->createMock(ParametersResolver::class)
+            $this->createMock(ParametersResolver::class),
+            $this->actionGroupServiceLocator
         );
 
         $this->registry = new ActionGroupRegistry(

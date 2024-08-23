@@ -5,7 +5,11 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Model\AbstractAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactoryInterface as ConditionFactoryInterface;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * Action service assembler.
+ */
 class ActionAssembler extends AbstractAssembler
 {
     const PARAMETERS_KEY = 'parameters';
@@ -54,19 +58,18 @@ class ActionAssembler extends AbstractAssembler
      */
     public function assemble(array $configuration)
     {
-        /** @var TreeExecutor $treeAction */
-        $treeAction = $this->actionFactory->create(
-            TreeExecutor::ALIAS,
-            array(),
-            $this->createConfigurableCondition($configuration)
-        );
-
+        $baseCondition = $this->createConfigurableCondition($configuration);
         $actionsConfiguration = $this->getOption($configuration, self::ACTIONS_KEY, $configuration);
+
+        $treeAction = null;
+        if ($baseCondition || count($actionsConfiguration) !== 1) {
+            /** @var TreeExecutor $treeAction */
+            $treeAction = $this->actionFactory->create(TreeExecutor::ALIAS, [], $baseCondition);
+        }
+
         foreach ($actionsConfiguration as $actionConfiguration) {
             if ($this->isService($actionConfiguration)) {
                 $options = (array)$this->getEntityParameters($actionConfiguration);
-                $breakOnFailure = $this->getOption($options, self::BREAK_ON_FAILURE_KEY, true);
-
                 $actionType = $this->getEntityType($actionConfiguration);
                 $serviceName = $this->getServiceName($actionType);
 
@@ -82,6 +85,11 @@ class ActionAssembler extends AbstractAssembler
                     );
                 }
 
+                if (!$treeAction) {
+                    return $action;
+                }
+
+                $breakOnFailure = $this->getOption($options, self::BREAK_ON_FAILURE_KEY, true);
                 $treeAction->addAction($action, $breakOnFailure);
             }
         }
@@ -91,7 +99,7 @@ class ActionAssembler extends AbstractAssembler
 
     /**
      * @param array $conditionConfiguration
-     * @return null|ConfigurableCondition
+     * @return ExpressionInterface|null
      */
     protected function createConfigurableCondition(array $conditionConfiguration)
     {

@@ -22,6 +22,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 class LoadWorkflowDefinitionsCommand extends Command
 {
+    private const DEFAULT_WATCH_INTERVAL = 10;
+
     /** @var string */
     protected static $defaultName = 'oro:workflow:definitions:load';
 
@@ -59,6 +61,14 @@ class LoadWorkflowDefinitionsCommand extends Command
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Workflow names'
             )
+            ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Continue to watch for changes after initial load')
+            ->addOption(
+                'watch-interval',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Definition reload interval seconds',
+                self::DEFAULT_WATCH_INTERVAL
+            )
             ->setDescription('Loads workflow definitions to the database.')
             ->setHelp(
                 <<<'HELP'
@@ -76,11 +86,19 @@ The <info>--workflows</info> option can be used to load only the specified workf
 
   <info>php %command.full_name% --workflows=<workflow1> --workflows=<workflow2></info>
 
+The <info>--watch</info> option can be used to load workflow definitions periodically during development. 
+The reload period is defined by the <info>--watch-interval</info> option:
+
+  <info>php %command.full_name% --watch --watch-interval=<interval></info>
+  
+It is highly recommended to use the <info>--watch</info> option with the <info>--workflows</info> option
+for performance reasons.
+
 HELP
             )
             ->addUsage('--directories=<path1> --directories=<path2>')
             ->addUsage('--workflows=<workflow1> --workflows=<workflow2>')
-        ;
+            ->addUsage('--workflows=<workflow1> --watch --watch-interval=<interval>');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -89,68 +107,99 @@ HELP
         $usedDirectories = $input->getOption('directories') ?: null;
         $usedWorkflows = $input->getOption('workflows') ?: null;
 
-        $workflowConfiguration = $this->configurationProvider->getWorkflowDefinitionConfiguration(
-            $usedDirectories,
-            $usedWorkflows
-        );
+        $hasDefinitions = $this->doLoad($usedDirectories, $usedWorkflows, $output);
 
-        if ($workflowConfiguration) {
-            $output->writeln('Loading workflow definitions...');
-
-            /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
-            $workflowDefinitionRepository = $this->doctrine->getRepository(WorkflowDefinition::class);
-            $workflowDefinitions = $this->configurationBuilder->buildFromConfiguration($workflowConfiguration);
-
-            $countProcessed = 0;
-            $countCreated = 0;
-            $countUpdated = 0;
-            foreach ($workflowDefinitions as $workflowDefinition) {
-                $countProcessed++;
-                $output->writeln(
-                    \sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()),
-                    OutputInterface::VERBOSITY_VERY_VERBOSE
-                );
-
-                // all loaded workflows set as system by default
-                $workflowDefinition->setSystem(true);
-
-                /** @var WorkflowDefinition $existingWorkflowDefinition */
-                $existingWorkflowDefinition = $workflowDefinitionRepository->find($workflowDefinition->getName());
-
-                if ($existingWorkflowDefinition) {
-                    $this->definitionHandler->updateWorkflowDefinition(
-                        $existingWorkflowDefinition,
-                        $workflowDefinition
-                    );
-                    $countUpdated++;
-                } else {
-                    $this->definitionHandler->createWorkflowDefinition($workflowDefinition);
-                    $countCreated++;
-                }
-
-                if ($output->isDebug()) {
-                    $output->writeln(Yaml::dump($workflowDefinition->getConfiguration(), 10));
-                }
+        if ($input->getOption('watch')) {
+            $watchInterval = $this->getWatchInterval($input);
+            while (true) {
+                sleep($watchInterval);
+                $this->doLoad($usedDirectories, $usedWorkflows, $output);
             }
-            $output->writeln(
-                \sprintf(
-                    'Processed %d workflow definitions: updated %d existing workflows, created %d new workflows.',
-                    $countProcessed,
-                    $countUpdated,
-                    $countCreated
-                ),
-                OutputInterface::VERBOSITY_VERBOSE
-            );
+        }
+
+        if ($hasDefinitions) {
             $output->writeln('Done.');
             $output->writeln('');
-            $output->writeln(\sprintf(
-                "Please run command '<info>%s</info>' to load translations.",
-                OroTranslationLoadCommand::getDefaultName()
-            ));
+            $output->writeln(
+                \sprintf(
+                    "Please run command '<info>%s</info>' to load translations.",
+                    OroTranslationLoadCommand::getDefaultName()
+                )
+            );
         } else {
             $output->writeln('No workflow definitions found.');
         }
 
         return Command::SUCCESS;
+    }
+
+    private function doLoad(?array $usedDirectories, ?array $usedWorkflows, OutputInterface $output): bool
+    {
+        $workflowConfiguration = $this->configurationProvider->getWorkflowDefinitionConfiguration(
+            $usedDirectories,
+            $usedWorkflows
+        );
+
+        if (!$workflowConfiguration) {
+            return false;
+        }
+        $output->writeln('Loading workflow definitions...');
+
+        /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
+        $workflowDefinitionRepository = $this->doctrine->getRepository(WorkflowDefinition::class);
+        $workflowDefinitions = $this->configurationBuilder->buildFromConfiguration($workflowConfiguration);
+
+        $countProcessed = 0;
+        $countCreated = 0;
+        $countUpdated = 0;
+        foreach ($workflowDefinitions as $workflowDefinition) {
+            $countProcessed++;
+            $output->writeln(
+                \sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()),
+                OutputInterface::VERBOSITY_VERY_VERBOSE
+            );
+
+            // all loaded workflows set as system by default
+            $workflowDefinition->setSystem(true);
+
+            /** @var WorkflowDefinition $existingWorkflowDefinition */
+            $existingWorkflowDefinition = $workflowDefinitionRepository->find($workflowDefinition->getName());
+
+            if ($existingWorkflowDefinition) {
+                $this->definitionHandler->updateWorkflowDefinition(
+                    $existingWorkflowDefinition,
+                    $workflowDefinition
+                );
+                $countUpdated++;
+            } else {
+                $this->definitionHandler->createWorkflowDefinition($workflowDefinition);
+                $countCreated++;
+            }
+
+            if ($output->isDebug()) {
+                $output->writeln(Yaml::dump($workflowDefinition->getConfiguration(), 10));
+            }
+        }
+        $output->writeln(
+            \sprintf(
+                'Processed %d workflow definitions: updated %d existing workflows, created %d new workflows.',
+                $countProcessed,
+                $countUpdated,
+                $countCreated
+            ),
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        return true;
+    }
+
+    private function getWatchInterval(InputInterface $input): int
+    {
+        $watchInterval = (int)$input->getOption('watch-interval');
+        if ($watchInterval <= 0) {
+            $watchInterval = self::DEFAULT_WATCH_INTERVAL;
+        }
+
+        return $watchInterval;
     }
 }

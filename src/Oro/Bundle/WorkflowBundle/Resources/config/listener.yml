@@ -138,3 +138,24 @@ services:
         tags:
             - { name: kernel.event_listener, event: entity_form.render.before, method: onUpdatePageRender }
             - { name: kernel.event_listener, event: entity_view.render.before, method: onViewPageRender }
+
+    oro_workflow.event_listener.workflow.resolve_destination_page_listener:
+        class: Oro\Bundle\WorkflowBundle\EventListener\Workflow\ResolveDestinationPageListener
+        arguments:
+            - '@oro_action.action_factory'
+        tags:
+            - { name: kernel.event_listener, event: oro_workflow.transition, method: onTransition }
+
+    oro_workflow.event_listener.workflow.pre_guard_transition_acl_resource_listener:
+        class: Oro\Bundle\WorkflowBundle\EventListener\Workflow\TransitionAclResourceListener
+        arguments:
+            - '@oro_action.expression.factory'
+        tags:
+            - { name: kernel.event_listener, event: oro_workflow.pre_announce, method: onPreAnnounce, priority: 100 }
+
+    oro_workflow.event_listener.workflow.pre_guard_transition_available_steps_listener:
+        class: Oro\Bundle\WorkflowBundle\EventListener\Workflow\TransitionAvailableStepsListener
+        arguments:
+            - '@oro_action.expression.factory'
+        tags:
+            - { name: kernel.event_listener, event: oro_workflow.pre_announce, method: onPreAnnounce, priority: 50 }

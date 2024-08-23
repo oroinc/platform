@@ -9,8 +9,6 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
 
 /**
  * Represents an entity restriction used in workflows.
- *
- *
  */
 #[ORM\Entity(repositoryClass: WorkflowRestrictionRepository::class)]
 #[ORM\Table(name: 'oro_workflow_restriction')]
@@ -48,7 +46,7 @@ class WorkflowRestriction
     /**
      * @var array
      */
-    #[ORM\Column(name: 'mode_values', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'mode_values', type: Types::JSON, nullable: true)]
     protected $values = [];
 
     /**

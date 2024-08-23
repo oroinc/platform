@@ -25,7 +25,7 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
      */
     public function getMigrationVersion(): string
     {
-        return 'v2_5';
+        return 'v2_6';
     }
 
     /**
@@ -196,18 +196,31 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addColumn('system', 'boolean');
         $table->addColumn('active', 'boolean', ['default' => false]);
         $table->addColumn('priority', 'integer', ['default' => 0]);
-        $table->addColumn('configuration', 'array', ['comment' => '(DC2Type:array)']);
+        $table->addColumn(
+            'configuration',
+            'json',
+            [
+                'comment' => '(DC2Type:json)',
+                'customSchemaOptions' => ['jsonb' => true]
+            ]
+        );
+        $table->addColumn(
+            'metadata',
+            'json',
+            [
+                'comment' => '(DC2Type:json)',
+                'customSchemaOptions' => ['jsonb' => true]
+            ]
+        );
         $table->addColumn('exclusive_active_groups', 'simple_array', [
-            'comment' => '(DC2Type:simple_array)',
             'notnull' => false,
         ]);
         $table->addColumn('exclusive_record_groups', 'simple_array', [
-            'comment' => '(DC2Type:simple_array)',
             'notnull' => false,
         ]);
         $table->addColumn('created_at', 'datetime');
         $table->addColumn('updated_at', 'datetime');
-        $table->addColumn('applications', 'simple_array', ['comment' => '(DC2Type:simple_array)', 'notnull' => true]);
+        $table->addColumn('applications', 'simple_array', ['notnull' => true]);
         $table->setPrimaryKey(['name']);
         $table->addIndex(['start_step_id'], 'idx_6f737c368377424f');
     }
@@ -224,16 +237,27 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addColumn('related_entity', 'string', ['length' => 255]);
         $table->addColumn('execution_order', 'smallint');
         $table->addColumn('exclude_definitions', 'simple_array', [
-            'notnull' => false,
-            'comment' => '(DC2Type:simple_array)'
+            'notnull' => false
         ]);
-        $table->addColumn('actions_configuration', 'array', ['comment' => '(DC2Type:array)']);
+        $table->addColumn(
+            'actions_configuration',
+            'json',
+            [
+                'comment' => '(DC2Type:json)',
+                'customSchemaOptions' => ['jsonb' => true]
+            ]
+        );
         $table->addColumn('created_at', 'datetime');
         $table->addColumn('updated_at', 'datetime');
-        $table->addColumn('pre_conditions_configuration', 'array', [
-            'notnull' => false,
-            'comment' => '(DC2Type:array)'
-        ]);
+        $table->addColumn(
+            'pre_conditions_configuration',
+            'json',
+            [
+                'comment' => '(DC2Type:json)',
+                'notnull' => false,
+                'customSchemaOptions' => ['jsonb' => true]
+            ]
+        );
         $table->setPrimaryKey(['name']);
     }
 
@@ -250,7 +274,15 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addColumn('field', 'string', ['length' => 150]);
         $table->addColumn('entity_class', 'string', ['length' => 255]);
         $table->addColumn('mode', 'string', ['length' => 8]);
-        $table->addColumn('mode_values', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
+        $table->addColumn(
+            'mode_values',
+            'json',
+            [
+                'notnull' => false,
+                'comment' => '(DC2Type:json)',
+                'customSchemaOptions' => ['jsonb' => true]
+            ]
+        );
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(
             ['workflow_name', 'workflow_step_id', 'field', 'entity_class', 'mode'],

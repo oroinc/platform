@@ -108,9 +108,16 @@ class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
         $constraint = new TransitionIsAllowed($workflowItem, $transitionName);
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation($expectedMessage)
-            ->setParameters($expectedMessageParameters)
-            ->assertRaised();
+        if ($expectedMessage !== $constraint->someConditionsNotMetMessage) {
+            $this->buildViolation($constraint->someConditionsNotMetMessage)
+                ->buildNextViolation($expectedMessage)
+                ->setParameters($expectedMessageParameters)
+                ->assertRaised();
+        } else {
+            $this->buildViolation($expectedMessage)
+                ->setParameters($expectedMessageParameters)
+                ->assertRaised();
+        }
     }
 
     public function validateExceptionsDataProvider(): array

@@ -2,41 +2,23 @@
 
 namespace Oro\Component\Action\Event;
 
+use Oro\Component\Action\Model\AbstractStorage;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event for extendable action.
+ */
 class ExtendableActionEvent extends Event
 {
-    const NAME = 'extendable_action';
+    public const NAME = 'extendable_action';
 
-    /**
-     * @var null|mixed
-     */
-    protected $context;
-
-    /**
-     * @param null|mixed $context
-     */
-    public function __construct($context = null)
-    {
-        $this->context = $context;
+    public function __construct(
+        protected ?AbstractStorage $context = null
+    ) {
     }
 
-    /**
-     * @return null|mixed
-     */
-    public function getContext()
+    public function getContext(): ?AbstractStorage
     {
         return $this->context;
-    }
-
-    /**
-     * @param mixed $context
-     * @return $this
-     */
-    public function setContext($context)
-    {
-        $this->context = $context;
-
-        return $this;
     }
 }
