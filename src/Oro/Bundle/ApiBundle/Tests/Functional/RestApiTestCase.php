@@ -245,7 +245,7 @@ abstract class RestApiTestCase extends ApiTestCase
             $entityType = self::extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals(
                 $response,
-                Response::HTTP_ACCEPTED,
+                [Response::HTTP_ACCEPTED, Response::HTTP_OK],
                 $entityType,
                 'patch list'
             );

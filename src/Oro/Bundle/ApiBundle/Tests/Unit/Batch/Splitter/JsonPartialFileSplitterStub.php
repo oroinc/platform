@@ -6,8 +6,7 @@ use Oro\Bundle\ApiBundle\Batch\Splitter\JsonPartialFileSplitter;
 
 class JsonPartialFileSplitterStub extends JsonPartialFileSplitter
 {
-    /** @var int */
-    private $sleepTimeout;
+    private int $sleepTimeout;
 
     public function __construct(int $sleepTimeout)
     {
@@ -15,7 +14,7 @@ class JsonPartialFileSplitterStub extends JsonPartialFileSplitter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function saveChunk(): void
     {

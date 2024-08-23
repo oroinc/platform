@@ -9,7 +9,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Event\InvalidateDynamicTranslationCacheEvent;
 use Oro\Bundle\TranslationBundle\EventListener\InvalidateDynamicJsTranslationListener;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Batch job's writer.
@@ -19,15 +19,8 @@ class TranslationWriter implements ItemWriterInterface
     public function __construct(
         protected ManagerRegistry $registry,
         protected TranslationManager $translationManager,
-        protected EventDispatcher $eventDispatcher
+        protected EventDispatcherInterface $eventDispatcher
     ) {
-    }
-
-    public function setEventDispatcher(EventDispatcher $eventDispatcher): self
-    {
-        $this->eventDispatcher = $eventDispatcher;
-
-        return $this;
     }
 
     /**

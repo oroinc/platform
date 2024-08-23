@@ -71,13 +71,23 @@ api:
                 title:
                     exclude: false
                     property_path: name
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
             filters:
                 fields:
                     name: ~
             actions:
+                get_list:
+                    page_size: 3
                 update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
             exclude: false # see Oro\Bundle\ApiBundle\Tests\Functional\Environment\EntityExclusionProvider
+            fields:
+                name:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
             filters:
                 fields:
                     name: ~
@@ -86,6 +96,8 @@ api:
                     name: ~
                     position: ~
             actions:
+                get_list:
+                    page_size: 3
                 update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:

@@ -20,22 +20,18 @@ class UpdateListTopicTest extends AbstractTopicTestCase
         $requiredOptionsSet = [
             'operationId' => 1,
             'entityClass' => \stdClass::class,
-            'requestType' => [
-                'bar',
-                'baz',
-            ],
+            'requestType' => ['bar', 'baz'],
             'version' => 'latest',
             'fileName' => 'file_name',
             'chunkSize' => 100,
-            'includedDataChunkSize' => 100,
+            'includedDataChunkSize' => 100
         ];
         $fullOptionsSet = array_merge(
             $requiredOptionsSet,
             [
-                'splitterState' => [
-                    'foo',
-                ],
-                'aggregateTime' => 1,
+                'synchronousMode' => true,
+                'splitterState' => ['foo'],
+                'aggregateTime' => 1
             ]
         );
 
@@ -45,14 +41,15 @@ class UpdateListTopicTest extends AbstractTopicTestCase
                 'expectedBody' => array_merge(
                     $requiredOptionsSet,
                     [
-                        'aggregateTime' => 0,
+                        'synchronousMode' => false,
+                        'aggregateTime' => 0
                     ]
-                ),
+                )
             ],
             'full set of options' => [
                 'body' => $fullOptionsSet,
-                'expectedBody' => $fullOptionsSet,
-            ],
+                'expectedBody' => $fullOptionsSet
+            ]
         ];
     }
 
@@ -67,39 +64,33 @@ class UpdateListTopicTest extends AbstractTopicTestCase
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
                     '/The required options "chunkSize", "entityClass", "fileName", "includedDataChunkSize",'
-                    . ' "operationId", "requestType", "version" are missing./',
+                    . ' "operationId", "requestType", "version" are missing./'
             ],
             'wrong operationId type' => [
                 'body' => [
                     'operationId' => '1',
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'fileName' => 'file_name',
                     'chunkSize' => 100,
-                    'includedDataChunkSize' => 100,
+                    'includedDataChunkSize' => 100
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/'
             ],
             'wrong entityClass type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => 1,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'fileName' => 'file_name',
                     'chunkSize' => 100,
-                    'includedDataChunkSize' => 100,
+                    'includedDataChunkSize' => 100
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "entityClass" with value 1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "entityClass" with value 1 is expected to be of type "string"/'
             ],
             'wrong requestType type' => [
                 'body' => [
@@ -109,111 +100,107 @@ class UpdateListTopicTest extends AbstractTopicTestCase
                     'version' => 'latest',
                     'fileName' => 'file_name',
                     'chunkSize' => 100,
-                    'includedDataChunkSize' => 100,
+                    'includedDataChunkSize' => 100
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "requestType" with value "bar" is expected '
-                    . 'to be of type "string\[\]"/',
+                    . 'to be of type "string\[\]"/'
             ],
             'wrong version type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 1,
                     'fileName' => 'file_name',
                     'chunkSize' => 100,
-                    'includedDataChunkSize' => 100,
+                    'includedDataChunkSize' => 100
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "version" with value 1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "version" with value 1 is expected to be of type "string"/'
+            ],
+            'wrong synchronousMode type' => [
+                'body' => [
+                    'operationId' => 1,
+                    'entityClass' => \stdClass::class,
+                    'requestType' => ['bar', 'baz'],
+                    'version' => 'latest',
+                    'synchronousMode' => 1,
+                    'fileName' => 'file_name',
+                    'chunkSize' => 100,
+                    'includedDataChunkSize' => 100
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' => '/The option "synchronousMode" with value 1 is expected to be of type "bool"/'
             ],
             'wrong fileName type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'fileName' => null,
                     'chunkSize' => 100,
-                    'includedDataChunkSize' => 100,
+                    'includedDataChunkSize' => 100
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "fileName" with value null is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "fileName" with value null is expected to be of type "string"/'
             ],
             'wrong chunkSize type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'fileName' => 'file_name',
                     'chunkSize' => '100',
-                    'includedDataChunkSize' => 100,
+                    'includedDataChunkSize' => 100
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "chunkSize" with value "100" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "chunkSize" with value "100" is expected to be of type "int"/'
             ],
             'wrong includedDataChunkSize type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'fileName' => 'file_name',
                     'chunkSize' => 100,
-                    'includedDataChunkSize' => '100',
+                    'includedDataChunkSize' => '100'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "includedDataChunkSize" with value "100" '
-                    . 'is expected to be of type "int"/',
+                    . 'is expected to be of type "int"/'
             ],
             'wrong splitterState type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'fileName' => 'file_name',
                     'chunkSize' => 100,
                     'includedDataChunkSize' => 100,
-                    'splitterState' => 'foo',
+                    'splitterState' => 'foo'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "splitterState" with value "foo" is expected to be of type "array"/',
+                'exceptionMessage' => '/The option "splitterState" with value "foo" is expected to be of type "array"/'
             ],
             'wrong aggregateTime type' => [
                 'body' => [
                     'operationId' => 1,
                     'entityClass' => \stdClass::class,
-                    'requestType' => [
-                        'bar',
-                        'baz',
-                    ],
+                    'requestType' => ['bar', 'baz'],
                     'version' => 'latest',
                     'fileName' => 'file_name',
                     'chunkSize' => 100,
                     'includedDataChunkSize' => 100,
-                    'aggregateTime' => '1',
+                    'aggregateTime' => '1'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "aggregateTime" with value "1" is expected to be of type "int"/',
-            ],
+                'exceptionMessage' => '/The option "aggregateTime" with value "1" is expected to be of type "int"/'
+            ]
         ];
     }
 

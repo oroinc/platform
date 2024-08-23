@@ -115,6 +115,7 @@ define(function(require, exports, module) {
          */
         update: function(hint) {
             this.$el.find(this.selectors.hint).html(_.escape(hint));
+
             if (!this.inline && hint === null) {
                 if (this.visible) {
                     this.$el.hide();

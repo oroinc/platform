@@ -41,6 +41,8 @@ api:
                     exclude: true
                 actionName:
                     exclude: true
+                affectedEntities:
+                    exclude: true
             actions:
                 get:
                     description: Get asynchronous operation

@@ -1,5 +1,6 @@
 imports:
     - { workflow: change,  as: chained_result, replace: []}
+    - { resource: some_workflow_to_import, import_condition: 'true === false'}
 workflows:
     chained_result:
         attributes:

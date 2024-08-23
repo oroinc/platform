@@ -53,14 +53,14 @@ class ProcessDefinition implements DomainObjectInterface
     /**
      * @var array
      */
-    #[ORM\Column(name: 'pre_conditions_configuration', type: Types::ARRAY, nullable: true)]
+    #[ORM\Column(name: 'pre_conditions_configuration', type: Types::JSON, nullable: true)]
     protected $preConditionsConfiguration;
 
     /**
      * @var array
      */
-    #[ORM\Column(name: 'actions_configuration', type: Types::ARRAY)]
-    protected $actionsConfiguration;
+    #[ORM\Column(name: 'actions_configuration', type: Types::JSON)]
+    protected $actionsConfiguration = [];
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
     #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]

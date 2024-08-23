@@ -81,6 +81,8 @@ class Workflow
      */
     protected $variables;
 
+    protected ?WorkflowItem $stubWorkflowItem = null;
+
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AclManager $aclManager,
@@ -93,10 +95,10 @@ class Workflow
         $this->doctrineHelper = $doctrineHelper;
         $this->aclManager = $aclManager;
         $this->restrictionManager = $restrictionManager;
-        $this->stepManager = $stepManager ? $stepManager : new StepManager();
-        $this->attributeManager = $attributeManager ? $attributeManager : new BaseAttributeManager();
-        $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
-        $this->variableManager = $variableManager ? $variableManager : new VariableManager();
+        $this->stepManager = $stepManager ?: new StepManager();
+        $this->attributeManager = $attributeManager ?: new BaseAttributeManager();
+        $this->transitionManager = $transitionManager ?: new TransitionManager();
+        $this->variableManager = $variableManager ?: new VariableManager();
     }
 
     /**
@@ -290,16 +292,7 @@ class Workflow
      */
     public function transit(WorkflowItem $workflowItem, $transition, Collection $errors = null)
     {
-        $transition = $this->transitionManager->extractTransition($transition);
-
-        $this->checkTransitionValid($transition, $workflowItem, true);
-
-        $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
-        $transition->transit($workflowItem, $errors);
-        $workflowItem->addTransitionRecord($transitionRecord);
-
-        $this->aclManager->updateAclIdentities($workflowItem);
-        $this->restrictionManager->updateEntityRestrictions($workflowItem);
+        $this->executeAndLogTransit($workflowItem, $transition, true, true, $errors);
     }
 
     /**
@@ -313,12 +306,28 @@ class Workflow
      */
     public function transitUnconditionally(WorkflowItem $workflowItem, $transition)
     {
+        $this->executeAndLogTransit($workflowItem, $transition, false, true);
+    }
+
+    public function executeAndLogTransit(
+        WorkflowItem $workflowItem,
+        $transition,
+        bool $checkTransitionAllowance = true,
+        bool $checkStepAllowance = true,
+        Collection $errors = null
+    ): void {
         $transition = $this->transitionManager->extractTransition($transition);
 
-        $this->checkTransitionValid($transition, $workflowItem, true);
+        if ($checkStepAllowance) {
+            $this->checkTransitionValid($transition, $workflowItem, true);
+        }
 
         $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
-        $transition->transitUnconditionally($workflowItem);
+        if ($checkTransitionAllowance) {
+            $transition->transit($workflowItem, $errors);
+        } else {
+            $transition->transitUnconditionally($workflowItem);
+        }
         $workflowItem->addTransitionRecord($transitionRecord);
 
         $this->aclManager->updateAclIdentities($workflowItem);
@@ -333,7 +342,7 @@ class Workflow
     protected function findWorkflowItem($entityClass, $entityId)
     {
         if (null === $entityId) {
-            return null;
+            return $this->stubWorkflowItem;
         }
 
         /** @var WorkflowItemRepository $repo */
@@ -393,6 +402,10 @@ class Workflow
             foreach ($variables as $name => $variable) {
                 $workflowData->set($name, $variable->getValue());
             }
+        }
+
+        if (!$entityId) {
+            $this->stubWorkflowItem = $workflowItem;
         }
 
         return $workflowItem;
@@ -531,11 +544,11 @@ class Workflow
             $minStepIdx--;
             while ($minStepIdx > -1) {
                 $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
-                if ($step->getOrder() <= $minStep->getOrder() && $step->getName() != $minStep->getName()) {
+                if ($step->getOrder() <= $minStep->getOrder() && $step->getName() !== $minStep->getName()) {
                     $minStepIdx--;
                     $minStep = $step;
                     $steps[] = $step;
-                } elseif ($step->getName() == $minStep->getName()) {
+                } elseif ($step->getName() === $minStep->getName()) {
                     $minStepIdx--;
                 } else {
                     break;
@@ -647,6 +660,6 @@ class Workflow
     {
         $configuration = $this->getDefinition()->getConfiguration();
 
-        return isset($configuration[$nodeName]) ? $configuration[$nodeName] : $default;
+        return $configuration[$nodeName] ?? $default;
     }
 }

@@ -6,8 +6,10 @@ workflows:
         entity_attribute: my_entity
         steps_display_ordered: true
         priority: 1
+        metadata:
+            has_limits: true
         scopes:
-            - 
+            -
                 scope1: value1
                 scope2: value2
             -
@@ -72,6 +74,10 @@ workflows:
         transitions:
             first_transition:
                 step_to: first_step
+                conditional_steps_to:
+                    first_step:
+                        conditions:
+                            '@equals': [1, 1]
                 is_start: true
                 is_hidden: true
                 is_unavailable_hidden: true

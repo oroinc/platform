@@ -226,6 +226,8 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     protected function sendUpdateListRequest(string $entityClass, array|string $data): int
     {
         $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_ACCEPTED);
+
         return $this->extractOperationIdFromContentLocationHeader($response);
     }
 
@@ -234,7 +236,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         self::assertEquals(MessageProcessorInterface::ACK, $messageContext->getStatus());
     }
 
-    protected function processUpdateList(string $entityClass, array|string $data, bool $assertNoErrors = true): int
+    protected function processUpdateList(string $entityClass, array|string $data, bool $assertValid = true): int
     {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 
@@ -263,7 +265,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         $this->consumeMessages();
 
         $this->consumeMessages();
-        if ($assertNoErrors) {
+        if ($assertValid) {
             $this->assertAsyncOperationErrors([], $operationId);
         }
 
@@ -338,14 +340,15 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     protected function processUpdateListDelayedCreationOfChunkJobs(
         string $entityClass,
         array|string $data,
-        bool $assertNoErrors = true
+        bool $assertValid = true
     ): int {
         $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
         $operationId = $this->extractOperationIdFromContentLocationHeader($response);
 
         $this->consumeAllMessages();
 
-        if ($assertNoErrors) {
+        if ($assertValid) {
+            self::assertResponseStatusCodeEquals($response, Response::HTTP_ACCEPTED);
             $this->assertAsyncOperationErrors([], $operationId);
         }
 

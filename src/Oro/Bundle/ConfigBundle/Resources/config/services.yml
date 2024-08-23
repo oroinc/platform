@@ -138,6 +138,11 @@ services:
         tags:
             - { name: form.type }
 
+    oro_form.extension.warning_extension:
+        class: Oro\Bundle\ConfigBundle\Form\Extension\WarningFormExtension
+        tags:
+            - { name: form.type_extension }
+
     oro_config.form.handler.config:
         class: Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler
         public: true

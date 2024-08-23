@@ -522,6 +522,7 @@ api:
                         emailUsers:
                             form_options:
                                 mapped: false
+                update_list: true
 
         Oro\Bundle\EmailBundle\Entity\EmailUser:
             documentation_resource: '@OroEmailBundle/Resources/doc/api/email_user.md'

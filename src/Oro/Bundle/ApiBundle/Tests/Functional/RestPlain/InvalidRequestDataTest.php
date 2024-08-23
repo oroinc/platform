@@ -22,7 +22,7 @@ class InvalidRequestDataTest extends RestPlainApiTestCase
         $this->assertResponseContainsValidationError(
             [
                 'title'  => 'request data constraint',
-                'detail' => 'The request data should not be empty'
+                'detail' => 'The request data should not be empty.'
             ],
             $response
         );

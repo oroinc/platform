@@ -5,25 +5,94 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
+use Oro\Bundle\ActionBundle\Model\ActionGroupServiceAdapter;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
-class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
+class ActionGroupAssemblerTest extends TestCase
 {
-    /** @var ActionGroupAssembler */
-    private $assembler;
+    private ServiceProviderInterface|MockObject $actionGroupServiceLocator;
+    private ParametersResolver|MockObject $parametersResolver;
+
+    private ActionGroupAssembler $assembler;
 
     protected function setUp(): void
     {
+        $this->actionGroupServiceLocator = $this->createMock(ServiceProviderInterface::class);
+        $this->parametersResolver = $this->createMock(ParametersResolver::class);
+
         $this->assembler = new ActionGroupAssembler(
             $this->createMock(ActionFactoryInterface::class),
             $this->createMock(ConditionFactory::class),
             new ParameterAssembler(),
-            $this->createMock(ParametersResolver::class)
+            $this->parametersResolver,
+            $this->actionGroupServiceLocator
         );
+    }
+
+    public function testAssembleWithServiceMinimal()
+    {
+        $service = new \stdClass();
+        $this->actionGroupServiceLocator->expects($this->once())
+            ->method('get')
+            ->with('test_service')
+            ->willReturn($service);
+
+        $configuration = [
+            'minimum_name' => [
+                'service' => 'test_service'
+            ]
+        ];
+
+        $definitions = $this->assembler->assemble($configuration);
+
+        $expected = [
+            'minimum_name' => new ActionGroupServiceAdapter(
+                $this->parametersResolver,
+                $service,
+                'execute',
+                null,
+                null
+            )
+        ];
+        $this->assertEquals($expected, $definitions);
+    }
+
+    public function testAssembleWithServiceAllParameters()
+    {
+        $service = new \stdClass();
+        $this->actionGroupServiceLocator->expects($this->once())
+            ->method('get')
+            ->with('test_service')
+            ->willReturn($service);
+
+        $configuration = [
+            'minimum_name' => [
+                'service' => 'test_service',
+                'method' => 'test_method',
+                'return_value_name' => 'test_return_value',
+                'parameters' => ['arg1' => []]
+            ]
+        ];
+
+        $definitions = $this->assembler->assemble($configuration);
+
+        $expected = [
+            'minimum_name' => new ActionGroupServiceAdapter(
+                $this->parametersResolver,
+                $service,
+                'test_method',
+                'test_return_value',
+                ['arg1' => []]
+            )
+        ];
+        $this->assertEquals($expected, $definitions);
     }
 
     /**
@@ -81,7 +150,7 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
                     ['@acl_granted' => 'test_acl'],
                     ['@condition' => 'config_conditions']
                 ]
-             ])
+            ])
             ->setActions(['config_actions']);
 
         return [

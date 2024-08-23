@@ -16,6 +16,16 @@ use Symfony\Component\Form\FormInterface;
 interface FormContext extends ContextInterface, ChangeContextInterface
 {
     /**
+     * Gets an identifier of an entity that was sent in the request.
+     */
+    public function getRequestId(): mixed;
+
+    /**
+     * Sets an identifier of an entity that was sent in the request.
+     */
+    public function setRequestId(mixed $requestId): void;
+
+    /**
      * Returns request data.
      */
     public function getRequestData(): array;

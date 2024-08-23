@@ -119,7 +119,7 @@ class RestrictionManager
     public function updateEntityRestrictions(WorkflowItem $workflowItem)
     {
         $definition = $workflowItem->getDefinition();
-        $currentStepName = $workflowItem->getCurrentStep()->getName();
+        $currentStepName = $workflowItem->getCurrentStep()?->getName();
 
         $restrictionIdentities = [];
         foreach ($definition->getRestrictions() as $restriction) {

@@ -5,6 +5,8 @@ services:
 
     oro_workflow.form.event_listener.form_init:
         class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener'
+        arguments:
+            - '@oro_workflow.event_dispatcher'
 
     oro_workflow.form.event_listener.required_attributes:
         class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener'

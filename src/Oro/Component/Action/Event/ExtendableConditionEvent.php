@@ -3,16 +3,15 @@
 namespace Oro\Component\Action\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Component\Action\Model\AbstractStorage;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event for extendable condition.
+ */
 class ExtendableConditionEvent extends Event
 {
-    const NAME = 'extendable';
-
-    /**
-     * @var null|mixed
-     */
-    protected $context;
+    public const NAME = 'extendable';
 
     /**
      * @var ArrayCollection
@@ -22,56 +21,31 @@ class ExtendableConditionEvent extends Event
     /**
      * @param null|mixed $context
      */
-    public function __construct($context = null)
-    {
-        $this->context = $context;
+    public function __construct(
+        protected ?AbstractStorage $context = null
+    ) {
         $this->errors = new ArrayCollection();
     }
 
-    /**
-     * @return null|mixed
-     */
-    public function getContext()
+    public function getContext(): ?AbstractStorage
     {
         return $this->context;
     }
 
-    /**
-     * @param mixed $context
-     * @return $this
-     */
-    public function setContext($context)
-    {
-        $this->context = $context;
-
-        return $this;
-    }
-
-    /**
-     * @param string $errorMessage
-     * @param mixed $errorContext
-     * @return $this
-     */
-    public function addError($errorMessage, $errorContext = null)
+    public function addError(string $errorMessage, mixed $errorContext = null): self
     {
         $this->errors->add(['message' => $errorMessage, 'context' => $errorContext]);
 
         return $this;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getErrors()
+    public function getErrors(): ArrayCollection
     {
         return $this->errors;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
-        return count($this->errors) > 0;
+        return !$this->errors->isEmpty();
     }
 }

@@ -17,19 +17,34 @@ class UpdateListFinishTopicTest extends AbstractTopicTestCase
 
     public function validBodyDataProvider(): array
     {
-        $fullOptionsSet = [
+        $requiredOptionsSet = [
             'entityClass' => '',
             'requestType' => [],
             'version' => '1',
             'operationId' => 1,
-            'fileName' => 'foo.bar',
+            'fileName' => 'foo.bar'
         ];
+        $fullOptionsSet = array_merge(
+            $requiredOptionsSet,
+            [
+                'synchronousMode' => true
+            ]
+        );
 
         return [
+            'only required options' => [
+                'body' => $requiredOptionsSet,
+                'expectedBody' => array_merge(
+                    $requiredOptionsSet,
+                    [
+                        'synchronousMode' => false
+                    ]
+                )
+            ],
             'full set of options' => [
                 'body' => $fullOptionsSet,
-                'expectedBody' => $fullOptionsSet,
-            ],
+                'expectedBody' => $fullOptionsSet
+            ]
         ];
     }
 
@@ -41,7 +56,7 @@ class UpdateListFinishTopicTest extends AbstractTopicTestCase
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
                     '/The required options "entityClass", "fileName", "operationId", "requestType", ' .
-                    '"version" are missing./',
+                    '"version" are missing./'
             ],
             'wrong operationId type' => [
                 'body' => [
@@ -52,7 +67,7 @@ class UpdateListFinishTopicTest extends AbstractTopicTestCase
                     'version' => '1'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/',
+                'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/'
             ],
             'wrong fileName type' => [
                 'body' => [
@@ -63,8 +78,20 @@ class UpdateListFinishTopicTest extends AbstractTopicTestCase
                     'version' => '1'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "fileName" with value 1 is expected to be of type "string"/',
+                'exceptionMessage' => '/The option "fileName" with value 1 is expected to be of type "string"/'
             ],
+            'wrong synchronousMode type' => [
+                'body' => [
+                    'entityClass' => '',
+                    'requestType' => [],
+                    'operationId' => 1,
+                    'fileName' => 1,
+                    'version' => 'latest',
+                    'synchronousMode' => 1
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' => '/The option "synchronousMode" with value 1 is expected to be of type "bool"/'
+            ]
         ];
     }
 }

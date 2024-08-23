@@ -194,7 +194,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
 
     protected function isNormalizeResultEnabled(NormalizeResultContext $context): bool
     {
-        return !$context->getLastGroup();
+        return !$context->isSoftErrorsHandling() && !$context->getLastGroup();
     }
 
     /**

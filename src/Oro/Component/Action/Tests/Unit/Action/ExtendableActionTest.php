@@ -6,11 +6,15 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\ExtendableAction;
 use Oro\Component\Action\Event\ExecuteActionEvents;
 use Oro\Component\Action\Event\ExtendableActionEvent;
-use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Event\ExtendableEventData;
+use Oro\Component\Action\Model\AbstractStorage;
+use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class ExtendableActionTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,9 +35,12 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeWhenThrowsExceptionProvider
      */
-    public function testInitializeWhenThrowsException(array $options, string $exceptionMessage)
-    {
-        $this->expectException(InvalidParameterException::class);
+    public function testInitializeWhenThrowsException(
+        array $options,
+        string $expectedException,
+        string $exceptionMessage
+    ) {
+        $this->expectException($expectedException);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
@@ -43,11 +50,14 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         return [
             'no required options' => [
                 'options' => [],
+                'expectedException' => MissingOptionsException::class,
                 'exceptionMessage' => 'The required option "events" is missing.',
             ],
             'wrong events option type' => [
                 'options' => ['events' => 'wrongEventsOptionType'],
-                'exceptionMessage' => 'The option "events" is expected to be of type "array", "string" given.'
+                'expectedException' => InvalidOptionsException::class,
+                'exceptionMessage' => 'The option "events" with value "wrongEventsOptionType" is expected to be of '
+                    . 'type "array" or "' . PropertyPathInterface::class . '", but is of type "string".'
             ],
         ];
     }
@@ -62,7 +72,7 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
 
     public function testExecute()
     {
-        $context = new ItemStub();
+        $context = new ExtendableEventData([]);
         $eventWithoutListeners = 'some_event_without_listeners';
         $eventWithListeners = 'some_event_with_listeners';
         $event = new ExtendableActionEvent($context);
@@ -83,6 +93,96 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->action->initialize(['events' => [$eventWithoutListeners, $eventWithListeners]]);
+        $this->action->execute($context);
+    }
+
+    public function testExecuteWithPassedEventData()
+    {
+        $context = new ExtendableEventData([]);
+        $eventWithoutListeners = 'some_event_without_listeners';
+        $eventWithListeners = 'some_event_with_listeners';
+        $data = ['key' => 'value'];
+        $event = new ExtendableActionEvent(new ExtendableEventData(['key' => 'value']));
+
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('hasListeners')
+            ->withConsecutive(
+                [$eventWithoutListeners],
+                [$eventWithListeners]
+            )
+            ->willReturn(false, true);
+        $this->dispatcher->expects(self::exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                [self::anything(), ExecuteActionEvents::HANDLE_BEFORE],
+                [$event, $eventWithListeners],
+                [self::anything(), ExecuteActionEvents::HANDLE_AFTER]
+            );
+
+        $this->action->initialize([
+            'events' => [$eventWithoutListeners, $eventWithListeners],
+            'eventData' => $data
+        ]);
+        $this->action->execute($context);
+    }
+
+    public function testExecuteWithActionDataStorageAwareInterface()
+    {
+        $context = $this->createMock(ActionDataStorageAwareInterface::class);
+        $dataStorage = $this->createMock(AbstractStorage::class);
+        $context->expects($this->once())
+            ->method('getActionDataStorage')
+            ->willReturn($dataStorage);
+        $eventWithoutListeners = 'some_event_without_listeners';
+        $eventWithListeners = 'some_event_with_listeners';
+        $event = new ExtendableActionEvent($dataStorage);
+
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('hasListeners')
+            ->withConsecutive(
+                [$eventWithoutListeners],
+                [$eventWithListeners]
+            )
+            ->willReturn(false, true);
+        $this->dispatcher->expects(self::exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                [self::anything(), ExecuteActionEvents::HANDLE_BEFORE],
+                [$event, $eventWithListeners],
+                [self::anything(), ExecuteActionEvents::HANDLE_AFTER]
+            );
+
+        $this->action->initialize([
+            'events' => [$eventWithoutListeners, $eventWithListeners]
+        ]);
+        $this->action->execute($context);
+    }
+
+    public function testExecuteWithArray()
+    {
+        $context = ['key' => 'value'];
+        $eventWithoutListeners = 'some_event_without_listeners';
+        $eventWithListeners = 'some_event_with_listeners';
+        $event = new ExtendableActionEvent(new ExtendableEventData($context));
+
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('hasListeners')
+            ->withConsecutive(
+                [$eventWithoutListeners],
+                [$eventWithListeners]
+            )
+            ->willReturn(false, true);
+        $this->dispatcher->expects(self::exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                [self::anything(), ExecuteActionEvents::HANDLE_BEFORE],
+                [$event, $eventWithListeners],
+                [self::anything(), ExecuteActionEvents::HANDLE_AFTER]
+            );
+
+        $this->action->initialize([
+            'events' => [$eventWithoutListeners, $eventWithListeners]
+        ]);
         $this->action->execute($context);
     }
 }

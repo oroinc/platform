@@ -219,6 +219,7 @@ oro:
             exclusive_record_groups.label: "Exclusive Record Groups"
             scopes.label:                 Workflow Scopes
             applications.label:           "Applications"
+            metadata.label:               Metadata
             transition_name.label:        Transition Name
 
             attribute:

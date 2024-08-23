@@ -217,12 +217,16 @@ define(function(require, exports, module) {
                 label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
                 options: options,
-                selected: _.extend({}, this.emptyValue, this.value),
+                selected: this.getSelectedValue(),
                 isEmpty: this.isEmpty(),
                 renderMode: this.renderMode,
                 criteriaClass: this.getCriteriaExtraClass(),
                 ...this.getTemplateDataProps()
             };
+        },
+
+        getSelectedValue() {
+            return _.extend({}, this.emptyValue, this.value);
         },
 
         resetFlags() {
@@ -426,10 +430,13 @@ define(function(require, exports, module) {
          * @protected
          */
         _clearChoicesStyle: function() {
-            const labels = this.selectWidget.getWidget().find('label');
-            labels.removeClass('ui-state-hover');
-            if (_.isEmpty(this.value.value)) {
-                labels.removeClass('ui-state-active');
+            if (this.selectWidget) {
+                const labels = this.selectWidget.getWidget().find('label');
+                labels.removeClass('ui-state-hover');
+
+                if (_.isEmpty(this.value.value)) {
+                    labels.removeClass('ui-state-active');
+                }
             }
         },
 
@@ -473,6 +480,9 @@ define(function(require, exports, module) {
          * @protected
          */
         _setDropdownWidth: function() {
+            if (!this.selectWidget) {
+                return;
+            }
             if (!this.cachedMinimumWidth) {
                 this.cachedMinimumWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             }
@@ -497,6 +507,9 @@ define(function(require, exports, module) {
          * @protected
          */
         _onClickFilterArea: function(e) {
+            if (!this.selectWidget) {
+                return;
+            }
             if (!this.selectDropdownOpened) {
                 this.selectWidget.multiselect('open');
             } else {
@@ -516,7 +529,9 @@ define(function(require, exports, module) {
             // set value
             this.applyValue();
             // update dropdown
-            this.selectWidget.updateDropdownPosition();
+            if (this.selectWidget) {
+                this.selectWidget.updateDropdownPosition();
+            }
         },
 
         /**

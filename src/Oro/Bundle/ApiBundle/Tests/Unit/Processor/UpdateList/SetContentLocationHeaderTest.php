@@ -17,10 +17,10 @@ class SetContentLocationHeaderTest extends UpdateListProcessorTestCase
 {
     private const ITEM_ROUTE_NAME = 'item_route';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
     /** @var SetContentLocationHeader */
@@ -49,7 +49,42 @@ class SetContentLocationHeaderTest extends UpdateListProcessorTestCase
         );
     }
 
-    public function testProcessOnExistingHeader()
+    public function testProcessForSynchronousModeAndWithResponseData(): void
+    {
+        $this->context->setSynchronousMode(true);
+        $this->context->setResult([]);
+        $this->processor->process($this->context);
+
+        self::assertFalse(
+            $this->context->getResponseHeaders()->has(SetContentLocationHeader::RESPONSE_HEADER_NAME)
+        );
+    }
+
+    public function testProcessForSynchronousModeAndWithoutResponseData(): void
+    {
+        $this->context->setSynchronousMode(true);
+        $this->processor->process($this->context);
+
+        $location = 'test location';
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with(AsyncOperation::class, DataType::ENTITY_TYPE, $this->context->getRequestType())
+            ->willReturn('test_entity');
+        $this->router->expects(self::once())
+            ->method('generate')
+            ->willReturn($location);
+
+        $this->context->setOperationId(123);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            $location,
+            $this->context->getResponseHeaders()->get(SetContentLocationHeader::RESPONSE_HEADER_NAME)
+        );
+    }
+
+    public function testProcessWithExistingHeader(): void
     {
         $existingLocation = 'existing location';
 
@@ -62,7 +97,7 @@ class SetContentLocationHeaderTest extends UpdateListProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoOperationId()
+    public function testProcessWhenNoOperationId(): void
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
@@ -76,7 +111,7 @@ class SetContentLocationHeaderTest extends UpdateListProcessorTestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $location = 'test location';
         $entityType = 'test_entity';

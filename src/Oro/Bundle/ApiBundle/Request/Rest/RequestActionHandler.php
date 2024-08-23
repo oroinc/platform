@@ -41,7 +41,7 @@ class RequestActionHandler extends BaseRequestActionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getRequestHeaders(Request $request): AbstractParameterBag
     {
@@ -49,7 +49,7 @@ class RequestActionHandler extends BaseRequestActionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getRequestFilters(Request $request): FilterValueAccessorInterface
     {
@@ -57,7 +57,7 @@ class RequestActionHandler extends BaseRequestActionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function prepareContext(Context $context, Request $request): void
     {
@@ -68,9 +68,9 @@ class RequestActionHandler extends BaseRequestActionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function buildResponse(Context $context): Response
+    protected function buildResponse(Context $context, Request $request): Response
     {
         $view = View::create($context->getResult());
 
@@ -88,9 +88,7 @@ class RequestActionHandler extends BaseRequestActionHandler
                 $data = $view->getData();
                 if (null !== $data) {
                     // Allow json_encode to convert float to integer.
-                    $encoder = new JsonEncode([
-                        JsonEncode::OPTIONS => 0,
-                    ]);
+                    $encoder = new JsonEncode([JsonEncode::OPTIONS => 0]);
                     $response->setContent($encoder->encode($data, $format));
                 } elseif (Response::HTTP_OK === $view->getStatusCode()) {
                     $response->headers->set('Content-Length', 0);
@@ -103,7 +101,7 @@ class RequestActionHandler extends BaseRequestActionHandler
             }
         );
 
-        return $this->viewHandler->handle($view);
+        return $this->viewHandler->handle($view, $request);
     }
 
     private function isCorsRequest(Request $request): bool

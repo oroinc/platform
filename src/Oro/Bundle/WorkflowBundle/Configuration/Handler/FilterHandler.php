@@ -25,6 +25,7 @@ class FilterHandler implements ConfigurationHandlerInterface
     protected static $transitionKeys = [
         'name',
         'step_to',
+        'conditional_step_to',
         'is_start',
         'is_hidden',
         'is_unavailable_hidden',

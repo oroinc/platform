@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Batch\Processor\Update;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
+use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\Model\IncludedData;
@@ -20,6 +21,7 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 {
     private ?int $operationId = null;
     private BatchSummary $summary;
+    private BatchAffectedEntities $affectedEntities;
     private bool $hasUnexpectedErrors = false;
     private ?string $retryReason = null;
     private ?FileManager $fileManager = null;
@@ -41,6 +43,7 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     {
         parent::initialize();
         $this->summary = new BatchSummary();
+        $this->affectedEntities = new BatchAffectedEntities();
     }
 
     /**
@@ -65,6 +68,14 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     public function getSummary(): BatchSummary
     {
         return $this->summary;
+    }
+
+    /**
+     * Gets entities affected by this batch operation.
+     */
+    public function getAffectedEntities(): BatchAffectedEntities
+    {
+        return $this->affectedEntities;
     }
 
     /**

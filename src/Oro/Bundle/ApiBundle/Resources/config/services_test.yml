@@ -376,12 +376,22 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: save_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2 }
 
-    oro_api.api.set_custom_associations_query:
+    oro_api.tests.set_custom_associations_query:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SetCustomAssociationsQuery
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomMagazine, priority: -35 }
+
+    oro_api.tests.wait_for_synchronous_operation_processed:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\WaitForSynchronousModeMessagesProcessed
+        tags:
+            - { name: oro.api.processor, action: update_list, group: finalize, priority: 11 }
+
+    oro_api.tests.wait_for_asynchronous_operation_deleted:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\WaitForSynchronousModeMessagesProcessed
+        tags:
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: 100 }
 
     oro_api.tests.test_flash_bag_depended_service:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestFlashBagDependedService

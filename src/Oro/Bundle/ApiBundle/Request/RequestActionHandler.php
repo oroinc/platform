@@ -61,7 +61,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -78,7 +78,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -95,7 +95,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -112,7 +112,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -129,7 +129,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -142,12 +142,14 @@ abstract class RequestActionHandler
         /** @var UpdateContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
-        $context->setId($this->getRequestParameter($request, 'id'));
+        $id = $this->getRequestParameter($request, 'id');
+        $context->setId($id);
+        $context->setRequestId($id);
         $context->setRequestData($this->getRequestData($request));
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -164,7 +166,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -183,7 +185,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -203,7 +205,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -223,7 +225,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -243,7 +245,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -262,7 +264,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -281,7 +283,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -298,7 +300,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -315,7 +317,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -333,7 +335,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -350,7 +352,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -367,7 +369,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -384,7 +386,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -400,7 +402,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -416,7 +418,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -432,7 +434,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -448,7 +450,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     /**
@@ -466,7 +468,7 @@ abstract class RequestActionHandler
 
         $processor->process($context);
 
-        return $this->buildResponse($context);
+        return $this->buildResponse($context, $request);
     }
 
     protected function getProcessor(string $action): ActionProcessorInterface
@@ -524,5 +526,5 @@ abstract class RequestActionHandler
 
     abstract protected function getRequestFilters(Request $request): FilterValueAccessorInterface;
 
-    abstract protected function buildResponse(Context $context): Response;
+    abstract protected function buildResponse(Context $context, Request $request): Response;
 }

@@ -62,10 +62,11 @@ class ResolveDestinationPage extends AbstractAction
             return;
         }
 
+        $destination = $this->contextAccessor->getValue($context, $this->destination);
         $redirectUrl = $request->get(DestinationPageResolver::PARAM_ORIGINAL_URL);
-        if ($this->destination !== DestinationPageResolver::DEFAULT_DESTINATION) {
+        if ($destination !== DestinationPageResolver::DEFAULT_DESTINATION) {
             $entity = $this->contextAccessor->getValue($context, $this->entity);
-            $redirectUrl = $this->resolver->resolveDestinationUrl($entity, $this->destination);
+            $redirectUrl = $this->resolver->resolveDestinationUrl($entity, $destination);
         }
 
         if ($redirectUrl) {

@@ -103,12 +103,18 @@ abstract class AbstractConfigurationProvider
      */
     protected function processImports(\SplFileInfo $file, array $imports, array $configData)
     {
+        $configsData = [$configData];
         foreach ($imports as $importData) {
             if (array_key_exists('resource', $importData)) {
-                $resourceFile = new \SplFileInfo($file->getPath() . DIRECTORY_SEPARATOR . $importData['resource']);
+                if (str_starts_with($importData['resource'], '@')) {
+                    $filePath = $this->kernel->locateResource($importData['resource']);
+                } else {
+                    $filePath = $file->getPath() . DIRECTORY_SEPARATOR . $importData['resource'];
+                }
+
+                $resourceFile = new \SplFileInfo($filePath);
                 if ($resourceFile->isReadable()) {
-                    $includedData = $this->loadConfigFile($resourceFile);
-                    $configData = array_merge_recursive($configData, $includedData);
+                    $configsData[] = $this->loadConfigFile($resourceFile);
                 } else {
                     throw new InvalidConfigurationException(
                         sprintf('Resource "%s" is unreadable', $resourceFile->getBasename())
@@ -117,7 +123,7 @@ abstract class AbstractConfigurationProvider
             }
         }
 
-        return $configData;
+        return array_merge_recursive(...$configsData);
     }
 
     /**

@@ -521,7 +521,9 @@ define(function(require, exports, module) {
 
             this.pageModel.set({
                 isLoggedIn: !this._isLoginPage(this.getAppUrl()),
-                isAdminPanel: iframe.document.styleSheets[0].href.indexOf('/css/themes/oro/') !== -1
+                isAdminPanel: [...iframe.document.head.querySelectorAll('link[rel="stylesheet"]')].find(
+                    link => link.href.includes('/admin/css/oro')
+                )
             });
         },
 

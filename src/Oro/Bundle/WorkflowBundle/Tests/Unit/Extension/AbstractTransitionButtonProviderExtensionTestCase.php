@@ -7,11 +7,13 @@ use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 
 abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
@@ -30,6 +32,9 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsResolver;
 
+    /** @var EventDispatcher|MockObject */
+    protected $eventDispatcher;
+
     /** @var AbstractButtonProviderExtension */
     protected $extension;
 
@@ -40,6 +45,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
         $this->originalUrlProvider = $this->createMock(OriginalUrlProvider::class);
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
         $this->extension = $this->createExtension();
         $this->extension->setApplicationProvider($this->applicationProvider);
@@ -77,7 +83,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
 
     protected function getTransition(string $name): Transition
     {
-        $transition = new Transition($this->optionsResolver);
+        $transition = new Transition($this->optionsResolver, $this->eventDispatcher);
 
         return $transition->setName($name);
     }

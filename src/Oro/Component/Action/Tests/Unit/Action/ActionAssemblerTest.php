@@ -109,7 +109,7 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            'nested configuration' => [
+            'nested configuration - remove unnecessary tree actions' => [
                 'source' => [
                     [
                         '@tree' => [
@@ -137,31 +137,15 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     [
                         'instance' => [
-                            '_type' => 'tree',
-                            'actions' => [
-                                [
-                                    'instance' => [
-                                        '_type' => 'assign_value',
-                                        'parameters' => ['from' => 'name', 'to' => 'contact.name', '_pass' => true]
-                                    ],
-                                    'breakOnFailure' => true,
-                                ],
-                            ]
+                            '_type' => 'assign_value',
+                            'parameters' => ['from' => 'name', 'to' => 'contact.name', '_pass' => true]
                         ],
                         'breakOnFailure' => true,
                     ],
                     [
                         'instance' => [
-                            '_type' => 'tree',
-                            'actions' => [
-                                [
-                                    'instance' => [
-                                        '_type' => 'assign_value',
-                                        'parameters' => ['from' => 'date', 'to' => 'contact.date', '_pass' => true]
-                                    ],
-                                    'breakOnFailure' => false,
-                                ],
-                            ]
+                            '_type' => 'assign_value',
+                            'parameters' => ['from' => 'date', 'to' => 'contact.date', '_pass' => true]
                         ],
                         'breakOnFailure' => true,
                     ],
@@ -227,7 +211,7 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
             $actionData['condition'] = $conditionData;
         }
 
-        $treeActions = $this->getActions($treeExecutor);
+        $treeActions = ReflectionUtil::getPropertyValue($treeExecutor, 'actions');
         $treeActions[] = [
             'instance'       => $actionData,
             'breakOnFailure' => $breakOnFailure
@@ -238,7 +222,21 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
 
     private function getActions(TreeExecutor $action): array
     {
-        return ReflectionUtil::getPropertyValue($action, 'actions');
+        $condition = $this->getCondition($action);
+        $actions = ReflectionUtil::getPropertyValue($action, 'actions');
+
+        if (!$condition) {
+            return $actions;
+        }
+
+        return [[
+            'instance' => [
+                '_type'   => TreeExecutor::ALIAS,
+                'actions' => $actions,
+                'condition' => $condition
+            ],
+            'breakOnFailure' => false
+        ]];
     }
 
     public function getTreeExecutor(): TreeExecutor

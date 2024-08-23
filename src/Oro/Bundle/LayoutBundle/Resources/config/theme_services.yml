@@ -75,7 +75,7 @@ services:
     oro_layout.layout_context_configurator.svg_icons_support:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\SvgIconsSupportContextConfigurator
         arguments:
-            - '@oro_layout.theme_manager'
+            - '@oro_layout.provider.svg_icons_support'
         tags:
             - { name: layout.context_configurator }
 
