@@ -143,7 +143,7 @@ define(function(require) {
                     // if content is not modified, return html representation back
                     this.$el.val(this.htmlValue);
                 } else {
-                    this.$el.val(txtHtmlTransformer.text2html(this.$el.val()));
+                    this.$el.val(this.$el.val());
                 }
             }
             this._deferredRender();
