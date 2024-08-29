@@ -18,6 +18,7 @@ define(function(require) {
             dropdownAutoWidth: !tools.isMobile(),
             minimumInputLength: 0,
             minimumResultsForSearch: 7,
+            openOnEnter: null,
             adaptContainerCssClass: function(className) {
                 const containerCssClass = this.initializeOptions.containerCssClass;
                 if (!containerCssClass) {
