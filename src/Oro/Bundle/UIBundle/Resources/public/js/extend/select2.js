@@ -815,7 +815,7 @@ define(function(require) {
                     killEvent(e);
                     return;
                 }
-                if (e.keyCode === KEY_CODES.SPACE && this.opts.openOnEnter) {
+                if (e.keyCode === KEY_CODES.SPACE) {
                     if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) {
                         return;
                     }
