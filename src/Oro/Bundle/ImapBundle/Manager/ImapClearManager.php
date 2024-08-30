@@ -127,7 +127,9 @@ class ImapClearManager implements LoggerAwareInterface
         $userEmailOriginRepo = $this->doctrineHelper->getEntityRepositoryForClass(UserEmailOrigin::class);
 
         $emailUserIdsForReindexation = [];
-        $emailUserIdsForReIndexationIterator = $userEmailOriginRepo->getEmailIdsFromDisabledFoldersIterator($origin);
+        $emailUserIdsForReIndexationIterator = $userEmailOriginRepo->getUserEmailIdsFromDisabledFoldersIterator(
+            $origin
+        );
         foreach ($emailUserIdsForReIndexationIterator as $row) {
             $emailUserIdsForReindexation[] = $row['id'];
         }
