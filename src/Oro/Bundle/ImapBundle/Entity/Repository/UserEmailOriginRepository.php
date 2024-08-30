@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -112,23 +113,43 @@ class UserEmailOriginRepository extends EntityRepository
 
     public function getEmailIdsFromDisabledFoldersIterator(EmailOrigin $origin): BufferedQueryResultIterator
     {
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('IDENTITY(ie.email) as id, ie')
-            ->from(ImapEmail::class, 'ie')
-            ->join('ie.imapFolder', 'ief')
-            ->join('ief.folder', 'ef')
-            ->andWhere('ef.origin =:originId')
-            ->setParameter('originId', $origin->getId());
-
-        if ($origin->isActive()) {
-            $qb->andWhere('ef.syncEnabled = :syncEnabled')
-                ->setParameter('syncEnabled', false);
-        }
+        $qb = $this->getEmailFromDisabledFoldersQueryBuilder($origin)
+            ->select('IDENTITY(ie.email) as id, ie');
 
         $iterator = new BufferedQueryResultIterator($qb);
         $iterator->setBufferSize(2000);
 
         return $iterator;
+    }
+
+    public function getUserEmailIdsFromDisabledFoldersIterator(EmailOrigin $origin): BufferedQueryResultIterator
+    {
+        $qb = $this->getEmailFromDisabledFoldersQueryBuilder($origin)
+            ->select('emailUser.id')
+            ->join('ie.email', 'email')
+            ->join('email.emailUsers', 'emailUser');
+
+        $iterator = new BufferedQueryResultIterator($qb);
+        $iterator->setBufferSize(2000);
+
+        return $iterator;
+    }
+
+    private function getEmailFromDisabledFoldersQueryBuilder(EmailOrigin $origin): QueryBuilder
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb
+            ->from(ImapEmail::class, 'ie')
+            ->join('ie.imapFolder', 'ief')
+            ->join('ief.folder', 'ef')
+            ->andWhere($qb->expr()->eq('ef.origin', ':originId'))
+            ->setParameter('originId', $origin->getId());
+
+        if ($origin->isActive()) {
+            $qb->andWhere($qb->expr()->eq('ef.syncEnabled', ':syncEnabled'))
+                ->setParameter('syncEnabled', false);
+        }
+
+        return $qb;
     }
 }
