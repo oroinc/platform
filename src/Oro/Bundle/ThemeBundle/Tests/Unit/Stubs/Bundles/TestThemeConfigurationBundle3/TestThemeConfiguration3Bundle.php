@@ -4,6 +4,6 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\Stubs\Bundles\TestThemeConfiguration
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class TestThemeConfigurationBundle3 extends Bundle
+class TestThemeConfiguration3Bundle extends Bundle
 {
 }

@@ -20,11 +20,8 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
  */
 class ThemeConfigurationProvider extends PhpArrayConfigProvider implements ThemeDefinitionBagInterface
 {
-    /** @var ThemeConfiguration */
-    private $configuration;
-
-    /** @var string */
-    private $folderPattern;
+    private ThemeConfiguration $configuration;
+    private string $folderPattern;
 
     public function __construct(
         string $cacheFile,
@@ -38,7 +35,7 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getThemeNames(): array
     {
@@ -48,7 +45,7 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getThemeDefinition(string $themeName): ?array
     {
@@ -58,23 +55,7 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function loadThemeResources(ResourcesContainerInterface $resourcesContainer): iterable
-    {
-        $configLoader = new CumulativeConfigLoader(
-            'oro_layout',
-            [
-                $this->getFolderingCumulativeFileLoaderForPath('Resources/views/layouts/{folder}/theme.yml'),
-                $this->getFolderingCumulativeFileLoaderForPath('../templates/layouts/{folder}/theme.yml')
-            ]
-        );
-
-        return $configLoader->load($resourcesContainer);
-    }
-
-    /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
@@ -96,26 +77,33 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
     }
 
     /**
-     * @param string $path
-     * @param string $folderPlaceholder
-     *
-     * @return FolderingCumulativeFileLoader
+     * @return CumulativeResourceInfo[]
      */
-    private function getFolderingCumulativeFileLoaderForPath($path, $folderPlaceholder = '{folder}')
+    private function loadThemeResources(ResourcesContainerInterface $resourcesContainer): array
     {
-        return new FolderingCumulativeFileLoader(
-            $folderPlaceholder,
-            $this->folderPattern,
-            new YamlCumulativeFileLoader($path)
+        $configLoader = new CumulativeConfigLoader(
+            'oro_layout',
+            [
+                new FolderingCumulativeFileLoader(
+                    '{folder}',
+                    $this->folderPattern,
+                    new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
+                ),
+                new FolderingCumulativeFileLoader(
+                    '{folder}',
+                    $this->folderPattern,
+                    new YamlCumulativeFileLoader('../templates/layouts/{folder}/theme.yml')
+                )
+            ]
         );
+
+        return $configLoader->load($resourcesContainer);
     }
 
     /**
-     * @param ResourcesContainerInterface $resourcesContainer
-     *
      * @return CumulativeResourceInfo[]
      */
-    private function loadAdditionalResources(ResourcesContainerInterface $resourcesContainer)
+    private function loadAdditionalResources(ResourcesContainerInterface $resourcesContainer): array
     {
         $loaders = [];
         foreach ($this->configuration->getAdditionalConfigFileNames() as $fileName) {
@@ -134,26 +122,18 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
         return $configLoader->load($resourcesContainer);
     }
 
-    /**
-     * @param CumulativeResourceInfo $resource
-     * @return array
-     */
-    private function getThemeConfig(CumulativeResourceInfo $resource)
+    private function getThemeConfig(CumulativeResourceInfo $resource): array
     {
-        $themeName = basename(dirname($resource->path));
+        $themeName = basename(\dirname($resource->path));
 
         return [
             $themeName => $resource->data
         ];
     }
 
-    /**
-     * @param CumulativeResourceInfo $resource
-     * @return array
-     */
-    private function getAdditionalConfig(CumulativeResourceInfo $resource)
+    private function getAdditionalConfig(CumulativeResourceInfo $resource): array
     {
-        $themeName = basename(dirname($resource->path, 2));
+        $themeName = basename(\dirname($resource->path, 2));
         $section = basename($resource->path, '.yml');
 
         return [

@@ -57,20 +57,15 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getResources(): array
     {
         return $this->doGetConfig();
     }
 
-    public function loadAndGetConfig(ResourcesContainerInterface $resourcesContainer): array
-    {
-        return $this->doLoadConfig($resourcesContainer);
-    }
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function findApplicableResources(array $paths): array
     {
@@ -98,7 +93,7 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
