@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Extension\Sorter;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier;
 
@@ -16,7 +16,7 @@ class HintExtensionTest extends WebTestCase
 
     public function testHintDisableOrderByModificationNullsIsAppliedByDefault()
     {
-        /** @var Manager $dataGridManager */
+        /** @var ManagerInterface $dataGridManager */
         $dataGridManager = self::getContainer()->get('oro_datagrid.datagrid.manager');
 
         $dataGrid = $dataGridManager->getDatagrid('items-grid');
@@ -29,7 +29,7 @@ class HintExtensionTest extends WebTestCase
 
     public function testHintDisableOrderByModificationNullsIsRemovedByGridConfiguration()
     {
-        /** @var Manager $dataGridManager */
+        /** @var ManagerInterface $dataGridManager */
         $dataGridManager = self::getContainer()->get('oro_datagrid.datagrid.manager');
 
         $dataGrid = $dataGridManager->getDatagrid('items-values-grid');

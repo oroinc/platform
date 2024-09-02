@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\ImportExport\FilteredEntityReader;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\ImportExport\FilteredEntityReader\OrmFilteredEntityIdentityReader;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewData;
@@ -137,7 +137,7 @@ class OrmFilteredEntityIdentityReaderTest extends WebTestCase
         return $this->getDatagridManager()->getDatagrid($name, [ParameterBag::MINIFIED_PARAMETERS => $parameters]);
     }
 
-    private function getDatagridManager(): Manager
+    private function getDatagridManager(): ManagerInterface
     {
         return self::getContainer()->get('oro_datagrid.datagrid.manager');
     }

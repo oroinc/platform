@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -37,7 +37,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     /** @var MassActionHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $massActionHelper;
 
-    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
     /** @var MassActionParametersParser|\PHPUnit\Framework\MockObject\MockObject */
@@ -51,7 +51,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->manager = $this->createMock(Manager::class);
+        $this->manager = $this->createMock(ManagerInterface::class);
         $this->massActionParametersParser = $this->createMock(MassActionParametersParser::class);
         $this->massActionHelper = $this->createMock(MassActionHelper::class);
         $this->iterableResultFactoryRegistry = $this->createMock(IterableResultFactoryRegistry::class);

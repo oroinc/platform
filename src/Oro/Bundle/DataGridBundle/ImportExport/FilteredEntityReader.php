@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\ImportExport\FilteredEntityReader\FilteredEntityIdentityReaderInterface;
@@ -25,7 +25,7 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, 
     public const FILTERED_RESULTS_GRID = 'filteredResultsGrid';
     public const FILTERED_RESULTS_GRID_PARAMS = 'filteredResultsGridParams';
 
-    /** @var Manager */
+    /** @var ManagerInterface */
     private $datagridManager;
 
     /** @var EntityReader */
@@ -37,7 +37,7 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, 
     private $entityIdentityReaders;
 
     public function __construct(
-        Manager $datagridManager,
+        ManagerInterface $datagridManager,
         EntityReader $entityReader,
         iterable $entityIdentityReaders
     ) {

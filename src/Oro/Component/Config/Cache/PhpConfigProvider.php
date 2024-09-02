@@ -121,7 +121,7 @@ abstract class PhpConfigProvider implements
                 $overrideExistingCacheFile = $this->debug && file_exists($cache->getPath());
 
                 $resourcesContainer = new ResourcesContainer();
-                $config = $this->doLoadConfig($resourcesContainer);
+                $config = $this->loadConfig($resourcesContainer);
                 $this->getCacheAccessor()->save($cache, $config, $resourcesContainer->getResources());
                 $this->cacheTimestamp = false;
                 $this->cacheFresh = null;
@@ -142,6 +142,14 @@ abstract class PhpConfigProvider implements
     public function getCacheResource(): ResourceInterface
     {
         return new FileResource($this->cacheFile);
+    }
+
+    /**
+     * Loads configuration data.
+     */
+    public function loadConfig(ResourcesContainerInterface $resourcesContainer): mixed
+    {
+        return $this->doLoadConfig($resourcesContainer);
     }
 
     /**

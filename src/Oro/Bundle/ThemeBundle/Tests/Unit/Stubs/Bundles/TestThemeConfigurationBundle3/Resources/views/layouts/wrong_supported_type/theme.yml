@@ -1,8 +1,8 @@
 label: Wrong supported type
 description: Wrong supported type.
 groups: [ commerce ]
-icon: bundles/orofrontend/default/images/favicon.ico
-logo: bundles/orofrontend/default/images/logo/demob2b-logo.svg
+icon: bundles/testthemeconfiguration3/default/images/favicon.ico
+logo: bundles/testthemeconfiguration3/default/images/logo/demob2b-logo.svg
 rtl_support: true
 configuration:
   sections:

@@ -2,24 +2,15 @@
 
 namespace Oro\Bundle\ThemeBundle\Validator;
 
-use Oro\Component\Config\CumulativeResourceInfo;
-
 /**
- * Theme configuration validator service interface.
- *
- * Services which will implements this interface will validates theme configuration files theme.yml.
+ * Represents a validator for the configuration of themes.
  */
 interface ConfigurationValidatorInterface
 {
-    public function supports(CumulativeResourceInfo $resource): bool;
-
     /**
-     * The method validates the theme configuration.
+     * Validates the configuration of themes.
      *
-     * Returns a list of messages if the file is not relevant
-     * Example: ['error message', 'not valid message', ...]
-     *
-     * @param CumulativeResourceInfo[] $resources
+     * @return string[] The list of constraint violation messages
      */
-    public function validate(iterable $resources): iterable;
+    public function validate(array $config): array;
 }

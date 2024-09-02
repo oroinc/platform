@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Functional\Grid;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -25,7 +25,7 @@ class GridTest extends WebTestCase
      */
     public function testUserSubGridNotContainActionsAndMassActions(string $gridName, array $gridParams)
     {
-        /** @var Manager $datagridManager */
+        /** @var ManagerInterface $datagridManager */
         $datagridManager = $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
         $datagrid = $datagridManager->getDatagridByRequestParams($gridName, $gridParams);
         $massActions = $datagrid->getConfig()->offsetGetOr(MassActionExtension::ACTION_KEY, []);

@@ -10,41 +10,41 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\AuditableBusinessUnitAwareTrait;
 use Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType;
-use Oro\Bundle\ThemeBundle\Entity\Repository\ThemeConfigurationRepository;
+use Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType as ThemeConfigurationFormType;
 
 /**
- * ThemeConfiguration entity class
+ * Represents a theme configuration.
  */
 #[Config(
-    routeName: "oro_theme_configuration_index",
-    routeView: "oro_theme_configuration_view",
-    routeCreate: "oro_theme_configuration_create",
-    routeUpdate: "oro_theme_configuration_update",
+    routeName: 'oro_theme_configuration_index',
+    routeView: 'oro_theme_configuration_view',
+    routeCreate: 'oro_theme_configuration_create',
+    routeUpdate: 'oro_theme_configuration_update',
     defaultValues: [
-      "entity" => [
-         "icon" => "fa-briefcase"
+      'entity' => [
+         'icon' => 'fa-briefcase'
       ],
-      "ownership" => [
-         "owner_type" => "BUSINESS_UNIT",
-         "owner_field_name" => "owner",
-         "owner_column_name" => "business_unit_owner_id",
-         "organization_field_name" => "organization",
-         "organization_column_name" => "organization_id"
+      'ownership' => [
+         'owner_type' => 'BUSINESS_UNIT',
+         'owner_field_name' => 'owner',
+         'owner_column_name' => 'business_unit_owner_id',
+         'organization_field_name' => 'organization',
+         'organization_column_name' => 'organization_id'
       ],
-      "form" => [
-          "form_type" => "Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType",
-          "grid_name" => "oro-theme-configuration-grid",
+      'form' => [
+          'form_type' => ThemeConfigurationFormType::class,
+          'grid_name' => 'oro-theme-configuration-grid',
       ],
-      "dataaudit" => [
-          "auditable" => true
+      'dataaudit' => [
+          'auditable' => true
       ],
-      "security" => [
-          "type" => "ACL",
-          "group_name" => ""
+      'security' => [
+          'type' => 'ACL',
+          'group_name' => ''
       ]
     ]
 )]
-#[ORM\Entity(repositoryClass: ThemeConfigurationRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: 'oro_theme_configuration')]
 #[ORM\HasLifecycleCallbacks]
 class ThemeConfiguration implements DatesAwareInterface, OrganizationAwareInterface
@@ -62,7 +62,7 @@ class ThemeConfiguration implements DatesAwareInterface, OrganizationAwareInterf
         length: 255,
         nullable: false,
         enumType: ThemeConfigurationType::class,
-        options: ["default" => "Storefront"]
+        options: ['default' => 'Storefront']
     )]
     protected ThemeConfigurationType $type = ThemeConfigurationType::Storefront;
 
@@ -166,7 +166,7 @@ class ThemeConfiguration implements DatesAwareInterface, OrganizationAwareInterf
     public function prePersist(): void
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
     }
 
     #[ORM\PreUpdate]

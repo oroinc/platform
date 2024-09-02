@@ -207,7 +207,7 @@ class StorageDataCollector
      */
     protected function getGrid($name, array $parameters)
     {
-        /** @var Manager $manager */
+        /** @var ManagerInterface $manager */
         $manager = $this->datagridManagerLink->getService();
 
         $dataGrid = null;
