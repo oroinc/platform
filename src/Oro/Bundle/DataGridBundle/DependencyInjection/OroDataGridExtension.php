@@ -36,5 +36,8 @@ class OroDataGridExtension extends Extension
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
         }
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $loader->load('debug.yml');
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\ImportExport;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface as DatagridManager;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridMaterializedViewReader;
 use Oro\Bundle\DataGridBundle\MaterializedView\MaterializedViewByDatagridFactory;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;

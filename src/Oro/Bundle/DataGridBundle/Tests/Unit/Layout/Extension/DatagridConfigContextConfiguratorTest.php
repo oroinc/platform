@@ -3,13 +3,13 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Layout\Extension\DatagridConfigContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
 
 class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dataGridManager;
 
     /** @var DatagridConfigContextConfigurator */
@@ -17,7 +17,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->dataGridManager = $this->createMock(Manager::class);
+        $this->dataGridManager = $this->createMock(ManagerInterface::class);
 
         $this->contextConfigurator = new DatagridConfigContextConfigurator($this->dataGridManager);
     }
