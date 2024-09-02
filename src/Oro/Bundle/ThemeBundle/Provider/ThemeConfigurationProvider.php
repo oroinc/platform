@@ -4,68 +4,80 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ThemeBundle\Provider;
 
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Provides:
- *  - Theme Configuration from system configuration;
- *  - option value of the Theme Configuration's configuration from system configuration;
- *  - theme name of the Theme Configuration from system configuration;
+ * Provides theme configuration options and theme name for a theme that is set in the system configuration.
  */
-class ThemeConfigurationProvider
+class ThemeConfigurationProvider implements ResetInterface
 {
+    private array $configurationCache = [];
+    private array $nameCache = [];
+
     public function __construct(
         private ConfigManager $configManager,
-        private ManagerRegistry $registry
+        private ManagerRegistry $doctrine
     ) {
     }
 
-    public function getThemeConfiguration(object|int|null $scopeIdentifier = null): ?ThemeConfiguration
+    /**
+     * {@inheritDoc}
+     */
+    public function reset(): void
     {
-        $themeConfigurationId = $this->getThemeConfigurationId($scopeIdentifier);
-        if ($themeConfigurationId) {
-            return $this->registry
-                ->getRepository(ThemeConfiguration::class)
-                ->find($themeConfigurationId);
+        $this->configurationCache = [];
+        $this->nameCache = [];
+    }
+
+    public function getThemeConfigurationOptions(object|int|null $scopeIdentifier = null): array
+    {
+        $themeConfigId = $this->getThemeConfigId($scopeIdentifier);
+        if (!$themeConfigId) {
+            return [];
         }
 
-        return null;
+        if (!\array_key_exists($themeConfigId, $this->configurationCache)) {
+            $this->configurationCache[$themeConfigId] = $this->loadValue($themeConfigId, 'configuration') ?? [];
+        }
+
+        return $this->configurationCache[$themeConfigId];
     }
 
     public function hasThemeConfigurationOption(
         string $configurationKey,
         object|int|null $scopeIdentifier = null
     ): bool {
-        $themeConfiguration = $this->getThemeConfiguration($scopeIdentifier);
-        $configuration = $themeConfiguration?->getConfiguration() ?? [];
-
-        return \array_key_exists($configurationKey, $configuration);
+        return \array_key_exists($configurationKey, $this->getThemeConfigurationOptions($scopeIdentifier));
     }
 
-    /**
-     * Returns a specific theme configuration option
-     */
     public function getThemeConfigurationOption(
         string $configurationKey,
         object|int|null $scopeIdentifier = null
     ): mixed {
-        $themeConfiguration = $this->getThemeConfiguration($scopeIdentifier);
-        $configuration = $themeConfiguration?->getConfiguration() ?? [];
-
-        return $configuration[$configurationKey] ?? null;
+        return $this->getThemeConfigurationOptions($scopeIdentifier)[$configurationKey] ?? null;
     }
 
     public function getThemeName(object|int|null $scopeIdentifier = null): ?string
     {
-        return $this->registry
-            ->getRepository(ThemeConfiguration::class)
-            ->getThemeByThemeConfigurationId($this->getThemeConfigurationId($scopeIdentifier));
+        $themeConfigId = $this->getThemeConfigId($scopeIdentifier);
+        if (!$themeConfigId) {
+            return null;
+        }
+
+        if (!\array_key_exists($themeConfigId, $this->nameCache)) {
+            $this->nameCache[$themeConfigId] = $this->loadValue($themeConfigId, 'theme');
+        }
+
+        return $this->nameCache[$themeConfigId];
     }
 
-    private function getThemeConfigurationId(object|int|null $scopeIdentifier = null): ?int
+    private function getThemeConfigId(object|int|null $scopeIdentifier = null): ?int
     {
         return $this->configManager->get(
             Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
@@ -73,5 +85,23 @@ class ThemeConfigurationProvider
             false,
             $scopeIdentifier
         );
+    }
+
+    private function loadValue(int $themeConfigId, string $fieldName): mixed
+    {
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(ThemeConfiguration::class);
+        $rows = $em->createQueryBuilder()
+            ->from(ThemeConfiguration::class, 'e')
+            ->select('e.' . $fieldName)
+            ->where('e.id = :id')
+            ->setParameter('id', $themeConfigId, Types::INTEGER)
+            ->getQuery()
+            ->getArrayResult();
+        if (!$rows) {
+            return null;
+        }
+
+        return $rows[0][$fieldName];
     }
 }

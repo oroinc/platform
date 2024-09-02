@@ -57,9 +57,6 @@ services:
             - '@oro_config.manager'
             - '@doctrine'
 
-    Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider:
-        alias: oro_theme.provider.theme_configuration
-
     # Voter
     oro_theme.acl.voter.theme_configuration_delete:
         class: Oro\Bundle\ThemeBundle\Acl\Voter\ThemeConfigurationDeleteVoter

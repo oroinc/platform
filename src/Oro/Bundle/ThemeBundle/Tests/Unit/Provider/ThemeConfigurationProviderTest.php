@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Provider;
 
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
@@ -14,42 +17,68 @@ use PHPUnit\Framework\TestCase;
 class ThemeConfigurationProviderTest extends TestCase
 {
     private ConfigManager|MockObject $configManager;
-
-    private ObjectRepository|MockObject $repository;
-
+    private EntityManagerInterface|MockObject $em;
     private ThemeConfigurationProvider $provider;
 
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->repository = $this->createMock(ObjectRepository::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry->expects(self::any())
-            ->method('getRepository')
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
             ->with(ThemeConfiguration::class)
-            ->willReturn($this->repository);
+            ->willReturn($this->em);
 
-        $this->provider = new ThemeConfigurationProvider($this->configManager, $registry);
+        $this->provider = new ThemeConfigurationProvider($this->configManager, $doctrine);
     }
 
-    public function testGetThemeConfigurationOptionThemeConfigurationNotSet(): void
+    private function expectsLoadValue(int $themeConfigurationId, string $fieldName, array $rows): void
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
+        $this->em->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('from')
+            ->with(ThemeConfiguration::class, 'e')
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('select')
+            ->with('e.' . $fieldName)
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('where')
+            ->with('e.id = :id')
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('setParameter')
+            ->with('id', $themeConfigurationId, Types::INTEGER)
+            ->willReturnSelf();
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getArrayResult')
+            ->willReturn($rows);
+    }
+
+    public function testGetThemeConfigurationOptionsWhenThemeConfigurationNotSet(): void
     {
         $this->configManager->expects(self::once())
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn(null);
 
-        $this->repository->expects(self::never())
-            ->method('find')
-            ->withAnyParameters();
+        $this->em->expects(self::never())
+            ->method('createQueryBuilder');
 
-        $actualOptionValue = $this->provider->getThemeConfigurationOption('some_option');
-
-        self::assertNull($actualOptionValue);
+        self::assertSame([], $this->provider->getThemeConfigurationOptions());
     }
 
-    public function testGetThemeConfigurationOptionThemeConfigurationNotExisted(): void
+    public function testGetThemeConfigurationOptionsWhenThemeConfigurationNotExist(): void
     {
         $themeConfigurationId = 1;
 
@@ -58,54 +87,19 @@ class ThemeConfigurationProviderTest extends TestCase
             ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn($themeConfigurationId);
 
-        $this->repository->expects(self::once())
-            ->method('find')
-            ->with($themeConfigurationId)
-            ->willReturn(null);
+        $this->expectsLoadValue($themeConfigurationId, 'configuration', []);
 
-        $actualOptionValue = $this->provider->getThemeConfigurationOption('some_option');
-
-        self::assertNull($actualOptionValue);
-    }
-
-    public function testGetThemeConfigurationOptionEmptyThemeConfiguration(): void
-    {
-        $themeConfigurationId = 1;
-        $themeConfiguration = new ThemeConfiguration();
-
-        $this->configManager->expects(self::once())
-            ->method('get')
-            ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
-            ->willReturn($themeConfigurationId);
-
-        $this->repository->expects(self::once())
-            ->method('find')
-            ->with($themeConfigurationId)
-            ->willReturn($themeConfiguration);
-
-        $actualOptionValue = $this->provider->getThemeConfigurationOption('some_option');
-
-        self::assertNull($actualOptionValue);
+        self::assertSame([], $this->provider->getThemeConfigurationOptions());
     }
 
     /**
-     * @dataProvider getThemeConfigurationOptionDataProvider
+     * @dataProvider getThemeConfigurationOptionsDataProvider
      */
-    public function testGetThemeConfigurationOption(?int $scopeIdentifier, string $option, $expectedOptionValue): void
+    public function testGetThemeConfigurationOptions(?int $scopeIdentifier, array $expectedOptions): void
     {
         $themeConfigurationId = 1;
-        $themeConfiguration = (new ThemeConfiguration())
-            ->setConfiguration([
-                'null' => null,
-                'string' => 'some_option_value',
-                'int' => 123,
-                'float' => 123.321,
-                'bool' => false,
-                'array' => ['foo' => 'bar'],
-                'object' => new \stdClass(),
-            ]);
 
-        $this->configManager->expects(self::once())
+        $this->configManager->expects(self::exactly(2))
             ->method('get')
             ->with(
                 Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
@@ -115,14 +109,115 @@ class ThemeConfigurationProviderTest extends TestCase
             )
             ->willReturn($themeConfigurationId);
 
-        $this->repository->expects(self::once())
-            ->method('find')
-            ->with($themeConfigurationId)
-            ->willReturn($themeConfiguration);
+        $this->expectsLoadValue($themeConfigurationId, 'configuration', [['configuration' => $expectedOptions]]);
 
-        $actualOptionValue = $this->provider->getThemeConfigurationOption($option, $scopeIdentifier);
+        self::assertEquals(
+            $expectedOptions,
+            $this->provider->getThemeConfigurationOptions($scopeIdentifier)
+        );
+        // test memory cache
+        self::assertEquals(
+            $expectedOptions,
+            $this->provider->getThemeConfigurationOptions($scopeIdentifier)
+        );
+    }
 
-        self::assertEquals($expectedOptionValue, $actualOptionValue);
+    public function getThemeConfigurationOptionsDataProvider(): array
+    {
+        $noScopeIdentifier = null;
+        $idScopeIdentifier = 123;
+
+        return [
+            // no scope
+            [$noScopeIdentifier, []],
+            [$noScopeIdentifier, ['test_option' => 'test_value']],
+            // scope identifier as id
+            [$idScopeIdentifier, []],
+            [$idScopeIdentifier, ['test_option' => 'test_value']],
+        ];
+    }
+
+    public function testGetThemeConfigurationOptionWhenThemeConfigurationNotSet(): void
+    {
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
+            ->willReturn(null);
+
+        $this->em->expects(self::never())
+            ->method('createQueryBuilder');
+
+        self::assertNull($this->provider->getThemeConfigurationOption('some_option'));
+    }
+
+    public function testGetThemeConfigurationOptionWhenThemeConfigurationNotExist(): void
+    {
+        $themeConfigurationId = 1;
+
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
+            ->willReturn($themeConfigurationId);
+
+        $this->expectsLoadValue($themeConfigurationId, 'configuration', []);
+
+        self::assertNull($this->provider->getThemeConfigurationOption('some_option'));
+    }
+
+    public function testGetThemeConfigurationOptionForEmptyThemeConfiguration(): void
+    {
+        $themeConfigurationId = 1;
+
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
+            ->willReturn($themeConfigurationId);
+
+        $this->expectsLoadValue($themeConfigurationId, 'configuration', [['configuration' => []]]);
+
+        self::assertNull($this->provider->getThemeConfigurationOption('some_option'));
+    }
+
+    /**
+     * @dataProvider getThemeConfigurationOptionDataProvider
+     */
+    public function testGetThemeConfigurationOption(
+        ?int $scopeIdentifier,
+        string $option,
+        mixed $expectedOptionValue
+    ): void {
+        $themeConfigurationId = 1;
+        $options = [
+            'null' => null,
+            'string' => 'some_option_value',
+            'int' => 123,
+            'float' => 123.321,
+            'bool' => false,
+            'array' => ['foo' => 'bar'],
+            'object' => new \stdClass(),
+        ];
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('get')
+            ->with(
+                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                false,
+                false,
+                $scopeIdentifier
+            )
+            ->willReturn($themeConfigurationId);
+
+        $this->expectsLoadValue($themeConfigurationId, 'configuration', [['configuration' => $options]]);
+
+        self::assertEquals(
+            $expectedOptionValue,
+            $this->provider->getThemeConfigurationOption($option, $scopeIdentifier)
+        );
+        // test memory cache
+        self::assertEquals(
+            $expectedOptionValue,
+            $this->provider->getThemeConfigurationOption($option, $scopeIdentifier)
+        );
     }
 
     public function getThemeConfigurationOptionDataProvider(): array
@@ -158,13 +253,12 @@ class ThemeConfigurationProviderTest extends TestCase
     public function testHasThemeConfigurationOption(?int $scopeIdentifier, string $option, $expectedResult): void
     {
         $themeConfigurationId = 1;
-        $themeConfiguration = (new ThemeConfiguration())
-            ->setConfiguration([
-                'null' => null,
-                'string' => 'some_option_value',
-            ]);
+        $options = [
+            'null' => null,
+            'string' => 'some_option_value',
+        ];
 
-        $this->configManager->expects(self::once())
+        $this->configManager->expects(self::exactly(2))
             ->method('get')
             ->with(
                 Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
@@ -174,14 +268,17 @@ class ThemeConfigurationProviderTest extends TestCase
             )
             ->willReturn($themeConfigurationId);
 
-        $this->repository->expects(self::once())
-            ->method('find')
-            ->with($themeConfigurationId)
-            ->willReturn($themeConfiguration);
+        $this->expectsLoadValue($themeConfigurationId, 'configuration', [['configuration' => $options]]);
 
-        $isOptionExists = $this->provider->hasThemeConfigurationOption($option, $scopeIdentifier);
-
-        self::assertEquals($expectedResult, $isOptionExists);
+        self::assertEquals(
+            $expectedResult,
+            $this->provider->hasThemeConfigurationOption($option, $scopeIdentifier)
+        );
+        // test memory cache
+        self::assertEquals(
+            $expectedResult,
+            $this->provider->hasThemeConfigurationOption($option, $scopeIdentifier)
+        );
     }
 
     public function getHasThemeConfigurationOptionDataProvider(): array
@@ -198,6 +295,64 @@ class ThemeConfigurationProviderTest extends TestCase
             [$idScopeIdentifier, 'not_existed_option', false],
             [$idScopeIdentifier, 'null', true],
             [$idScopeIdentifier, 'string', true],
+        ];
+    }
+
+    public function testGetThemeNameWhenThemeConfigurationNotSet(): void
+    {
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
+            ->willReturn(null);
+
+        $this->em->expects(self::never())
+            ->method('createQueryBuilder');
+
+        self::assertNull($this->provider->getThemeName());
+    }
+
+    /**
+     * @dataProvider getThemeNameDataProvider
+     */
+    public function testGetThemeName(?int $scopeIdentifier, ?string $expectedName): void
+    {
+        $themeConfigurationId = 1;
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('get')
+            ->with(
+                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                false,
+                false,
+                $scopeIdentifier
+            )
+            ->willReturn($themeConfigurationId);
+
+        $this->expectsLoadValue($themeConfigurationId, 'theme', [['theme' => $expectedName]]);
+
+        self::assertEquals(
+            $expectedName,
+            $this->provider->getThemeName($scopeIdentifier)
+        );
+        // test memory cache
+        self::assertEquals(
+            $expectedName,
+            $this->provider->getThemeName($scopeIdentifier)
+        );
+    }
+
+    public function getThemeNameDataProvider(): array
+    {
+        $noScopeIdentifier = null;
+        $idScopeIdentifier = 123;
+
+        return [
+            // no scope
+            [$noScopeIdentifier, null],
+            [$noScopeIdentifier, 'test_name'],
+            // scope identifier as id
+            [$idScopeIdentifier, null],
+            [$idScopeIdentifier, 'test_name'],
         ];
     }
 }
