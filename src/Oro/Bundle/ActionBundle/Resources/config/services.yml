@@ -270,3 +270,14 @@ services:
 
     Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider:
         alias: oro_action.provider.original_url_provider
+
+    oro_action.grouped_actions_widget_provider:
+        class: Oro\Bundle\ActionBundle\Provider\GroupedActionsWidgetProvider
+        arguments:
+            - 'activity'
+            - 'view_navButtons.activity'
+            - '@oro_action.helper.context'
+            - '@oro_action.provider.button_search_context'
+            - '@oro_action.provider.button'
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity, priority: -220 }
