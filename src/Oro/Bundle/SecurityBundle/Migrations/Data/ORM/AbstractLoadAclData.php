@@ -95,7 +95,6 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
      * Yaml File Example:
      *
      *     ROLE_NAME:
-     *         bap_role: BAP_ROLE NAME
      *         label: Role Label
      *         permissions:
      *             entity|Some\Bundle\Entity\Name: [VIEW_SYSTEM, CREATE_SYSTEM, ...]
@@ -124,6 +123,7 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
      */
     protected function getRole(ObjectManager $objectManager, $roleName, $roleConfigData)
     {
+        // outdated, kept for backward compatibility with existing data files
         if (!empty($roleConfigData['bap_role'])) {
             $roleName = $roleConfigData['bap_role'];
         }
