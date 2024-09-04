@@ -357,8 +357,7 @@ services:
         arguments:
             - '@router'
             - '@oro_attachment.configurator.provider.attachment_hash_provider'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@logger'
 
     oro_attachment.provider.file_name:
         class: Oro\Bundle\AttachmentBundle\Provider\FileNameProvider
@@ -541,8 +540,8 @@ services:
             - { name: validator.constraint_validator }
 
     Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileUrlValidator:
-        calls:
-            - ['setLogger', ['@logger']]
+        arguments:
+            - '@logger'
         tags:
             - { name: validator.constraint_validator }
 
@@ -556,11 +555,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProvider
         arguments:
             - '@oro_entity_config.config_manager'
-        calls:
-            - [setLogger, ['@logger']]
-
-    Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface:
-        alias: oro_attachment.provider.attachment_entity_config
+            - '@logger'
 
     oro_attachment.provider.image_file_names:
         class: Oro\Bundle\AttachmentBundle\Provider\ImageFileNamesProvider
@@ -658,8 +653,7 @@ services:
             - '@security.authorization_checker'
             - '@oro_attachment.import_export.file_import_strategy_helper'
             - '@translator'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@logger'
         tags:
             - { name: monolog.logger, channel: oro_attachment }
 

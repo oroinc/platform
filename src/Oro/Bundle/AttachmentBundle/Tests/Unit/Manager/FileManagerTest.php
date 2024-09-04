@@ -11,7 +11,6 @@ use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestGaufretteAdapterWithMetadata;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
@@ -68,8 +67,8 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     private function createFileEntity(
         string $originalFileName = 'testFile.txt',
         string $fileName = 'testFile.txt'
-    ): TestFile {
-        $fileEntity = new TestFile();
+    ): File {
+        $fileEntity = new File();
         if (null !== $originalFileName) {
             $fileEntity->setOriginalFilename($originalFileName);
         }
@@ -165,8 +164,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $url = 'http://example.org/image.png';
 
         $externalFile = new ExternalFile($url, 'original-image.png', 4242, 'image/png');
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromUrl')
             ->with($url)
             ->willReturn($externalFile);
@@ -397,8 +395,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method(self::anything());
 
         $externalFile = new ExternalFile($fileEntity->getExternalUrl());
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromFile')
             ->with($fileEntity)
             ->willReturn($externalFile);
@@ -432,7 +429,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(FileNotFoundException::class);
 
-        self::assertNull($this->fileManager->getFileFromFileEntity($fileEntity, true));
+        self::assertNull($this->fileManager->getFileFromFileEntity($fileEntity));
     }
 
     public function testPreUploadDeleteFile(): void

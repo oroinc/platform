@@ -12,11 +12,11 @@ use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Twig\FileExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -33,16 +33,11 @@ class FileExtensionTest extends TestCase
     private const FILE_ID = 42;
 
     private AttachmentManager|MockObject $attachmentManager;
-
     private PictureSourcesProviderInterface|MockObject $pictureSourcesProvider;
-
     private ConfigManager|MockObject $configManager;
-
     private FileTitleProviderInterface|MockObject $fileTitleProvider;
-
     private FileExtension $extension;
-
-    private TestFile $file;
+    private File $file;
 
     protected function setUp(): void
     {
@@ -64,31 +59,27 @@ class FileExtensionTest extends TestCase
 
         $this->extension = new FileExtension($serviceLocator);
 
-        $this->file = (new TestFile())
-            ->setId(self::FILE_ID)
-            ->setFilename('name.pdf')
-            ->setOriginalFilename('original-name.pdf');
+        $this->file = new File();
+        ReflectionUtil::setId($this->file, self::FILE_ID);
+        $this->file->setFilename('name.pdf');
+        $this->file->setOriginalFilename('original-name.pdf');
 
         $fileRepo = $this->createMock(EntityRepository::class);
-        $managerRegistry
-            ->expects(self::any())
+        $managerRegistry->expects(self::any())
             ->method('getRepository')
             ->willReturn($fileRepo);
-        $fileRepo
-            ->expects(self::any())
+        $fileRepo->expects(self::any())
             ->method('find')
             ->with($this->file->getId())
             ->willReturn($this->file);
 
-        $this->attachmentManager
-            ->expects(self::any())
+        $this->attachmentManager->expects(self::any())
             ->method('getFilteredImageUrl')
             ->willReturnCallback(static function (File $file, string $filter, string $format) {
                 return '/' . $filter . '/' . $file->getFilename() . ($format ? '.' . $format : '');
             });
 
-        $this->attachmentManager
-            ->expects(self::any())
+        $this->attachmentManager->expects(self::any())
             ->method('getResizedImageUrl')
             ->willReturnCallback(static function (File $file, int $width, int $height, string $format) {
                 return '/' . $width . '/' . $height . '/' . $file->getFilename() . ($format ? '.' . $format : '');

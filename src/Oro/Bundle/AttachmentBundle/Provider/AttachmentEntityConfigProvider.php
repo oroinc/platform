@@ -4,40 +4,32 @@ namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Provides attachment entity config.
  */
-class AttachmentEntityConfigProvider implements AttachmentEntityConfigProviderInterface, LoggerAwareInterface
+class AttachmentEntityConfigProvider implements AttachmentEntityConfigProviderInterface
 {
-    use LoggerAwareTrait;
+    private EntityConfigManager $entityConfigManager;
+    private LoggerInterface $logger;
 
-    /** @var EntityConfigManager */
-    private $entityConfigManager;
-
-    public function __construct(EntityConfigManager $entityConfigManager)
+    public function __construct(EntityConfigManager $entityConfigManager, LoggerInterface $logger)
     {
         $this->entityConfigManager = $entityConfigManager;
-        $this->setLogger(new NullLogger());
+        $this->logger = $logger;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFieldConfig(string $entityClass, string $fieldName): ?ConfigInterface
     {
         if (!$this->entityConfigManager->hasConfig($entityClass, $fieldName)) {
-            $this->logger
-                ->warning(
-                    sprintf(
-                        'Attachment entity field config for %s entity class and %s field was not found',
-                        $entityClass,
-                        $fieldName
-                    )
-                );
+            $this->logger->warning(
+                'Attachment entity field config for {entityClass} entity class and {fieldName} field was not found.',
+                ['entityClass' => $entityClass, 'fieldName' => $fieldName]
+            );
 
             // Either entity or field is not configurable.
             return null;
@@ -48,15 +40,15 @@ class AttachmentEntityConfigProvider implements AttachmentEntityConfigProviderIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEntityConfig(string $entityClass): ?ConfigInterface
     {
         if (!$this->entityConfigManager->hasConfig($entityClass)) {
-            $this->logger
-                ->warning(
-                    sprintf('Attachment entity config for %s entity class was not found', $entityClass)
-                );
+            $this->logger->warning(
+                'Attachment entity config for {entityClass} entity class was not found.',
+                ['entityClass' => $entityClass]
+            );
 
             // Entity is not configurable.
             return null;

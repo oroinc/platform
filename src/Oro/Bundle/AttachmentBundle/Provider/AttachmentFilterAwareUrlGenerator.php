@@ -3,9 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentHashProvider;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -13,21 +11,20 @@ use Symfony\Component\Routing\RequestContext;
 /**
  * URL generator for files. Adds filterMd5 to parameters when filter is present.
  */
-class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, LoggerAwareInterface
+class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface
 {
-    use LoggerAwareTrait;
-
     private UrlGeneratorInterface $urlGenerator;
-
     private AttachmentHashProvider $attachmentHashProvider;
+    private LoggerInterface $logger;
 
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
-        AttachmentHashProvider $attachmentUrlProvider
+        AttachmentHashProvider $attachmentUrlProvider,
+        LoggerInterface $logger
     ) {
         $this->urlGenerator = $urlGenerator;
         $this->attachmentHashProvider = $attachmentUrlProvider;
-        $this->logger = new NullLogger();
+        $this->logger = $logger;
     }
 
     /**
@@ -52,12 +49,8 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
         } catch (InvalidParameterException $e) {
             $url = '';
             $this->logger->warning(
-                sprintf(
-                    'Failed to generate file url by route "%s" with parameters: %s',
-                    $name,
-                    json_encode($parameters)
-                ),
-                ['e' => $e]
+                'Failed to generate file url.',
+                ['route' => $name, 'routeParameters' => $parameters, 'exception' => $e]
             );
         }
 

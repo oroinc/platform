@@ -5,14 +5,15 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
-use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use Psr\Log\LoggerInterface;
 
 class AttachmentEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use LoggerAwareTraitTestTrait;
-
-    /** @var EntityConfigManager */
+    /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigManager;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var AttachmentEntityConfigProvider */
     private $provider;
@@ -20,68 +21,73 @@ class AttachmentEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(EntityConfigManager::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->provider = new AttachmentEntityConfigProvider($this->entityConfigManager);
-
-        $this->setUpLoggerMock($this->provider);
+        $this->provider = new AttachmentEntityConfigProvider($this->entityConfigManager, $this->logger);
     }
 
     public function testGetFieldConfigWhenNoConfig(): void
     {
-        $this->entityConfigManager
-            ->expects($this->once())
+        $this->entityConfigManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass = 'SampleClass', $fieldName = 'sampleFieldName')
             ->willReturn(false);
 
-        $this->assertLoggerWarningMethodCalled();
+        $this->logger->expects(self::once())
+            ->method('warning')
+            ->with(
+                'Attachment entity field config for {entityClass} entity class and {fieldName} field was not found.',
+                ['entityClass' => $entityClass, 'fieldName' => $fieldName]
+            );
 
-        $this->assertNull($this->provider->getFieldConfig($entityClass, $fieldName));
+        self::assertNull($this->provider->getFieldConfig($entityClass, $fieldName));
     }
 
     public function testGetFieldConfig(): void
     {
-        $this->entityConfigManager
-            ->expects($this->once())
+        $config = $this->createMock(ConfigInterface::class);
+
+        $this->entityConfigManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass = 'SampleClass', $fieldName = 'sampleFieldName')
             ->willReturn(true);
-
-        $this->entityConfigManager
-            ->expects($this->once())
+        $this->entityConfigManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('attachment', $entityClass, $fieldName)
-            ->willReturn($config = $this->createMock(ConfigInterface::class));
+            ->willReturn($config);
 
-        $this->assertEquals($config, $this->provider->getFieldConfig($entityClass, $fieldName));
+        self::assertEquals($config, $this->provider->getFieldConfig($entityClass, $fieldName));
     }
 
     public function testGetEntityConfigWhenNoConfig(): void
     {
-        $this->entityConfigManager
-            ->expects($this->once())
+        $this->entityConfigManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass = 'SampleClass')
             ->willReturn(false);
 
-        $this->assertLoggerWarningMethodCalled();
+        $this->logger->expects(self::once())
+            ->method('warning')
+            ->with(
+                'Attachment entity config for {entityClass} entity class was not found.',
+                ['entityClass' => $entityClass]
+            );
 
-        $this->assertNull($this->provider->getEntityConfig($entityClass));
+        self::assertNull($this->provider->getEntityConfig($entityClass));
     }
 
     public function testGetEntityConfig(): void
     {
-        $this->entityConfigManager
-            ->expects($this->once())
+        $config = $this->createMock(ConfigInterface::class);
+
+        $this->entityConfigManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass = 'SampleClass')
             ->willReturn(true);
-
-        $this->entityConfigManager
-            ->expects($this->once())
+        $this->entityConfigManager->expects(self::once())
             ->method('getEntityConfig')
             ->with('attachment', $entityClass)
-            ->willReturn($config = $this->createMock(ConfigInterface::class));
+            ->willReturn($config);
 
         $this->assertEquals($config, $this->provider->getEntityConfig($entityClass));
     }
