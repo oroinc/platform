@@ -55,7 +55,7 @@ class AttachmentImageContext extends AttachmentContext implements OroPageObjectA
     }
 
     /**
-     * @Then /^(?:|I) download "(?P<attachmentName>[^"]+)" attachment/
+     * @Then /^(?:|I )download "(?P<attachmentName>[^"]+)" attachment/
      */
     public function downloadFile(string $attachmentName): void
     {
@@ -67,7 +67,7 @@ class AttachmentImageContext extends AttachmentContext implements OroPageObjectA
     }
 
     /**
-     * @Then /^(?:|I) can not download "(?P<attachmentName>[^"]+)" attachment/
+     * @Then /^(?:|I )can not download "(?P<attachmentName>[^"]+)" attachment/
      */
     public function downloadFileForbidden(string $attachmentName): void
     {

@@ -2262,10 +2262,10 @@ TEXT;
      * Check visibility checkbox for specified column
      * Show this column in grid
      *
-     * @Given /^(?:|I) show column (?P<columnName>(?:[^"]|\\")*) in grid$/
-     * @Given /^(?:|I) show column (?P<columnName>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"/
-     * @Given /^(?:|I) mark as visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
-     * @Given /^(?:|I) mark as visible column (?P<columnName>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"/
+     * @Given /^(?:|I )show column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )show column (?P<columnName>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"/
+     * @Given /^(?:|I )mark as visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )mark as visible column (?P<columnName>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"/
      */
     public function iShowColumnInGrid($columnName, $gridName = null)
     {
@@ -2280,10 +2280,10 @@ TEXT;
      * Uncheck visibility checkbox for specified column
      * Hide this column in grid
      *
-     * @Given /^(?:|I) hide column (?P<columnName>(?:[^"]|\\")*) in grid$/
-     * @Given /^(?:|I) hide column (?P<columnName>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"/
-     * @Given /^(?:|I) mark as not visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
-     * @Given /^(?:|I) mark as not visible column (?P<columnName>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"/
+     * @Given /^(?:|I )hide column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )hide column (?P<columnName>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"/
+     * @Given /^(?:|I )mark as not visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )mark as not visible column (?P<columnName>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"/
      */
     public function iHideColumnInGrid($columnName, $gridName = null)
     {
@@ -2297,10 +2297,10 @@ TEXT;
     /**
      * Hide all columns in grid except mentioned
      *
-     * @When /^(?:|I) hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
-     * @When /^(?:|I) hide all columns in "(?P<gridName>[^"]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
-     * @When /^(?:|I) hide all columns in grid$/
-     * @When /^(?:|I) hide all columns in "(?P<gridName>[^"]+)"$/
+     * @When /^(?:|I )hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^(?:|I )hide all columns in "(?P<gridName>[^"]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^(?:|I )hide all columns in grid$/
+     * @When /^(?:|I )hide all columns in "(?P<gridName>[^"]+)"$/
      *
      * @param string $exceptions
      * @param string|null $gridName
@@ -2320,10 +2320,10 @@ TEXT;
     /**
      * Show all columns in grid except mentioned
      *
-     * @When /^(?:|I) show all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
-     * @When /^(?:|I) show all columns in "(?P<gridName>[^"]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
-     * @When /^(?:|I) show all columns in grid$/
-     * @When /^(?:|I) show all columns in "(?P<gridName>[^"]+)"$/
+     * @When /^(?:|I )show all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^(?:|I )show all columns in "(?P<gridName>[^"]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^(?:|I )show all columns in grid$/
+     * @When /^(?:|I )show all columns in "(?P<gridName>[^"]+)"$/
      *
      * @param string $exceptions
      * @param string|null $gridName
@@ -2430,8 +2430,8 @@ TEXT;
     /**
      * Show specified filter for grid
      *
-     * @Given /^(?:|I) show filter "(?P<filter>(?:[^"]|\\")*)" in grid$/
-     * @Given /^(?:|I) show filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>[^"]+)" grid$/
+     * @Given /^(?:|I )show filter "(?P<filter>(?:[^"]|\\")*)" in grid$/
+     * @Given /^(?:|I )show filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>[^"]+)" grid$/
      */
     public function iShowFilterInGrid(string $filter, string $gridName = null)
     {
@@ -2471,7 +2471,7 @@ TEXT;
     /**
      * Hide specified filter for grid
      *
-     * @Given /^(?:|I) hide filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>[^"]+)" grid$/
+     * @Given /^(?:|I )hide filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>[^"]+)" grid$/
      *
      * @param string $filter
      * @param string $gridName

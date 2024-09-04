@@ -13,7 +13,7 @@ class GridColumnManager extends Element
      * Represents parent grid
      * @var Element|null
      */
-    private $grid;
+    protected $grid;
 
     /**
      * @param string $title
