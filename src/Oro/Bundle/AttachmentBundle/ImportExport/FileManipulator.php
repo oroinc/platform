@@ -7,9 +7,7 @@ use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -17,29 +15,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Sets {@see File}::$file property by either uploading or cloning it from another {@see File}.
  */
-class FileManipulator implements LoggerAwareInterface
+class FileManipulator
 {
-    use LoggerAwareTrait;
-
     private FileManager $fileManager;
-
     private AuthorizationCheckerInterface $authorizationChecker;
-
     private FileImportStrategyHelper $fileImportStrategyHelper;
-
     private TranslatorInterface $translator;
+    private LoggerInterface $logger;
 
     public function __construct(
         FileManager $fileManager,
         AuthorizationCheckerInterface $authorizationChecker,
         FileImportStrategyHelper $fileImportStrategyHelper,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        LoggerInterface $logger
     ) {
         $this->fileManager = $fileManager;
         $this->authorizationChecker = $authorizationChecker;
         $this->fileImportStrategyHelper = $fileImportStrategyHelper;
         $this->translator = $translator;
-        $this->logger = new NullLogger();
+        $this->logger = $logger;
     }
 
     /**
@@ -76,7 +71,7 @@ class FileManipulator implements LoggerAwareInterface
                 $file->setFile($innerFile);
                 $file->setOriginalFilename($originFile->getOriginalFilename());
             } catch (\Throwable $exception) {
-                $this->logger->error('Failed to clone a file during import', ['e' => $exception]);
+                $this->logger->error('Failed to clone a file during import.', ['exception' => $exception]);
                 $parameters['%error%'] = $exception->getMessage();
             }
         }
@@ -133,7 +128,7 @@ class FileManipulator implements LoggerAwareInterface
                 $parameters + ['%url%' => $exception->getUrl(), '%error%' => $exception->getReason()]
             );
         } catch (\Throwable $exception) {
-            $this->logger->error('Failed to upload a file during import', ['e' => $exception]);
+            $this->logger->error('Failed to upload a file during import.', ['exception' => $exception]);
 
             $errors = [
                 $this->translator->trans(

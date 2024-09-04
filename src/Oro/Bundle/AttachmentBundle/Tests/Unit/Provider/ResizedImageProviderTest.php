@@ -5,12 +5,13 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Imagine\Exception\RuntimeException;
 use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -19,17 +20,11 @@ use Psr\Log\LoggerInterface;
 class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
 {
     private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-
     private ImagineBinaryByFileContentFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $imagineBinaryFactory;
-
     private ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject $imagineBinaryFilter;
-
     private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfig;
-
     private FilterRuntimeConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject $filterRuntimeConfigProvider;
-
     private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
     private ResizedImageProvider $provider;
 
     protected function setUp(): void
@@ -51,10 +46,10 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getImageFile(): TestFile
+    private function getImageFile(): File
     {
-        $file = new TestFile();
-        $file->setId(1);
+        $file = new File();
+        ReflectionUtil::setId($file, 1);
         $file->setFilename('test.jpg');
 
         return $file;

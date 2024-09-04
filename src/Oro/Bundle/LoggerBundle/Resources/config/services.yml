@@ -57,6 +57,7 @@ services:
         class: Oro\Bundle\LoggerBundle\Monolog\Processor\StacktraceProcessor
         arguments:
             - '%log_stacktrace_level%'
+            - '%kernel.project_dir%'
         tags:
             - { name: monolog.processor }
 

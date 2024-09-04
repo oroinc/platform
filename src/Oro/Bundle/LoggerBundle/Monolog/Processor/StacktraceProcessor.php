@@ -11,12 +11,14 @@ use Monolog\Processor\ProcessorInterface;
 class StacktraceProcessor implements ProcessorInterface
 {
     private int $level;
+    private string $projectDir;
 
-    public function __construct(?string $level)
+    public function __construct(?string $level, string $projectDir)
     {
         $this->level = $level && $level !== 'none'
             ? Logger::toMonologLevel($level)
             : PHP_INT_MAX;
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -27,7 +29,7 @@ class StacktraceProcessor implements ProcessorInterface
         if (isset($record['context']['exception']) && $record['level'] >= $this->level) {
             $exception = $record['context']['exception'];
             if ($exception instanceof \Throwable) {
-                $record['context']['stacktrace'] = $exception->getTraceAsString();
+                $record['context']['stacktrace'] = str_replace($this->projectDir, '', $exception->getTraceAsString());
             }
         }
 

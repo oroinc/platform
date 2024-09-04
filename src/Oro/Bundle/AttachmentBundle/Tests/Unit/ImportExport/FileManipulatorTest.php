@@ -8,10 +8,10 @@ use Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper;
 use Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
-use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use Oro\Component\Testing\ReflectionUtil;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,20 +21,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FileManipulatorTest extends \PHPUnit\Framework\TestCase
 {
-    use LoggerAwareTraitTestTrait;
-
     private const ENTITY_CLASS = 'SampleClass';
     private const FIELD_NAME = 'sampleField';
     private const FIELD_LABEL = 'Sample Label';
 
     private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-
     private AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject $authorizationChecker;
-
     private FileImportStrategyHelper|\PHPUnit\Framework\MockObject\MockObject $fileImportStrategyHelper;
-
     private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
     private FileManipulator $manipulator;
 
     protected function setUp(): void
@@ -43,14 +38,12 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->fileImportStrategyHelper = $this->createMock(FileImportStrategyHelper::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->fileImportStrategyHelper
-            ->expects(self::any())
+        $this->fileImportStrategyHelper->expects(self::any())
             ->method('getClass')
             ->willReturn(self::ENTITY_CLASS);
-
-        $this->fileImportStrategyHelper
-            ->expects(self::any())
+        $this->fileImportStrategyHelper->expects(self::any())
             ->method('getFieldLabel')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn(self::FIELD_LABEL);
@@ -59,20 +52,25 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
             $this->fileManager,
             $this->authorizationChecker,
             $this->fileImportStrategyHelper,
-            $this->translator
+            $this->translator,
+            $this->logger
         );
+    }
 
-        $this->setUpLoggerMock($this->manipulator);
+    private function getFile(int $id): File
+    {
+        $file = new File();
+        ReflectionUtil::setId($file, $id);
+        $file->setUuid(UUIDGenerator::v4());
+
+        return $file;
     }
 
     public function testSetFileFromOriginFileWhenNotGranted(): void
     {
-        $originFile = (new TestFile())
-            ->setId(42)
-            ->setUuid(UUIDGenerator::v4());
+        $originFile = $this->getFile(42);
 
-        $this->authorizationChecker
-            ->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with(BasicPermission::VIEW, $originFile)
             ->willReturn(false);
@@ -83,8 +81,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
             '%fieldname%' => self::FIELD_LABEL,
         ];
 
-        $this->translator
-            ->expects(self::exactly(2))
+        $this->translator->expects(self::exactly(2))
             ->method('trans')
             ->withConsecutive(
                 ['oro.attachment.import.failed_to_clone_forbidden', $parameters],
@@ -103,12 +100,9 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetFileFromOriginFileWhenNoFile(): void
     {
-        $originFile = (new TestFile())
-            ->setId(42)
-            ->setUuid(UUIDGenerator::v4());
+        $originFile = $this->getFile(42);
 
-        $this->authorizationChecker
-            ->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with(BasicPermission::VIEW, $originFile)
             ->willReturn(true);
@@ -119,8 +113,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
             '%fieldname%' => self::FIELD_LABEL,
         ];
 
-        $this->translator
-            ->expects(self::exactly(2))
+        $this->translator->expects(self::exactly(2))
             ->method('trans')
             ->withConsecutive(
                 ['oro.attachment.import.failed_to_clone_origin_file_empty'],
@@ -139,27 +132,22 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetFileFromOriginFileWhenFailedToClone(): void
     {
-        $originFile = (new TestFile())
-            ->setId(42)
-            ->setUuid(UUIDGenerator::v4());
+        $originFile = $this->getFile(42);
 
-        $this->authorizationChecker
-            ->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with(BasicPermission::VIEW, $originFile)
             ->willReturn(true);
 
         $exception = new \RuntimeException('Unexpected error');
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('getFileFromFileEntity')
             ->with($originFile)
             ->willThrowException($exception);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
-            ->with('Failed to clone a file during import', ['e' => $exception]);
+            ->with('Failed to clone a file during import.', ['exception' => $exception]);
 
         $parameters = [
             '%origin_id%' => $originFile->getId(),
@@ -167,8 +155,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
             '%fieldname%' => self::FIELD_LABEL,
         ];
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('oro.attachment.import.failed_to_clone', $parameters + ['%error%' => $exception->getMessage()])
             ->willReturnArgument(0);
@@ -182,20 +169,16 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testSetFileFromOriginFileWhenSuccess(): void
     {
         $file = new File();
-        $originFile = (new TestFile())
-            ->setId(42)
-            ->setUuid(UUIDGenerator::v4())
+        $originFile = $this->getFile(42)
             ->setOriginalFilename('original-image.png');
 
-        $this->authorizationChecker
-            ->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with(BasicPermission::VIEW, $originFile)
             ->willReturn(true);
 
         $innerFile = new \SplFileInfo('image.png');
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('getFileFromFileEntity')
             ->with($originFile)
             ->willReturn($innerFile);
@@ -215,16 +198,14 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
         $fileForUpload = new SymfonyFile('image.png', false);
 
         $exception = new \RuntimeException('Unexpected error');
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('setFileFromPath')
             ->with($file, $fileForUpload)
             ->willThrowException($exception);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
-            ->with('Failed to upload a file during import', ['e' => $exception]);
+            ->with('Failed to upload a file during import.', ['exception' => $exception]);
 
         $parameters = [
             '%fieldname%' => self::FIELD_LABEL,
@@ -232,8 +213,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
             '%error%' => $exception->getMessage(),
         ];
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('oro.attachment.import.failed_to_upload', $parameters)
             ->willReturnArgument(0);
@@ -250,16 +230,14 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
         $fileForUpload = new ExternalFile('http://example.org/image.png');
 
         $exception = new \RuntimeException('Unexpected error');
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('setExternalFileFromUrl')
             ->with($file, $fileForUpload->getUrl())
             ->willThrowException($exception);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
-            ->with('Failed to upload a file during import', ['e' => $exception]);
+            ->with('Failed to upload a file during import.', ['exception' => $exception]);
 
         $parameters = [
             '%fieldname%' => self::FIELD_LABEL,
@@ -267,8 +245,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
             '%error%' => $exception->getMessage(),
         ];
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('oro.attachment.import.failed_to_upload', $parameters)
             ->willReturnArgument(0);
@@ -292,14 +269,12 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
                 implode(', ', [SymfonyFile::class, ExternalFile::class])
             )
         );
-        $this->fileManager
-            ->expects(self::never())
+        $this->fileManager->expects(self::never())
             ->method(self::anything());
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
-            ->with('Failed to upload a file during import', ['e' => $exception]);
+            ->with('Failed to upload a file during import.', ['exception' => $exception]);
 
         $parameters = [
             '%fieldname%' => self::FIELD_LABEL,
@@ -307,8 +282,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
             '%error%' => $exception->getMessage(),
         ];
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('oro.attachment.import.failed_to_upload', $parameters)
             ->willReturnArgument(0);
@@ -324,8 +298,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
         $file = new File();
         $fileForUpload = new SymfonyFile('image.png', false);
 
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('setFileFromPath')
             ->with($file, $fileForUpload);
 
@@ -341,14 +314,12 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
         $file = new File();
         $fileForUpload = new ExternalFile('http://example.org/image.png');
 
-        $this->fileImportStrategyHelper
-            ->expects(self::once())
+        $this->fileImportStrategyHelper->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with($fileForUpload, $entity, self::FIELD_NAME)
             ->willReturn([]);
 
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('setExternalFileFromUrl')
             ->with($file, $fileForUpload->getUrl());
 
@@ -364,15 +335,13 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
         $file = new File();
         $fileForUpload = new ExternalFile('http://example.org/image.png');
 
-        $this->fileImportStrategyHelper
-            ->expects(self::once())
+        $this->fileImportStrategyHelper->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with($fileForUpload, $entity, self::FIELD_NAME)
             ->willReturn([]);
 
         $exception = new ExternalFileNotAccessibleException($fileForUpload->getUrl(), 'Not found');
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('setExternalFileFromUrl')
             ->with($file, $fileForUpload->getUrl())
             ->willThrowException($exception);
@@ -383,8 +352,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
             '%error%' => $exception->getReason(),
         ];
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('oro.attachment.import.failed_to_process_external_file', $parameters)
             ->willReturnArgument(0);
@@ -402,14 +370,12 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
         $fileForUpload = new ExternalFile('http://example.org/image.png');
         $errorMessage = 'sample error';
 
-        $this->fileImportStrategyHelper
-            ->expects(self::once())
+        $this->fileImportStrategyHelper->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with($fileForUpload, $entity, self::FIELD_NAME)
             ->willReturn([$errorMessage]);
 
-        $this->fileManager
-            ->expects(self::never())
+        $this->fileManager->expects(self::never())
             ->method('setExternalFileFromUrl');
 
         self::assertEquals(
