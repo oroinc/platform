@@ -11,6 +11,9 @@ services:
     Oro\Bundle\DataGridBundle\Datagrid\Manager:
         alias: 'oro_datagrid.datagrid.manager'
 
+    Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface:
+        alias: 'oro_datagrid.datagrid.manager'
+
     oro_datagrid.datagrid.name_strategy:
         class: Oro\Bundle\DataGridBundle\Datagrid\NameStrategy
         arguments:

@@ -1,0 +1,21 @@
+services:
+  oro_datagrid.datagrid.manager:
+    class: Oro\Bundle\DataGridBundle\Datagrid\TraceableManager
+    public: true
+    arguments:
+      - '@oro_datagrid.configuration.provider.chain'
+      - '@oro_datagrid.datagrid.builder'
+      - '@oro_datagrid.datagrid.request_parameters_factory'
+      - '@oro_datagrid.datagrid.name_strategy'
+    calls:
+      - [setRequestStack, ['@request_stack']]
+    tags:
+        - { name: kernel.reset, method: reset }
+
+  oro_datagrid.data_collector:
+    class: Oro\Bundle\DataGridBundle\DataCollector\GridDataCollector
+    arguments:
+      - '@oro_datagrid.datagrid.manager'
+      - '@event_dispatcher'
+    tags:
+        - { name: data_collector, template: '@OroDataGrid/Collector/grid.html.twig', id: datagrids }
