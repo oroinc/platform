@@ -24,10 +24,15 @@ export default {
     addLocker(cid) {
         lockers[cid] = true;
         scrollUpdate();
+
+        Object.keys(lockers).length && document.querySelector('body').classList.add('modal-is-opened');
     },
 
     removeLocker(cid) {
         delete lockers[cid];
         scrollUpdate();
+
+        !Object.keys(lockers).length &&
+            document.querySelector('body').classList.remove('modal-is-opened');
     }
 };

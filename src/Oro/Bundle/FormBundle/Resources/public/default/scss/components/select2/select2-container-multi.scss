@@ -2,7 +2,9 @@
 
 .select2-container-multi {
     --select-arrow-position: #{$select2-container-multi-arrow-position};
-
+    /* rtl:raw:
+        --select-arrow-position: #{$select2-container-multi-arrow-position-rtl};
+    */
     background: $select-bg $select-arrow-bg-color;
 
     .select2-choices {

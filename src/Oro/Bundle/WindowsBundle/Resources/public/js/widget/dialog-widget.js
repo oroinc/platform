@@ -282,7 +282,6 @@ define(function(require, exports, module) {
                 return;
             }
 
-            document.querySelector('body').classList.remove('modal-is-opened');
             this.removeMessageContainer();
 
             $(window).off(this.eventNamespace());
@@ -324,7 +323,6 @@ define(function(require, exports, module) {
          * Handles content load event and sets focus on first form input
          */
         onContentUpdated: function() {
-            document.querySelector('body').classList.add('modal-is-opened');
             this._fixScrollableHeight();
             this.focusContent();
         },

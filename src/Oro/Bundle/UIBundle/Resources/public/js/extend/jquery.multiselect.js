@@ -14,7 +14,8 @@ define(function(require) {
         options: _.extend({}, $.ech.multiselect.prototype.options, {
             outerTrigger: null,
             refreshNotOpened: true,
-            preventTabOutOfContainer: true
+            preventTabOutOfContainer: true,
+            closeOnOutOfClick: true
         }),
 
         _create(...args) {
@@ -72,7 +73,7 @@ define(function(require) {
 
             // close each widget when clicking on any other element/anywhere else on the page
             $(document).on(events, event => {
-                if (this._isOpen && this._isExcluded(event.target)) {
+                if (this._isOpen && this._isExcluded(event.target) && this.options.closeOnOutOfClick) {
                     this.close();
                 }
             });
@@ -372,9 +373,9 @@ define(function(require) {
             const self = this;
             const button = this.button;
             const menu = this.menu;
-            const speed = this.speed;
+            let speed = this.speed;
             const o = this.options;
-            const args = [];
+            let args = [];
 
             // bail if the multiselectopen event returns false, this widget is disabled, or is already open
             if (this._trigger('beforeopen') === false || button.hasClass('ui-state-disabled') || this._isOpen) {
@@ -382,7 +383,7 @@ define(function(require) {
             }
 
             const $container = menu.find('.ui-multiselect-checkboxes');
-            const effect = o.show;
+            let effect = o.show;
 
             // figure out opening effects/speeds
             if (Array.isArray(o.show)) {
@@ -538,8 +539,6 @@ define(function(require) {
 
         refresh(init) {
             if (this.hasBeenOpened || this.options.refreshNotOpened) {
-                let $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
-                const scrollTop = this.menu.find('.ui-multiselect-checkboxes').scrollTop();
                 let {activeElement} = document;
 
                 if (!this.menu[0].contains(activeElement)) {
@@ -548,8 +547,6 @@ define(function(require) {
 
                 this._super(init);
 
-                // updated checkbox container
-                $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
                 if (activeElement) {
                     if (activeElement.id) {
                         this.menu.find(`#${activeElement.id}`).trigger('focus');
@@ -565,8 +562,6 @@ define(function(require) {
                         this.menu.trigger('focus');
                     }
                 }
-
-                $checkboxesContainer.scrollTop(scrollTop);
             }
             this.headerLinkContainer.attr('role', 'presentation');
             this.menu.find('.ui-multiselect-checkboxes').attr({
