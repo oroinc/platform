@@ -7,25 +7,22 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\AttachmentAwareTestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
+use Oro\Component\Testing\ReflectionUtil;
 
 class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 {
     private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em;
-
     private AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject $attachmentAssociationHelper;
-
     private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
-
     private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $pictureSourcesProvider;
-
     private AttachmentProvider $attachmentProvider;
 
     protected function setUp(): void
@@ -41,6 +38,14 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
             $this->attachmentManager,
             $this->pictureSourcesProvider
         );
+    }
+
+    private function getFile(int $id): File
+    {
+        $file = new File();
+        ReflectionUtil::setId($file, $id);
+
+        return $file;
     }
 
     public function testGetEntityAttachments(): void
@@ -115,30 +120,26 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttachmentInfoNotIsWebpEnabledIfSupported(): void
     {
-        $attachment = (new TestFile())
-            ->setId(1)
+        $attachment = $this->getFile(1)
             ->setMimeType('image/jpeg')
             ->setFileSize(500)
             ->setOriginalFilename('original_file_name');
         $entity = new AttachmentAwareTestClass();
         $entity->setAttachment($attachment);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isImageType')
             ->with('image/jpeg')
             ->willReturn(true);
 
-        $this->pictureSourcesProvider
-            ->expects(self::once())
+        $this->pictureSourcesProvider->expects(self::once())
             ->method('getResizedPictureSources')
             ->with($attachment, AttachmentManager::THUMBNAIL_WIDTH, AttachmentManager::THUMBNAIL_HEIGHT)
             ->willReturn([
                 'src' => '/url/thumbnail.jpg',
                 'sources' => [],
             ]);
-        $this->pictureSourcesProvider
-            ->expects(self::once())
+        $this->pictureSourcesProvider->expects(self::once())
             ->method('getFilteredPictureSources')
             ->with($attachment)
             ->willReturn([
@@ -146,16 +147,13 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFileUrl')
             ->with($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD)
             ->willReturn('/attachment/download/file.jpg');
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getFilteredImageUrl');
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getAttachmentIconClass')
             ->with($attachment)
             ->willReturn('fa-file-o');
@@ -183,22 +181,19 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttachmentInfoIsWebpEnabledIfSupported(): void
     {
-        $attachment = (new TestFile())
-            ->setId(1)
+        $attachment = $this->getFile(1)
             ->setMimeType('image/jpeg')
             ->setFileSize(500)
             ->setOriginalFilename('original_file_name');
         $entity = new AttachmentAwareTestClass();
         $entity->setAttachment($attachment);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isImageType')
             ->with('image/jpeg')
             ->willReturn(true);
 
-        $this->pictureSourcesProvider
-            ->expects(self::once())
+        $this->pictureSourcesProvider->expects(self::once())
             ->method('getResizedPictureSources')
             ->with($attachment, AttachmentManager::THUMBNAIL_WIDTH, AttachmentManager::THUMBNAIL_HEIGHT)
             ->willReturn([
@@ -210,8 +205,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ]);
-        $this->pictureSourcesProvider
-            ->expects(self::once())
+        $this->pictureSourcesProvider->expects(self::once())
             ->method('getFilteredPictureSources')
             ->with($attachment)
             ->willReturn([
@@ -224,13 +218,11 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFileUrl')
             ->with($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD)
             ->willReturn('/attachment/download/file.jpg');
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getAttachmentIconClass')
             ->with($attachment)
             ->willReturn('fa-file-o');

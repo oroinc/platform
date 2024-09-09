@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Async\Export\Executor\DatagridPreExportExecutorInt
 use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface as DatagridManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;

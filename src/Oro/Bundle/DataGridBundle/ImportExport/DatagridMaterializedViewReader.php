@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface as DatagridManager;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as BaseKernelBrowser;
@@ -179,7 +179,7 @@ class Client extends BaseKernelBrowser
                 $request->attributes->set('_theme', 'default');
             }
 
-            /** @var Manager $gridManager */
+            /** @var ManagerInterface $gridManager */
             $gridManager = $container->get('oro_datagrid.datagrid.manager');
             $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
             $acl         = $gridConfig->getAclResource();

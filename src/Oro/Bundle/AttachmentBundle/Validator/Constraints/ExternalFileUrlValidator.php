@@ -4,9 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Validator\Constraints;
 
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\FormBundle\Utils\RegExpUtils;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -15,13 +13,13 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates the external URL of {@see ExternalFile}.
  */
-class ExternalFileUrlValidator extends ConstraintValidator implements LoggerAwareInterface
+class ExternalFileUrlValidator extends ConstraintValidator
 {
-    use LoggerAwareTrait;
+    private LoggerInterface $logger;
 
-    public function __construct()
+    public function __construct(LoggerInterface $logger)
     {
-        $this->logger = new NullLogger();
+        $this->logger = $logger;
     }
 
     /**

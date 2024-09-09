@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
@@ -11,12 +11,15 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Dispatches mass action
+ */
 class MassActionDispatcher
 {
     const REQUEST_TYPE = 'request_type';
 
     /**
-     * @var Manager
+     * @var ManagerInterface
      */
     protected $manager;
 
@@ -36,7 +39,7 @@ class MassActionDispatcher
     protected $iterableResultFactoryRegistry;
 
     public function __construct(
-        Manager $manager,
+        ManagerInterface $manager,
         MassActionHelper $massActionHelper,
         MassActionParametersParser $massActionParametersParser,
         IterableResultFactoryRegistry $iterableResultFactoryRegistry

@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -25,7 +25,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
     private const ENTITY_NAME = 'test_entity';
     private const GRID_NAME   = 'test_grid';
 
-    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $datagridManager;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -42,7 +42,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->datagridManager = $this->createMock(Manager::class);
+        $this->datagridManager = $this->createMock(ManagerInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->storage = $this->createMock(EntityPaginationStorage::class);
         $this->paginationManager = $this->createMock(EntityPaginationManager::class);

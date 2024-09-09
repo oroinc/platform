@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
@@ -245,7 +245,7 @@ class IterableResultFactoryTest extends WebTestCase
         return $this->client->getContainer()->get('oro_datagrid.extension.mass_action.iterable_result_factory.alias');
     }
 
-    private function getDatagridManager(): Manager
+    private function getDatagridManager(): ManagerInterface
     {
         return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
     }

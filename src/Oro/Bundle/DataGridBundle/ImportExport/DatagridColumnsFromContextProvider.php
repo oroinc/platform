@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface as DatagridManager;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;

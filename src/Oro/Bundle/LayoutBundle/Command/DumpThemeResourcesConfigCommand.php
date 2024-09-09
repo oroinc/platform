@@ -47,7 +47,7 @@ HELP
     {
         $output = new SymfonyStyle($input, $output);
 
-        $config = $this->themeConfiguration->loadAndGetConfig(new ResourcesContainer());
+        $config = $this->themeConfiguration->loadConfig(new ResourcesContainer());
         $output->writeln(json_encode($config));
 
         return Command::SUCCESS;

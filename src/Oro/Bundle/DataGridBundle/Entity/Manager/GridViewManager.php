@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Entity\Manager;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridViewUser;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\GridViewUser;
@@ -36,7 +36,7 @@ class GridViewManager
     /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var  Manager */
+    /** @var  ManagerInterface */
     protected $gridManager;
 
     /** @var array */
@@ -60,7 +60,7 @@ class GridViewManager
     public function __construct(
         AclHelper $aclHelper,
         ManagerRegistry $registry,
-        Manager $gridManager,
+        ManagerInterface $gridManager,
         RestrictionManager $restrictionManager
     ) {
         $this->aclHelper = $aclHelper;

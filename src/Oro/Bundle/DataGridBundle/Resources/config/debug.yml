@@ -1,0 +1,16 @@
+services:
+  Oro\Bundle\DataGridBundle\Datagrid\TraceableManager:
+    decorates: oro_datagrid.datagrid.manager
+    arguments:
+      - '@.inner'
+      - '@request_stack'
+    tags:
+        - { name: kernel.reset, method: reset }
+
+  oro_datagrid.data_collector:
+    class: Oro\Bundle\DataGridBundle\DataCollector\GridDataCollector
+    arguments:
+      - '@oro_datagrid.datagrid.manager'
+      - '@event_dispatcher'
+    tags:
+        - { name: data_collector, template: '@OroDataGrid/Collector/grid.html.twig', id: datagrids }

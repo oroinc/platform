@@ -17,21 +17,16 @@ services:
             - { name: twig.extension }
 
     # Validators
-    oro_theme.chain_configuration_validator:
-        class: Oro\Bundle\ThemeBundle\Validator\ChainConfigurationValidator
+    oro_theme.configuration_validator:
+        class: Oro\Bundle\ThemeBundle\Validator\ConfigurationValidator
         arguments:
             - '@oro_layout.theme_extension.configuration.provider'
             - !tagged_iterator oro_theme.configuration_validator
 
-    oro_theme.definition_configuration_validator:
-        class: Oro\Bundle\ThemeBundle\Validator\DefinitionConfigurationValidator
-        arguments:
-            - '@oro_layout.theme_extension.configuration'
-        tags:
-            - { name: oro_theme.configuration_validator, alias: oro_theme_definition_configuration_validator }
-
-    oro_theme.preview_configuration_validator:
+    oro_theme.configuration_validator.preview:
         class: Oro\Bundle\ThemeBundle\Validator\PreviewConfigurationValidator
+        arguments:
+            - ['png', 'jpg']
         tags:
             - { name: oro_theme.configuration_validator, alias: oro_theme_preview_configuration_validator }
 
@@ -61,9 +56,6 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@doctrine'
-
-    Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider:
-        alias: oro_theme.provider.theme_configuration
 
     # Voter
     oro_theme.acl.voter.theme_configuration_delete:

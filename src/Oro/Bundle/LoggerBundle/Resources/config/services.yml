@@ -1,5 +1,7 @@
 parameters:
+    log_stacktrace_level: null
     oro_logger.detailed_logs_default_level: error
+
 services:
     oro_logger.cache:
         class: Symfony\Component\Cache\Adapter\ArrayAdapter
@@ -48,6 +50,14 @@ services:
 
     oro_logger.processor.log_message:
         class: Monolog\Processor\PsrLogMessageProcessor
+        tags:
+            - { name: monolog.processor }
+
+    oro_logger.processor.stacktrace:
+        class: Oro\Bundle\LoggerBundle\Monolog\Processor\StacktraceProcessor
+        arguments:
+            - '%log_stacktrace_level%'
+            - '%kernel.project_dir%'
         tags:
             - { name: monolog.processor }
 

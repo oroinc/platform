@@ -5,7 +5,6 @@ The current file describes significant changes in the code that may affect the u
 ## UNRELEASED
 
 ### Added
-* Added public method `loadThemeResources` to `\Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface`
 
 #### ThemeBundle
 * Added theme configuration feature that provides theme developers a way to make a storefront theme configurable by a store owner.

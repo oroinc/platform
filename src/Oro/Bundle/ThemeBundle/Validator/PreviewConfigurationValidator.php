@@ -2,65 +2,48 @@
 
 namespace Oro\Bundle\ThemeBundle\Validator;
 
-use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 
 /**
- * Theme configuration validator service.
- *
- * Service validates the validity of files theme.yml.
- * */
+ * Validates that preview images exist and have accepted file extension.
+ */
 class PreviewConfigurationValidator implements ConfigurationValidatorInterface
 {
-    private const SUPPORTS_EXTENSIONS = ['png', 'jpg'];
+    private const PUBLIC_PATH_PREFIX = 'bundles/';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supports(CumulativeResourceInfo $resource): bool
-    {
-        $configuration = $resource->data['configuration'] ?? [];
+    private array $bundlePublicDirs = [];
 
-        return !empty($configuration);
+    public function __construct(
+        private array $supportedExtensions
+    ) {
     }
 
     /**
      * {@inheritDoc}
      */
-    public function validate(iterable $resources): iterable
+    public function validate(array $config): array
     {
         $messages = [];
-        $manager = CumulativeResourceManager::getInstance();
-
-        foreach ($resources as $resource) {
-            $bundleDir = $manager->getBundleDir($resource->bundleClass);
-            $bundlePublicDir = $bundleDir . '/Resources/public';
-            $configuration = $resource->data['configuration'] ?? [];
-
-            foreach ($configuration['sections'] ?? [] as $sKey => $section) {
-                foreach ($section['options'] ?? [] as $oKey => $option) {
-                    foreach ($option['previews'] ?? [] as $pKey => $preview) {
-                        if (!$this->isImageValid($preview, $bundlePublicDir)) {
-                            $configKey = implode(
-                                '.',
-                                [
-                                    'configuration',
-                                    'sections',
-                                    $sKey,
-                                    $oKey,
-                                    $pKey
-                                ]
-                            );
-
-                            $messages[] = sprintf(
-                                '%s in %s. The preview file %s does not exist, ' .
-                                'or the extension is not supported, supported extensions are [%s]',
-                                $configKey,
-                                $resource->bundleClass,
-                                $preview,
-                                implode(', ', self::SUPPORTS_EXTENSIONS)
-                            );
+        foreach ($config as $themeConfig) {
+            $sections = $themeConfig['configuration']['sections'] ?? [];
+            foreach ($sections as $sectionName => $section) {
+                $options = $section['options'] ?? [];
+                foreach ($options as $optionName => $option) {
+                    $previews = $option['previews'] ?? [];
+                    foreach ($previews as $pathName => $path) {
+                        if ($this->isImageValid($path)) {
+                            continue;
                         }
+                        $messages[] = sprintf(
+                            '%s. The preview file %s does not exist'
+                            . ' or the extension is not supported. Supported extensions are [%s].',
+                            implode(
+                                '.',
+                                ['configuration.sections', $sectionName, 'options', $optionName, 'previews', $pathName]
+                            ),
+                            $path,
+                            implode(', ', $this->supportedExtensions)
+                        );
                     }
                 }
             }
@@ -69,20 +52,49 @@ class PreviewConfigurationValidator implements ConfigurationValidatorInterface
         return $messages;
     }
 
-    private function isImageValid(string $preview, string $bundlePublicDir): bool
+    private function isImageValid(string $path): bool
     {
-        $publicPos = mb_strpos($preview, '/', mb_strlen('bundles/'));
-        if ($publicPos !== false) {
-            $bundlePath = $bundlePublicDir . mb_substr($preview, $publicPos);
-            $fileInfo = new \SplFileInfo($bundlePath);
-
-            if (file_exists($bundlePath)
-                && in_array($fileInfo->getExtension(), self::SUPPORTS_EXTENSIONS)
-            ) {
-                return true;
-            }
+        if (!str_starts_with($path, self::PUBLIC_PATH_PREFIX)) {
+            return false;
         }
 
-        return false;
+        $publicPathPrefixLength = \strlen(self::PUBLIC_PATH_PREFIX);
+        $bundleNameEndPos = strpos($path, '/', $publicPathPrefixLength);
+        if (false === $bundleNameEndPos) {
+            return false;
+        }
+
+        $bundleName = substr($path, $publicPathPrefixLength, $bundleNameEndPos - $publicPathPrefixLength);
+        $bundlePublicDir = $this->getBundlePublicDir($bundleName);
+        if (null === $bundlePublicDir) {
+            return false;
+        }
+
+        $bundlePath = $bundlePublicDir . substr($path, $bundleNameEndPos);
+
+        return
+            file_exists($bundlePath)
+            && \in_array((new \SplFileInfo($bundlePath))->getExtension(), $this->supportedExtensions, true);
+    }
+
+    private function getBundlePublicDir(string $bundleName): ?string
+    {
+        $bundleName = strtolower($bundleName);
+        if (!\array_key_exists($bundleName, $this->bundlePublicDirs)) {
+            $bundleClass = null;
+            $bundleFullName = $bundleName . 'bundle';
+            $manager = CumulativeResourceManager::getInstance();
+            foreach ($manager->getBundles() as $name => $class) {
+                if (strtolower($name) === $bundleFullName) {
+                    $bundleClass = $class;
+                    break;
+                }
+            }
+            $this->bundlePublicDirs[$bundleName] = null !== $bundleClass
+                ? $manager->getBundleDir($bundleClass) . '/Resources/public'
+                : null;
+        }
+
+        return $this->bundlePublicDirs[$bundleName];
     }
 }

@@ -1,0 +1,203 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.datagrids|length > 0 %}
+        {% set icon %}
+            {{ source('@OroDataGrid/Collector/icon.svg') }}
+            <span class="sf-toolbar-value">{{ collector.datagrids|length }}</span>
+        {% endset %}
+        {% set text %}
+            {% for datagridName, datagrids in collector.datagrids %}
+                <div class="sf-toolbar-info-piece">
+                    <b>{{ datagridName }}</b>
+                    <span>{{ (datagrids|first).configuration.source.type }}</span>
+                </div>
+            {% endfor %}
+        {% endset %}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
+    {% endif %}
+{% endblock %}
+
+
+{% block menu %}
+    <span class="label {{ collector.datagrids|length ? '' : 'disabled' }}">
+    <span class="icon">{{ source('@OroDataGrid/Collector/icon.svg') }}</span>
+    <strong>Datagrids</strong>
+    <span class="count">
+        <span>{{ collector.datagrids|length }}</span>
+    </span>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Rendered Datagrids</h2>
+
+    <div class="sf-tabs">
+    {% for datagridName, datagrids in collector.datagrids %}
+        <div class="tab">
+            <h3 class="tab-title">{{ datagridName }}</h3>
+            <div class="tab-content">
+                <div class="sf-tabs">
+                    {% for datagridParamsHash, datagridData in datagrids %}
+                        <div class="tab">
+                            <h3 class="tab-title">Configuration</h3>
+                            <div class="tab-content">
+                                {{ _self.render_table(datagridData.configuration) }}
+                            </div>
+                        </div>
+                        <div class="tab">
+                            <h3 class="tab-title">Parameters</h3>
+                            <div class="tab-content">
+                                {{ _self.render_table(datagridData.parameters) }}
+                            </div>
+                        </div>
+                        <div class="tab">
+                            <h3 class="tab-title">Resolved Metadata</h3>
+                            <div class="tab-content">
+                                {{ _self.render_table(datagridData.resolved_metadata) }}
+                            </div>
+                        </div>
+                        {{ _self.render_listeners_table(collector.listeners, collector.events, datagridData.names) }}
+                        {{ _self.render_extensions_table(datagridData.extensions) }}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% macro render_table(datagrid) %}
+    <table>
+    <thead>
+    <tr>
+        <th class="text-right">Option</th>
+        <th>Value</th>
+    </tr>
+    </thead>
+    {% for columnName, columnValue in datagrid %}
+        <tr>
+            <th class="text-right nowrap">{{ columnName }}</th>
+            <td class="font-normal">{{ profiler_dump(columnValue) }}</td>
+        </tr>
+    {% endfor %}
+</table>
+{% endmacro %}
+
+
+{% macro render_listeners_table(listeners, events, names) %}
+    {% set gridSpecificEvents = [] %}
+    {% for event in events %}
+        {% for name in names %}
+            {% set gridSpecificEvents = gridSpecificEvents|merge([event ~ '.' ~ name]) %}
+        {% endfor %}
+    {% endfor %}
+    {% set events = events|merge(gridSpecificEvents) %}
+
+    {% set listenersCount = 0 %}
+    {% set datagridSpecificListenersCount = null %}
+    {% set content %}
+        <div class="tab-content">
+        {% if listeners is empty %}
+            <div class="empty">
+                <p>
+                    <strong>There are no called listeners</strong>.
+                </p>
+            </div>
+        {% else %}
+            <table>
+                <thead>
+                <tr>
+                    <th class="text-right">Priority</th>
+                    <th>Listener</th>
+                </tr>
+                </thead>
+
+                {% set previous_event = (listeners|first).event %}
+                {% for listener in listeners %}
+                    {% if listener.event in events %}
+                        {% set listenersCount = listenersCount + 1 %}
+                        {% set trAttrs = ''|raw %}
+                        {% if listener.event in gridSpecificEvents %}
+                            {% set datagridSpecificListenersCount = datagridSpecificListenersCount + 1 %}
+                            {% set trAttrs %}class="status status-success"{% endset %}
+                        {% endif %}
+                        {% if loop.first or listener.event != previous_event %}
+                            {% if not loop.first %}
+                                </tbody>
+                            {% endif %}
+                            <tbody>
+                            <tr {{ trAttrs }}>
+                                <th colspan="2" class="colored font-normal">{{ listener.event }}</th>
+                            </tr>
+                            {% set previous_event = listener.event %}
+                        {% endif %}
+                        <tr {{ trAttrs }}>
+                            <td class="text-right nowrap">{{ listener.priority|default('-') }}</td>
+                            <td class="font-normal">{{ profiler_dump(listener.stub) }}</td>
+                        </tr>
+                        {% if loop.last %}
+                            </tbody>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </table>
+        {% endif %}
+        </div>
+    {% endset %}
+
+{% set title %}
+    <h3 class="tab-title">{{ listenersCount }} called listeners
+        <span class="badge">
+            ({{ datagridSpecificListenersCount|default('no') }} datagrid specific)
+        </span>
+    </h3>
+{% endset %}
+
+    <div class="tab">
+        {{ title }}
+        {{ content }}
+    </div>
+{% endmacro %}
+
+{% macro render_extensions_table(extensions) %}
+    {% set extensionsCount = 0 %}
+    {% set content %}
+        <div class="tab-content">
+        {% if extensions is empty %}
+            <div class="empty">
+                <p>
+                    <strong>There are no called extensions</strong>.
+                </p>
+            </div>
+        {% else %}
+            <table>
+                <thead>
+                <tr>
+                    <th class="text-right">Priority</th>
+                    <th>Extension</th>
+                </tr>
+                </thead>
+                {% for extension in extensions %}
+                    {% set extensionsCount = extensionsCount + 1 %}
+                    <tr>
+                        <td class="text-right nowrap">{{ extension.priority|default('-') }}</td>
+                        <td class="font-normal">{{ profiler_dump(extension.stub) }}</td>
+                    </tr>
+                {% if loop.last %}
+                    </tbody>
+                {% endif %}
+                {% endfor %}
+            </table>
+        {% endif %}
+        </div>
+    {% endset %}
+    {% set title %}
+        <h3 class="tab-title">{{ extensionsCount }} applied extensions</h3>
+    {% endset %}
+
+    <div class="tab">
+        {{ title }}
+        {{ content }}
+    </div>
+{% endmacro %}

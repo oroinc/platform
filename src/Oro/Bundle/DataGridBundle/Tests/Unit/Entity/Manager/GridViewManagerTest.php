@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewUserRepository;
@@ -30,7 +30,7 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
     /** @var User */
     private $user;
 
-    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dataGridManager;
 
     /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
@@ -44,7 +44,7 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
         $this->user = new User();
         $this->user->setUsername('username');
 
-        $this->dataGridManager = $this->createMock(Manager::class);
+        $this->dataGridManager = $this->createMock(ManagerInterface::class);
         $this->restrictionManager = $this->createMock(RestrictionManager::class);
         $this->gridViewRepository = $this->createMock(GridViewRepository::class);
         $this->gridViewUserRepository = $this->createMock(GridViewUserRepository::class);

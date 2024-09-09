@@ -1,8 +1,8 @@
 label: Correct config theme
 description: Correct config theme.
 groups: [ commerce ]
-icon: bundles/orofrontend/default/images/favicon.ico
-logo: bundles/orofrontend/default/images/logo/demob2b-logo.svg
+icon: bundles/testthemeconfiguration/default/images/favicon.ico
+logo: bundles/testthemeconfiguration/default/images/logo/demob2b-logo.svg
 rtl_support: true
 configuration:
   sections:
@@ -17,8 +17,8 @@ configuration:
             modern: 'Lightweight colors optimized for modern high screen resolutions'
             traditional: 'More contrasting color selections that work well on all types of screens'
           previews:
-            modern: 'bundles/orofrontend/images/previews/modern-palette.png'
-            traditional: 'bundles/orofrontend/images/previews/tradition-pallete.jpg'
+            modern: 'bundles/testthemeconfiguration/images/previews/modern-palette.png'
+            traditional: 'bundles/testthemeconfiguration/images/previews/tradition-pallete.jpg'
           options:
             as_boolean: false
             as_empty_string: ''
@@ -31,8 +31,8 @@ configuration:
           type: checkbox
           default: unchecked
           previews:
-            checked: 'bundles/orofrontend/images/previews/rounded-controls.png'
-            unchecked: 'bundles/orofrontend/images/previews/square-controls.jpg'
+            checked: 'bundles/testthemeconfiguration/images/previews/rounded-controls.png'
+            unchecked: 'bundles/testthemeconfiguration/images/previews/square-controls.jpg'
         button_color:
           label: 'Primary Call-To-Action Buttons Color'
           type: radio

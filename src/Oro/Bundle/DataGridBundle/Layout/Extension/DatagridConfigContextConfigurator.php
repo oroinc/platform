@@ -2,16 +2,19 @@
 
 namespace Oro\Bundle\DataGridBundle\Layout\Extension;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
 
+/**
+ * Sets grid config for given grid name(-s) into layout context
+ */
 class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
 {
-    /** @var Manager */
+    /** @var ManagerInterface */
     private $dataGridManager;
 
-    public function __construct(Manager $dataGridManager)
+    public function __construct(ManagerInterface $dataGridManager)
     {
         $this->dataGridManager = $dataGridManager;
     }
