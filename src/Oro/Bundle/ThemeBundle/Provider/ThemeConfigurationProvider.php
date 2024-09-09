@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -93,7 +94,7 @@ class ThemeConfigurationProvider implements ResetInterface
         $em = $this->doctrine->getManagerForClass(ThemeConfiguration::class);
         $rows = $em->createQueryBuilder()
             ->from(ThemeConfiguration::class, 'e')
-            ->select('e.' . $fieldName)
+            ->select(QueryBuilderUtil::sprintf('e.%s', $fieldName))
             ->where('e.id = :id')
             ->setParameter('id', $themeConfigId, Types::INTEGER)
             ->getQuery()
