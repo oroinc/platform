@@ -26,6 +26,7 @@
     .input {
         padding-left: $input-btn-size;
         padding-right: $input-btn-size;
+        text-align: center;
     }
 
     .input-quantity-btn {
@@ -33,8 +34,8 @@
         top: 1px;
         bottom: 1px;
         min-height: $form-row-input-button-min-height;
-        padding: $form-row-input-button-padding;
         color: $form-row-input-button-color;
+        z-index: $form-row-input-button-z-index;
 
         &--minus {
             left: 1px;
