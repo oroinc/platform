@@ -42,6 +42,9 @@ define(function(require, exports, module) {
         /** @property {string}: 'icon-text' | 'icon-only' | 'text-only' */
         launcherMode: '',
 
+        /** @property {string}: 'icon-text' | 'icon-only' | 'text-only' */
+        dropdownLauncherMode: '',
+
         /**
          * Allow launcher to use / set default aria-label attribute if it is not defined
          *
@@ -122,13 +125,20 @@ define(function(require, exports, module) {
                 this.allowDefaultAriaLabel = opts.allowDefaultAriaLabel;
             }
 
+            ActionCell.__super__.initialize.call(this, options);
+            this.actions = this.createActions();
+
+            this.isDropdownActions = this.actions.length >= this.actionsHideCount;
+
             if (_.isObject(opts.themeOptions.launcherOptions)) {
                 this.launcherMode = opts.themeOptions.launcherOptions.launcherMode || this.launcherMode;
                 this.actionsState = opts.themeOptions.launcherOptions.actionsState || this.actionsState;
+
+                if (this.isDropdownActions) {
+                    this.launcherMode = opts.themeOptions.launcherOptions.dropdownLauncherMode || this.launcherMode;
+                }
             }
 
-            ActionCell.__super__.initialize.call(this, options);
-            this.actions = this.createActions();
             this.model.set('availableActions', this.actions);
             _.each(this.actions, function(action) {
                 this.listenTo(action, 'preExecute', this.onActionRun);
@@ -279,8 +289,6 @@ define(function(require, exports, module) {
 
                 return this;
             }
-
-            this.isDropdownActions = this.actions.length >= this.actionsHideCount;
 
             if (this.actionsState === 'show') {
                 this.isDropdownActions = false;
