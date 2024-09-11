@@ -39,7 +39,7 @@ define(function(require) {
             });
 
             mask.show(zIndex - 1)
-                .onhide(function(e) {
+                .onhide(function() {
                     $(e.target).timepicker('hide');
                 });
         })
