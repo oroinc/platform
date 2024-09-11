@@ -32,19 +32,12 @@ define(function(require) {
                 e.target.timepickerObj.list.addClass('input-in-dialog-widget');
             }
 
-            $(document).on('click.timepickerOutgoing', event => {
-                if (!e.target.contains(event.target)) {
-                    $(e.target).timepicker('hide');
-                }
-            });
-
             mask.show(zIndex - 1)
-                .onhide(function(e) {
+                .onhide(function() {
                     $(e.target).timepicker('hide');
                 });
         })
         .on('hideTimepicker', function(e) {
             mask.hide();
-            $(document).off('click.timepickerOutgoing');
         });
 });
