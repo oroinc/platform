@@ -156,8 +156,11 @@ define(function(require, exports, module) {
          */
         getTemplateData: function() {
             const data = ModalView.__super__.getTemplateData.call(this);
-            const fields = ['allowOk', 'allowCancel', 'cancelButtonClass', 'closeButtonClass', 'secondaryButtonClass',
-                'okButtonClass', 'closeText', 'cancelText', 'okText', 'secondaryText', 'title', 'content'];
+            const fields = [
+                'allowOk', 'allowCancel', 'cancelButtonClass', 'closeButtonClass', 'secondaryButtonClass',
+                'okButtonClass', 'closeText', 'cancelText', 'okText', 'secondaryText', 'title', 'content',
+                'allowClose'
+            ];
 
             return _.extend({
                 modalId: this.cid

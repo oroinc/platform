@@ -42,7 +42,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             }
         });
 
-        $(document).on('keydown click', 'textarea[data-autoresize]', e => {
+        $(document).on('keydown click focus', 'textarea[data-autoresize]', e => {
             const el = e.target;
             setTimeout(() => {
                 if (el.scrollHeight > el.offsetHeight) {
@@ -144,6 +144,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         layout.onPageRendered(adjustHeight);
 
         $(window).on('resize', _.debounce(adjustHeight, 40));
+
+        if (window.visualViewport) {
+            const onVisualViewportResize = event => {
+                mediator.trigger('visualViewport:resize', event);
+                document.querySelector(':root').style.setProperty(
+                    '--visual-viewport-height',
+                    `${window.visualViewport.height}px`
+                );
+            };
+
+            $(window.visualViewport).on('resize', onVisualViewportResize);
+            onVisualViewportResize();
+        }
 
         mediator.on('page:afterChange', adjustHeight);
 
