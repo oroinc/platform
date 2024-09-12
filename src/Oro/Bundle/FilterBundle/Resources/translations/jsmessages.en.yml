@@ -14,7 +14,9 @@
 oro:
     filter:
         by: Filter By
-        reset.label: Clear All Filters
+        reset:
+            label: Clear All Filters
+            short_label: Clear All
         wrapper:
             reset:
                 hint: Reset
@@ -94,6 +96,8 @@ oro:
             max_length: Please enter at most {{ max_length }} characters
         datagrid-toolbar:
             filters: Filter Toggle
+            filters_overlay: Filter By
+            filters_overlay_entity_hint: Filter {{ entityHint }} By
             aria_label: Expand or Collapse Grid Filters
             filters_count: Filters ({{ count }})
             save_filters: Save Filters
@@ -120,3 +124,6 @@ oro:
         updateButton:
             aria_label: 'Apply {{ label }}'
             text: 'Apply'
+        clearFilterButton:
+            aria_label: 'Clear {{ label }}'
+            text: 'Clear Filter'

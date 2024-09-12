@@ -13,9 +13,9 @@ use Psr\Log\LoggerInterface;
 class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDescription()
+    public function getDescription(): array|string
     {
         $logger = new ArrayLogger();
         $logger->info('Remove outdated entity configuration data with scope name "note".');
@@ -25,43 +25,33 @@ class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function execute(LoggerInterface $logger)
+    public function execute(LoggerInterface $logger): void
     {
         $this->doExecute($logger);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param boolean $dryRun
-     */
-    protected function doExecute(LoggerInterface $logger, $dryRun = false)
+    private function doExecute(LoggerInterface $logger, bool $dryRun = false): void
     {
         $sql = 'SELECT id, class_name, data FROM oro_entity_config';
         $this->logQuery($logger, $sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
+        foreach ($rows as $row) {
+            $data = !empty($row['data'])
+                ? $this->connection->convertToPHPValue($row['data'], Types::ARRAY)
+                : [];
+            if (!\array_key_exists('note', $data)) {
+                continue;
+            }
 
-        $entityConfigs = $this->connection->fetchAllAssociative($sql);
-        $entityConfigs = array_map(function ($entityConfig) {
-            $entityConfig['data'] = empty($entityConfig['data'])
-                ? []
-                : $this->connection->convertToPHPValue($entityConfig['data'], Types::ARRAY);
-
-            return $entityConfig;
-        }, $entityConfigs);
-
-        foreach ($entityConfigs as $entityConfig) {
-            unset($entityConfig['data']['note']);
-            $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
-            $parameters = [
-                $this->connection->convertToDatabaseValue($entityConfig['data'], Types::ARRAY),
-                $entityConfig['id']
-            ];
-
-            $this->logQuery($logger, $sql, $parameters);
-
+            unset($data['note']);
+            $sql = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
+            $params = ['data' => $data, 'id' => $row['id']];
+            $types = ['data' => Types::ARRAY, 'id' => Types::INTEGER];
+            $this->logQuery($logger, $sql, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeStatement($sql, $parameters);
+                $this->connection->executeStatement($sql, $params, $types);
             }
         }
     }

@@ -1,3 +1,4 @@
+<% let oroui = _.macros('oroui') %>
 <div class="data-filter-choice" data-date-filter-template>
     <%= parts.join('') %>
 
@@ -23,12 +24,27 @@
                 >
             </div>
         </div>
+        <div class="filter-action-row">
+            <% if (allowClearButtonInFilter) { %>
+            <button type="button"
+                data-role="clear-filter"
+                class="btn btn--flat filter-clear hidden"
+                aria-label="<%- clearFilterButtonAriaLabel %>"
+            ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+            <% } %>
+            <button type="button"
+                class="btn filter-update"
+                aria-label="<%- updateButtonAriaLabel %>"
+            ><%- _.__("oro.filter.updateButton.text") %></button>
+        </div>
     <% } else { %>
         <div class="filter-date-range">
             <div class="filter-start-date">
                 <div class="datepicker-box">
                     <span class="datepicker-box__icon" aria-hidden="true">
-                        <span class="fa-calendar"></span>
+                        <%= oroui.renderIcon({
+                            name: 'calendar'
+                        }) %>
                     </span>
                     <input type="text"
                            class="<%- inputClass %>"
@@ -43,7 +59,9 @@
             <div class="filter-end-date">
                 <div class="datepicker-box">
                     <span class="datepicker-box__icon" aria-hidden="true">
-                        <span class="fa-calendar"></span>
+                        <%= oroui.renderIcon({
+                            name: 'calendar'
+                        }) %>
                     </span>
                     <input type="text" class="<%- inputClass %>"
                            value="<%- value.value.end %>"
@@ -55,6 +73,13 @@
             </div>
         </div>
         <div class="filter-action-row">
+            <% if (allowClearButtonInFilter) { %>
+                <button type="button"
+                    data-role="clear-filter"
+                    class="btn btn--flat filter-clear hidden"
+                    aria-label="<%- clearFilterButtonAriaLabel %>"
+                ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+            <% } %>
             <button type="button"
                 class="btn filter-update"
                 aria-label="<%- updateButtonAriaLabel %>"

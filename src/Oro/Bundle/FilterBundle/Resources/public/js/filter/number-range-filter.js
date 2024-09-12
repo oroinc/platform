@@ -106,7 +106,7 @@ define(function(require) {
         _updateValueField: function() {
             NumberRangeFilter.__super__._updateValueField.call(this);
 
-            const type = this.$(this.criteriaValueSelectors.type).val();
+            const type = this.getType();
             const filterEnd = this.$('.filter-separator, .filter-end');
             const {inputFieldAriaLabel, rangeStartFieldAriaLabel} = this.getTemplateDataProps();
 

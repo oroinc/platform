@@ -256,6 +256,12 @@
     .select2-selected {
         display: $select2-results-selected-disabled-display;
     }
+
+    &:has(.select2-searching) {
+        .select2-no-results {
+            display: none;
+        }
+    }
 }
 
 .select2-more-results {
