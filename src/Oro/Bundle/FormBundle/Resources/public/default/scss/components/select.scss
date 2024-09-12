@@ -1,6 +1,10 @@
 /* @theme: default; */
 
 .select {
+    /*rtl:raw:
+    --select-arrow-position: left #{spacing('md')} center;
+    */
+
     background: $select-bg;
 
     @include base-ui-element(

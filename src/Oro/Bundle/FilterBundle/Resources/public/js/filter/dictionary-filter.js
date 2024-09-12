@@ -111,8 +111,7 @@ define(function(require) {
         },
 
         _toggleSelect2Element: function() {
-            const container = this.$(this.criteriaSelector);
-            const type = container.find(this.criteriaValueSelectors.type).val();
+            const type = this.getType();
             const select2element = this.$el.find(this.elementSelector);
 
             if (this.isEmptyType(type)) {
@@ -559,9 +558,10 @@ define(function(require) {
                             return item ? item.text : item;
                         })
                         .filter(_.negate(_.isUndefined))
-                        .value();
+                        .value()
+                        .join(', ');
 
-                const hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
+                const hintValue = this.wrapHintValue ? (`"${hintRawValue}"`) : hintRawValue;
 
                 return (option ? option.label + ' ' : '') + hintValue;
             } else {

@@ -29,7 +29,25 @@ class GridFilterDateTimeItem extends AbstractGridFilterItem
      */
     public function selectType($filterType)
     {
-        $this->find('css', '.filter-select-oro-wrapper select')->selectOption($filterType);
+        $typeSelect = $this->find('css', '.filter-select-oro-wrapper select');
+
+        if (null !== $typeSelect) {
+            $typeSelect->selectOption($filterType);
+            return;
+        }
+
+        $typeSelect = $this->find(
+            'xpath',
+            sprintf(
+                './/*[contains(concat(" ",normalize-space(@class)," ")," filter-select-oro-wrapper ")]//%s',
+                sprintf('label[starts-with(normalize-space(),"%s")]', $filterType)
+            ) . '//input[@data-choice-value-select]'
+        );
+
+        if (null !== $typeSelect) {
+            $typeSelect->click();
+            return;
+        }
     }
 
     /**

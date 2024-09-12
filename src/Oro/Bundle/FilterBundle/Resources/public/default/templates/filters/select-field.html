@@ -1,24 +1,28 @@
+<% if (choices.length) { %>
 <div class="filter-select-oro-wrapper" data-select-field-template>
-    <select class="select select--full oro-select2"
-        name="<%- name %>"
-        <% if (_.isMobile()) { %>
-            data-skip-input-widgets
-        <% } %>
-
-        <% if (typeof(dataName) !== "undefined") { %>
-            data-name="<%- dataName %>"
-        <% } %>
-        aria-label="<%- choiceAriaLabel %>"
-    >
+    <div class="selectable-group">
+        <% let uniqueGroupName = _.uniqueId('name-'); %>
         <% _.each(choices, function (option) { %>
-            <option value="<%- option.value %>"
-
-                <% if (option.value == selectedChoice) { %>
-                    selected="selected"
-                <% } %>
-            >
-                <%- option.label %>
-            </option>
+            <% let uniqueId = _.uniqueId('radio-') %>
+            <div class="selectable-group__item">
+                <label class="checkbox-label " data-radio="data-radio" for="<%- uniqueId %>" aria-label="<%- choiceAriaLabel %>">
+                    <input
+                        type="radio"
+                        id="<%- uniqueId %>"
+                        name="<%- uniqueGroupName %>"
+                        value="<%- option.value %>"
+                        <% if (typeof(dataName) !== "undefined") { %>
+                            data-name="<%- dataName %>"
+                        <% } %>
+                        <% if (option.value == selectedChoice) { %>
+                            checked="checked"
+                        <% } %>
+                        data-choice-value-select
+                    >
+                    <%- option.label %>
+                </label>
+            </div>
         <% }); %>
-    </select>
+    </div>
 </div>
+<% } %>
