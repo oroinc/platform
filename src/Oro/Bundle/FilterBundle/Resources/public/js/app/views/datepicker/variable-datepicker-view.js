@@ -10,6 +10,12 @@ define(function(require) {
     const moment = require('moment');
     const localeSettings = require('orolocale/js/locale-settings');
     const manageFocus = require('oroui/js/tools/manage-focus').default;
+    let config = require('module-config').default(module.id);
+
+    config = _.extend({
+        defaultTabs: []
+    }, config);
+
     require('orofilter/js/datevariables-widget');
     require('orofilter/js/itemizedpicker-widget');
 
@@ -109,7 +115,7 @@ define(function(require) {
                     icon: 'list-ul',
                     label: __('oro.filter.date.tab.variables')
                 }
-            ];
+            ].map(tab => Object.assign(tab, config.defaultTabs.find(item => item.name === tab.name)));
 
             this.dateVariableHelper = new DateVariableHelper(options.datePickerOptions.dateVars);
             this.dateValueHelper = new DateValueHelper(options.dayFormats);

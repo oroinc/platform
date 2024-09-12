@@ -1,0 +1,13 @@
+<div class="ui-datevariables-div <%- attributes %>">
+    <div class="ui-datevariables-header">
+        <span class="datevariables-title"><%- title %></span>
+        <%= tooltipHTML %>
+    </div>
+    <ul>
+        <% _.each(dateVars, function(dateVariable, varCode) { %>
+        <li>
+            <a class="ui_date_variable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a>
+        </li>
+        <% }); %>
+    </ul>
+</div>

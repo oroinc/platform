@@ -62,6 +62,14 @@ oro_behat_extension:
       selector: '.toolbar .actions-panel .action[title="Filter Toggle"]'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
 
+    GridFiltersButtonSelected:
+      selector: '.toolbar .actions-panel .action.filters-selected[title="Filter Toggle"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
+
+    GridFiltersButtonSidebarSelected:
+      selector: '.toolbar .actions-panel .filters-selected .action[title="Filter Toggle"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
+
     GridFilterStringItem:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem

@@ -2,12 +2,17 @@
     <input type="hidden" name="value">
     <input type="hidden" name="type">
 
-    <% if (renderMode !== 'toggle-mode') { %>
-        <div class="filter-action-row">
+    <div class="filter-action-row">
+        <% if (allowClearButtonInFilter) { %>
             <button type="button"
-                class="btn btn--outlined filter-update"
-                aria-label="<%- updateButtonAriaLabel %>"
-            ><%- _.__("oro.filter.updateButton.text") %></button>
-        </div>
-    <% } %>
+                data-role="clear-filter"
+                class="btn btn--flat filter-clear hidden"
+                aria-label="<%- clearFilterButtonAriaLabel %>"
+            ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+        <% } %>
+        <button type="button"
+            class="btn btn--outlined filter-update"
+            aria-label="<%- updateButtonAriaLabel %>"
+        ><%- _.__("oro.filter.updateButton.text") %></button>
+    </div>
 </div>

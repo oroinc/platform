@@ -3,7 +3,7 @@
     <% if (renderMode === 'toggle-mode') { %>
         <div class="filter-box toggle-mode" <%= attributes %>>
             <div class="filter-container">
-                <div data-filters-items>
+                <div class="filter-items-container" data-filters-items>
                     <% if (!obj.outerHintContainer) { %>
                     <div class="filter-items-hint">
                         <button type="button" class="btn btn--flat reset-filter-button">
@@ -45,14 +45,16 @@
                     </select>
                     <% } %>
                 </div>
-                <div class="filter-items-hint">
-                    <button type="button"
-                            class="btn btn--flat reset-filter-button"
-                    >
-                        <%= oroui.renderIcon({name: 'close'}) %>
-                        <%- _.__('oro.filter.reset.label') %>
-                    </button>
-                </div>
+                <% if (!obj.outerHintContainer) { %>
+                    <div class="filter-items-hint">
+                        <button type="button"
+                                class="btn btn--flat reset-filter-button"
+                        >
+                            <%= oroui.renderIcon({name: 'close'}) %>
+                            <%- _.__('oro.filter.reset.label') %>
+                        </button>
+                    </div>
+                <% } %>
             </div>
         </div>
     <% } %>

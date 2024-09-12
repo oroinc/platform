@@ -1,7 +1,7 @@
 /* @theme: default; */
 
 .ui-timepicker-wrapper {
-    z-index: z('dropdown') + 1;
+    z-index: z('fixed');
 
     max-height: 158px;
 
@@ -10,24 +10,44 @@
     border: $ui-timepicker-list-border;
     box-shadow: $ui-timepicker-list-box-shadow;
     border-radius: $base-ui-element-border-radius;
+    padding-block: $ui-timepicker-list-padding-block;
 
     background: $ui-timepicker-list-background;
+
+    &.input-in-dialog-widget {
+        z-index: z('popup') + 1;
+    }
 }
 
 .ui-timepicker-list {
     li {
-        padding: 4px 9px;
+        height: $ui-timepicker-list-item-height;
+        padding-inline: $ui-timepicker-list-item-padding-inline;
+        display: $ui-timepicker-list-item-display;
+        align-items: $ui-timepicker-list-item-align-items;
+        position: $ui-timepicker-list-item-position;
 
         color: $ui-timepicker-list-item-color;
 
-        white-space: nowrap;
+        white-space: $ui-timepicker-list-item-white-space;
 
-        cursor: pointer;
+        cursor: $ui-timepicker-list-item-cursor;
 
         &.ui-timepicker-selected,
         &:hover {
             background: $ui-timepicker-list-item-hover-background;
             color: $ui-timepicker-list-item-hover-color;
+
+            &::before {
+                content: $ui-timepicker-list-item-before-content;
+                background: $ui-timepicker-list-item-before-background;
+                width: $ui-timepicker-list-item-before-width;
+                position: $ui-timepicker-list-item-before-position;
+                inset-block: $ui-timepicker-list-item-before-inset-block;
+                inset-inline-start: $ui-timepicker-list-item-before-inset-inline-start;
+                border-start-end-radius: $ui-timepicker-list-item-before-border-start-end-radius;
+                border-end-end-radius: $ui-timepicker-list-item-before-border-end-end-radius;
+            }
         }
     }
 }

@@ -253,7 +253,6 @@ define(function(require, exports, module) {
                 backdrop: this.options.allowCancel ? true : 'static'
             }, this.options.modalOptions));
 
-            document.querySelector('body').classList.add('modal-is-opened');
             // Adjust the modal and backdrop z-index; for dealing with multiple modals
             const numModalViews = ModalView.count;
             const $backdrop = $('.modal-backdrop').eq(numModalViews);
@@ -311,7 +310,6 @@ define(function(require, exports, module) {
                 this._setSuspendState(false);
             }
 
-            document.querySelector('body').classList.remove('modal-is-opened');
             this.$el.modal('hide');
         },
 
