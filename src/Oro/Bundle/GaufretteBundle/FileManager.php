@@ -511,7 +511,9 @@ class FileManager
         }
 
         $fileName = $this->getFileNameWithSubDirectory($fileName);
-        $srcStream->open(new StreamMode('rb'));
+        if (!$srcStream->cast(1)) {
+            $srcStream->open(new StreamMode('rb'));
+        }
 
         $nonEmptyStream = true;
         $firstChunk = '';

@@ -166,7 +166,7 @@ class ExportHandler extends AbstractHandler
             }
             $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
 
-            $this->fileManager->writeFileToStorage($localFilePath, $fileName);
+            $this->fileManager->copyFileToStorage($localFilePath, $fileName);
 
             foreach ($files as $file) {
                 $this->fileManager->deleteFile($file);

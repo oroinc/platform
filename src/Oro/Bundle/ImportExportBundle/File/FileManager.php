@@ -3,6 +3,9 @@
 namespace Oro\Bundle\ImportExportBundle\File;
 
 use Gaufrette\File;
+use Gaufrette\Stream;
+use Gaufrette\Stream\Local as LocalStream;
+use Gaufrette\StreamMode;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -78,6 +81,19 @@ class FileManager
             $this->removeByteOrderMark(@file_get_contents($localFilePath, 'r')),
             $fileName
         );
+    }
+
+    public function copyFileToStorage(string $localFilePath, string $fileName): void
+    {
+        $stream = new LocalStream($localFilePath);
+        try {
+            $stream->open(new StreamMode('rb'));
+        } catch (\RuntimeException) {
+            return;
+        }
+
+        $this->skipByteOrderMarkInStream($stream);
+        $this->gaufretteFileManager->writeStreamToStorage($stream, $fileName);
     }
 
     public function writeToStorage(string $content, string $fileName): void
@@ -211,12 +227,30 @@ class FileManager
      */
     private function removeByteOrderMark(string $fileContent): string
     {
-        $bom = pack('H*', 'EFBBBF');
+        $bom = $this->getBomString();
         $sanitizedFileContent = preg_replace("/^$bom/", '', $fileContent);
 
         return is_string($sanitizedFileContent)
             ? $sanitizedFileContent
             : '';
+    }
+
+    /**
+     * This process ensures that BOM at the beginning of the stream is skipped.
+     */
+    private function skipByteOrderMarkInStream(Stream $stream): void
+    {
+        $bom = $this->getBomString();
+        $bomSize = strlen($bom);
+        $startBytes = $stream->read($bomSize);
+        if ($startBytes !== $bom) {
+            $stream->seek(0);
+        }
+    }
+
+    private function getBomString(): string
+    {
+        return pack('H*', 'EFBBBF');
     }
 
     public function getFileSize(string $fileName): int
