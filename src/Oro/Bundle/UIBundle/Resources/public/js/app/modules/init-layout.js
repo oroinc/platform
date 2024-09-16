@@ -361,4 +361,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             labelForElement.trigger('set-focus');
         }
     });
+
+    $(document).on( 'change', '[data-dynamic-mark]', e => {
+        const mark = $(e.currentTarget).data('dynamicMark');
+        const id = e.target.getAttribute('id');
+
+        $(e.currentTarget).find('[data-mark]').remove();
+        $(`[for="${id}"]`).prepend(mark.start).append(mark.end);
+    });
 });
