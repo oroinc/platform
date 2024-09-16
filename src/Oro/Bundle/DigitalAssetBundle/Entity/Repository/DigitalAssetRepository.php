@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Entity\Repository;
 
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -15,92 +14,70 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 class DigitalAssetRepository extends EntityRepository
 {
     /**
-     * @param int $id
-     *
      * @return File[]
      */
     public function findChildFilesByDigitalAssetId(int $id): array
     {
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder();
-
-        $qb
+        return $this->getEntityManager()->createQueryBuilder()
             ->select('file')
             ->from(File::class, 'file')
-            ->andWhere($qb->expr()->eq('file.digitalAsset', ':id'))
-            ->setParameter('id', $id);
-
-        return $qb->getQuery()->getResult();
+            ->andWhere('file.digitalAsset = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * Find source file by digital asset id
+     * Finds source file by digital asset ID.
      */
     public function findSourceFile(int $id): ?File
     {
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder();
-
-        $qb->select('file')
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select('file')
             ->from(File::class, 'file')
             ->innerJoin(DigitalAsset::class, 'digitalAsset', Join::WITH, 'digitalAsset.sourceFile = file')
-            ->where($qb->expr()->eq('digitalAsset.id', ':id'))
-            ->setParameter('id', $id);
-
-        return $qb->getQuery()->getOneOrNullResult();
+            ->where('digitalAsset.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
-     * Find files created from digital asset for specific entity field
-     *
-     * @param string $entityClass
-     * @param int|string $entityId
-     * @param string $fieldName
+     * Finds files created from digital asset for specific entity field.
      *
      * @return File[]
      */
-    public function findForEntityField(
-        string $entityClass,
-        $entityId,
-        string $fieldName
-    ): array {
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder();
-
-        $qb
+    public function findForEntityField(string $entityClass, int $entityId, string $fieldName): array
+    {
+        return $this->getEntityManager()->createQueryBuilder()
             ->select('file, digitalAsset, sourceFile')
             ->from(File::class, 'file')
             ->innerJoin('file.digitalAsset', 'digitalAsset')
             ->innerJoin('digitalAsset.sourceFile', 'sourceFile')
-            ->where(
-                $qb->expr()->eq('file.parentEntityClass', ':parentEntityClass'),
-                $qb->expr()->eq('file.parentEntityId', ':parentEntityId'),
-                $qb->expr()->eq('file.parentEntityFieldName', ':parentEntityFieldName')
-            )
-            ->setParameters([
-                ':parentEntityClass' => $entityClass,
-                ':parentEntityId' => $entityId,
-                ':parentEntityFieldName' => $fieldName,
-            ]);
-
-        return $qb->getQuery()->getResult();
+            ->where('file.parentEntityClass = :parentEntityClass')
+            ->andWhere('file.parentEntityId = :parentEntityId')
+            ->andWhere('file.parentEntityFieldName = :parentEntityFieldName')
+            ->setParameter('parentEntityClass', $entityClass)
+            ->setParameter('parentEntityId', $entityId)
+            ->setParameter('parentEntityFieldName', $fieldName)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * Find user allowed digital assets by ids
+     * Finds user allowed digital assets by IDs.
      *
-     * @param int[] $ids
+     * @param int[]     $ids
      * @param AclHelper $aclHelper
      *
      * @return DigitalAsset[]
      */
     public function findByIds(array $ids, AclHelper $aclHelper): iterable
     {
-        $qb = $this->createQueryBuilder('digitalAsset', 'digitalAsset.id');
-
-        $qb->select('digitalAsset, sourceFile')
+        $qb = $this->createQueryBuilder('digitalAsset', 'digitalAsset.id')
+            ->select('digitalAsset, sourceFile')
             ->innerJoin('digitalAsset.sourceFile', 'sourceFile')
-            ->where($qb->expr()->in('digitalAsset.id', ':ids'))
+            ->where('digitalAsset.id IN (:ids)')
             ->setParameter(':ids', $ids);
 
         return $aclHelper->apply($qb)->getResult();
@@ -108,23 +85,20 @@ class DigitalAssetRepository extends EntityRepository
 
     public function getFileDataForTwigTag(int $fileId): array
     {
-        $entityManager = $this->getEntityManager();
-        $expr = $entityManager->getExpressionBuilder();
-        $result = $entityManager->createQueryBuilder()
-            ->select(
-                [
-                    'file.uuid',
-                    'file.parentEntityClass',
-                    'file.parentEntityId',
-                    'file.parentEntityFieldName',
-                    'IDENTITY(file.digitalAsset) as digitalAssetId',
-                    'file.extension',
-                ]
-            )
+        $result = $this->getEntityManager()->createQueryBuilder()
+            ->select([
+                'file.uuid',
+                'file.parentEntityClass',
+                'file.parentEntityId',
+                'file.parentEntityFieldName',
+                'IDENTITY(file.digitalAsset) as digitalAssetId',
+                'file.extension',
+            ])
             ->from(File::class, 'file')
-            ->where($expr->eq('file.id', ':fileId'))
+            ->where('file.id = :fileId')
+            ->setParameter('fileId', $fileId)
             ->getQuery()
-            ->execute(['fileId' => $fileId], AbstractQuery::HYDRATE_ARRAY);
+            ->getArrayResult();
 
         return $result ? reset($result) : [];
     }

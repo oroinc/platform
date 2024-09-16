@@ -6,38 +6,28 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**
- * File entity repository
+ * Doctrine repository for File entity.
  */
 class FileRepository extends EntityRepository
 {
     /**
-     * Find files for specific entity fields
-     *
-     * @param string $entityClass
-     * @param int $entityId
-     * @param null|string $fieldName
+     * Finds files for a specific entity or entity field.
      *
      * @return File[]
      */
-    public function findForEntityField(string $entityClass, int $entityId, ?string $fieldName = null): iterable
+    public function findForEntityField(string $entityClass, int $entityId, ?string $fieldName = null): array
     {
-        $qb = $this->createQueryBuilder('file');
-
-        $qb->select('file')
-            ->where(
-                $qb->expr()->eq('file.parentEntityClass', ':parentEntityClass'),
-                $qb->expr()->eq('file.parentEntityId', ':parentEntityId')
-            )
-            ->setParameters([
-                ':parentEntityClass' => $entityClass,
-                ':parentEntityId' => $entityId,
-            ]);
-
+        $qb = $this->createQueryBuilder('file')
+            ->where('file.parentEntityClass = :parentEntityClass')
+            ->andWhere('file.parentEntityId = :parentEntityId')
+            ->setParameter('parentEntityClass', $entityClass)
+            ->setParameter('parentEntityId', $entityId);
         if ($fieldName) {
             $qb
-                ->andWhere($qb->expr()->eq('file.parentEntityFieldName', ':parentEntityFieldName'))
+                ->andWhere('file.parentEntityFieldName = :parentEntityFieldName')
                 ->setParameter(':parentEntityFieldName', $fieldName);
         }
+
         return $qb->getQuery()->getResult();
     }
 }
