@@ -17,11 +17,10 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-/**
- *
- */
-class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
+final class OperationButtonProviderExtensionTest extends TestCase
 {
     private const ENTITY_CLASS = 'stdClass';
     private const ENTITY_ID = 42;
@@ -33,14 +32,9 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     private const REFERRER_URL = '/test/referrer/utl';
     private const GROUP = 'test_group';
 
-    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHelper;
-
-    /** @var OperationRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $operationRegistry;
-
-    /** @var OperationButtonProviderExtension */
-    private $extension;
+    private ContextHelper&MockObject $contextHelper;
+    private OperationRegistry&MockObject $operationRegistry;
+    private OperationButtonProviderExtension $extension;
 
     protected function setUp(): void
     {
@@ -68,7 +62,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findDataProvider
      */
-    public function testFind(array $operations, ButtonSearchContext $buttonSearchContext, array $expected)
+    public function testFind(array $operations, ButtonSearchContext $buttonSearchContext, array $expected): void
     {
         $this->operationRegistry->expects($this->once())
             ->method('find')
@@ -136,7 +130,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isAvailableDataProvider
      */
-    public function testIsAvailable(bool $expected)
+    public function testIsAvailable(bool $expected): void
     {
         $context = $this->createButtonSearchContext();
         $buttonContext = $this->createMock(ButtonContext::class);
@@ -223,7 +217,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isAvailableExceptionDataProvider
      */
-    public function testIsAvailableException(?ArrayCollection $errors)
+    public function testIsAvailableException(?ArrayCollection $errors): void
     {
         $context = $this->createButtonSearchContext();
         $buttonContext = $this->createMock(ButtonContext::class);
@@ -301,7 +295,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testIsAvailableExceptionUnsupportedButton()
+    public function testIsAvailableExceptionUnsupportedButton(): void
     {
         $this->contextHelper->expects($this->never())
             ->method('getActionData');
@@ -317,7 +311,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->isAvailable($stubButton, $this->createButtonSearchContext());
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->extension->supports($this->createOperationButton(false)));
         $this->assertFalse($this->extension->supports($this->createMock(ButtonInterface::class)));
