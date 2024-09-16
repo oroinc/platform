@@ -4,6 +4,7 @@
 
 $select2-container-multi-size-l: spacing('sm') 40px spacing('sm') spacing('md') !default;
 $select2-container-multi-arrow-position: right spacing('sm') center !default;
+$select2-container-multi-arrow-position-rtl: left spacing('sm') center !default;
 
 $select2-container-multi-search-choice-bg-color: get-var-color('neutral', 'grey1') !default;
 

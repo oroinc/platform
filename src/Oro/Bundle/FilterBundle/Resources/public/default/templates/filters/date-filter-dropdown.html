@@ -1,10 +1,18 @@
+<% let oroui = _.macros('oroui') %>
 <% if (!tabs.length) { %>
     <div id="calendar<%- suffix %>"></div>
 <% } else { %>
     <ul class="nav nav-tabs nav-tabs-oro">
         <% _.each(tabs, function (tab, i) { %>
         <li class="nav-item">
-            <a class="nav-link <%- tab.name %><% if (i === 0) { %> active<% } %>" href="#<%- tab.name %><%- suffix %>" role="button"><%- tab.label %></a>
+            <a class="nav-link <%- tab.name %><% if (i === 0) { %> active<% } %>" href="#<%- tab.name %><%- suffix %>" role="button">
+                <% if (tab.icon) { %>
+                    <%= oroui.renderIcon({
+                        name: tab.icon
+                    }) %>
+                <% } %>
+                <%- tab.label %>
+            </a>
         </li>
         <% }); %>
     </ul>

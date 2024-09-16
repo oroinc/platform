@@ -14,6 +14,7 @@ aliases:
     oro/filter/select-filter$: orofilter/js/filter/select-filter
     oro/filter/text-filter$: orofilter/js/filter/text-filter
 configs:
+    orofilter/js/app/views/datepicker/variable-datepicker-view: {}
     orofilter/js/datafilter-builder: {}
     orofilter/js/filter-hint: {}
     orofilter/js/filter/abstract-filter: {}

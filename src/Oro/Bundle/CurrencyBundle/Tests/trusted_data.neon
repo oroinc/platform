@@ -3,3 +3,7 @@ trusted_data:
     check_methods_safety:
         Oro\Bundle\CurrencyBundle\Query\CurrencyQueryBuilderTransformerInterface:
             getTransformSelectQuery: [0, 2, 3]
+    safe_methods:
+        Oro\Bundle\CurrencyBundle\Query\CurrencyQueryBuilderTransformerInterface:
+            getTransformSelectQuery: true
+            getTransformSelectQueryForDataGrid: true

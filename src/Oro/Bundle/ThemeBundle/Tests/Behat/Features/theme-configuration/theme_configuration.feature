@@ -15,36 +15,36 @@ Feature: Theme Configuration
     And I should see "System / Theme Configurations" in breadcrumbs
     When I click "Create Theme Configuration"
     Then "Theme Configuration Form" must contains values:
-      | Owner                           | Main                                  |
-      | Theme                           | Refreshing Teal                       |
-      | Name                            |                                       |
-      | Description                     |                                       |
-      | Type                            | Storefront                            |
-      | Promotional Content             | Choose Content Block                  |
-      | Top Navigation Menu             | Choose a top navigation menu          |
-      | Quick Links Menu                | commerce_quick_access_refreshing_teal |
-      | Quick Access Button Type        | None                                  |
-      | Language and Currency Switchers | Always in the "hamburger" menu        |
-      | Standalone Main Menu            | false                                 |
-      | Search On Smaller Screens       | Integrated                            |
-      | Page Template                   |                                       |
-      | Filter Panel Position           | top                                   |
+      | Owner                                         | Main                                  |
+      | Theme                                         | Refreshing Teal                       |
+      | Name                                          |                                       |
+      | Description                                   |                                       |
+      | Type                                          | Storefront                            |
+      | Promotional Content                           | Choose Content Block                  |
+      | Top Navigation Menu                           | Choose a top navigation menu          |
+      | Quick Links Menu                              | commerce_quick_access_refreshing_teal |
+      | Quick Access Button Type                      | None                                  |
+      | Language and Currency Switchers               | Always in the "hamburger" menu        |
+      | Standalone Main Menu                          | false                                 |
+      | Search On Smaller Screens                     | Integrated                            |
+      | Page Template                                 |                                       |
+      | Filter Panel Position on Product Listing Page | top                                   |
     And Page title equals to "Create Theme Configuration - Theme Configurations - System"
     And I should see "System / Theme Configurations" in breadcrumbs
     When I fill "Theme Configuration Form" with:
-      | Name                              | New Theme Configuration |
-      | Theme                             | default                 |
-      | Description                       | Default Description     |
-      | Type                              | Storefront              |
-      | Top Navigation Menu               | frontend_menu           |
-      | Quick Links Menu                  | frontend_menu           |
-      | Quick Access Button Label         | Quick access button     |
-      | Quick Access Button Type          | menu                    |
-      | Quick Access Button Frontend Menu | frontend_menu           |
-      | Standalone Main Menu              | true                    |
-      | Search On Smaller Screens         | integrated              |
-      | Page Template                     | wide                    |
-      | Filter Panel Position             | sidebar                 |
+      | Name                                          | New Theme Configuration |
+      | Theme                                         | default                 |
+      | Description                                   | Default Description     |
+      | Type                                          | Storefront              |
+      | Top Navigation Menu                           | frontend_menu           |
+      | Quick Links Menu                              | frontend_menu           |
+      | Quick Access Button Label                     | Quick access button     |
+      | Quick Access Button Type                      | menu                    |
+      | Quick Access Button Frontend Menu             | frontend_menu           |
+      | Standalone Main Menu                          | true                    |
+      | Search On Smaller Screens                     | integrated              |
+      | Page Template                                 | wide                    |
+      | Filter Panel Position on Product Listing Page | sidebar                 |
     And I save and close form
     Then I should see "Theme Configuration" flash message
 
@@ -52,20 +52,20 @@ Feature: Theme Configuration
     Given I go to System / Theme Configurations
     When I click "Edit" on row "New Theme Configuration" in grid
     Then "Theme Configuration Form" must contains values:
-      | Owner                             | Main                    |
-      | Name                              | New Theme Configuration |
-      | Theme                             | Refreshing Teal         |
-      | Description                       | Default Description     |
-      | Type                              | Storefront              |
-      | Top Navigation Menu               | frontend_menu           |
-      | Quick Links Menu                  | frontend_menu           |
-      | Quick Access Button Label         | Quick access button     |
-      | Quick Access Button Type          | Frontend Menu           |
-      | Quick Access Button Frontend Menu | frontend_menu           |
-      | Standalone Main Menu              | true                    |
-      | Search On Smaller Screens         | Integrated              |
-      | Page Template                     | wide                    |
-      | Filter Panel Position             | sidebar                 |
+      | Owner                                         | Main                    |
+      | Name                                          | New Theme Configuration |
+      | Theme                                         | Refreshing Teal         |
+      | Description                                   | Default Description     |
+      | Type                                          | Storefront              |
+      | Top Navigation Menu                           | frontend_menu           |
+      | Quick Links Menu                              | frontend_menu           |
+      | Quick Access Button Label                     | Quick access button     |
+      | Quick Access Button Type                      | Frontend Menu           |
+      | Quick Access Button Frontend Menu             | frontend_menu           |
+      | Standalone Main Menu                          | true                    |
+      | Search On Smaller Screens                     | Integrated              |
+      | Page Template                                 | wide                    |
+      | Filter Panel Position on Product Listing Page | sidebar                 |
     And I click "Cancel"
 
   Scenario: Update Theme Configuration
@@ -73,18 +73,18 @@ Feature: Theme Configuration
     When I click "Edit" on row "Refreshing Teal" in grid
     Then the "Theme" field should be disabled in form "Theme Configuration Form"
     When I fill "Theme Configuration Form" with:
-      | Description                       | Default Description Updated |
-      | Type                              | Storefront                  |
-      | Top Navigation Menu               | commerce_top_nav            |
-      | Quick Links Menu                  | commerce_top_nav            |
-      | Quick Access Button Type          | menu                        |
-      | Quick Access Button Label         | Quick access button         |
-      | Quick Access Button Frontend Menu | commerce_top_nav            |
-      | Language and Currency Switchers   | always_in_hamburger_menu    |
-      | Standalone Main Menu              | false                       |
-      | Search On Smaller Screens         | standalone                  |
-      | Page Template                     | tabs                        |
-      | Filter Panel Position             | top                         |
+      | Description                                   | Default Description Updated |
+      | Type                                          | Storefront                  |
+      | Top Navigation Menu                           | commerce_top_nav            |
+      | Quick Links Menu                              | commerce_top_nav            |
+      | Quick Access Button Type                      | menu                        |
+      | Quick Access Button Label                     | Quick access button         |
+      | Quick Access Button Frontend Menu             | commerce_top_nav            |
+      | Language and Currency Switchers               | always_in_hamburger_menu    |
+      | Standalone Main Menu                          | false                       |
+      | Search On Smaller Screens                     | standalone                  |
+      | Page Template                                 | tabs                        |
+      | Filter Panel Position on Product Listing Page | top                         |
     And I save and close form
     Then I should see "Theme Configuration" flash message
 
@@ -92,20 +92,20 @@ Feature: Theme Configuration
     Given I go to System / Theme Configurations
     When I click "Edit" on row "Refreshing Teal" in grid
     Then "Theme Configuration Form" must contains values:
-      | Owner                             | Main                           |
-      | Name                              | Refreshing Teal                |
-      | Description                       | Default Description Updated    |
-      | Type                              | Storefront                     |
-      | Top Navigation Menu               | commerce_top_nav               |
-      | Quick Links Menu                  | commerce_top_nav               |
-      | Quick Access Button Type          | Frontend Menu                  |
-      | Quick Access Button Label         | Quick access button            |
-      | Quick Access Button Frontend Menu | commerce_top_nav               |
-      | Language and Currency Switchers   | Always in the "hamburger" menu |
-      | Standalone Main Menu              | false                          |
-      | Search On Smaller Screens         | Standalone                     |
-      | Page Template                     | tabs                           |
-      | Filter Panel Position             | top                            |
+      | Owner                                         | Main                           |
+      | Name                                          | Refreshing Teal                |
+      | Description                                   | Default Description Updated    |
+      | Type                                          | Storefront                     |
+      | Top Navigation Menu                           | commerce_top_nav               |
+      | Quick Links Menu                              | commerce_top_nav               |
+      | Quick Access Button Type                      | Frontend Menu                  |
+      | Quick Access Button Label                     | Quick access button            |
+      | Quick Access Button Frontend Menu             | commerce_top_nav               |
+      | Language and Currency Switchers               | Always in the "hamburger" menu |
+      | Standalone Main Menu                          | false                          |
+      | Search On Smaller Screens                     | Standalone                     |
+      | Page Template                                 | tabs                           |
+      | Filter Panel Position on Product Listing Page | top                            |
     And click "Cancel"
 
   Scenario: Check Quick Access Button Field Behavior

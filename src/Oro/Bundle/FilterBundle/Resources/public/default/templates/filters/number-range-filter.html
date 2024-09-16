@@ -1,23 +1,10 @@
 <div class="choice-filter number-range-filter" data-number-range-filter-template>
-    <div class="filter-select-oro-wrapper">
-        <select name="<%- name %>" class="select select--full oro-select2" data-choice-value-select
-            <% if (_.isMobile()) { %>
-                data-skip-input-widgets
-            <% } %>
-            aria-label="<%- choiceAriaLabel %>"
-        >
-            <% _.each(choices, function (option) { %>
-                <option value="<%- option.value %>"
-
-                    <% if (option.value == selectedChoice) { %>
-                        selected="selected"
-                    <% } %>
-                >
-                    <%- option.label %>
-                </option>
-            <% }); %>
-        </select>
-    </div>
+    <% let orofilter = _.macros('orofilter') %>
+    <%= orofilter.selectCondition({
+        choices: choices,
+        choiceAriaLabel: choiceAriaLabel,
+        selectedChoice: selectedChoice
+    }) %>
     <div class="value-field-frame">
         <div class="filter-value">
             <div class="filter-value-range">
@@ -42,13 +29,18 @@
         </div>
         <input class="name_input" type="hidden" name="<%- name %>" id="<%- name %>" value="<%- selectedChoice %>">
 
-        <% if (renderMode !== 'toggle-mode') { %>
-            <div class="filter-action-row">
+        <div class="filter-action-row">
+            <% if (allowClearButtonInFilter) { %>
                 <button type="button"
-                    class="btn filter-update"
-                    aria-label="<%- updateButtonAriaLabel %>"
-                ><%- _.__("oro.filter.updateButton.text") %></button>
-            </div>
-        <% } %>
+                    data-role="clear-filter"
+                    class="btn btn--flat filter-clear hidden"
+                    aria-label="<%- clearFilterButtonAriaLabel %>"
+                ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+            <% } %>
+            <button type="button"
+                class="btn filter-update"
+                aria-label="<%- updateButtonAriaLabel %>"
+            ><%- _.__("oro.filter.updateButton.text") %></button>
+        </div>
     </div>
 </div>

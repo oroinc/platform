@@ -13,7 +13,13 @@ aliases:
     oro/filter/number-range-filter$: orofilter/js/filter/number-range-filter
     oro/filter/select-filter$: orofilter/js/filter/select-filter
     oro/filter/text-filter$: orofilter/js/filter/text-filter
+app-modules:
+    - orofilter/js/app/modules/template-macros-module
 configs:
+    orofilter/js/app/views/datepicker/variable-datepicker-view:
+        defaultTabs:
+            - {name: 'calendar', icon: 'calendar'}
+            - {name: 'variables', icon: 'list'}
     oro/filter/abstract-filter: {}
     oro/filter/date-filter: {}
     oro/filter/datetime-filter: {}
@@ -58,3 +64,4 @@ map:
         orofilter/templates/filter/select-filter.html: orofilter/default/templates/filters/select-filter.html
         orofilter/templates/filter/text-filter.html: orofilter/default/templates/filters/text-filter.html
         orofilter/templates/filters-container.html: orofilter/default/templates/filters/filters-container.html
+        orofilter/templates/datevariables-tooltip.html: orofilter/default/templates/datevariables-tooltip.html

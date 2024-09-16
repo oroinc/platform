@@ -77,8 +77,12 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $close = $this->find('css', '[data-role="close"]');
-        $close->click();
+        $button = $this->elementFactory->createElement('FrontendGridFilterManagerButton');
+        if ($button->isIsset()) {
+            $button->clickForce();
+        }
+
+        self::assertFalse($this->isVisible(), 'Can not close grid filter manager dropdown');
     }
 
     public function hasFilter(string $filterTitle): bool
@@ -98,7 +102,7 @@ class FrontendGridFilterManager extends Element
         if ($this->isVisible()) {
             return;
         }
-        $button = $this->elementFactory->createElement('GridFilterManagerButton');
+        $button = $this->elementFactory->createElement('FrontendGridFilterManagerButton');
         $button->click();
 
         self::assertTrue($this->isVisible(), 'Can not open grid filter manager dropdown');

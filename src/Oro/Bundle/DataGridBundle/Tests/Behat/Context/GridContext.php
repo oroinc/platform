@@ -1046,6 +1046,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         // does not need set value if use filter 'is empty' or 'is not empty'
         if (!in_array($type, ['is empty', 'is not empty'])) {
             $filterItem->setFilterValue($value);
+            $filterItem->submit();
         }
     }
 
@@ -1270,6 +1271,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $filterItem->open();
         $filterItem->selectType($type);
+        $this->waitForAjax();
         $filterItem->setFilterValue($value);
         $filterItem->submit();
     }
@@ -1345,19 +1347,31 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )filter "?(?P<filterName>[^"]+)"? as (?P<type>(?:|equals|not equals)) "(?P<start>[^"]+)" as single value$/
      * @When /^(?:|when )(?:|I )filter "?(?P<filterName>[^"]+)"? as (?P<type>(?:|between|not between)) "(?P<start>[^"]+)" and "(?P<end>[^"]+)"$/
      * @When /^(?:|when )(?:|I )filter "?(?P<filterName>[^"]+)"? as (?P<type>(?:|between|not between)) "(?P<start>[^"]+)" and "(?P<end>[^"]+)" in "(?P<filterGridName>[^"]+)"$/
+     * @When /^(?:|when )(?:|I )filter "?(?P<filterName>[^"]+)"? as (?P<type>(?:|between|not between)) "(?P<start>[^"]+)" and "(?P<end>[^"]+)" in "(?P<filterGridName>[^"]+)" grid ?(?P<strictly>strictly)$/
      *
      * @param string $filterName
      * @param string $type
      * @param string $start
      * @param string $end
      * @param string $filterGridName
+     * @param string $strictly
      */
     //@codingStandardsIgnoreEnd
-    public function applyDateTimeFilter($filterName, $type, $start, $end = null, $filterGridName = 'Grid')
-    {
-        $filterItem = $this->spin(function () use ($filterGridName, $filterName, $type) {
+    public function applyDateTimeFilter(
+        $filterName,
+        $type,
+        $start,
+        $end = null,
+        $filterGridName = 'Grid',
+        $strictly = ''
+    ) {
+        $filterItem = $this->spin(function () use ($filterGridName, $filterName, $type, $strictly) {
             /** @var GridFilterDateTimeItem $filterItem */
-            $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterDateTimeItem', $filterName);
+            $filterItem = $this->getGridFilters($filterGridName)->getFilterItem(
+                'GridFilterDateTimeItem',
+                $filterName,
+                $strictly === 'strictly'
+            );
             $filterItem->open();
             $filterItem->selectType($type);
 
@@ -1570,12 +1584,18 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $hints = array_filter(
             array_map(
                 function ($item) {
-                    $label = trim($this->createElement('FrontendGridFilterHintLabel', $item)->getText());
+                    $labelElement = $this->createElement('FrontendGridFilterHintLabel', $item);
                     $text = trim($this->createElement('FrontendGridFilterHint', $item)->getText());
+
+                    if (!$labelElement->isIsset()) {
+                        return $text;
+                    }
+
+                    $label = trim($labelElement->getText());
 
                     return $label && $text ? sprintf('%s %s', $label, $text) : '';
                 },
-                $this->getGridFilters($gridName)->findAll('css', 'span.filter-criteria-hint-item')
+                $this->getGridFilters($gridName, false)->findAll('css', 'span.filter-criteria-hint-item')
             )
         );
 
@@ -2784,19 +2804,20 @@ TEXT;
 
     /**
      * @param string $gridName
+     * @param boolean $openFilters
      * @return GridFilters|Element
      */
-    private function getGridFilters($gridName)
+    private function getGridFilters($gridName, $openFilters = true)
     {
         $filters = $this->elementFactory->createElement($gridName . 'Filters');
         if (!$filters->isVisible()) {
             $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
-            if ($gridToolbarActions->isVisible()) {
+            if ($gridToolbarActions->isVisible() && $openFilters) {
                 $gridToolbarActions->getActionByTitle('Filter Toggle')->click();
             }
 
             $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
-            if ($filterState->isValid() && $filterState->isVisible()) {
+            if ($filterState->isValid() && $filterState->isVisible() && $openFilters) {
                 $filterState->click();
             }
         }

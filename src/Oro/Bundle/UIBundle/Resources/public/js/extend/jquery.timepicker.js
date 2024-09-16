@@ -28,6 +28,10 @@ define(function(require) {
     $(document)
         .on('showTimepicker', function(e) {
             const zIndex = e.target.timepickerObj.list.css('zIndex');
+            if (e.target.closest('.ui-dialog-content')) {
+                e.target.timepickerObj.list.addClass('input-in-dialog-widget');
+            }
+
             mask.show(zIndex - 1)
                 .onhide(function() {
                     $(e.target).timepicker('hide');

@@ -184,6 +184,7 @@ map:
         tooltip.js: bootstrap-tooltip
         underscore: oroui/js/extend/underscore
         util.js: bootstrap-util
+        oroui/templates/delete-confirmation.html: oroui/templates/modal-dialog.html
     chaplin:
         backbone: backbone
     extend-popper:
