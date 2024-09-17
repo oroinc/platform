@@ -179,7 +179,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('mergeFiles')
             ->with([]);
         $this->fileManager->expects(self::once())
-            ->method('writeFileToStorage');
+            ->method('copyFileToStorage');
         $this->fileManager->expects(self::once())
             ->method('deleteFile')
             ->with('test1.csv');

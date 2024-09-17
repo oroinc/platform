@@ -5,28 +5,22 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\Enum\EnumField;
 
-/**
- * @ORM\Entity()
- * @ORM\Table()
- */
+#[ORM\Entity]
+#[ORM\Table]
 class TestEntityWithMagicEnumField
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255)
      */
+    #[ORM\Column(type: 'string', length: 255)]
     protected $name;
 
-    /**
-     * @ORM\Column(type="string", enumType=EnumField::class)
-     */
+    #[ORM\Column(type: 'string', enumType: EnumField::class)]
     protected EnumField $enum = EnumField::Option1;
 
     public function __construct($id = null)
