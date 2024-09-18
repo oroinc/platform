@@ -1,6 +1,7 @@
 @ticket-BAP-11242
 @automatically-ticket-tagged
-
+@skip
+#Unskip when BB-24668 will be fixed
 Feature: Get help link
   I order to find help
   As crm user
