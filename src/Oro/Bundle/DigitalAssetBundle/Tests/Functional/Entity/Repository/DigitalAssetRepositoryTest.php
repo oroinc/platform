@@ -22,9 +22,29 @@ class DigitalAssetRepositoryTest extends WebTestCase
         return self::getContainer()->get('doctrine')->getRepository(DigitalAsset::class);
     }
 
+    private function getDigitalAsset(string $reference): DigitalAsset
+    {
+        return $this->getReference($reference);
+    }
+
+    private function getFile(string $reference): File
+    {
+        return $this->getReference($reference);
+    }
+
+    private function getFileIds(array $files): array
+    {
+        $ids = array_map(function (File $file) {
+            return $file->getId();
+        }, $files);
+        sort($ids);
+
+        return $ids;
+    }
+
     public function testFindChildFilesByDigitalAssetId(): void
     {
-        $digitalAsset = $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_1);
+        $digitalAsset = $this->getDigitalAsset(LoadDigitalAssetData::DIGITAL_ASSET_1);
         self::assertEquals(
             $digitalAsset->getChildFiles()->toArray(),
             $this->getRepository()->findChildFilesByDigitalAssetId($digitalAsset->getId())
@@ -38,8 +58,7 @@ class DigitalAssetRepositoryTest extends WebTestCase
 
     public function testFindSourceFile(): void
     {
-        /** @var DigitalAsset $digitalAsset */
-        $digitalAsset = $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_1);
+        $digitalAsset = $this->getDigitalAsset(LoadDigitalAssetData::DIGITAL_ASSET_1);
 
         self::assertEquals(
             $digitalAsset->getSourceFile(),
@@ -49,24 +68,22 @@ class DigitalAssetRepositoryTest extends WebTestCase
 
     public function testFindForEntityField(): void
     {
-        $result = $this->getRepository()->findForEntityField(\stdClass::class, 1, 'attachmentFieldA');
-        usort($result, function (File $a, File $b): int {
-            return $a->getId() <=> $b->getId();
-        });
+        $foundFiles = $this->getRepository()->findForEntityField(\stdClass::class, 1, 'attachmentFieldA');
+        $expectedFiles = [
+            $this->getFile(LoadDigitalAssetData::DIGITAL_ASSET_1_CHILD_1),
+            $this->getFile(LoadDigitalAssetData::DIGITAL_ASSET_2_CHILD_1),
+        ];
 
-        self::assertEquals(
-            [
-                $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_1_CHILD_1),
-                $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_2_CHILD_1),
-            ],
-            $result
+        self::assertSame(
+            $this->getFileIds($expectedFiles),
+            $this->getFileIds($foundFiles)
         );
     }
 
     public function testFindByIds(): void
     {
-        $digitalAsset1 = $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_1);
-        $digitalAsset3 = $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_3);
+        $digitalAsset1 = $this->getDigitalAsset(LoadDigitalAssetData::DIGITAL_ASSET_1);
+        $digitalAsset3 = $this->getDigitalAsset(LoadDigitalAssetData::DIGITAL_ASSET_3);
 
         self::assertEquals(
             [
@@ -90,14 +107,14 @@ class DigitalAssetRepositoryTest extends WebTestCase
      */
     public function testGetFileDataForTwigTag(string $referenceName): void
     {
-        $file = $this->getReference($referenceName);
+        $file = $this->getFile($referenceName);
         self::assertEquals(
             [
                 'uuid' => $file->getUuid(),
                 'parentEntityClass' => $file->getParentEntityClass(),
                 'parentEntityId' => $file->getParentEntityId(),
                 'parentEntityFieldName' => $file->getParentEntityFieldName(),
-                'digitalAssetId' => $file->getDigitalAsset() ? $file->getDigitalAsset()->getId() : null,
+                'digitalAssetId' => $file->getDigitalAsset()?->getId(),
                 'extension' => $file->getExtension(),
             ],
             $this->getRepository()->getFileDataForTwigTag($file->getId())
