@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 
 /**
  * Excludes fields that are not required for export.
@@ -39,7 +39,7 @@ class ExportQueryProvider
      */
     private function isTargetEntityExportable(?string $entityName): bool
     {
-        if (is_a($entityName, AbstractEnumValue::class, true)) {
+        if (is_a($entityName, EnumOptionInterface::class, true)) {
             return false;
         }
 

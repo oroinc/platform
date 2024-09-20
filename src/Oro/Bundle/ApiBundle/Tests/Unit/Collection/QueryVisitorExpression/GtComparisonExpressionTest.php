@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\GtComparisonExpression;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class GtComparisonExpressionTest extends \PHPUnit\Framework\TestCase
@@ -16,6 +17,7 @@ class GtComparisonExpressionTest extends \PHPUnit\Framework\TestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
         $field = 'e.test';

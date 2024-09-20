@@ -46,6 +46,546 @@ The current file describes significant changes in the code that may affect the u
 #### SanitizeBundle
 * Updated sanitize logic, it takes into account a new `crypted_text` doctrine type now.
 
+# Oro Enum Changes
+
+Updating the ORO Enum implementation is caused by:
+
+- Read-only permissions for web server user on entity extend files in the system cache.
+- Updates to entities from the UI do not require cache updates in the entity management.
+- Need to avoid code generation.
+- Reduce the number of requests in cases where the object uses join queries with a large number of lists.
+- After completion, it will be possible to remove MultiHostBundle on schema update.
+
+## The structure of relationships between entities and storage
+
+*Before:*
+
+- The main storage place for ORO Enums are tables created for each enum. The table name begins with ``oro_enum_``.
+
+Example:
+
+```
+oro_enum_auth_status
+oro_enum_inventory_status
+```
+
+- The connection between a specific enum and a table is created using a relation column. To get the value of the enum,
+  you need to make a join in the query.
+- The entity configuration stores the relationship between the enum and the target table and the configuration of the
+  enum itself.
+- There is a difference in configuration for the enum and for the product attribute of the enum.
+- All extend enums are inherited from the base one ```Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue```.
+
+*After:*
+
+- All ORO enums are stored in a table ```oro_enum_option```.
+- The connection between the target table that uses the enum and the enum itself is built without a relation. Enum
+  values used by entities are stored in the field ```serialized_data```.
+
+- Updated enums are inherited not from the ```Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue```
+  but from ```Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface```
+
+``` json
+{
+    "inventory_status": "prod_inventory_status.in_stock",
+    "multi_enum": ["prod_multi_enum.test_option_1", "prod_multi_enum.test_option_3"]
+}
+```
+## The structure of DB storage
+
+*Before:*
+
+Stored in the generated table, which begins with the prefix "oro_enum_" (that is, each enum has its own table).
+
+Example of enum for "oro_enum_auth_status" table:
+
+```markdown
+| id      | name    | priority | is_default |
+| reset   | Reset   | 2        | false      |
+| locked  | Locked  | 3        | false      |
+| expired | Expired | 4        | false      |
+| active  | Active  | 1        | true       |
+```
+
+*After:*
+
+Stored in the "oro_enum_option" table.
+
+Example:
+
+```markdown
+| id                  | internal_id | enum_code   | name    | priority | is_default |
+| auth_status.locked  | locked      | auth_status | Locked  | 3        | false      |
+| auth_status.expired | expired     | auth_status | Expired | 4        | false      |
+| auth_status.active  | active      | auth_status | Active  | 1        | true       |
+| auth_status.reset   | reset       | auth_status | Reset   | 2        | false      |
+```
+
+## Versioned migration Enum changes:
+
+*Before:*
+
+```php
+    $queries->addPostQuery(
+        new OutdatedInsertEnumValuesQuery(
+            $this->extendExtension,
+            'cu_auth_status', 
+            [new OutdatedEnumDataValue(CustomerUserAuthStatus::STATUS_EXPIRED, 'Expired', 3)]
+        )
+     );
+```
+
+```php
+namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_0;
+
+class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
+ {
+     use ExtendExtensionAwareTrait;
+ 
+     public function up(Schema $schema, QueryBag $queries)
+     {
+         $table = $schema->getTable('oro_calendar_event_attendee');
+        $this->extendExtension->addEnumField(
+            $schema,
+            $table,
+            'status',
+            'ce_attendee_status',
+            false,
+            false,
+            [
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM]
+            ]
+         );
+     }
+```
+
+*After:*
+
+```php
+    $queries->addPostQuery(
+        new OutdatedInsertEnumValuesQuery(
+            $this->outdatedExtendExtension, // Outdated extend extension must be used for old enums
+            'cu_auth_status', 
+            [new OutdatedEnumDataValue(CustomerUserAuthStatus::STATUS_EXPIRED, 'Expired', 3)]
+        )
+     );
+```
+
+```php
+namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_0;
+
+class OroCalendarBundle implements Migration, OutdatedExtendExtensionAwareInterface
+ {
+     use OutdatedExtendExtensionAwareTrait;
+ 
+    public function up(Schema $schema, QueryBag $queries)
+     {
+         $table = $schema->getTable('oro_calendar_event_attendee');
+        $this->outdatedExtendExtension->addOutdatedEnumField(
+            $schema,
+            $table,
+            'status',
+            'ce_attendee_status',
+            false,
+            false,
+            [
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM]
+            ]
+         );
+     }
+```
+
+## Migration data fixture:
+
+*Before:*
+
+```php
+   $queries->addPostQuery(new OutdatedInsertEnumValuesQuery($this->outdatedExtendExtension, 'cu_auth_status', [
+            new OutdatedEnumDataValue(CustomerUserAuthStatus::STATUS_EXPIRED, 'Expired', 3)
+        ]));
+```
+
+*After:*
+
+```php
+class LoadLeadStatusOptionData extends AbstractEnumFixture
+{
+    protected function getData(): array
+    {
+        return [
+            'new' => 'New',
+            'qualified' => 'Qualified',
+            'canceled' => 'Disqualified',
+        ];
+    }
+
+    protected function getDefaultValue(): string
+    {
+        return 'new';
+    }
+
+    protected function getEnumCode(): string
+    {
+        return 'lead_status';
+    }
+}
+
+```
+
+## Joining enum options DQL:
+
+*Before:*
+
+- join Enum options via "relation"
+
+```php
+    ->leftJoin('attendee.status', 'attendee_status')
+```
+
+*After:*
+
+```php
+->leftJoin(
+    EnumOption::class,
+    'attendee_status',
+    Expr\Join::WITH,
+    "JSON_EXTRACT(attendee.serialized_data, 'status') = attendee_status"
+)
+
+```
+
+- Query by enum fields
+
+```php
+ $qb = $this->doctrine->getRepository(CustomerUser::class)
+            ->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('IDENTITY(u.auth_status) <> :authStatus')
+```
+
+*After:*
+
+```php
+ $qb = $this->doctrine->getRepository(CustomerUser::class)
+            ->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere("JSON_EXTRACT(u.serialized_data, 'auth_status') <> :authStatus")
+```
+
+## Query to Enum Option Repository:
+
+*Before:*
+
+```php
+   $statusEnum = $this->doctrine
+        ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
+        ->find(Attendee::STATUS_NONE);
+```
+
+*After:*
+
+```php
+    $statusEnum = $this->doctrine
+         ->getRepository(EnumOption::class)
+         ->find(ExtendHelper::buildEnumOptionId(Attendee::STATUS_ENUM_CODE, Attendee::STATUS_NONE)
+    );
+```
+
+## Comparison of enum option:
+
+*Before:*
+
+```php
+  if ($user->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE) {}
+```
+
+```php
+  if (!$originalValue instanceof AbstractEnumValue) {}
+```
+
+*After:*
+
+```php
+  if ($user->getAuthStatus()->getIntenalId() !== UserManager::STATUS_ACTIVE) {}
+```
+
+```php
+  if (!$originalValue instanceof EnumOptionInterface) {}
+```
+
+### Expression Language changes:
+
+*Before:*
+
+```yaml
+    shippingRuleD:
+      name: 'D'
+      enabled: true
+      sortOrder: 1
+      stopProcessing: true
+      expression: "lineItems.any( lineItem.product.shipping_category.id = 'd' )"
+```
+
+*After:*
+
+```yaml
+    shippingRuleD:
+        name: 'D'
+        enabled: true
+        sortOrder: 1
+        stopProcessing: true
+        expression: "lineItems.any( lineItem.product.shipping_category.internalId = 'd' )" # use internalId instead of id
+```
+
+### Datagrids changes:
+
+*Before:*
+
+- join enum options
+
+```yaml
+join:
+  left:
+    - { join: ra.status, alias: status }
+```
+
+*After:*
+
+```yaml
+join:
+  left:
+#    - { join: ra.status, alias: status } # removed
+```
+
+- Example of datagrid columns and joins update
+
+*Before:*
+
+```yaml
+    orders-grid:
+        acl_resource: oro_order_view
+        extends: base-orders-grid
+        source:
+            query:
+                select:
+                    - internalStatus.name as internalStatusName
+                    - internalStatus.id as internalStatusId
+                join:
+                    left:
+                        - { join: order1.internal_status, alias: internalStatus }
+                groupBy:  order1.id
+            hints:
+                - HINT_TRANSLATABLE
+        columns:
+            internalStatusName:
+                label: oro.order.internal_status.label
+```
+
+*After:*
+
+```yaml
+    orders-grid:
+        acl_resource: oro_order_view
+        extends: base-orders-grid
+        source:
+            query:
+                select:
+#                    - internalStatus.name as internalStatusName # removed
+#                    - internalStatus.id as internalStatusId # removed
+                join:
+                    left:
+#                       - { join: order1.internal_status, alias: internalStatus } # removed
+                groupBy:  order1.id
+            hints:
+                - HINT_TRANSLATABLE
+        columns:
+            internal_status:
+                label: oro.order.internal_status.label
+```
+
+### Data fixture changes:
+
+- load enum options
+
+*Before:*
+
+```yaml
+Extend\Entity\EV_Acc_Internal_Rating:
+    1_of_5:
+        __construct:
+            - '1_of_5'
+            - '1_of_5'
+```
+*After:*
+
+```yaml
+Oro\Bundle\EntityExtendBundle\Entity\EnumOption:
+    1_of_5:
+        __construct:
+            - 'acc_internal_rating' # enum_code
+            - '1_of_5'
+            - '1_of_5'
+```
+
+## Search index
+
+- Enum fields do not change in the search index, the only thing you need to remember is that in the search, the internal id of the enum is used as a key, and the value remains unchanged.
+
+## Import and Export
+
+- The format of import and export has not changed, but you need to remember that the internalId of the enum option is used as an identifier.
+
+### Transition definition configuration changes:
+
+*Before:*
+
+```yaml
+quote_creating_definition:
+  preconditions:
+    '@and':
+         - '@neq':  [$status.id, 'lost']
+         - '@neq':  [$status.id, 'won']
+         - '@type': [$customer.target, 'Oro\Bundle\CustomerBundle\Entity\Customer']
+
+```
+*After:*
+
+```yaml
+quote_creating_definition:
+  preconditions:
+    '@and':
+      - '@neq':  [$status.internalId, 'lost']
+      - '@neq':  [$status.internalId, 'won']
+      - '@type': [$customer.target, 'Oro\Bundle\CustomerBundle\Entity\Customer']
+```
+
+### Checking the set of changes of enum field
+
+*Before:*
+
+```php
+    $changeSet = $unitOfWork->getEntityChangeSet($entity);
+    if (isset($changeSet['status']) || isset($changeSet['inventory_status'])) {}
+```
+
+*After:*
+
+```php
+    $changeSet = $unitOfWork->getEntityChangeSet($entity);
+    if (isset($changeSet['serialized_data'][0]['status']) # $changeSet['serialized_data'][0] - previous status value
+        || isset($changeSet['serialized_data'][0]['inventory_status'])) {}
+```
+
+### System configuration changes:
+
+*Before:*
+
+```php
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('oro_seller_dashboard');
+        $rootNode = $treeBuilder->getRootNode();
+
+        SettingsBuilder::append(
+            $rootNode,
+            [
+                'order_count_status_criteria' => [
+                    'type' => 'array',
+                    'value' => [
+                        OrderStatusesProviderInterface::INTERNAL_STATUS_OPEN
+                    ]
+                ]
+            ]
+        );
+    }
+```
+*After:*
+
+```php
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('oro_seller_dashboard');
+        $rootNode = $treeBuilder->getRootNode();
+
+        SettingsBuilder::append(
+            $rootNode,
+            [
+                'order_count_status_criteria' => [
+                    'type' => 'array',
+                    'value' => [
+                        ExtendHelper::buildEnumOptionId(
+                            Order::INTERNAL_STATUS_CODE,
+                            OrderStatusesProviderInterface::INTERNAL_STATUS_OPEN
+                        ),
+                    ]
+                ]
+            ]
+        );
+    }
+```
+
+### Template changes (optional, to improve performance):
+
+*Before:*
+
+```html
+<i {% if invitationClass %}class="{{ invitationClass }}" title="{{ attendee.status.name }}" {% endif %}></i>
+
+```
+
+*After:*
+
+```html
+<i {% if invitationClass %}class="{{ invitationClass }}" title="{{ attendee.status.id|trans_enum }}" {% endif %}></i>
+```
+
+### Behat test changes:
+
+*Before:*
+
+```text
+ Scenario: Create Multi-Select fields with one auditable
+   ...
+   And I fill form with:
+   | Field name    | AuditableMultiSelect |
+   | Type          | Multi-Select         |
+   And I click "Continue"
+   And set Options with:
+   | Label   |
+   | Option1 |
+   | Option2 |
+   | Option3 |
+   And I fill form with:
+   | Auditable | Yes |
+   And I save and create new form
+   Then click update schema            # schema update step is needed
+   When I click update schema
+   Then I should see Schema updated flash message
+   ...
+```
+*After:*
+
+```text
+Scenario: Create Multi-Select fields with one auditable
+  ...
+  And I fill form with:
+  | Field name    | AuditableMultiSelect |
+  | Type          | Multi-Select         |
+  And I click "Continue"
+  And set Options with:
+  | Label   |
+  | Option1 |
+  | Option2 |
+  | Option3 |
+  And I fill form with:
+  | Auditable | Yes |
+  And I save and create new form
+#  Then click update schema                # This step is not needed more for enums fields!!!
+#  When I click update schema
+#  Then I should see Schema updated flash message
+  ...
+```
+
 ### Removed
 
 #### EntityBundle

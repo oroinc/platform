@@ -3,12 +3,15 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -100,14 +103,21 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $configModel->expects($this->once())
             ->method('getType')
             ->willReturn($dataType);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('enum')
+            ->willReturn($enumConfigProvider);
+        $enumConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(EnumOption::class)
+            ->willReturn(false);
         $configModel->expects($this->once())
             ->method('toArray')
             ->with('enum')
             ->willReturn(['enum_name' => 'Test Enum']);
 
         $event = $this->getFormEventMock($configModel);
-        $event->expects($this->never())
-            ->method('setData');
 
         $this->subscriber->preSetData($event);
     }
@@ -119,7 +129,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $enumCode = 'test_enum';
         $enumLabel = ExtendHelper::getEnumTranslationKey('label', $enumCode);
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $enumOptionClassName = EnumOption::class;
 
         $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
@@ -128,7 +138,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $configModel->expects($this->once())
             ->method('toArray')
             ->with('enum')
-            ->willReturn(['enum_code' => $enumCode]);
+            ->willReturn(['enum_code' => $enumCode, 'enum_public' => true]);
 
         $event = $this->getFormEventMock($configModel);
 
@@ -139,8 +149,9 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $expectedData = [
             'enum' => [
-                'enum_name'    => $enumLabel,
-                'enum_public'  => true,
+                'enum_name' => $enumLabel,
+                'enum_code' => $enumCode,
+                'enum_public' => true,
                 'enum_options' => $enumOptions,
             ]
         ];
@@ -149,12 +160,12 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn($initialData);
 
-        $enumConfig = new Config(new EntityConfigId('enum', $enumValueClassName));
+        $enumConfig = new Config(new EntityConfigId('enum', $enumOptionClassName));
         $enumConfig->set('public', true);
 
         $this->enumSynchronizer->expects($this->once())
             ->method('getEnumOptions')
-            ->with($enumValueClassName)
+            ->with($enumCode, $enumOptionClassName)
             ->willReturn($enumOptions);
 
         $enumConfigProvider = $this->createMock(ConfigProvider::class);
@@ -164,12 +175,8 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
-            ->with($enumValueClassName)
+            ->with($enumOptionClassName)
             ->willReturn(true);
-        $enumConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($enumValueClassName)
-            ->willReturn($enumConfig);
 
         $event->expects($this->once())
             ->method('setData')
@@ -236,12 +243,14 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPostSubmitForNewEnum(string $dataType)
     {
-        $enumCode = 'test_enum';
         $enumName = 'Test Enum';
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $enumValueClassName = EnumOption::class;
         $locale = 'fr';
 
         $configModel = $this->createMock(FieldConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
+        $configModel->expects($this->once())->method('getEntity')->willReturn($entityConfigModel);
+        $entityConfigModel->expects($this->once())->method('getClassName')->willReturn($enumValueClassName);
         $configModel->expects($this->never())
             ->method('getId');
         $configModel->expects($this->once())
@@ -259,38 +268,36 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = $this->getFormEventMock($configModel, $form);
 
-        $enumOptions   = [
+        $enumOptions = [
             ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
             ['id' => 'val1', 'label' => 'Value 1', 'priority' => 4],
             ['label' => 'Value 1', 'priority' => 2],
         ];
         $submittedData = [
             'enum' => [
-                'enum_name'    => $enumName,
-                'enum_public'  => true,
+                'enum_code' => 'test_enum',
+                'enum_name' => $enumName,
+                'enum_public' => true,
                 'enum_options' => $enumOptions
             ]
         ];
-        $expectedData  = [
+        $expectedData = [
             'enum' => [
-                'enum_name'    => $enumName,
-                'enum_public'  => true,
+                'enum_code' => 'test_enum',
+                'enum_name' => $enumName,
+                'enum_public' => true,
                 'enum_options' => [
                     ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
                     ['label' => 'Value 1', 'priority' => 2],
                     ['id' => 'val1', 'label' => 'Value 1', 'priority' => 3],
                 ],
-                'enum_locale'  => $locale
+                'enum_locale' => $locale
             ]
         ];
 
         $event->expects($this->once())
             ->method('getData')
             ->willReturn($submittedData);
-        $configModel->expects($this->once())
-            ->method('toArray')
-            ->with('enum')
-            ->willReturn([]);
 
         $this->translator->expects($this->once())
             ->method('getLocale')
@@ -317,11 +324,11 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPostSubmitForNewEnumWithoutNameAndPublic(string $dataType)
     {
-        $entityClassName    = 'Test\Entity';
-        $fieldName          = 'testField';
-        $enumCode           = ExtendHelper::generateEnumCode($entityClassName, $fieldName);
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-        $locale             = 'fr';
+        $entityClassName = 'Test\Entity';
+        $fieldName = 'testField';
+        $enumCode = ExtendHelper::generateEnumCode($entityClassName, $fieldName);
+        $enumValueClassName = EnumOption::class;
+        $locale = 'fr';
 
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel->expects($this->once())
@@ -337,9 +344,6 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $configModel->expects($this->once())
             ->method('getEntity')
             ->willReturn($entityConfigModel);
-        $configModel->expects($this->once())
-            ->method('getFieldName')
-            ->willReturn($fieldName);
 
         $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
         $form->expects($this->once())
@@ -352,28 +356,26 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = $this->getFormEventMock($configModel, $form);
 
-        $enumOptions   = [
+        $enumOptions = [
             ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
         ];
         $submittedData = [
             'enum' => [
+                'enum_code' => 'test_enum',
                 'enum_options' => $enumOptions
             ]
         ];
-        $expectedData  = [
+        $expectedData = [
             'enum' => [
+                'enum_code' => 'test_enum',
                 'enum_options' => $enumOptions,
-                'enum_locale'  => $locale
+                'enum_locale' => $locale
             ]
         ];
 
         $event->expects($this->once())
             ->method('getData')
             ->willReturn($submittedData);
-        $configModel->expects($this->once())
-            ->method('toArray')
-            ->with('enum')
-            ->willReturn([]);
 
         $this->translator->expects($this->once())
             ->method('getLocale')
@@ -403,13 +405,14 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $enumCode = 'test_enum';
         $enumName = 'Test Enum';
         $enumPublic = false;
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $enumValueClassName = EnumOption::class;
         $locale = 'fr';
 
         $configModel = $this->createMock(FieldConfigModel::class);
-        $configModel->expects($this->once())
-            ->method('getId')
-            ->willReturn(123);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
+        $configModel->expects($this->once())->method('getEntity')->willReturn($entityConfigModel);
+        $entityConfigModel->expects($this->once())->method('getClassName')->willReturn($enumValueClassName);
+
         $configModel->expects($this->once())
             ->method('getType')
             ->willReturn($dataType);
@@ -426,21 +429,23 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = $this->getFormEventMock($configModel, $form);
 
-        $enumOptions   = [
-            ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
+        $enumOptions = [
+            ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1, 'internalId' => 'val1'],
         ];
         $submittedData = [
             'enum' => [
-                'enum_name'    => $enumName,
-                'enum_public'  => $enumPublic,
-                'enum_options' => $enumOptions
+                'enum_name' => $enumName,
+                'enum_public' => $enumPublic,
+                'enum_options' => $enumOptions,
+                'enum_code' => $enumCode
             ]
         ];
-        $expectedData  = [
+        $expectedData = [
             'enum' => [
-                'enum_name'    => $enumName,
-                'enum_public'  => $enumPublic,
-                'enum_options' => $enumOptions
+                'enum_name' => $enumName,
+                'enum_public' => $enumPublic,
+                'enum_options' => $enumOptions,
+                'enum_code' => $enumCode
             ]
         ];
 
@@ -449,8 +454,8 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($submittedData);
         $configModel->expects($this->once())
             ->method('toArray')
-            ->with('enum')
-            ->willReturn(['enum_code' => $enumCode]);
+            ->with('extend')
+            ->willReturn(['state' => ExtendScope::STATE_ACTIVE]);
 
         $this->translator->expects($this->once())
             ->method('getLocale')
@@ -464,16 +469,21 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('hasConfig')
             ->with($enumValueClassName)
             ->willReturn(true);
+        $config = $this->createMock(ConfigInterface::class);
+        $enumConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($enumValueClassName, null)
+            ->willReturn($config);
 
         $this->enumSynchronizer->expects($this->once())
             ->method('applyEnumNameTrans')
             ->with($enumCode, $enumName, $locale);
         $this->enumSynchronizer->expects($this->once())
             ->method('applyEnumOptions')
-            ->with($enumValueClassName, $enumOptions, $locale);
+            ->with($enumCode, $enumValueClassName, $enumOptions, $locale);
         $this->enumSynchronizer->expects($this->once())
             ->method('applyEnumEntityOptions')
-            ->with($enumValueClassName, $enumPublic);
+            ->with($config, $enumPublic);
 
         $event->expects($this->once())
             ->method('setData')
@@ -495,12 +505,15 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPostSubmitForEnumSyncError(string $dataType)
     {
-        $enumCode = 'test_enum';
         $enumName = 'Test Enum';
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $enumValueClassName = EnumOption::class;
         $locale = 'en_GB';
 
         $configModel = $this->createMock(FieldConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
+        $configModel->expects($this->once())->method('getEntity')->willReturn($entityConfigModel);
+        $entityConfigModel->expects($this->once())->method('getClassName')->willReturn($enumValueClassName);
+
         $configModel->expects($this->any())
             ->method('getId')
             ->willReturn(1);
@@ -519,13 +532,14 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = $this->getFormEventMock($configModel, $form);
 
-        $enumOptions   = [
+        $enumOptions = [
             ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
         ];
         $submittedData = [
             'enum' => [
-                'enum_name'    => $enumName,
-                'enum_public'  => true,
+                'enum_code' => 'test_enum',
+                'enum_name' => $enumName,
+                'enum_public' => true,
                 'enum_options' => $enumOptions
             ]
         ];
@@ -535,8 +549,8 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($submittedData);
         $configModel->expects($this->any())
             ->method('toArray')
-            ->with('enum')
-            ->willReturn([]);
+            ->with('extend')
+            ->willReturn(['state' => ExtendScope::STATE_ACTIVE]);
 
         $this->translator->expects($this->any())
             ->method('getLocale')
@@ -561,7 +575,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $exception = new \Exception();
         $this->enumSynchronizer->expects($this->once())
             ->method('applyEnumOptions')
-            ->with($enumValueClassName, $enumOptions, $locale)
+            ->with('test_enum', $enumValueClassName, $enumOptions, $locale)
             ->willThrowException($exception);
 
         $form->expects($this->once())

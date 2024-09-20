@@ -782,6 +782,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_id_helper'
             - '@oro_api.query_acl_helper'
+            - '@oro_entity.query_hint_resolver'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: load_data, priority: 100 }
             - { name: oro.api.processor, action: get_relationship, group: load_data, priority: 100 }
@@ -814,6 +815,7 @@ services:
             - '@oro_api.entity_serializer'
             - '@oro_api.doctrine_helper'
             - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_entity.query_hint_resolver'
         tags:
             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false, priority: -10 }

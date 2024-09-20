@@ -56,16 +56,6 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
         $this->doTestPreSetDataForNewEntityKeepExistingValue($this->type);
     }
 
-    public function testPreSetDataForNewEntity(): void
-    {
-        $this->doTestPreSetDataForNewEntity($this->type);
-    }
-
-    public function testPreSetDataForNewEntityWithMultiEnum(): void
-    {
-        $this->doTestPreSetDataForNewEntityWithMultiEnum($this->type);
-    }
-
     /**
      * @dataProvider configureOptionsProvider
      */
@@ -114,9 +104,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
     public function testConfigureOptionsWithOverrideConfigs(): void
     {
         $newPlaceholder = 'Test Placeholder';
-
         $resolver = $this->getOptionsResolver();
-
         $resolvedOptions = $this->doTestConfigureOptions(
             $this->type,
             $resolver,

@@ -369,5 +369,6 @@ services:
         arguments:
             - "@doctrine"
             - "@translator"
+            - "@oro_entity_extend.enum_options_provider"
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.dashboards-grid, method: onBuildBefore }

@@ -17,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension;
@@ -499,7 +500,14 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 'configArray' => [
                     'source' => [
                         'query' => [
-                            'join' => ['left' => [['join' => 'o.' . self::FIELD_NAME, 'alias' => 'auto_rel_1']]],
+                            'join' => ['left' => [
+                                [
+                                    'join' => EnumOption::class,
+                                    'alias' => 'auto_rel_1',
+                                    'conditionType' => 'WITH',
+                                    'condition' => "JSON_EXTRACT(order1.serialized_data, 'testField') = auto_rel_1"
+                                ]
+                            ]],
                             'select' => [
                                 'IDENTITY(o.' . self::FIELD_NAME . ') as ' . self::FIELD_NAME,
                                 'auto_rel_1. as auto_rel_1_',
@@ -519,14 +527,18 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 ],
                 'expectedConfigArray' => [
                     'extended_entity_name' => 'Test:Entity',
-                    'source' => ['query' => ['select' => ['o.' . self::FIELD_NAME . 'Snapshot']]],
-                    'columns' => [self::FIELD_NAME => ['data_name' => self::FIELD_NAME . 'Snapshot']],
+                    'source' => ['query' => ['select' => ["JSON_EXTRACT(order1.serialized_data, 'testField') = o"]]],
+                    'columns' => [self::FIELD_NAME => ['data_name' => self::FIELD_NAME]],
                     'sorters' => [
-                        'columns' => [self::FIELD_NAME => ['data_name' => 'o.' . self::FIELD_NAME . 'Snapshot']],
+                        'columns' => [
+                            self::FIELD_NAME => ['data_name' => "JSON_EXTRACT(order1.serialized_data, 'testField') = o"]
+                        ],
                     ],
-                    'filters' => ['columns' => [self::FIELD_NAME => ['data_name' => 'o.' . self::FIELD_NAME]]],
+                    'filters' => ['columns' => [
+                        self::FIELD_NAME => ['data_name' => "JSON_EXTRACT(order1.serialized_data, 'testField') = o"]]
+                    ],
                     'fields_acl' => [
-                        'columns' => [self::FIELD_NAME . 'Snapshot' => ['data_name' => 'o.' . self::FIELD_NAME]],
+                        'columns' => [self::FIELD_NAME => ['data_name' => 'o.' . self::FIELD_NAME]],
                     ],
                 ],
             ],

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\EventListener;
 
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -13,11 +13,11 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
  */
 class PasswordChangedListener
 {
-    private EnumValueProvider $enumValueProvider;
+    private EnumOptionsProvider $enumOptionsProvider;
 
-    public function __construct(EnumValueProvider $enumValueProvider)
+    public function __construct(EnumOptionsProvider $enumOptionsProvider)
     {
-        $this->enumValueProvider = $enumValueProvider;
+        $this->enumOptionsProvider = $enumOptionsProvider;
     }
 
     public function prePersist(User $user): void
@@ -34,9 +34,9 @@ class PasswordChangedListener
 
     private function updateAuthStatus(User $user): void
     {
-        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE) {
+        if ($user->getAuthStatus() && $user->getAuthStatus()->getInternalId() !== UserManager::STATUS_ACTIVE) {
             $user->setAuthStatus(
-                $this->enumValueProvider->getEnumValueByCode('auth_status', UserManager::STATUS_ACTIVE)
+                $this->enumOptionsProvider->getEnumOptionByCode('auth_status', UserManager::STATUS_ACTIVE)
             );
         }
     }

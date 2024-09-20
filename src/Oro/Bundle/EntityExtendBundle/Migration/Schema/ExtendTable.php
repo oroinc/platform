@@ -30,7 +30,7 @@ class ExtendTable extends TableWithNameGenerator
      */
     protected function createColumnObject(array $args)
     {
-        $args['tableName']            = $this->getName();
+        $args['tableName'] = $this->getName();
         $args['extendOptionsManager'] = $this->extendOptionsManager;
 
         return parent::createColumnObject($args);
@@ -38,7 +38,7 @@ class ExtendTable extends TableWithNameGenerator
 
     /**
      * @param string $name
-     * @param mixed  $value Can be scalar type, array or OroOptions object
+     * @param mixed $value Can be scalar type, array or OroOptions object
      *
      * @return \Doctrine\DBAL\Schema\Table
      */
@@ -54,6 +54,27 @@ class ExtendTable extends TableWithNameGenerator
         }
 
         return parent::addOption($name, $value);
+    }
+
+    public function addExtendColumnOption(
+        string $assocationColumn,
+        string $scope,
+        string $propertyPath,
+        array $optionValue
+    ): self {
+        $existendOptions = [];
+        $extendColumnOptions = $this->extendOptionsManager->getColumnOptions($this->getName(), $assocationColumn);
+        if (isset($extendColumnOptions[$scope][$propertyPath])) {
+            $existendOptions = $extendColumnOptions[$scope][$propertyPath];
+        }
+        $appendOptions = [
+            $scope => [
+                $propertyPath => array_merge($existendOptions, $optionValue)
+            ]
+        ];
+        $this->extendOptionsManager->setColumnOptions($this->getName(), $assocationColumn, $appendOptions);
+
+        return $this;
     }
 
     /**

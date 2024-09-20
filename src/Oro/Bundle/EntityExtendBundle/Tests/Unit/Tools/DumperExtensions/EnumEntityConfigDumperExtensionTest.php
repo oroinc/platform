@@ -11,10 +11,12 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
-use Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation;
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\EnumEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -107,9 +109,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $enumCode1 = ExtendHelper::buildEnumCode('Test Enum 1');
         $enumCode2 = ExtendHelper::buildEnumCode('Test Enum 2');
         $enumCode5 = ExtendHelper::generateEnumCode('Test\EnumValue1', 'field5');
-        $enumValueClassName1 = ExtendHelper::buildEnumValueClassName($enumCode1);
-        $enumValueClassName2 = ExtendHelper::buildEnumValueClassName($enumCode2);
-        $enumValueClassName5 = ExtendHelper::buildEnumValueClassName($enumCode5);
+        $enumOptionClassName = EnumOption::class;
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $enumConfigProvider = $this->createMock(ConfigProvider::class);
@@ -139,22 +139,22 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->exactly(3))
             ->method('hasConfigEntityModel')
             ->willReturnMap([
-                [$enumValueClassName1, false],
-                [$enumValueClassName2, true],
-                [$enumValueClassName5, true],
+                [$enumOptionClassName, false],
+                [$enumOptionClassName, true],
+                [$enumOptionClassName, true],
             ]);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->any())
             ->method('createConfigEntityModel')
-            ->with($enumValueClassName1, ConfigModel::MODE_HIDDEN);
+            ->with($enumOptionClassName, ConfigModel::MODE_HIDDEN);
 
-        $this->setAddEnumValueEntityFieldsExpectations($enumValueClassName1, $enumCode1);
+        $this->setAddEnumValueEntityFieldsExpectations($enumOptionClassName, $enumCode1);
 
-        $this->relationBuilder->expects($this->exactly(2))
+        $this->relationBuilder->expects($this->exactly(3))
             ->method('updateEntityConfigs')
             ->withConsecutive(
                 [
-                    $enumValueClassName1,
+                    $enumOptionClassName,
                     [
                         'entity' => [
                             'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode1),
@@ -164,8 +164,8 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                         'extend' => [
                             'owner'     => ExtendScope::OWNER_SYSTEM,
                             'is_extend' => true,
-                            'table'     => $this->nameGenerator->generateEnumTableName($enumCode1),
-                            'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
+                            'table' => OutdatedExtendExtension::generateEnumTableName($enumCode1, true),
+                            'inherit' => AbstractEnumValue::class
                         ],
                         'enum'   => [
                             'code'     => $enumCode1,
@@ -175,20 +175,55 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 [
-                    $enumValueClassName2,
+                    $enumOptionClassName,
                     [
+                        'entity' => [
+                            'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode2),
+                            'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode2),
+                            'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode2)
+                        ],
+                        'extend' => [
+                            'owner'     => ExtendScope::OWNER_SYSTEM,
+                            'is_extend' => true,
+                            'table' => OutdatedExtendExtension::generateEnumTableName($enumCode2, true),
+                            'inherit' => AbstractEnumValue::class
+                        ],
                         'enum' => [
-                            'public' => true
+                            'code'   => $enumCode2,
+                            'public' => true,
+                            'multiple' => true
+                        ]
+                    ]
+                ],
+                [
+                    $enumOptionClassName,
+                    [
+                        'entity' => [
+                            'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode5),
+                            'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode5),
+                            'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode5)
+                        ],
+                        'extend' => [
+                            'owner'     => ExtendScope::OWNER_SYSTEM,
+                            'is_extend' => true,
+                            'table' => OutdatedExtendExtension::generateEnumTableName($enumCode5, true),
+                            'inherit' => AbstractEnumValue::class
+                        ],
+                        'enum' => [
+                            'code'   => $enumCode5,
+                            'public' => false,
+                            'multiple' => false
                         ]
                     ]
                 ]
             );
+
         $this->relationBuilder->expects($this->exactly(2))
             ->method('addManyToOneRelation')
             ->withConsecutive(
                 [
                     $this->identicalTo($entityConfig1),
-                    $enumValueClassName1,
+                    $enumOptionClassName,
                     'field1',
                     'name',
                     [
@@ -200,7 +235,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 ],
                 [
                     $this->identicalTo($entityConfig1),
-                    $enumValueClassName5,
+                    $enumOptionClassName,
                     'field5',
                     'name',
                     [
@@ -215,7 +250,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('addManyToManyRelation')
             ->with(
                 $this->identicalTo($entityConfig1),
-                $enumValueClassName2,
+                $enumOptionClassName,
                 'field2',
                 ['name'],
                 ['name'],
@@ -251,7 +286,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfigs = [$fieldConfig1];
 
         $enumCode1 = ExtendHelper::generateEnumCode('Test\EnumValue1', 'field1');
-        $enumValueClassName1 = ExtendHelper::buildEnumValueClassName($enumCode1);
+        $enumValueClassName1 = EnumOption::class;
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $enumConfigProvider = $this->createMock(ConfigProvider::class);
@@ -298,8 +333,8 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                     'extend' => [
                         'owner'     => ExtendScope::OWNER_SYSTEM,
                         'is_extend' => true,
-                        'table'     => $this->nameGenerator->generateEnumTableName($enumCode1, true),
-                        'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
+                        'table' => OutdatedExtendExtension::generateEnumTableName($enumCode1, true),
+                        'inherit' => AbstractEnumValue::class
                     ],
                     'enum'   => [
                         'code'     => $enumCode1,
@@ -328,7 +363,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function setAddEnumValueEntityFieldsExpectations(string $enumValueClassName, string $enumCode): void
     {
-        $this->configManager->expects($this->exactly(4))
+        $this->configManager->expects($this->any())
             ->method('createConfigFieldModel')
             ->withConsecutive(
                 [$enumValueClassName, 'id', 'string'],
@@ -337,7 +372,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 [$enumValueClassName, 'default', 'boolean']
             );
 
-        $this->relationBuilder->expects($this->exactly(4))
+        $this->relationBuilder->expects($this->any())
             ->method('updateFieldConfigs')
             ->withConsecutive(
                 [
@@ -401,15 +436,15 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     public function testPostUpdateForEnumValues()
     {
         $entityConfig1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
-        $entityConfig1->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
+        $entityConfig1->set('inherit', AbstractEnumValue::class);
         $entityConfig2 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $entityConfig2->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
+        $entityConfig2->set('inherit', AbstractEnumValue::class);
         $entityConfig2->set(
             'schema',
             [
                 'doctrine' => [
                     'Test\EnumValue2' => [
-                        'repositoryClass' => EnumValueRepository::class
+                        'repositoryClass' => EnumOptionRepository::class
                     ]
                 ]
             ]
@@ -436,12 +471,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'doctrine' => [
                     'Test\EnumValue1' => [
-                        'repositoryClass' => EnumValueRepository::class,
-                        'gedmo'           => [
-                            'translation' => [
-                                'entity' => EnumValueTranslation::class
-                            ]
-                        ]
+                        'repositoryClass' => EnumOptionRepository::class
                     ]
                 ]
             ],

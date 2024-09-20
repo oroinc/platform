@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumPublicType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -44,8 +44,8 @@ class EnumPublicTypeTest extends TypeTestCase
         array $options,
         array $expectedOptions
     ) {
-        $fieldName          = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
-        $enumValueClassName = $enumCode ? ExtendHelper::buildEnumValueClassName($enumCode) : null;
+        $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
+        $enumOptionClassName = $enumCode ? EnumOption::class : null;
 
         $this->typeHelper->expects($this->any())
             ->method('getEnumCode')
@@ -57,7 +57,7 @@ class EnumPublicTypeTest extends TypeTestCase
             ->willReturn($isSystem);
         $this->typeHelper->expects($this->any())
             ->method('isImmutable')
-            ->with('enum', $enumValueClassName, null, 'public')
+            ->with('enum', $enumOptionClassName, null, 'public')
             ->willReturn($isImmutablePublic);
         $this->typeHelper->expects($this->any())
             ->method('hasOtherReferences')
@@ -67,7 +67,7 @@ class EnumPublicTypeTest extends TypeTestCase
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
 
-        $options['config_id']     = $configId;
+        $options['config_id'] = $configId;
         $options['config_is_new'] = $isNewConfig;
 
         $resolvedOptions = $resolver->resolve($options);
@@ -85,9 +85,9 @@ class EnumPublicTypeTest extends TypeTestCase
         $resolver = new OptionsResolver();
         $resolver->setDefaults(
             [
-                'config_id'         => null,
-                'config_is_new'     => false,
-                'disabled'          => false,
+                'config_id' => null,
+                'config_is_new' => false,
+                'disabled' => false,
                 'validation_groups' => true
             ]
         );
@@ -99,95 +99,95 @@ class EnumPublicTypeTest extends TypeTestCase
     {
         return [
             [
-                'configId'           => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
-                'isNewConfig'        => false,
-                'enumCode'           => null,
-                'isSystem'           => false,
-                'isImmutablePublic'  => false,
+                'configId' => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
+                'isNewConfig' => false,
+                'enumCode' => null,
+                'isSystem' => false,
+                'isImmutablePublic' => false,
                 'hasOtherReferences' => false,
-                'options'            => [],
-                'expectedOptions'    => [
-                    'disabled'          => false,
+                'options' => [],
+                'expectedOptions' => [
+                    'disabled' => false,
                     'validation_groups' => true
                 ]
             ],
             [
-                'configId'           => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
-                'isNewConfig'        => false,
-                'enumCode'           => 'test_enum',
-                'isSystem'           => false,
-                'isImmutablePublic'  => false,
+                'configId' => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
+                'isNewConfig' => false,
+                'enumCode' => 'test_enum',
+                'isSystem' => false,
+                'isImmutablePublic' => false,
                 'hasOtherReferences' => false,
-                'options'            => [],
-                'expectedOptions'    => [
-                    'disabled'          => false,
+                'options' => [],
+                'expectedOptions' => [
+                    'disabled' => false,
                     'validation_groups' => true
                 ]
             ],
             [
-                'configId'           => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
-                'isNewConfig'        => false,
-                'enumCode'           => 'test_enum',
-                'isSystem'           => false,
-                'isImmutablePublic'  => false,
+                'configId' => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
+                'isNewConfig' => false,
+                'enumCode' => 'test_enum',
+                'isSystem' => false,
+                'isImmutablePublic' => false,
                 'hasOtherReferences' => false,
-                'options'            => [
+                'options' => [
                     'disabled' => true,
                 ],
-                'expectedOptions'    => [
-                    'disabled'          => true,
+                'expectedOptions' => [
+                    'disabled' => true,
                     'validation_groups' => false
                 ]
             ],
             [
-                'configId'           => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
-                'isNewConfig'        => true,
-                'enumCode'           => 'test_enum',
-                'isSystem'           => false,
-                'isImmutablePublic'  => false,
+                'configId' => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
+                'isNewConfig' => true,
+                'enumCode' => 'test_enum',
+                'isSystem' => false,
+                'isImmutablePublic' => false,
                 'hasOtherReferences' => false,
-                'options'            => [],
-                'expectedOptions'    => [
-                    'disabled'          => true,
+                'options' => [],
+                'expectedOptions' => [
+                    'disabled' => true,
                     'validation_groups' => false
                 ]
             ],
             [
-                'configId'           => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
-                'isNewConfig'        => false,
-                'enumCode'           => 'test_enum',
-                'isSystem'           => true,
-                'isImmutablePublic'  => false,
+                'configId' => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
+                'isNewConfig' => false,
+                'enumCode' => 'test_enum',
+                'isSystem' => true,
+                'isImmutablePublic' => false,
                 'hasOtherReferences' => false,
-                'options'            => [],
-                'expectedOptions'    => [
-                    'disabled'          => true,
+                'options' => [],
+                'expectedOptions' => [
+                    'disabled' => true,
                     'validation_groups' => false
                 ]
             ],
             [
-                'configId'           => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
-                'isNewConfig'        => false,
-                'enumCode'           => 'test_enum',
-                'isSystem'           => false,
-                'isImmutablePublic'  => true,
+                'configId' => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
+                'isNewConfig' => false,
+                'enumCode' => 'test_enum',
+                'isSystem' => false,
+                'isImmutablePublic' => true,
                 'hasOtherReferences' => false,
-                'options'            => [],
-                'expectedOptions'    => [
-                    'disabled'          => true,
+                'options' => [],
+                'expectedOptions' => [
+                    'disabled' => true,
                     'validation_groups' => false
                 ]
             ],
             [
-                'configId'           => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
-                'isNewConfig'        => false,
-                'enumCode'           => 'test_enum',
-                'isSystem'           => false,
-                'isImmutablePublic'  => false,
+                'configId' => new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum'),
+                'isNewConfig' => false,
+                'enumCode' => 'test_enum',
+                'isSystem' => false,
+                'isImmutablePublic' => false,
                 'hasOtherReferences' => true,
-                'options'            => [],
-                'expectedOptions'    => [
-                    'disabled'          => true,
+                'options' => [],
+                'expectedOptions' => [
+                    'disabled' => true,
                     'validation_groups' => false
                 ]
             ],

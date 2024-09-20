@@ -14,16 +14,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class EnumExclusionProvider extends AbstractExclusionProvider
 {
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var int */
-    private $snapshotSuffixOffset;
-
-    public function __construct(ConfigManager $configManager)
+    public function __construct(protected ConfigManager $configManager)
     {
-        $this->configManager        = $configManager;
-        $this->snapshotSuffixOffset = -strlen(ExtendHelper::ENUM_SNAPSHOT_SUFFIX);
     }
 
     /**
@@ -31,29 +23,19 @@ class EnumExclusionProvider extends AbstractExclusionProvider
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        // check for "snapshot" field of multi-enum type
-        if (substr($fieldName, $this->snapshotSuffixOffset) === ExtendHelper::ENUM_SNAPSHOT_SUFFIX) {
-            $guessedName = substr($fieldName, 0, $this->snapshotSuffixOffset);
-            if (!empty($guessedName) && $this->isMultiEnumField($metadata->name, $guessedName)) {
-                return true;
-            }
+        if ($this->isMultiEnumField($metadata->name, $fieldName)) {
+            return true;
         }
 
         return false;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    protected function isMultiEnumField($className, $fieldName)
+    protected function isMultiEnumField(string $className, string $fieldName): bool
     {
         if ($this->configManager->hasConfig($className, $fieldName)) {
             /** @var FieldConfigId $fieldId */
             $fieldId = $this->configManager->getId('extend', $className, $fieldName);
-            if ($fieldId->getFieldType() === 'multiEnum') {
+            if (ExtendHelper::isMultiEnumType($fieldId->getFieldType())) {
                 return true;
             }
         }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Stub;
 
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserStub extends User
@@ -23,7 +23,7 @@ class UserStub extends User
         return $this->auth_status;
     }
 
-    public function setAuthStatus(AbstractEnumValue $enum = null)
+    public function setAuthStatus(EnumOptionInterface $enum = null)
     {
         $this->auth_status = $enum;
 

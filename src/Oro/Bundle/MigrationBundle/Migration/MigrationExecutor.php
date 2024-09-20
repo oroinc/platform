@@ -28,6 +28,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class MigrationExecutor
 {
+    protected const LENGTH_LIMIT_INDX_STRING = 620;
+
     protected MigrationQueryExecutorInterface $queryExecutor;
     protected OroDataCacheManager $cacheManager;
     protected LoggerInterface $logger;
@@ -84,7 +86,7 @@ class MigrationExecutor
      * Executes UP method for the given migrations.
      *
      * @param MigrationState[] $migrations
-     * @param bool             $dryRun
+     * @param bool $dryRun
      *
      * @throws \RuntimeException if at lease one migration failed
      */
@@ -182,8 +184,8 @@ class MigrationExecutor
     /**
      * Creates a database schema object.
      *
-     * @param Table[]           $tables
-     * @param Sequence[]        $sequences
+     * @param Table[] $tables
+     * @param Sequence[] $sequences
      * @param SchemaConfig|null $schemaConfig
      *
      * @return Schema
@@ -230,8 +232,8 @@ class MigrationExecutor
     /**
      * Validates the given columns.
      *
-     * @param string    $tableName
-     * @param Column[]  $columns
+     * @param string $tableName
+     * @param Column[] $columns
      * @param Migration $migration
      *
      * @throws InvalidNameException if invalid column name is detected
@@ -287,7 +289,7 @@ class MigrationExecutor
     {
         $columns = $index->getColumns();
         foreach ($columns as $columnName) {
-            if ($table->getColumn($columnName)->getLength() > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
+            if ($table->getColumn($columnName)->getLength() > self::LENGTH_LIMIT_INDX_STRING) {
                 throw new InvalidNameException(
                     sprintf(
                         'Could not create index for column with length more than %s. ' .

@@ -51,7 +51,9 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
         }
 
         // allow `null` or statues that are not included in `self::$disallowed`
-        $isAllowed = $user->getAuthStatus() ? !in_array($user->getAuthStatus()->getId(), self::$disallowed) : true;
+        $isAllowed = $user->getAuthStatus()
+            ? !in_array($user->getAuthStatus()->getInternalId(), self::$disallowed)
+            : true;
 
         if ($isAllowed) {
             return;

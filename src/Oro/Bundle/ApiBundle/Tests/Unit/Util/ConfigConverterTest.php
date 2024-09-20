@@ -7,11 +7,12 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigConverter;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Component\EntitySerializer\AssociationQuery;
 
 class ConfigConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderRegistry */
+    /** @var EntityOverrideProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $entityOverrideProviderRegistry;
 
     /** @var ConfigConverter */
@@ -92,6 +93,47 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         $associationQuery = $convertedConfig->getField($associationName)->get('association_query');
         self::assertInstanceOf(AssociationQuery::class, $associationQuery);
         self::assertEquals($targetClass, $associationQuery->getTargetEntityClass());
+        self::assertSame($qb, $associationQuery->getQueryBuilder());
+        self::assertSame($isCollection, $associationQuery->isCollection());
+    }
+
+    /**
+     * @dataProvider convertConfigWithAssociationQueryDataProvider
+     */
+    public function testConvertConfigWithAssociationQueryForEnum(?string $targetType)
+    {
+        $requestType = new RequestType(['test']);
+        $associationName = 'association1';
+        $targetClass = 'Extend\Entity\EV_Test_Target_Class';
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                $associationName => [
+                    'target_class'      => $targetClass,
+                    'association_query' => $qb
+                ]
+            ]
+        ];
+        $isCollection = true;
+        if ($targetType) {
+            $config['fields'][$associationName]['target_type'] = $targetType;
+            if ('to-one' === $targetType) {
+                $isCollection = false;
+            }
+        }
+
+        $this->entityOverrideProviderRegistry->expects(self::never())
+            ->method('getEntityOverrideProvider');
+
+        $this->configConverter->setRequestType($requestType);
+        $convertedConfig = $this->configConverter->convertConfig($config);
+
+        /** @var AssociationQuery $associationQuery */
+        $associationQuery = $convertedConfig->getField($associationName)->get('association_query');
+        self::assertInstanceOf(AssociationQuery::class, $associationQuery);
+        self::assertEquals(EnumOption::class, $associationQuery->getTargetEntityClass());
         self::assertSame($qb, $associationQuery->getQueryBuilder());
         self::assertSame($isCollection, $associationQuery->isCollection());
     }

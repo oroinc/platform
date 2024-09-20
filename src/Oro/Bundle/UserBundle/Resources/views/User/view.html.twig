@@ -83,12 +83,12 @@
             {{ UI.badge('oro.user.enabled.disabled'|trans, 'disabled') }}
         {% endif %}
 
-        {% if entity.authStatus.id == 'expired' %}
-            {{ UI.badge(entity.authStatus.name, 'disabled', 'fa-unlock-alt') }}
-        {% elseif entity.authStatus.id == 'active' %}
-            {{ UI.badge(entity.authStatus.name, 'enabled', 'fa-unlock') }}
+        {% if entity.auth_status.internalId == 'expired' %}
+            {{ UI.badge(entity.auth_status.id|trans_enum, 'disabled', 'fa-unlock-alt') }}
+        {% elseif entity.auth_status.internalId == 'active' %}
+            {{ UI.badge(entity.auth_status.id|trans_enum, 'enabled', 'fa-unlock') }}
         {% else %}
-            {{ UI.badge(entity.authStatus.name, 'tentatively', 'fa-lock') }}
+            {{ UI.badge(entity.auth_status.id|trans_enum, 'tentatively', 'fa-lock') }}
         {% endif %}
         {% placeholder view_page_title_status with {entity: entity} %}
     </span>

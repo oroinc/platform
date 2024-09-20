@@ -20,6 +20,7 @@ use Oro\Component\Testing\Unit\ORM\OrmTestCase;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class QueryBuilderUtilTest extends OrmTestCase
 {
@@ -405,6 +406,58 @@ class QueryBuilderUtilTest extends OrmTestCase
             ->with($expectedParameters);
 
         QueryBuilderUtil::removeUnusedParameters($qb);
+    }
+
+    public function testFindClassForRootAlias()
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('p')
+            ->from(Person::class, 'p')
+            ->join('p.bestItem', 'i');
+
+        $this->assertEquals(
+            Person::class,
+            QueryBuilderUtil::findClassByAlias($qb, 'p')
+        );
+    }
+
+    public function testFindClassForRootAliasFowQueryWithSeveralRootEntities()
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('p')
+            ->from(Person::class, 'p')
+            ->from(Group::class, 'g')
+            ->join('p.bestItem', 'i');
+
+        $this->assertEquals(
+            Group::class,
+            QueryBuilderUtil::findClassByAlias($qb, 'g')
+        );
+    }
+
+    public function testFindClassWhenAliasNotFound()
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('p')
+            ->from(Person::class, 'p')
+            ->join('p.bestItem', 'i');
+
+        $this->assertNull(
+            QueryBuilderUtil::findClassByAlias($qb, 'another')
+        );
+    }
+
+    /**
+     * @dataProvider getJoinClassDataProvider
+     */
+    public function testFindClassByAliasForJoinAlias(callable $qbFactory, array $joinPath, string $expectedClass)
+    {
+        $qb = $qbFactory($this->em);
+
+        $this->assertEquals(
+            $expectedClass,
+            QueryBuilderUtil::findClassByAlias($qb, ArrayUtil::getIn($qb->getDqlPart('join'), $joinPath)->getAlias())
+        );
     }
 
     /**

@@ -266,7 +266,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         AssociationMetadata $associationMetadata
     ): mixed {
         if (is_scalar($object)) {
-            return $object;
+            return $this->getEntityId($object, $requestType, $associationMetadata->getTargetMetadata());
         }
 
         $this->resultDataAccessor->addEntity();

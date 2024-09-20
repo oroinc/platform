@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Translatable\Translatable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'category_table')]
-class Category
+class Category implements Translatable
 {
     #[ORM\Column(name: 'name', type: Types::STRING, length: 50)]
     #[ORM\Id]

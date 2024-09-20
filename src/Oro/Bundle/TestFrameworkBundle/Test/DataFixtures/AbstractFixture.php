@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture as BaseAbstractFixture;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -172,20 +173,17 @@ abstract class AbstractFixture extends BaseAbstractFixture implements ContainerA
      *      // $data['status'] refers to entity of enum "ce_attendee_status" with id="accepted"
      * </code>
      *
-     * @see \Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue
-     * @see \Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::buildEnumValueClassName
-     *
      * @param array $data
      * @param string $name
      * @param string $enumCode
+     *
+     * @see \Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface
      */
     protected function resolveEnum(array &$data, $name, $enumCode)
     {
         if (!empty($data[$name])) {
-            $className = ExtendHelper::buildEnumValueClassName($enumCode);
-            $enumValueRepository = $this->container->get('doctrine')->getManager()->getRepository($className);
-
-            $data[$name] = $enumValueRepository->find($data[$name]);
+            $enumValueRepository = $this->container->get('doctrine')->getManager()->getRepository(EnumOption::class);
+            $data[$name] = $enumValueRepository->find(ExtendHelper::buildEnumOptionId($enumCode, $data[$name]));
         }
     }
 

@@ -566,7 +566,7 @@ class EntityDefinitionFieldConfig extends FieldConfig
      * IMPORTANT: the query builder must follow the rules described in AssociationQuery class.
      * @see \Oro\Component\EntitySerializer\AssociationQuery
      */
-    public function setAssociationQuery(QueryBuilder $query = null): void
+    public function setAssociationQuery(?QueryBuilder $query): void
     {
         if (null === $query) {
             unset($this->items[ConfigUtil::ASSOCIATION_QUERY]);

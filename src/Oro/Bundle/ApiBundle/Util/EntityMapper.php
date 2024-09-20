@@ -9,7 +9,9 @@ use Doctrine\Persistence\Proxy;
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -369,7 +371,7 @@ class EntityMapper
      */
     private function assertEntityAndModelClasses(string $entityClass, string $modelClass): void
     {
-        if (!is_subclass_of($modelClass, $entityClass)) {
+        if (!$this->isValidModelClass($modelClass, $entityClass)) {
             throw new \InvalidArgumentException(sprintf(
                 'The model class "%s" must be equal to or a subclass of the entity class "%s".',
                 $modelClass,
@@ -385,6 +387,15 @@ class EntityMapper
             ));
         }
         $this->assertEntity($entityClass);
+    }
+
+    private function isValidModelClass(string $modelClass, string $entityClass): bool
+    {
+        if (ExtendHelper::isOutdatedEnumOptionEntity($modelClass)) {
+            return EnumOption::class === $entityClass;
+        }
+
+        return is_subclass_of($modelClass, $entityClass);
     }
 
     /**
@@ -408,6 +419,9 @@ class EntityMapper
      */
     private function createObject(string $objectClass, object $source): object
     {
+        if (ExtendHelper::isOutdatedEnumOptionEntity($objectClass)) {
+            $objectClass = EnumOption::class;
+        }
         $object = $this->entityInstantiator->instantiate($objectClass);
         $objectReflClass = new EntityReflectionClass($objectClass);
         $sourceProperties = self::getProperties($this->doctrineHelper->getClass($source));

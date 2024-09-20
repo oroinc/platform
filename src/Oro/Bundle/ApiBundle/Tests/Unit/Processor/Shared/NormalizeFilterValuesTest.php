@@ -107,6 +107,11 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $this->context->getFilterValues()->set('label', new FilterValue('label', 'test_label'));
         $this->context->getFilterValues()->set('name', new FilterValue('label', 'test_name'));
 
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->addField(new FieldMetadata('id'));
+        $metadata->addField(new FieldMetadata('label'));
+        $metadata->addField(new FieldMetadata('name'));
+
         $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(3))
             ->method('normalizeValue')
@@ -118,11 +123,40 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $this->entityIdTransformerRegistry->expects(self::never())
             ->method('getEntityIdTransformer');
 
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         self::assertSame(1, $this->context->getFilterValues()->getOne('id')->getValue());
         self::assertSame('normalized_label', $this->context->getFilterValues()->getOne('label')->getValue());
         self::assertSame('normalized_name', $this->context->getFilterValues()->getOne('name')->getValue());
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessForFieldFilterWhenNoFieldMetadata()
+    {
+        $filters = $this->context->getFilters();
+        $labelFilter = new StringComparisonFilter('string');
+        $labelFilter->setField('label');
+        $filters->add('label', $labelFilter);
+
+        $this->context->getFilterValues()->set('label', new FilterValue('label', 'test_label'));
+
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $requestType = $this->context->getRequestType();
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('test_label', 'string', $requestType, false, false, [])
+            ->willReturn('normalized_label');
+        $this->entityIdTransformerRegistry->expects(self::never())
+            ->method('getEntityIdTransformer');
+
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        self::assertSame('normalized_label', $this->context->getFilterValues()->getOne('label')->getValue());
 
         self::assertFalse($this->context->hasErrors());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
@@ -200,6 +234,45 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
+        $associationMetadata->setTargetMetadata($associationTargetMetadata);
+        $metadata->addAssociation($associationMetadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false, [])
+            ->willReturn('predefinedId');
+        $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($entityIdTransformer);
+        $entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('predefinedId', self::identicalTo($associationTargetMetadata))
+            ->willReturn(1);
+
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        self::assertSame(1, $this->context->getFilterValues()->getOne('association')->getValue());
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessForRenamedAssociationFilter()
+    {
+        $filters = $this->context->getFilters();
+        $associationFilter = new ComparisonFilter('integer');
+        $associationFilter->setField('association_field');
+        $filters->add('association', $associationFilter);
+
+        $this->context->getFilterValues()->set('association', new FilterValue('association', 'predefinedId'));
+
+        $metadata = new EntityMetadata('Test\Entity');
+        $associationMetadata = new AssociationMetadata('associationField');
+        $associationMetadata->setPropertyPath('association_field');
         $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $metadata->addAssociation($associationMetadata);

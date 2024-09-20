@@ -16,15 +16,15 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
      */
     public function transform($value)
     {
-        if (null === $value || array() === $value) {
-            return array();
+        if (null === $value || [] === $value) {
+            return [];
         }
 
         if (!is_array($value) && !$value instanceof \Traversable) {
             throw new UnexpectedTypeException($value, 'array');
         }
 
-        $result = array();
+        $result = [];
         foreach ($value as $entity) {
             $id = $this->propertyAccessor->getValue($entity, $this->propertyPath);
             $result[] = $id;
@@ -39,16 +39,14 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
     public function reverseTransform($value)
     {
         if (!$value) {
-            return array();
+            return [];
         }
 
         if (!is_array($value) && !$value instanceof \Traversable) {
             throw new UnexpectedTypeException($value, 'array');
         }
 
-        $entities = $this->loadEntitiesByIds($value);
-
-        return $entities;
+        return $this->loadEntitiesByIds($value);
     }
 
     /**

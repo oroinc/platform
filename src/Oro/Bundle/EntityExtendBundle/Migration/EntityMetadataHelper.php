@@ -121,7 +121,7 @@ class EntityMetadataHelper
             if ($manager instanceof EntityManagerInterface) {
                 $allMetadata = $this->getAllMetadata($manager);
                 foreach ($allMetadata as $metadata) {
-                    $tableName = $metadata->getTableName();
+                    $tableName = isset($metadata->table) ? $metadata->getTableName() : null;
                     if (!empty($tableName)) {
                         $className = $metadata->getName();
                         $this->tableToClassesMap[$tableName][] = $className;

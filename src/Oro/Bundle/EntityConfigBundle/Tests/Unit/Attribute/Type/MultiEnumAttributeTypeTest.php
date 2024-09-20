@@ -28,8 +28,8 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetSearchableValue()
     {
-        $value1 = new TestEnumValue('id1', 'name1', 101);
-        $value2 = new TestEnumValue('id2', 'name2', 102);
+        $value1 = new TestEnumValue('test', 'name1', 'id1', 101);
+        $value2 = new TestEnumValue('test', 'name2', 'id2', 102);
 
         $this->assertSame(
             'name1 name2',
@@ -49,7 +49,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "integer" given'
+            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface", "integer" given'
         );
 
         $this->getAttributeType()->getSearchableValue($this->attribute, [42], $this->localization);
@@ -57,8 +57,8 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetFilterableValue()
     {
-        $value1 = new TestEnumValue('id1', 'name1', 101);
-        $value2 = new TestEnumValue('id2', 'name2', 102);
+        $value1 = new TestEnumValue('test', 'Test1', 'id1', 101);
+        $value2 = new TestEnumValue('test', 'Test2', 'id2', 102);
 
         $this->assertSame(
             [
@@ -81,7 +81,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "integer" given'
+            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface", "integer" given'
         );
 
         $this->getAttributeType()->getFilterableValue($this->attribute, [42], $this->localization);

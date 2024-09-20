@@ -10,7 +10,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -413,41 +412,8 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetPublicEnumTypes()
+    public function testGetUndefinedEnumFieldType()
     {
-        $config1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
-        $config1->set('is_extend', true);
-        $config1->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
-        $config1->set('state', ExtendScope::STATE_ACTIVE);
-        $config2 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $config2->set('is_extend', true);
-        $config2->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
-        $config2->set('state', ExtendScope::STATE_UPDATE);
-        $config3 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $config3->set('is_extend', true);
-        $config3->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
-        $config3->set('state', ExtendScope::STATE_NEW);
-        $config4 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $config4->set('is_extend', true);
-        $config4->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
-        $config4->set('state', ExtendScope::STATE_DELETE);
-        $config5 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
-        $config5->set('is_extend', true);
-        $config5->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
-        $config5->set('state', ExtendScope::STATE_ACTIVE);
-        $config6 = new Config(new EntityConfigId('extend', 'Test\Entity6'));
-        $config7 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $config7->set('is_extend', true);
-        $config7->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
-        $config7->set('state', ExtendScope::STATE_ACTIVE);
-        $config7->set('is_deleted', true);
-        $config8 = new Config(new EntityConfigId('extend', 'Test\EnumValue8'));
-        $config8->set('is_extend', true);
-        $config8->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
-        $config8->set('state', ExtendScope::STATE_ACTIVE);
-
-        $configs = [$config1, $config2, $config3, $config4, $config5, $config6, $config7, $config8];
-
         $enumConfig1 = new Config(new EntityConfigId('enum', 'Test\EnumValue1'));
         $enumConfig1->set('public', true);
         $enumConfig1->set('code', 'test_enum1');
@@ -462,31 +428,16 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $enumConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(1))
             ->method('getProvider')
             ->willReturnMap([
                 ['enum', $enumConfigProvider],
                 ['extend', $extendConfigProvider]
             ]);
-        $extendConfigProvider->expects($this->once())
-            ->method('getConfigs')
-            ->with(null, true)
-            ->willReturn($configs);
-        $enumConfigProvider->expects($this->exactly(4))
-            ->method('getConfig')
-            ->willReturnMap([
-                ['Test\EnumValue1', null, $enumConfig1],
-                ['Test\EnumValue2', null, $enumConfig2],
-                ['Test\EnumValue5', null, $enumConfig5],
-                ['Test\EnumValue8', null, $enumConfig8],
-            ]);
 
         $this->assertEquals(
-            [
-                'test_enum1' => 'multiEnum||test_enum1',
-                'test_enum2' => 'enum||test_enum2'
-            ],
-            $this->typeHelper->getPublicEnumTypes()
+            null,
+            $this->typeHelper->getEnumFieldType('Test\EnumValue1', 'undefined_field')
         );
     }
 }

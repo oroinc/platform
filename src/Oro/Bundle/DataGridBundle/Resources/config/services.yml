@@ -243,6 +243,7 @@ services:
         class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\TextGuesser
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_entity.helper.field_helper'
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser }
 
@@ -295,6 +296,7 @@ services:
             - '@doctrine'
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_datagrid.choice.helper'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: oro_datagrid.board_processor, alias: default }
 

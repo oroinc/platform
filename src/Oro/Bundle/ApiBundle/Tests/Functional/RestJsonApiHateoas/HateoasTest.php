@@ -166,7 +166,7 @@ class HateoasTest extends RestJsonApiTestCase
 
         $entityId = $this->getReference('entity1_1')->getId();
         $entity21Id = $this->getReference('entity2_1')->getId();
-        $enum1Id = $this->getReference('enum1_1')->getId();
+        $enum1Id = $this->getReference('enum1_1')->getInternalId();
         $response = $this->get(
             ['entity' => 'testapientity1', 'id' => (string)$entityId],
             ['include' => 'biM2O,enumField'],

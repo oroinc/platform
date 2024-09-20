@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -30,15 +33,6 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     /** @var string */
     protected $entityName;
 
-    /**  @var FieldHelper */
-    protected $fieldHelper;
-
-    /** @var RelationCalculator */
-    protected $relationCalculator;
-
-    /** @var LocaleSettings */
-    protected $localeSettings;
-
     /** @var string */
     protected $relationDelimiter = ' ';
 
@@ -50,16 +44,13 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     protected array $availableForExportField = [];
 
     public function __construct(
-        FieldHelper $fieldHelper,
-        RelationCalculatorInterface $relationCalculator,
-        LocaleSettings $localeSettings
+        protected FieldHelper $fieldHelper,
+        protected RelationCalculatorInterface $relationCalculator,
+        protected LocaleSettings $localeSettings,
     ) {
-        $this->fieldHelper = $fieldHelper;
-        $this->relationCalculator = $relationCalculator;
-        $this->localeSettings = $localeSettings;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -250,6 +241,14 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                         $fieldOrder
                     );
                     $rules = array_merge($rules, $relationRules);
+                } elseif (isset($field['type']) && ExtendHelper::isEnumerableType($field['type'])) {
+                    $enumRules = $this->getEnumRules(
+                        $entityName,
+                        $field,
+                        $fieldHeader,
+                        $fieldOrder
+                    );
+                    $rules = array_merge($rules, $enumRules);
                 } else {
                     // process scalars
                     $rules[$fieldHeader] = ['value' => $fieldName, 'order' => $fieldOrder];
@@ -317,6 +316,15 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     );
                     $rules = array_merge($rules, $relationRules);
                     $backendHeaders = array_merge($backendHeaders, $relationBackendHeaders);
+                } elseif (isset($field['type']) && ExtendHelper::isEnumerableType($field['type'])) {
+                    [$enumRules, $enumBackendHeaders] = $this->getEnumRulesAndBackendHeaders(
+                        $entityName,
+                        $field,
+                        $fieldHeader,
+                        $fieldOrder
+                    );
+                    $rules = array_merge($rules, $enumRules);
+                    $backendHeaders = array_merge($backendHeaders, $enumBackendHeaders);
                 } else {
                     // process scalars
                     $rules[$fieldHeader] = ['value' => $fieldName, 'order' => $fieldOrder];
@@ -701,5 +709,127 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         }
 
         return $event;
+    }
+
+    private function getEnumRulesAndBackendHeaders($entityName, $field, $fieldHeader, $fieldOrder)
+    {
+        $enumRules = [];
+        $enumBackendHeaders = [];
+
+        $headerPostfix = $this->getEnumHeaderPostfix($entityName, $field['name']);
+
+        if (ExtendHelper::isMultiEnumType($field['type'])) {
+            $frontendCollectionDelimiter = $this->relationDelimiter
+                . $this->collectionDelimiter
+                . $this->relationDelimiter;
+            $frontendHeader = $fieldHeader . $frontendCollectionDelimiter . $headerPostfix['key'];
+            $backendHeader = $field['name']
+                . $this->convertDelimiter
+                . $this->collectionDelimiter
+                . $this->convertDelimiter
+                . $headerPostfix['key'];
+
+            $enumRules[$frontendHeader] = [
+                'value' => $backendHeader,
+                'order' => $fieldOrder,
+            ];
+
+            $enumOptions = $this->fieldHelper->getEnumOptionKeys($entityName, $field['name']);
+            foreach ($enumOptions as $key => $enumOption) {
+                $enumBackendHeaders[] = $this->createEnumHeader(
+                    $field,
+                    $headerPostfix,
+                    $this->convertDelimiter,
+                    $fieldOrder,
+                    $key
+                );
+            }
+        } else {
+            $enumHeader = $fieldHeader . $this->relationDelimiter . $headerPostfix['key'];
+            $enumRules[$enumHeader] = $this->createEnumHeader(
+                $field,
+                $headerPostfix,
+                $this->convertDelimiter,
+                $fieldOrder
+            );
+            $enumBackendHeaders[] = $enumRules[$enumHeader];
+        }
+
+        return [$enumRules, $enumBackendHeaders];
+    }
+
+    protected function getEnumRules($entityName, $field, $fieldHeader, $fieldOrder): array
+    {
+        $enumRules = [];
+        $headerPostfix = $this->getEnumHeaderPostfix($entityName, $field['name']);
+
+        $frontendHeaderBase = $fieldHeader . $this->relationDelimiter;
+        $backendHeaderBase = $field['name'] . $this->convertDelimiter;
+
+        if (ExtendHelper::isMultiEnumType($field['type'])) {
+            $frontendHeader = $frontendHeaderBase
+                . $this->collectionDelimiter
+                . $this->relationDelimiter
+                . $headerPostfix['key'];
+            $backendHeader = $backendHeaderBase
+                . $this->collectionDelimiter
+                . $this->convertDelimiter
+                . $headerPostfix['value'];
+
+            $enumRules[$frontendHeader] = [
+                'value' => $backendHeader,
+                'order' => $fieldOrder,
+            ];
+        } else {
+            $frontendHeader = $frontendHeaderBase . $headerPostfix['key'];
+            $backendHeader = $backendHeaderBase . $headerPostfix['value'];
+
+            $enumRules[$frontendHeader] = [
+                'value' => $backendHeader,
+                'order' => $fieldOrder,
+            ];
+        }
+
+        return $enumRules;
+    }
+
+    private function getEnumHeaderPostfix($entityName, $fieldName): array
+    {
+        $fields = $this->fieldHelper->getEntityFields(
+            EnumOption::class,
+            EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
+        $isOwnerSystem =
+            $this->fieldHelper->getExtendConfigOwner($entityName, $fieldName) === ExtendScope::OWNER_SYSTEM;
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            if (!$this->isFieldAvailableForExport(EnumOption::class, $fieldName)) {
+                continue;
+            }
+            if ($fieldName === 'id' && !$isOwnerSystem || !in_array($fieldName, ['id', 'name'])) {
+                continue;
+            }
+
+            return [
+                'key' => $this->getFieldHeader($entityName, $field),
+                'value' => $fieldName
+            ];
+        }
+
+        return [
+            'key' => $isOwnerSystem ? 'Id' : 'Name',
+            'value' => $isOwnerSystem ? 'id' : 'name'
+        ];
+    }
+
+    private function createEnumHeader($field, $headerPostfix, $delimiter, $fieldOrder, $key = null): array
+    {
+        $backendHeaderValue = $field['name'] . $delimiter . $key . $delimiter . $headerPostfix['value'];
+
+        return [
+            'value' => $key !== null ? $backendHeaderValue : $field['name'] . $delimiter . $headerPostfix['value'],
+            'order' => $fieldOrder,
+            'subOrder' => $key,
+        ];
     }
 }

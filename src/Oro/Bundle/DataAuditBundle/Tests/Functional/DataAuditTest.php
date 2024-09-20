@@ -14,9 +14,9 @@ use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditData
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
@@ -834,15 +834,12 @@ class DataAuditTest extends WebTestCase
     public function testMultiEnum()
     {
         $owner = new TestAuditDataOwner();
+        /** @var EnumOptionRepository $enumRepo */
+        $enumRepo = $this->getEntityManager()->getRepository(EnumOption::class);
 
-        $className = ExtendHelper::buildEnumValueClassName('audit_muenum');
-
-        /** @var EnumValueRepository $enumRepo */
-        $enumRepo = $this->getEntityManager()->getRepository($className);
-
-        $enum1 = $enumRepo->createEnumValue('enum1', 1, true);
-        $enum2 = $enumRepo->createEnumValue('enum2', 2, false);
-        $enum34 = $enumRepo->createEnumValue('enum3', 3, false);
+        $enum1 = $enumRepo->createEnumOption('audit_muenum', 'enum1', 'enum1', 1, true);
+        $enum2 = $enumRepo->createEnumOption('audit_muenum', 'enum2', 'enum2', 2);
+        $enum34 = $enumRepo->createEnumOption('audit_muenum', 'enum3', 'enum3', 3);
         $owner->addMultiEnumProperty($enum1);
         $owner->addMultiEnumProperty($enum2);
         $owner->addMultiEnumProperty($enum34);
@@ -854,8 +851,8 @@ class DataAuditTest extends WebTestCase
         $em->flush();
         $this->getMessageCollector()->clear();
 
-        $enum5 = $enumRepo->createEnumValue('enum5', 5, false);
-        $enum6 = $enumRepo->createEnumValue('enum6', 6, false);
+        $enum5 = $enumRepo->createEnumOption('audit_muenum', 'enum5', 'enum5', 5);
+        $enum6 = $enumRepo->createEnumOption('audit_muenum', 'enum6', 'enum6', 6);
         $enum34->setName('enum4');
         $owner->removeMultiEnumProperty($enum1);
         $owner->removeMultiEnumProperty($enum2);
@@ -867,28 +864,20 @@ class DataAuditTest extends WebTestCase
         $em->persist($enum6);
         $em->flush();
 
-        $this->processMessages(true);
+        $this->processMessages();
 
         $this->assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
-                        '&quot;enum5&quot; added',
-                        '<s></s>enum5',
-                        '&quot;enum6&quot; added',
-                        '<s></s>enum6',
-                        '&quot;enum1&quot; removed',
-                        '<s>enum1</s>',
-                        '&quot;enum2&quot; removed',
-                        '&quot;enum4&quot; changed',
-                        '<s>enum3</s>&nbsp;enum4',
+                        '<s>enum1,enum2,enum3</s>&nbsp;enum3,enum5,enum6',
                     ],
                 ],
-                'Extend\Entity\EV_Audit_Muenum' => [
-                    'enum1' => '<s>enum1</s>',
-                    'enum3' => '<s>enum3</s>&nbsp;enum4',
-                    'enum5' => '<s></s>&nbsp;enum5',
-                    'enum6' => '<s></s>&nbsp;enum6',
+                EnumOption::class => [
+                    'audit_muenum.enum1' => '<s>audit_muenum.enum1</s>',
+                    'audit_muenum.enum3' => '<s>enum3</s>&nbsp;enum4',
+                    'audit_muenum.enum5' => '<s></s>&nbsp;enum5',
+                    'audit_muenum.enum6' => '<s></s>&nbsp;enum6',
                 ],
             ]
         );
@@ -897,15 +886,12 @@ class DataAuditTest extends WebTestCase
     public function testMultiEnumRemove()
     {
         $owner = new TestAuditDataOwner();
+        /** @var EnumOptionRepository $enumRepo */
+        $enumRepo = $this->getEntityManager()->getRepository(EnumOption::class);
 
-        $className = ExtendHelper::buildEnumValueClassName('audit_muenum');
-
-        /** @var EnumValueRepository $enumRepo */
-        $enumRepo = $this->getEntityManager()->getRepository($className);
-
-        $enum1 = $enumRepo->createEnumValue('enum1', 1, true);
-        $enum2 = $enumRepo->createEnumValue('enum2', 2, false);
-        $enum3 = $enumRepo->createEnumValue('enum3', 3, false);
+        $enum1 = $enumRepo->createEnumOption('audit_muenum', 'enum1', 'enum1', 1, true);
+        $enum2 = $enumRepo->createEnumOption('audit_muenum', 'enum2', 'enum2', 2);
+        $enum3 = $enumRepo->createEnumOption('audit_muenum', 'enum3', 'enum3', 3);
         $owner->addMultiEnumProperty($enum1);
         $owner->addMultiEnumProperty($enum2);
         $owner->addMultiEnumProperty($enum3);
@@ -922,15 +908,13 @@ class DataAuditTest extends WebTestCase
         $owner->removeMultiEnumProperty($enum3);
         $em->flush();
 
-        $this->processMessages(true);
+        $this->processMessages();
 
         $this->assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
-                        '&quot;enum1&quot; removed',
-                        '&quot;enum2&quot; removed',
-                        '&quot;enum3&quot; removed',
+                       '<s>enum1,enum2,enum3</s>&nbsp;'
                     ],
                 ],
             ]
@@ -940,14 +924,12 @@ class DataAuditTest extends WebTestCase
     public function testMultiEnumClear(): void
     {
         $owner = new TestAuditDataOwner();
-        $className = ExtendHelper::buildEnumValueClassName('audit_muenum');
+        /** @var EnumOptionRepository $enumRepository */
+        $enumRepository = $this->getEntityManager()->getRepository(EnumOption::class);
 
-        /** @var EnumValueRepository $enumRepository */
-        $enumRepository = $this->getEntityManager()->getRepository($className);
-
-        $enum1 = $enumRepository->createEnumValue('enum1', 1, true);
-        $enum2 = $enumRepository->createEnumValue('enum2', 2, false);
-        $enumAfterCollectionClear = $enumRepository->createEnumValue('enum3', 3, false);
+        $enum1 = $enumRepository->createEnumOption('audit_muenum', 'enum1', 'enum1', 1, true);
+        $enum2 = $enumRepository->createEnumOption('audit_muenum', 'enum2', 'enum2', 2, false);
+        $enumAfterCollectionClear = $enumRepository->createEnumOption('audit_muenum', 'enum3', 'enum3', 3, false);
         $owner->addMultiEnumProperty($enum1);
         $owner->addMultiEnumProperty($enum2);
 
@@ -959,18 +941,16 @@ class DataAuditTest extends WebTestCase
         $em->flush();
 
         $this->getMessageCollector()->clear();
-        $owner->getMultiEnumProperty()->clear();
+        $owner->setMultiEnumProperty([]);
         $owner->addMultiEnumProperty($enumAfterCollectionClear);
 
         $em->flush();
-        $this->processMessages(true);
+        $this->processMessages();
         $this->assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
-                        '&quot;enum1&quot; removed',
-                        '&quot;enum2&quot; removed',
-                        '&quot;enum3&quot; added',
+                        '<s>enum1,enum2</s>&nbsp;enum3'
                     ],
                 ],
             ]
@@ -1153,13 +1133,10 @@ class DataAuditTest extends WebTestCase
     public function testEnum()
     {
         $owner = new TestAuditDataOwner();
+        /** @var EnumOptionRepository $enumRepo */
+        $enumRepo = $this->getEntityManager()->getRepository(EnumOption::class);
 
-        $className = ExtendHelper::buildEnumValueClassName('audit_enum');
-
-        /** @var EnumValueRepository $enumRepo */
-        $enumRepo = $this->getEntityManager()->getRepository($className);
-
-        $enum1 = $enumRepo->createEnumValue('enum1', 1, true);
+        $enum1 = $enumRepo->createEnumOption('audit_enum', 'enum1', 'enum1', 1, true);
         $owner->setEnumProperty($enum1);
         $em = $this->getEntityManager();
         $em->persist($enum1);
@@ -1167,7 +1144,7 @@ class DataAuditTest extends WebTestCase
         $em->flush();
         $this->getMessageCollector()->clear();
 
-        $enum2 = $enumRepo->createEnumValue('enum2', 2, false);
+        $enum2 = $enumRepo->createEnumOption('audit_enum', 'enum2', 'enum2', 2);
         $owner->setEnumProperty($enum2);
         $em->persist($enum2);
         $em->flush();
@@ -1178,12 +1155,11 @@ class DataAuditTest extends WebTestCase
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
-                        '&quot;enum2&quot; added',
-                        '&quot;enum1&quot; removed',
+                      '<s>enum1</s>&nbsp;enum2'
                     ],
                 ],
-                'Extend\Entity\EV_Audit_Enum' => [
-                    'enum2' => '<s></s>&nbsp;enum2',
+                EnumOption::class => [
+                    'audit_enum.enum2' => '<s></s>&nbsp;enum2',
                 ],
             ]
         );

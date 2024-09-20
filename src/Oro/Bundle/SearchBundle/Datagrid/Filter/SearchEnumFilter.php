@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Filter;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\EnumFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -32,6 +33,9 @@ class SearchEnumFilter extends EnumFilter
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
             throw new UnexpectedTypeException($ds, SearchFilterDatasourceAdapter::class);
+        }
+        if (isset($data['value']) && is_array($data['value'])) {
+            $data['value'] = ExtendHelper::mapToEnumInternalIds($data['value']);
         }
 
         return $this->applyRestrictions($ds, $data);

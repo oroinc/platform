@@ -24,9 +24,6 @@ Feature: Is any of and is not any multienum filter
     When I save and close form
     Then I should see "Field saved" flash message
 
-    When I click update schema
-    Then I should see "Schema updated" flash message
-
   Scenario: Update first user
     Given I go to System/User Management/Users
     And click edit First in grid

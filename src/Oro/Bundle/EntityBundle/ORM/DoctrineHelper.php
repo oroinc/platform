@@ -95,7 +95,7 @@ class DoctrineHelper implements ResetInterface
     public function getEntityIdentifier(object $entity): array
     {
         $entityClass = $this->getClass($entity);
-        $manager = $this->registry->getManagerForClass($entityClass);
+        $manager = $this->getEntityManagerForClass($entityClass, false);
         if (null !== $manager) {
             return $manager->getClassMetadata($entityClass)->getIdentifierValues($entity);
         }
@@ -115,14 +115,14 @@ class DoctrineHelper implements ResetInterface
     public function isNewEntity(object $entity): bool
     {
         $entityClass = $this->getClass($entity);
-        $manager = $this->registry->getManagerForClass($entityClass);
+        $manager = $this->getEntityManagerForClass($entityClass, false);
         if (null === $manager) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
 
         $identifierValues = $manager->getClassMetadata($entityClass)->getIdentifierValues($entity);
 
-        return count($identifierValues) === 0;
+        return \count($identifierValues) === 0;
     }
 
     /**
@@ -259,6 +259,10 @@ class DoctrineHelper implements ResetInterface
      */
     public function isManageableEntity($entityOrClass)
     {
+        if (\is_string($entityOrClass)) {
+            return $this->isManageableEntityClass($entityOrClass);
+        }
+
         return null !== $this->getEntityManager($entityOrClass, false);
     }
 
@@ -304,14 +308,12 @@ class DoctrineHelper implements ResetInterface
      */
     public function getEntityMetadataForClass($entityClass, $throwException = true)
     {
-        $manager = $this->registry->getManagerForClass($entityClass);
+        $manager = $this->getEntityManagerForClass($entityClass, false);
         if (null === $manager && $throwException) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
 
-        return null !== $manager
-            ? $manager->getClassMetadata($entityClass)
-            : null;
+        return $manager?->getClassMetadata($entityClass);
     }
 
     /**

@@ -11,6 +11,7 @@ use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Factory;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetModel;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -37,8 +38,8 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
             ->setOwner($user)
             ->setOrganization($user->getOrganization());
         $dashboard->getEntity()->setDashboardType(
-            $manager->getRepository(ExtendHelper::buildEnumValueClassName('dashboard_type'))
-                ->findOneBy(['id' => 'widgets'])
+            $manager->getRepository(EnumOption::class)
+                ->findOneBy(['id' => ExtendHelper::buildEnumOptionId('dashboard_type', 'widgets')])
         );
 
         $dashboardManager->save($dashboard);

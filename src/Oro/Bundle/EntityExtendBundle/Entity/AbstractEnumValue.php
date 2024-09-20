@@ -10,6 +10,7 @@ use Oro\Bundle\FormBundle\Entity\PriorityItem;
 
 /**
  * The base class for all entities represent values for a particular enum
+ * @deprecated
  */
 #[ORM\MappedSuperclass]
 abstract class AbstractEnumValue implements Translatable, PriorityItem

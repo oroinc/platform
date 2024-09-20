@@ -303,8 +303,8 @@ class FeatureContext extends OroFeatureContext implements
      * Used instead of manual walking on configuration like "System/ Configuration" configuration.
      *
      * Example: I change configuration options:
-     *      | oro_config.oprion1 | true  |
-     *      | oro_config.oprion2 | false |
+     *      | oro_config.option1 | true  |
+     *      | oro_config.option2 | false |
      *
      * @Given /^(?:|I )change configuration options:$/
      */

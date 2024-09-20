@@ -9,7 +9,9 @@ use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Container\ContainerInterface;
@@ -218,7 +220,14 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         foreach ($this->fields[$dataClass] as $fieldName => $priority) {
             foreach ($attributes as $attribute) {
                 if ($fieldName === $attribute->getFieldName() && !$form->has($fieldName)) {
-                    $form->add($fieldName);
+                    ExtendHelper::isEnumerableType($attribute->getType())
+                        ? $form->add($fieldName, options: [
+                        'query_builder' => function (EnumOptionRepository $repo) use ($attribute) {
+                            return $repo->getValuesQueryBuilder($attribute->get());
+                        },
+                        'multiple' => ExtendHelper::isMultiEnumType($attribute->getType()),
+                        'empty_data' => ExtendHelper::isMultiEnumType($attribute->getType()) ? [] : null
+                    ]) : $form->add($fieldName);
                     break;
                 }
             }

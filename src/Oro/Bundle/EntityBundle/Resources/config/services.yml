@@ -164,6 +164,7 @@ services:
             - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider']]
             - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider']]
             - [setExclusionProvider, ['@oro_entity.exclusion_provider']]
+            - [setEnumVirtualFieldProvider, ['@oro_entity.virtual_field_provider.enum']]
 
     oro_entity.exclusion_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
@@ -525,6 +526,7 @@ services:
             arguments:
                 - '@form.factory'
                 - '@doctrine'
+                - '@oro_entity_extend.enum_type_helper'
 
     oro_entity.form.entity_field.handler.base_handler:
         class: Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler
@@ -549,6 +551,7 @@ services:
         arguments:
             - '@doctrine'
             - '@translator'
+            - '@oro_entity.helper.field_helper'
 
     oro_entity.helper.field_helper:
         class: Oro\Bundle\EntityBundle\Helper\FieldHelper
@@ -557,6 +560,7 @@ services:
             - '@oro_entity_config.provider.importexport'
             - '@oro_entity_extend.extend.field_type_helper'
             - '@property_accessor'
+            - '@oro_entity_extend.enum_options_provider'
 
     oro_entity.helper.relation_helper:
         class: 'Oro\Bundle\EntityBundle\Helper\RelationHelper'

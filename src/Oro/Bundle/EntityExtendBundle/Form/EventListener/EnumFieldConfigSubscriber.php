@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Form\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -71,35 +73,51 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
      */
     public function preSetData(FormEvent $event)
     {
-        $form        = $event->getForm();
+        $form = $event->getForm();
         $configModel = $form->getConfig()->getOption('config_model');
 
         if (!($configModel instanceof FieldConfigModel)) {
             return;
         }
-        if (!in_array($configModel->getType(), ['enum', 'multiEnum'])) {
-            return;
-        };
-
-        $enumConfig = $configModel->toArray('enum');
-        if (empty($enumConfig['enum_code'])) {
-            // new enum - a form already has a all data because on submit them are not removed from a config
+        if (!ExtendHelper::isEnumerableType($configModel->getType())) {
             return;
         }
 
+        $enumConfig = $configModel->toArray('enum');
+        $enumName = $this->getValue($enumConfig, 'enum_name');
+        $isNewEnum = false;
+        if (empty($enumConfig['enum_code'])) {
+            $isNewEnum = true;
+            $enumConfig['enum_code'] = $enumName !== null
+                ? ExtendHelper::buildEnumCode($enumName)
+                : ExtendHelper::generateEnumCode(
+                    $configModel->getEntity()->getClassName(),
+                    $configModel->getFieldName(),
+                    $this->nameGenerator->getMaxEnumCodeSize()
+                );
+        }
+
         $enumCode = $enumConfig['enum_code'];
-        $data     = $event->getData();
+        $data = $event->getData();
+        if (null === $enumName) {
+            $data['enum']['enum_name'] = $this->translator->trans(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode)
+            );
+        }
+        if (!isset($data['enum']['enum_code'])) {
+            $data['enum']['enum_code'] = $enumCode;
+        }
 
-        $data['enum']['enum_name'] = $this->translator->trans(
-            ExtendHelper::getEnumTranslationKey('label', $enumCode)
-        );
-
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $enumOptionsClassName = EnumOption::class;
         $enumConfigProvider = $this->configManager->getProvider('enum');
-        if ($enumConfigProvider->hasConfig($enumValueClassName)) {
-            $enumEntityConfig             = $enumConfigProvider->getConfig($enumValueClassName);
-            $data['enum']['enum_public']  = $enumEntityConfig->get('public');
-            $data['enum']['enum_options'] = $this->enumSynchronizer->getEnumOptions($enumValueClassName);
+        if ($enumConfigProvider->hasConfig($enumOptionsClassName)) {
+            $data['enum']['enum_public'] = $enumConfig['enum_public'] ?? false;
+            if (!$isNewEnum) {
+                $data['enum']['enum_options'] = $this->enumSynchronizer->getEnumOptions(
+                    $enumCode,
+                    $enumOptionsClassName
+                );
+            }
         }
 
         $event->setData($data);
@@ -113,52 +131,48 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
      */
     public function postSubmit(FormEvent $event)
     {
-        $form        = $event->getForm();
+        $form = $event->getForm();
         $configModel = $form->getConfig()->getOption('config_model');
 
         if (!($configModel instanceof FieldConfigModel)) {
             return;
         }
-        if (!in_array($configModel->getType(), ['enum', 'multiEnum'])) {
+        if (!ExtendHelper::isEnumerableType($configModel->getType())) {
             return;
-        };
+        }
         if ($form->isSubmitted() && !$form->isValid()) {
             return;
         }
-
-        $data       = $event->getData();
-        $enumConfig = $configModel->toArray('enum');
-
+        $dataClass = $configModel->getEntity()->getClassName();
+        $data = $event->getData();
         $enumName = $this->getValue($data['enum'], 'enum_name');
-        $enumCode = $this->getValue($enumConfig, 'enum_code');
-        if (empty($enumCode)) {
-            $enumCode = $enumName !== null
-                ? ExtendHelper::buildEnumCode($enumName)
-                : ExtendHelper::generateEnumCode(
-                    $configModel->getEntity()->getClassName(),
-                    $configModel->getFieldName(),
-                    $this->nameGenerator->getMaxEnumCodeSize()
-                );
-        }
-
-        $locale             = $this->translator->getLocale();
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $enumCode = $this->getValue($data['enum'], 'enum_code');
+        $locale = $this->translator->getLocale();
+        $enumOptionClassName = EnumOption::class;
         $enumConfigProvider = $this->configManager->getProvider('enum');
-
         // add default translations
         $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
 
-        if ($enumConfigProvider->hasConfig($enumValueClassName)) {
+        if ($enumConfigProvider->hasConfig($enumOptionClassName)) {
             try {
                 // existing enum
-                if ($configModel->getId()) {
+                $extendFieldData = $configModel->toArray('extend');
+                if (isset($extendFieldData['state']) && $extendFieldData['state'] === ExtendScope::STATE_ACTIVE) {
                     $enumOptions = $this->getValue($data['enum'], 'enum_options');
                     if ($enumOptions !== null) {
-                        $this->enumSynchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
+                        $this->enumSynchronizer->applyEnumOptions(
+                            $enumCode,
+                            $enumOptionClassName,
+                            $enumOptions,
+                            $locale
+                        );
                     }
                     $enumPublic = $this->getValue($data['enum'], 'enum_public');
                     if ($enumPublic !== null) {
-                        $this->enumSynchronizer->applyEnumEntityOptions($enumValueClassName, $enumPublic);
+                        $this->enumSynchronizer->applyEnumEntityOptions(
+                            $enumConfigProvider->getConfig($dataClass, $configModel->getFieldName()),
+                            $enumPublic
+                        );
                     }
                 }
 
@@ -169,9 +183,7 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
                         $this->translator->trans('oro.entity_extend.enum.options_error.message', [], 'validators')
                     )
                 );
-                if (null !== $this->logger) {
-                    $this->logger->error('Error occurred during enum options save', ['exception' => $e]);
-                }
+                $this->logger?->error('Error occurred during enum options save', ['exception' => $e]);
             }
         } else {
             // new enum
@@ -182,7 +194,7 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
     }
 
     /**
-     * @param array  $values
+     * @param array $values
      * @param string $name
      * @return mixed
      */

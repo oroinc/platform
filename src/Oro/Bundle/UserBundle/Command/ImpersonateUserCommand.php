@@ -144,7 +144,7 @@ HELP
                 $io->warning('User account is disabled. You will not be able to login as this user.');
             }
 
-            if ($user->getAuthStatus() && $user->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE) {
+            if ($user->getAuthStatus() && $user->getAuthStatus()->getInternalId() !== UserManager::STATUS_ACTIVE) {
                 $io->warning([
                     \sprintf('The user\'s auth status is "%s".', $user->getAuthStatus()->getName()),
                     'You will not be able to login as this user until the auth status is changed to "Active".',

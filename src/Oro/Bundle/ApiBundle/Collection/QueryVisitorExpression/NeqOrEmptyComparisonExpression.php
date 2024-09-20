@@ -29,7 +29,7 @@ class NeqOrEmptyComparisonExpression implements ComparisonExpressionInterface
             throw new QueryException(sprintf('The value for "%s" must not be NULL.', $field));
         }
 
-        $subquery = $visitor->createSubquery($field);
+        $subquery = $visitor->createSubquery($field, false, $expression !== $field ? $expression : null);
 
         if ($value instanceof Range) {
             $fromParameterName = $parameterName . '_from';

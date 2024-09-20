@@ -28,4 +28,4 @@ services:
         arguments:
             - '@oro_translation.api.predefined_language_code_documentation_provider'
         tags:
-            - { name: oro.api.processor, action: get_config, targetAction: get_list, extra: 'descriptions&!identifier_fields_only', class: Oro\Bundle\LocaleBundle\Entity\Localization, priority: -220 }
+            - { name: oro.api.processor, action: get_config, extra: 'descriptions&!identifier_fields_only', class: Oro\Bundle\LocaleBundle\Entity\Localization, targetAction: get_list, priority: -220 }

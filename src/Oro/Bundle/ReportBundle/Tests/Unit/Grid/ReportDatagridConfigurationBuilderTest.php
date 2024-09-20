@@ -13,6 +13,7 @@ use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
@@ -48,7 +49,8 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
             $virtualRelationProvider,
             new DoctrineHelper($this->doctrine),
             new DatagridGuesser([]),
-            $this->createMock(EntityNameResolver::class)
+            $this->createMock(EntityNameResolver::class),
+            $this->createMock(EnumTypeHelper::class)
         );
         $this->builder->setDateGroupingBuilder($this->dateGroupingBuilder);
         $this->builder->setConfigManager($this->configManager);

@@ -12,6 +12,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestQueryStringNormalizer;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
@@ -199,7 +200,11 @@ abstract class RestGetController extends AbstractFOSRestController implements
                 $entityClass = get_class($entity);
                 /** @var UnitOfWork $uow */
                 $uow = $this->container->get('doctrine')->getManager()->getUnitOfWork();
-                foreach ($uow->getOriginalEntityData($entity) as $field => $value) {
+                $targetFields = array_merge(
+                    $uow->getOriginalEntityData($entity),
+                    $this->getEnumerableFields($entityClass)
+                );
+                foreach ($targetFields as $field => $value) {
                     if ($resultFields && !in_array($field, $resultFields)) {
                         continue;
                     }
@@ -429,6 +434,21 @@ abstract class RestGetController extends AbstractFOSRestController implements
     protected function buildNotFoundResponse()
     {
         return $this->buildResponse('', self::ACTION_READ, ['result' => null], Response::HTTP_NOT_FOUND);
+    }
+
+    protected function getEnumerableFields(string $entityClass): array
+    {
+        $configManager = $this->container->get('oro_entity_config.config_manager');
+        $fieldConfigIds = $configManager->getIds('enum', $entityClass, true);
+        $enumFields = [];
+        foreach ($fieldConfigIds as $fieldConfigId) {
+            if (!ExtendHelper::isEnumerableType($fieldConfigId->getFieldType())) {
+                continue;
+            }
+            $enumFields[$fieldConfigId->getFieldName()] = $fieldConfigId->getFieldType();
+        }
+
+        return $enumFields;
     }
 
     public static function getSubscribedServices(): array

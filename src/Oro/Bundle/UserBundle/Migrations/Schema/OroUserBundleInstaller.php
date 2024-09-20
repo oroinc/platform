@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareTrait;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
@@ -13,14 +12,11 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
-use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
-use Oro\Bundle\EntityExtendBundle\Migration\Query\EnumDataValue;
-use Oro\Bundle\EntityExtendBundle\Migration\Query\InsertEnumValuesQuery;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -98,7 +94,7 @@ class OroUserBundleInstaller implements
 
         $this->updateOroEmailUserTable($schema);
 
-        $this->addOroUserAuthStatusField($schema, $queries);
+        $this->addOroUserAuthStatusField($schema);
         $this->addOroUserRelationToScope($schema);
     }
 
@@ -755,29 +751,24 @@ class OroUserBundleInstaller implements
         );
     }
 
-    private function addOroUserAuthStatusField(Schema $schema, QueryBag $queries): void
+    private function addOroUserAuthStatusField(Schema $schema): void
     {
-        $enumTable = $this->extendExtension->addEnumField(
+        $this->extendExtension->addEnumField(
             $schema,
             'oro_user',
             'auth_status',
             'auth_status'
         );
-
-        $options = new OroOptions();
-        $options->set('enum', 'immutable_codes', [UserManager::STATUS_ACTIVE, UserManager::STATUS_RESET]);
-        $enumTable->addOption(OroOptions::KEY, $options);
-
-        $queries->addPostQuery(new InsertEnumValuesQuery($this->extendExtension, 'auth_status', [
-            new EnumDataValue(UserManager::STATUS_ACTIVE, 'Active', 1, true),
-            new EnumDataValue(UserManager::STATUS_RESET, 'Reset', 2)
-        ]));
-
-        $queries->addPostQuery(new ParametrizedSqlMigrationQuery(
-            'UPDATE oro_user SET auth_status_id = :default_status',
-            ['default_status' => UserManager::STATUS_ACTIVE],
-            ['default_status' => Types::STRING]
-        ));
+        $enumOptionIds = [
+            ExtendHelper::buildEnumOptionId('auth_status', UserManager::STATUS_ACTIVE),
+            ExtendHelper::buildEnumOptionId('auth_status', UserManager::STATUS_RESET),
+        ];
+        $schema->getTable('oro_user')->addExtendColumnOption(
+            'auth_status',
+            'enum',
+            'immutable_codes',
+            $enumOptionIds
+        );
     }
 
     private function addOroUserRelationToScope(Schema $schema): void

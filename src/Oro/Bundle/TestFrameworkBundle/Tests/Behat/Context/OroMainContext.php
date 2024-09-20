@@ -1100,6 +1100,18 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: And I should see "Schedule Now" element with the url matches "/folder/" in top window
+     *
+     * @Then /^(?:|I )should see "(?P<elementName>[^"]+)" element with the url matches (?P<url>"[^"]+") in top window$/
+     */
+    public function iShouldSeeElementWithUrl($elementName, $url)
+    {
+        $elements = $this->findAllElements($elementName);
+        $element = reset($elements);
+        self::assertMatchesRegularExpression($url, $element->getAttribute('href'));
+    }
+
+    /**
      * Example: And I should see "file.jpg" file link with the url matches "/admin/"
      *
      * @Then /^(?:|I )should not see "(?P<text>[^"]+)" link with the url matches (?P<url>"[^"]+")$/

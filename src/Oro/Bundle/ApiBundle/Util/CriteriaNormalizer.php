@@ -7,6 +7,9 @@ use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\Join;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Performs the following normalizations of the Criteria object:
@@ -26,15 +29,18 @@ class CriteriaNormalizer
     private DoctrineHelper $doctrineHelper;
     private RequireJoinsFieldVisitorFactory $requireJoinsFieldVisitorFactory;
     private OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory;
+    private ConfigManager $configManager;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         RequireJoinsFieldVisitorFactory $requireJoinsFieldVisitorFactory,
-        OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory
+        OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory,
+        ConfigManager $configManager
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->requireJoinsFieldVisitorFactory = $requireJoinsFieldVisitorFactory;
         $this->optimizeJoinsFieldVisitorFactory = $optimizeJoinsFieldVisitorFactory;
+        $this->configManager = $configManager;
     }
 
     public function normalizeCriteria(Criteria $criteria, string $rootEntityClass): void
@@ -90,11 +96,46 @@ class CriteriaNormalizer
                     }
                     $aliases[] = $alias;
 
-                    $criteria
-                        ->addLeftJoin($path, $parentAlias . '.' . $item[self::FIELD_OPTION])
-                        ->setAlias($alias);
+                    $this->addLeftJoin(
+                        $criteria,
+                        $rootEntityClass,
+                        $path,
+                        $parentAlias,
+                        $item[self::FIELD_OPTION],
+                        $alias
+                    );
                 }
             }
+        }
+    }
+
+    private function addLeftJoin(
+        Criteria $criteria,
+        string $rootEntityClass,
+        string $path,
+        string $parentAlias,
+        string $fieldName,
+        string $alias
+    ): void {
+        $parentClass = $this->findClassByAlias($criteria, $rootEntityClass, $parentAlias);
+        if ($parentClass && $this->isMultiEnumField($parentClass, $fieldName)) {
+            $criteria
+                ->addLeftJoin(
+                    $path,
+                    EnumOption::class,
+                    Join::WITH,
+                    sprintf(
+                        "JSONB_ARRAY_CONTAINS_JSON(%s.serialized_data, '%s', CONCAT('\"', %s.id, '\"')) = true",
+                        $parentAlias,
+                        $fieldName,
+                        $alias
+                    )
+                )
+                ->setAlias($alias);
+        } else {
+            $criteria
+                ->addLeftJoin($path, $parentAlias . '.' . $fieldName)
+                ->setAlias($alias);
         }
     }
 
@@ -167,7 +208,7 @@ class CriteriaNormalizer
                     }
                 } elseif (!str_starts_with($field, Criteria::PLACEHOLDER_START)
                     && !str_contains($field, '.')
-                    && $rootMetadata->hasAssociation($field)
+                    && ($rootMetadata->hasAssociation($field) || $this->isMultiEnumField($rootEntityClass, $field))
                 ) {
                     $pathMap[$field] = $this->buildJoinPathMapValue($field);
                 }
@@ -217,7 +258,6 @@ class CriteriaNormalizer
                 self::FIELD_OPTION         => $path,
                 self::PARENT_PATH_OPTION   => null,
                 self::NESTING_LEVEL_OPTION => 0
-
             ];
         }
 
@@ -302,5 +342,56 @@ class CriteriaNormalizer
         } catch (DbalException $e) {
             return null;
         }
+    }
+
+    private function findClassByAlias(Criteria $criteria, string $rootEntityClass, string $alias): ?string
+    {
+        if (Criteria::ROOT_ALIAS_PLACEHOLDER === $alias) {
+            return $rootEntityClass;
+        }
+
+        $join = $this->findJoinByAlias($criteria, $alias);
+        if (null !== $join) {
+            return $this->getJoinClass($criteria, $rootEntityClass, $join);
+        }
+
+        return null;
+    }
+
+    private function getJoinClass(Criteria $criteria, string $rootEntityClass, Join $join): string
+    {
+        if (class_exists($join->getJoin())) {
+            return $join->getJoin();
+        }
+
+        [$parentAlias, $field] = explode('.', $join->getJoin());
+        $parentClass = Criteria::ROOT_ALIAS_PLACEHOLDER === $parentAlias
+            ? $rootEntityClass
+            : $this->getJoinClass($criteria, $rootEntityClass, $this->findJoinByAlias($criteria, $parentAlias));
+
+        return $this->doctrineHelper->getEntityMetadataForClass($parentClass)->getAssociationTargetClass($field);
+    }
+
+    private function findJoinByAlias(Criteria $criteria, string $alias): ?Join
+    {
+        $joins = $criteria->getJoins();
+        foreach ($joins as $join) {
+            if ($join->getAlias() === $alias) {
+                return $join;
+            }
+        }
+
+        return null;
+    }
+
+    private function isMultiEnumField(string $entityClass, string $fieldName): bool
+    {
+        if (!$this->configManager->hasConfig($entityClass, $fieldName)) {
+            return false;
+        }
+
+        return ExtendHelper::isMultiEnumType(
+            $this->configManager->getId('extend', $entityClass, $fieldName)->getFieldType()
+        );
     }
 }

@@ -409,7 +409,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $key = spl_object_hash($entity);
             if (array_key_exists($key, $updates)) {
                 $updates[$key]['change_set'] = array_merge(
-                    $updates[$key]['change_set'],
+                    (array)$updates[$key]['change_set'],
                     $additionalUpdate['change_set']
                 );
             } else {

@@ -78,6 +78,7 @@ services:
         arguments:
             - [] # composite expressions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass
             - [] # comparison expressions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass
+            - '@oro_api.query.field_dql_expression_provider'
             - '@oro_entity.orm.entity_class_resolver'
 
     oro_api.query.composite_expression.and:

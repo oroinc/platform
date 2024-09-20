@@ -5,15 +5,68 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DoctrineHelperTest extends OrmRelatedTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->notManageableClassNames = [\stdClass::class];
+    }
+
     private function getClassMetadata(string $entityClass): ClassMetadata
     {
         return $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+    }
+
+    public function testIsManageableEntityClassForEnumOptionEntity(): void
+    {
+        self::assertFalse($this->doctrineHelper->isManageableEntityClass('Extend\Entity\EV_Test_Enum'));
+    }
+
+    public function testIsManageableEntityClassForManageableEntity(): void
+    {
+        self::assertTrue($this->doctrineHelper->isManageableEntityClass(Entity\Category::class));
+    }
+
+    public function testIsManageableEntityClassForNotManageableEntity(): void
+    {
+        self::assertFalse($this->doctrineHelper->isManageableEntityClass(\stdClass::class));
+    }
+
+    public function testGetEntityManagerForClassForEnumOptionEntity(): void
+    {
+        $this->expectException(NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "Extend\Entity\EV_Test_Enum" is not manageable.');
+
+        $this->doctrineHelper->getEntityManagerForClass('Extend\Entity\EV_Test_Enum');
+    }
+
+    public function testGetEntityManagerForClassForEnumOptionEntityAndWithoutThrowException(): void
+    {
+        self::assertNull($this->doctrineHelper->getEntityManagerForClass('Extend\Entity\EV_Test_Enum', false));
+    }
+
+    public function testGetEntityManagerForClassForManageableEntity(): void
+    {
+        self::assertSame($this->em, $this->doctrineHelper->getEntityManagerForClass(Entity\Category::class));
+    }
+
+    public function testGetEntityManagerForClassForNotManageableEntity(): void
+    {
+        $this->expectException(NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "stdClass" is not manageable.');
+
+        $this->doctrineHelper->getEntityManagerForClass(\stdClass::class);
+    }
+
+    public function testGetEntityManagerForClassForNotManageableEntityAndWithoutThrowException(): void
+    {
+        self::assertNull($this->doctrineHelper->getEntityManagerForClass(\stdClass::class, false));
     }
 
     public function testFindEntityMetadataByPathForAssociation()

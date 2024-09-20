@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\ColumnOptionsGuesserMock;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
@@ -36,7 +37,8 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             $this->getVirtualRelationProvider(),
             $doctrineHelper,
             new DatagridGuesser([new ColumnOptionsGuesserMock()]),
-            $this->getEntityNameResolver()
+            $this->getEntityNameResolver(),
+            $this->createMock(EnumTypeHelper::class)
         );
 
         $builder->setGridName(self::TEST_GRID_NAME);
@@ -68,7 +70,8 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             $this->getVirtualRelationProvider(),
             $doctrineHelper,
             new DatagridGuesser([new ColumnOptionsGuesserMock()]),
-            $this->getEntityNameResolver()
+            $this->getEntityNameResolver(),
+            $this->createMock(EnumTypeHelper::class)
         );
 
         $builder->setConfigManager($configManager);

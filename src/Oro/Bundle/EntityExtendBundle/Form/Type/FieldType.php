@@ -207,10 +207,7 @@ class FieldType extends AbstractType
         return array_flip($relationTypes);
     }
 
-    /**
-     * @return array
-     */
-    public function getTranslatedTypeChoices()
+    public function getTranslatedTypeChoices(): array
     {
         return array_merge($this->getTranslatedFieldTypes(), $this->getTranslatedRelationTypes());
     }

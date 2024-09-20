@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -165,7 +170,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(ExtendHelper::getRelationType($relationKey));
     }
 
-    public function invalidRelationKeysForGetRelationType()
+    public function invalidRelationKeysForGetRelationType(): array
     {
         return [
             [null],
@@ -283,16 +288,16 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildEnumValueId(string $enumValueName, string $expectedEnumValueId)
     {
-        $enumValueId = ExtendHelper::buildEnumValueId($enumValueName);
+        $enumValueId = ExtendHelper::buildEnumInternalId($enumValueName);
         $this->assertEquals(
             $expectedEnumValueId,
             $enumValueId
         );
         $this->assertTrue(
-            strlen($enumValueId) <= ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH,
+            strlen($enumValueId) <= ExtendHelper::MAX_ENUM_INTERNAL_ID_LENGTH,
             sprintf(
                 'The enum value id must be less or equal than %d characters',
-                ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH
+                ExtendHelper::MAX_ENUM_INTERNAL_ID_LENGTH
             )
         );
     }
@@ -331,7 +336,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 
         setlocale(LC_CTYPE, 'en_US.UTF-8');
         try {
-            $result = ExtendHelper::buildEnumValueId('broken_value_nameºss');
+            $result = ExtendHelper::buildEnumInternalId('broken_value_nameºss');
         } finally {
             setlocale(LC_CTYPE, $locale);
         }
@@ -344,7 +349,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     public function testBuildEnumValueIdForInvalidEnumValueName(string $enumValueName)
     {
         $this->expectException(\InvalidArgumentException::class);
-        ExtendHelper::buildEnumValueId($enumValueName);
+        ExtendHelper::buildEnumInternalId($enumValueName);
     }
 
     /**
@@ -354,7 +359,15 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame(
             '',
-            ExtendHelper::buildEnumValueId($enumValueName, false)
+            ExtendHelper::buildEnumInternalId($enumValueName, false)
+        );
+    }
+
+    public function testGetEnumInternalId()
+    {
+        $this->assertEquals(
+            'option1',
+            ExtendHelper::getEnumInternalId('test_enum.option1')
         );
     }
 
@@ -371,24 +384,42 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider buildEnumValueClassNameProvider
+     * @dataProvider isEnumOptionEntityDataProvider
      */
-    public function testBuildEnumValueClassName(string $enumCode, string $expectedClassName)
+    public function testIsEnumOptionEntity(string $className, bool $result): void
     {
-        $this->assertEquals(
-            $expectedClassName,
-            ExtendHelper::buildEnumValueClassName($enumCode)
-        );
+        $this->assertEquals($result, ExtendHelper::isOutdatedEnumOptionEntity($className));
     }
 
-    public static function buildEnumValueClassNameProvider(): array
+    public static function isEnumOptionEntityDataProvider(): array
     {
         return [
-            ['test', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test'],
-            ['test_123', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_123'],
-            ['test_enum', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum'],
-            ['testenum', ExtendHelper::ENTITY_NAMESPACE . 'EV_Testenum'],
+            ['Extend\Entity\EV_Class', true],
+            ['Extend\Entity\Class', false],
+            ['Acme\Class', false]
         ];
+    }
+
+    /**
+     * @dataProvider getEnumOptionEntityClassNameDataProvider
+     */
+    public function testGetOutdatedEnumOptionEntityClassName(string $enumCode, string $className): void
+    {
+        $this->assertEquals($className, ExtendHelper::getOutdatedEnumOptionClassName($enumCode));
+    }
+
+    public static function getEnumOptionEntityClassNameDataProvider(): array
+    {
+        return [
+            ['test', 'Extend\Entity\EV_Test'],
+            ['test_class', 'Extend\Entity\EV_Test_Class'],
+            ['Test_Class', 'Extend\Entity\EV_Test_Class']
+        ];
+    }
+
+    public function testGetEnumCode(): void
+    {
+        $this->assertEquals('test_class', ExtendHelper::getEnumCode('Extend\Entity\EV_Test_Class'));
     }
 
     public function testGetMultiEnumSnapshotFieldName()
@@ -459,6 +490,21 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
             ['Acme\Bundle\TestBundle\Entity\Test', 'Test'],
             ['Test', 'Test'],
         ];
+    }
+
+    public function testGetParentClassNameForEnumOptionEntity(): void
+    {
+        $this->assertEquals(EnumOption::class, ExtendHelper::getParentClassName('Extend\Entity\EV_Test'));
+    }
+
+    public function testGetParentClassNameWhenNoParentClass(): void
+    {
+        $this->assertNull(ExtendHelper::getParentClassName(TestClass::class));
+    }
+
+    public function testGetParentClassNameWhenThereIsParentClass(): void
+    {
+        $this->assertEquals(Bundle::class, ExtendHelper::getParentClassName(TestBundle1::class));
     }
 
     /**

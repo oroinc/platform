@@ -42,7 +42,7 @@ class AuditFieldTypeRegistry
         'dateinterval' => false,
         'datetime_immutable' => false,
         'datetimeyz_immutable' => false,
-        'json' => false,
+        'json' => true,
         'time_immutable' => false,
 
         // collection types

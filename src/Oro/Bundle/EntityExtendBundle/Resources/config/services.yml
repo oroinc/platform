@@ -334,6 +334,23 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp, priority: 100 }
 
+    oro_entity_extend.migration.update_enum_structure.listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateEnumStructureMigrationListener
+        arguments:
+            - '@oro_migration.service_container'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -260 }
+            - { name: container.service_subscriber }
+    
+    oro_entity_extend.extension.doctrine_type_mapping:
+        class: 'Oro\Component\Action\Model\DoctrineTypeMappingExtension'
+        public: false
+        calls:
+            - [ addDoctrineTypeMapping, [ 'enum', 'string' ] ]
+            - [ addDoctrineTypeMapping, [ 'multiEnum', 'array' ] ]
+        tags:
+            - { name: oro.action.extension.doctrine_type_mapping }
+
     oro_entity_extend.migration.update_config.post_up.listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
         arguments:
@@ -378,6 +395,16 @@ services:
             - '@oro_entity_config.configuration_handler'
         tags:
             - { name: oro_migration.extension, extension_name: extend }
+            
+    oro_entity_extend.migration.extension.outdated_extend:
+        class: Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtension
+        arguments:
+            - "@oro_entity_extend.migration.options_manager"
+            - "@oro_entity_extend.migration.entity_metadata_helper"
+            - '@oro_entity_config.provider_config_bag'
+            - '@oro_entity_config.configuration_handler'
+        tags:
+            - { name: oro_migration.extension, extension_name: outdated_extend }
 
     oro_entity_extend.migration.extension.convert_to_extend:
         class: Oro\Bundle\EntityExtendBundle\Migration\Extension\ConvertToExtendExtension
@@ -505,7 +532,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer
         arguments:
             - "@oro_entity.helper.field_helper"
-            - '@oro_entity_extend.enum_value_provider'
+            - '@oro_entity_extend.enum_options_provider'
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
 
@@ -568,30 +595,52 @@ services:
         tags:
             - { name: oro_entity.alias_provider, priority: -90 }
 
-    oro_entity_extend.entity_class_name_provider.enum:
-        class: Oro\Bundle\EntityExtendBundle\Provider\EnumEntityClassNameProvider
-        public: false
-        arguments:
-            - "@oro_entity_config.config_manager"
-            - "@translator"
-            - '@Doctrine\Inflector\Inflector'
-        tags:
-            - { name: oro_entity.class_name_provider, priority: -110 }
-
-    oro_entity_extend.enum_value_provider:
-        class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider
+    oro_entity_extend.enum_options_provider:
+        class: Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider
         public: true
         arguments:
             - "@oro_entity.doctrine_helper"
             - "@oro_entity_extend.cache.enum_translation_provider"
 
+    oro_entity_extend.field.enum_option_extension:
+        class: Oro\Bundle\EntityExtendBundle\EntityExtend\EnumOptionFieldExtension
+        arguments:
+            - '@translator'
+        tags:
+            - { name: 'oro_entity_extend.entity_field_extension', priority: 101 }
+
     oro_entity_extend.dictionary_value_list_provider.enum:
-        class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider
+        class: Oro\Bundle\EntityExtendBundle\Provider\EnumOptionValueListProvider
         arguments:
             - "@oro_entity_config.config_manager"
             - "@doctrine"
         tags:
             - { name: oro_entity.dictionary_value_list_provider, priority: -90 }
+
+    oro_entity_extend.dictionary_value_list_provider.enum_option:
+        class: Oro\Bundle\EntityExtendBundle\Provider\EnumOptionListProvider
+        arguments:
+            - '@doctrine'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.entity_class_provider.enum_option'
+        tags:
+            - { name: oro_entity.dictionary_value_list_provider, priority: -90 }
+
+    oro_entity_extend.entity_class_provider.enum_option:
+        class: Oro\Bundle\EntityExtendBundle\Provider\EnumOptionEntityClassProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro_entity.class_provider }
+
+    oro_entity_extend.query_hint.enum_option:
+        abstract: true
+        tags:
+            -
+                name: oro_entity.query_hint
+                hint: oro_entity_extend.enum_option
+                alias: HINT_ENUM_OPTION
+                tree_walker: Oro\Bundle\EntityExtendBundle\ORM\Walker\EnumOptionWalker
 
     oro_entity_extend.field_type_provider:
         class: Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider
@@ -694,27 +743,44 @@ services:
             - '@oro_entity_extend.cache.enum_translation'
             - '@oro_locale.helper.localization'
             - '@oro_locale.settings'
+            - '@translator'
 
-    oro_entity_extend.listener.cache.enum_value.abstract:
+    oro_entity_extend.listener.cache.enum_option.abstract:
         abstract: true
         arguments:
+            - '@doctrine'
             - '@oro_entity_extend.cache.enum_translation_provider'
+            - "@oro_translation.manager.translation"
+            - "@oro_entity_config.translation.helper"
+            - '@oro_message_queue.client.message_producer'
 
-    oro_entity_extend.listener.cache.enum_value_translation:
-        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueTranslationListener
-        parent: oro_entity_extend.listener.cache.enum_value.abstract
+    oro_entity_extend.listener.cache.enum_option_translation:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumOptionTranslationListener
+        parent: oro_entity_extend.listener.cache.enum_option.abstract
         tags:
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postPersist }
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postUpdate }
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postRemove }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumOptionTranslation', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumOptionTranslation', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumOptionTranslation', event: postRemove }
+            - { name: doctrine.event_listener, event: postFlush }
 
-    oro_entity_extend.listener.cache.enum_value:
-        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueListener
-        parent: oro_entity_extend.listener.cache.enum_value.abstract
+    oro_entity_extend.listener.cache.enum_option:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumOptionListener
+        parent: oro_entity_extend.listener.cache.enum_option.abstract
         tags:
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postPersist }
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postUpdate }
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postRemove }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumOption', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumOption', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumOption', event: postRemove }
+            - { name: doctrine.event_listener, event: postFlush }
+
+    oro_entity_extend.listener.actualize_enum_option_translation:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\ActualizeEnumOptionTranslationListener
+        arguments:
+            - '@oro_entity_extend.manager.enum_option_translation_manager'
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postRemove }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_entity_extend.validator.field_name_length:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLengthValidator
@@ -810,3 +876,38 @@ services:
                 'Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProvider': '@oro_entity_extend.entity_metadata_provider'
             - '%kernel.cache_dir%'
             - '@logger'
+
+    oro_entity_extend.enum.field_config_listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\EnumFieldConfigListener
+        arguments:
+            - '@oro_entity_config.config.config_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.field.create, method: createFieldConfig }
+
+    oro_entity_extend.enum.entity_options_actualizer:
+        class: Oro\Bundle\EntityExtendBundle\Tools\EntityEnumOptionsActualizer
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.config_manager'
+
+    oro_entity_extend.async.actualize_entity_enum_options_processor:
+        class: 'Oro\Bundle\EntityExtendBundle\Async\ActualizedEntityEnumOptionsProcessor'
+        arguments:
+            - '@oro_entity_extend.enum.entity_options_actualizer'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_entity_extend.enum_option_class_name_provider:
+        class: Oro\Bundle\EntityExtendBundle\Provider\EnumOptionEntityClassNameProvider
+        public: false
+        arguments:
+            - '@oro_entity.entity_class_name_provider.default'
+        tags:
+            - { name: oro_entity.class_name_provider }
+
+    oro_entity_extend.manager.enum_option_translation_manager:
+        class: Oro\Bundle\EntityExtendBundle\Manager\EnumOptionTranslationManager
+        arguments:
+            - '@doctrine'

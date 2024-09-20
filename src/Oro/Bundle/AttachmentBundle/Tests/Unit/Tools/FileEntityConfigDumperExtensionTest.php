@@ -132,8 +132,8 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->fieldTypeHelper->expects(self::exactly(4))
             ->method('getUnderlyingType')
             ->willReturnMap([
-                ['image', 'manyToOne'],
-                ['file', 'manyToOne'],
+                ['image', $imageFieldConfig, 'manyToOne'],
+                ['file', $fileFieldConfig, 'manyToOne'],
             ]);
 
         $this->configManager->expects(self::exactly(6))
@@ -280,8 +280,8 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->fieldTypeHelper->expects(self::exactly(6))
             ->method('getUnderlyingType')
             ->willReturnMap([
-                ['multiImage', 'oneToMany'],
-                ['multiFile', 'oneToMany'],
+                ['multiImage', $imagesFieldConfig, 'oneToMany'],
+                ['multiFile', $filesFieldConfig, 'oneToMany'],
             ]);
 
         $this->extension->preUpdate();

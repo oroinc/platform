@@ -16,6 +16,7 @@ use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -41,6 +42,9 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $virtualRelationProvider;
+
+    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $enumVirtualFieldProvider;
 
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
@@ -96,6 +100,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
         $this->virtualRelationProvider = $this->createMock(VirtualRelationProviderInterface::class);
+        $this->enumVirtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
 
         $this->provider = new EntityFieldProvider(
             $this->entityConfigProvider,
@@ -110,6 +115,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->setVirtualFieldProvider($this->virtualFieldProvider);
         $this->provider->setVirtualRelationProvider($this->virtualRelationProvider);
         $this->provider->setExclusionProvider($this->exclusionProvider);
+        $this->provider->setEnumVirtualFieldProvider($this->enumVirtualFieldProvider);
     }
 
     public function testGetFieldsNoEntityConfig(): void
@@ -550,15 +556,15 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'relations' => [
                     'rel1' => [
-                        'target_class' => 'Acme\EnumValue1',
-                        'type' => 'ref-one',
+                        'target_class' => EnumOption::class,
+                        'type' => 'enum',
                         'config' => [
                             'label' => 'Enum Field',
                         ],
                     ],
                     'rel2' => [
-                        'target_class' => 'Acme\EnumValue2',
-                        'type' => 'ref-many',
+                        'target_class' => EnumOption::class,
+                        'type' => 'enum',
                         'config' => [
                             'label' => 'Multi Enum Field',
                         ],
@@ -634,7 +640,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'name' => 'rel1',
                         'type' => 'enum',
                         'label' => 'Enum Field Translated',
-                        'related_entity_name' => 'Acme\EnumValue1',
+                        'related_entity_name' => EnumOption::class,
                     ],
                     [
                         'name' => 'field1',
@@ -646,7 +652,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'name' => 'rel2',
                         'type' => 'multiEnum',
                         'label' => 'Multi Enum Field Translated',
-                        'related_entity_name' => 'Acme\EnumValue2',
+                        'related_entity_name' => EnumOption::class,
                     ],
                     [
                         'name' => 'virtual_relation',

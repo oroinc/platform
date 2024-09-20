@@ -18,7 +18,6 @@ class MultiSelectGuesser extends ChoicesGuesser
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $metadata = $entityManager->getClassMetadata($entityName);
-
         $result = [];
         if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);

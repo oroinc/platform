@@ -28,7 +28,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetSearchableValue()
     {
-        $value = new TestEnumValue('id', 'name', 100);
+        $value = new TestEnumValue('test', 'name', 'id', 100);
 
         $this->assertEquals(
             'name',
@@ -45,7 +45,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "boolean" given'
+            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface", "boolean" given'
         );
 
         $this->getAttributeType()->getSearchableValue($this->attribute, true, $this->localization);
@@ -53,10 +53,10 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetFilterableValue()
     {
-        $value = new TestEnumValue('id', 'name', 100);
+        $value = new TestEnumValue('id', 'test', 'name', 100);
 
         $this->assertEquals(
-            [$this->attribute->getFieldName() . '_enum.' . $value->getId() => 1],
+            [$this->attribute->getFieldName() . '_enum.' . $value->getInternalId() => 1],
             $this->getAttributeType()->getFilterableValue($this->attribute, $value, $this->localization)
         );
     }
@@ -73,7 +73,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "boolean" given'
+            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface", "boolean" given'
         );
 
         $this->getAttributeType()->getFilterableValue($this->attribute, true, $this->localization);
@@ -81,7 +81,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetSortableValue()
     {
-        $value = new TestEnumValue('id', 'name', 100);
+        $value = new TestEnumValue('id', 'test', 'name', 100);
 
         $this->assertEquals(
             100,
@@ -98,7 +98,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue", "boolean" given'
+            'Value must be instance of "Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface", "boolean" given'
         );
 
         $this->getAttributeType()->getSortableValue($this->attribute, true, $this->localization);

@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Board\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -14,6 +15,9 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
@@ -22,23 +26,12 @@ use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
  */
 class DefaultProcessor implements BoardProcessorInterface
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
-    /** @var ChoiceFieldHelper */
-    protected $choiceHelper;
-
     public function __construct(
-        ManagerRegistry $doctrine,
-        EntityClassResolver $entityClassResolver,
-        ChoiceFieldHelper $choiceHelper
+        protected ManagerRegistry $doctrine,
+        protected EntityClassResolver $entityClassResolver,
+        protected ChoiceFieldHelper $choiceHelper,
+        protected ConfigManager $configManager
     ) {
-        $this->doctrine = $doctrine;
-        $this->entityClassResolver = $entityClassResolver;
-        $this->choiceHelper = $choiceHelper;
     }
 
     /**
@@ -55,20 +48,23 @@ class DefaultProcessor implements BoardProcessorInterface
         if ($metadata->hasAssociation($property)) {
             $mapping = $metadata->getAssociationMapping($property);
             if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
-                $targetEntity = $metadata->getAssociationTargetClass($property);
-                $targetEntityMetadata = $em->getClassMetadata($targetEntity);
-                $labelField = $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_VALUE_KEY]
-                    ?? $this->choiceHelper->guessLabelField($targetEntityMetadata, $property);
-                $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
-                $orderBy = $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_ORDER_BY] ?? null;
-                $result = $this->choiceHelper->getChoices(
-                    $targetEntity,
-                    $keyField,
-                    $labelField,
-                    $orderBy
+                $result = $this->getChoicesList(
+                    $em,
+                    $metadata->getAssociationTargetClass($property),
+                    $property,
+                    $boardConfig
                 );
-                $defaultOption = $this->getDefaultColumn($boardConfig, $result);
-                $result = $this->prepareOptions($result, $defaultOption);
+            }
+        } elseif ($this->configManager->hasConfigFieldModel($entityName, $property)) {
+            $fieldConfig = $this->configManager->getFieldConfig('enum', $entityName, $property);
+            if (ExtendHelper::isSingleEnumType($fieldConfig->getId()->getFieldType())) {
+                $result = $this->getChoicesList(
+                    $em,
+                    EnumOption::class,
+                    $property,
+                    $boardConfig,
+                    ['enumCode' => $fieldConfig->get('enum_code')]
+                );
             }
         }
 
@@ -205,5 +201,29 @@ class DefaultProcessor implements BoardProcessorInterface
         }
 
         return $default;
+    }
+
+    protected function getChoicesList(
+        EntityManager $em,
+        string $targetEntity,
+        string $property,
+        mixed $boardConfig,
+        array $whereOptions = []
+    ): array {
+        $targetEntityMetadata = $em->getClassMetadata($targetEntity);
+        $labelField = $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_VALUE_KEY]
+            ?? $this->choiceHelper->guessLabelField($targetEntityMetadata, $property);
+        $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
+        $orderBy = $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_ORDER_BY] ?? null;
+        $result = $this->choiceHelper->getChoices(
+            $targetEntity,
+            $keyField,
+            $labelField,
+            $orderBy,
+            whereOptions: $whereOptions
+        );
+        $defaultOption = $this->getDefaultColumn($boardConfig, $result);
+
+        return $this->prepareOptions($result, $defaultOption);
     }
 }

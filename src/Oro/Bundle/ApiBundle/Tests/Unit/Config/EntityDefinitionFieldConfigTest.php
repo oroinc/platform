@@ -467,7 +467,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame($query, $config->getAssociationQuery());
         self::assertEquals($query, $config->get(ConfigUtil::ASSOCIATION_QUERY));
 
-        $config->setAssociationQuery();
+        $config->setAssociationQuery(null);
         self::assertNull($config->getAssociationQuery());
         self::assertFalse($config->has(ConfigUtil::ASSOCIATION_QUERY));
     }

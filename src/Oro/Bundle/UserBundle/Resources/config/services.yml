@@ -9,7 +9,7 @@ services:
             - '@oro_user.security.user_loader'
             - '@doctrine'
             - '@security.password_hasher_factory'
-            - '@oro_entity_extend.enum_value_provider'
+            - '@oro_entity_extend.enum_options_provider'
             - '@oro_user.manager.mailer_processor_link'
 
     oro_user.manager.mailer_processor_link:
@@ -38,7 +38,7 @@ services:
     oro_user.listener.password_changed_listener:
         class: Oro\Bundle\UserBundle\EventListener\PasswordChangedListener
         arguments:
-            - '@oro_entity_extend.enum_value_provider'
+            - '@oro_entity_extend.enum_options_provider'
         tags:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\User, event: prePersist}
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\User, event: preUpdate}

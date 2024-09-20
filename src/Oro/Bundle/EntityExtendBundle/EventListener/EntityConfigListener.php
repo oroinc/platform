@@ -70,21 +70,6 @@ class EntityConfigListener
         if (!$parentClassName && !$isExtendEntity) {
             return;
         }
-
-        if (ExtendHelper::isExtendEntityProxy($parentClassName)) {
-            // When application is installed parent class will be replaced (via class_alias)
-            $extendClass = $parentClassName;
-        } elseif ($isExtendEntity) {
-            $extendClass = null;
-        } else {
-            // During install parent class is not replaced (via class_alias)
-            $shortClassName = ExtendHelper::getShortClassName($className);
-            if (ExtendHelper::getShortClassName($parentClassName) !== 'Extend' . $shortClassName) {
-                return;
-            }
-            $extendClass = ExtendHelper::getExtendEntityProxyClassName($parentClassName);
-        }
-
         $configManager = $event->getConfigManager();
         $config        = $configManager->getProvider('extend')->getConfig($className);
         $hasChanges    = false;

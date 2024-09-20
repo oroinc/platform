@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
-use Extend\Entity\EV_Api_Enum1 as TestEnum1;
-use Extend\Entity\EV_Api_Enum2 as TestEnum2;
 use Extend\Entity\TestApiE1;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
@@ -11,6 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ZeroIdentifierTest extends RestJsonApiTestCase
 {
+    private const TEST_ENUM_1_CLASS = 'Extend\Entity\EV_Api_Enum1';
+    private const TEST_ENUM_2_CLASS = 'Extend\Entity\EV_Api_Enum2';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -22,14 +23,14 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
 
     public function testGetResourceByZeroIdentifier()
     {
-        $entityType = $this->getEntityType(TestEnum1::class);
-        $response = $this->get(['entity' => $entityType, 'id' => '<toString(@enum1_0->id)>']);
+        $entityType = $this->getEntityType(self::TEST_ENUM_1_CLASS);
+        $response = $this->get(['entity' => $entityType, 'id' => '<toString(@enum1_0->internalId)>']);
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type' => $entityType,
-                    'id'   => '<toString(@enum1_0->id)>',
+                    'id'   => '<toString(@enum1_0->internalId)>',
                 ]
             ],
             $response
@@ -38,7 +39,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
 
     public function testGetNotExistedResourceByZeroIdentifier()
     {
-        $entityType = $this->getEntityType(TestEnum2::class);
+        $entityType = $this->getEntityType(self::TEST_ENUM_2_CLASS);
         $response = $this->request(
             'GET',
             $this->getUrl($this->getItemRouteName(), ['entity' => $entityType, 'id' => '0'])
@@ -51,7 +52,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(TestApiE1::class);
         $relatedEntity = $this->getReference('enum1_0');
-        $relatedEntityType = $this->getEntityType(TestEnum1::class);
+        $relatedEntityType = $this->getEntityType(self::TEST_ENUM_1_CLASS);
 
         $data = [
             'data' => [
@@ -60,7 +61,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
                     'enumField' => [
                         'data' => [
                             'type' => $relatedEntityType,
-                            'id'   => $relatedEntity->getId()
+                            'id'   => $relatedEntity->getInternalId()
                         ]
                     ]
                 ]
@@ -76,7 +77,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
                         'enumField' => [
                             'data' => [
                                 'type' => $relatedEntityType,
-                                'id'   => $relatedEntity->getId()
+                                'id'   => $relatedEntity->getInternalId()
                             ]
                         ]
                     ]
@@ -88,7 +89,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
         // test that the data was created
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestApiE1::class, (int)$this->getResourceId($response));
-        self::assertSame($relatedEntity->getId(), $entity->getEnumField()->getId());
+        self::assertSame($relatedEntity->getInternalId(), $entity->getEnumField()->getInternalId());
     }
 
     public function testUpdateRelationshipWithZeroIdentifier()
@@ -96,7 +97,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
         $entity = $this->getReference('entity_2');
         $relatedEntity = $this->getReference('enum1_0');
         $entityType = $this->getEntityType(TestApiE1::class);
-        $relatedEntityType = $this->getEntityType(TestEnum1::class);
+        $relatedEntityType = $this->getEntityType(self::TEST_ENUM_1_CLASS);
 
         $data = [
             'data' => [
@@ -106,7 +107,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
                     'enumField' => [
                         'data' => [
                             'type' => $relatedEntityType,
-                            'id'   => $relatedEntity->getId()
+                            'id'   => $relatedEntity->getInternalId()
                         ]
                     ]
                 ]
@@ -122,7 +123,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
         self::assertEquals(
             [
                 'type' => $relatedEntityType,
-                'id'   => $relatedEntity->getId()
+                'id'   => $relatedEntity->getInternalId()
             ],
             $responseContent['data']['relationships']['enumField']['data']
         );
@@ -130,7 +131,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
         // test that the data was updated
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestApiE1::class, $entity->getId());
-        self::assertSame($relatedEntity->getId(), $entity->getEnumField()->getId());
+        self::assertSame($relatedEntity->getInternalId(), $entity->getEnumField()->getInternalId());
     }
 
     public function testGetSubresourceWithZeroIdentifier()
@@ -138,7 +139,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
         $entity = $this->getReference('entity_1');
         $relatedEntity = $this->getReference('enum1_0');
         $entityType = $this->getEntityType(TestApiE1::class);
-        $relatedEntityType = $this->getEntityType(TestEnum1::class);
+        $relatedEntityType = $this->getEntityType(self::TEST_ENUM_1_CLASS);
 
         $response = $this->getSubresource([
             'entity'      => $entityType,
@@ -150,7 +151,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
             [
                 'data' => [
                     'type' => $relatedEntityType,
-                    'id'   => $relatedEntity->getId(),
+                    'id'   => $relatedEntity->getInternalId(),
                 ]
             ],
             $response

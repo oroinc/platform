@@ -19,7 +19,7 @@ class EnumSelectType extends AbstractEnumType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         parent::buildView($view, $form, $options);
 
@@ -30,20 +30,20 @@ class EnumSelectType extends AbstractEnumType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
         $defaultConfigs = [
-            'allowClear'  => true,
+            'allowClear' => true,
             'placeholder' => 'oro.form.choose_value'
         ];
 
         $resolver->setDefaults(
             [
                 'placeholder' => null,
-                'empty_data'  => static fn (Options $options) => $options['multiple'] ? [] : null,
-                'configs'     => $defaultConfigs,
+                'empty_data' => static fn (Options $options) => $options['multiple'] ? [] : null,
+                'configs' => $defaultConfigs,
                 'disabled_values' => [],
                 'excluded_values' => [],
                 'choice_translation_domain' => false, // Enums should use the Gedmo for translations
@@ -79,10 +79,7 @@ class EnumSelectType extends AbstractEnumType
         return Select2TranslatableEntityType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->getBlockPrefix();
     }
@@ -96,7 +93,7 @@ class EnumSelectType extends AbstractEnumType
     }
 
     /**
-     * @param FormView       $view
+     * @param FormView $view
      * @param array|callable $disabledChoices
      */
     protected function disableChoices(FormView $view, $disabledChoices)
@@ -105,7 +102,7 @@ class EnumSelectType extends AbstractEnumType
             return;
         }
 
-        $choices         = $view->vars['choices'];
+        $choices = $view->vars['choices'];
         array_walk(
             $choices,
             function (ChoiceView $choiceView) use ($disabledChoices) {
@@ -122,11 +119,7 @@ class EnumSelectType extends AbstractEnumType
         );
     }
 
-    /**
-     * @param FormView       $view
-     * @param array|callable $excludedChoices
-     */
-    protected function excludeChoices(FormView $view, $excludedChoices)
+    protected function excludeChoices(FormView $view, array|callable $excludedChoices): void
     {
         if (empty($excludedChoices)) {
             return;
@@ -136,9 +129,9 @@ class EnumSelectType extends AbstractEnumType
             $view->vars['choices'],
             function (ChoiceView $choiceView) use ($excludedChoices) {
                 if (is_array($excludedChoices)) {
-                    return !in_array($choiceView->value, $excludedChoices);
+                    return !in_array($choiceView->data->getInternalId(), $excludedChoices);
                 } elseif (is_callable($excludedChoices)) {
-                    return $excludedChoices($choiceView->value);
+                    return $excludedChoices($choiceView->data->getInternalId());
                 }
             }
         );

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 
 /**
  * Provides a text representation of enum entities.
@@ -15,7 +15,7 @@ class EnumEntityNameProvider implements EntityNameProviderInterface
      */
     public function getName($format, $locale, $entity)
     {
-        if (!$entity instanceof AbstractEnumValue) {
+        if (!$entity instanceof EnumOptionInterface) {
             return false;
         }
 
@@ -27,7 +27,7 @@ class EnumEntityNameProvider implements EntityNameProviderInterface
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {
-        if (!is_a($className, AbstractEnumValue::class, true)) {
+        if (!is_a($className, EnumOptionInterface::class, true)) {
             return false;
         }
 

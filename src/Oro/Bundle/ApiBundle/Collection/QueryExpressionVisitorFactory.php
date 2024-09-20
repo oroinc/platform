@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionInterface;
+use Oro\Bundle\ApiBundle\Util\FieldDqlExpressionProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
@@ -15,20 +16,24 @@ class QueryExpressionVisitorFactory
     private array $compositeExpressions;
     /** @var ComparisonExpressionInterface[] */
     private array $comparisonExpressions;
+    private FieldDqlExpressionProviderInterface $fieldDqlExpressionProvider;
     private EntityClassResolver $entityClassResolver;
 
     /**
-     * @param CompositeExpressionInterface[]  $compositeExpressions  [type => expression, ...]
-     * @param ComparisonExpressionInterface[] $comparisonExpressions [operator => expression, ...]
-     * @param EntityClassResolver             $entityClassResolver
+     * @param CompositeExpressionInterface[]      $compositeExpressions  [type => expression, ...]
+     * @param ComparisonExpressionInterface[]     $comparisonExpressions [operator => expression, ...]
+     * @param FieldDqlExpressionProviderInterface $fieldDqlExpressionProvider
+     * @param EntityClassResolver                 $entityClassResolver
      */
     public function __construct(
         array $compositeExpressions,
         array $comparisonExpressions,
+        FieldDqlExpressionProviderInterface $fieldDqlExpressionProvider,
         EntityClassResolver $entityClassResolver
     ) {
         $this->compositeExpressions = $compositeExpressions;
         $this->comparisonExpressions = $comparisonExpressions;
+        $this->fieldDqlExpressionProvider = $fieldDqlExpressionProvider;
         $this->entityClassResolver = $entityClassResolver;
     }
 
@@ -40,6 +45,7 @@ class QueryExpressionVisitorFactory
         return new QueryExpressionVisitor(
             $this->compositeExpressions,
             $this->comparisonExpressions,
+            $this->fieldDqlExpressionProvider,
             $this->entityClassResolver
         );
     }

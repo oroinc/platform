@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 
 class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
     /** @var CompleteObjectDefinitionHelper */
@@ -35,6 +35,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
@@ -63,6 +64,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
@@ -114,6 +116,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
@@ -147,6 +150,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
@@ -200,6 +204,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
@@ -253,6 +258,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
@@ -321,6 +327,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
@@ -353,6 +360,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
@@ -366,6 +374,55 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'renamedId' => [
                         'property_path' => 'name'
                     ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForEnumEntity()
+    {
+        $config = $this->createConfigObject([
+            'hints' => [
+                'HINT_TRANSLATABLE'
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName('Extend\Entity\EV_Test_Enum');
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->completeObjectDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'hints' => [
+                    'HINT_TRANSLATABLE',
+                    ['name' => 'HINT_ENUM_OPTION', 'value' => 'test_enum']
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForEnumEntityWhenHintAlreadySet()
+    {
+        $config = $this->createConfigObject([
+            'hints' => [
+                ['name' => 'HINT_ENUM_OPTION', 'value' => 'another_enum']
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName('Extend\Entity\EV_Test_Enum');
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->completeObjectDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'hints' => [
+                    ['name' => 'HINT_ENUM_OPTION', 'value' => 'another_enum']
                 ]
             ],
             $config

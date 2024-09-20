@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Adds extended entity fields to datagrids.
@@ -97,8 +98,10 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
     protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions): void
     {
         parent::prepareColumnOptions($field, $columnOptions);
-
-        if ($this->getFieldConfig('datagrid', $field)->is('show_filter')) {
+        if ($this->getFieldConfig('datagrid', $field)->is('show_filter')
+            || (ExtendHelper::isEnumerableType($field->getFieldType())
+                && $this->getFieldConfig('datagrid', $field)->is('is_visible'))
+        ) {
             $columnOptions[DatagridGuesser::FILTER]['renderable'] = true;
         }
     }

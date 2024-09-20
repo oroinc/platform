@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExistsComparisonExpression;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class ExistsComparisonExpressionTest extends \PHPUnit\Framework\TestCase
@@ -14,6 +15,7 @@ class ExistsComparisonExpressionTest extends \PHPUnit\Framework\TestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
         $field = 'e.test';
@@ -39,6 +41,7 @@ class ExistsComparisonExpressionTest extends \PHPUnit\Framework\TestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
         $field = 'e.test';

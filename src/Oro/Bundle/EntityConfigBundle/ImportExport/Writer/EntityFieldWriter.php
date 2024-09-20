@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Writer;
 
 use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -10,8 +11,10 @@ use Oro\Bundle\EntityConfigBundle\Event\AfterWriteFieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\EntityFieldStateChecker;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -20,32 +23,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EntityFieldWriter implements ItemWriterInterface
 {
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var ConfigTranslationHelper */
-    protected $translationHelper;
-
-    /** @var EnumSynchronizer */
-    protected $enumSynchronizer;
-
-    /** @var EntityFieldStateChecker */
-    private $stateChecker;
-
-    private EventDispatcherInterface $eventDispatcher;
-
     public function __construct(
-        ConfigManager $configManager,
-        ConfigTranslationHelper $translationHelper,
-        EnumSynchronizer $enumSynchronizer,
-        EntityFieldStateChecker $entityFieldStateChecker,
-        EventDispatcherInterface $eventDispatcher
+        protected ConfigManager $configManager,
+        protected ConfigTranslationHelper $translationHelper,
+        protected EnumSynchronizer $enumSynchronizer,
+        protected EntityFieldStateChecker $stateChecker,
+        private EventDispatcherInterface $eventDispatcher,
+        private ConfigHelper $configHelper
     ) {
-        $this->configManager = $configManager;
-        $this->translationHelper = $translationHelper;
-        $this->enumSynchronizer = $enumSynchronizer;
-        $this->stateChecker = $entityFieldStateChecker;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -75,7 +60,9 @@ class EntityFieldWriter implements ItemWriterInterface
 
         if (!$this->configManager->hasConfig($className, $fieldName)) {
             $this->configManager->createConfigFieldModel($className, $fieldName, $configModel->getType());
-            $state = ExtendScope::STATE_NEW;
+            $state = ExtendHelper::isEnumerableType($configModel->getType())
+                ? ExtendScope::STATE_ACTIVE
+                : ExtendScope::STATE_NEW;
         }
 
         if ($state === ExtendScope::STATE_ACTIVE && $this->stateChecker->isSchemaUpdateNeeded($configModel)) {
@@ -99,8 +86,8 @@ class EntityFieldWriter implements ItemWriterInterface
 
         $this->setExtendData($configModel, $state);
 
-        if ($state !== ExtendScope::STATE_NEW && in_array($configModel->getType(), ['enum', 'multiEnum'], true)) {
-            $this->setEnumData($configModel->toArray('enum'), $className, $fieldName);
+        if ($state !== ExtendScope::STATE_NEW && ExtendHelper::isEnumerableType($configModel->getType())) {
+            $this->setEnumData($configModel, $className, $fieldName);
         }
 
         $this->eventDispatcher->dispatch(
@@ -137,10 +124,10 @@ class EntityFieldWriter implements ItemWriterInterface
         foreach ($data as $code => $value) {
             if (in_array($code, $translatable, true)) {
                 // check if a label text was changed
-                $labelKey = (string) $config->get($code);
+                $labelKey = (string)$config->get($code);
 
                 if ($state === ExtendScope::STATE_NEW ||
-                    !$this->translationHelper->isTranslationEqual($labelKey, (string) $value)
+                    !$this->translationHelper->isTranslationEqual($labelKey, (string)$value)
                 ) {
                     $translations[$labelKey] = $value;
                 }
@@ -154,30 +141,31 @@ class EntityFieldWriter implements ItemWriterInterface
         return $translations;
     }
 
-    /**
-     * @param array $data
-     * @param string $className
-     * @param string $fieldName
-     */
-    protected function setEnumData(array $data, $className, $fieldName)
+    protected function setEnumData(FieldConfigModel $extendFieldConfig, string $className, string $fieldName): void
     {
         $provider = $this->configManager->getProvider('enum');
         if (!$provider) {
             return;
         }
-
-        $enumCode = $provider->getConfig($className, $fieldName)->get('enum_code');
-
-        if (!$enumCode || !isset($data['enum_options'])) {
-            return;
+        $enumConfig = $extendFieldConfig->toArray('enum');
+        if (empty($enumConfig['enum_code'])) {
+            $enumConfig['enum_code'] = ExtendHelper::generateEnumCode(
+                $className,
+                $fieldName,
+                ExtendDbIdentifierNameGenerator::MAX_ENUM_CODE_SIZE
+            );
         }
-
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-
-        if ($provider->hasConfig($enumValueClassName)) {
+        $enumConfig['enum_name'] = ExtendHelper::getEnumTranslationKey('label', $enumConfig['enum_code']);
+        $enumConfig['enum_public'] = $enumConfig['enum_public'] ?? false;
+        $this->configHelper->updateFieldConfigs(
+            $extendFieldConfig,
+            ['enum' => array_merge($extendFieldConfig->toArray('enum'), $enumConfig)]
+        );
+        if ($provider->hasConfig(EnumOption::class)) {
             $this->enumSynchronizer->applyEnumOptions(
-                $enumValueClassName,
-                $this->getUniqueOptions($data['enum_options']),
+                $enumConfig['enum_code'],
+                EnumOption::class,
+                $this->getUniqueOptions($enumConfig['enum_options']),
                 $this->translationHelper->getLocale()
             );
         }
@@ -199,7 +187,7 @@ class EntityFieldWriter implements ItemWriterInterface
         $config = $provider->getConfig($className, $fieldName);
         $data = [
             'owner' => ExtendScope::OWNER_CUSTOM,
-            'state' =>  $config->is('state', ExtendScope::STATE_NEW) ? ExtendScope::STATE_NEW : $state,
+            'state' => $config->is('state', ExtendScope::STATE_NEW) ? ExtendScope::STATE_NEW : $state,
             'is_extend' => true,
             'is_deleted' => false,
             'is_serialized' => $config->get('is_serialized', false, false)

@@ -33,7 +33,11 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
         $this->assertSame(
             $string,
             $this->getAttributeType()
-                ->getSearchableValue($this->attribute, new TestEnumValue('id', $string), $this->localization)
+                ->getSearchableValue(
+                    $this->attribute,
+                    new TestEnumValue('test_enum_code', $string, $string, 1),
+                    $this->localization
+                )
         );
     }
 
@@ -44,7 +48,11 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
         $this->assertSame(
             $string,
             $this->getAttributeType()
-                ->getFilterableValue($this->attribute, new TestEnumValue('id', $string), $this->localization)
+                ->getFilterableValue(
+                    $this->attribute,
+                    new TestEnumValue('test_enum_code', $string, $string, 1),
+                    $this->localization
+                )
         );
     }
 

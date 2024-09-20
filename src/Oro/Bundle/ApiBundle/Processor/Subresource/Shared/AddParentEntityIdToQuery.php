@@ -62,7 +62,17 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             return;
         }
 
-        if (ConfigUtil::IGNORE_PROPERTY_PATH !== $associationName) {
+        if (ConfigUtil::IGNORE_PROPERTY_PATH === $associationName
+            || $this->isEnumerableType($context->getParentConfig(), $associationName)
+        ) {
+            $this->entityIdHelper->applyEntityIdentifierRestriction(
+                $query,
+                $context->getParentId(),
+                $context->getParentMetadata(),
+                'e',
+                self::PARENT_ENTITY_ID_QUERY_PARAM_NAME
+            );
+        } else {
             $parentJoinAlias = $this->joinParentEntity(
                 $query,
                 $rootAlias,
@@ -76,14 +86,6 @@ class AddParentEntityIdToQuery implements ProcessorInterface
                 $context->getParentId(),
                 $context->getParentMetadata(),
                 $parentJoinAlias,
-                self::PARENT_ENTITY_ID_QUERY_PARAM_NAME
-            );
-        } else {
-            $this->entityIdHelper->applyEntityIdentifierRestriction(
-                $query,
-                $context->getParentId(),
-                $context->getParentMetadata(),
-                'e',
                 self::PARENT_ENTITY_ID_QUERY_PARAM_NAME
             );
         }
@@ -161,39 +163,30 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         if ($joinFieldName) {
             // bidirectional association
             $query->innerJoin('e.' . $joinFieldName, $joinAlias);
+        } elseif ($isCollection) {
+            // unidirectional "to-many" association
+            $query->innerJoin(
+                $parentClassName,
+                $joinAlias,
+                Join::WITH,
+                QueryBuilderUtil::sprintf('%s MEMBER OF %s.%s', $parentJoinAlias, $joinAlias, $associationName)
+            );
         } else {
-            if (!$parentJoinAlias) {
-                $parentJoinAlias = QueryBuilderUtil::getSingleRootAlias($query);
-            }
-            if ($isCollection) {
-                // unidirectional "to-many" association
-                $query->innerJoin(
-                    $parentClassName,
-                    $joinAlias,
-                    Join::WITH,
-                    QueryBuilderUtil::sprintf('%s MEMBER OF %s.%s', $parentJoinAlias, $joinAlias, $associationName)
-                );
-            } else {
-                // unidirectional "to-one" association
-                $query->innerJoin(
-                    $parentClassName,
-                    $joinAlias,
-                    Join::WITH,
-                    QueryBuilderUtil::sprintf('%s.%s = %s', $joinAlias, $associationName, $parentJoinAlias)
-                );
-            }
+            // unidirectional "to-one" association
+            $query->innerJoin(
+                $parentClassName,
+                $joinAlias,
+                Join::WITH,
+                QueryBuilderUtil::sprintf('%s.%s = %s', $joinAlias, $associationName, $parentJoinAlias)
+            );
         }
     }
 
     private function getAssociationName(SubresourceContext $context): ?string
     {
         $associationName = $context->getAssociationName();
-        $associationField = $context->getParentConfig()->getField($associationName);
-        if (null === $associationField) {
-            return null;
-        }
 
-        return $associationField->getPropertyPath($associationName);
+        return $context->getParentConfig()?->getField($associationName)?->getPropertyPath($associationName);
     }
 
     private function getJoinFieldName(string $parentClassName, string $associationName): ?string
@@ -208,5 +201,21 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         return $associationMapping['isOwningSide']
             ? $associationMapping['inversedBy']
             : $associationMapping['mappedBy'];
+    }
+
+    private function isEnumerableType(EntityDefinitionConfig $parentConfig, string $associationName): bool
+    {
+        $associationTargetConfig = $parentConfig->getField($associationName)?->getTargetEntity();
+        if (null === $associationTargetConfig) {
+            return false;
+        }
+        $hints = $associationTargetConfig->getHints();
+        foreach ($hints as $hint) {
+            if (\is_array($hint) && 'HINT_ENUM_OPTION' === $hint['name']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

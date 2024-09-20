@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\Entity\Manager\Field\CustomGridFieldValidatorInterfa
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldValidator;
 use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
@@ -36,8 +37,9 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $doctrine->expects(self::once())
             ->method('getManager')
             ->willReturn($objectManager);
+        $fieldHalper = $this->createMock(FieldHelper::class);
 
-        $this->validator = new EntityFieldValidator($doctrine, $this->translation);
+        $this->validator = new EntityFieldValidator($doctrine, $this->translation, $fieldHalper);
     }
 
     public function testPositiveValidate()

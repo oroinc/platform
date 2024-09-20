@@ -10,7 +10,9 @@ use Gedmo\Translatable\Translatable;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 
@@ -62,12 +64,14 @@ class DictionaryEntityDataProvider
         $entityClass = $this->resolveEntityClass($entityName);
         $qb = $this->getQueryBuilder($entityClass);
         $em = $qb->getEntityManager();
-        $metadata = $em->getClassMetadata($entityClass);
+        $metadata = $this->getClassMetadata($em, $entityClass);
         if ($searchQuery) {
             $searchFields = $this->getSearchFields($metadata);
+            $expressions = [];
             foreach ($searchFields as $searchField) {
-                $qb->orWhere('LOWER(e.' . $searchField . ') LIKE LOWER(:search_value)');
+                $expressions[] = 'LOWER(e.' . $searchField . ') LIKE LOWER(:search_value)';
             }
+            $qb->andWhere(\count($expressions) > 1 ? $qb->expr()->orX(...$expressions) : $expressions[0]);
             $qb->setParameter('search_value', '%' . $searchQuery . '%');
         }
 
@@ -78,9 +82,9 @@ class DictionaryEntityDataProvider
     {
         $entityClass = $this->resolveEntityClass($entityName);
         $qb = $this->getQueryBuilder($entityClass);
-        $metadata = $qb->getEntityManager()->getClassMetadata($entityClass);
+        $metadata = $this->getClassMetadata($qb->getEntityManager(), $entityClass);
         $qb->andWhere('e.' . $this->getEntityIdentifierFieldName($metadata) . ' in (:ids)');
-        $qb->setParameter('ids', $ids);
+        $qb->setParameter('ids', $this->prepareIds($ids, $entityClass));
 
         return $this->loadValues($qb, $metadata);
     }
@@ -114,6 +118,15 @@ class DictionaryEntityDataProvider
         throw new \LogicException(sprintf('Cannot get a query builder for the "%s" entity.', $entityClass));
     }
 
+    private function getClassMetadata(EntityManagerInterface $em, string $entityClass): ClassMetadata
+    {
+        if (ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {
+            $entityClass = EnumOption::class;
+        }
+
+        return $em->getClassMetadata($entityClass);
+    }
+
     private function loadValues(QueryBuilder $qb, ClassMetadata $metadata): array
     {
         $query = $this->aclHelper->apply($qb);
@@ -142,7 +155,7 @@ class DictionaryEntityDataProvider
             return $this->additionalDictionaries[$className];
         }
 
-        if (is_a($className, AbstractEnumValue::class, true)) {
+        if (is_a($className, EnumOptionInterface::class, true)) {
             return [self::SEARCH_FIELD_FOR_ENUM];
         }
 
@@ -162,6 +175,23 @@ class DictionaryEntityDataProvider
             'Search fields are not configured for the "%s" entity.',
             $metadata->getName()
         ));
+    }
+
+    private function prepareIds(array $ids, string $entityClass): array
+    {
+        if (ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {
+            $enumOptionIds = [];
+            $enumCode = ExtendHelper::getEnumCode($entityClass);
+            foreach ($ids as $id) {
+                $enumOptionIds[] = ExtendHelper::isInternalEnumId($id)
+                    ? ExtendHelper::buildEnumOptionId($enumCode, $id)
+                    : $id;
+            }
+
+            return $enumOptionIds;
+        }
+
+        return $ids;
     }
 
     private function getEntityIdentifierFieldName(ClassMetadata $metadata): string

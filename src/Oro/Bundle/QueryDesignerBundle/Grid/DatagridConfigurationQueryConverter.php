@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
@@ -32,7 +33,8 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         VirtualRelationProviderInterface $virtualRelationProvider,
         DoctrineHelper $doctrineHelper,
         DatagridGuesser $datagridGuesser,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        protected EnumTypeHelper $enumTypeHelper
     ) {
         parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrineHelper);
         $this->datagridGuesser = $datagridGuesser;
@@ -132,9 +134,10 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             );
         }
 
-        $fieldType = $functionReturnType;
-        if (null === $fieldType) {
-            $fieldType = $this->getFieldType($entityClass, $fieldName);
+        $fieldType = $functionReturnType ?? $this->getFieldType($entityClass, $fieldName);
+
+        if ($this->enumTypeHelper->getEnumCode($entityClass, $fieldName) !== null) {
+            $fieldType = $this->enumTypeHelper->getEnumFieldType($entityClass, $fieldName);
         }
 
         if (!$functionExpr && 'dictionary' === $fieldType) {

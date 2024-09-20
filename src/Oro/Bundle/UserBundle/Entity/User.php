@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -35,8 +35,8 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  *
- * @method setAuthStatus(AbstractEnumValue $enum)
- * @method AbstractEnumValue getAuthStatus()
+ * @method setAuthStatus(EnumOptionInterface $enum)
+ * @method EnumOptionInterface getAuthStatus()
  * @mixin OroUserBundle_Entity_User
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]

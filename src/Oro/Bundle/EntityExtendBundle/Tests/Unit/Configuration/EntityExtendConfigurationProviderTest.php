@@ -31,12 +31,9 @@ class EntityExtendConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 $bundle1->getName() => get_class($bundle1),
                 $bundle2->getName() => get_class($bundle2)
             ]);
-
+        // No more enum UnderlyingTypes
         $this->assertEquals(
-            [
-                'enum'      => 'manyToOne',
-                'multiEnum' => 'manyToMany'
-            ],
+            [],
             $this->configurationProvider->getUnderlyingTypes()
         );
     }

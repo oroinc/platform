@@ -154,6 +154,14 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function inInv($x, $y, $withParam = false)
+    {
+        return $this->expr->in($this->prepareParameter($x, $withParam, false), $this->prepareParameter($y));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function notIn($x, $y, $withParam = false)
     {
         return $this->expr->notIn($this->prepareParameter($x), $this->prepareParameter($y, $withParam, false));

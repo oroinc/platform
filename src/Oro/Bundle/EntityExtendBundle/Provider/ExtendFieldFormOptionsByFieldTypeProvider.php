@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Returns basic form options specific for field type.
@@ -59,13 +60,15 @@ class ExtendFieldFormOptionsByFieldTypeProvider implements ExtendFieldFormOption
                 $options['grouping'] = true;
                 break;
             case 'enum':
-                $options['enum_code'] = $this->entityConfigManager->getFieldConfig('enum', $className, $fieldName)
-                    ->get('enum_code');
+                $fieldConfigEnum = $this->entityConfigManager->getFieldConfig('enum', $className, $fieldName);
+                $options['enum_code'] = $fieldConfigEnum->get('enum_code');
+                $options['multiple'] = ExtendHelper::isMultiEnumType($fieldConfigEnum->getId()->getFieldType());
                 break;
             case 'multiEnum':
                 $options['expanded'] = true;
-                $options['enum_code'] = $this->entityConfigManager->getFieldConfig('enum', $className, $fieldName)
-                    ->get('enum_code');
+                $multiEnumConfig = $this->entityConfigManager->getFieldConfig('enum', $className, $fieldName);
+                $options['enum_code'] = $multiEnumConfig->get('enum_code');
+                $options['multiple'] = ExtendHelper::isMultiEnumType($multiEnumConfig->getId()->getFieldType());
                 break;
             case RelationType::MANY_TO_ONE:
                 $options = $this->getDefaultOptionsForToOne($className, $fieldName);

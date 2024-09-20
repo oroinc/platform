@@ -29,7 +29,7 @@ class EntityIdAccessor
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function getEntityId(mixed $entity, EntityMetadata $metadata, RequestType $requestType): string
+    public function getEntityId(mixed $entity, EntityMetadata $metadata, RequestType $requestType): mixed
     {
         $idFieldNames = $metadata->getIdentifierFieldNames();
         $idFieldNamesCount = \count($idFieldNames);
