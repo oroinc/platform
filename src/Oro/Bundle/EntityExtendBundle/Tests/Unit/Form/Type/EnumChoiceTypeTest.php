@@ -95,18 +95,6 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         ]);
     }
 
-    public function testClassNormalizerUnexpectedEnumException(): void
-    {
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"');
-
-        $resolver = $this->getOptionsResolver();
-        $this->type->configureOptions($resolver);
-        $resolver->resolve([
-            'enum_code' => 'unknown',
-        ]);
-    }
-
     public function configureOptionsProvider(): array
     {
         return [

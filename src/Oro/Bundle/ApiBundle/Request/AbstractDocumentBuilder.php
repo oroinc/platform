@@ -94,7 +94,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntityId(mixed $entity, RequestType $requestType, EntityMetadata $metadata): string
+    public function getEntityId(mixed $entity, RequestType $requestType, EntityMetadata $metadata): mixed
     {
         return $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }

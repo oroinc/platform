@@ -3,20 +3,19 @@
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
- * Class TextGuesser
+ * TextGuesser class
  * @package Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions
  */
 class TextGuesser implements GuesserInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(
+        protected DoctrineHelper $doctrineHelper,
+        private FieldHelper $fieldHelper,
+    ) {
     }
 
     /**
@@ -28,10 +27,18 @@ class TextGuesser implements GuesserInterface
         $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
-        if ($isEnabledInline && $metadata->hasField($columnName) && !$metadata->hasAssociation($columnName)) {
+        if ($isEnabledInline
+            && $this->hasField($metadata, $entityName, $columnName)
+            && !$metadata->hasAssociation($columnName)) {
             $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
         }
 
         return $result;
+    }
+
+    private function hasField($metadata, $entityName, $columnName)
+    {
+        return $metadata->hasField($columnName)
+            || $this->fieldHelper->getFieldConfig('enum', $entityName, $columnName);
     }
 }

@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
@@ -38,7 +39,8 @@ class DatagridConfigurationBuilder
         VirtualRelationProviderInterface $virtualRelationProvider,
         DoctrineHelper $doctrineHelper,
         DatagridGuesser $datagridGuesser,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        EnumTypeHelper $enumTypeHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
 
@@ -48,7 +50,8 @@ class DatagridConfigurationBuilder
             $virtualRelationProvider,
             $doctrineHelper,
             $datagridGuesser,
-            $entityNameResolver
+            $entityNameResolver,
+            $enumTypeHelper,
         );
     }
 

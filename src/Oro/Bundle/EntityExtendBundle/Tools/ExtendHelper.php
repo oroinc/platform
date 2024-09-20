@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -12,22 +13,20 @@ use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 /**
  * Provides utility static methods to work with extended entities.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ExtendHelper
 {
-    const ENTITY_NAMESPACE = 'Extend\\Entity\\';
+    public const ENTITY_NAMESPACE = 'Extend\\Entity\\';
+    public const ENUM_CLASS_NAME_PREFIX = self::ENTITY_NAMESPACE . 'EV_';
+    public const ENUM_TRANSLATION_PREFIX = 'oro.entity_extend.enum_option.';
+    public const MAX_ENUM_ID_LENGTH = 100;
+    public const MAX_ENUM_INTERNAL_ID_LENGTH = 32;
+    public const MAX_ENUM_SNAPSHOT_LENGTH = 500;
+    public const ENUM_OPTION_SEPARATOR = '.';
+    public const ENUM_SNAPSHOT_SUFFIX = 'Snapshot'; // Outdated enum snapshot suffix
 
-    const MAX_ENUM_VALUE_ID_LENGTH = 32;
-    const MAX_ENUM_SNAPSHOT_LENGTH = 500;
-    const BASE_ENUM_VALUE_CLASS    = 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue';
-    const ENUM_SNAPSHOT_SUFFIX     = 'Snapshot';
-
-    /**
-     * @param string $type
-     *
-     * @return string
-     */
-    public static function getReverseRelationType($type)
+    public static function getReverseRelationType(string $type): string
     {
         switch ($type) {
             case RelationType::ONE_TO_MANY:
@@ -49,7 +48,7 @@ class ExtendHelper
      *
      * @return string
      */
-    public static function buildToManyRelationTargetFieldName($entityClassName, $fieldName)
+    public static function buildToManyRelationTargetFieldName(string $entityClassName, string $fieldName): string
     {
         return strtolower(self::getShortClassName($entityClassName)) . '_' . $fieldName;
     }
@@ -87,16 +86,13 @@ class ExtendHelper
     /**
      * Returns a relation key used for extended relations.
      * The result string is "relationType|entityClassName|targetEntityClassName|fieldName".
-     *
-     * @param string $entityClassName
-     * @param string $fieldName
-     * @param string $relationType
-     * @param string $targetEntityClassName
-     *
-     * @return string
      */
-    public static function buildRelationKey($entityClassName, $fieldName, $relationType, $targetEntityClassName)
-    {
+    public static function buildRelationKey(
+        string $entityClassName,
+        string $fieldName,
+        string $relationType,
+        string $targetEntityClassName
+    ): string {
         return implode('|', [$relationType, $entityClassName, $targetEntityClassName, $fieldName]);
     }
 
@@ -153,33 +149,76 @@ class ExtendHelper
 
     /**
      * Returns an enum identifier based on the given enum name.
-     *
-     * @param string $enumName
-     * @param bool   $throwExceptionIfInvalidName
-     *
-     * @return string The enum code. Can be empty string if $throwExceptionIfInvalidName = false
+     * The return value can be empty string if $throwExceptionIfInvalidName = false.
      *
      * @throws \InvalidArgumentException
      */
-    public static function buildEnumCode($enumName, $throwExceptionIfInvalidName = true)
+    public static function buildEnumCode(string $enumName, bool $throwExceptionIfInvalidName = true): string
     {
-        if (empty($enumName)) {
-            if (!$throwExceptionIfInvalidName) {
-                return '';
+        if ('' === $enumName) {
+            if ($throwExceptionIfInvalidName) {
+                throw new \InvalidArgumentException('The enum name must not be empty.');
             }
 
-            throw new \InvalidArgumentException('$enumName must not be empty.');
+            return '';
         }
 
         $result = self::convertEnumNameToCode($enumName);
-
-        if (empty($result) && $throwExceptionIfInvalidName) {
-            throw new \InvalidArgumentException(
-                sprintf('The conversion of "%s" to enum code produces empty string.', $enumName)
-            );
+        if ($throwExceptionIfInvalidName && '' === $result) {
+            throw new \InvalidArgumentException(sprintf(
+                'The conversion of "%s" to enum code produces empty string.',
+                $enumName
+            ));
         }
 
         return $result;
+    }
+
+    public static function isEnumerableType(string $type): bool
+    {
+        return self::isSingleEnumType($type) || self::isMultiEnumType($type);
+    }
+
+    public static function isSingleEnumType(string $type): bool
+    {
+        return $type === 'enum';
+    }
+
+    public static function isMultiEnumType(string $type): bool
+    {
+        return $type === 'multiEnum';
+    }
+
+    public static function buildEnumOptionTranslationKey(string $enumOptionId): string
+    {
+        return self::ENUM_TRANSLATION_PREFIX . $enumOptionId;
+    }
+
+    public static function getEnumOptionIdFromTranslationKey(string $translationKey): string
+    {
+        if (!str_contains($translationKey, self::ENUM_TRANSLATION_PREFIX)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Wrong translation key passed "%s" it should contains "%s" as part of itself.',
+                self::ENUM_TRANSLATION_PREFIX
+            ));
+        }
+
+        return str_replace(self::ENUM_TRANSLATION_PREFIX, '', $translationKey);
+    }
+
+    public static function buildEnumOptionId(string $enumCode, string $internalId): string
+    {
+        return $enumCode . self::ENUM_OPTION_SEPARATOR . $internalId;
+    }
+
+    public static function extractEnumCode(string $enumOptionId): string
+    {
+        $explodedParts = explode(self::ENUM_OPTION_SEPARATOR, $enumOptionId);
+        if (!is_array($explodedParts) && count($explodedParts) !== 2) {
+            throw new \LogicException('Input enum options id is broken or has invalid format');
+        }
+
+        return reset($explodedParts);
     }
 
     /**
@@ -187,20 +226,17 @@ class ExtendHelper
      * This method can be used if there is no enum name and as result
      * {@link buildEnumCode()} method cannot be used.
      *
-     * @param string $entityClassName
-     * @param string $fieldName
-     * @param string $maxEnumCodeSize
-     *
-     * @return string The enum code.
-     *
      * @throws \InvalidArgumentException
      */
-    public static function generateEnumCode($entityClassName, $fieldName, $maxEnumCodeSize = null)
-    {
-        if (empty($entityClassName)) {
+    public static function generateEnumCode(
+        string $entityClassName,
+        string $fieldName,
+        int $maxEnumCodeSize = null
+    ): string {
+        if ('' === $entityClassName) {
             throw new \InvalidArgumentException('$entityClassName must not be empty.');
         }
-        if (empty($fieldName)) {
+        if ('' === $fieldName) {
             throw new \InvalidArgumentException('$fieldName must not be empty.');
         }
         if (null !== $maxEnumCodeSize && $maxEnumCodeSize < 21) {
@@ -236,38 +272,50 @@ class ExtendHelper
 
     /**
      * Returns an enum value identifier based on the given value name.
-     *
-     * @param string $enumValueName
-     * @param bool   $throwExceptionIfInvalidName
-     *
-     * @return string The enum value identifier. Can be empty string if $throwExceptionIfInvalidName = false
+     * The return value can be empty string if $throwExceptionIfInvalidName = false.
      *
      * @throws \InvalidArgumentException
      */
-    public static function buildEnumValueId($enumValueName, $throwExceptionIfInvalidName = true)
+    public static function buildEnumInternalId(string $enumValueName, bool $throwExceptionIfInvalidName = true): string
     {
         if ($enumValueName === '') {
-            if (!$throwExceptionIfInvalidName) {
-                return '';
+            if ($throwExceptionIfInvalidName) {
+                throw new \InvalidArgumentException('The enum value name must not be empty.');
             }
 
-            throw new \InvalidArgumentException('$enumValueName must not be empty.');
+            return '';
         }
 
         $result = self::convertEnumNameToCode($enumValueName);
-
-        if (strlen($result) > self::MAX_ENUM_VALUE_ID_LENGTH) {
-            $hash   = dechex(crc32($result));
-            $result = substr($result, 0, self::MAX_ENUM_VALUE_ID_LENGTH - strlen($hash) - 1) . '_' . $hash;
+        if (strlen($result) > self::MAX_ENUM_INTERNAL_ID_LENGTH) {
+            $hash = dechex(crc32($result));
+            $result = substr($result, 0, self::MAX_ENUM_INTERNAL_ID_LENGTH - strlen($hash) - 1) . '_' . $hash;
         }
-
-        if ($throwExceptionIfInvalidName && strlen($result) === 0) {
-            throw new \InvalidArgumentException(
-                sprintf('The conversion of "%s" to enum value id produces empty string.', $enumValueName)
-            );
+        if ($throwExceptionIfInvalidName && '' === $result) {
+            throw new \InvalidArgumentException(sprintf(
+                'The conversion of "%s" to enum value id produces empty string.',
+                $enumValueName
+            ));
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $enumOptionId format: "enum_code.internal_id"
+     */
+    public static function getEnumInternalId(string $enumOptionId): string
+    {
+        if (self::isInternalEnumId($enumOptionId)) {
+            return $enumOptionId;
+        }
+
+        return substr($enumOptionId, strpos($enumOptionId, '.') + 1);
+    }
+
+    public static function isInternalEnumId(string $value): bool
+    {
+        return !str_contains($value, '.');
     }
 
     /**
@@ -317,21 +365,57 @@ class ExtendHelper
     }
 
     /**
-     * Returns full class name for an entity is used to store values of the given enum.
-     *
-     * @param string $enumCode
-     *
-     * @return string
-     *
-     * @throws \InvalidArgumentException
+     * Checks if the given string is a virtual class for an enum option entity.
      */
-    public static function buildEnumValueClassName($enumCode)
+    public static function isOutdatedEnumOptionEntity(string $className): bool
     {
-        if (empty($enumCode)) {
-            throw new \InvalidArgumentException('$enumCode must not be empty.');
+        return str_starts_with($className, self::ENUM_CLASS_NAME_PREFIX);
+    }
+
+    /**
+     * Gets a virtual class of an enum option entity for the given enum code.
+     */
+    public static function getOutdatedEnumOptionClassName(string $enumCode): string
+    {
+        return self::ENUM_CLASS_NAME_PREFIX
+            . str_replace(' ', '_', ucwords(str_replace('_', ' ', $enumCode)));
+    }
+
+    /**
+     * Gets an enum identifier for the given virtual class for an enum option entity.
+     */
+    public static function getEnumCode(string $enumOptionEntityClassName): string
+    {
+        return strtolower(substr($enumOptionEntityClassName, \strlen(self::ENUM_CLASS_NAME_PREFIX)));
+    }
+
+    public static function mapToEnumOptionIds(string $enumCode, array $enumInternalIds): array
+    {
+        return array_map(
+            fn ($internalId) => self::buildEnumOptionId($enumCode, $internalId),
+            $enumInternalIds
+        );
+    }
+
+    /**
+     * @param array $dataWithEnumKeys ['enum_internal_id' => 'mixed_value']
+     */
+    public static function mapKeysToEnumOptionIds(array $dataWithEnumKeys, string $enumCode): array
+    {
+        $mappedToOptionIdData = [];
+        foreach ($dataWithEnumKeys as $internalId => $value) {
+            $mappedToOptionIdData[ExtendHelper::buildEnumOptionId($enumCode, $internalId)] = $value;
         }
 
-        return self::ENTITY_NAMESPACE . 'EV_' . str_replace(' ', '_', ucwords(strtr($enumCode, '_-', '  ')));
+        return $mappedToOptionIdData;
+    }
+
+    public static function mapToEnumInternalIds(array $enumOptionIds): array
+    {
+        return array_map(
+            fn ($optionId) => self::getEnumInternalId($optionId),
+            $enumOptionIds
+        );
     }
 
     /**
@@ -347,23 +431,13 @@ class ExtendHelper
         return $fieldName . self::ENUM_SNAPSHOT_SUFFIX;
     }
 
-    /**
-     * Returns a translation key (placeholder) for entities responsible to store enum values
-     *
-     * @param string $propertyName property key: label, description, plural_label, etc.
-     * @param string $enumCode
-     * @param string $fieldName
-     *
-     * @return string
-     * @throws \InvalidArgumentException
-     */
-    public static function getEnumTranslationKey($propertyName, $enumCode, $fieldName = null)
-    {
-        if (empty($propertyName)) {
+    public static function getEnumTranslationKey(
+        string $propertyName,
+        string $enumCode = '',
+        ?string $fieldName = null
+    ): string {
+        if ('' === $propertyName) {
             throw new \InvalidArgumentException('$propertyName must not be empty');
-        }
-        if (empty($enumCode)) {
-            throw new \InvalidArgumentException('$enumCode must not be empty');
         }
 
         if (!$fieldName) {
@@ -382,24 +456,16 @@ class ExtendHelper
      * Checks if an entity is a custom one
      * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
      * created automatically in Symfony cache
-     *
-     * @param string $className
-     *
-     * @return bool
      */
-    public static function isCustomEntity($className)
+    public static function isCustomEntity(string $className): bool
     {
         return str_starts_with($className, self::ENTITY_NAMESPACE);
     }
 
     /**
      * Checks if the given class is a proxy for extend entity
-     *
-     * @param string $className
-     *
-     * @return bool
      */
-    public static function isExtendEntityProxy($className)
+    public static function isExtendEntityProxy(string $className): bool
     {
         return str_starts_with($className, self::ENTITY_NAMESPACE);
     }
@@ -418,6 +484,23 @@ class ExtendHelper
         return false === $lastDelimiter
             ? $className
             : substr($className, $lastDelimiter + 1);
+    }
+
+    /**
+     * Gets a parent class for the given class.
+     */
+    public static function getParentClassName(string $className): ?string
+    {
+        if (self::isOutdatedEnumOptionEntity($className)) {
+            return EnumOption::class;
+        }
+
+        $parentClass = (new \ReflectionClass($className))->getParentClass();
+        if (!$parentClass) {
+            return null;
+        }
+
+        return $parentClass->getName();
     }
 
     /**
@@ -477,23 +560,6 @@ class ExtendHelper
         }
 
         return true;
-    }
-
-    /**
-     * Check if the given configurable entity is used to store enum values and ready to be used in a business logic.
-     * It means that a entity class should be extended from AbstractEnumValue,
-     * should exist and should not be marked as deleted.
-     *
-     * @param ConfigInterface $extendConfig The entity's configuration in the 'extend' scope
-     *
-     * @return bool
-     */
-    public static function isEnumValueEntityAccessible(ConfigInterface $extendConfig)
-    {
-        return
-            $extendConfig->is('is_extend')
-            && $extendConfig->is('inherit', self::BASE_ENUM_VALUE_CLASS)
-            && self::isEntityAccessible($extendConfig);
     }
 
     /**

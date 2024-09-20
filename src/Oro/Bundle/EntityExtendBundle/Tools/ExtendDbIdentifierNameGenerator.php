@@ -9,14 +9,14 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
  */
 class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
 {
-    const CUSTOM_TABLE_PREFIX              = 'oro_ext_';
-    const CUSTOM_TABLE_PRIMARY_KEY_COLUMN  = 'id';
-    const ENUM_TABLE_PREFIX                = 'oro_enum_';
-    const CUSTOM_MANY_TO_MANY_TABLE_PREFIX = 'oro_rel_';
-    const CUSTOM_INDEX_PREFIX              = 'oro_idx_';
-    const RELATION_COLUMN_SUFFIX           = '_id';
-    const SNAPSHOT_COLUMN_SUFFIX           = '_ss';
-    const RELATION_DEFAULT_COLUMN_PREFIX   = ExtendConfigDumper::DEFAULT_PREFIX;
+    public const CUSTOM_TABLE_PREFIX = 'oro_ext_';
+    public const CUSTOM_TABLE_PRIMARY_KEY_COLUMN = 'id';
+    public const CUSTOM_MANY_TO_MANY_TABLE_PREFIX = 'oro_rel_';
+    public const CUSTOM_INDEX_PREFIX = 'oro_idx_';
+    public const RELATION_COLUMN_SUFFIX = '_id';
+    public const SNAPSHOT_COLUMN_SUFFIX = '_ss';
+    public const RELATION_DEFAULT_COLUMN_PREFIX = ExtendConfigDumper::DEFAULT_PREFIX;
+    public const MAX_ENUM_CODE_SIZE = 64;
 
     /**
      * Gets the max size of an custom entity name
@@ -32,12 +32,10 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
 
     /**
      * Gets the max size of an enum code
-     *
-     * @return int
      */
-    public function getMaxEnumCodeSize()
+    public function getMaxEnumCodeSize(): int
     {
-        return $this->getMaxIdentifierSize() - strlen(self::ENUM_TABLE_PREFIX);
+        return self::MAX_ENUM_CODE_SIZE;
     }
 
     /**
@@ -200,63 +198,6 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
             strtolower(ExtendHelper::getShortClassName($entityClassName)),
             $suffix
         );
-    }
-
-    /**
-     * Builds a table name for an enum entity
-     *
-     * @param string $enumCode
-     * @param bool   $allowHash If TRUE and $enumCode exceeds a limit for an enum code
-     *                          a table name is generated based on a hash
-     *                          If FALSE an exception will be raised
-     *
-     * @return string
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function generateEnumTableName($enumCode, $allowHash = false)
-    {
-        if (strlen($enumCode) > $this->getMaxEnumCodeSize()) {
-            if (!$allowHash) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'The enum code length must be less or equal %d characters. Code: %s.',
-                        $this->getMaxEnumCodeSize(),
-                        $enumCode
-                    )
-                );
-            }
-
-            $hash = dechex(crc32($enumCode));
-
-            // try to build "good looking" name if it is possible
-            $lastPos  = strrpos($enumCode, '_');
-            $lastPart = $lastPos !== false ? substr($enumCode, $lastPos + 1) : null;
-            if ($lastPart) {
-                if (strlen($lastPart) === strlen($hash)) {
-                    // suppose that the last part is a hash
-                    return self::ENUM_TABLE_PREFIX . $hash . '_' . $lastPart;
-                }
-                if (strlen($lastPart) <= $this->getMaxEnumCodeSize() - strlen($hash) - 1) {
-                    $lastPos = strrpos($enumCode, '_', -(strlen($enumCode) - $lastPos + 1));
-                    if ($lastPos !== false) {
-                        $longerLastPart = substr($enumCode, $lastPos + 1);
-                        if (strlen($longerLastPart) <= $this->getMaxEnumCodeSize() - strlen($hash) - 1) {
-                            return self::ENUM_TABLE_PREFIX . $hash . '_' . $longerLastPart;
-                        }
-                    }
-
-                    return self::ENUM_TABLE_PREFIX . $hash . '_' . $lastPart;
-                }
-            }
-
-            return
-                self::ENUM_TABLE_PREFIX
-                . $hash . '_'
-                . substr($enumCode, -($this->getMaxEnumCodeSize() - strlen($hash) - 1));
-        }
-
-        return self::ENUM_TABLE_PREFIX . $enumCode;
     }
 
     /**

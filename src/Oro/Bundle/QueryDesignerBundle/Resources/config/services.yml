@@ -94,6 +94,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_datagrid.datagrid.guesser'
             - '@oro_entity.entity_name_resolver'
+            - '@oro_entity_extend.enum_type_helper'
 
     oro_query_designer.validator.query_validator:
         class: Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryValidator

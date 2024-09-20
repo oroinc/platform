@@ -142,7 +142,7 @@ data:
                 related: '{baseUrl}/testapientity1/{entityId}/enumField'
             data:
                 type: testapienum1
-                id: '<toString(@enum1_1->id)>'
+                id: '<toString(@enum1_1->internalId)>'
         multiEnumField:
             links:
                 self: '{baseUrl}/testapientity1/{entityId}/relationships/multiEnumField'
@@ -150,9 +150,9 @@ data:
             data:
                 -
                     type: testapienum2
-                    id: '<toString(@enum2_1->id)>'
+                    id: '<toString(@enum2_1->internalId)>'
                 -
                     type: testapienum2
-                    id: '<toString(@enum2_2->id)>'
+                    id: '<toString(@enum2_2->internalId)>'
 links:
     self: '{baseUrl}/testapientity1'

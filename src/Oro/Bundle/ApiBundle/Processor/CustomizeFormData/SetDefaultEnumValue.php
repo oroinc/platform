@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -14,20 +14,20 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class SetDefaultEnumValue implements ProcessorInterface
 {
-    private EnumValueProvider $enumValueProvider;
+    private EnumOptionsProvider $enumOptionsProvider;
     private DoctrineHelper $doctrineHelper;
     private PropertyAccessorInterface $propertyAccessor;
     private string $enumFieldName;
     private string $enumCode;
 
     public function __construct(
-        EnumValueProvider $enumValueProvider,
+        EnumOptionsProvider $enumOptionsProvider,
         DoctrineHelper $doctrineHelper,
         PropertyAccessorInterface $propertyAccessor,
         string $enumFieldName,
         string $enumCode
     ) {
-        $this->enumValueProvider = $enumValueProvider;
+        $this->enumOptionsProvider = $enumOptionsProvider;
         $this->doctrineHelper = $doctrineHelper;
         $this->propertyAccessor = $propertyAccessor;
         $this->enumFieldName = $enumFieldName;
@@ -55,7 +55,7 @@ class SetDefaultEnumValue implements ProcessorInterface
             return;
         }
 
-        $defaultValue = $this->enumValueProvider->getDefaultEnumValueByCode($this->enumCode);
+        $defaultValue = $this->enumOptionsProvider->getDefaultEnumOptionByCode($this->enumCode);
         if (null !== $defaultValue) {
             $this->propertyAccessor->setValue($entity, $this->enumFieldName, $defaultValue);
         }

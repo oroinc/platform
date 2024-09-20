@@ -6,7 +6,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
@@ -34,7 +34,7 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
-            ->with(AbstractEnumValue::class)
+            ->with(EnumOption::class)
             ->willReturn($entityManager);
 
         $configuration = new Configuration();
@@ -55,7 +55,7 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
-            ->with(AbstractEnumValue::class)
+            ->with(EnumOption::class)
             ->willReturn($entityManager);
 
         $configuration = new Configuration();

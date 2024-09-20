@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
@@ -154,11 +155,9 @@ class WorkflowEntityValidator extends ConstraintValidator
     }
 
     /**
-     * @param $object
-     *
-     * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function getEntityChangeSet($object)
+    protected function getEntityChangeSet($object): array
     {
         $changesSet = [];
         $unitOfWork = $this->entityManager->getUnitOfWork();
@@ -169,14 +168,23 @@ class WorkflowEntityValidator extends ConstraintValidator
 
         foreach ($fieldList as $field) {
             $fieldName = $field['name'];
+            $isEnumerableType = ExtendHelper::isEnumerableType($field['type']);
             // skip field, its a partially omitted one!
-            if (! (isset($originalData[$fieldName]) || array_key_exists($fieldName, $originalData))) {
+            if (!(isset($originalData[$fieldName]) || array_key_exists($fieldName, $originalData))
+                && !($isEnumerableType && isset($originalData['serialized_data'][$fieldName]))
+            ) {
                 continue;
             }
 
             $actualValue = $this->fieldHelper->getObjectValue($object, $fieldName);
-            $originalValue = $originalData[$fieldName];
-
+            $originalValue = $isEnumerableType
+                ? $originalData['serialized_data'][$fieldName]
+                : $originalData[$fieldName];
+            if ($isEnumerableType) {
+                $actualValue = ExtendHelper::isSingleEnumType($field['type'])
+                    ? $actualValue?->getId()
+                    : array_map(fn ($option) => $option?->getId(), $actualValue);
+            }
             if ($actualValue !== $originalValue) {
                 $changesSet[$fieldName] = [$originalValue, $actualValue];
             }

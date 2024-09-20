@@ -298,7 +298,9 @@ class WsseAuthenticatorTest extends \PHPUnit\Framework\TestCase
         $advancedUser->addOrganization($organization);
         $advancedUser->addApiKey($userApiKey);
         $advancedUser->setEnabled(true);
-        $advancedUser->setAuthStatus(new TestEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE));
+        $advancedUser->setAuthStatus(
+            new TestEnumValue('test_enum_code', 'Test', UserManager::STATUS_ACTIVE)
+        );
         $role = $this->createMock(Role::class);
         $advancedUser->setUserRoles([$role]);
         $advancedUser->setUsername('sample_user');

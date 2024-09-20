@@ -10,6 +10,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Field Helper for Grids
+ */
 class FieldsHelper
 {
     /** @var ConfigManager */
@@ -37,9 +40,9 @@ class FieldsHelper
             return [];
         }
 
-        $entityConfigProvider   = $this->configManager->getProvider('entity');
-        $extendConfigProvider   = $this->configManager->getProvider('extend');
-        $viewConfigProvider     = $this->configManager->getProvider('view');
+        $entityConfigProvider = $this->configManager->getProvider('entity');
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $viewConfigProvider = $this->configManager->getProvider('view');
         $datagridConfigProvider = $this->configManager->getProvider('datagrid');
 
         $fields = [];
@@ -53,7 +56,7 @@ class FieldsHelper
             if ($this->isApplicableField($extendConfig, $fieldConfig)) {
                 $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
                 $fields[] = [
-                    'id'       => $fieldId,
+                    'id' => $fieldId,
                     'priority' => $viewConfig->get('priority', false, 0)
                 ];
             }
@@ -83,8 +86,16 @@ class FieldsHelper
             return false;
         }
 
-        return $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+        // allow dynamic enum fields with system owner
+        return ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+                || $this->isSerializedEnumField($extendConfig))
             && ExtendHelper::isFieldAccessible($extendConfig)
             && $fieldConfig->is('is_visible');
+    }
+
+    private function isSerializedEnumField(ConfigInterface $extendConfig): bool
+    {
+        return $extendConfig->is('is_serialized')
+            && ExtendHelper::isEnumerableType((string)$extendConfig->getId()->getFieldType());
     }
 }

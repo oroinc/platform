@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -10,18 +10,18 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $enumValueProvider;
+    /** @var EnumOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $enumOptionsProvider;
 
     /** @var EnumExtension */
     private $extension;
 
     protected function setUp(): void
     {
-        $this->enumValueProvider = $this->createMock(EnumValueProvider::class);
+        $this->enumOptionsProvider = $this->createMock(EnumOptionsProvider::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_entity_extend.enum_value_provider', $this->enumValueProvider)
+            ->add('oro_entity_extend.enum_options_provider', $this->enumOptionsProvider)
             ->getContainer($this);
 
         $this->extension = new EnumExtension($container);
@@ -29,118 +29,133 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testTransEnum()
     {
-        $enumValueEntityClass = 'Test\EnumValue';
-
         $values = [
-            'Value 1' => 'val1'
+            'Value 1' => 'test_enum_code.val1'
         ];
 
-        $this->enumValueProvider->expects($this->any())
-            ->method('getEnumChoices')
-            ->with($enumValueEntityClass)
+        $this->enumOptionsProvider->expects($this->any())
+            ->method('getEnumChoicesByCode')
+            ->with('test_enum_code')
             ->willReturn($values);
 
         $this->assertEquals(
             'Value 1',
-            self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass])
+            self::callTwigFilter($this->extension, 'trans_enum', ['test_enum_code.val1'])
         );
         $this->assertEquals(
-            'val2',
-            self::callTwigFilter($this->extension, 'trans_enum', ['val2', $enumValueEntityClass])
+            null,
+            self::callTwigFilter($this->extension, 'trans_enum', ['test_enum_code.val2'])
         );
     }
 
     public function testTransEnumWhenLabelIsZero()
     {
-        $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            '0' => 'val1'
+            '0' => 'test_enum_code.val1'
         ];
 
-        $this->enumValueProvider->expects($this->any())
-            ->method('getEnumChoices')
-            ->with($enumValueEntityClass)
+        $this->enumOptionsProvider->expects($this->any())
+            ->method('getEnumChoicesByCode')
+            ->with('test_enum_code')
             ->willReturn($values);
 
         $this->assertEquals(
             '0',
-            self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass])
+            self::callTwigFilter($this->extension, 'trans_enum', ['test_enum_code.val1'])
         );
     }
 
     public function testTransEnumWhenIdIsZero()
     {
-        $enumValueEntityClass = 'Test\EnumValue';
-
         $values = [
-           'Value 1' => '0',
+           'Value 1' => 'test_enum_code.0',
         ];
 
-        $this->enumValueProvider->expects($this->any())
-            ->method('getEnumChoices')
-            ->with($enumValueEntityClass)
+        $this->enumOptionsProvider->expects($this->any())
+            ->method('getEnumChoicesByCode')
+            ->with('test_enum_code')
             ->willReturn($values);
 
         $this->assertEquals(
             'Value 1',
-            self::callTwigFilter($this->extension, 'trans_enum', ['0', $enumValueEntityClass])
+            self::callTwigFilter($this->extension, 'trans_enum', ['test_enum_code.0'])
         );
     }
 
     public function testTransEnumWhenIdsAreNumeric()
     {
-        $enumValueEntityClass = 'Test\EnumValue';
-
         $values = [
-            'Value 1' => '05',
-            'Value 2' => '5'
+            'Value 1' => 'test_enum_code.05',
+            'Value 2' => 'test_enum_code.5'
         ];
 
-        $this->enumValueProvider->expects($this->any())
-            ->method('getEnumChoices')
-            ->with($enumValueEntityClass)
+        $this->enumOptionsProvider->expects($this->any())
+            ->method('getEnumChoicesByCode')
+            ->with('test_enum_code')
             ->willReturn($values);
 
         $this->assertEquals(
             'Value 2',
-            self::callTwigFilter($this->extension, 'trans_enum', ['5', $enumValueEntityClass])
+            self::callTwigFilter($this->extension, 'trans_enum', ['test_enum_code.5'])
         );
     }
 
     public function testSortEnum()
     {
-        $enumValueEntityClass = 'Test\EnumValue';
-
         $values = [
-            'Value 3' => 'val3',
-            'Value 1' => 'val1',
-            'Value 4' => 'val4',
-            'Value 2' => 'val2',
+            'Value 3' => 'test_enum_code.val3',
+            'Value 1' => 'test_enum_code.val1',
+            'Value 4' => 'test_enum_code.val4',
+            'Value 2' => 'test_enum_code.val2',
         ];
 
-        $this->enumValueProvider->expects($this->any())
-            ->method('getEnumChoices')
-            ->with($enumValueEntityClass)
+        $this->enumOptionsProvider->expects($this->any())
+            ->method('getEnumChoicesByCode')
+            ->with('test_enum_code')
             ->willReturn($values);
 
         $this->assertEquals(
-            ['val1', 'val4', 'val2'],
-            self::callTwigFilter($this->extension, 'sort_enum', [['val2', 'val4', 'val1'], $enumValueEntityClass])
-        );
-        // call one ore time to check local cache
-        $this->assertEquals(
-            ['val3', 'val1', 'val4', 'val2'],
+            ['test_enum_code.val1', 'test_enum_code.val4', 'test_enum_code.val2'],
             self::callTwigFilter(
                 $this->extension,
                 'sort_enum',
-                [['val1', 'val2', 'val3', 'val4'], $enumValueEntityClass]
+                [
+                    [
+                        'test_enum_code.val2',
+                        'test_enum_code.val4',
+                        'test_enum_code.val1'
+                    ]
+                ]
+            )
+        );
+
+        // call one ore time to check local cache
+        $this->assertEquals(
+            ['test_enum_code.val3', 'test_enum_code.val1', 'test_enum_code.val4', 'test_enum_code.val2'],
+            self::callTwigFilter(
+                $this->extension,
+                'sort_enum',
+                [
+                    [
+                        'test_enum_code.val1',
+                        'test_enum_code.val2',
+                        'test_enum_code.val3',
+                        'test_enum_code.val4'
+                    ]
+                ]
             )
         );
         // call when the list of ids is a string
         $this->assertEquals(
-            ['val1', 'val4', 'val2'],
-            self::callTwigFilter($this->extension, 'sort_enum', ['val1,val2,val4', $enumValueEntityClass])
+            ['test_enum_code.val1', 'test_enum_code.val4', 'test_enum_code.val2'],
+            self::callTwigFilter(
+                $this->extension,
+                'sort_enum',
+                [
+                    json_encode(['test_enum_code.val1', 'test_enum_code.val4', 'test_enum_code.val2'])
+                ]
+            )
         );
     }
 }

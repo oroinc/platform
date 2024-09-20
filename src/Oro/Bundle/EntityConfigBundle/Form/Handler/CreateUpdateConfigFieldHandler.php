@@ -97,12 +97,10 @@ class CreateUpdateConfigFieldHandler
 
         $extendEntityConfig = $this->configHelper->getEntityConfig($entityConfigModel, 'extend');
         $newFieldModel = $this->createFieldModel($fieldName, $fieldType, $extendEntityConfig, $additionalFieldOptions);
-
         $form = $this->configHelperHandler->createSecondStepFieldForm($newFieldModel);
 
         if ($this->configHelperHandler->isFormValidAfterSubmit($request, $form)) {
             $extendEntityConfig->set('upgradeable', true);
-
             //persist data inside the form
             $this->configManager->persist($extendEntityConfig);
             $this->configManager->flush();
@@ -113,17 +111,9 @@ class CreateUpdateConfigFieldHandler
         return $this->configHelperHandler->constructConfigResponse($newFieldModel, $form, $formAction);
     }
 
-    /**
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param ConfigInterface $extendEntityConfig
-     * @param array $additionalFieldOptions
-     *
-     * @return FieldConfigModel
-     */
     public function createFieldModel(
-        $fieldName,
-        $fieldType,
+        string $fieldName,
+        string $fieldType,
         ConfigInterface $extendEntityConfig,
         array $additionalFieldOptions = []
     ): FieldConfigModel {

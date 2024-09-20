@@ -278,13 +278,6 @@ class EntityReflectionClassTest extends WebTestCase
     public function getMethodsDataProvider(): array
     {
         return [
-            'get extend enum attribute method exist' => [
-                'class' => TestExtendedEntity::class,
-                'expectedMethod' => VirtualReflectionMethod::create(
-                    TestExtendedEntity::class,
-                    'getTestExtendedEntityEnumAttribute'
-                ),
-            ],
             'remove extend method exist' => [
                 'class' => TestExtendedEntity::class,
                 'expectedMethod' => VirtualReflectionMethod::create(

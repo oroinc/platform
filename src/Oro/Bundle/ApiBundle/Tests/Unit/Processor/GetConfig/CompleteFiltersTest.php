@@ -5,7 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteFilters;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -19,6 +22,9 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
+
     /** @var CompleteFilters */
     private $processor;
 
@@ -27,8 +33,14 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         parent::setUp();
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->processor = new CompleteFilters($this->doctrineHelper, ['string', 'datetime'], ['string']);
+        $this->processor = new CompleteFilters(
+            $this->doctrineHelper,
+            $this->configManager,
+            ['string', 'datetime'],
+            ['string']
+        );
     }
 
     public function testProcessForAlreadyCompletedFilters(): void
@@ -136,6 +148,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -190,6 +206,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -244,6 +264,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -295,6 +319,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $rootEntityMetadata->expects(self::never())
             ->method('hasField')
             ->with('field1');
@@ -349,6 +377,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $rootEntityMetadata->expects(self::never())
             ->method('hasField')
             ->with('field1');
@@ -404,6 +436,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $rootEntityMetadata->expects(self::never())
             ->method('hasField')
             ->with('field1');
@@ -460,6 +496,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -516,6 +556,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -570,6 +614,12 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, null, false],
+                [self::TEST_CLASS_NAME, 'field1', false]
+            ]);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -622,6 +672,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(['association1' => 'integer']);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -683,6 +737,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(['association1' => 'integer']);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -733,6 +791,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -780,6 +842,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -832,6 +898,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -885,6 +955,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -937,6 +1011,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -991,6 +1069,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1044,6 +1126,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1093,6 +1179,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1138,6 +1228,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1184,6 +1278,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1234,6 +1332,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1259,6 +1361,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('association1')
             ->willReturn(false);
@@ -1279,6 +1385,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(['association1' => 'integer']);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1313,6 +1423,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('association1')
             ->willReturn(false);
@@ -1333,6 +1447,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(['association1' => 'integer']);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1365,6 +1483,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('association1')
             ->willReturn(true);
@@ -1385,6 +1507,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(['association1' => 'integer']);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1420,6 +1546,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('association1')
             ->willReturn(true);
@@ -1440,6 +1570,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(['association1' => 'integer']);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1513,6 +1647,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1535,6 +1673,9 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testExtendedAssociations(): void
     {
         $config = [
@@ -1587,6 +1728,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1671,6 +1816,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -1722,6 +1871,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $this->doctrineHelper->expects(self::once())
             ->method('getFieldDataType')
             ->with(self::identicalTo($rootEntityMetadata), 'id')
@@ -1780,6 +1933,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $this->doctrineHelper->expects(self::once())
             ->method('getFieldDataType')
             ->with(self::identicalTo($rootEntityMetadata), 'id')
@@ -1836,6 +1993,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $this->doctrineHelper->expects(self::once())
             ->method('getFieldDataType')
             ->with(self::identicalTo($rootEntityMetadata), 'id')
@@ -1895,6 +2056,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $this->doctrineHelper->expects(self::never())
             ->method('getFieldDataType');
 
@@ -1945,6 +2110,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $this->doctrineHelper->expects(self::never())
             ->method('getFieldDataType');
 
@@ -1960,185 +2129,13 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testEnumIdentifierField(): void
-    {
-        $config = [
-            'exclusion_policy'       => 'all',
-            'identifier_field_names' => ['id'],
-            'fields'                 => [
-                'id' => null
-            ]
-        ];
-
-        $filters = [
-            'fields' => []
-        ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
-
-        $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with(TestEnumValue::class)
-            ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityMetadataForClass')
-            ->with(TestEnumValue::class)
-            ->willReturn($rootEntityMetadata);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getIndexedFields')
-            ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn([]);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getIndexedAssociations')
-            ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn([]);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getFieldDataType')
-            ->with(self::identicalTo($rootEntityMetadata), 'id')
-            ->willReturn('string');
-
-        $this->context->setClassName(TestEnumValue::class);
-        $this->context->setResult($this->createConfigObject($config));
-        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id' => [
-                        'data_type'   => 'string',
-                        'allow_array' => true
-                    ]
-                ]
-            ],
-            $this->context->getFilters()
-        );
-    }
-
-    public function testRenamedEnumIdentifierField(): void
-    {
-        $config = [
-            'exclusion_policy'       => 'all',
-            'identifier_field_names' => ['renamedId'],
-            'fields'                 => [
-                'renamedId' => [
-                    'property_path' => 'id'
-                ]
-            ]
-        ];
-
-        $filters = [
-            'fields' => []
-        ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
-
-        $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with(TestEnumValue::class)
-            ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityMetadataForClass')
-            ->with(TestEnumValue::class)
-            ->willReturn($rootEntityMetadata);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getIndexedFields')
-            ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn([]);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getIndexedAssociations')
-            ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn([]);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getFieldDataType')
-            ->with(self::identicalTo($rootEntityMetadata), 'id')
-            ->willReturn('string');
-
-        $this->context->setClassName(TestEnumValue::class);
-        $this->context->setResult($this->createConfigObject($config));
-        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'renamedId' => [
-                        'data_type'   => 'string',
-                        'allow_array' => true
-                    ]
-                ]
-            ],
-            $this->context->getFilters()
-        );
-    }
-
-    public function testEnumIdentifierFieldWhenFilterIsAlreadyConfigured(): void
-    {
-        $config = [
-            'exclusion_policy'       => 'all',
-            'identifier_field_names' => ['id'],
-            'fields'                 => [
-                'id' => null
-            ]
-        ];
-
-        $filters = [
-            'fields' => [
-                'id' => [
-                    'data_type'   => 'string',
-                    'allow_array' => false
-                ]
-            ]
-        ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
-
-        $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with(TestEnumValue::class)
-            ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityMetadataForClass')
-            ->with(TestEnumValue::class)
-            ->willReturn($rootEntityMetadata);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getIndexedFields')
-            ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn([]);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getIndexedAssociations')
-            ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn([]);
-        $this->doctrineHelper->expects(self::never())
-            ->method('getFieldDataType');
-
-        $this->context->setClassName(TestEnumValue::class);
-        $this->context->setResult($this->createConfigObject($config));
-        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id' => [
-                        'data_type' => 'string'
-                    ]
-                ]
-            ],
-            $this->context->getFilters()
-        );
-    }
-
     public function testEnumAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
                 'association1' => [
-                    'target_class'           => TestEnumValue::class,
+                    'target_class'           => 'Extend\Entity\EV_Test_Enum',
                     'exclusion_policy'       => 'all',
                     'identifier_field_names' => ['id'],
                     'fields'                 => [
@@ -2167,6 +2164,44 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(['association1' => 'string']);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, null, true],
+                [self::TEST_CLASS_NAME, 'association1', true]
+            ]);
+        $this->configManager->expects(self::once())
+            ->method('getIds')
+            ->with('extend', self::TEST_CLASS_NAME, true)
+            ->willReturn([
+                new FieldConfigId('extend', self::TEST_CLASS_NAME, 'association1', 'enum')
+            ]);
+        $this->configManager->expects(self::exactly(2))
+            ->method('getFieldConfig')
+            ->willReturnMap([
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'association1',
+                    new Config(
+                        new FieldConfigId('extend', self::TEST_CLASS_NAME, 'association1', 'enum'),
+                        []
+                    )
+                ],
+                [
+                    'enum',
+                    self::TEST_CLASS_NAME,
+                    'association1',
+                    new Config(
+                        new FieldConfigId('enum', self::TEST_CLASS_NAME, 'association1', 'enum'),
+                        ['enum_code' => 'test_enum']
+                    )
+                ]
+            ]);
+        $this->configManager->expects(self::once())
+            ->method('getId')
+            ->with('extend', self::TEST_CLASS_NAME, 'association1')
+            ->willReturn(new FieldConfigId('extend', self::TEST_CLASS_NAME, 'association1', 'enum'));
 
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
@@ -2177,8 +2212,99 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'association1' => [
-                        'data_type'   => 'string',
-                        'allow_array' => true
+                        'data_type' => 'string'
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testMultiEnumAssociation(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'target_class'           => 'Extend\Entity\EV_Test_Enum',
+                    'exclusion_policy'       => 'all',
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => null
+                    ]
+                ]
+            ]
+        ];
+        $filters = [];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedFields')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedAssociations')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn(['association1' => 'string']);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, null, true],
+                [self::TEST_CLASS_NAME, 'association1', true]
+            ]);
+        $this->configManager->expects(self::once())
+            ->method('getIds')
+            ->with('extend', self::TEST_CLASS_NAME, true)
+            ->willReturn([
+                new FieldConfigId('extend', self::TEST_CLASS_NAME, 'association1', 'multiEnum')
+            ]);
+        $this->configManager->expects(self::exactly(2))
+            ->method('getFieldConfig')
+            ->willReturnMap([
+                [
+                    'extend',
+                    self::TEST_CLASS_NAME,
+                    'association1',
+                    new Config(
+                        new FieldConfigId('extend', self::TEST_CLASS_NAME, 'association1', 'multiEnum'),
+                        []
+                    )
+                ],
+                [
+                    'enum',
+                    self::TEST_CLASS_NAME,
+                    'association1',
+                    new Config(
+                        new FieldConfigId('enum', self::TEST_CLASS_NAME, 'association1', 'multiEnum'),
+                        ['enum_code' => 'test_enum']
+                    )
+                ]
+            ]);
+        $this->configManager->expects(self::once())
+            ->method('getId')
+            ->with('extend', self::TEST_CLASS_NAME, 'association1')
+            ->willReturn(new FieldConfigId('extend', self::TEST_CLASS_NAME, 'association1', 'multiEnum'));
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'data_type'  => 'string',
+                        'collection' => true
                     ]
                 ]
             ],
@@ -2211,6 +2337,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $assocEntityMetadata = $this->getClassMetadataMock(self::TEST_ASSOC_CLASS_NAME);
         $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('association1')
             ->willReturn(false);
@@ -2233,6 +2363,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(['association1' => 'integer']);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
         $assocEntityMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('newIdentifier')
@@ -2255,9 +2389,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testEnumEntity(): void
+    public function testEnumOptionEntity(): void
     {
-        $this->context->setClassName(TestEnumValue::class);
+        $entityClass = EnumOption::class;
+        $this->context->setClassName($entityClass);
         $config = [
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['id'],
@@ -2268,21 +2403,15 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         ];
         $filters = [];
 
-        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
-        $rootEntityMetadata->expects(self::once())
-            ->method('hasField')
-            ->willReturn(true);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getTypeOfField')
-            ->willReturn('integer');
+        $rootEntityMetadata = $this->getClassMetadataMock($entityClass);
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
-            ->with(TestEnumValue::class)
+            ->with($entityClass)
             ->willReturn(true);
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
-            ->with(TestEnumValue::class)
+            ->with($entityClass)
             ->willReturn($rootEntityMetadata);
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedFields')
@@ -2292,12 +2421,16 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(false);
         $this->doctrineHelper->expects(self::once())
             ->method('getFieldDataType')
             ->with(self::identicalTo($rootEntityMetadata), 'id')
             ->willReturn('string');
 
-        $this->context->setClassName(TestEnumValue::class);
+        $this->context->setClassName($entityClass);
         $this->context->setResult($this->createConfigObject($config));
         $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
         $this->processor->process($this->context);
@@ -2306,14 +2439,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
-                    'id'       => [
-                        'data_type'   => 'string',
-                        'allow_array' => true
-                    ],
-                    'priority' => [
-                        'data_type'   => 'integer',
-                        'allow_array' => true,
-                        'allow_range' => true
+                    'id' => [
+                        'data_type' => 'string'
                     ]
                 ]
             ],

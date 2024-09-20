@@ -44,6 +44,9 @@ class RequireJoinsFieldVisitor extends ExpressionVisitor
     public function walkComparison(Comparison $comparison)
     {
         $field = $comparison->getField();
+        if (!$field) {
+            return;
+        }
         if (!isset($this->fields[$field])) {
             $this->fields[$field] = $this->isJoinRequired($comparison);
         } elseif (!$this->fields[$field] && $this->isJoinRequired($comparison)) {

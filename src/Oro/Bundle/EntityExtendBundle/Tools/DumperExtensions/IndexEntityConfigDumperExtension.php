@@ -4,11 +4,15 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\EntityConfig\IndexScope;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * Entity dumper extension to created indexes if a field is visible in datagrid
+ */
 class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     /** @var ConfigManager */
@@ -19,7 +23,7 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
 
     public function __construct(ConfigManager $configManager, FieldTypeHelper $fieldTypeHelper)
     {
-        $this->configManager   = $configManager;
+        $this->configManager = $configManager;
         $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
@@ -43,14 +47,14 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
         $targetEntityConfigs = $this->configManager->getProvider('extend')->getConfigs();
         foreach ($targetEntityConfigs as $targetEntityConfig) {
             if ($targetEntityConfig->is('is_extend')) {
-                $indices = $targetEntityConfig->has('index')
+                $indexes = $targetEntityConfig->has('index')
                     ? $targetEntityConfig->get('index')
                     : [];
-                if ($this->updateIndices($indices, $targetEntityConfig->getId()->getClassName())) {
-                    if (empty($indices)) {
+                if ($this->updateIndexes($indexes, $targetEntityConfig->getId()->getClassName())) {
+                    if (empty($indexes)) {
                         $targetEntityConfig->remove('index');
                     } else {
-                        $targetEntityConfig->set('index', $indices);
+                        $targetEntityConfig->set('index', $indexes);
                     }
                     $this->configManager->persist($targetEntityConfig);
                 }
@@ -59,14 +63,14 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     }
 
     /**
-     * @param array  $indices
+     * @param array $indexes
      * @param string $targetEntityClass
      *
      * @return bool
      */
-    protected function updateIndices(array &$indices, $targetEntityClass)
+    protected function updateIndexes(array &$indexes, $targetEntityClass)
     {
-        $hasChanges   = false;
+        $hasChanges = false;
         $fieldConfigs = $this->configManager->getProvider('extend')->getConfigs($targetEntityClass);
         foreach ($fieldConfigs as $fieldConfig) {
             if ($fieldConfig->is('is_extend')) {
@@ -74,18 +78,18 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
                 $fieldConfigId = $fieldConfig->getId();
                 $fieldName = $fieldConfigId->getFieldName();
                 $fieldType = $fieldConfigId->getFieldType();
-                if ($this->isIndexRequired($fieldConfigId->getClassName(), $fieldName, $fieldType)) {
-                    if (!isset($indices[$fieldName]) || !$indices[$fieldName]) {
+                if ($this->isIndexRequired($fieldConfig, $fieldConfigId->getClassName(), $fieldName, $fieldType)) {
+                    if (!isset($indexes[$fieldName]) || !$indexes[$fieldName]) {
                         // TODO: need to be changed to fieldName => columnName
                         // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3940
-                        $indices[$fieldName] = IndexScope::INDEX_SIMPLE;
+                        $indexes[$fieldName] = IndexScope::INDEX_SIMPLE;
                         if ($fieldConfig->is('unique')) {
-                            $indices[$fieldName] = IndexScope::INDEX_UNIQUE;
+                            $indexes[$fieldName] = IndexScope::INDEX_UNIQUE;
                         }
-                        $hasChanges          = true;
+                        $hasChanges = true;
                     }
-                } elseif (isset($indices[$fieldName]) || array_key_exists($fieldName, $indices)) {
-                    unset($indices[$fieldName]);
+                } elseif (isset($indexes[$fieldName]) || array_key_exists($fieldName, $indexes)) {
+                    unset($indexes[$fieldName]);
                     $hasChanges = true;
                 }
             }
@@ -98,16 +102,14 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
      * Determines whether the index for the given field is needed or not.
      * All relation type fields should be excluded.
      * Index requirement is determined by visibility of a field on a grid.
-     *
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     *
-     * @return bool
      */
-    protected function isIndexRequired($className, $fieldName, $fieldType)
-    {
-        $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
+    protected function isIndexRequired(
+        ConfigInterface $fieldConfig,
+        string $className,
+        string $fieldName,
+        string $fieldType
+    ): bool {
+        $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType, $fieldConfig);
         if (!$this->fieldTypeHelper->isRelation($underlyingType)) {
             $datagridConfigProvider = $this->configManager->getProvider('datagrid');
             if ($datagridConfigProvider->hasConfig($className, $fieldName)) {

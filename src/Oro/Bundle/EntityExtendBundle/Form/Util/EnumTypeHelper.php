@@ -72,7 +72,7 @@ class EnumTypeHelper extends ConfigTypeHelper
             foreach ($enumFieldConfigs as $enumFieldConfig) {
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $enumFieldConfig->getId();
-                if (!in_array($fieldConfigId->getFieldType(), [self::TYPE_ENUM, self::MULTI_ENUM])) {
+                if (!ExtendHelper::isEnumerableType($fieldConfigId->getFieldType())) {
                     // skip not enum fields
                     continue;
                 }
@@ -113,33 +113,13 @@ class EnumTypeHelper extends ConfigTypeHelper
         return false;
     }
 
-    /**
-     * Returns the list of data type keys for all public enums
-     *
-     * @return string[] key = enum code, value = data type key
-     */
-    public function getPublicEnumTypes()
+    public function getEnumFieldType($className, $fieldName): ?string
     {
-        $result = [];
-
-        $enumConfigProvider   = $this->configManager->getProvider('enum');
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $entityConfigs        = $extendConfigProvider->getConfigs(null, true);
-        foreach ($entityConfigs as $entityConfig) {
-            if (!ExtendHelper::isEnumValueEntityAccessible($entityConfig)) {
-                continue;
-            }
-
-            $className  = $entityConfig->getId()->getClassName();
-            $enumConfig = $enumConfigProvider->getConfig($className);
-            if (!$enumConfig->is('public')) {
-                continue;
-            }
-
-            $enumCode          = $enumConfig->get('code');
-            $result[$enumCode] = ($enumConfig->is('multiple') ? self::MULTI_ENUM : self::TYPE_ENUM) . '||' . $enumCode;
+        $enumConfigProvider = $this->configManager->getProvider('enum');
+        if ($enumConfigProvider->hasConfig($className, $fieldName)) {
+            return $enumConfigProvider->getConfig($className, $fieldName)->getId()->getFieldType();
         }
 
-        return $result;
+        return null;
     }
 }

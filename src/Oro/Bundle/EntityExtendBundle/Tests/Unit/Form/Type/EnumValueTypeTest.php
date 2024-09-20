@@ -327,7 +327,11 @@ class EnumValueTypeTest extends FormIntegrationTestCase
                     ['enum_code', false, null, $enumCode],
                     ['immutable_codes', false, [], $immutableCodes],
                 ]);
-
+            $config->expects($this->any())
+                ->method('has')
+                ->willReturnMap([
+                    ['immutable_codes', true],
+                ]);
             $configProvider->expects($this->any())
                 ->method('getConfigById')
                 ->willReturn($config);

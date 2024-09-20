@@ -8,10 +8,10 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection\ReflectionVirtualProperty;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -27,18 +27,6 @@ class FieldHelper
 
     const IDENTITY_ONLY_WHEN_NOT_EMPTY = -1;
 
-    /** @var ConfigProvider */
-    protected $configProvider;
-
-    /** @var EntityFieldProvider */
-    protected $fieldProvider;
-
-    /** @var FieldTypeHelper */
-    protected $fieldTypeHelper;
-
-    /** @var PropertyAccessor */
-    protected $propertyAccessor;
-
     /** @var array */
     protected $fieldsCache = [];
 
@@ -52,15 +40,12 @@ class FieldHelper
     protected $identityFieldsCache = [];
 
     public function __construct(
-        EntityFieldProvider $fieldProvider,
-        ConfigProvider $configProvider,
-        FieldTypeHelper $fieldTypeHelper,
-        PropertyAccessorInterface $propertyAccessor,
+        protected EntityFieldProvider $fieldProvider,
+        protected ConfigProvider $configProvider,
+        protected FieldTypeHelper $fieldTypeHelper,
+        protected PropertyAccessorInterface $propertyAccessor,
+        protected EnumOptionsProvider $enumOptionsProvider,
     ) {
-        $this->fieldProvider   = $fieldProvider;
-        $this->configProvider  = $configProvider;
-        $this->fieldTypeHelper = $fieldTypeHelper;
-        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -462,5 +447,36 @@ class FieldHelper
         $isInputDataContainsField = is_array($itemData) && array_key_exists($fieldName, $itemData);
 
         return $this->isRequiredIdentityField($entityName, $fieldName) || $isInputDataContainsField;
+    }
+
+    public function getExtendConfigOwner($entityName, $fieldName): ?string
+    {
+        if (!$this->configProvider->getConfigManager()->hasConfig($entityName, $fieldName)) {
+            return null;
+        }
+
+        $extendConfig = $this->configProvider->getConfigManager()->getFieldConfig('extend', $entityName, $fieldName);
+
+        return $extendConfig->get('owner');
+    }
+
+    public function getEnumOptionKeys(string $entityName, string $fieldName): array
+    {
+        $enumCode = $this->configProvider->getConfigManager()->getFieldConfig(
+            'enum',
+            $entityName,
+            $fieldName
+        )?->get('enum_code');
+
+        return null !== $enumCode ? array_keys($this->enumOptionsProvider->getEnumChoicesByCode($enumCode)) : [];
+    }
+
+    public function getFieldConfig($scope, $class, $property)
+    {
+        $configProvider = $this->configProvider->getConfigManager()->getProvider($scope);
+
+        return $configProvider->hasConfig($class, $property)
+            ? $configProvider->getConfig($class, $property)
+            : null;
     }
 }

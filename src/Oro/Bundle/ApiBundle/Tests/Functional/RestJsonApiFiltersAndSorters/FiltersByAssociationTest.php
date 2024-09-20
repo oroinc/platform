@@ -32,7 +32,23 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
 
     public function testEqualFilterForEnum()
     {
-        $filter = ['filter' => ['enumField' => ['eq' => '<toString(@enum1_1->id)>']]];
+        $filter = ['filter' => ['enumField' => ['eq' => '<toString(@enum1_1->internalId)>']]];
+
+        $expectedRows = [
+            ['id' => '<toString(@entity1_1->id)>'],
+            ['id' => '<toString(@entity1_2->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(['entity' => 'testapientity1'], $filter, ['HTTP_X-Include' => 'totalCount']);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+        self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
+    }
+
+    public function testEqualFilterForMultiEnum()
+    {
+        $filter = ['filter' => ['multiEnumField' => ['eq' => '<toString(@enum2_1->internalId)>']]];
 
         $expectedRows = [
             ['id' => '<toString(@entity1_1->id)>'],
@@ -244,7 +260,23 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
 
     public function testNotEqualFilterForEnum()
     {
-        $filter = ['filter' => ['enumField' => ['neq' => '<toString(@enum1_1->id)>']]];
+        $filter = ['filter' => ['enumField' => ['neq' => '<toString(@enum1_1->internalId)>']]];
+
+        $expectedRows = [
+            ['id' => '<toString(@entity1_3->id)>'],
+            ['id' => '<toString(@entity1_4->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(['entity' => 'testapientity1'], $filter, ['HTTP_X-Include' => 'totalCount']);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+        self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
+    }
+
+    public function testNotEqualFilterForMultiEnum()
+    {
+        $filter = ['filter' => ['multiEnumField' => ['neq' => '<toString(@enum2_1->internalId)>']]];
 
         $expectedRows = [
             ['id' => '<toString(@entity1_3->id)>'],
@@ -461,6 +493,24 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
     public function testExistsFilterForEnum()
     {
         $filter = ['filter' => ['enumField' => ['exists' => true]]];
+
+        $expectedRows = [
+            ['id' => '<toString(@entity1_1->id)>'],
+            ['id' => '<toString(@entity1_2->id)>'],
+            ['id' => '<toString(@entity1_3->id)>'],
+            ['id' => '<toString(@entity1_4->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(['entity' => 'testapientity1'], $filter, ['HTTP_X-Include' => 'totalCount']);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+        self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
+    }
+
+    public function testExistsFilterForMultiEnum()
+    {
+        $filter = ['filter' => ['multiEnumField' => ['exists' => true]]];
 
         $expectedRows = [
             ['id' => '<toString(@entity1_1->id)>'],
@@ -701,6 +751,21 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
         self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
     }
 
+    public function testNotExistsFilterForMultiEnum()
+    {
+        $filter = ['filter' => ['multiEnumField' => ['exists' => false]]];
+
+        $expectedRows = [
+            ['id' => '<toString(@entity1_null->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(['entity' => 'testapientity1'], $filter, ['HTTP_X-Include' => 'totalCount']);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+        self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
+    }
+
     public function testNotExistsFilterForManyToOneAssociation()
     {
         $filter = ['filter' => ['biM2O' => ['exists' => false]]];
@@ -793,7 +858,24 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
 
     public function testNeqOrNullFilterForEnum()
     {
-        $filter = ['filter' => ['enumField' => ['neq_or_null' => '<toString(@enum1_1->id)>']]];
+        $filter = ['filter' => ['enumField' => ['neq_or_null' => '<toString(@enum1_1->internalId)>']]];
+
+        $expectedRows = [
+            ['id' => '<toString(@entity1_3->id)>'],
+            ['id' => '<toString(@entity1_4->id)>'],
+            ['id' => '<toString(@entity1_null->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(['entity' => 'testapientity1'], $filter, ['HTTP_X-Include' => 'totalCount']);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+        self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
+    }
+
+    public function testNeqOrNullFilterForMultiEnum()
+    {
+        $filter = ['filter' => ['multiEnumField' => ['neq_or_null' => '<toString(@enum2_1->internalId)>']]];
 
         $expectedRows = [
             ['id' => '<toString(@entity1_3->id)>'],
@@ -1028,7 +1110,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
 
     public function testContainsFilterForEnum()
     {
-        $filter = ['filter' => ['enumField' => ['contains' => '<toString(@enum1_1->id)>']]];
+        $filter = ['filter' => ['enumField' => ['contains' => '<toString(@enum1_1->internalId)>']]];
 
         $response = $this->cget(['entity' => 'testapientity1'], $filter, [], false);
 
@@ -1040,6 +1122,22 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             ],
             $response
         );
+    }
+
+    public function testContainsFilterForMultiEnum()
+    {
+        $filter = ['filter' => ['multiEnumField' => ['contains' => '<toString(@enum2_1->internalId)>']]];
+
+        $expectedRows = [
+            ['id' => '<toString(@entity1_1->id)>'],
+            ['id' => '<toString(@entity1_2->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(['entity' => 'testapientity1'], $filter, ['HTTP_X-Include' => 'totalCount']);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+        self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
     }
 
     public function testContainsFilterForManyToOneAssociation()
@@ -1265,7 +1363,7 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
 
     public function testNotContainsFilterForEnum()
     {
-        $filter = ['filter' => ['enumField' => ['not_contains' => '<toString(@enum1_1->id)>']]];
+        $filter = ['filter' => ['enumField' => ['not_contains' => '<toString(@enum1_1->internalId)>']]];
 
         $response = $this->cget(['entity' => 'testapientity1'], $filter, [], false);
 
@@ -1277,6 +1375,23 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
             ],
             $response
         );
+    }
+
+    public function testNotContainsFilterForMultiEnum()
+    {
+        $filter = ['filter' => ['multiEnumField' => ['not_contains' => '<toString(@enum2_1->internalId)>']]];
+
+        $expectedRows = [
+            ['id' => '<toString(@entity1_3->id)>'],
+            ['id' => '<toString(@entity1_4->id)>'],
+            ['id' => '<toString(@entity1_null->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(['entity' => 'testapientity1'], $filter, ['HTTP_X-Include' => 'totalCount']);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+        self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
     }
 
     public function testNotContainsFilterForManyToOneAssociation()

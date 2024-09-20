@@ -124,7 +124,8 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
             $userStub->expects(self::any())
                 ->method('getAuthStatus')
                 ->willReturn(new TestEnumValue(
-                    $authStatusId ?? UserManager::STATUS_ACTIVE,
+                    UserManager::AUTH_STATUS_ENUM_CODE,
+                    'Test',
                     $authStatusId ?? UserManager::STATUS_ACTIVE
                 ));
         }

@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -103,17 +104,17 @@ class AddExcludedActions implements ProcessorInterface
         if ($config) {
             $configs[] = $config;
         }
-        if ($this->isInherit($config)) {
-            $parentClass = (new \ReflectionClass($entityClass))->getParentClass();
+        if ($this->isInherit($config) && !ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {
+            $parentClass = ExtendHelper::getParentClassName($entityClass);
             while ($parentClass) {
-                $config = $this->getConfig($parentClass->getName(), $version, $requestType);
+                $config = $this->getConfig($parentClass, $version, $requestType);
                 if ($config) {
                     $configs[] = $config;
                 }
                 if (!$this->isInherit($config)) {
                     break;
                 }
-                $parentClass = $parentClass->getParentClass();
+                $parentClass = ExtendHelper::getParentClassName($parentClass);
             }
         }
 

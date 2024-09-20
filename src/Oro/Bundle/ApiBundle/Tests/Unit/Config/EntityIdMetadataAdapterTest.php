@@ -58,4 +58,21 @@ class EntityIdMetadataAdapterTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals($fieldPropertyPath, $adapter->getPropertyPath($fieldName));
     }
+
+    public function testGetHintsWhenNoHintsInConfig()
+    {
+        $adapter = new EntityIdMetadataAdapter('Test\Class', new EntityDefinitionConfig());
+
+        self::assertSame([], $adapter->getHints());
+    }
+
+    public function testGetHintsWhenConfigHasHints()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->addHint('HINT_TEST');
+
+        $adapter = new EntityIdMetadataAdapter('Test\Class', $config);
+
+        self::assertSame(['HINT_TEST'], $adapter->getHints());
+    }
 }

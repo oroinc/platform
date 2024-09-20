@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -15,19 +16,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityFieldValidator
 {
-    /** @var ManagerRegistry */
-    protected $registry;
-
     /** @var CustomGridFieldValidatorInterface[]|array */
     protected $validators;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    public function __construct(ManagerRegistry $registry, TranslatorInterface $translator)
-    {
-        $this->registry = $registry;
-        $this->translator = $translator;
+    public function __construct(
+        private ManagerRegistry $registry,
+        private TranslatorInterface $translator,
+        private FieldHelper $fieldHelper
+    ) {
         $this->validators = [];
     }
 
@@ -167,7 +163,9 @@ class EntityFieldValidator
         /** @var ClassMetadata $metaData */
         $metaData = $this->getMetaData($entity);
 
-        return $metaData->hasField($fieldName) || $metaData->hasAssociation($fieldName);
+        return $metaData->hasField($fieldName)
+            || $metaData->hasAssociation($fieldName)
+            || $this->fieldHelper->getFieldConfig('enum', get_class($entity), $fieldName);
     }
 
     /**

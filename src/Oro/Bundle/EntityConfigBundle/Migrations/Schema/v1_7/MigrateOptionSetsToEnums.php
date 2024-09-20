@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_7;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareTrait;
@@ -17,10 +18,10 @@ class MigrateOptionSetsToEnums implements
     Migration,
     OrderedMigrationInterface,
     DataStorageExtensionAwareInterface,
-    ExtendExtensionAwareInterface
+    OutdatedExtendExtensionAwareInterface
 {
     use DataStorageExtensionAwareTrait;
-    use ExtendExtensionAwareTrait;
+    use OutdatedExtendExtensionAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -39,15 +40,15 @@ class MigrateOptionSetsToEnums implements
 
         $optionSets = $this->dataStorageExtension->get('existing_option_sets');
         foreach ($optionSets as &$optionSet) {
-            $entityTableName = $this->extendExtension->getTableNameByEntityClass($optionSet['class_name']);
-            $data            = $optionSet['data'];
+            $entityTableName = $this->outdatedExtendExtension->getTableNameByEntityClass($optionSet['class_name']);
+            $data = $optionSet['data'];
 
-            $enumCode             = $this->buildEnumCode(
+            $enumCode = $this->buildEnumCode(
                 $optionSet['class_name'],
                 $optionSet['field_name'],
                 $existingEnumTables
             );
-            $enumTable            = $this->extendExtension->addEnumField(
+            $enumTable = $this->outdatedExtendExtension->addOutdatedEnumField(
                 $schema,
                 $entityTableName,
                 $optionSet['field_name'],
@@ -70,7 +71,7 @@ class MigrateOptionSetsToEnums implements
 
                 $optionSet['pk_column_name'] = reset($pkColumns);
             }
-            $optionSet['enum_class_name'] = ExtendHelper::buildEnumValueClassName($enumCode);
+            $optionSet['enum_class_name'] = OutdatedExtendExtension::buildEnumValueClassName($enumCode);
             $optionSet['enum_table_name'] = $enumTable->getName();
         }
 
@@ -98,24 +99,22 @@ class MigrateOptionSetsToEnums implements
     }
 
     /**
-     * @param string   $entityClassName
-     * @param string   $fieldName
+     * @param string $entityClassName
+     * @param string $fieldName
      * @param string[] $existingEnumTables
      *
      * @return string
      */
     protected function buildEnumCode($entityClassName, $fieldName, $existingEnumTables)
     {
-        $nameGenerator = $this->extendExtension->getNameGenerator();
-
         $enumCode = ExtendHelper::generateEnumCode(
             $entityClassName,
             $fieldName,
-            $nameGenerator->getMaxEnumCodeSize()
+            $this->outdatedExtendExtension->getNameGenerator()->getMaxEnumCodeSize()
         );
 
         // check if an enum with that code is already exist and generate new code if so
-        while (in_array($nameGenerator->generateEnumTableName($enumCode), $existingEnumTables, true)) {
+        while (in_array($this->outdatedExtendExtension::generateEnumTableName($enumCode), $existingEnumTables, true)) {
             $enumCode = sprintf(
                 'enum_%s_%s',
                 dechex(crc32(ExtendHelper::getShortClassName($entityClassName))),
@@ -136,17 +135,17 @@ class MigrateOptionSetsToEnums implements
             );
 
             foreach ($optionSet['values'] as &$option) {
-                $option['enum_value_id'] = ExtendHelper::buildEnumValueId($option['label']);
-                $params                  = [
-                    'id'         => $option['enum_value_id'],
-                    'name'       => $option['label'],
-                    'priority'   => $option['priority'],
+                $option['enum_value_id'] = ExtendHelper::buildEnumInternalId($option['label']);
+                $params = [
+                    'id' => $option['enum_value_id'],
+                    'name' => $option['label'],
+                    'priority' => $option['priority'],
                     'is_default' => $option['is_default']
                 ];
-                $types                   = [
-                    'id'         => 'string',
-                    'name'       => 'string',
-                    'priority'   => 'integer',
+                $types = [
+                    'id' => 'string',
+                    'name' => 'string',
+                    'priority' => 'integer',
                     'is_default' => 'boolean'
                 ];
 
@@ -206,10 +205,10 @@ class MigrateOptionSetsToEnums implements
 
     /**
      * @param QueryBag $queries
-     * @param string   $entityTableName
-     * @param string   $entityFieldName
-     * @param int      $entityId
-     * @param string   $enumValueId
+     * @param string $entityTableName
+     * @param string $entityFieldName
+     * @param int $entityId
+     * @param string $enumValueId
      */
     protected function assignEnumValue(
         QueryBag $queries,
@@ -218,19 +217,19 @@ class MigrateOptionSetsToEnums implements
         $entityId,
         $enumValueId
     ) {
-        $nameGenerator = $this->extendExtension->getNameGenerator();
+        $nameGenerator = $this->outdatedExtendExtension->getNameGenerator();
 
-        $query  = sprintf(
+        $query = sprintf(
             'UPDATE %s SET %s = :enumValueId WHERE id = :entityId',
             $entityTableName,
             $nameGenerator->generateRelationColumnName($entityFieldName)
         );
         $params = [
-            'entityId'    => $entityId,
+            'entityId' => $entityId,
             'enumValueId' => $enumValueId
         ];
-        $types  = [
-            'entityId'    => 'integer',
+        $types = [
+            'entityId' => 'integer',
             'enumValueId' => 'string'
         ];
 
@@ -241,13 +240,13 @@ class MigrateOptionSetsToEnums implements
 
     /**
      * @param QueryBag $queries
-     * @param string   $entityTableName
-     * @param string   $entityPkColumnName
-     * @param string   $entityClassName
-     * @param string   $entityFieldName
-     * @param string   $enumClassName
-     * @param int      $entityId
-     * @param string   $enumValueId
+     * @param string $entityTableName
+     * @param string $entityPkColumnName
+     * @param string $entityClassName
+     * @param string $entityFieldName
+     * @param string $enumClassName
+     * @param int $entityId
+     * @param string $enumValueId
      */
     protected function assignMultiEnumValue(
         QueryBag $queries,
@@ -259,9 +258,9 @@ class MigrateOptionSetsToEnums implements
         $entityId,
         $enumValueId
     ) {
-        $nameGenerator = $this->extendExtension->getNameGenerator();
+        $nameGenerator = $this->outdatedExtendExtension->getNameGenerator();
 
-        $query  = sprintf(
+        $query = sprintf(
             'INSERT INTO %s (%s, %s) SELECT %s, :enumValueId '
             . 'FROM %s WHERE %s = :entityId',
             $nameGenerator->generateManyToManyJoinTableName($entityClassName, $entityFieldName, $enumClassName),
@@ -272,11 +271,11 @@ class MigrateOptionSetsToEnums implements
             $entityPkColumnName
         );
         $params = [
-            'entityId'    => $entityId,
+            'entityId' => $entityId,
             'enumValueId' => $enumValueId
         ];
-        $types  = [
-            'entityId'    => 'integer',
+        $types = [
+            'entityId' => 'integer',
             'enumValueId' => 'string'
         ];
 
@@ -287,9 +286,9 @@ class MigrateOptionSetsToEnums implements
 
     /**
      * @param QueryBag $queries
-     * @param string   $entityTableName
-     * @param string   $entityFieldName
-     * @param int      $entityId
+     * @param string $entityTableName
+     * @param string $entityFieldName
+     * @param int $entityId
      * @param string[] $enumValueIds
      */
     protected function updateEnumSnapshot(
@@ -299,9 +298,9 @@ class MigrateOptionSetsToEnums implements
         $entityId,
         $enumValueIds
     ) {
-        $nameGenerator = $this->extendExtension->getNameGenerator();
+        $nameGenerator = $this->outdatedExtendExtension->getNameGenerator();
 
-        $query  = sprintf(
+        $query = sprintf(
             'UPDATE %s SET %s = :snapshot WHERE id = :entityId',
             $entityTableName,
             $nameGenerator->generateMultiEnumSnapshotColumnName($entityFieldName)
@@ -310,8 +309,8 @@ class MigrateOptionSetsToEnums implements
             'entityId' => $entityId,
             'snapshot' => $this->buildSnapshotValue($enumValueIds)
         ];
-        $types  = [
-            'entityId'    => 'integer',
+        $types = [
+            'entityId' => 'integer',
             'enumValueId' => 'string'
         ];
 
@@ -331,7 +330,7 @@ class MigrateOptionSetsToEnums implements
         $snapshot = implode(',', $ids);
 
         if (strlen($snapshot) > ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH) {
-            $snapshot  = substr($snapshot, 0, ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH);
+            $snapshot = substr($snapshot, 0, ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH);
             $lastDelim = strrpos($snapshot, ',');
             if (ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH - $lastDelim - 1 < 3) {
                 $lastDelim = strrpos($snapshot, ',', -(strlen($snapshot) - $lastDelim + 1));

@@ -74,7 +74,7 @@ class ConfigProvider implements ResetInterface
         }
 
         if (!$identifierFieldsOnly && $this->fullConfigsCacheDisabled) {
-            return $this->loadConfig($className, $version, $requestType, $extras, $identifierFieldsOnly, $cacheKey);
+            return $this->loadConfig($className, $version, $requestType, $extras, false, $cacheKey);
         }
 
         if (\array_key_exists($cacheKey, $this->cache)) {

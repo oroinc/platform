@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -20,9 +19,9 @@ class EnumFilterType extends AbstractMultiChoiceType
     public const TYPE_IN = '1';
     public const TYPE_NOT_IN = '2';
 
-    private EnumValueProvider $valueProvider;
+    private EnumOptionsProvider $valueProvider;
 
-    public function __construct(TranslatorInterface $translator, EnumValueProvider $valueProvider)
+    public function __construct(TranslatorInterface $translator, EnumOptionsProvider $valueProvider)
     {
         parent::__construct($translator);
         $this->valueProvider = $valueProvider;
@@ -59,16 +58,7 @@ class EnumFilterType extends AbstractMultiChoiceType
                     throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
                 }
 
-                $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
-                if (!is_a($class, AbstractEnumValue::class, true)) {
-                    throw new InvalidOptionsException(sprintf(
-                        '"%s" must be a child of "%s"',
-                        $class,
-                        AbstractEnumValue::class
-                    ));
-                }
-
-                return $class;
+                return EnumOption::class;
             }
         );
 
@@ -76,12 +66,12 @@ class EnumFilterType extends AbstractMultiChoiceType
         $resolver->setNormalizer(
             'field_options',
             function (Options $options, $value) {
-                if (isset($options['class'])) {
+                if (isset($options['enum_code'])) {
                     $nullValue = null;
                     if ($options->offsetExists('null_value')) {
                         $nullValue = $options->offsetGet('null_value');
                     }
-                    $value['choices'] = $this->getChoices($options['class'], $nullValue);
+                    $value['choices'] = $this->getChoices($options['enum_code'], $nullValue);
                 } else {
                     $value['choices'] = [];
                 }
@@ -104,7 +94,7 @@ class EnumFilterType extends AbstractMultiChoiceType
     {
         /**
          * Convert value to string.
-         * AbstractEnumValue declare primary key as string.
+         * EnumOptionInterface declare primary key as string.
          * For enums with numerical PK value should be converted to string for correct types in DB query.
          */
         $builder->addModelTransformer(
@@ -141,15 +131,15 @@ class EnumFilterType extends AbstractMultiChoiceType
         return 'oro_enum_filter';
     }
 
-    private function getChoices(string $enumValueClassName, ?string $nullValue): array
+    private function getChoices(?string $enumCode, ?string $nullValue): array
     {
         $choices = [];
         if (!empty($nullValue)) {
             $choices[$this->translator->trans('oro.entity_extend.datagrid.enum.filter.empty')] = $nullValue;
         }
 
-        if (!empty($enumValueClassName)) {
-            $choices = $this->valueProvider->getEnumChoices($enumValueClassName) + $choices;
+        if (!empty($enumCode)) {
+            $choices = $this->valueProvider->getEnumChoicesByCode($enumCode) + $choices;
         }
 
         return $choices;

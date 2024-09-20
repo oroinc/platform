@@ -13,6 +13,8 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -340,6 +342,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      *
      * @return array [data item key => [entity key, association map], ...]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function collectIdentifiersForAssociations(
         array &$entityIdMap,
@@ -359,12 +362,15 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
 
             $config = $association->getTargetEntity();
             $idFieldName = AssociationConfigUtil::getEntityIdentifierFieldName($config);
-            if ($idFieldName) {
+            if ($idFieldName && $config->isMetaPropertyEnabled('title')) {
                 $isCollection = $association->isCollectionValuedAssociation();
                 if (!$isCollection) {
                     $value = [$value];
                 }
                 $targetEntityClass = $association->getTargetClass();
+                if (ExtendHelper::isOutdatedEnumOptionEntity($targetEntityClass)) {
+                    $targetEntityClass = EnumOption::class;
+                }
                 $targetAssociationPath = $associationPath
                     ? $associationPath . ConfigUtil::PATH_DELIMITER . $associationName
                     : $associationName;

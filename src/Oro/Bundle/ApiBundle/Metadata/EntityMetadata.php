@@ -31,6 +31,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
     private array $fields = [];
     /** @var AssociationMetadata[] */
     private array $associations = [];
+    private array $hints = [];
     private ?ParameterBag $attributes = null;
     private ?TargetMetadataAccessorInterface $targetMetadataAccessor = null;
 
@@ -70,6 +71,9 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
         $result = [];
         if (null !== $this->attributes) {
             $result = $this->attributes->toArray();
+        }
+        if ($this->hints) {
+            $result['hints'] = $this->hints;
         }
         $result['class'] = $this->className;
         if ($this->inherited) {
@@ -501,6 +505,24 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
             $metadata->setName($newName);
             $this->addAssociation($metadata);
         }
+    }
+
+    /**
+     * Gets Doctrine query hints.
+     * Each hint can be a string or an associative array with "name" and "value" keys.
+     */
+    public function getHints(): array
+    {
+        return $this->hints;
+    }
+
+    /**
+     * Sets Doctrine query hints.
+     * Each hint can be a string or an associative array with "name" and "value" keys.
+     */
+    public function setHints(array $hints): array
+    {
+        return $this->hints = $hints;
     }
 
     /**

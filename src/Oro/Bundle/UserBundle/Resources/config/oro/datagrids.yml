@@ -21,12 +21,8 @@ datagrids:
                     - u.createdAt
                     - u.updatedAt
                     - u.enabled
-                    - au.name as authStatus
                 from:
                     - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
-                join:
-                    left:
-                        - { join: u.auth_status, alias: au }
             hints:
                 - HINT_TRANSLATABLE
         inline_editing:
@@ -49,11 +45,15 @@ datagrids:
                 choices:
                     oro.user.datagrid.user.columns.disabled: 0
                     oro.user.datagrid.user.columns.enabled: 1
-            authStatus:
+            auth_status:
                 label:         oro.user.datagrid.auth_status.label
                 editable:      false
                 inline_editing:
                     enable: false
+                frontend_type: select
+                data_name: auth_status
+                choices: "@oro_entity_extend.enum_options_provider->getEnumChoicesByCode('auth_status')"
+                translatable_options: false
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
@@ -99,8 +99,8 @@ datagrids:
                     data_name: u.updatedAt
                 enabled:
                     data_name: u.enabled
-                authStatus:
-                    data_name: au.priority
+                auth_status:
+                    data_name: auth_status
             default:
                 username: ASC
 
@@ -126,9 +126,9 @@ datagrids:
                             choices:
                                 oro.user.datagrid.user.filters.disabled: 2
                                 oro.user.datagrid.user.filters.enabled: 1
-                authStatus:
+                auth_status:
                     type:      enum
-                    data_name: au.id
+                    data_name: auth_status
                     enum_code: auth_status
                 createdAt:
                     type: datetime

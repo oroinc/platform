@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -23,10 +23,7 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('sort_enum', [$this, 'sortEnum']),
@@ -37,31 +34,30 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * Sorts the given enum value identifiers according priorities specified for an enum values
      *
-     * @param string|string[] $enumValueIds The list of enum value identifiers.
+     * @param string|string[] $enumOptionIds The list of enum value identifiers.
      *                                      If this parameter is a string it is supposed that ids are
      *                                      delimited by comma (,).
-     * @param string          $enumValueEntityClassOrEnumCode
-     *
-     * @return string[]
      */
-    public function sortEnum($enumValueIds, $enumValueEntityClassOrEnumCode)
+    public function sortEnum(mixed $enumOptionIds): array
     {
-        $ids = $enumValueIds;
+        $ids = $enumOptionIds;
         if ($ids === null) {
             $ids = [];
         } elseif (\is_string($ids)) {
-            $ids = explode(',', $ids);
+            $ids = json_decode($ids);
         }
-
         if (empty($ids) || count($ids) === 1) {
             return $ids;
         }
-
+        $enumCode = $this->getEnumCodeFromOptionId(reset($ids));
+        if (null === $enumCode) {
+            return [];
+        }
         $ids = array_fill_keys($ids, true);
-        $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
+        $values = $this->getEnumOptions($enumCode);
 
         $result = [];
-        foreach ($values as $name => $id) {
+        foreach ($values as $id) {
             if (isset($ids[$id])) {
                 $result[] = $id;
             }
@@ -70,34 +66,38 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $result;
     }
 
-    /**
-     * Translates the given enum value
-     *
-     * @param string $enumValueId
-     * @param string $enumValueEntityClassOrEnumCode
-     *
-     * @return string
-     */
-    public function transEnum($enumValueId, $enumValueEntityClassOrEnumCode)
+    public function transEnum(?string $enumOptionId): ?string
     {
-        $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
-        $label = array_search($enumValueId, $values, true);
+        if (null === $enumOptionId) {
+            return null;
+        }
+        $enumCode = $this->getEnumCodeFromOptionId($enumOptionId);
+        if (null === $enumCode) {
+            return null;
+        }
+        $values = $this->getEnumOptions($enumCode);
+        $label = array_search($enumOptionId, $values, true);
 
-        return $label !== false ? $label : $enumValueId;
+        return $label !== false ? $label : null;
     }
 
     /**
-     * @param string $enumValueEntityClassOrEnumCode
      *
      * @return array [enum value id => enum value name, ...] sorted by value priority
      */
-    private function getEnumValues($enumValueEntityClassOrEnumCode)
+    private function getEnumOptions(string $enumCode): array
     {
-        if (!str_contains($enumValueEntityClassOrEnumCode, '\\')) {
-            $enumValueEntityClassOrEnumCode = ExtendHelper::buildEnumValueClassName($enumValueEntityClassOrEnumCode);
-        }
+        return $this->getEnumOptionsProvider()->getEnumChoicesByCode($enumCode);
+    }
 
-        return $this->getEnumValueProvider()->getEnumChoices($enumValueEntityClassOrEnumCode);
+    private function getEnumCodeFromOptionId(string $enumOptionId): ?string
+    {
+        try {
+            return ExtendHelper::extractEnumCode($enumOptionId);
+        } catch (\Throwable $exception) {
+            // passed invalid enumOptionId
+            return null;
+        }
     }
 
     /**
@@ -106,12 +106,12 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_entity_extend.enum_value_provider' => EnumValueProvider::class,
+            'oro_entity_extend.enum_options_provider' => EnumOptionsProvider::class,
         ];
     }
 
-    private function getEnumValueProvider(): EnumValueProvider
+    private function getEnumOptionsProvider(): EnumOptionsProvider
     {
-        return $this->container->get('oro_entity_extend.enum_value_provider');
+        return $this->container->get('oro_entity_extend.enum_options_provider');
     }
 }

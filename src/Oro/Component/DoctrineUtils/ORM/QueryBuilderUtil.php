@@ -16,8 +16,9 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class QueryBuilderUtil
 {
-    const IN         = 'in';
-    const IN_BETWEEN = 'in_between';
+    public const IN = 'in';
+    public const IN_BETWEEN = 'in_between';
+    protected const SERIALIZED_QUERY_PART = 'CAST(JSON_EXTRACT(';
 
     /**
      * Calculates the page offset
@@ -100,6 +101,9 @@ class QueryBuilderUtil
             foreach ($selectPart->getParts() as $part) {
                 if (preg_match_all('#(\,\s*)*(?P<expr>.+?)\\s+AS\\s+(?P<alias>\\w+)#i', $part, $matches)) {
                     foreach ($matches['alias'] as $key => $val) {
+                        if (str_starts_with($part, self::SERIALIZED_QUERY_PART) && $val === $alias) {
+                            return substr($part, 0, strrpos($part, ')') + 1);
+                        }
                         if ($val === $alias) {
                             return $matches['expr'][$key];
                         }
@@ -310,13 +314,23 @@ class QueryBuilderUtil
         $qb->setParameters($usedParameters);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param Expr\Join $join
-     *
-     * @return string
-     */
-    public static function getJoinClass(QueryBuilder $qb, Expr\Join $join)
+    public static function findClassByAlias(QueryBuilder $qb, string $alias): ?string
+    {
+        foreach ($qb->getRootAliases() as $i => $rootAlias) {
+            if ($rootAlias === $alias) {
+                return $qb->getRootEntities()[$i];
+            }
+        }
+
+        $join = self::findJoinByAlias($qb, $alias);
+        if (null !== $join) {
+            return self::getJoinClass($qb, $join);
+        }
+
+        return null;
+    }
+
+    public static function getJoinClass(QueryBuilder $qb, Expr\Join $join): string
     {
         if (class_exists($join->getJoin())) {
             return $join->getJoin();

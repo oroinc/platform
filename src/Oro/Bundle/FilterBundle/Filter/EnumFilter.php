@@ -43,9 +43,9 @@ class EnumFilter extends BaseMultiChoiceFilter
         if (isset($params[self::ENUM_CODE_KEY])) {
             $params[FilterUtility::FORM_OPTIONS_KEY] = [
                 self::ENUM_CODE_KEY => $params[self::ENUM_CODE_KEY],
-                self::CLASS_KEY => ExtendHelper::buildEnumValueClassName($params[self::ENUM_CODE_KEY])
+                self::CLASS_KEY => ExtendHelper::getOutdatedEnumOptionClassName($params[self::ENUM_CODE_KEY])
             ];
-            $params[self::CLASS_KEY] = ExtendHelper::buildEnumValueClassName($params[self::ENUM_CODE_KEY]);
+            $params[self::CLASS_KEY] = ExtendHelper::getOutdatedEnumOptionClassName($params[self::ENUM_CODE_KEY]);
             unset($params[self::ENUM_CODE_KEY]);
         }
 

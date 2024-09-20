@@ -40,9 +40,9 @@ class ExtendConfigProcessor
     }
 
     /**
-     * @param array                $configs
+     * @param array $configs
      * @param LoggerInterface|null $logger
-     * @param bool                 $dryRun Log modifications without apply them
+     * @param bool $dryRun Log modifications without apply them
      * @throws \Exception
      */
     public function processConfigs(array $configs, LoggerInterface $logger = null, $dryRun = false)
@@ -141,7 +141,7 @@ class ExtendConfigProcessor
 
     /**
      * @param string $className
-     * @param array  $configs
+     * @param array $configs
      */
     protected function processEntityConfigs($className, array $configs)
     {
@@ -171,8 +171,8 @@ class ExtendConfigProcessor
     /**
      * @param string $className
      * @param string $fieldName
-     * @param array  $configs
-     * @param bool   $isExtendEntity
+     * @param array $configs
+     * @param bool $isExtendEntity
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processFieldConfigs($className, $fieldName, array $configs, $isExtendEntity)
@@ -190,7 +190,7 @@ class ExtendConfigProcessor
             }
             if ($needUpdateState) {
                 $extendConfigProvider = $this->configManager->getProvider('extend');
-                $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
+                $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
                 if (!$extendConfig->is('state', ExtendScope::STATE_UPDATE)) {
                     $extendConfig->set('state', ExtendScope::STATE_UPDATE);
                     $this->configManager->persist($extendConfig);
@@ -211,7 +211,7 @@ class ExtendConfigProcessor
     /**
      * @param string $className
      * @param string $mode
-     * @param array  $configs
+     * @param array $configs
      * @throws \LogicException
      */
     protected function createEntityModel($className, $mode, array $configs)
@@ -232,7 +232,7 @@ class ExtendConfigProcessor
         $this->updateConfigs($configs, $className);
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig         = $extendConfigProvider->getConfig($className);
+        $extendConfig = $extendConfigProvider->getConfig($className);
         $extendConfig->set('state', ExtendScope::STATE_NEW);
         $this->configManager->persist($extendConfig);
     }
@@ -257,7 +257,7 @@ class ExtendConfigProcessor
 
     /**
      * @param string $className
-     * @param string $mode      Can be the value of one of ConfigModel::MODE_* constants
+     * @param string $mode Can be the value of one of ConfigModel::MODE_* constants
      */
     protected function changeEntityMode($className, $mode)
     {
@@ -274,8 +274,8 @@ class ExtendConfigProcessor
      * @param string $fieldName
      * @param string $fieldType
      * @param string $mode
-     * @param array  $configs
-     * @param bool   $isExtendEntity
+     * @param array $configs
+     * @param bool $isExtendEntity
      * @throws \LogicException
      */
     protected function createFieldModel($className, $fieldName, $fieldType, $mode, array $configs, $isExtendEntity)
@@ -306,7 +306,7 @@ class ExtendConfigProcessor
         $this->updateConfigs($configs, $className, $fieldName);
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
+        $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
         $extendConfig->set('state', ExtendScope::STATE_NEW);
         $this->configManager->persist($extendConfig);
     }
@@ -314,7 +314,7 @@ class ExtendConfigProcessor
     /**
      * @param string $className
      * @param string $fieldName
-     * @param array  $configs
+     * @param array $configs
      *
      * @return bool TRUE if a config was changed; otherwise, FALSE
      */
@@ -351,7 +351,7 @@ class ExtendConfigProcessor
     /**
      * @param string $className
      * @param string $fieldName
-     * @param string $mode      Can be the value of one of ConfigModel::MODE_* constants
+     * @param string $mode Can be the value of one of ConfigModel::MODE_* constants
      *
      * @return bool TRUE if the mode was changed; otherwise, FALSE
      */
@@ -369,8 +369,8 @@ class ExtendConfigProcessor
     }
 
     /**
-     * @param array       $configs
-     * @param string      $className
+     * @param array $configs
+     * @param string $className
      * @param string|null $fieldName
      * @return bool TRUE is any changes were made
      */
@@ -379,15 +379,15 @@ class ExtendConfigProcessor
         $result = false;
 
         foreach ($configs as $scope => $values) {
-            $config     = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
+            $config = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
             $hasChanges = false;
             foreach ($values as $key => $value) {
-                $path       = explode('.', $key);
+                $path = explode('.', $key);
                 $pathLength = count($path);
                 if ($pathLength > 1) {
-                    $code        = array_shift($path);
+                    $code = array_shift($path);
                     $existingVal = (array)$config->get($code);
-                    $current     = &$existingVal;
+                    $current = &$existingVal;
                     foreach ($path as $name) {
                         if (!array_key_exists($name, $current)) {
                             $current[$name] = [];
@@ -457,9 +457,9 @@ class ExtendConfigProcessor
     /**
      * Gets a value of an element with the given key and then remove the element from array
      *
-     * @param array  $arr
+     * @param array $arr
      * @param string $key
-     * @param mixed  $defaultValue
+     * @param mixed $defaultValue
      * @return mixed
      */
     protected function getAndRemoveElement(array &$arr, $key, $defaultValue = null)
@@ -474,9 +474,9 @@ class ExtendConfigProcessor
     }
 
     /**
-     * @param string      $scope
-     * @param string      $code
-     * @param string      $className
+     * @param string $scope
+     * @param string $code
+     * @param string $className
      * @param string|null $fieldName
      * @return bool
      */

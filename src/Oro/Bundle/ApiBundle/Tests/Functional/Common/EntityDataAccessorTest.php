@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Common;
 
-use Extend\Entity\EV_Api_Enum1 as ExtendableEntityWithIsGetter;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity as ExtendableEntityWithoutGetter;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder as Entity;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption as EntityWithIsGetter;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User as ExtendableEntity;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
@@ -37,9 +37,9 @@ class EntityDataAccessorTest extends WebTestCase
         self::assertTrue($this->entityDataAccessor->hasGetter(ExtendableEntityWithoutGetter::class, 'name'));
     }
 
-    public function testHasGetterForAccessibleFieldForExtendableEntityWithIsGetter(): void
+    public function testHasGetterForAccessibleFieldForEntityWithIsGetter(): void
     {
-        self::assertTrue($this->entityDataAccessor->hasGetter(ExtendableEntityWithIsGetter::class, 'default'));
+        self::assertTrue($this->entityDataAccessor->hasGetter(EntityWithIsGetter::class, 'default'));
     }
 
     public function testHasGetterForNotAccessibleFieldForRegularEntity(): void
@@ -87,14 +87,13 @@ class EntityDataAccessorTest extends WebTestCase
         self::assertEquals($newValue, $value);
     }
 
-    public function testTryGetValueForAccessibleFieldForExtendableEntityWithIsGetter(): void
+    public function testTryGetValueForAccessibleFieldForEntityWithIsGetter(): void
     {
-        $entity = new ExtendableEntityWithIsGetter('id', 'name');
-        $newValue = true;
-        $entity->setDefault($newValue);
+        $entity = new EntityWithIsGetter('code', 'name', 'id');
+        $entity->setDefault(true);
         $value = false;
         self::assertTrue($this->entityDataAccessor->tryGetValue($entity, 'default', $value));
-        self::assertEquals(true, $value);
+        self::assertTrue($value);
     }
 
     public function testTryGetValueForNotAccessibleFieldForRegularEntity(): void

@@ -28,7 +28,6 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -49,11 +48,6 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         . ' the ownership capabilities of the record.';
     private const ORGANIZATION_DESCRIPTION = 'An organization record represents'
         . ' a real enterprise, business, firm, company or another organization to which the users belong.';
-    private const ENUM_NAME_DESCRIPTION = 'The human readable name of the option.';
-    private const ENUM_DEFAULT_DESCRIPTION = 'Determines if this option is selected by default'
-        . ' for new records.';
-    private const ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked.'
-        . ' First appears the option with the higher number of the priority.';
     private const FIELD_FILTER_DESCRIPTION = 'Filter records by \'%s\' field.';
     private const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
 
@@ -1007,42 +1001,6 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'organization' => [
                         'description' => 'action field description. ' . self::ORGANIZATION_DESCRIPTION
-                    ]
-                ]
-            ],
-            $this->context->getResult()
-        );
-    }
-
-    public function testEnumFields()
-    {
-        $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
-                'name'     => null,
-                'default'  => null,
-                'priority' => null
-            ]
-        ];
-
-        $this->context->setClassName(TestEnumValue::class);
-        $this->context->setTargetAction('get_list');
-        $this->context->setResult($this->createConfigObject($config));
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'exclusion_policy'       => 'all',
-                'identifier_description' => self::ID_DESCRIPTION,
-                'fields'                 => [
-                    'name'     => [
-                        'description' => self::ENUM_NAME_DESCRIPTION
-                    ],
-                    'default'  => [
-                        'description' => self::ENUM_DEFAULT_DESCRIPTION
-                    ],
-                    'priority' => [
-                        'description' => self::ENUM_PRIORITY_DESCRIPTION
                     ]
                 ]
             ],

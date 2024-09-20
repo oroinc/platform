@@ -12,17 +12,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DuplicateEntityAliasResolver */
+    /** @var DuplicateEntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $duplicateResolver;
 
     /** @var ExtendEntityAliasProvider */
@@ -37,13 +36,17 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
                 [
                     EntityConfiguration::ENTITY_ALIASES,
                     [
-                        'Test\EntityWithCustomAlias'                             => [
+                        'Test\EntityWithCustomAlias'          => [
                             'alias'        => 'my_alias',
                             'plural_alias' => 'my_plural_alias'
                         ],
-                        ExtendHelper::ENTITY_NAMESPACE . 'EntityWithCustomAlias' => [
+                        'Extend\Entity\EntityWithCustomAlias' => [
                             'alias'        => 'my_alias_custom_entity',
                             'plural_alias' => 'my_plural_alias_custom_entity'
+                        ],
+                        'Extend\Entity\EV_EntityWithCustomAlias' => [
+                            'alias'        => 'my_alias_custom_enum',
+                            'plural_alias' => 'my_plural_alias_custom_enum'
                         ]
                     ]
                 ],
@@ -51,7 +54,8 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
                     EntityConfiguration::ENTITY_ALIAS_EXCLUSIONS,
                     [
                         'Test\ExcludedEntity',
-                        ExtendHelper::ENTITY_NAMESPACE . 'ExcludedEntity'
+                        'Extend\Entity\ExcludedEntity',
+                        'Extend\Entity\EV_ExcludedEntity'
                     ]
                 ]
             ]);
@@ -67,16 +71,7 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function assertEntityAlias($expected, $actual)
-    {
-        if ($expected instanceof EntityAlias) {
-            self::assertEquals($expected, $actual);
-        } else {
-            self::assertSame($expected, $actual);
-        }
-    }
-
-    public function testGetEntityAliasForNotConfigurableEntity()
+    public function testGetEntityAliasForNotConfigurableEntity(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -89,21 +84,10 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($result);
     }
 
-    public function testGetEntityAliasForEnum()
+    public function testGetEntityAliasForEnum(): void
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = 'Extend\Entity\EV_Test_Enum';
         $expectedAlias = new EntityAlias('testenum', 'testenums');
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass), ['code' => 'test_enum']);
-
-        $this->configManager->expects(self::once())
-            ->method('hasConfig')
-            ->with($entityClass)
-            ->willReturn(true);
-        $this->configManager->expects(self::once())
-            ->method('getEntityConfig')
-            ->with('enum', $entityClass)
-            ->willReturn($enumConfig);
 
         $this->duplicateResolver->expects(self::once())
             ->method('getAlias')
@@ -120,24 +104,13 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass, $expectedAlias);
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertEquals($expectedAlias, $result);
     }
 
-    public function testGetEntityAliasForEnumWhenItHasAliasInEntityConfig()
+    public function testGetEntityAliasForEnumWhenItHasAliasInEntityConfig(): void
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = 'Extend\Entity\EV_Test_Enum';
         $expectedAlias = new EntityAlias('testenum', 'testenums');
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass), ['code' => 'test_enum']);
-
-        $this->configManager->expects(self::once())
-            ->method('hasConfig')
-            ->with($entityClass)
-            ->willReturn(true);
-        $this->configManager->expects(self::once())
-            ->method('getEntityConfig')
-            ->with('enum', $entityClass)
-            ->willReturn($enumConfig);
 
         $this->duplicateResolver->expects(self::once())
             ->method('getAlias')
@@ -151,26 +124,15 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->method('saveAlias');
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertEquals($expectedAlias, $result);
     }
 
-    public function testGetEntityAliasForEnumWithDuplicatedAlias()
+    public function testGetEntityAliasForEnumWithDuplicatedAlias(): void
     {
-        $entityClass = 'Test\Entity';
+        $entityClass = 'Extend\Entity\EV_Test_Enum';
         $defaultAlias = 'testenum';
         $defaultPluralAlias = 'testenums';
         $expectedAlias = new EntityAlias('testenum1', 'testenum1');
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass), ['code' => 'test_enum']);
-
-        $this->configManager->expects(self::once())
-            ->method('hasConfig')
-            ->with($entityClass)
-            ->willReturn(true);
-        $this->configManager->expects(self::once())
-            ->method('getEntityConfig')
-            ->with('enum', $entityClass)
-            ->willReturn($enumConfig);
 
         $this->duplicateResolver->expects(self::once())
             ->method('getAlias')
@@ -189,24 +151,13 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass, $expectedAlias);
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertEquals($expectedAlias, $result);
     }
 
-    public function testGetEntityAliasForEnumWithCustomAlias()
+    public function testGetEntityAliasForEnumWithCustomAlias(): void
     {
-        $entityClass = 'Test\EntityWithCustomAlias';
-        $expectedAlias = new EntityAlias('my_alias', 'my_plural_alias');
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass), ['code' => 'test_enum']);
-
-        $this->configManager->expects(self::once())
-            ->method('hasConfig')
-            ->with($entityClass)
-            ->willReturn(true);
-        $this->configManager->expects(self::once())
-            ->method('getEntityConfig')
-            ->with('enum', $entityClass)
-            ->willReturn($enumConfig);
+        $entityClass = 'Extend\Entity\EV_EntityWithCustomAlias';
+        $expectedAlias = new EntityAlias('my_alias_custom_enum', 'my_plural_alias_custom_enum');
 
         $this->duplicateResolver->expects(self::never())
             ->method('getAlias');
@@ -216,40 +167,21 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->method('saveAlias');
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertEquals($expectedAlias, $result);
     }
 
-    public function testGetEntityAliasForExcludedEnum()
+    public function testGetEntityAliasForExcludedEnum(): void
     {
-        $entityClass = 'Test\ExcludedEntity';
-        $expectedAlias = false;
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass), ['code' => 'test_enum']);
-
-        $this->configManager->expects(self::once())
-            ->method('hasConfig')
-            ->with($entityClass)
-            ->willReturn(true);
-        $this->configManager->expects(self::once())
-            ->method('getEntityConfig')
-            ->with('enum', $entityClass)
-            ->willReturn($enumConfig);
-
-        $this->duplicateResolver->expects(self::never())
-            ->method('getAlias');
-        $this->duplicateResolver->expects(self::never())
-            ->method('hasAlias');
-        $this->duplicateResolver->expects(self::never())
-            ->method('saveAlias');
+        $entityClass = 'Extend\Entity\EV_ExcludedEntity';
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        $this->assertFalse($result);
     }
 
     /**
      * @dataProvider dictionaryDataProvider
      */
-    public function testGetEntityAliasForDictionary(string $entityClass, ?string $expectedAlias)
+    public function testGetEntityAliasForDictionary(string $entityClass, ?string $expectedAlias): void
     {
         $enumConfig = new Config(new EntityConfigId('enum', $entityClass));
         $groupingConfig = new Config(
@@ -261,15 +193,13 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
-            ->willReturnMap([
-                ['enum', $entityClass, $enumConfig],
-                ['grouping', $entityClass, $groupingConfig]
-            ]);
+            ->with('grouping', $entityClass)
+            ->willReturn(new Config(new EntityConfigId('grouping', $entityClass), ['groups' => ['dictionary']]));
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertEquals($expectedAlias, $result);
     }
 
     public function dictionaryDataProvider(): array
@@ -290,24 +220,19 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetEntityAliasForCustomEntity()
+    public function testGetEntityAliasForCustomEntity(): void
     {
-        $entityClass = ExtendHelper::ENTITY_NAMESPACE . 'User';
+        $entityClass = 'Extend\Entity\User';
         $expectedAlias = new EntityAlias('extenduser', 'extendusers');
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass));
-        $groupingConfig = new Config(new EntityConfigId('grouping', $entityClass));
 
         $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
-            ->willReturnMap([
-                ['enum', $entityClass, $enumConfig],
-                ['grouping', $entityClass, $groupingConfig]
-            ]);
+            ->with('grouping', $entityClass)
+            ->willReturn(new Config(new EntityConfigId('grouping', $entityClass)));
 
         $this->duplicateResolver->expects(self::once())
             ->method('getAlias')
@@ -324,27 +249,22 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass, $expectedAlias);
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertEquals($expectedAlias, $result);
     }
 
-    public function testGetEntityAliasForCustomEntityWhenItHasAliasInEntityConfig()
+    public function testGetEntityAliasForCustomEntityWhenItHasAliasInEntityConfig(): void
     {
-        $entityClass = ExtendHelper::ENTITY_NAMESPACE . 'User';
+        $entityClass = 'Extend\Entity\User';
         $entityAlias = new EntityAlias('extenduser', 'extendusers');
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass));
-        $groupingConfig = new Config(new EntityConfigId('grouping', $entityClass));
 
         $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
-            ->willReturnMap([
-                ['enum', $entityClass, $enumConfig],
-                ['grouping', $entityClass, $groupingConfig]
-            ]);
+            ->with('grouping', $entityClass)
+            ->willReturn(new Config(new EntityConfigId('grouping', $entityClass)));
         $this->duplicateResolver->expects(self::once())
             ->method('getAlias')
             ->with($entityClass)
@@ -355,29 +275,24 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->method('saveAlias');
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($entityAlias, $result);
+        self::assertEquals($entityAlias, $result);
     }
 
-    public function testGetEntityAliasForCustomEntityWithDuplicatedAlias()
+    public function testGetEntityAliasForCustomEntityWithDuplicatedAlias(): void
     {
-        $entityClass = ExtendHelper::ENTITY_NAMESPACE . 'User';
+        $entityClass = 'Extend\Entity\User';
         $defaultAlias = 'extenduser';
         $defaultPluralAlias = 'extendusers';
         $expectedAlias = new EntityAlias('extenduser1', 'extenduser1');
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass));
-        $groupingConfig = new Config(new EntityConfigId('grouping', $entityClass));
 
         $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
-            ->willReturnMap([
-                ['enum', $entityClass, $enumConfig],
-                ['grouping', $entityClass, $groupingConfig]
-            ]);
+            ->with('grouping', $entityClass)
+            ->willReturn(new Config(new EntityConfigId('grouping', $entityClass)));
 
         $this->duplicateResolver->expects(self::once())
             ->method('getAlias')
@@ -396,27 +311,22 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass, $expectedAlias);
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertEquals($expectedAlias, $result);
     }
 
-    public function testGetEntityAliasForCustomEntityWithCustomAlias()
+    public function testGetEntityAliasForCustomEntityWithCustomAlias(): void
     {
-        $entityClass = ExtendHelper::ENTITY_NAMESPACE . 'EntityWithCustomAlias';
+        $entityClass = 'Extend\Entity\EntityWithCustomAlias';
         $expectedAlias = new EntityAlias('my_alias_custom_entity', 'my_plural_alias_custom_entity');
 
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass));
-        $groupingConfig = new Config(new EntityConfigId('grouping', $entityClass));
-
         $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
-            ->willReturnMap([
-                ['enum', $entityClass, $enumConfig],
-                ['grouping', $entityClass, $groupingConfig]
-            ]);
+            ->with('grouping', $entityClass)
+            ->willReturn(new Config(new EntityConfigId('grouping', $entityClass)));
 
         $this->duplicateResolver->expects(self::never())
             ->method('getAlias');
@@ -426,27 +336,21 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->method('saveAlias');
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertEquals($expectedAlias, $result);
     }
 
-    public function testGetEntityAliasForExcludedCustomEntity()
+    public function testGetEntityAliasForExcludedCustomEntity(): void
     {
-        $entityClass = ExtendHelper::ENTITY_NAMESPACE . 'ExcludedEntity';
-        $expectedAlias = false;
-
-        $enumConfig = new Config(new EntityConfigId('enum', $entityClass));
-        $groupingConfig = new Config(new EntityConfigId('grouping', $entityClass));
+        $entityClass = 'Extend\Entity\ExcludedEntity';
 
         $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
-            ->willReturnMap([
-                ['enum', $entityClass, $enumConfig],
-                ['grouping', $entityClass, $groupingConfig]
-            ]);
+            ->with('grouping', $entityClass)
+            ->willReturn(new Config(new EntityConfigId('grouping', $entityClass)));
 
         $this->duplicateResolver->expects(self::never())
             ->method('getAlias');
@@ -456,6 +360,6 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ->method('saveAlias');
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
-        $this->assertEntityAlias($expectedAlias, $result);
+        self::assertFalse($result);
     }
 }

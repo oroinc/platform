@@ -155,7 +155,9 @@ class ConfigHelper
             'extend' => [
                 'is_extend' => true,
                 'owner' => ExtendScope::OWNER_CUSTOM,
-                'state' => ExtendScope::STATE_NEW
+                'state' => ExtendHelper::isEnumerableType($fieldType)
+                    ? ExtendScope::STATE_ACTIVE
+                    : ExtendScope::STATE_NEW
             ]
         ];
 
@@ -163,7 +165,7 @@ class ConfigHelper
         // check if a field type is complex, for example reverse relation or public enum
         $fieldTypeParts = explode('||', $fieldType);
         if (count($fieldTypeParts) > 1) {
-            if (in_array($fieldTypeParts[0], ['enum', 'multiEnum'], true)) {
+            if (ExtendHelper::isEnumerableType($fieldTypeParts[0])) {
                 // enum
                 $fieldType = $fieldTypeParts[0];
                 $fieldOptions['enum']['enum_code'] = $fieldTypeParts[1];

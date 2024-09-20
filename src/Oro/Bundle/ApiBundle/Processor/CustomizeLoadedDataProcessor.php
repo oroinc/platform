@@ -39,11 +39,11 @@ class CustomizeLoadedDataProcessor extends ByStepActionProcessor
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        if ($context->isIdentifierOnly()) {
+        $firstGroup = $context->getFirstGroup();
+        if ('item' === $firstGroup && $context->isIdentifierOnly()) {
             return $context->getAction() . '.identifier_only';
         }
 
-        $firstGroup = $context->getFirstGroup();
         if ($firstGroup === $context->getLastGroup()) {
             return $context->getAction() . '.' . $firstGroup;
         }

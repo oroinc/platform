@@ -3,6 +3,7 @@ services:
         class: Oro\Bundle\EntityBundle\Api\EntityStructureNormalizer
         arguments:
             - '@oro_api.value_normalizer'
+            - '@oro_entity_config.config_manager'
 
     oro_entity.api.validate_entity_fallback:
         class: Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback

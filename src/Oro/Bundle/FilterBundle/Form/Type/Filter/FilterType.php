@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ *  The form type which can be used as a text filter.
+ */
 class FilterType extends AbstractType
 {
     const NAME = 'oro_type_filter';
@@ -61,9 +64,8 @@ class FilterType extends AbstractType
         if ($options['operator_choices']) {
             $result['choices'] = $options['operator_choices'];
         }
-        $result = array_merge($result, $options['operator_options']);
 
-        return $result;
+        return array_merge($result, $options['operator_options']);
     }
 
     /**

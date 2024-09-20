@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Component\Config\Common\ConfigObject;
 
 /**
@@ -350,11 +350,12 @@ class DatagridConfiguration extends ConfigObject
         $this->addFilter(
             $columnName,
             [
-                'type'      => 'entity',
+                'type' => 'entity',
                 'data_name' => $dataName,
-                'options'   => [
+                'options' => [
                     'field_options' => [
-                        'class' => ExtendHelper::buildEnumValueClassName($enumCode),
+                        'class' => EnumOption::class,
+                        'enum_code' => $enumCode,
                         'choice_label' => 'name',
                         'query_builder' => function (EntityRepository $entityRepository) {
                             return $entityRepository->createQueryBuilder('c')

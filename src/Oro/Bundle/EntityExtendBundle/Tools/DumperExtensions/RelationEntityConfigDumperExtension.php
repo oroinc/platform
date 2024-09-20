@@ -251,7 +251,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $relationKey = ExtendHelper::buildRelationKey(
             $fieldConfigId->getClassName(),
             $fieldConfigId->getFieldName(),
-            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType()),
+            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType(), $fieldConfig),
             $fieldConfig->get('target_entity')
         );
 
@@ -318,7 +318,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
             'extend',
             $fieldConfigId->getClassName(),
             $fieldConfigId->getFieldName(),
-            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType())
+            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType(), $fieldConfig)
         );
     }
 

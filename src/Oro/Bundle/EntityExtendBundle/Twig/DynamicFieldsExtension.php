@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\CachedClassUtils;
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
@@ -142,8 +144,23 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
         if ($row) {
             unset($row['priority']);
         }
+        if (isset($row['value']) && $row['value'] instanceof EnumOptionInterface) {
+            $row['value'] = $this->obtainEnumOption($row['value']);
+        }
 
         return $row;
+    }
+
+    private function obtainEnumOption(EnumOptionInterface $enumOption): ?EnumOptionInterface
+    {
+        try {
+            $enumOption->getEnumCode();
+        } catch (EntityNotFoundException $exception) {
+            // enum option values is not actualized by EntityEnumOptionsActualizer
+            return null;
+        }
+
+        return $enumOption;
     }
 
     /**
@@ -169,7 +186,8 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
         }
 
         // skip relations if they are referenced to not accessible entity
-        $underlyingFieldType = $this->getFieldTypeHelper()->getUnderlyingType($fieldConfigId->getFieldType());
+        $underlyingFieldType = $this->getFieldTypeHelper()
+            ->getUnderlyingType($fieldConfigId->getFieldType(), $extendConfig);
 
         // skip disabled entities by feature flags
         if ($extendConfig->has('target_entity')

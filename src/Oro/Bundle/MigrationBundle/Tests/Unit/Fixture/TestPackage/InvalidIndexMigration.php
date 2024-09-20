@@ -14,7 +14,7 @@ class InvalidIndexMigration implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('index_table');
-        $table->addColumn('key', 'string', ['length' => 500]);
+        $table->addColumn('key', 'string', ['length' => 1000]);
         $table->addIndex(['key'], 'index');
     }
 }

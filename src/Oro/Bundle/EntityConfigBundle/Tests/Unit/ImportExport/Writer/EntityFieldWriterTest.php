@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Writer;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -10,8 +10,8 @@ use Oro\Bundle\EntityConfigBundle\ImportExport\Writer\EntityFieldWriter;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\EntityFieldStateChecker;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -37,13 +37,15 @@ class EntityFieldWriterTest extends TestCase
         $this->enumSynchronizer = $this->createMock(EnumSynchronizer::class);
         $this->stateChecker = $this->createMock(EntityFieldStateChecker::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $configHalper = $this->createMock(ConfigHelper::class);
 
         $this->writer = new EntityFieldWriter(
             $this->configManager,
             $this->translationHelper,
             $this->enumSynchronizer,
             $this->stateChecker,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $configHalper
         );
     }
 
@@ -64,6 +66,7 @@ class EntityFieldWriterTest extends TestCase
                     5 => ['id' => 'test_id_2', 'label' => 'Test ID 2'],
                     6 => ['id' => '', 'label' => 'Option Two'],
                 ],
+                'enum_code' => $enumCode
             ]
         );
         $entityClassName = 'Test';
@@ -87,15 +90,6 @@ class EntityFieldWriterTest extends TestCase
                 ['enum', $provider],
             ]);
 
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects(self::once())
-            ->method('get')
-            ->with('enum_code')
-            ->willReturn($enumCode);
-        $provider->expects(self::once())
-            ->method('getConfig')
-            ->with($entityClassName, $fieldName)
-            ->willReturn($config);
         $provider->expects(self::once())
             ->method('hasConfig')
             ->willReturn(true);
@@ -106,7 +100,8 @@ class EntityFieldWriterTest extends TestCase
         $this->enumSynchronizer->expects($this->once())
             ->method('applyEnumOptions')
             ->with(
-                ExtendHelper::buildEnumValueClassName($enumCode),
+                $enumCode,
+                EnumOption::class,
                 [
                     0 => ['id' => 'test_id', 'label' => 'Test ID'],
                     1 => ['id' => '', 'label' => 'Option Two'],

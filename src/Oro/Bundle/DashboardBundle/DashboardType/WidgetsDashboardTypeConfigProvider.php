@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\DashboardType;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Defines widgets dashboard type.
@@ -24,7 +25,7 @@ class WidgetsDashboardTypeConfigProvider implements DashboardTypeConfigProviderI
      */
     public function isSupported(?string $dashboardType): bool
     {
-        return null === $dashboardType || self::TYPE_NAME === $dashboardType;
+        return null === $dashboardType || self::TYPE_NAME === ExtendHelper::getEnumInternalId($dashboardType);
     }
 
     /**

@@ -21,7 +21,7 @@ class EmptyComparisonExpression implements ComparisonExpressionInterface
         string $parameterName,
         mixed $value
     ): mixed {
-        $subquery = $visitor->createSubquery($field);
+        $subquery = $visitor->createSubquery($field, false, $expression !== $field ? $expression : null);
         $subquery->select(QueryBuilderUtil::getSingleRootAlias($subquery));
 
         $builder = $visitor->getExpressionBuilder();

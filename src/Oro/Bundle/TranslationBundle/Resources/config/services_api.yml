@@ -49,7 +49,7 @@ services:
         arguments:
             - '@oro_translation.api.predefined_language_code_documentation_provider'
         tags:
-            - { name: oro.api.processor, action: get_config, targetAction: get_list, extra: 'descriptions&!identifier_fields_only', class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, priority: -220 }
+            - { name: oro.api.processor, action: get_config, extra: 'descriptions&!identifier_fields_only', class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, targetAction: get_list, priority: -220 }
 
     oro_translation.api.build_translation_query:
         class: Oro\Bundle\TranslationBundle\Api\Processor\BuildTranslationQuery
@@ -78,6 +78,7 @@ services:
             - '@oro_translation.api.translation_data_loader'
             - '@oro_api.doctrine_helper'
             - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_entity.query_hint_resolver'
         tags:
             - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
 
@@ -96,7 +97,7 @@ services:
     oro_translation.api.reset_identifier_generator_for_translation_update:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\ResetIdentifierGenerator
         tags:
-            - { name: oro.api.processor, action: get_metadata, targetAction: update, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, priority: -50 }
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, targetAction: update, priority: -50 }
 
     oro_translation.api.load_translation_create:
         class: Oro\Bundle\TranslationBundle\Api\Processor\LoadTranslationCreate

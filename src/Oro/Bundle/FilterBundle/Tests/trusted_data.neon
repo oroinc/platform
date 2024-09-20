@@ -111,6 +111,9 @@ trusted_data:
         Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder:
             setCaseInsensitive: true
             literal: true
+        Oro\Bundle\FilterBundle\Filter\MultiEnumFilter:
+            getContainsExpr: true
+            getEnumOptionsExpr: true
     check_methods:
         Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface:
             __all__: true

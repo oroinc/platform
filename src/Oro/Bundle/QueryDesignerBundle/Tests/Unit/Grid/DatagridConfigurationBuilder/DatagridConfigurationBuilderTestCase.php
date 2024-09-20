@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
@@ -35,7 +36,8 @@ class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTestCase
         VirtualFieldProviderInterface $virtualFieldProvider = null,
         VirtualRelationProviderInterface $virtualRelationProvider = null,
         array $guessers = [],
-        EntityNameResolver $entityNameResolver = null
+        EntityNameResolver $entityNameResolver = null,
+        EnumTypeHelper $enumTypeHelper = null,
     ): DatagridConfigurationBuilder {
         $builder = new DatagridConfigurationBuilder(
             $functionProvider ?? $this->getFunctionProvider(),
@@ -43,7 +45,8 @@ class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTestCase
             $virtualRelationProvider ?? $this->getVirtualRelationProvider(),
             new DoctrineHelper($doctrine ?? $this->getDoctrine()),
             new DatagridGuesser($guessers ?: [new ColumnOptionsGuesserMock()]),
-            $entityNameResolver ?? $this->getEntityNameResolver()
+            $entityNameResolver ?? $this->getEntityNameResolver(),
+            $enumTypeHelper ?? $this->getEnumTypeHelper()
         );
         $builder->setGridName('test_grid');
         $builder->setSource($source);

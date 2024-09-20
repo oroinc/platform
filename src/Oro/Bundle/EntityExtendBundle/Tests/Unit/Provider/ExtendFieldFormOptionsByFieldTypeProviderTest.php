@@ -122,6 +122,7 @@ class ExtendFieldFormOptionsByFieldTypeProviderTest extends \PHPUnit\Framework\T
                 'expectedOptions' => [
                     'enum_code' => 'sample_enum',
                     'sample_key' => 'sample_value',
+                    'multiple' => false
                 ],
             ],
             'multiEnum' => [
@@ -130,7 +131,7 @@ class ExtendFieldFormOptionsByFieldTypeProviderTest extends \PHPUnit\Framework\T
                     'enum_code' => 'sample_enum',
                     'expanded' => true,
                     'sample_key' => 'sample_value',
-
+                    'multiple' => true
                 ],
             ],
         ];

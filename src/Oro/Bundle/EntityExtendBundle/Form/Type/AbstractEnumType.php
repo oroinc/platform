@@ -5,9 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -23,18 +23,8 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
  */
 abstract class AbstractEnumType extends AbstractType
 {
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    public function __construct(
-        ConfigManager $configManager,
-        ManagerRegistry $doctrine
-    ) {
-        $this->configManager = $configManager;
-        $this->doctrine      = $doctrine;
+    public function __construct(protected ConfigManager $configManager, protected ManagerRegistry $doctrine)
+    {
     }
 
     /**
@@ -53,14 +43,22 @@ abstract class AbstractEnumType extends AbstractType
         $resolver->setDefaults(
             [
                 // either enum_code or class must be specified
-                'enum_code'     => null,
-                'class'         => null,
-                'query_builder' => function (EnumValueRepository $repo) {
-                    return $repo->getValuesQueryBuilder();
+                'enum_code' => null,
+                'class' => null,
+                'choice_label' => 'name',
+                'multiple' => null,
+                'query_builder' => function (EnumOptionRepository $repo) {
                 },
-                'choice_label'  => 'name',
-                'multiple'      => null
             ]
+        );
+
+        $resolver->setNormalizer(
+            'query_builder',
+            function (Options $options) {
+                return function (EnumOptionRepository $repo) use ($options) {
+                    return $repo->getValuesQueryBuilder($options['enum_code']);
+                };
+            }
         );
 
         $resolver->setNormalizer(
@@ -74,21 +72,10 @@ abstract class AbstractEnumType extends AbstractType
                     throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
                 }
 
-                $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
-                if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
-                    throw new InvalidOptionsException(
-                        sprintf(
-                            '"%s" must be a child of "%s"',
-                            $class,
-                            'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
-                        )
-                    );
-                }
-
-                return $class;
+                return EnumOption::class;
             }
-        )
-        ->setNormalizer(
+        );
+        $resolver->setNormalizer(
             'multiple',
             function (Options $options, $value) {
                 if ($value === null && !empty($options['class'])) {
@@ -127,9 +114,9 @@ abstract class AbstractEnumType extends AbstractType
         }
 
         // Set initial options for new entity
-        /** @var EnumValueRepository $repo */
+        /** @var EnumOptionRepository $repo */
         $repo = $this->doctrine->getRepository($formConfig->getOption('class'));
-        $data = $repo->getDefaultValues();
+        $data = $repo->getDefaultValues($formConfig->getOption('enum_code'));
         if ($formConfig->getOption('multiple')) {
             $event->setData($data ?: []);
         } else {
@@ -151,7 +138,7 @@ abstract class AbstractEnumType extends AbstractType
         try {
             $value = $accessor->getValue($targetEntity, $form->getPropertyPath());
             if ($formConfig->getOption('multiple')) {
-                $result = ($value instanceof Collection && $value->isEmpty());
+                $result = ($value instanceof Collection && $value->isEmpty()) || (is_array($value) && empty($value));
             } else {
                 $result = (null === $value);
             }

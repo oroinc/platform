@@ -13,5 +13,5 @@ uniM2MnD: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
 uniO2M: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
 default_uniO2M: '<(@entity2_1->id)>'
 uniO2MnD: ['<(@entity2_1->id)>', '<(@entity2_2->id)>']
-enumField: '<(@enum1_1->id)>'
-multiEnumField: ['<(@enum2_1->id)>', '<(@enum2_2->id)>']
+enumField: '<(@enum1_1->internalId)>'
+multiEnumField: ['<(@enum2_1->internalId)>', '<(@enum2_2->internalId)>']

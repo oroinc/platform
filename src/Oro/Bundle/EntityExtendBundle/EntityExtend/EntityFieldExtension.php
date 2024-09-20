@@ -191,9 +191,6 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         return $result;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function get(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isPropertyExists($transport)) {

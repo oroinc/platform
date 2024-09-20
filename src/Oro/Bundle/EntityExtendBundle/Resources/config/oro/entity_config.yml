@@ -449,6 +449,18 @@ entity_config:
                                 - {label: 'Enum value #1', is_default: No}
                                 - {label: 'Enum value #2', is_default: No}
 
+                # this attribute is used to store an alias that was generated
+                # for a target entity of an enum field and helps to resolve duplicated aliases
+                entity_alias: # string
+                    options:
+                        auditable: false
+
+                # this attribute is used to store a plural alias that was generated
+                # for a target entity of an enum field and helps to resolve duplicated aliases
+                entity_plural_alias: # string
+                    options:
+                        auditable: false
+
     search:
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#search
         entity:

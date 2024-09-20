@@ -4,13 +4,15 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,11 +36,13 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache = $this->createMock(CacheInterface::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
         $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->enumTranslationCache = new EnumTranslationCache(
             $this->cache,
             $this->localizationHelper,
-            $this->localeSettings
+            $this->localeSettings,
+            $this->translator
         );
     }
 
@@ -48,20 +52,22 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         $this->localizationHelper->expects($this->exactly(2))
             ->method('getCurrentLocalization')
             ->willReturn($localization);
-        $enumClass = 'Extend\Entity\EV_Test_Enum';
-        $expected = ['test_val' => 'Test Value'];
-        $repo = $this->createMock(EnumValueRepository::class);
+        $expected = ['test_enum_code.test_val' => 'Test Value'];
+        $repo = $this->createMock(EnumOptionRepository::class);
         $repo->expects(self::once())
             ->method('getValues')
-            ->willReturn([new TestEnumValue('test_val', 'Test Value')]);
+            ->willReturn([new TestEnumValue('test_enum_code', 'Test Value', 'test_val')]);
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->willReturn('Test Value');
         $this->cache->expects($this->once())
             ->method('get')
-            ->with(UniversalCacheKeyGenerator::normalizeCacheKey($enumClass . '|' . self::LOCALE))
+            ->with(UniversalCacheKeyGenerator::normalizeCacheKey(EnumOption::class . '|' . self::LOCALE))
             ->willReturnCallback(function ($cacheKey, $callback) {
                 $item = $this->createMock(ItemInterface::class);
                 return $callback($item);
             });
-        self::assertEquals($expected, $this->enumTranslationCache->get($enumClass, $repo));
+        self::assertEquals($expected, $this->enumTranslationCache->get(EnumOption::class, $repo));
     }
 
     public function testGetCached()
@@ -70,16 +76,16 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         $this->localizationHelper->expects($this->exactly(2))
             ->method('getCurrentLocalization')
             ->willReturn($localization);
-        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $enumCode = 'test_enum_code';
         $expected = ['test_val' => 'Test Value'];
-        $repo = $this->createMock(EnumValueRepository::class);
+        $repo = $this->createMock(EnumOptionRepository::class);
         $repo->expects(self::never())
             ->method('getValues');
         $this->cache->expects($this->once())
             ->method('get')
-            ->with(UniversalCacheKeyGenerator::normalizeCacheKey($enumClass . '|' . self::LOCALE))
+            ->with(UniversalCacheKeyGenerator::normalizeCacheKey($enumCode . '|' . self::LOCALE))
             ->willReturn($expected);
-        self::assertEquals($expected, $this->enumTranslationCache->get($enumClass, $repo));
+        self::assertEquals($expected, $this->enumTranslationCache->get($enumCode, $repo));
     }
 
     public function testInvalidate()

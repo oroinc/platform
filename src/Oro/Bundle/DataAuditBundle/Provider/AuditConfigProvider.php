@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 
 /**
  * Provider for wide-used audit configuration
@@ -33,7 +33,7 @@ class AuditConfigProvider
      */
     public function isAuditableEntity($entityClass)
     {
-        if (is_a($entityClass, AbstractEnumValue::class, true)) {
+        if (is_a($entityClass, EnumOptionInterface::class, true)) {
             return true;
         }
 
@@ -62,7 +62,7 @@ class AuditConfigProvider
             return false;
         }
 
-        if (is_a($entityClass, AbstractEnumValue::class, true)) {
+        if (is_a($entityClass, EnumOptionInterface::class, true)) {
             return true;
         }
 

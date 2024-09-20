@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints as ExtendAssert;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -17,6 +16,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * EnumValue form type
+ */
 class EnumValueType extends AbstractType
 {
     /** @var ConfigProvider */
@@ -81,16 +83,13 @@ class EnumValueType extends AbstractType
         if (!$this->configProvider->hasConfigById($configId)) {
             return true;
         }
-
-        $enumCode = $this->configProvider->getConfigById($configId)->get('enum_code');
-        if (empty($enumCode)) {
+        $configById = $this->configProvider->getConfigById($configId);
+        $enumCode = $configById->get('enum_code');
+        if (empty($enumCode) || !$configById->has('immutable_codes')) {
             return true;
         }
 
-        $className = ExtendHelper::buildEnumValueClassName($enumCode);
-        $config    = $this->configProvider->getConfig($className);
-
-        return !in_array($data['id'], $config->get('immutable_codes', false, []));
+        return !in_array($data['id'], $configById->get('immutable_codes', false, []));
     }
 
     /**
@@ -100,7 +99,7 @@ class EnumValueType extends AbstractType
     {
         $resolver->setDefaults([
             'constraints' => [
-                new ExtendAssert\EnumValue(),
+                new ExtendAssert\EnumOption(),
             ],
             'allow_multiple_selection' => true
         ]);

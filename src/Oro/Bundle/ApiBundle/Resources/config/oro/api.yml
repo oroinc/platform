@@ -24,6 +24,25 @@ api:
             # this entity does not have own API resource
             actions: false
 
+        Oro\Bundle\EntityExtendBundle\Entity\EnumOption:
+            documentation_resource: '@OroApiBundle/Resources/doc/api/enum_option.md'
+            fields:
+                internalId:
+                    exclude: true
+                enumCode:
+                    exclude: true
+            filters:
+                fields:
+                    id:
+                        allow_array: true
+                    priority: ~
+            sorters:
+                fields:
+                    priority: ~
+            # this entity does not have own API resource
+            # it is defined in the config to be able to use enum options in API
+            actions: false
+
         Oro\Bundle\ApiBundle\Entity\AsyncOperation:
             documentation_resource: '@OroApiBundle/Resources/doc/api/async_operation.md'
             disable_meta_properties: true

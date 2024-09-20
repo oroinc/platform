@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\Provider\EntityFieldProviderTest;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
 class FieldProviderTest extends EntityFieldProviderTest
@@ -25,6 +26,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         $this->provider->setVirtualFieldProvider($this->virtualFieldProvider);
         $this->provider->setVirtualRelationProvider($this->virtualRelationProvider);
         $this->provider->setExclusionProvider($this->exclusionProvider);
+        $this->provider->setEnumVirtualFieldProvider($this->enumVirtualFieldProvider);
     }
 
     public function fieldsWithRelationsExpectedDataProvider(): array
@@ -229,14 +231,9 @@ class FieldProviderTest extends EntityFieldProviderTest
                 [
                     [
                         'name' => 'rel1',
-                        'type' => 'ref-one',
-                        'label' => 'Enum Field Translated',
-                    ],
-                    [
-                        'name' => 'rel1',
                         'type' => 'enum',
                         'label' => 'Enum Field Translated',
-                        'related_entity_name' => 'Acme\EnumValue1',
+                        'related_entity_name' => EnumOption::class,
                     ],
                     [
                         'name' => 'field1',
@@ -248,7 +245,7 @@ class FieldProviderTest extends EntityFieldProviderTest
                         'name' => 'rel2',
                         'type' => 'multiEnum',
                         'label' => 'Multi Enum Field Translated',
-                        'related_entity_name' => 'Acme\EnumValue2',
+                        'related_entity_name' => EnumOption::class,
                     ],
                     [
                         'name' => 'virtual_relation',

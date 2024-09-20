@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
@@ -29,7 +30,15 @@ class EntityTypeTest extends OrmRelatedTestCase
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions([
                 new PreloadedExtension(
-                    [new EntityType($this->doctrineHelper, new EntityLoader(new DoctrineHelper($this->doctrine)))],
+                    [
+                        new EntityType(
+                            $this->doctrineHelper,
+                            new EntityLoader(
+                                new DoctrineHelper($this->doctrine),
+                                $this->createMock(QueryHintResolverInterface::class)
+                            )
+                        )
+                    ],
                     []
                 )
             ])

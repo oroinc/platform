@@ -30,6 +30,8 @@ Feature: User Grid Views
     Given I click on "All Users" in grid view list
     Then there is 3 records in grid
     When I click on "Cannot login" in grid view list
+#   This step is repeated because we have a random failure
+    And I click on "Cannot login" in grid view list
     Then I should see "Enabled: Enabled"
     And I should see "Password: is any of \"Reset"
     And there is one record in grid

@@ -92,6 +92,7 @@ class ThemeConfigurationProvider implements ResetInterface
     {
         /** @var EntityManagerInterface $em */
         $em = $this->doctrine->getManagerForClass(ThemeConfiguration::class);
+        QueryBuilderUtil::checkField($fieldName);
         $rows = $em->createQueryBuilder()
             ->from(ThemeConfiguration::class, 'e')
             ->select(QueryBuilderUtil::sprintf('e.%s', $fieldName))

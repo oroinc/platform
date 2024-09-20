@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\EntitySerializer\EntityConfigInterface;
 
@@ -57,7 +57,7 @@ class CompleteSorters extends CompleteSection
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ): void {
-        $fields = $this->getSorterFields($metadata);
+        $fields = $this->getIndexedFields($metadata);
         foreach ($fields as $propertyPath => $dataType) {
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
             if ($fieldName && !$sorters->hasField($fieldName)) {
@@ -66,25 +66,12 @@ class CompleteSorters extends CompleteSection
         }
     }
 
-    private function getSorterFields(ClassMetadata $metadata): array
-    {
-        $fields = $this->doctrineHelper->getIndexedFields($metadata);
-        if (is_subclass_of($metadata->name, AbstractEnumValue::class)
-            && !isset($fields['priority'])
-            && $metadata->hasField('priority')
-        ) {
-            $fields['priority'] = $metadata->getTypeOfField('priority');
-        }
-
-        return $fields;
-    }
-
     private function completeSortersForAssociations(
         EntityConfigInterface $sorters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ): void {
-        $indexedAssociations = $this->doctrineHelper->getIndexedAssociations($metadata);
+        $indexedAssociations = $this->getIndexedAssociations($metadata);
         foreach ($indexedAssociations as $propertyPath => $dataType) {
             $sorter = $sorters->findField($propertyPath, true);
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
@@ -92,13 +79,31 @@ class CompleteSorters extends CompleteSection
                 if (null === $sorter) {
                     $sorter = $sorters->addField($fieldName);
                 }
-                if ($metadata->isCollectionValuedAssociation($propertyPath)) {
-                    $targetIdIdFieldName = $this->doctrineHelper
-                        ->getEntityMetadataForClass($metadata->getAssociationTargetClass($propertyPath))
-                        ->getSingleIdentifierFieldName();
-                    $sorter->setPropertyPath($propertyPath . ConfigUtil::PATH_DELIMITER . $targetIdIdFieldName);
+                if ($this->isCollectionValuedAssociation($metadata, $propertyPath)) {
+                    if ($metadata->hasAssociation($propertyPath)) {
+                        $targetIdIdFieldName = $this->doctrineHelper
+                            ->getEntityMetadataForClass($metadata->getAssociationTargetClass($propertyPath))
+                            ->getSingleIdentifierFieldName();
+                        $sorter->setPropertyPath($propertyPath . ConfigUtil::PATH_DELIMITER . $targetIdIdFieldName);
+                    } elseif ($this->isEnumAssociation($definition, $propertyPath)) {
+                        $sorter->setPropertyPath($propertyPath . ConfigUtil::PATH_DELIMITER . 'id');
+                    }
                 }
             }
         }
+    }
+
+    private function isEnumAssociation(EntityDefinitionConfig $definition, string $propertyName): bool
+    {
+        $field = $definition->findField($propertyName, true);
+        if (null === $field) {
+            return false;
+        }
+        $targetClass = $field->getTargetClass();
+        if (!$targetClass || null === $field->getTargetEntity()) {
+            return false;
+        }
+
+        return ExtendHelper::isOutdatedEnumOptionEntity($targetClass);
     }
 }

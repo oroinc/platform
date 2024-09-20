@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\EntitySerializer\AssociationQuery;
 use Oro\Component\EntitySerializer\ConfigConverter as BaseConfigConverter;
 use Oro\Component\EntitySerializer\EntityConfig;
@@ -60,6 +62,10 @@ class ConfigConverter extends BaseConfigConverter
     {
         if (null === $this->requestType) {
             return $class;
+        }
+
+        if (ExtendHelper::isOutdatedEnumOptionEntity($class)) {
+            return EnumOption::class;
         }
 
         $entityClass = $this->entityOverrideProviderRegistry
