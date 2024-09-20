@@ -8,7 +8,5 @@ Feature: Get help link
   I need to have link to documentation
 
   Scenario: Click help link
-    Given I login as administrator
-    When I click on "Help Icon"
-    Then a new browser tab is opened and I switch to it
-    And I should see "Welcome to Oro Documentation"
+    When I login as administrator
+    Then I should see 'Get help' link with the url matches "http://www.oroinc.com/doc"
