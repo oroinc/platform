@@ -355,4 +355,33 @@ class DocumentationTest extends RestJsonApiTestCase
         }
         self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
     }
+
+    /**
+     * @depends testWarmUpCache
+     * This test should be at the end to avoid unnecessary warming up documentation cache in previous tests.
+     */
+    public function testFiltersWhenIncludeFilterIsDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'disable_inclusion' => true
+            ],
+            true
+        );
+        $this->warmUpDocumentationCache();
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        $expectedData = $this->loadYamlData('filters.yml', 'documentation');
+        unset($expectedData['filters']['include']);
+        foreach ($expectedData['filters'] as $key => $val) {
+            if (str_starts_with($key, 'fields[') && !str_contains($key, $entityType)) {
+                unset($expectedData['filters'][$key]);
+            }
+        }
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
+    }
 }
