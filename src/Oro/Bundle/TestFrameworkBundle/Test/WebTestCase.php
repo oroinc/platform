@@ -1019,7 +1019,9 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function jsonToArray(string $json): array
     {
-        return (array)json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        return $json
+            ? (array)json_decode($json, true, 512, JSON_THROW_ON_ERROR)
+            : [];
     }
 
     /**

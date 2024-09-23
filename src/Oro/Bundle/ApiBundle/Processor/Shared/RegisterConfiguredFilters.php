@@ -4,12 +4,12 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 
@@ -69,8 +69,9 @@ class RegisterConfiguredFilters extends RegisterFilters
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         }
 
-        $configs = $context->getConfig();
-        $idFieldName = $this->getSingleIdentifierFieldName($configs);
+        /** @var EntityDefinitionConfig $config */
+        $config = $context->getConfig();
+        $idFieldName = $this->getSingleIdentifierFieldName($config);
         $associationNames = $this->getAssociationNames($metadata);
         $filterCollection = $context->getFilters();
         $fields = $configOfFilters->getFields();
@@ -96,11 +97,21 @@ class RegisterConfiguredFilters extends RegisterFilters
                     if (\in_array($propertyPath, $associationNames, true)) {
                         $this->updateAssociationOperators($filter, $field->isCollection());
                     }
-                    if ($configs->hasField($propertyPath) && $configs->getField($propertyPath)?->getTargetEntity()) {
-                        $this->updateAssociationFieldPropertyPath($filter, $configs->getField($propertyPath));
+                    $fieldConfig = $config->getField($propertyPath);
+                    if (null !== $fieldConfig) {
+                        $targetEntityClass = $fieldConfig->getTargetClass();
+                        if ($targetEntityClass) {
+                            $targetEntityConfig = $fieldConfig->getTargetEntity();
+                            if (null !== $targetEntityConfig) {
+                                $this->updateAssociationFieldPropertyPath(
+                                    $filter,
+                                    $targetEntityClass,
+                                    $targetEntityConfig
+                                );
+                            }
+                        }
                     }
                 }
-
                 $filterCollection->add($filterKey, $filter);
             }
         }
@@ -149,19 +160,25 @@ class RegisterConfiguredFilters extends RegisterFilters
     }
 
     private function updateAssociationFieldPropertyPath(
-        FieldAwareFilterInterface|StandaloneFilter $filter,
-        ?EntityDefinitionFieldConfig $config
+        FieldAwareFilterInterface $filter,
+        string $targetEntityClass,
+        EntityDefinitionConfig $targetEntityConfig
     ): void {
-        if (null !== $config) {
-            $path = $filter->getField();
-            $singleIdName = $this->getSingleIdentifierFieldName($config->getTargetEntity());
-            if ($singleIdName) {
-                $targetEntityConfig = $config->getTargetEntity();
-                $pathProperty = $targetEntityConfig?->getField($singleIdName)?->getPropertyPath();
-                if ($pathProperty && $pathProperty !== $singleIdName) {
-                    $filter->setField(sprintf('%s.%s', $path, $pathProperty));
-                }
-            }
+        $idFieldName = $this->getSingleIdentifierFieldName($targetEntityConfig);
+        if (!$idFieldName) {
+            return;
         }
+
+        $idFieldPropertyPath = $targetEntityConfig->getField($idFieldName)?->getPropertyPath();
+        if (!$idFieldPropertyPath || $idFieldPropertyPath === $idFieldName) {
+            return;
+        }
+
+        $idFieldPropertyPaths = $this->doctrineHelper->getEntityIdentifierFieldNames($targetEntityClass, false);
+        if (\count($idFieldPropertyPaths) === 1 && $idFieldPropertyPath === $idFieldPropertyPaths[0]) {
+            return;
+        }
+
+        $filter->setField($filter->getField() . ConfigUtil::PATH_DELIMITER . $idFieldPropertyPath);
     }
 }
