@@ -1318,7 +1318,9 @@ define(function(require) {
                  * @event grid_load:complete
                  */
                 mediator.trigger('grid_load:complete', this.collection, this.$el);
-                this.initLayout();
+                this.initLayout({
+                    datagrid: this
+                });
                 this.trigger('content:update');
             }
         },

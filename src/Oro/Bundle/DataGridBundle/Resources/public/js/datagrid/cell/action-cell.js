@@ -110,7 +110,7 @@ define(function(require, exports, module) {
          * Initialize cell actions and launchers
          */
         initialize: function(options) {
-            const opts = options || {};
+            const opts = this.opts = options || {};
             this.subviews = [];
 
             if (opts.actionsHideCount !== void 0) {
@@ -128,18 +128,10 @@ define(function(require, exports, module) {
             ActionCell.__super__.initialize.call(this, options);
             this.actions = this.createActions();
 
-            this.isDropdownActions = this.actions.length >= this.actionsHideCount;
-
-            if (_.isObject(opts.themeOptions.launcherOptions)) {
-                this.launcherMode = opts.themeOptions.launcherOptions.launcherMode || this.launcherMode;
-                this.actionsState = opts.themeOptions.launcherOptions.actionsState || this.actionsState;
-
-                if (this.isDropdownActions) {
-                    this.launcherMode = opts.themeOptions.launcherOptions.dropdownLauncherMode || this.launcherMode;
-                }
-            }
-
             this.model.set('availableActions', this.actions);
+
+            this.isDropdownMode();
+
             _.each(this.actions, function(action) {
                 this.listenTo(action, 'preExecute', this.onActionRun);
             }, this);
@@ -147,6 +139,22 @@ define(function(require, exports, module) {
             this.listenTo(this.model, 'change:action_configuration', this.onActionConfigChange);
 
             this.subviews.push(...this.actions);
+        },
+
+        isDropdownMode() {
+            this.isDropdownActions = this.model.get('availableActions').length >= this.actionsHideCount;
+
+            if (_.isObject(this.opts.themeOptions.launcherOptions)) {
+                this.launcherMode = this.opts.themeOptions.launcherOptions.launcherMode || this.launcherMode;
+                this.actionsState = this.opts.themeOptions.launcherOptions.actionsState || this.actionsState;
+
+                if (this.isDropdownActions) {
+                    this.launcherMode =
+                        this.opts.themeOptions.launcherOptions.dropdownLauncherMode || this.launcherMode;
+                }
+            }
+
+            return this.isDropdownActions;
         },
 
         /**
@@ -270,9 +278,18 @@ define(function(require, exports, module) {
             this.actions.length = 0;
             this.actions.push(..._.sortBy(_.compact(actions), 'order'));
 
+            const isDropdownActions = this.isDropdownActions;
+            this.model.set('availableActions', this.actions.filter(action => action.launcherInstance?.enabled));
+            this.isDropdownMode();
+
+            if (isDropdownActions !== this.isDropdownActions) {
+                // Patch existing actions
+                this.actions.forEach(action => action.launcherInstance.launcherMode = this.launcherMode);
+                this.render();
+            }
+
             this.isLauncherListFilled = false;
             this.fillLauncherList();
-            this.model.set('availableActions', this.actions.filter(action => action.launcherInstance?.enabled));
         },
 
         /**
@@ -295,6 +312,11 @@ define(function(require, exports, module) {
             } else if (this.actionsState === 'hide') {
                 this.isDropdownActions = true;
             }
+
+            // Reset properties to allow rendering actions as a dropdown or list, and vice versa
+            delete this.baseMarkup;
+            delete this.launchersListTemplate;
+            delete this.launchersContainerSelector;
 
             if (!this.isDropdownActions) {
                 this.baseMarkup = this.simpleBaseMarkup;
