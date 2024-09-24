@@ -11,6 +11,7 @@ class RecipientListTest extends \PHPUnit\Framework\TestCase
 {
     private RecipientList $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new RecipientList();

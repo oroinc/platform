@@ -37,9 +37,7 @@ class MultiInsertQueryExecutor implements InsertQueryExecutorInterface
         $this->batchSize = $batchSize;
     }
 
-    /**
-     *{@inheritDoc}
-     */
+    #[\Override]
     public function execute(string $className, array $fields, QueryBuilder $selectQueryBuilder): int
     {
         $connection = $this->helper->getManager($className)->getConnection();

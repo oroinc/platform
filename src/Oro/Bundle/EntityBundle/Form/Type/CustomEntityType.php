@@ -8,9 +8,7 @@ use Symfony\Component\Form\FormView;
 
 class CustomEntityType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $blockConfig = isset($view->vars['block_config']) ? $view->vars['block_config'] : [];
@@ -23,17 +21,12 @@ class CustomEntityType extends AbstractType
         $view->vars['block_config'] = $blockConfig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'custom_entity_type';

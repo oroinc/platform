@@ -43,6 +43,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      * @param null|int $value
      * @return null|object
      */
+    #[\Override]
     public function transform($value)
     {
         if (!$value) {
@@ -61,6 +62,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      * @param File|null $file
      * @return int|null
      */
+    #[\Override]
     public function reverseTransform($file)
     {
         if (null === $file) {

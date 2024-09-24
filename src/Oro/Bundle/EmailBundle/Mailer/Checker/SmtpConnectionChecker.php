@@ -9,14 +9,13 @@ use Symfony\Component\Mailer\Transport\Dsn;
  */
 class SmtpConnectionChecker implements ConnectionCheckerInterface
 {
+    #[\Override]
     public function supports(Dsn $dsn): bool
     {
         return in_array($dsn->getScheme(), ['smtp', 'smtps']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function checkConnection(Dsn $dsn, string &$error = null): bool
     {
         return $this->createSmtpCheckingTransport($dsn)->check($error);

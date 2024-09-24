@@ -16,9 +16,7 @@ class SetOperationFlags implements ProcessorInterface
     public const UPDATE_FLAG = '_meta_update';
     public const UPSERT_FLAG = '_meta_upsert';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

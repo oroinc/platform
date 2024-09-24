@@ -39,6 +39,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         $this->tokenStorage = $tokenStorage;
     }
 
+    #[\Override]
     public function supports(): bool
     {
         $token = $this->tokenStorage->getToken();
@@ -49,6 +50,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         return $token->getUser() instanceof User;
     }
 
+    #[\Override]
     protected function fillTree(OwnerTreeBuilderInterface $tree): void
     {
         $userClass = $this->ownershipMetadataProvider->getUserClass();

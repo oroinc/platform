@@ -20,6 +20,7 @@ class DatagridPreExportExecutor implements DatagridPreExportExecutorInterface
         $this->jobExecutors = $jobExecutors;
     }
 
+    #[\Override]
     public function run(JobRunner $jobRunner, Job $job, DatagridInterface $datagrid, array $options): bool
     {
         foreach ($this->jobExecutors as $jobExecutor) {
@@ -38,6 +39,7 @@ class DatagridPreExportExecutor implements DatagridPreExportExecutorInterface
         );
     }
 
+    #[\Override]
     public function isSupported(DatagridInterface $datagrid, array $options): bool
     {
         foreach ($this->jobExecutors as $jobExecutor) {

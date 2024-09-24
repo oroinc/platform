@@ -20,6 +20,7 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var BackLinkExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);

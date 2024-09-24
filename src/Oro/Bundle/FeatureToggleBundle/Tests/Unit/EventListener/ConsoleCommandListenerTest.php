@@ -17,6 +17,7 @@ class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ConsoleCommandListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

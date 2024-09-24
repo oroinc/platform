@@ -19,6 +19,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
 
     private ImageFileRemovalProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->imageRemovalManager = $this->createMock(FileRemovalManagerInterface::class);

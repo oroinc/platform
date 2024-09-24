@@ -39,9 +39,7 @@ class ApiDocMetadataParser implements ParserInterface
         $this->dataTypeConverter = $dataTypeConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(array $item)
     {
         return
@@ -49,9 +47,7 @@ class ApiDocMetadataParser implements ParserInterface
             && $item['options']['metadata'] instanceof ApiDocMetadata;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function parse(array $item)
     {
         /** @var ApiDocMetadata $data */

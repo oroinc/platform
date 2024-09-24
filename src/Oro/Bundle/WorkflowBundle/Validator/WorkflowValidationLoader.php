@@ -24,9 +24,7 @@ class WorkflowValidationLoader extends AbstractLoader implements ServiceSubscrib
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -36,9 +34,7 @@ class WorkflowValidationLoader extends AbstractLoader implements ServiceSubscrib
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (!$this->getDatabaseChecker()->checkDatabase()) {

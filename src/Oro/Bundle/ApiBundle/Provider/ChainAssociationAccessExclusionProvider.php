@@ -18,9 +18,7 @@ class ChainAssociationAccessExclusionProvider implements AssociationAccessExclus
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoreAssociationAccessCheck(string $entityClass, string $associationName): bool
     {
         foreach ($this->providers as $provider) {

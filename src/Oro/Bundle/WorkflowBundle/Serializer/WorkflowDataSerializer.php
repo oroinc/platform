@@ -26,6 +26,7 @@ class WorkflowDataSerializer extends Serializer implements WorkflowAwareSerializ
     /**
      * @return Workflow
      */
+    #[\Override]
     public function getWorkflow()
     {
         return $this->workflowRegistry->getWorkflow($this->getWorkflowName());
@@ -34,6 +35,7 @@ class WorkflowDataSerializer extends Serializer implements WorkflowAwareSerializ
     /**
      * @param string $workflowName
      */
+    #[\Override]
     public function setWorkflowName($workflowName)
     {
         $this->workflowName = $workflowName;
@@ -42,6 +44,7 @@ class WorkflowDataSerializer extends Serializer implements WorkflowAwareSerializ
     /**
      * @return string
      */
+    #[\Override]
     public function getWorkflowName()
     {
         return $this->workflowName;

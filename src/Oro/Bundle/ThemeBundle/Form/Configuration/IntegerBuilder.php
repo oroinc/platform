@@ -15,17 +15,11 @@ class IntegerBuilder extends AbstractConfigurationChildBuilder
         return 'integer';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     #[\Override] protected function getTypeClass(): string
     {
         return IntegerType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     #[\Override] protected function getDefaultOptions(): array
     {
         return [

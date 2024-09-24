@@ -17,6 +17,7 @@ class LoggerClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerClientDecoratorListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

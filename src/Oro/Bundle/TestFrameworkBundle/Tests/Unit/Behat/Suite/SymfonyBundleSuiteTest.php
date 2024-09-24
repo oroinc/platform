@@ -15,9 +15,7 @@ class SymfonyBundleSuiteTest extends \PHPUnit\Framework\TestCase
 
     private SymfonyBundleSuite $suite;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->settings = [

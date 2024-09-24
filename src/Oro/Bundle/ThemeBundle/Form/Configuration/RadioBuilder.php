@@ -12,9 +12,7 @@ class RadioBuilder extends AbstractChoiceBuilder
         return 'radio';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDefaultOptions(): array
     {
         return [

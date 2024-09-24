@@ -24,6 +24,7 @@ class UnauthorizedApiRequestListenerTest extends \PHPUnit\Framework\TestCase
     /** @var UnauthorizedApiRequestListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = $this->createMock(RequestActionHandler::class);

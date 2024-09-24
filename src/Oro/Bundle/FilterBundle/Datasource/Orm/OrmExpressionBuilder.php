@@ -25,49 +25,37 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
         $this->caseInsensitive = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setCaseInsensitive($caseInsensitive = false)
     {
         $this->caseInsensitive = $caseInsensitive;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function andX($_)
     {
         return call_user_func_array([$this->expr, 'andX'], func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function orX($_)
     {
         return call_user_func_array([$this->expr, 'orX'], func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function comparison($x, $operator, $y, $withParam = false)
     {
         return new Expr\Comparison($this->prepareParameter($x), $operator, $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function eq($x, $y, $withParam = false)
     {
         return $this->expr->eq($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function neq($x, $y, $withParam = false)
     {
         /*
@@ -103,97 +91,72 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
         return $this->expr->neq($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function lt($x, $y, $withParam = false)
     {
         return $this->expr->lt($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function lte($x, $y, $withParam = false)
     {
         return $this->expr->lte($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function gt($x, $y, $withParam = false)
     {
         return $this->expr->gt($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function gte($x, $y, $withParam = false)
     {
         return $this->expr->gte($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function not($restriction)
     {
         return $this->expr->not($restriction);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function in($x, $y, $withParam = false)
     {
         return $this->expr->in($this->prepareParameter($x), $this->prepareParameter($y, $withParam, false));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function inInv($x, $y, $withParam = false)
     {
         return $this->expr->in($this->prepareParameter($x, $withParam, false), $this->prepareParameter($y));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function notIn($x, $y, $withParam = false)
     {
         return $this->expr->notIn($this->prepareParameter($x), $this->prepareParameter($y, $withParam, false));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isNull($x)
     {
         return $this->expr->isNull($x);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isNotNull($x)
     {
         return $this->expr->isNotNull($x);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function like($x, $y, $withParam = false)
     {
         return $this->expr->like($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function notLike($x, $y, $withParam = false)
     {
         /*
@@ -218,33 +181,24 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
         return new Expr\Comparison($this->prepareParameter($x), 'NOT LIKE', $this->prepareParameter($y, $withParam));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function literal($literal)
     {
         return $this->expr->literal($literal);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function trim($x)
     {
         return $this->expr->trim($x);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function coalesce(array $x)
     {
         return new Coalesce($x);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists($x)
     {
         return $this->expr->exists($x);

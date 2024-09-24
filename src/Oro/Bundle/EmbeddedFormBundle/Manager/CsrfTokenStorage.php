@@ -37,17 +37,13 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
         $this->sessionIdProvider = $sessionIdProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasToken($tokenId): bool
     {
         return $this->tokenCache->hasItem($this->getCacheKey($tokenId));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getToken($tokenId): string
     {
         $cacheItem = $this->tokenCache->getItem($this->getCacheKey($tokenId));
@@ -59,9 +55,7 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
         return $token;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setToken($tokenId, $token)
     {
         $cacheItem = $this->tokenCache->getItem($this->getCacheKey($tokenId));
@@ -76,9 +70,7 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeToken($tokenId): ?string
     {
         try {
@@ -90,9 +82,7 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear()
     {
         $this->tokenCache->clear();

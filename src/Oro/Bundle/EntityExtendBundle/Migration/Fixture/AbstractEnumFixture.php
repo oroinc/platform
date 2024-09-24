@@ -16,6 +16,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
  */
 abstract class AbstractEnumFixture extends AbstractFixture implements DependentFixtureInterface
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var EnumOptionRepository $enumRepo */
@@ -50,6 +51,7 @@ abstract class AbstractEnumFixture extends AbstractFixture implements DependentF
 
     abstract protected function getEnumCode(): string;
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadLanguageData::class];

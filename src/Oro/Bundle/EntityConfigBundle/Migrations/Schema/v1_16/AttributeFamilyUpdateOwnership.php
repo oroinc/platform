@@ -13,9 +13,7 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\SetOwnershipTypeQuery;
  */
 class AttributeFamilyUpdateOwnership implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_attribute_family');

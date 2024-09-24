@@ -12,6 +12,7 @@ class InitializeSubresourceConfigExtrasTest extends OptionsProcessorTestCase
     /** @var InitializeSubresourceConfigExtras */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

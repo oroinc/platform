@@ -16,18 +16,16 @@ class TransitionCronTriggerAssembler extends AbstractTransitionTriggerAssembler
         $this->triggerCronVerifier = $triggerCronVerifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function canAssemble(array $options)
     {
         return !empty($options['cron']);
     }
 
     /**
-     * {@inheritdoc}
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     protected function verifyTrigger(BaseTransitionTrigger $trigger)
     {
         if (!$trigger instanceof TransitionCronTrigger) {
@@ -39,9 +37,7 @@ class TransitionCronTriggerAssembler extends AbstractTransitionTriggerAssembler
         $this->triggerCronVerifier->verify($trigger);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition)
     {
         $trigger = new TransitionCronTrigger();

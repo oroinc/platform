@@ -45,6 +45,7 @@ class FileBasedProviderDecorator extends FileBasedProvider
             rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, trim($fixturesDir)), DIRECTORY_SEPARATOR);
     }
 
+    #[\Override]
     protected function comulativeSaniztizeConfigLoad(): array
     {
         if (null === $this->ruleFiles) {

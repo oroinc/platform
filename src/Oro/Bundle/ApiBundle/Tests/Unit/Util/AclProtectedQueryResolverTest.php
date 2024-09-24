@@ -21,6 +21,7 @@ class AclProtectedQueryResolverTest extends OrmRelatedTestCase
     /** @var AclProtectedQueryResolver */
     private $queryResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

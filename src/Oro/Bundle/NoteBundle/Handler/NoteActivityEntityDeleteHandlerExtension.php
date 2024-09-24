@@ -32,9 +32,7 @@ class NoteActivityEntityDeleteHandlerExtension implements ActivityEntityDeleteHa
         $this->accessDeniedExceptionFactory = $accessDeniedExceptionFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertDeleteGranted($entity, $targetEntity): void
     {
         $this->innerExtension->assertDeleteGranted($entity, $targetEntity);

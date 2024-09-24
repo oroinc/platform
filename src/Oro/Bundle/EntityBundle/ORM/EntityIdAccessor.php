@@ -14,9 +14,7 @@ class EntityIdAccessor implements ObjectIdAccessorInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIdentifier($object)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($object);

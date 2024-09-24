@@ -20,6 +20,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
     /** @var NormalizeEntityId */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,9 +35,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->processor = new NormalizeEntityId($entityIdTransformerRegistry);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createContext(): FormContext
     {
         return new CreateContext($this->configProvider, $this->metadataProvider);

@@ -18,11 +18,13 @@ class Md5Processor implements ProcessorInterface
     ) {
     }
 
+    #[\Override]
     public static function getProcessorName(): string
     {
         return 'md5';
     }
 
+    #[\Override]
     public function getIncompatibilityMessages(
         string $fieldName,
         ClassMetadata $metadata,
@@ -40,9 +42,7 @@ class Md5Processor implements ProcessorInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSqls(string $fieldName, ClassMetadata $metadata, array $sanitizeRuleOptions = []): array
     {
         $quotedColumnName = $this->helper->getQuotedColumnName($fieldName, $metadata);

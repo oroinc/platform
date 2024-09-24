@@ -73,9 +73,7 @@ class NormalizeIncludedData implements ProcessorInterface
         $this->upsertCriteriaBuilder = $upsertCriteriaBuilder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext&SingleItemContext $context */

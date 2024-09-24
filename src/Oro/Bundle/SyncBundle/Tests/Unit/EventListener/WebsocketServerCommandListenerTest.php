@@ -21,6 +21,7 @@ class WebsocketServerCommandListenerTest extends TestCase
 
     private WebsocketServerCommandListener|MockObject $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dsnParameters = $this->createMock(DsnBasedParameters::class);

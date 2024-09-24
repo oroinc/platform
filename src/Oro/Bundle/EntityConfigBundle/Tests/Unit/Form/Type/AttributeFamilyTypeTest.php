@@ -20,6 +20,7 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
     /** @var AttributeFamilyType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new AttributeFamilyType($this->getTranslator());
@@ -51,9 +52,7 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
         $this->assertArrayHasKey('image', $children);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $attributeManagerMock = $this->createMock(AttributeManager::class);

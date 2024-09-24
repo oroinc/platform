@@ -30,6 +30,7 @@ class MenuUpdateBuilder implements BuilderInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    #[\Override]
     public function build(ItemInterface $menu, array $options = [], $alias = null): void
     {
         if (!$menu->isDisplayed()) {

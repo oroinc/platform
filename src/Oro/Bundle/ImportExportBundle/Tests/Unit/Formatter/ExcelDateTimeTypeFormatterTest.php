@@ -11,6 +11,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var ExcelDateTimeTypeFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $localeSettings = $this->createMock(LocaleSettings::class);

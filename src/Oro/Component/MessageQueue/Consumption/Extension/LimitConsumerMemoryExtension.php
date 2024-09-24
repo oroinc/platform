@@ -30,25 +30,19 @@ class LimitConsumerMemoryExtension extends AbstractExtension
         $this->memoryLimit = $memoryLimit * 1024 * 1024;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         $this->checkMemory($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $this->checkMemory($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onIdle(Context $context)
     {
         $this->checkMemory($context);

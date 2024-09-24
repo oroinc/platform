@@ -7,9 +7,6 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 
 class TestImap extends Imap
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         $this->messageClass = 'Oro\Bundle\ImapBundle\Mail\Storage\Message';

@@ -15,6 +15,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionAvailable */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $factory = $this->createMock(FactoryWithTypesInterface::class);

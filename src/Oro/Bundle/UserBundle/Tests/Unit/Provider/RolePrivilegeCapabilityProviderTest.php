@@ -27,6 +27,7 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RolePrivilegeCapabilityProvider */
     private $capabilityProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

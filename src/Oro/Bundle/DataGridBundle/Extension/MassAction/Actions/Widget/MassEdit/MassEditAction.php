@@ -11,9 +11,7 @@ class MassEditAction extends WindowMassAction
     /** @var array */
     protected $requiredOptions = ['handler', 'route', 'data_identifier'];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['frontend_type'])) {
@@ -23,9 +21,7 @@ class MassEditAction extends WindowMassAction
         return parent::setOptions($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAllowedRequestTypes()
     {
         return [Request::METHOD_POST];

@@ -22,11 +22,13 @@ class DeleteMaterializedViewTopicTest extends AbstractTopicTestCase
             ->addAllowedTypes('materializedViewName', 'string');
     }
 
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new DeleteMaterializedViewTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         return [
@@ -37,6 +39,7 @@ class DeleteMaterializedViewTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

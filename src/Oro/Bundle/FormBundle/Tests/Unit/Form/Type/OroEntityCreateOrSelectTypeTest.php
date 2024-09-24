@@ -24,6 +24,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
     /** @var OroEntityCreateOrSelectType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
@@ -73,9 +74,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

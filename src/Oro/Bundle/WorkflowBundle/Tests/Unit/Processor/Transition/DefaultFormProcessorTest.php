@@ -21,6 +21,7 @@ class DefaultFormProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultFormProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

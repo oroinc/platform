@@ -19,6 +19,7 @@ class HistoryItemBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var HistoryItemBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

@@ -20,9 +20,7 @@ class EnumOptionEntityClassProvider implements EntityClassProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassNames(): array
     {
         $result = [];

@@ -42,9 +42,7 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor implements Co
         $this->hash = $this->buildHash($formServiceId, $action, $method, $enctype);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         if (!$this->form) {
@@ -54,9 +52,7 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor implements Co
         return $this->form;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toString()
     {
         return 'form_service_id:' . $this->formServiceId;
@@ -65,6 +61,7 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor implements Co
     /**
      * @param mixed $formData
      */
+    #[\Override]
     public function setFormData($formData)
     {
         if (!$this->getForm()->isSubmitted()) {
@@ -72,9 +69,7 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor implements Co
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHash()
     {
         return $this->hash;

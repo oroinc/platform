@@ -22,6 +22,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
     /** @var LoggerAwareWebsocketClientDecorator */
     private $loggerAwareClientDecorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->decoratedClient = $this->createMock(WebsocketClientInterface::class);

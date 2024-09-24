@@ -90,9 +90,7 @@ class ProcessDataSerializeListener implements ServiceSubscriberInterface
         return $entity instanceof ProcessJob;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

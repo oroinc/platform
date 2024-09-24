@@ -12,9 +12,7 @@ class MultiImageTypeTest extends \PHPUnit\Framework\TestCase
 {
     private MultiFileType|MultiImageType $type;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new MultiImageType();

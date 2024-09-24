@@ -11,6 +11,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

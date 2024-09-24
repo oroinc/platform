@@ -17,6 +17,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 
     private ExportHandler $exportHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

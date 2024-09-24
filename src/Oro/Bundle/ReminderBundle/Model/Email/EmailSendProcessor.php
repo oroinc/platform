@@ -50,9 +50,7 @@ class EmailSendProcessor implements SendProcessorInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function push(Reminder $reminder)
     {
         $this->reminders[] = $reminder;
@@ -61,6 +59,7 @@ class EmailSendProcessor implements SendProcessorInterface
     /**
      * Send all reminders using email
      */
+    #[\Override]
     public function process()
     {
         foreach ($this->reminders as $reminder) {
@@ -91,9 +90,7 @@ class EmailSendProcessor implements SendProcessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return 'oro.reminder.processor.email.label';

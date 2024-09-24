@@ -18,6 +18,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
     private const VALID_GRID_NAME = 'grid-name';
     private const INVALID_GRID_NAME = 'invalid-grid-name';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->chainConfigurationProvider = $this->createMock(ConfigurationProviderInterface::class);
@@ -33,11 +34,13 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new DatagridExportTopic($this->chainConfigurationProvider);
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         $jobId = 1;
@@ -103,6 +106,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         $jobId = 1;

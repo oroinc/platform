@@ -8,9 +8,7 @@ use Twig\Environment;
 
 class TwigRendererEngineTest extends RendererEngineTest
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createRendererEngine()
     {
         return new TwigRendererEngine([], $this->createMock(Environment::class));

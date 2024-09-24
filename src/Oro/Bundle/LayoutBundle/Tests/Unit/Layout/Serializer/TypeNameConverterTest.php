@@ -16,6 +16,7 @@ class TypeNameConverterTest extends \PHPUnit\Framework\TestCase
     /** @var TypeNameConverter */
     private $typeNameConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->converter1 = $this->createMock(TypeNameConverterInterface::class);

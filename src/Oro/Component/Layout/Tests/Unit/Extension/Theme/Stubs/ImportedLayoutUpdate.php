@@ -11,21 +11,22 @@ use Oro\Component\Layout\Model\LayoutUpdateImport;
 
 class ImportedLayoutUpdate implements LayoutUpdateInterface, LayoutUpdateImportInterface
 {
+    #[\Override]
     public function getImport()
     {
     }
 
+    #[\Override]
     public function setImport(LayoutUpdateImport $import)
     {
     }
 
+    #[\Override]
     public function setParentUpdate(ImportsAwareLayoutUpdateInterface $parentLayoutUpdate)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
     }

@@ -12,9 +12,7 @@ class NewAddress extends Constraint
     /** @var string */
     public $message = 'oro.address.validation.existing_address_used';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return [self::PROPERTY_CONSTRAINT];

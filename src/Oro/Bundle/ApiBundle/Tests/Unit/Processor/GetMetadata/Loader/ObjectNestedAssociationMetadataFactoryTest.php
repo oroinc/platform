@@ -22,6 +22,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
     /** @var ObjectNestedAssociationMetadataFactory */
     private $objectNestedAssociationMetadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->nestedAssociationMetadataHelper = $this->createMock(NestedAssociationMetadataHelper::class);

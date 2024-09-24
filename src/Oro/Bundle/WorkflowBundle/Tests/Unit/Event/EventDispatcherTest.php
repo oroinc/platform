@@ -13,6 +13,7 @@ class EventDispatcherTest extends TestCase
     private EventDispatcherInterface $innerDispatcher;
     private EventDispatcher $dispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerDispatcher = $this->createMock(EventDispatcherInterface::class);

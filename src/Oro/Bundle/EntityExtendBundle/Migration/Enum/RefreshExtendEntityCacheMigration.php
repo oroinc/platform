@@ -17,6 +17,7 @@ class RefreshExtendEntityCacheMigration implements Migration
     {
     }
 
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->container->get('oro_entity_config.config_manager')->clear();

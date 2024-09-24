@@ -12,9 +12,6 @@ class CurrencyAwareStub
         $this->currency = $currency;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setCurrency(string $currency = null)
     {
         $this->currency = $currency;

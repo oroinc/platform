@@ -22,6 +22,7 @@ class ConfigurableType extends AbstractType
     /**
      * @return mixed
      */
+    #[\Override]
     public function getName()
     {
         if ($this->name === null) {
@@ -45,9 +46,7 @@ class ConfigurableType extends AbstractType
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent()
     {
         return $this->parent ?: parent::getParent();

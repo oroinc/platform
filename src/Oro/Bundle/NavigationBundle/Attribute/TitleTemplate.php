@@ -29,17 +29,13 @@ class TitleTemplate extends ConfigurationAnnotation
         $this->value = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAliasName()
     {
         return 'title_template';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function allowArray()
     {
         return false;

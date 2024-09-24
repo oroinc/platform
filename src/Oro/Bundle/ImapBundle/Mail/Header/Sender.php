@@ -33,12 +33,7 @@ use Laminas\Mail\Header\Sender as BaseSender;
  */
 class Sender extends BaseSender
 {
-    /**
-     * {@inheritdoc}
-     *
-     * This method is a copy of {@see \Laminas\Mail\Header\Sender::fromString}.
-     * It is needed to override static call of `GenericHeader::splitHeaderLine`.
-     */
+    #[\Override]
     public static function fromString($headerLine)
     {
         [$name, $value] = GenericHeader::splitHeaderLine($headerLine);

@@ -41,26 +41,31 @@ class EmailTemplateChainLoader implements EmailTemplateLoaderInterface
         return $this->chainLoader->getLoaders();
     }
 
+    #[\Override]
     public function getSourceContext(string $name): Source
     {
         return $this->chainLoader->getSourceContext($name);
     }
 
+    #[\Override]
     public function getCacheKey(string $name): string
     {
         return $this->chainLoader->getCacheKey($name);
     }
 
+    #[\Override]
     public function isFresh(string $name, int $time): bool
     {
         return $this->chainLoader->isFresh($name, $time);
     }
 
+    #[\Override]
     public function exists(string $name): bool
     {
         return $this->chainLoader->exists($name);
     }
 
+    #[\Override]
     public function getEmailTemplate(string $name): EmailTemplateModel
     {
         $exceptions = [];

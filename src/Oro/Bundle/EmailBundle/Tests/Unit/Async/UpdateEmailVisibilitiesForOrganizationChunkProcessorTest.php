@@ -35,6 +35,7 @@ class UpdateEmailVisibilitiesForOrganizationChunkProcessorTest extends OrmTestCa
     /** @var UpdateEmailVisibilitiesForOrganizationChunkProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailAddressVisibilityManager = $this->createMock(EmailAddressVisibilityManager::class);

@@ -11,6 +11,7 @@ use Oro\Bundle\SanitizeBundle\RuleProcessor\Field\ProcessorInterface;
  */
 class AlwaysNullGuesser implements GuesserInterface
 {
+    #[\Override]
     public function guessProcessor(string $fieldName, ClassMetadata $metadata): ?ProcessorInterface
     {
         return null;

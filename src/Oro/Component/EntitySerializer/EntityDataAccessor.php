@@ -20,9 +20,7 @@ class EntityDataAccessor implements DataAccessorInterface
     /** @var array [class name => [property name => property, ...], ...] */
     private array $propertyCache = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasGetter(string $className, string $property): bool
     {
         $reflClass = $this->getReflectionClass($className);
@@ -32,9 +30,7 @@ class EntityDataAccessor implements DataAccessorInterface
             || null !== $this->findProperty($reflClass, $property);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function tryGetValue(object|array $object, string $property, mixed &$value): bool
     {
         if (\is_array($object)) {
@@ -75,9 +71,7 @@ class EntityDataAccessor implements DataAccessorInterface
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getValue(object|array $object, string $property): mixed
     {
         $value = null;

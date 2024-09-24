@@ -45,6 +45,7 @@ class LayoutBuilderTest extends \PHPUnit\Framework\TestCase
 
     protected BlockViewCache|\PHPUnit\Framework\MockObject\MockObject $blockViewCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(LayoutRegistryInterface::class);

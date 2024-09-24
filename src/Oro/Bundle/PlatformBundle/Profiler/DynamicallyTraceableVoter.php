@@ -24,6 +24,7 @@ class DynamicallyTraceableVoter extends TraceableVoter
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    #[\Override]
     public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         $result = $this->voter->vote($token, $subject, $attributes);

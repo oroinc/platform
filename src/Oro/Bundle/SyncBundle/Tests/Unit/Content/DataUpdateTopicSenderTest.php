@@ -27,6 +27,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
     /** @var DataUpdateTopicSender */
     private $dataUpdateTopicSender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);

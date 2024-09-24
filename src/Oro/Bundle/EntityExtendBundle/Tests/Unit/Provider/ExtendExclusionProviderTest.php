@@ -24,6 +24,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendExclusionProvider */
     private $exclusionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

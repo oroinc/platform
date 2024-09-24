@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
  */
 class GetListProcessor extends RequestActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): GetListContext
     {
         return new GetListContext($this->configProvider, $this->metadataProvider);

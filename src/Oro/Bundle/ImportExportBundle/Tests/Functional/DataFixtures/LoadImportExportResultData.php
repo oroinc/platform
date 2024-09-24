@@ -30,9 +30,7 @@ class LoadImportExportResultData extends AbstractFixture
         ]
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $user = $this->getFirstUser($manager);

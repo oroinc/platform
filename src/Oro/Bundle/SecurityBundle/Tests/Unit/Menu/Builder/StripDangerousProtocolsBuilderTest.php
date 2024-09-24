@@ -16,6 +16,7 @@ class StripDangerousProtocolsBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var StripDangerousProtocolsBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->uriSecurityHelper = $this->createMock(UriSecurityHelper::class);

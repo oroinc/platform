@@ -21,9 +21,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         $this->translationManager = $translationManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

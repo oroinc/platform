@@ -9,9 +9,7 @@ use OpenApi\Annotations as OA;
  */
 class YamlOpenApiFormatter implements OpenApiFormatterInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function format(OA\OpenApi $api): string
     {
         return $api->toYaml();

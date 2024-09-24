@@ -11,6 +11,7 @@ class ConvertExceptionToErrorTest extends UnhandledErrorProcessorTestCase
     /** @var ConvertExceptionToError */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

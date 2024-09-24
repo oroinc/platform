@@ -16,6 +16,7 @@ class IndexListenerTest extends WebTestCase
 {
     use MessageQueueAssertTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

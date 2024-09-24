@@ -23,17 +23,13 @@ class ExpressionDenied extends SyntaxException implements UserInputErrorExceptio
         parent::__construct($message);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMessageTemplate(): string
     {
         return $this->template;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMessageParams(): array
     {
         return ['%s' => $this->variableLabel];

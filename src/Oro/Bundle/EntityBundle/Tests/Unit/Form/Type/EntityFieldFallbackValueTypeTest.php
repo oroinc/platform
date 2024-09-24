@@ -261,9 +261,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         return ['fallback' => []];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $this->fallbackResolver = $this->createMock(EntityFallbackResolver::class);

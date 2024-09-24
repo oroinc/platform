@@ -6,17 +6,13 @@ use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AssociationEntityConfig
 
 class CommentEntityConfigDumperExtension extends AssociationEntityConfigDumperExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationEntityClass()
     {
         return 'Oro\Bundle\CommentBundle\Entity\Comment';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationScope()
     {
         return 'comment';

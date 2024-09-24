@@ -11,6 +11,7 @@ use Oro\Component\Testing\ReflectionUtil;
 
 class LoadProcessConfigurationCommandTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -15,6 +15,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
     private ConfigCacheInterface $cache;
     private PhpConfigCacheAccessor $accessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('PhpConfigCacheAccessor');

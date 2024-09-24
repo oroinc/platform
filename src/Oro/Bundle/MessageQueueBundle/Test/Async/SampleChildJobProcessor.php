@@ -24,6 +24,7 @@ class SampleChildJobProcessor implements MessageProcessorInterface, TopicSubscri
         $this->jobRunner = $jobRunner;
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $this->jobRunner->runDelayed($message->getBody()['jobId'], function (JobRunner $jobRunner, Job $job) {
@@ -33,6 +34,7 @@ class SampleChildJobProcessor implements MessageProcessorInterface, TopicSubscri
         return MessageProcessorInterface::ACK;
     }
 
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [SampleChildJobTopic::getName()];

@@ -10,6 +10,7 @@ class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ReflectionClassHelper */
     private $utils;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->utils = new ReflectionClassHelper(StubInterface::class);

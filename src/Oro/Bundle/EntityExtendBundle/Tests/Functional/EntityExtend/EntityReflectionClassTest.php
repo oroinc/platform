@@ -12,6 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityReflectionClassTest extends WebTestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         $this->bootKernel();

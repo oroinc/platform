@@ -15,9 +15,7 @@ class AclConfigLoader implements AclAttributeLoaderInterface
     private const CONFIG_FILE = 'Resources/config/oro/acls.yml';
     private const ROOT_NODE   = 'acls';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(AclAttributeStorage $storage, ResourcesContainerInterface $resourcesContainer): void
     {
         $configLoader = CumulativeConfigLoaderFactory::create('oro_acl_config', self::CONFIG_FILE);

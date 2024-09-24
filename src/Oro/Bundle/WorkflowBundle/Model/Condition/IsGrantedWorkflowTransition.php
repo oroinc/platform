@@ -58,17 +58,13 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         $this->aclGroupProvider = $aclGroupProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (2 === count($options)) {
@@ -88,9 +84,7 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         if (!$this->tokenAccessor->hasUser()) {
@@ -122,17 +116,13 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray([$this->transitionName]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode([$this->transitionName], $factoryAccessor);

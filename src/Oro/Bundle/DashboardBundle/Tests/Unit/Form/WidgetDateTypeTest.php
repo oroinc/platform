@@ -12,6 +12,7 @@ class WidgetDateTypeTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetDateType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new WidgetDateType();

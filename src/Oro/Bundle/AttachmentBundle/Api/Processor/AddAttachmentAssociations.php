@@ -24,9 +24,7 @@ class AddAttachmentAssociations implements ProcessorInterface
         $this->attachmentAssociationProvider = $attachmentAssociationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

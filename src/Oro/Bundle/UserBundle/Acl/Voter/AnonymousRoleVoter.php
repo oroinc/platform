@@ -12,9 +12,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 class AnonymousRoleVoter implements VoterInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         if (!\is_object($subject) || !$subject instanceof Role) {

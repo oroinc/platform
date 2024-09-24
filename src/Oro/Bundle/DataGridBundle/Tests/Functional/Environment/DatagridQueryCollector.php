@@ -60,9 +60,7 @@ class DatagridQueryCollector implements QueryExecutorInterface
         return $this->executedQueries;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(DatagridInterface $datagrid, Query $query, $executeFunc = null)
     {
         $datagridName = $datagrid->getName();

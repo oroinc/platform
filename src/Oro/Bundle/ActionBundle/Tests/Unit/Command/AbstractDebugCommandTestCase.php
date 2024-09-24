@@ -26,6 +26,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
     /** @var Command */
     protected $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = $this->createMock(FactoryWithTypesInterface::class);

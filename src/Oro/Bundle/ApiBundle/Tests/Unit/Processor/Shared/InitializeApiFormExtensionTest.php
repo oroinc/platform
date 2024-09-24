@@ -23,6 +23,7 @@ class InitializeApiFormExtensionTest extends FormProcessorTestCase
     /** @var InitializeApiFormExtension */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

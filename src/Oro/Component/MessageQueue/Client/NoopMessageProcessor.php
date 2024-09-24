@@ -21,9 +21,7 @@ class NoopMessageProcessor implements MessageProcessorInterface
         $this->defaultStatus = $defaultStatus;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         if ($this->defaultStatus === self::THROW_EXCEPTION) {

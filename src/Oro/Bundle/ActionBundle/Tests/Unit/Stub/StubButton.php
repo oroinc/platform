@@ -46,61 +46,61 @@ class StubButton implements ButtonInterface
         }
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getOrder()
     {
         return $this->order;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplate()
     {
         return $this->template;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplateData(array $customData = [])
     {
         return $this->templateData;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getButtonContext()
     {
         return $this->buttonContext ?: new ButtonContext();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getGroup()
     {
         return $this->group;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName()
     {
         return $this->name;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getLabel(): string
     {
         return (string) $this->label;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getAriaLabel(): ?string
     {
         return $this->ariaLabel;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getIcon()
     {
         return $this->icon;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTranslationDomain()
     {
         return 'test_domain';

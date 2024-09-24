@@ -18,9 +18,7 @@ class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implemen
 {
     private const BATCH_SIZE = 200;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -29,9 +27,7 @@ class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implemen
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->update($manager, User::class);

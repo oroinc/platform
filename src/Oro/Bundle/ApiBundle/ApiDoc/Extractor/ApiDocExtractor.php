@@ -16,25 +16,19 @@ class ApiDocExtractor extends BaseExtractor implements
 {
     use ApiDocExtractorTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRoutes()
     {
         return $this->processRoutes(parent::getRoutes());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function all($view = ApiDoc::DEFAULT_VIEW)
     {
         return parent::all($this->resolveView($view));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function extractAnnotations(array $routes, $view = ApiDoc::DEFAULT_VIEW)
     {
         return $this->doExtractAnnotations(

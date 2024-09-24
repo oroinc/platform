@@ -28,9 +28,7 @@ class AddActivityTarget extends AbstractAction
         $this->activityManager = $activityManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context): void
     {
         $email = $this->contextAccessor->getValue($context, $this->activityEntity);
@@ -43,9 +41,7 @@ class AddActivityTarget extends AbstractAction
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function initialize(array $options): void
     {
         if ((\count($options) < 2) || (\count($options) > 3)) {

@@ -28,17 +28,13 @@ class DelegateIncludeHandler implements IncludeHandlerInterface
         $this->handlers[$name] = $serviceId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(Context $context)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(Context $context)
     {
         $processed        = [];

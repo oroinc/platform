@@ -25,6 +25,7 @@ class AttributeConfigurationProvider implements AttributeConfigurationProviderIn
      *
      * @return string
      */
+    #[\Override]
     public function getAttributeLabel(FieldConfigModel $attribute)
     {
         return $this->getConfig($attribute, 'entity')->get('label', false, $attribute->getFieldName());
@@ -35,6 +36,7 @@ class AttributeConfigurationProvider implements AttributeConfigurationProviderIn
      *
      * @return bool
      */
+    #[\Override]
     public function isAttributeActive(FieldConfigModel $attribute)
     {
         return $this->getConfig($attribute, 'extend')
@@ -46,6 +48,7 @@ class AttributeConfigurationProvider implements AttributeConfigurationProviderIn
      *
      * @return bool
      */
+    #[\Override]
     public function isAttributeCustom(FieldConfigModel $attribute)
     {
         return $this->getConfig($attribute, 'extend')
@@ -57,6 +60,7 @@ class AttributeConfigurationProvider implements AttributeConfigurationProviderIn
      *
      * @return bool
      */
+    #[\Override]
     public function isAttributeSearchable(FieldConfigModel $attribute)
     {
         return $this->getConfig($attribute)->is('searchable');
@@ -67,6 +71,7 @@ class AttributeConfigurationProvider implements AttributeConfigurationProviderIn
      *
      * @return bool
      */
+    #[\Override]
     public function isAttributeFilterable(FieldConfigModel $attribute)
     {
         return $this->getConfig($attribute)->is('filterable');
@@ -77,6 +82,7 @@ class AttributeConfigurationProvider implements AttributeConfigurationProviderIn
      *
      * @return bool
      */
+    #[\Override]
     public function isAttributeFilterByExactValue(FieldConfigModel $attribute)
     {
         return $this->getConfig($attribute)->is('filter_by', 'exact_value');
@@ -87,6 +93,7 @@ class AttributeConfigurationProvider implements AttributeConfigurationProviderIn
      *
      * @return bool
      */
+    #[\Override]
     public function isAttributeSortable(FieldConfigModel $attribute)
     {
         return $this->getConfig($attribute)->is('sortable');

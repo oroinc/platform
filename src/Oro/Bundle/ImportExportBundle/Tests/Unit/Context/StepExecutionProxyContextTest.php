@@ -21,6 +21,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
     /** @var StepExecutionProxyContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->stepExecution = $this->createMock(StepExecution::class);

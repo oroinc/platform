@@ -38,10 +38,10 @@ class JobRepository extends EntityRepository implements JobRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return JobEntity|null
      */
+    #[\Override]
     public function findJobById(int $id): ?Job
     {
         $qb = $this->createQueryBuilder('job');
@@ -55,10 +55,10 @@ class JobRepository extends EntityRepository implements JobRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return JobEntity|null
      */
+    #[\Override]
     public function findRootJobByOwnerIdAndJobName(string $ownerId, string $jobName): ?Job
     {
         $qb = $this->createQueryBuilder('job');
@@ -73,10 +73,10 @@ class JobRepository extends EntityRepository implements JobRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return JobEntity|null
      */
+    #[\Override]
     public function findRootJobByJobNameAndStatuses(string $jobName, array $statuses): ?Job
     {
         $qb = $this->createQueryBuilder('job');
@@ -94,10 +94,10 @@ class JobRepository extends EntityRepository implements JobRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return JobEntity|null
      */
+    #[\Override]
     public function findChildJobByName(string $name, Job $rootJob): ?Job
     {
         $qb = $this->createQueryBuilder('job');
@@ -112,9 +112,7 @@ class JobRepository extends EntityRepository implements JobRepositoryInterface
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getChildStatusesWithJobCountByRootJob(Job $rootJob): array
     {
         $qb = $this->createQueryBuilder('job');
@@ -134,9 +132,7 @@ class JobRepository extends EntityRepository implements JobRepositoryInterface
         return $childStatusesWithJobCount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getChildJobIdsByRootJobAndStatus(Job $rootJob, string $status): array
     {
         $qb = $this->createQueryBuilder('job');
@@ -159,10 +155,10 @@ class JobRepository extends EntityRepository implements JobRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return JobEntity
      */
+    #[\Override]
     public function createJob(): Job
     {
         return new $this->_entityName();

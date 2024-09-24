@@ -10,6 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionTranslation;
  */
 class EnumOptionTranslationListener extends AbstractEnumOptionListener
 {
+    #[\Override]
     protected function invalidateCache($entity): void
     {
         if ($entity instanceof EnumOptionTranslation) {
@@ -22,6 +23,7 @@ class EnumOptionTranslationListener extends AbstractEnumOptionListener
         }
     }
 
+    #[\Override]
     protected function getEntityTranslationInfo(object $entity): array
     {
         return $entity instanceof EnumOptionTranslation

@@ -67,6 +67,7 @@ class User implements UserInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;
@@ -166,6 +167,7 @@ class User implements UserInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->name;

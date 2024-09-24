@@ -34,9 +34,7 @@ class BuildFormBuilder implements ProcessorInterface
         $this->enableFullValidation = $enableFullValidation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

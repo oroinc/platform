@@ -12,6 +12,7 @@ class WorkflowColumnListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowColumnListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new WorkflowColumnListener();

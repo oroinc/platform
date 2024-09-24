@@ -22,6 +22,7 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

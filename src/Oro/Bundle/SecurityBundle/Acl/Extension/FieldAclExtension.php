@@ -72,17 +72,13 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         $this->maskBuilder = new FieldMaskBuilder();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtensionKey()
     {
         return EntityAclExtension::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($type, $id)
     {
         if (\array_key_exists($type, $this->supportedTypes)) {
@@ -109,25 +105,19 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClasses()
     {
         throw new \LogicException('Field ACL Extension does not support "getClasses" method.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getObjectIdentity($val)
     {
         throw new \LogicException('Field ACL Extension does not support "getObjectIdentity" method.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         $fields = $this->entityMetadataProvider->getMetadata($oid->getType())->getFields();
@@ -139,9 +129,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAccessLevelNames($object, $permissionName = null)
     {
         if (self::PERMISSION_CREATE === $permissionName) {
@@ -152,9 +140,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         return parent::getAccessLevelNames($object, $permissionName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
         if (!$this->isSupportedObject($object)) {
@@ -164,33 +150,25 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         return $this->isAccessGranted($triggeredMask, $object, $securityToken);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaskPattern($mask)
     {
         return FieldMaskBuilder::getPatternFor($mask);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getServiceBits($mask)
     {
         return $mask & FieldMaskBuilder::SERVICE_BITS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeServiceBits($mask)
     {
         return $mask & FieldMaskBuilder::REMOVE_SERVICE_BITS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseDescriptor($descriptor, &$type, &$id, &$group)
     {
         $descriptor = ObjectIdentityHelper::removeFieldName($descriptor);

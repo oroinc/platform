@@ -19,9 +19,7 @@ class ValidateClassExistenceApplicableChecker implements ApplicableCheckerInterf
         $this->enumOptionEntityClassProvider = $enumOptionEntityClassProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         foreach (self::CLASS_ATTRIBUTES as $attributeName) {

@@ -4,9 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 class SqlSchemaUpdateMigrationQuery extends SqlMigrationQuery implements SchemaUpdateQuery
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isUpdateRequired()
     {
         return true;

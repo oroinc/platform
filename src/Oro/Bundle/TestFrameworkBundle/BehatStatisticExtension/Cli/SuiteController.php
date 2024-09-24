@@ -42,9 +42,7 @@ class SuiteController implements Controller
         $this->featureStatisticManager = $featureStatisticManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -64,9 +62,9 @@ class SuiteController implements Controller
     }
 
     /**
-     * {@inheritdoc}
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $tested = $input->getOption('available-suite-sets') ? [] : $this->featureStatisticManager->getTested();

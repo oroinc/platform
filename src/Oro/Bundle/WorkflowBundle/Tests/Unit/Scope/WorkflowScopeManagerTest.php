@@ -37,6 +37,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowScopeManager */
     private $workflowScopeManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(ObjectRepository::class);

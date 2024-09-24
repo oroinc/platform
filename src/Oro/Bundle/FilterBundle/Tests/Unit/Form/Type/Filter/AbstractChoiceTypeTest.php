@@ -18,6 +18,7 @@ class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractChoiceType */
     private $instance;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

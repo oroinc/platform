@@ -31,9 +31,7 @@ class ScopeTransformer implements DataTransformerInterface
         $this->scopeType = $scopeType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -51,9 +49,7 @@ class ScopeTransformer implements DataTransformerInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

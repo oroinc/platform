@@ -17,9 +17,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class ValidateIncludedDataDependencies implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

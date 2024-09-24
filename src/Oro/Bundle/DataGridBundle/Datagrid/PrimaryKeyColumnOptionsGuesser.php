@@ -17,9 +17,7 @@ class PrimaryKeyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFormatter($class, $property, $type): ?ColumnGuess
     {
         $metadata = $this->doctrine->getManagerForClass($class)->getClassMetadata($class);

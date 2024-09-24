@@ -8,43 +8,53 @@ namespace Oro\Component\Testing\Unit\ORM\Mocks;
  */
 class DriverConnectionMock implements \Doctrine\DBAL\Driver\Connection
 {
+    #[\Override]
     public function prepare($prepareString)
     {
     }
 
+    #[\Override]
     public function query()
     {
         return new StatementMock();
     }
 
+    #[\Override]
     public function quote($input, $type = \PDO::PARAM_STR)
     {
     }
 
+    #[\Override]
     public function exec($statement)
     {
     }
 
+    #[\Override]
     public function lastInsertId($name = null)
     {
     }
 
+    #[\Override]
     public function beginTransaction()
     {
     }
 
+    #[\Override]
     public function commit()
     {
     }
 
+    #[\Override]
     public function rollBack()
     {
     }
 
+    #[\Override]
     public function errorCode()
     {
     }
 
+    #[\Override]
     public function errorInfo()
     {
     }

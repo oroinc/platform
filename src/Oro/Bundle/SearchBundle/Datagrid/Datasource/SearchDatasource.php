@@ -37,9 +37,7 @@ class SearchDatasource implements DatasourceInterface
         $this->yamlToSearchQueryConverter = new YamlToSearchQueryConverter();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(DatagridInterface $grid, array $config)
     {
         $this->datagrid = $grid;
@@ -51,9 +49,7 @@ class SearchDatasource implements DatasourceInterface
         $grid->setDatasource(clone $this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getResults()
     {
         $event = new SearchResultBefore($this->datagrid, $this->searchQuery);

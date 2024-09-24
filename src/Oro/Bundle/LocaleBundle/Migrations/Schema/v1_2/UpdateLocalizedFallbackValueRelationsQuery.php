@@ -22,25 +22,19 @@ class UpdateLocalizedFallbackValueRelationsQuery extends AbstractEntityConfigQue
 
     const LIMIT = 100;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Update all LocalizedFallbackValue relations to be unidirectional';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRowBatchLimit()
     {
         return static::LIMIT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processRow(array $row, LoggerInterface $logger)
     {
         $data = $this->connection->convertToPHPValue($row['data'], 'array');

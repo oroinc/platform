@@ -26,9 +26,7 @@ class CallMethod extends AbstractAction
      */
     protected $options;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $object = $this->getObject($context);
@@ -97,9 +95,7 @@ class CallMethod extends AbstractAction
         return $parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['method'])) {

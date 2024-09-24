@@ -319,9 +319,7 @@ class ScopeManager implements ResetInterface
         return new ScopeCriteria($criteria, $this->getClassMetadataFactory());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->loadedProviders = [];

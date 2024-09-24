@@ -42,9 +42,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
         $this->configProcessorOptionsPath = $configProcessorOptionsPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -53,9 +51,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->runUpdateConfigCommand($logger);

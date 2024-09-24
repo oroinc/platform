@@ -95,9 +95,7 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
         $this->cloneExtendEntityStorage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGridPrefix(): string
     {
         return self::GRID_PREFIX;
@@ -187,6 +185,7 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
      *
      * @return string
      */
+    #[\Override]
     public function getEntity()
     {
         return $this->entity;
@@ -198,6 +197,7 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
      * @param string $entity
      * @return Report
      */
+    #[\Override]
     public function setEntity($entity)
     {
         $this->entity = $entity;
@@ -228,17 +228,13 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefinition()
     {
         return $this->definition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDefinition($definition)
     {
         $this->definition = $definition;

@@ -18,10 +18,7 @@ class YamlDriver extends BaseYamlDriver
         parent::__construct(new ExtendEntityLocator($configManager), null);
     }
 
-    /**
-     * {@inheritDoc}
-     * $file === 'ClassName'
-     */
+    #[\Override]
     protected function loadMappingFile($file)
     {
         if (empty($this->schemas)) {

@@ -28,9 +28,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
         $this->activityAssociationHelper = $activityAssociationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicableTarget($entityClass, $accessible = true)
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
@@ -41,59 +39,51 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc}
      * @param TestActivity $entity
      */
+    #[\Override]
     public function getSubject($entity)
     {
         return $entity->getMessage();
     }
 
     /**
-     * {@inheritdoc}
      * @param TestActivity $entity
      */
+    #[\Override]
     public function getDescription($entity)
     {
         return $entity->getDescription();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData(ActivityList $activityList)
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOwner($entity)
     {
         return null;
     }
 
     /**
-     * {@inheritdoc}
      * @param TestActivity $entity
      */
+    #[\Override]
     public function getOrganization($entity)
     {
         return $entity->getOrganization();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplate()
     {
         return '@OroActivityList/ActivityList/js/activityItemTemplate.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRoutes($entity)
     {
         return [
@@ -103,17 +93,13 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActivityId($entity)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable($entity)
     {
         if (\is_object($entity)) {
@@ -124,18 +110,18 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc}
      * @param TestActivity $entity
      */
+    #[\Override]
     public function getTargetEntities($entity)
     {
         return $entity->getActivityTargets();
     }
 
     /**
-     * {@inheritdoc}
      * @param TestActivity $entity
      */
+    #[\Override]
     public function getActivityOwners($entity, ActivityList $activityList)
     {
         $organization = $this->getOrganization($entity);
@@ -153,9 +139,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
         return [$activityOwner];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isActivityListApplicable(ActivityList $activityList): bool
     {
         return true;

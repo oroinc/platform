@@ -9,17 +9,13 @@ use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
  */
 class CreateProcessor extends RequestActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): CreateContext
     {
         return new CreateContext($this->configProvider, $this->metadataProvider);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getLogContext(NormalizeResultContext $context): array
     {
         $result = parent::getLogContext($context);

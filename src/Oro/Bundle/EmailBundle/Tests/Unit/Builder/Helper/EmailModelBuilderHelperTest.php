@@ -48,6 +48,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EmailModelBuilderHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);

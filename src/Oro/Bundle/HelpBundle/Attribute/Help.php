@@ -47,17 +47,13 @@ class Help implements ConfigurationInterface
         return $configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function allowArray(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAliasName(): string
     {
         return static::ALIAS;

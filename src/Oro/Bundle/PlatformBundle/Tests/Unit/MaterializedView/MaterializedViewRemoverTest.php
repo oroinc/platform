@@ -22,6 +22,7 @@ class MaterializedViewRemoverTest extends \PHPUnit\Framework\TestCase
     /** @var MaterializedViewRemover */
     private $remover;
 
+    #[\Override]
     protected function setUp(): void
     {
         $managerRegistry = $this->createMock(ManagerRegistry::class);

@@ -33,9 +33,9 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Throwable
      */
+    #[\Override]
     public function tick(): void
     {
         /** @var Connection $connection */
@@ -55,9 +55,7 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTimeout(): int
     {
         return $this->timeout;

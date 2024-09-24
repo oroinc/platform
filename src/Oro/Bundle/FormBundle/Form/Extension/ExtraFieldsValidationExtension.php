@@ -12,9 +12,7 @@ class ExtraFieldsValidationExtension extends AbstractTypeExtension
 
     const EXTRA_FIELDS_MESSAGE = 'oro.form.extra_fields';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['extra_fields_message' => self::EXTRA_FIELDS_MESSAGE]);

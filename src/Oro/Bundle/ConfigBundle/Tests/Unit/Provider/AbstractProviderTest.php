@@ -76,6 +76,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     abstract protected function getFilePath(string $fileName): string;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -407,9 +408,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

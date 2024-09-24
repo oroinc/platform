@@ -24,9 +24,7 @@ class InitializeCriteria implements ProcessorInterface
         $this->entityClassResolver = $entityClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

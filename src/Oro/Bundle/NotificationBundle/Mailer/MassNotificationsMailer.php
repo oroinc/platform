@@ -34,6 +34,7 @@ class MassNotificationsMailer implements MailerInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public function send(RawMessage $message, Envelope $envelope = null): void
     {
         try {

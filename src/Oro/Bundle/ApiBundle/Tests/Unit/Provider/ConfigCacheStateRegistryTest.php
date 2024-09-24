@@ -18,6 +18,7 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateInterface */
     private $secondState;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultState = $this->createMock(ConfigCacheStateInterface::class);

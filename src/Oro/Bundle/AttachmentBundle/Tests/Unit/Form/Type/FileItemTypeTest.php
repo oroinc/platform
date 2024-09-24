@@ -13,6 +13,7 @@ class FileItemTypeTest extends \PHPUnit\Framework\TestCase
 {
     private FileItemType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new FileItemType();

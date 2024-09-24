@@ -28,6 +28,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
     /** @var CompleteFilters */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

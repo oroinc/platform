@@ -17,6 +17,7 @@ class EntityCreateSelectFormExtension extends AbstractExtension
         $this->registry = $registry;
     }
 
+    #[\Override]
     protected function loadTypes(): array
     {
         return [

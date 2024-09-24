@@ -12,6 +12,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
     /** @var UserEmailOrigin|\PHPUnit\Framework\MockObject\MockObject */
     private $origin;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->origin = $this->createMock(UserEmailOrigin::class);

@@ -49,6 +49,7 @@ class EmailUserFromEmailModelBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailUserFromEmailModelBuilder */
     private $emailUserFromEmailModelBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

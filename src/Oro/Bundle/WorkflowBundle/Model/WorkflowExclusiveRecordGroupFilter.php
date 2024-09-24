@@ -24,9 +24,7 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(ArrayCollection $workflows, WorkflowRecordContext $context)
     {
         $lockedGroup = $this->retrieveLockedGroups($workflows, $context);

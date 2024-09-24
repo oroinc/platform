@@ -15,6 +15,7 @@ class QueryExecutorTest extends OrmTestCase
     private EntityManagerInterface $em;
     private QueryExecutor $queryExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

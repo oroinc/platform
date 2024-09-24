@@ -23,53 +23,38 @@ class TestBundle implements BundleInterface
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNamespace(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function boot()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function shutdown()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContainerExtension(): ?ExtensionInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
     }
@@ -82,17 +67,13 @@ class TestBundle implements BundleInterface
         $this->path = $path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPath(): string
     {
         return $this->path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
     }

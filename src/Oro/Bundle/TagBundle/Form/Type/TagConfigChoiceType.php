@@ -14,9 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TagConfigChoiceType extends AbstractConfigType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -39,33 +37,24 @@ class TagConfigChoiceType extends AbstractConfigType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_tag_config_choice';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isReadOnly(Options $options)
     {
         return $this->isImplementsTaggable($options) || parent::isReadOnly($options);

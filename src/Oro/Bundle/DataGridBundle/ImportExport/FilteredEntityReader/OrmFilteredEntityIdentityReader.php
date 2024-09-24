@@ -24,9 +24,7 @@ class OrmFilteredEntityIdentityReader implements FilteredEntityIdentityReaderInt
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIds(DatagridInterface $datagrid, string $entityName, array $options): array
     {
         $datasource = $datagrid->getAcceptedDatasource();
@@ -53,9 +51,7 @@ class OrmFilteredEntityIdentityReader implements FilteredEntityIdentityReaderInt
         return $filteredEntitiesIds ?: [0];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridInterface $datagrid, string $className, array $options): bool
     {
         return $datagrid->getDatasource() instanceof OrmDatasource;

@@ -59,16 +59,14 @@ class LocalizedValueExtension extends AbstractExtension
     /**
      * Should be applied before formatter extension
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getPriority()
     {
         return 200;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -77,9 +75,7 @@ class LocalizedValueExtension extends AbstractExtension
             && count($this->getProperties($config)) > 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         if (null === $this->localizationHelper->getCurrentLocalization()) {
@@ -96,8 +92,8 @@ class LocalizedValueExtension extends AbstractExtension
 
     /**
      * @param OrmDatasource $datasource
-     * {@inheritdoc}
      */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if (null !== $this->localizationHelper->getCurrentLocalization()) {
@@ -150,9 +146,7 @@ class LocalizedValueExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         if (null === ($localization = $this->localizationHelper->getCurrentLocalization())) {

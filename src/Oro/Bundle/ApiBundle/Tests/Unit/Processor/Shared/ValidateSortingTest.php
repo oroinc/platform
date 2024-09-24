@@ -32,6 +32,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 {
     private ValidateSorting $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

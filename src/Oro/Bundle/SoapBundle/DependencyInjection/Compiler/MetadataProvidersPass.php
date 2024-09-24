@@ -11,9 +11,7 @@ class MetadataProvidersPass implements CompilerPassInterface
     const TAG_NAME = 'oro_soap.metadata_provider';
     const CHAIN_SERVICE_ID = 'oro_soap.provider.metadata.chain';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->has(self::CHAIN_SERVICE_ID)) {

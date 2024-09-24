@@ -12,9 +12,7 @@ class LoadUserData extends AbstractLoadUserData
     public const USER_NAME_2 = 'system_user_2';
     public const USER_PASSWORD_2 = 'system_user_2_api_key';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getUsersData(): array
     {
         return [

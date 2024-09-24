@@ -67,6 +67,7 @@ class ConnectionChecker implements LoggerAwareInterface, ResettableInterface
         return $host !== '' && $host !== 'null';
     }
 
+    #[\Override]
     public function reset(): void
     {
         $this->isConnected = null;

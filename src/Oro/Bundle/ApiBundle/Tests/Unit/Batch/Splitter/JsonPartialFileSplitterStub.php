@@ -13,9 +13,7 @@ class JsonPartialFileSplitterStub extends JsonPartialFileSplitter
         $this->sleepTimeout = $sleepTimeout * 1000;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function saveChunk(): void
     {
         usleep($this->sleepTimeout);

@@ -19,9 +19,6 @@ trait AuthenticatedTokenTrait
     /** @var AbstractUser */
     private $innerUser;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUser($user): void
     {
         if ($user instanceof AbstractUser) {
@@ -33,9 +30,6 @@ trait AuthenticatedTokenTrait
         parent::setUser($user);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles(): array
     {
         if ($this->innerUser instanceof AbstractUser) {
@@ -45,9 +39,6 @@ trait AuthenticatedTokenTrait
         return $this->getUserRoles();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoleNames(): array
     {
         if ($this->innerUser instanceof AbstractUser) {

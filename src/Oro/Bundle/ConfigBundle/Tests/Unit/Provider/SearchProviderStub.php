@@ -22,17 +22,13 @@ class SearchProviderStub implements SearchProviderInterface
         $this->enabled = $enabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($name)
     {
         return $this->enabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData($name)
     {
         return $this->data;

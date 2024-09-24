@@ -15,6 +15,7 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $virtualFieldsConfig;
 
+    #[\Override]
     protected function setUp(): void
     {
         $hierarchy = [

@@ -22,9 +22,7 @@ class AddDashboardType implements Migration, OutdatedExtendExtensionAwareInterfa
 {
     use OutdatedExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $enumTable = $this->outdatedExtendExtension->addOutdatedEnumField(

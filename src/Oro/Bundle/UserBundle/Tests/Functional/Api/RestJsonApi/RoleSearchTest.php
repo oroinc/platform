@@ -11,6 +11,7 @@ class RoleSearchTest extends RestJsonApiTestCase
 {
     use SearchExtensionTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

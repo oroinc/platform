@@ -12,6 +12,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
     private ConfigExclusionProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $hierarchyProvider = $this->createMock(EntityHierarchyProviderInterface::class);

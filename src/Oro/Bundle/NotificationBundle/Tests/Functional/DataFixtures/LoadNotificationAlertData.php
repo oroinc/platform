@@ -68,11 +68,13 @@ class LoadNotificationAlertData extends AbstractFixture implements ContainerAwar
         ]
     ];
 
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -80,6 +82,7 @@ class LoadNotificationAlertData extends AbstractFixture implements ContainerAwar
         ];
     }
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var User $user */

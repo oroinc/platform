@@ -19,6 +19,7 @@ class SvgIconsSupportContextConfigurator implements ContextConfiguratorInterface
     {
     }
 
+    #[\Override]
     public function configureContext(ContextInterface $context): void
     {
         $context

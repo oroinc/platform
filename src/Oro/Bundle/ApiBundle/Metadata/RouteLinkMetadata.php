@@ -45,9 +45,7 @@ class RouteLinkMetadata extends LinkMetadata
         $this->defaultParams = $defaultParams;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $result = parent::toArray();
@@ -62,9 +60,7 @@ class RouteLinkMetadata extends LinkMetadata
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {
         $params = $this->resolveParameters($dataAccessor, $this->routeParams);

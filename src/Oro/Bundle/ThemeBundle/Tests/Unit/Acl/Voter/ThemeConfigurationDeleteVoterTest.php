@@ -25,9 +25,7 @@ class ThemeConfigurationDeleteVoterTest extends TestCase
 
     private ThemeConfigurationDeleteVoter $voter;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(EntityRepository::class);

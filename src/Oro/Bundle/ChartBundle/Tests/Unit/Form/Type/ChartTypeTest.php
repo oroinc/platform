@@ -19,6 +19,7 @@ class ChartTypeTest extends FormIntegrationTestCase
     /** @var ChartType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
@@ -91,9 +92,7 @@ class ChartTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

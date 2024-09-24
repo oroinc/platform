@@ -17,6 +17,7 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridFiltersProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterFactory = $this->createMock(FilterFactory::class);

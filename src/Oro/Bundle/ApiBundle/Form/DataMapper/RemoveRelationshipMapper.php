@@ -12,9 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class RemoveRelationshipMapper extends AbstractRelationshipMapper
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function mapDataToCollectionFormField(
         object $data,
         FormInterface $formField,
@@ -23,9 +21,7 @@ class RemoveRelationshipMapper extends AbstractRelationshipMapper
         // do nothing here because only input collection items should be processed by the form
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function mapCollectionFormFieldToData(
         object $data,
         FormInterface $formField,

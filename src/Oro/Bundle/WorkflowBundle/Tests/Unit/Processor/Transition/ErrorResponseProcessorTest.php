@@ -11,6 +11,7 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ErrorResponseProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new ErrorResponseProcessor();

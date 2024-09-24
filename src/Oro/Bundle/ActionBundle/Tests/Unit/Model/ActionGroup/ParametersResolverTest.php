@@ -21,6 +21,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
     /** @var ParametersResolver */
     private $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resolver = new ParametersResolver();

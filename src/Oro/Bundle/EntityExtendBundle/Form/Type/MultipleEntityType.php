@@ -24,9 +24,7 @@ class MultipleEntityType extends AbstractType
         $this->router = $router;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!empty($options['default_element'])) {
@@ -49,9 +47,7 @@ class MultipleEntityType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $data = $view->parent->vars['value'];
@@ -67,25 +63,18 @@ class MultipleEntityType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_multiple_entity';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return SymfonyMultipleEntityType::class;

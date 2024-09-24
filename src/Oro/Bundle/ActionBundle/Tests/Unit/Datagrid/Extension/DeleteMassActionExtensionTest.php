@@ -33,6 +33,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DeleteMassActionExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

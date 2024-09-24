@@ -36,9 +36,7 @@ class CopyTagging extends AbstractAction
         $this->taggableHelper = $taggableHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!empty($options[static::PATH_SOURCE]) && !$options[static::PATH_SOURCE] instanceof PropertyPathInterface) {
@@ -56,9 +54,7 @@ class CopyTagging extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $source       = $this->getTaggable($context, static::PATH_SOURCE);

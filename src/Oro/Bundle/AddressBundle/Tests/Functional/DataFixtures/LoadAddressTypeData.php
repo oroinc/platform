@@ -24,6 +24,7 @@ class LoadAddressTypeData extends AbstractFixture
     /**
      * Load address types
      */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->addressTypes as $addressTypeInfo) {

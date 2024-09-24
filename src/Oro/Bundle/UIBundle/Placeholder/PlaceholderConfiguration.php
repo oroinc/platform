@@ -16,9 +16,7 @@ class PlaceholderConfiguration implements ConfigurationInterface
     public const PLACEHOLDERS_NODE = 'placeholders';
     public const ITEMS_NODE        = 'items';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

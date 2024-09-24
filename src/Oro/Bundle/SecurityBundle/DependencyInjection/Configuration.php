@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Cookie;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('oro_security');

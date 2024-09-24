@@ -29,6 +29,7 @@ abstract class AbstractDebugCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getArgument($this->getArgumentName());

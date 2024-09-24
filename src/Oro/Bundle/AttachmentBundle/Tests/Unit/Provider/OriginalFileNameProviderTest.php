@@ -25,6 +25,7 @@ class OriginalFileNameProviderTest extends \PHPUnit\Framework\TestCase
 
     private OriginalFileNameProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerProvider = $this->createMock(FileNameProviderInterface::class);

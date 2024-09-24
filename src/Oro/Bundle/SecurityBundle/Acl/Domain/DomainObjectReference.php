@@ -39,9 +39,7 @@ class DomainObjectReference implements ObjectIdentityInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function equals(ObjectIdentityInterface $identity)
     {
         return
@@ -49,17 +47,13 @@ class DomainObjectReference implements ObjectIdentityInterface
             && $this->className === $identity->getType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIdentifier()
     {
         return $this->objectId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType()
     {
         return $this->className;

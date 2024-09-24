@@ -23,6 +23,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
     /** @var EntityNestedObjectMetadataFactory */
     private $entityNestedObjectMetadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->nestedObjectMetadataHelper = $this->createMock(NestedObjectMetadataHelper::class);

@@ -11,6 +11,7 @@ class ExportActionTest extends \PHPUnit\Framework\TestCase
     /** @var ExportAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new ExportAction();

@@ -29,9 +29,7 @@ class FormType extends AbstractType
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->subscriber);
@@ -55,17 +53,12 @@ class FormType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_config_form_type';
@@ -108,9 +101,7 @@ class FormType extends AbstractType
         ));
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['valid'] = $this->isFormValid($form);

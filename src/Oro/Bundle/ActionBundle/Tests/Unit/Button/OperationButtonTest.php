@@ -31,6 +31,7 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
     /** @var OperationButton */
     private $button;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->originOperationName = 'origin_name';

@@ -15,6 +15,7 @@ class ValidateParentActionAvailabilityTest extends GetSubresourceProcessorTestCa
     /** @var ValidateParentActionAvailability */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

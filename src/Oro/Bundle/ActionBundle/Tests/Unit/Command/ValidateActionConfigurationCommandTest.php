@@ -26,6 +26,7 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
     /** @var ValidateActionConfigurationCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = $this->createMock(ConfigurationProviderInterface::class);

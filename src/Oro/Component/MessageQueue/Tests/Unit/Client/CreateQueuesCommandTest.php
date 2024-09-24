@@ -16,6 +16,7 @@ class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
 
     private CreateQueuesCommand $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(DestinationMetaRegistry::class);

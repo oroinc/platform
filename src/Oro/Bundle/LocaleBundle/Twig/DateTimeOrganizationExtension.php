@@ -22,9 +22,7 @@ use Twig\TwigFilter;
  */
 class DateTimeOrganizationExtension extends DateTimeExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         $filters = parent::getFilters();
@@ -102,9 +100,7 @@ class DateTimeOrganizationExtension extends DateTimeExtension
         return $localizationData['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
     }
 
-    /**
-     * {@inheritdoc]
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

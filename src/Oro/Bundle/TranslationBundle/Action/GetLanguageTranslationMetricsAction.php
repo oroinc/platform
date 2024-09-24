@@ -40,6 +40,7 @@ class GetLanguageTranslationMetricsAction extends AbstractLanguageResultAction
         $this->translationMetricsProvider = $translationMetricsProvider;
     }
 
+    #[\Override]
     protected function executeAction($context): void
     {
         $metrics = null;

@@ -17,6 +17,7 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationStrategyProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultStrategy = $this->createMock(TranslationStrategyInterface::class);

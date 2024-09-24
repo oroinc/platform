@@ -16,17 +16,13 @@ class UniquePinbarTabUrl extends Constraint
     /** @var string */
     public $pinbarTabClass = PinbarTab::class;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return UniquePinbarTabUrlValidator::class;

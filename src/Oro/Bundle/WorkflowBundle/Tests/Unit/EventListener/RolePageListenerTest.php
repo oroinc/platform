@@ -20,6 +20,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     /** @var RolePageListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();

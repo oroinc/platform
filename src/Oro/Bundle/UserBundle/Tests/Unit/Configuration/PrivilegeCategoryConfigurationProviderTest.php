@@ -19,6 +19,7 @@ class PrivilegeCategoryConfigurationProviderTest extends \PHPUnit\Framework\Test
     /** @var PrivilegeCategoryConfigurationProvider */
     private $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $bundle1 = new TestBundle1();

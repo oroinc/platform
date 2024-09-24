@@ -18,6 +18,7 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
 
     private DbalTransportFactory $dbalTransportFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dbalTransportFactory = new DbalTransportFactory();

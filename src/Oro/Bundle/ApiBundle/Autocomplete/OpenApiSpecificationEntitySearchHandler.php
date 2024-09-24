@@ -16,9 +16,7 @@ class OpenApiSpecificationEntitySearchHandler implements SearchHandlerInterface
         $this->entityProvider = $entityProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         [$searchTerm, $view] = explode(';', $query, 2);
@@ -40,9 +38,7 @@ class OpenApiSpecificationEntitySearchHandler implements SearchHandlerInterface
         return ['results' => $resultData, 'more' => $more];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         if ($item instanceof OpenApiSpecificationEntity) {
@@ -58,17 +54,13 @@ class OpenApiSpecificationEntitySearchHandler implements SearchHandlerInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getProperties()
     {
         return ['name'];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityName()
     {
         return OpenApiSpecificationEntity::class;

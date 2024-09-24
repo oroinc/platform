@@ -11,6 +11,7 @@ class NotHasValueTest extends \PHPUnit\Framework\TestCase
 {
     private Condition\NotHasValue $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\NotHasValue();

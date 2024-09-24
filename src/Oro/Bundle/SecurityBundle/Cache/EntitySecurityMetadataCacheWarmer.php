@@ -20,6 +20,7 @@ class EntitySecurityMetadataCacheWarmer implements CacheWarmerInterface
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function warmUp($cacheDir)
     {
         $this->provider->warmUpCache();
@@ -28,6 +29,7 @@ class EntitySecurityMetadataCacheWarmer implements CacheWarmerInterface
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function isOptional()
     {
         return true;

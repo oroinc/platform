@@ -23,9 +23,7 @@ class GroupAttributesValidator extends ConstraintValidator
         $this->attributeManager = $attributeManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$value instanceof AttributeFamily) {

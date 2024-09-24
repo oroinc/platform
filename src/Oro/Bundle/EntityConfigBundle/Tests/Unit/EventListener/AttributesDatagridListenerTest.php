@@ -41,6 +41,7 @@ class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributesDatagridListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

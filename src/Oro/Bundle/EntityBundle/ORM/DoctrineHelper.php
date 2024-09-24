@@ -33,9 +33,7 @@ class DoctrineHelper implements ResetInterface
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->entityClasses = [];

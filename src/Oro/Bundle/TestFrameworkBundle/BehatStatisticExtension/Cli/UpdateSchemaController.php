@@ -38,9 +38,7 @@ class UpdateSchemaController implements Controller
         $this->models = $models;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -53,9 +51,7 @@ class UpdateSchemaController implements Controller
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('update-statistic-schema')) {

@@ -24,9 +24,7 @@ class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExte
         $this->extension = $extension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -42,17 +40,13 @@ class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExte
         return $this->container->get('oro_entity_config.config.attributes_config_helper');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getField($entity, FieldConfigModel $field)
     {
         return $this->extension->getField($entity, $field);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFields($entity, $entityClass = null)
     {
         $fields = $this->extension->getFields($entity, $entityClass);

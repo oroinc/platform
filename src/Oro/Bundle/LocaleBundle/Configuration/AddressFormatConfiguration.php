@@ -12,9 +12,7 @@ class AddressFormatConfiguration implements ConfigurationInterface
 {
     public const ROOT_NODE = 'address_format';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

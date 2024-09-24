@@ -25,6 +25,7 @@ class FormFieldsMapProviderTest extends TestCase
 
     private FormConfigInterface|MockObject $formConfig;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

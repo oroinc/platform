@@ -18,9 +18,7 @@ class PostProcessorsVoter implements VoterInterface
         $this->isEnabled = $isEnabled;
     }
 
-    /**
-     * @inhericDoc
-     */
+    #[\Override]
     public function vote($feature, $scopeIdentifier = null): int
     {
         if ($feature === self::ATTACHMENT_POST_PROCESSORS) {

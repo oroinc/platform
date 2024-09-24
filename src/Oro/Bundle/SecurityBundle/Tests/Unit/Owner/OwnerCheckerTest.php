@@ -62,6 +62,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerChecker */
     private $ownerChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

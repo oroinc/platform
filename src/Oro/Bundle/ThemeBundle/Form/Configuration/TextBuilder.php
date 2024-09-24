@@ -14,17 +14,11 @@ class TextBuilder extends AbstractConfigurationChildBuilder
         return 'text';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     #[\Override] protected function getTypeClass(): string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     #[\Override] protected function getDefaultOptions(): array
     {
         return [

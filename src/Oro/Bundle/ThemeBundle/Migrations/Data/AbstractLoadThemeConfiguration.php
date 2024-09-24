@@ -39,6 +39,7 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
      */
     abstract protected function getThemeConfigurationKeys(): array;
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->init($manager);

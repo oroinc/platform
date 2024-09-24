@@ -17,6 +17,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class EmailContextSearchTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

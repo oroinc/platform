@@ -49,6 +49,7 @@ class DraftAccessRule implements AccessRuleInterface
         $this->enabled = $enabled;
     }
 
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         $entityClass = $criteria->getEntityClass();
@@ -59,6 +60,7 @@ class DraftAccessRule implements AccessRuleInterface
             && BasicPermission::VIEW === $permission;
     }
 
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         $entityClass = $criteria->getEntityClass();

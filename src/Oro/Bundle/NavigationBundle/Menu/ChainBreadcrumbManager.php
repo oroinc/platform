@@ -20,37 +20,37 @@ class ChainBreadcrumbManager implements BreadcrumbManagerInterface
         $this->managers = $managers;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getBreadcrumbs($menuName, $isInverse = true, $route = null)
     {
         return $this->getSupportedManager($route)->getBreadcrumbs($menuName, $isInverse, $route);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getMenu($menu, array $pathName = [], array $options = [])
     {
         return $this->getSupportedManager()->getMenu($menu, $pathName, $options);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getCurrentMenuItem($menu)
     {
         return $this->getSupportedManager()->getCurrentMenuItem($menu);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getBreadcrumbArray($menuName, $item, $isInverse = true)
     {
         return $this->getSupportedManager()->getBreadcrumbArray($menuName, $item, $isInverse);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getBreadcrumbLabels($menu, $route)
     {
         return $this->getSupportedManager($route)->getBreadcrumbLabels($menu, $route);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function supports($route = null)
     {
         foreach ($this->managers as $manager) {

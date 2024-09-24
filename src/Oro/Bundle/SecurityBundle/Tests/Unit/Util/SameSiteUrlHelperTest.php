@@ -12,6 +12,7 @@ class SameSiteUrlHelperTest extends \PHPUnit\Framework\TestCase
 
     private SameSiteUrlHelper $sameSiteUrlHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();

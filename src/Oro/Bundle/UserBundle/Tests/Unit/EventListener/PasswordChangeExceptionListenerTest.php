@@ -23,6 +23,7 @@ class PasswordChangeExceptionListenerTest extends \PHPUnit\Framework\TestCase
 
     private PasswordChangeExceptionListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->session = $this->createMock(Session::class);

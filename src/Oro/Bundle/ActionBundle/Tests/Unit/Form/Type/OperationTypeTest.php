@@ -22,6 +22,7 @@ class OperationTypeTest extends FormIntegrationTestCase
     /** @var OperationType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new OperationType(
@@ -31,9 +32,7 @@ class OperationTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

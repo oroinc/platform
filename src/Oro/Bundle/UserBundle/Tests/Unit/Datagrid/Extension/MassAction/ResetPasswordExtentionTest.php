@@ -18,6 +18,7 @@ class ResetPasswordExtentionTest extends \PHPUnit\Framework\TestCase
     /** @var ResetPasswordExtension */
     private $resetExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configuration = $this->createMock(DatagridConfiguration::class);

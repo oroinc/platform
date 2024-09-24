@@ -24,6 +24,7 @@ class FullAccessFieldRootAclBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var FullAccessFieldRootAclBuilder */
     private $fullAccessFieldRootAclBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extensionSelector = $this->createMock(AclExtensionSelector::class);

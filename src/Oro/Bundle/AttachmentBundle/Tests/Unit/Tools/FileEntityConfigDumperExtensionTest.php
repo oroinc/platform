@@ -27,6 +27,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FileEntityConfigDumperExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

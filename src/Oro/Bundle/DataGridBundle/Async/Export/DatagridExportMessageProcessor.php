@@ -59,11 +59,13 @@ class DatagridExportMessageProcessor implements
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [DatagridExportTopic::getName()];
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $messageBody = $message->getBody();

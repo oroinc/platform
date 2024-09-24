@@ -13,9 +13,7 @@ class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
 
     const TRANSITION_DEFINITION_KEY = 'transition_definitions';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -29,6 +27,7 @@ class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param bool $dryRun
      */
+    #[\Override]
     public function execute(LoggerInterface $logger, $dryRun = false)
     {
         $this->doExecute($logger);

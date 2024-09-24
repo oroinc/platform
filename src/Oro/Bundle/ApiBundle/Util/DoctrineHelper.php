@@ -14,9 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class DoctrineHelper extends BaseHelper
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isManageableEntityClass($entityClass)
     {
         if (ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {
@@ -26,9 +24,7 @@ class DoctrineHelper extends BaseHelper
         return parent::isManageableEntityClass($entityClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityManagerForClass($entityClass, $throwException = true)
     {
         if (ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {

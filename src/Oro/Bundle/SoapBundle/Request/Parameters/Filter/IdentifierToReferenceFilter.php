@@ -28,9 +28,7 @@ class IdentifierToReferenceFilter implements ParameterFilterInterface
         $this->field      = $field;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter($rawValue, $operator)
     {
         /** @var EntityManager $em */

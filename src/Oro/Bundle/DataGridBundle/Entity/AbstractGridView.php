@@ -110,9 +110,7 @@ abstract class AbstractGridView implements ViewInterface
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->name;
@@ -126,25 +124,19 @@ abstract class AbstractGridView implements ViewInterface
         return $this->type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFiltersData()
     {
         return $this->filtersData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortersData()
     {
         return $this->sortersData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGridName()
     {
         return $this->gridName;
@@ -191,9 +183,7 @@ abstract class AbstractGridView implements ViewInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFiltersData(array $filtersData = [])
     {
         $this->filtersData = $filtersData;
@@ -201,9 +191,7 @@ abstract class AbstractGridView implements ViewInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSortersData(array $sortersData = [])
     {
         $this->sortersData = $sortersData;
@@ -211,9 +199,7 @@ abstract class AbstractGridView implements ViewInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getColumnsData()
     {
         if ($this->columnsData === null) {
@@ -223,17 +209,13 @@ abstract class AbstractGridView implements ViewInterface
         return $this->columnsData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setColumnsData(array $columnsData = [])
     {
         $this->columnsData = $columnsData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setGridName($gridName)
     {
         $this->gridName = $gridName;
@@ -289,6 +271,7 @@ abstract class AbstractGridView implements ViewInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getAppearanceTypeName()
     {
         return (string) $this->appearanceType;

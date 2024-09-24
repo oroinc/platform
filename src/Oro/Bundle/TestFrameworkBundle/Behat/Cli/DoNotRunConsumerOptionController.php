@@ -21,9 +21,7 @@ class DoNotRunConsumerOptionController implements Controller
         $this->subscriber = $subscriber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command->addOption(
@@ -35,9 +33,7 @@ class DoNotRunConsumerOptionController implements Controller
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('do-not-run-consumer') &&

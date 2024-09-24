@@ -131,9 +131,7 @@ class AttachmentController extends AbstractController
         return $this->container->get(AttachmentManager::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

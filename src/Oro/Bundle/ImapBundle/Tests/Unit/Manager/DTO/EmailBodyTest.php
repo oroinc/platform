@@ -14,6 +14,7 @@ class EmailBodyTest extends TestCase
     /** @var EmailBody */
     private $emailBody;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailBody = new EmailBody();

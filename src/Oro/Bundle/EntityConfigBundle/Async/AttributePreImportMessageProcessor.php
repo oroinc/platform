@@ -17,11 +17,13 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
  */
 class AttributePreImportMessageProcessor extends PreImportMessageProcessor
 {
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [AttributePreImportTopic::getName()];
     }
 
+    #[\Override]
     protected function processJob(MessageInterface $message, array $body, array $files)
     {
         $result = $this->jobRunner->runUniqueByMessage(

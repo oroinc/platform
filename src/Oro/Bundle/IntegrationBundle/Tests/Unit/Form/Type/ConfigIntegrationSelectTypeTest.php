@@ -17,6 +17,7 @@ class ConfigIntegrationSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigIntegrationSelectType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

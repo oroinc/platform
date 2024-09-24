@@ -20,6 +20,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
     /** @var CalendarDateManager */
     private $calendarDateManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -18,9 +18,7 @@ class ProcessorIteratorFactory implements ProcessorIteratorFactoryInterface, Res
         $this->actionsWithApplicableCacheMap = array_fill_keys($actionsWithApplicableCache, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createProcessorIterator(
         array $processors,
         ContextInterface $context,
@@ -42,9 +40,7 @@ class ProcessorIteratorFactory implements ProcessorIteratorFactoryInterface, Res
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->applicableCaches = [];

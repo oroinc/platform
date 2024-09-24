@@ -15,17 +15,13 @@ class CreateIndexedConfigValues implements Migration, OrderedMigrationInterface,
 {
     use RenameExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 2;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPreQuery($this->getRemoveObsoleteValuesSql());

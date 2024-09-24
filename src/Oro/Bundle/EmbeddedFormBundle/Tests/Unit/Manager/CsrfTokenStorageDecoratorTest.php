@@ -27,6 +27,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var CsrfTokenStorageDecorator */
     private $csrfTokenStorageDecorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mainTokenStorage = $this->createMock(TokenStorageInterface::class);

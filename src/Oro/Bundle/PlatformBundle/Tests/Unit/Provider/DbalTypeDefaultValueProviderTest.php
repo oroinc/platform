@@ -8,6 +8,7 @@ class DbalTypeDefaultValueProviderTest extends \PHPUnit\Framework\TestCase
 {
     private DbalTypeDefaultValueProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new DbalTypeDefaultValueProvider();

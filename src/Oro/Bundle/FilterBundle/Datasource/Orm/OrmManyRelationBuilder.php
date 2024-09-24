@@ -22,17 +22,13 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(FilterDatasourceAdapterInterface $ds)
     {
         return $ds instanceof OrmFilterDatasourceAdapter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
         $fieldName,
@@ -54,9 +50,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
             : $ds->expr()->in($alias, $qb->getDQL());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildNullValueExpr(
         FilterDatasourceAdapterInterface $ds,
         $fieldName,

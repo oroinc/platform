@@ -40,9 +40,7 @@ class CompleteDescriptions implements ProcessorInterface
         $this->filtersDescriptionHelper = $filtersDescriptionHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

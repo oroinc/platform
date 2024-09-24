@@ -21,9 +21,7 @@ class ConfigVoter implements VoterInterface
         $this->featureConfigManager = $featureConfigManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function vote($feature, $scopeIdentifier = null)
     {
         $toggle = $this->featureConfigManager->get($feature, self::TOGGLE_KEY);

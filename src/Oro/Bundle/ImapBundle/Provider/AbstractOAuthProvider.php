@@ -26,9 +26,7 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
         $this->resourceOwnerMap = $resourceOwnerMap;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessTokenByAuthCode(string $code, array $scopes = null): OAuthAccessTokenData
     {
         $response = $this->doAccessTokenHttpRequest($this->getAccessTokenParameters($code, $scopes));
@@ -39,9 +37,7 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
         return $this->createAccessTokenData($response);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessTokenByRefreshToken(string $refreshToken, array $scopes = null): OAuthAccessTokenData
     {
         $response = $this->doAccessTokenHttpRequest($this->getRefreshTokenParameters($refreshToken, $scopes));
@@ -52,9 +48,7 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
         return $this->createAccessTokenData($response);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getUserInfo(string $accessToken): UserResponseInterface
     {
         $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName($this->getResourceOwnerName());

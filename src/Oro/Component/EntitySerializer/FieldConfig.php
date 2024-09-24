@@ -119,6 +119,7 @@ class FieldConfig implements FieldConfigInterface
     /**
      * Indicates whether the exclusion flag is set explicitly.
      */
+    #[\Override]
     public function hasExcluded(): bool
     {
         return null !== $this->exclude;
@@ -127,6 +128,7 @@ class FieldConfig implements FieldConfigInterface
     /**
      * Indicates whether the field should be excluded.
      */
+    #[\Override]
     public function isExcluded(): bool
     {
         return $this->exclude ?? false;
@@ -137,6 +139,7 @@ class FieldConfig implements FieldConfigInterface
      *
      * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
+    #[\Override]
     public function setExcluded(?bool $exclude = true): void
     {
         $this->exclude = $exclude;
@@ -169,6 +172,7 @@ class FieldConfig implements FieldConfigInterface
     /**
      * Indicates whether the path of the field value exists.
      */
+    #[\Override]
     public function hasPropertyPath(): bool
     {
         return $this->has(ConfigUtil::PROPERTY_PATH);
@@ -177,6 +181,7 @@ class FieldConfig implements FieldConfigInterface
     /**
      * Gets the path of the field value.
      */
+    #[\Override]
     public function getPropertyPath(string $defaultValue = null): ?string
     {
         if (empty($this->items[ConfigUtil::PROPERTY_PATH])) {
@@ -189,6 +194,7 @@ class FieldConfig implements FieldConfigInterface
     /**
      * Sets the path of the field value.
      */
+    #[\Override]
     public function setPropertyPath(string $propertyPath = null): void
     {
         if ($propertyPath) {

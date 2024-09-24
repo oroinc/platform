@@ -13,6 +13,7 @@ class EntityMetadataEventTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMetadataEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityMetadata = $this->createMock(EntityMetadata::class);

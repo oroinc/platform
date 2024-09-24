@@ -16,6 +16,7 @@ class EntityRouteVariableProcessorTest extends WebTestCase
     /** @var Item */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

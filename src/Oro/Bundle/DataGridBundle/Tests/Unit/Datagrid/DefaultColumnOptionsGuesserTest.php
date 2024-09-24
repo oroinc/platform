@@ -11,6 +11,7 @@ class DefaultColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultColumnOptionsGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->guesser = new DefaultColumnOptionsGuesser();

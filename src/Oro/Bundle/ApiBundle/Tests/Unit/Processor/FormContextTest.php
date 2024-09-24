@@ -19,6 +19,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
 {
     private FormContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);

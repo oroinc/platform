@@ -22,6 +22,7 @@ class OnNoTokenAccessListener extends AbstractListener
     ) {
     }
 
+    #[\Override]
     public function supports(Request $request): ?bool
     {
         $accessAttributes = (array)$request->attributes->get('_access_control_attributes');
@@ -30,9 +31,7 @@ class OnNoTokenAccessListener extends AbstractListener
             && null === $this->tokenStorage->getToken();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function authenticate(RequestEvent $event): void
     {
         if (!$event instanceof LazyResponseEvent) {
@@ -40,6 +39,7 @@ class OnNoTokenAccessListener extends AbstractListener
         }
     }
 
+    #[\Override]
     public static function getPriority(): int
     {
         return -200; // before Symfony\Component\Security\Http\Firewall\AccessListener

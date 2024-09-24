@@ -14,9 +14,7 @@ class FixOptionSetObjects implements Migration
      */
     protected $connection;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(new FixOptionSetQuery());

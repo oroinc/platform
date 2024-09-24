@@ -35,6 +35,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     /** @var OroJquerySelect2HiddenType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchRegistry = $this->createMock(SearchRegistry::class);
@@ -59,9 +60,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [

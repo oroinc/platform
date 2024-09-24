@@ -16,6 +16,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
 {
     private EnumSelectType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -23,9 +23,7 @@ class ChainMessageFilter implements MessageFilterInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(MessageBuffer $buffer): void
     {
         $filters = $this->getFilters($buffer);

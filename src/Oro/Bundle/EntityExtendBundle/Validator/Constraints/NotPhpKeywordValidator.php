@@ -84,9 +84,7 @@ class NotPhpKeywordValidator extends ConstraintValidator
         '__trait__',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {

@@ -15,25 +15,19 @@ class TranslationStrategy implements TranslationStrategyInterface
         $this->locales = $locales;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLocaleFallbacks()
     {
         return $this->locales;

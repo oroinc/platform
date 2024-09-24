@@ -13,9 +13,7 @@ abstract class CheckRequestType implements ProcessorInterface
 {
     public const OPERATION_NAME = 'check_request_type';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

@@ -18,9 +18,7 @@ class Queue implements QueueInterface
         $this->queueName = $queueName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getQueueName(): string
     {
         return $this->queueName;

@@ -12,9 +12,7 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
  */
 class OrmFilterExtension extends AbstractFilterExtension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -23,9 +21,7 @@ class OrmFilterExtension extends AbstractFilterExtension
             && null !== $config->offsetGetByPath(Configuration::COLUMNS_PATH);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $filters = $this->getFiltersToApply($config);

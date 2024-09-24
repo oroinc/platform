@@ -13,9 +13,7 @@ use Oro\Bundle\SegmentBundle\Model\SegmentDatagridConfigurationQueryDesigner;
  */
 class SegmentDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSource(AbstractQueryDesigner $source)
     {
         $this->source = new SegmentDatagridConfigurationQueryDesigner(
@@ -24,9 +22,7 @@ class SegmentDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration()
     {
         $config = parent::getConfiguration();
@@ -37,9 +33,7 @@ class SegmentDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
         return $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable($gridName)
     {
         return str_starts_with($gridName, Segment::GRID_PREFIX);

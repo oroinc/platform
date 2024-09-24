@@ -24,6 +24,7 @@ class CommandRunner implements CommandRunnerInterface
      *
      * @return string
      */
+    #[\Override]
     public function run($commandName, $commandArguments = [])
     {
         if (! $commandArguments) {

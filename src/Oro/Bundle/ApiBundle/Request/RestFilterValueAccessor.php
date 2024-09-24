@@ -71,9 +71,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function initialize(): void
     {
         parent::initialize();
@@ -81,9 +79,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
         $this->parseQueryString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function normalizeOperator(?string $operator): string
     {
         $operator = parent::normalizeOperator($operator);

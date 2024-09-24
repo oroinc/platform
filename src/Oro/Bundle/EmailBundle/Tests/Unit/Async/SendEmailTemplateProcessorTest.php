@@ -23,6 +23,7 @@ class SendEmailTemplateProcessorTest extends TestCase
 
     private SendEmailTemplateProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

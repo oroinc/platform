@@ -18,9 +18,7 @@ class ChainOriginProvider implements OriginProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrigins(): array
     {
         $origins = [];

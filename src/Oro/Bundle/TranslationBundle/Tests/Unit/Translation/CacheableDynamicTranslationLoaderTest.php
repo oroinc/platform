@@ -26,6 +26,7 @@ class CacheableDynamicTranslationLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var CacheableDynamicTranslationLoader */
     private $cacheableLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->loader = $this->createMock(DynamicTranslationLoaderInterface::class);

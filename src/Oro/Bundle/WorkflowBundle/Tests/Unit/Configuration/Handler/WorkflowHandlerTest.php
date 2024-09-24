@@ -11,6 +11,7 @@ class WorkflowHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = new WorkflowHandler();

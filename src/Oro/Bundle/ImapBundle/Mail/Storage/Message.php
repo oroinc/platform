@@ -23,7 +23,6 @@ use Oro\Bundle\ImapBundle\Mime\Decode;
 class Message extends \Laminas\Mail\Storage\Message
 {
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -101,8 +100,8 @@ class Message extends \Laminas\Mail\Storage\Message
     /**
      * Fix incorrect create headers object in ZF Mime\Decode::splitMessage
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getHeaders()
     {
         if (null === $this->headers) {
@@ -229,9 +228,7 @@ class Message extends \Laminas\Mail\Storage\Message
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPart($num)
     {
         if (isset($this->parts[$num])) {
@@ -251,9 +248,7 @@ class Message extends \Laminas\Mail\Storage\Message
         return $this->parts[$num];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function countParts()
     {
         if ($this->countParts) {
@@ -276,6 +271,7 @@ class Message extends \Laminas\Mail\Storage\Message
      *
      * @throws RuntimeException
      */
+    #[\Override]
     protected function cacheContent()
     {
         // caching content if we can't fetch parts

@@ -65,6 +65,7 @@ class Token
     /**
      * @return null|string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->stringRepresentation;

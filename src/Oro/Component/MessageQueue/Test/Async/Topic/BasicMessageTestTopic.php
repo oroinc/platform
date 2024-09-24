@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BasicMessageTestTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.message_queue.basic_message_processor';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Test topic for basic message processor.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

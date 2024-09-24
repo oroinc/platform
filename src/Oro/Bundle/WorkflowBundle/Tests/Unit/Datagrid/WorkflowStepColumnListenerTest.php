@@ -70,6 +70,7 @@ class WorkflowStepColumnListenerTest extends TestCase
     /** @var WorkflowStepColumnListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -16,9 +16,7 @@ class ValidateRequestData implements ProcessorInterface
 {
     public const OPERATION_NAME = 'validate_request_data';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */

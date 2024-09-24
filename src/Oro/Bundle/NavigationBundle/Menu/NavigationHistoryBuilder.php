@@ -44,6 +44,7 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
      * @param array $options
      * @param string|null $alias
      */
+    #[\Override]
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $maxItems = $this->configManager->get('oro_navigation.max_items');

@@ -39,7 +39,7 @@ final class JUnitDurationListener implements EventListener
      */
     private $featureResultStore = [];
 
-    /** @inheritdoc */
+    #[\Override]
     public function listenEvent(Formatter $formatter, Event $event, $eventName)
     {
         if ($event instanceof BeforeScenarioTested) {

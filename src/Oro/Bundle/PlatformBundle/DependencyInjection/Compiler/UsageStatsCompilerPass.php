@@ -24,6 +24,7 @@ class UsageStatsCompilerPass implements CompilerPassInterface
         $this->tag = $tag;
     }
 
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->service)) {

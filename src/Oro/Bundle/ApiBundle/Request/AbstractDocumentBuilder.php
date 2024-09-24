@@ -65,17 +65,13 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         $this->resultDataAccessor = new DocumentBuilderDataAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDocument(): array
     {
         return $this->result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear(): void
     {
         $this->resultDataAccessor->clear();
@@ -83,33 +79,25 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         $this->links = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityAlias(string $entityClass, RequestType $requestType): ?string
     {
         return ValueNormalizerUtil::tryConvertToEntityType($this->valueNormalizer, $entityClass, $requestType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityId(mixed $entity, RequestType $requestType, EntityMetadata $metadata): mixed
     {
         return $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setMetadata(array $metadata): void
     {
         $this->resultDataAccessor->setMetadata($metadata);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDataObject(mixed $object, RequestType $requestType, ?EntityMetadata $metadata): void
     {
         $this->assertNoData();
@@ -127,9 +115,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         $this->addLinksWithMetadataToResult($this->result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDataCollection($collection, RequestType $requestType, ?EntityMetadata $metadata): void
     {
         $this->assertNoData();
@@ -150,9 +136,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addIncludedObject(mixed $object, RequestType $requestType, ?EntityMetadata $metadata): void
     {
         $this->assertData();
@@ -167,27 +151,21 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addLink(string $name, string $href, array $properties = []): void
     {
         $this->assertData();
         $this->links[$name] = [$href, $properties];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addLinkMetadata(string $name, LinkMetadataInterface $link): void
     {
         $this->assertNoData();
         $this->links[$name] = $link;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setErrorObject(Error $error): void
     {
         $this->assertNoData();
@@ -195,9 +173,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         $this->result[self::ERRORS] = [$this->convertErrorToArray($error)];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setErrorCollection(array $errors): void
     {
         $this->assertNoData();

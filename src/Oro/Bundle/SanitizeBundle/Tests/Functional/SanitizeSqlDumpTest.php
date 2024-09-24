@@ -14,6 +14,7 @@ class SanitizeSqlDumpTest extends WebTestCase
 {
     private ?string $outputFile = null;
 
+    #[\Override]
     protected function setup(): void
     {
         $this->initClient();

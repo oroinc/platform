@@ -25,9 +25,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
         parent::__construct($factory, $util);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         return $this->buildComparisonExpr(
@@ -38,9 +36,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'dictionary';
@@ -60,17 +56,13 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
         mixed $comparisonType,
@@ -150,9 +142,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return EnumFilterType::class;

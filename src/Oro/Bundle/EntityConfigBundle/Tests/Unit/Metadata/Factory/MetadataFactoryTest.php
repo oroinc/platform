@@ -15,6 +15,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataFactory */
     private $metadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadataFactory = new MetadataFactory(new AttributeDriver(new AttributeReader()));

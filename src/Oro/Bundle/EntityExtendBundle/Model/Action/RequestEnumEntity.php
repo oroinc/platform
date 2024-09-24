@@ -11,9 +11,7 @@ use Oro\Component\Action\Exception\InvalidParameterException;
  */
 class RequestEnumEntity extends BaseRequestEntity
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['enum_code'])) {

@@ -13,9 +13,7 @@ class RepeatableFileProfilerStorage extends FileProfilerStorage
     private const TIMEOUT = 10;
     private const RETRY_SLEEP = 400;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function read($token): ?Profile
     {
         if (!$token) {

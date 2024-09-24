@@ -17,9 +17,7 @@ class SoapClient implements SoapClientInterface
         $this->clientFactory = $clientFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function send(SoapClientSettingsInterface $settings, array $data)
     {
         $soapClient = $this->clientFactory->create(

@@ -22,17 +22,13 @@ class DateTimeValueFormatter implements FormatterInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($value, array $formatterArguments = [])
     {
         return $this->formatter->format($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultValue()
     {
         return $this->translator->trans('oro.locale.formatter.datetime.default');

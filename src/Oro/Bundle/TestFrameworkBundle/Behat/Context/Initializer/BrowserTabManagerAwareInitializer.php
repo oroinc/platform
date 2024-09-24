@@ -22,6 +22,7 @@ class BrowserTabManagerAwareInitializer implements ContextInitializer
         $this->manager = $manager;
     }
 
+    #[\Override]
     public function initializeContext(Context $context)
     {
         if ($context instanceof BrowserTabManagerAwareInterface) {

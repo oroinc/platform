@@ -24,6 +24,7 @@ class ExcludeDefinitionsProcessSchedulePolicy implements ProcessSchedulePolicy
      * @param ProcessData $processData
      * @return bool
      */
+    #[\Override]
     public function isScheduleAllowed(ProcessTrigger $processTrigger, ProcessData $processData)
     {
         $name = $processTrigger->getDefinition()->getName();

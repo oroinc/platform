@@ -20,11 +20,13 @@ class CaptchaServiceSelectType extends AbstractType
     ) {
     }
 
+    #[\Override]
     public function getParent()
     {
         return ChoiceType::class;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('choice_loader', new CallbackChoiceLoader(function () {
@@ -37,6 +39,7 @@ class CaptchaServiceSelectType extends AbstractType
         }));
     }
 
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_captcha_service_select';

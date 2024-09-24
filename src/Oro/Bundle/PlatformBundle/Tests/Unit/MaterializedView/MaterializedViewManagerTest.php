@@ -38,6 +38,7 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
 
     private MaterializedViewManager $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

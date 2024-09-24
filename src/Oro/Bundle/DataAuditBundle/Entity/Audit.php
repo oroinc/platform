@@ -47,9 +47,7 @@ class Audit extends AbstractAudit
     #[ORM\Column(name: 'owner_description', type: Types::STRING, length: 255, nullable: true)]
     protected ?string $ownerDescription = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setUser(AbstractUser $user = null)
     {
         $this->user = $user;
@@ -57,9 +55,7 @@ class Audit extends AbstractAudit
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUser()
     {
         return $this->user;

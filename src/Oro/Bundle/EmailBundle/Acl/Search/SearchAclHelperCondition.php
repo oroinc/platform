@@ -22,17 +22,13 @@ class SearchAclHelperCondition implements SearchAclHelperConditionInterface
         $this->ownershipDataBuilder = $ownershipDataBuilder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(string $className, string $permission): bool
     {
         return 'VIEW' === $permission && is_a($className, EmailUser::class, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addRestriction(Query $query, string $alias, ?Expression $orExpression): ?Expression
     {
         $expressionBuilder = new ExpressionBuilder();

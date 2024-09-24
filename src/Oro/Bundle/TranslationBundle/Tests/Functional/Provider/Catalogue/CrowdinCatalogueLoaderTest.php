@@ -12,6 +12,7 @@ class CrowdinCatalogueLoaderTest extends WebTestCase
     /** @var CrowdinCatalogueLoader */
     private $loader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -19,17 +19,13 @@ class GetContextValue extends AbstractFunction
     /** @var bool */
     protected $hasDefault = false;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'context';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         $params = [$this->value];
@@ -40,9 +36,7 @@ class GetContextValue extends AbstractFunction
         return $this->convertToArray($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         $params = [$this->value];
@@ -53,9 +47,7 @@ class GetContextValue extends AbstractFunction
         return $this->convertToPhpCode($params, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $count = count($options);
@@ -79,9 +71,7 @@ class GetContextValue extends AbstractFunction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doEvaluate($context)
     {
         if ($this->hasDefault) {

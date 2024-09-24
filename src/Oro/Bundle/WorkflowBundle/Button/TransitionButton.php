@@ -4,9 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Button;
 
 class TransitionButton extends AbstractTransitionButton
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateData(array $customData = [])
     {
         $workflowItem = $this->workflow->getWorkflowItemByEntityId($this->getButtonContext()->getEntityId());

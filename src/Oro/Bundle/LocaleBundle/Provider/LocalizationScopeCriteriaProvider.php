@@ -20,25 +20,19 @@ class LocalizationScopeCriteriaProvider implements ScopeCriteriaProviderInterfac
         $this->currentLocalizationProvider = $currentLocalizationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaField()
     {
         return self::LOCALIZATION;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValue()
     {
         return $this->currentLocalizationProvider->getCurrentLocalization();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValueType()
     {
         return Localization::class;

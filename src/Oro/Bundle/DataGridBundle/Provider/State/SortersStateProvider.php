@@ -31,9 +31,7 @@ class SortersStateProvider extends AbstractStateProvider
         $this->datagridParametersHelper = $datagridParametersHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getState(DatagridConfiguration $datagridConfiguration, ParameterBag $datagridParameters): array
     {
         // Fetch state from datagrid parameters.
@@ -55,9 +53,7 @@ class SortersStateProvider extends AbstractStateProvider
         return $this->sanitizeState($state, $this->getSortersConfig($datagridConfiguration));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getStateFromParameters(
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters
@@ -73,9 +69,7 @@ class SortersStateProvider extends AbstractStateProvider
         return $this->sanitizeState($state, $this->getSortersConfig($datagridConfiguration));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultState(DatagridConfiguration $datagridConfiguration): array
     {
         $state = $this->getDefaultSorters($datagridConfiguration);
@@ -93,9 +87,6 @@ class SortersStateProvider extends AbstractStateProvider
         return $state;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function getFromParameters(ParameterBag $datagridParameters): array
     {
         $sortersState = $this->datagridParametersHelper

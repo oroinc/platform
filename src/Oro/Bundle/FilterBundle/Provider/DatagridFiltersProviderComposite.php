@@ -20,9 +20,7 @@ class DatagridFiltersProviderComposite implements DatagridFiltersProviderInterfa
         $this->datagridFiltersProviders = $datagridFiltersProviders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDatagridFilters(DatagridConfiguration $gridConfig): array
     {
         $filters = [[]];

@@ -112,9 +112,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         return $this->contextLink->getService();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isGranted(AclInterface $acl, array $masks, array $sids, $administrativeMode = false)
     {
         $result = null;
@@ -147,10 +145,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
         $result = null;

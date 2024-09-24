@@ -17,9 +17,7 @@ class LinkTargetType extends AbstractType
     public const SAME_WINDOW_VALUE = 1;
     public const NEW_WINDOW_VALUE = 0;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -34,17 +32,13 @@ class LinkTargetType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

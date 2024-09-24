@@ -23,9 +23,7 @@ class SimpleArrayFormatter implements FormatterInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($value, array $formatterArguments = [])
     {
         if (!$value) {
@@ -48,9 +46,7 @@ class SimpleArrayFormatter implements FormatterInterface
         return implode($formatterArguments['separator'] ?? ', ', $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultValue()
     {
         return $this->translator->trans('oro.entity.formatter.simple_array.default');

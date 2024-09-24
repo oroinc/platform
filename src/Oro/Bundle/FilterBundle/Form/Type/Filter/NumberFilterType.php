@@ -52,33 +52,24 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         $this->numberFormatter = $numberFormatter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return FilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Change value field type to text if IN or NOT IN is used as condition
@@ -99,9 +90,7 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $operatorChoices = [
@@ -142,6 +131,7 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         });
     }
 
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $dataType = self::DATA_INTEGER;

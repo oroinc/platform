@@ -28,6 +28,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigFileDataTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

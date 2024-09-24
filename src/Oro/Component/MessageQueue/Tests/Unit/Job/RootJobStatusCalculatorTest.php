@@ -35,6 +35,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
     /** @var RootJobStatusCalculator */
     private $rootJobStatusCalculator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobManager = $this->createMock(JobManagerInterface::class);

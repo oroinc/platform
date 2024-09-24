@@ -22,9 +22,7 @@ class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
         $this->notExpression = $notExpression;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
         string $field,

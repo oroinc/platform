@@ -15,6 +15,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /** @iheritdoc */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         return $this->configuration;

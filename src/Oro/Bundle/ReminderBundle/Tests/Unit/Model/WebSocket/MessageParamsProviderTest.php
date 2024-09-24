@@ -24,6 +24,7 @@ class MessageParamsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MessageParamsProvider */
     private $messageParamsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dateTimeFormatter = $this->createMock(DateTimeFormatterInterface::class);

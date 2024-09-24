@@ -18,6 +18,7 @@ class FieldDqlExpressionProviderTest extends OrmRelatedTestCase
     /** @var FieldDqlExpressionProvider */
     private $fieldDqlExpressionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

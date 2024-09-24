@@ -8,9 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 
 class MoneyValueColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFormatter($class, $property, $type)
     {
         if (MoneyValueType::TYPE === $type) {
@@ -25,9 +23,7 @@ class MoneyValueColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         return parent::guessFormatter($class, $property, $type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFilter($class, $property, $type)
     {
         if (MoneyValueType::TYPE === $type) {

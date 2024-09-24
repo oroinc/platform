@@ -27,25 +27,19 @@ class StubScopeCriteriaProvider implements ScopeCriteriaProviderInterface
         $this->criteriaValueType = $criteriaValueType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaField()
     {
         return $this->criteriaField;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValue()
     {
         return $this->criteriaValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValueType()
     {
         return $this->criteriaValueType;

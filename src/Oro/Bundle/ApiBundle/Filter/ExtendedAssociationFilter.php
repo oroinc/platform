@@ -47,17 +47,13 @@ class ExtendedAssociationFilter extends AssociationFilter implements ConfigAware
         $this->associationKind = $associationKind;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setConfig(EntityDefinitionConfig $config): void
     {
         $this->config = $config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function doBuildExpression(string $field, string $path, string $operator, mixed $value): ?Expression
     {
         $this->assertFilterValuePath($field, $path);

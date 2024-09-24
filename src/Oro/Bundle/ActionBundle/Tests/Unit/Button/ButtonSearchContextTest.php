@@ -12,6 +12,7 @@ class ButtonSearchContextTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonSearchContext */
     private $buttonSearchContext;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->buttonSearchContext = new ButtonSearchContext();

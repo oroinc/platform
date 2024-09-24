@@ -9,9 +9,7 @@ use Oro\Bundle\SegmentBundle\Migrations\Schema\v1_5\UpdateDateVariablesQuery;
 
 class OroReportBundle implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPostQuery(new UpdateDateVariablesQuery('oro_report'));

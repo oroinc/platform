@@ -17,6 +17,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
     /** @var Body */
     private $body;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->part = $this->createMock(Part::class);

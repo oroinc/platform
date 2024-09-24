@@ -12,9 +12,7 @@ class NotEmptyFilters extends Constraint
     /** @var string */
     public $message = 'oro.query_designer.condition_builder.filters.not_empty';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

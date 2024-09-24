@@ -47,9 +47,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();
@@ -107,9 +105,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
         $this->logger->info('Sent notification message.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [SendImportNotificationTopic::getName()];

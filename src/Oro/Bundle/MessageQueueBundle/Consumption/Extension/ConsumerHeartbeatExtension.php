@@ -31,17 +31,13 @@ class ConsumerHeartbeatExtension extends AbstractExtension
         $this->consumerHeartbeat = $consumerHeartbeat;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context)
     {
         self::$lastUpdatedTime = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context): void
     {
         // do nothing if the check was disabled with 0 config option value

@@ -9,6 +9,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithAvatars;
 
 class UserAclHandlerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

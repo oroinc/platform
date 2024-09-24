@@ -37,9 +37,6 @@ class AnonymousToken extends AbstractToken
         $this->setUser($user);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCredentials(): mixed
     {
         return '';
@@ -55,17 +52,13 @@ class AnonymousToken extends AbstractToken
         return $this->secret;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __serialize(): array
     {
         return [$this->secret, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __unserialize(array $data): void
     {
         [$this->secret, $parentData] = $data;

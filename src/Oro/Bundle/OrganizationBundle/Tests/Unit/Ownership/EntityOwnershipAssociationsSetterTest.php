@@ -23,6 +23,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
     /** @var EntityOwnershipAssociationsSetter */
     private $setter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

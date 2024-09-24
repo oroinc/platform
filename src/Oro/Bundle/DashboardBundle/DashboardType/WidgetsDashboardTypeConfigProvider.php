@@ -20,17 +20,13 @@ class WidgetsDashboardTypeConfigProvider implements DashboardTypeConfigProviderI
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isSupported(?string $dashboardType): bool
     {
         return null === $dashboardType || self::TYPE_NAME === ExtendHelper::getEnumInternalId($dashboardType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfig(Dashboard $dashboard): array
     {
         $dashboardName = $dashboard->getName();

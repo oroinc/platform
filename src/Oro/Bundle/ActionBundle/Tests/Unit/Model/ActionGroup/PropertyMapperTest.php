@@ -15,6 +15,7 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
     /** @var PropertyMapper */
     private $propertyMapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

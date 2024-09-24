@@ -31,6 +31,7 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
     /** @var FileType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->externalFileFactory = $this->createMock(ExternalFileFactory::class);

@@ -16,6 +16,7 @@ class RouteChoiceTypeTest extends WebTestCase
     /** @var FormFactoryInterface */
     private $formFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

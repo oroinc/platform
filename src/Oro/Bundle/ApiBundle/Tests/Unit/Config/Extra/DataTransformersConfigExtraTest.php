@@ -9,6 +9,7 @@ class DataTransformersConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var DataTransformersConfigExtra */
     private $extra;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extra = new DataTransformersConfigExtra();

@@ -34,9 +34,7 @@ class AddFieldsFilter implements ProcessorInterface
         $this->valueNormalizer = $valueNormalizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

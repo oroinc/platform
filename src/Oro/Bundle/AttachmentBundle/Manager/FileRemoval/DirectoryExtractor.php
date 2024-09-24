@@ -28,9 +28,7 @@ final class DirectoryExtractor implements DirectoryExtractorInterface
         $this->allowedToUseForSingleFile = $allowedToUseForSingleFile;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function extract(string $path): ?string
     {
         $matches = [];
@@ -43,9 +41,7 @@ final class DirectoryExtractor implements DirectoryExtractorInterface
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isAllowedToUseForSingleFile(): bool
     {
         return $this->allowedToUseForSingleFile;

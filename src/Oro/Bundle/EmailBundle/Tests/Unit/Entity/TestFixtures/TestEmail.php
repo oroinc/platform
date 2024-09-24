@@ -23,21 +23,25 @@ class TestEmail implements EmailInterface
         $this->email = $email;
     }
 
+    #[\Override]
     public function getEmailField()
     {
         return 'email';
     }
 
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
+    #[\Override]
     public function getEmail()
     {
         return $this->email;
     }
 
+    #[\Override]
     public function getEmailOwner()
     {
         return $this->owner;

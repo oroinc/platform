@@ -47,6 +47,7 @@ class AliceFixtureLoader implements LoaderInterface
      * @param PurgeMode|null $purgeMode
      * @return object[]
      */
+    #[\Override]
     public function load(
         array $dataOrFiles,
         array $parameters = [],

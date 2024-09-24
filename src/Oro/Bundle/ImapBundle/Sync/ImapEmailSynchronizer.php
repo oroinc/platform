@@ -69,9 +69,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         $this->credentialsIssueManager = $credentialsIssueManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(EmailOrigin $origin)
     {
         return ($origin instanceof UserEmailOrigin) && $this->isTypeSupported($origin->getAccountType());
@@ -83,17 +81,13 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             || $this->oauthManagerRegistry->isOauthImapEnabled($accountType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getEmailOriginClass()
     {
         return UserEmailOrigin::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportScheduleJob()
     {
         return true;
@@ -105,6 +99,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      * @param UserEmailOrigin $origin
      * @return ImapEmailSynchronizationProcessor
      */
+    #[\Override]
     protected function createSynchronizationProcessor($origin)
     {
         $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
@@ -135,9 +130,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function delegateToProcessor(
         EmailOrigin $origin,
         AbstractEmailSynchronizationProcessor $processor,
@@ -160,9 +153,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null)
     {
         try {

@@ -41,9 +41,7 @@ class TabMenuWidgetProvider implements WidgetProviderInterface
         $this->objectClass      = $objectClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($object)
     {
         return $this->objectClass
@@ -51,9 +49,7 @@ class TabMenuWidgetProvider implements WidgetProviderInterface
             : true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWidgets($object)
     {
         return $this->widgetProvider->getTabs(

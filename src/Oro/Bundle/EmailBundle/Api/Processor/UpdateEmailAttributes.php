@@ -27,9 +27,7 @@ class UpdateEmailAttributes implements ProcessorInterface
         $this->emailEntityListener = $emailEntityListener;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

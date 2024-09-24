@@ -13,11 +13,13 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class WorkflowTransitionCronTriggerTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new WorkflowTransitionCronTriggerTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         return [
@@ -64,6 +66,7 @@ class WorkflowTransitionCronTriggerTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

@@ -20,6 +20,7 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ColumnConfigListener */
     private $columnListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);

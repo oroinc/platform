@@ -11,17 +11,13 @@ class OroSearchBundleUseInnoDbQuery implements MigrationQuery, ConnectionAwareIn
 {
     use ConnectionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Use InnoDB for MySQL >= 5.6';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $version = $this->connection->fetchOne('select version()');

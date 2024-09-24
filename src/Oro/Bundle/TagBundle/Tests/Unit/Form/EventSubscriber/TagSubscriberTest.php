@@ -22,6 +22,7 @@ class TagSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var TagSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(TagManager::class);

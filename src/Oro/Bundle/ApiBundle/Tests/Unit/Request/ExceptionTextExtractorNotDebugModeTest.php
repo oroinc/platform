@@ -23,6 +23,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
 {
     private ExceptionTextExtractor $exceptionTextExtractor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

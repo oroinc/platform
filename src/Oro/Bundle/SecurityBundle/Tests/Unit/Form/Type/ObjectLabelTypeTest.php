@@ -12,6 +12,7 @@ class ObjectLabelTypeTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectLabelType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $entityAliasResolver = $this->createMock(EntityAliasResolver::class);

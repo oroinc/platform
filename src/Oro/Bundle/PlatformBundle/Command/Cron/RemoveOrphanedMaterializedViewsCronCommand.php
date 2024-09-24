@@ -32,6 +32,7 @@ class RemoveOrphanedMaterializedViewsCronCommand extends Command implements Cron
         parent::__construct();
     }
 
+    #[\Override]
     protected function configure(): void
     {
         parent::configure();
@@ -45,11 +46,13 @@ class RemoveOrphanedMaterializedViewsCronCommand extends Command implements Cron
         );
     }
 
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return '0 0 * * *'; // Every midnight.
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $symfonyStyle = new SymfonyStyle($input, $output);

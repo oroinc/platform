@@ -18,6 +18,7 @@ class ResizedImageProviderTest extends WebTestCase
 {
     use AttachmentSettingsTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

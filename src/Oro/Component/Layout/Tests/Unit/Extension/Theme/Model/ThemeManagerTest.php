@@ -18,6 +18,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
 {
     private ThemeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = $this->createMock(ThemeFactoryInterface::class);

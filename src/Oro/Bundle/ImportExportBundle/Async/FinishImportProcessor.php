@@ -21,11 +21,13 @@ class FinishImportProcessor implements MessageProcessorInterface, TopicSubscribe
     {
     }
 
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [FinishImportTopic::getName()];
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $body = $message->getBody();

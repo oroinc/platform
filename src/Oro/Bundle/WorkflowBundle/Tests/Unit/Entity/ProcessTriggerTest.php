@@ -15,6 +15,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessTrigger */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new ProcessTrigger();

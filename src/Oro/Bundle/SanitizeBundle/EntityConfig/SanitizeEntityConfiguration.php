@@ -15,11 +15,13 @@ class SanitizeEntityConfiguration implements EntityConfigInterface
     {
     }
 
+    #[\Override]
     public function getSectionName(): string
     {
         return 'sanitize';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

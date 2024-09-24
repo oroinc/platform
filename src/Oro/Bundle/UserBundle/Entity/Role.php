@@ -89,6 +89,7 @@ class Role extends AbstractRole implements ExtendEntityInterface
      *
      * @return string
      */
+    #[\Override]
     public function getRole()
     {
         return $this->role;
@@ -99,6 +100,7 @@ class Role extends AbstractRole implements ExtendEntityInterface
      *
      * @return string
      */
+    #[\Override]
     public function getLabel()
     {
         return $this->label;
@@ -117,9 +119,7 @@ class Role extends AbstractRole implements ExtendEntityInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPrefix()
     {
         return static::PREFIX_ROLE;

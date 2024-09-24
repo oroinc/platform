@@ -24,9 +24,7 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         $this->configurationFactories[$configurationFactory->getKey()] = $configurationFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
@@ -43,9 +41,7 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         $this->configureReadonlyProtocol($container, $config['stream_wrapper']['readonly_protocol']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         if ($container instanceof ExtendedContainerBuilder) {

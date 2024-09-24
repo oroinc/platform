@@ -22,9 +22,7 @@ class Substring extends AbstractAction
      */
     protected $options;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $sourceString = (string)$this->getOptionValue($context, self::OPTION_STRING);
@@ -46,8 +44,8 @@ class Substring extends AbstractAction
      *  - startPos - starting position of substring's, 0 if not set
      *  - length - length of substring
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options[self::OPTION_ATTRIBUTE])) {

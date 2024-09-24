@@ -137,9 +137,7 @@ class WorkflowDataSerializeListener implements ServiceSubscriberInterface
         return array_keys($configuration[$definitionsNode][$variablesNode]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

@@ -31,6 +31,7 @@ class TokenStream
      *
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return implode("\n", $this->tokens);

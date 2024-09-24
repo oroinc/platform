@@ -21,9 +21,7 @@ class WsseNonceCachePass implements CompilerPassInterface
         $this->wsseKey = $wsseKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $securityConfigs = $container->getExtensionConfig('security');

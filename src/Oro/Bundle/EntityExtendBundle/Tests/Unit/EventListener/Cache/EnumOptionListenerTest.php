@@ -14,6 +14,7 @@ class EnumOptionListenerTest extends EnumValueListenerTestCase
 
     private EnumOptionListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

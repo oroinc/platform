@@ -27,9 +27,7 @@ class CsvMimeTypeGuesser extends FileinfoMimeTypeGuesser
      */
     private $escape = '\\';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function guessMimeType(string $path): ?string
     {
         // Guess for files with csv extension only

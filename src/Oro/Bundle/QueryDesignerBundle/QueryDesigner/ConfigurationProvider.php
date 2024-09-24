@@ -37,9 +37,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $this->doGetConfig();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer): array
     {
         $configs = [];

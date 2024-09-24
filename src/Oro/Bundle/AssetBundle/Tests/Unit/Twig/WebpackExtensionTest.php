@@ -17,6 +17,7 @@ class WebpackExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var UiExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->webpackServer = $this->createMock(WebpackServer::class);

@@ -63,6 +63,7 @@ class OroTranslationServiceAdapterTest extends TestCase
     /** @var OroTranslationServiceAdapter */
     private $adapter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->client = $this->createMock(Client::class);

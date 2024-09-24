@@ -13,6 +13,7 @@ class MigrationEventTest extends \PHPUnit\Framework\TestCase
 
     private $connection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

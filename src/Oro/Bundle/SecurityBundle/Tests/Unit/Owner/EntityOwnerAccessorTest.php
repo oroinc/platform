@@ -15,6 +15,7 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
 {
     private Inflector $inflector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->inflector = (new InflectorFactory())->build();

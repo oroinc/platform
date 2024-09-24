@@ -11,9 +11,7 @@ use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
  */
 class UserMenuBuilder implements BuilderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $menu->setExtra('type', 'user_menu');

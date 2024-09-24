@@ -24,9 +24,7 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
         $this->ownershipData = $ownershipData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -35,9 +33,7 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

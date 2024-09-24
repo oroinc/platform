@@ -10,9 +10,7 @@ class Configuration implements ConfigurationInterface
     public const ROOT = 'someExtensionConfig';
     public const NODE = 'someKey';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder(self::ROOT);

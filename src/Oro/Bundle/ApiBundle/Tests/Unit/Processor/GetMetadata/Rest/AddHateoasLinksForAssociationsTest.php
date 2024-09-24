@@ -25,6 +25,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
     /** @var AddHateoasLinksForAssociations */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

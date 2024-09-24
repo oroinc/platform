@@ -18,6 +18,7 @@ class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MemoryCacheProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->universalCacheKeyGenerator = $this->createMock(UniversalCacheKeyGenerator::class);

@@ -17,9 +17,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class SearchEntityFilter extends EntityFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         if (isset($params['class'])) {
@@ -31,9 +29,7 @@ class SearchEntityFilter extends EntityFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
@@ -43,24 +39,18 @@ class SearchEntityFilter extends EntityFilter
         return $this->applyRestrictions($ds, $data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         throw new \BadMethodCallException('Not implemented');
     }
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return SearchEntityFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getEntityClass(): ?string
     {
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY);

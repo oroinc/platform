@@ -9,11 +9,13 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
 class UpdateVisibilitiesTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new UpdateVisibilitiesTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         return [
@@ -24,6 +26,7 @@ class UpdateVisibilitiesTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

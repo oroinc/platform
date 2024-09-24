@@ -10,6 +10,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
 {
     private Condition\Andx $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\Andx();

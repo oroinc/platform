@@ -14,6 +14,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
     /** @var ExpandedAssociationExtractor */
     private $extractor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extractor = new ExpandedAssociationExtractor();

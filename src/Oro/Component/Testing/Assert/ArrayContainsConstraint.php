@@ -22,9 +22,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
         $this->strict = $strict;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function matches($other): bool
     {
         $this->matchArrayContains($this->expected, $other, []);
@@ -32,25 +30,19 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
         return empty($this->errors);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toString(): string
     {
         return 'the array contains other array';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function failureDescription($other): string
     {
         return $this->toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function additionalFailureDescription($other): string
     {
         $result = "Errors:\n";

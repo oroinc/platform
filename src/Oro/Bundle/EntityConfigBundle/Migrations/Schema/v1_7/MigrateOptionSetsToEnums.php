@@ -23,17 +23,13 @@ class MigrateOptionSetsToEnums implements
     use DataStorageExtensionAwareTrait;
     use OutdatedExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $existingEnumTables = $this->getExistingEnumTables($schema);

@@ -47,17 +47,13 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         $this->valuesForUpdate = $valuesForUpdate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Update multiple entity configuration values and entity configuration index values';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         // update field itself

@@ -54,9 +54,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTokenParsers()
     {
         return [
@@ -64,9 +62,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -125,9 +121,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         return $contextStack->getCurrentContext();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -139,9 +133,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTests()
     {
         return [
@@ -283,9 +275,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         return \is_string($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

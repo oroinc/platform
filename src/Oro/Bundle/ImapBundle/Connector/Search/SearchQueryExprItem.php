@@ -28,6 +28,7 @@ class SearchQueryExprItem extends SearchQueryExprValueBase implements
     /**
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;
@@ -36,6 +37,7 @@ class SearchQueryExprItem extends SearchQueryExprValueBase implements
     /**
      * @param string $name
      */
+    #[\Override]
     public function setName($name)
     {
         $this->name = $name;

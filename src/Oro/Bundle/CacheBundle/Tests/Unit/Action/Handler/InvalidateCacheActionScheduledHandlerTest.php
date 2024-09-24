@@ -23,6 +23,7 @@ class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestC
     /** @var InvalidateCacheActionScheduledHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->deferredScheduler = $this->createMock(DeferredScheduler::class);

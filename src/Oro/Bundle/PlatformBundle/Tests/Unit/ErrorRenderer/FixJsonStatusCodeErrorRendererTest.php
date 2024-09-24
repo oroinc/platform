@@ -16,6 +16,7 @@ class FixJsonStatusCodeErrorRendererTest extends \PHPUnit\Framework\TestCase
     /** @var FixJsonStatusCodeErrorRenderer */
     private $errorRenderer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerErrorRenderer = $this->createMock(ErrorRendererInterface::class);

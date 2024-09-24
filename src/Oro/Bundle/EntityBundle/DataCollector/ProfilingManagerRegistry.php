@@ -32,9 +32,7 @@ class ProfilingManagerRegistry extends BaseRegistry
         $this->loggingHydrators = $hydrators;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeEntityManagerConfiguration(OrmConfiguration $configuration)
     {
         parent::initializeEntityManagerConfiguration($configuration);

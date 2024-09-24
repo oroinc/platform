@@ -22,6 +22,7 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     /** @var NumberRangeFilterType */
     protected $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $constraintFactory = new ConstraintFactory();
@@ -52,17 +53,13 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptionsDataProvider(): array
     {
         return [
@@ -86,9 +83,9 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function bindDataProvider(): array
     {
         return [

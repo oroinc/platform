@@ -10,6 +10,7 @@ class EmbeddedFormTest extends \PHPUnit\Framework\TestCase
     /** @var EmbeddedForm */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new EmbeddedForm();

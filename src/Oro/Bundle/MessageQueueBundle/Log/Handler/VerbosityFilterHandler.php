@@ -48,9 +48,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isHandling(array $record): bool
     {
         return
@@ -59,9 +57,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
             && parent::isHandling($record);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(array $record): bool
     {
         return
@@ -75,9 +71,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
         $this->output = $event->getOutput();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -169,9 +169,7 @@ class Element extends NodeElement
         return $this->elementFactory->findElementContains($name, $text, $this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function click()
     {
         try {

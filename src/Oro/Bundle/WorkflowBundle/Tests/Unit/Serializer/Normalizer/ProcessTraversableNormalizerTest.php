@@ -14,6 +14,7 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessTraversableNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serializer = $this->createMock(Serializer::class);

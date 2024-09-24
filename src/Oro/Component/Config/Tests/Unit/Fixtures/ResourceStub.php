@@ -16,17 +16,13 @@ class ResourceStub implements SelfCheckingResourceInterface
         $this->fresh = $fresh;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __toString(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFresh($timestamp): bool
     {
         return $this->fresh;

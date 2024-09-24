@@ -11,6 +11,7 @@ class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
     /** @var StartedWorkflowsBag */
     private $startedWorkflowsBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->startedWorkflowsBag = new StartedWorkflowsBag();

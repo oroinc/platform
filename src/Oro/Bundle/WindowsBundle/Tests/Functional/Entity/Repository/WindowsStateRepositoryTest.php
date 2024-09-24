@@ -11,6 +11,7 @@ use Oro\Bundle\WindowsBundle\Tests\Functional\DataFixtures\LoadWindowsStateData;
 
 class WindowsStateRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

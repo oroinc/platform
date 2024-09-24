@@ -26,9 +26,7 @@ class OptionsProcessor extends NormalizeResultActionProcessor
         $this->metadataProvider = $metadataProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): OptionsContext
     {
         return new OptionsContext($this->configProvider, $this->metadataProvider);

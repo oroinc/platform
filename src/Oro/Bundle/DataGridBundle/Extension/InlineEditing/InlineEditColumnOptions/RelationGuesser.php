@@ -17,9 +17,7 @@ class RelationGuesser implements GuesserInterface
     /** Frontend type */
     const RELATION = 'relation';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];

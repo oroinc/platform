@@ -14,7 +14,7 @@ class OroEntityExtendBundle implements Migration, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $query = "UPDATE oro_entity_config_field SET mode='%s' WHERE type='%s' and mode='default'";

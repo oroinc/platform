@@ -49,9 +49,7 @@ class PhpDateTimeFormatConverter extends AbstractDateTimeFormatConverter
         'V'     => 'e', // Timezone identifier (UTC, GMT, Atlantic/Azores)
     );
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function convertFormat($format)
     {
         return str_replace(array('"', '\''), '', parent::convertFormat($format));

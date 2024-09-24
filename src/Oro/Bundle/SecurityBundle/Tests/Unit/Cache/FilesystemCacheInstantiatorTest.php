@@ -9,6 +9,7 @@ class FilesystemCacheInstantiatorTest extends \PHPUnit\Framework\TestCase
     /** @var FilesystemCacheInstantiator */
     private $instantiator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->instantiator = new FilesystemCacheInstantiator(123, 'someDir');

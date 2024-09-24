@@ -16,6 +16,7 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
     /** @var ValidatorInterface */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -18,6 +18,7 @@ class CompositePropagator implements MenuUpdateToMenuItemPropagatorInterface
         $this->propagators = $propagators;
     }
 
+    #[\Override]
     public function isApplicable(ItemInterface $menuItem, MenuUpdateInterface $menuUpdate, string $strategy): bool
     {
         foreach ($this->propagators as $propagator) {
@@ -29,6 +30,7 @@ class CompositePropagator implements MenuUpdateToMenuItemPropagatorInterface
         return false;
     }
 
+    #[\Override]
     public function propagateFromMenuUpdate(
         ItemInterface $menuItem,
         MenuUpdateInterface $menuUpdate,

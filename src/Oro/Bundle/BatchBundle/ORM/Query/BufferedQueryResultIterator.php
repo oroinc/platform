@@ -82,9 +82,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
      */
     protected $reverse = false;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setBufferSize($bufferSize)
     {
         parent::setBufferSize($bufferSize);
@@ -108,17 +106,13 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function key(): int
     {
         return $this->position;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->offset++;
@@ -131,9 +125,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         // reset total count only if at least one item was loaded by this iterator
@@ -150,9 +142,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
         $this->next();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function count(): int
     {
         if (null === $this->totalCount) {
@@ -166,9 +156,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
         return $this->totalCount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeQuery(Query $query)
     {
         $this->maxResults = $query->getMaxResults();

@@ -4,17 +4,13 @@ namespace Oro\Component\ConfigExpression\Condition;
 
 class In extends AbstractComparison
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doCompare($left, $right)
     {
         return in_array($left, $right);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'in';

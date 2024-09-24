@@ -19,6 +19,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $crypter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);

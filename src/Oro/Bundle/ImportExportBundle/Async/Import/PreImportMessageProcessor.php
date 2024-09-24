@@ -125,9 +125,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->batchSize = $batchSize;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [PreImportTopic::getName()];
@@ -283,9 +281,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         return $files;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();

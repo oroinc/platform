@@ -12,6 +12,7 @@ class ButtonContextTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonContext */
     private $buttonContext;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->buttonContext = new ButtonContext();

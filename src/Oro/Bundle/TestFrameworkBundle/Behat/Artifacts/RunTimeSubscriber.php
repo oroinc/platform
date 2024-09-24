@@ -35,9 +35,7 @@ class RunTimeSubscriber implements EventSubscriberInterface
         $this->prettyArtifactsSubscriber = $prettyArtifactsSubscriber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

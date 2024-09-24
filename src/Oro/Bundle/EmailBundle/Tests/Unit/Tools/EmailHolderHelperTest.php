@@ -20,6 +20,7 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EmailHolderHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extendConfigProvider = $this->createMock(ConfigProvider::class);

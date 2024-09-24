@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
  */
 class OneToManyWithoutOrphanRemovalTest extends AbstractOneToManyCollectionTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -18,25 +19,19 @@ class OneToManyWithoutOrphanRemovalTest extends AbstractOneToManyCollectionTestC
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isOrphanRemoval(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getAssociationName(): string
     {
         return 'withoutOrphanRemovalItems';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getItems($entity): Collection
     {
         return $entity->getWithoutOrphanRemovalItems();

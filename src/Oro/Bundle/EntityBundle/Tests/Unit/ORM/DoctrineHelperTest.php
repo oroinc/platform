@@ -42,6 +42,7 @@ class DoctrineHelperTest extends TestCase
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

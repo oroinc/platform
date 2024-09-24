@@ -17,6 +17,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

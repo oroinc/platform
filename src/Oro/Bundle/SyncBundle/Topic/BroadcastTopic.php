@@ -8,9 +8,7 @@ use Ratchet\Wamp\Topic;
 
 class BroadcastTopic extends AbstractTopic
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPublish(
         ConnectionInterface $connection,
         Topic $topic,

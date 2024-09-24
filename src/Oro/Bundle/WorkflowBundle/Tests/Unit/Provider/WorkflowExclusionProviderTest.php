@@ -14,6 +14,7 @@ class WorkflowExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowExclusionProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadata = $this->createMock(ClassMetadata::class);

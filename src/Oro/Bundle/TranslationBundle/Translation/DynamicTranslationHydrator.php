@@ -16,9 +16,7 @@ class DynamicTranslationHydrator extends AbstractHydrator
     private const KEY = 'key';
     private const VALUE = 'value';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function hydrateAllData()
     {
         $fields = array_flip($this->_rsm->scalarMappings);
@@ -38,17 +36,13 @@ class DynamicTranslationHydrator extends AbstractHydrator
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toIterable($stmt, ResultSetMapping $resultSetMapping, array $hints = []): iterable
     {
         throw new \BadMethodCallException('not supported');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hydrateRow()
     {
         throw new \BadMethodCallException('not supported');

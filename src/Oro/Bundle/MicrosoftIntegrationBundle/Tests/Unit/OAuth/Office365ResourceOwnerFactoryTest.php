@@ -21,6 +21,7 @@ class Office365ResourceOwnerFactoryTest extends TestCase
     private HttpUtils $httpUtils;
     private RequestDataStorageInterface $storage;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);

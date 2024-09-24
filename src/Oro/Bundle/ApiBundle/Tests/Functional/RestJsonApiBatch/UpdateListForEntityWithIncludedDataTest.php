@@ -14,6 +14,7 @@ use Oro\Component\MessageQueue\Job\Job;
  */
 class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -13,6 +13,7 @@ class ResetPasswordMassActionTest extends \PHPUnit\Framework\TestCase
     /** @var ActionConfiguration */
     private $configuration;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configuration = ActionConfiguration::createNamed(

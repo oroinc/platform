@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $bundle1 = new Fixtures\BarBundle\BarBundle();
@@ -39,6 +40,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ]);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         CumulativeResourceManager::getInstance()->clear();

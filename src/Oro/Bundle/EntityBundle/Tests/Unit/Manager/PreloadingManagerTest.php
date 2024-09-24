@@ -30,6 +30,7 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
     /** @var PreloadingManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

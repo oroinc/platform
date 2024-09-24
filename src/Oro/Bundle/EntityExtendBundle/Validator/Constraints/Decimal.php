@@ -37,9 +37,6 @@ class Decimal extends Constraint
      */
     public $scale = 0;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($options = null)
     {
         if (is_array($options)) {

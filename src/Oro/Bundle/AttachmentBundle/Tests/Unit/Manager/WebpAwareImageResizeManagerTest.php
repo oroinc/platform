@@ -16,6 +16,7 @@ class WebpAwareImageResizeManagerTest extends \PHPUnit\Framework\TestCase
 
     private WebpAwareImageResizeManager $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerImageResizeManager = $this->createMock(ImageResizeManagerInterface::class);

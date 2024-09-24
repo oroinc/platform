@@ -36,6 +36,7 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var OperationExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);

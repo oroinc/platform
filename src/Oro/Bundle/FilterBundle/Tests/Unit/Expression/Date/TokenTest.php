@@ -10,6 +10,7 @@ class TokenTest extends \PHPUnit\Framework\TestCase
     private int $testValue;
     private Token $token;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->testType = Token::TYPE_INTEGER;

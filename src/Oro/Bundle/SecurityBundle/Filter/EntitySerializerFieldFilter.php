@@ -34,9 +34,7 @@ class EntitySerializerFieldFilter implements FieldFilterInterface
         $this->isIdFieldProtected = $isIdFieldProtected;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function checkField(object $entity, string $entityClass, string $field): ?bool
     {
         if (!$this->isIdFieldProtected && $this->isIdentifierField($entityClass, $field)) {

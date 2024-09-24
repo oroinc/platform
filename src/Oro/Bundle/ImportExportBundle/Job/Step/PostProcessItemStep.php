@@ -41,9 +41,7 @@ class PostProcessItemStep extends ItemStep
         $this->jobExecutor = $jobExecutor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function doExecute(StepExecution $stepExecution)
     {
         $this->initializeStepElements($stepExecution);

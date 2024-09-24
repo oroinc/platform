@@ -13,6 +13,7 @@ class TestEntityImplementsDomainObjectInterface implements DomainObjectInterface
         $this->id = $id;
     }
 
+    #[\Override]
     public function getObjectIdentifier()
     {
         if ($this->id === null) {

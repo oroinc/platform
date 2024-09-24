@@ -12,6 +12,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTransitionRecord */
     private $transitionRecord;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transitionRecord = new WorkflowTransitionRecord();

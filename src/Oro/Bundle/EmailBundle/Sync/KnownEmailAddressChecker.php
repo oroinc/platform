@@ -72,9 +72,9 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isAtLeastOneKnownEmailAddress($_)
     {
         $emailsToLoad = [];
@@ -111,9 +111,9 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isAtLeastOneUserEmailAddress($userId, $_)
     {
         $emailsToLoad = [];
@@ -152,9 +152,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preLoadEmailAddresses(array $emails)
     {
         $emailsToLoad = [];
@@ -175,9 +173,9 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isAtLeastOneMailboxEmailAddress($mailboxId, $_)
     {
         $emailsToLoad = [];

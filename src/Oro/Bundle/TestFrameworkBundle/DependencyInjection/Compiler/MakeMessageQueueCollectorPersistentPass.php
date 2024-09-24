@@ -15,6 +15,7 @@ class MakeMessageQueueCollectorPersistentPass extends RegisterPersistentServices
         'oro_message_queue.test.driver.message_collector',
     ];
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         parent::process($container);
@@ -27,6 +28,7 @@ class MakeMessageQueueCollectorPersistentPass extends RegisterPersistentServices
         }
     }
 
+    #[\Override]
     protected function getPersistentServices(ContainerBuilder $container): array
     {
         return self::PERSISTENT_SERVICES;

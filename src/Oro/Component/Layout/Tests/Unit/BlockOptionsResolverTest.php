@@ -15,6 +15,7 @@ class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
     /** @var BlockOptionsResolver */
     private $blockOptionsResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(LayoutRegistryInterface::class);

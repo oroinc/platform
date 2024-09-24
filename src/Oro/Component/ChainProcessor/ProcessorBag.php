@@ -45,18 +45,14 @@ class ProcessorBag implements ProcessorBagInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addApplicableChecker(ApplicableCheckerInterface $checker, int $priority = 0): void
     {
         $this->additionalApplicableCheckers[$priority][] = $checker;
         $this->processorApplicableChecker = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProcessors(ContextInterface $context): ProcessorIterator
     {
         $this->ensureProcessorApplicableCheckerInitialized();
@@ -64,17 +60,13 @@ class ProcessorBag implements ProcessorBagInterface
         return $this->createProcessorIterator($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActions(): array
     {
         return $this->configProvider->getActions();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActionGroups(string $action): array
     {
         return $this->configProvider->getGroups($action);

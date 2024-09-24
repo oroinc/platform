@@ -18,6 +18,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
 
     private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->consumer = $this->createMock(QueueConsumer::class);

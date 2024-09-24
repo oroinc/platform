@@ -10,17 +10,13 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  */
 class TextAttributeType extends StringAttributeType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSortable(FieldConfigModel $attribute)
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');

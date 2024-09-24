@@ -82,9 +82,7 @@ class Comparison implements ExpressionInterface
         return $this->op;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visit(Visitor $visitor)
     {
         return $visitor->walkComparison($this);

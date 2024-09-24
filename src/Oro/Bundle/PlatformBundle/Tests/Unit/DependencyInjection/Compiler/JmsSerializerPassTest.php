@@ -15,6 +15,7 @@ class JmsSerializerPassTest extends \PHPUnit\Framework\TestCase
     /** @var JmsSerializerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new JmsSerializerPass();

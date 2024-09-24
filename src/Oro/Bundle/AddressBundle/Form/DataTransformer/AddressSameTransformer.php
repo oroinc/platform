@@ -26,9 +26,7 @@ class AddressSameTransformer implements DataTransformerInterface
         $this->fields = $fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if ($value === null) {
@@ -50,9 +48,7 @@ class AddressSameTransformer implements DataTransformerInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         return $value;

@@ -23,6 +23,7 @@ class EmailUserAccessRuleTest extends \PHPUnit\Framework\TestCase
     /** @var EmailUserAccessRule */
     private $accessRule;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclConditionDataBuilder = $this->createMock(AclConditionDataBuilderInterface::class);

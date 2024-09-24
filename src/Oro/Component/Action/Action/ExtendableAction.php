@@ -32,9 +32,7 @@ class ExtendableAction extends AbstractAction
      */
     protected $eventData;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $eventData = $this->getEventData($context);
@@ -67,9 +65,7 @@ class ExtendableAction extends AbstractAction
         throw new \RuntimeException('Unsupported context given');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $optionsResolver = new OptionsResolver();

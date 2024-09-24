@@ -24,9 +24,7 @@ class LoadEntity implements ProcessorInterface
         $this->entityLoader = $entityLoader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */

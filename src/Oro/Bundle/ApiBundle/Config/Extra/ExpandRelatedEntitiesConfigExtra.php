@@ -56,33 +56,25 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
         return isset($this->map[$path]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ConfigContext $context): void
     {
         $context->set(self::NAME, $this->expandedEntities);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPropagable(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         return 'expand:' . implode(',', $this->expandedEntities);

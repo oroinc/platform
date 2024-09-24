@@ -10,6 +10,7 @@ class ComparisonExpressionsVisitorTest extends \PHPUnit\Framework\TestCase
 {
     private ComparisonExpressionsVisitor $visitor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->visitor = new ComparisonExpressionsVisitor();

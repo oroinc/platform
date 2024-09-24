@@ -34,9 +34,7 @@ class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getViewValue($value)
     {
         $data = [];
@@ -61,9 +59,7 @@ class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
         return $this->translator->trans('oro.user.dashboard.all_owners');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         if ($value === null) {
@@ -73,9 +69,7 @@ class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
         return parent::getConvertedValue($widgetConfig, $value, $config, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormValue(array $config, $value)
     {
         if ($value === null) {

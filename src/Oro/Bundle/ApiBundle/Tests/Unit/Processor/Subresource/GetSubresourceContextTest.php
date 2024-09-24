@@ -10,6 +10,7 @@ class GetSubresourceContextTest extends \PHPUnit\Framework\TestCase
 {
     private GetSubresourceContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new GetSubresourceContext(

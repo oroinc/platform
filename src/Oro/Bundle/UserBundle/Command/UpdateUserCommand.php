@@ -21,6 +21,7 @@ class UpdateUserCommand extends CreateUserCommand
     protected static $defaultName = 'oro:user:update';
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -67,6 +68,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $username = $input->getArgument('user-name');

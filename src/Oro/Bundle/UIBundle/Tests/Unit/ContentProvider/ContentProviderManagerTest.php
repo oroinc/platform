@@ -17,6 +17,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ContentProviderManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider1 = $this->createMock(ContentProviderInterface::class);

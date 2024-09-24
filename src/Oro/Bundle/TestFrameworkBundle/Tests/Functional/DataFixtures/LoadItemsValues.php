@@ -17,9 +17,7 @@ class LoadItemsValues extends AbstractFixture implements DependentFixtureInterfa
         LoadItems::ITEM1,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [
@@ -27,9 +25,7 @@ class LoadItemsValues extends AbstractFixture implements DependentFixtureInterfa
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->values as $reference) {

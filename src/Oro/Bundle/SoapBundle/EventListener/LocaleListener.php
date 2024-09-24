@@ -38,6 +38,7 @@ class LocaleListener implements EventSubscriberInterface
         return str_starts_with($request->getPathInfo(), self::API_PREFIX);
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

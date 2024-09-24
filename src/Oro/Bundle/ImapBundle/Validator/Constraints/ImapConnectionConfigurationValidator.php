@@ -20,9 +20,7 @@ class ImapConnectionConfigurationValidator extends ConstraintValidator
         $this->checker = $checker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof ImapConnectionConfiguration) {

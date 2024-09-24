@@ -12,16 +12,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SampleChildJobTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.message_queue.sample_child_job';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return '';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

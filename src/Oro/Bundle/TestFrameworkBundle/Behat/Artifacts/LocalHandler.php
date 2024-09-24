@@ -28,9 +28,7 @@ class LocalHandler implements ArtifactsHandlerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function save($file)
     {
         $fileName = TokenGenerator::generateToken('image').'.png';
@@ -45,9 +43,7 @@ class LocalHandler implements ArtifactsHandlerInterface
         return 'file://'.$screenshotName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getConfigKey()
     {
         return 'local';

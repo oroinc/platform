@@ -22,9 +22,7 @@ class ConfigurationOptionFilterVisitor extends ExpressionVisitor
         return $this->filters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison): void
     {
         if (Comparison::EQ !== $comparison->getOperator() && Comparison::IN !== $comparison->getOperator()) {
@@ -38,17 +36,13 @@ class ConfigurationOptionFilterVisitor extends ExpressionVisitor
         $this->filters[$comparison->getField()] = $this->walkValue($comparison->getValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkValue(Value $value): mixed
     {
         return $value->getValue();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr): void
     {
         if (CompositeExpression::TYPE_AND !== $expr->getType()) {

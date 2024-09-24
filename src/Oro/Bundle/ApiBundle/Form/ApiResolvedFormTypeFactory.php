@@ -22,9 +22,7 @@ class ApiResolvedFormTypeFactory implements ResolvedFormTypeFactoryInterface
         $this->formExtensionChecker = $formExtensionChecker;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createResolvedType(
         FormTypeInterface $type,
         array $typeExtensions,

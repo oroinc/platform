@@ -19,11 +19,13 @@ class OrganizationFormLoginFactory extends FormLoginFactory
         parent::__construct();
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return 'organization-form-login';
     }
 
+    #[\Override]
     public function createAuthenticator(
         ContainerBuilder $container,
         string $firewallName,

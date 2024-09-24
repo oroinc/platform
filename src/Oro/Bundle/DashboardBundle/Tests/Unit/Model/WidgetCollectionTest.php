@@ -19,6 +19,7 @@ class WidgetCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetCollection */
     private $collection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dashboard = $this->createMock(Dashboard::class);

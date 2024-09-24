@@ -9,9 +9,7 @@ use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
  */
 class AbstractDemoDataFixturesListener extends AbstractDataFixturesListener
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreLoad(MigrationDataFixturesEvent $event)
     {
         if ($event->isDemoFixtures()) {
@@ -19,9 +17,7 @@ class AbstractDemoDataFixturesListener extends AbstractDataFixturesListener
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostLoad(MigrationDataFixturesEvent $event)
     {
         if ($event->isDemoFixtures()) {

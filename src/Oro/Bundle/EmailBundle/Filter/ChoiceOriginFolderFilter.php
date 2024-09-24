@@ -11,9 +11,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
  */
 class ChoiceOriginFolderFilter extends ChoiceFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $formView = $this->getFormView();
@@ -36,9 +34,7 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
         return $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return ChoiceOriginFolderFilterType::class;

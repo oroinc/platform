@@ -24,6 +24,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumOptionsProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

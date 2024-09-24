@@ -29,11 +29,11 @@ class UniquePinbarTabUrlValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
      *
      * @param mixed $entity
      * @param UniquePinbarTabUrl $constraint
      */
+    #[\Override]
     public function validate($entity, Constraint $constraint)
     {
         if (!$entity instanceof AbstractPinbarTab) {

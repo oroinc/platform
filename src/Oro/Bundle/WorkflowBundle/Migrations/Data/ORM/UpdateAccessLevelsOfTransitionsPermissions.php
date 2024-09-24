@@ -25,17 +25,13 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
  */
 class UpdateAccessLevelsOfTransitionsPermissions extends AbstractUpdatePermissions implements DependentFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserRolesData::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         if (!$this->container->get(ApplicationState::class)->isInstalled()) {

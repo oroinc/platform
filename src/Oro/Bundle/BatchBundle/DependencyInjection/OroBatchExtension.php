@@ -11,9 +11,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroBatchExtension extends Extension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configLoader = CumulativeConfigLoaderFactory::create('oro_batch_jobs', 'Resources/config/batch_jobs.yml');

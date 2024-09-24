@@ -19,6 +19,7 @@ class TranslationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

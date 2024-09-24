@@ -35,9 +35,7 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
         $this->connectionName = $connectionName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $watchers = $this->findTransactionWatchers($container);

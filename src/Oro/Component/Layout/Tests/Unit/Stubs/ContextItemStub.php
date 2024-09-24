@@ -6,9 +6,7 @@ use Oro\Component\Layout\ContextItemInterface;
 
 class ContextItemStub implements ContextItemInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toString()
     {
         return 'id:1';
@@ -20,6 +18,7 @@ class ContextItemStub implements ContextItemInterface
      *
      * @return string
      */
+    #[\Override]
     public function getHash()
     {
         return $this->toString();

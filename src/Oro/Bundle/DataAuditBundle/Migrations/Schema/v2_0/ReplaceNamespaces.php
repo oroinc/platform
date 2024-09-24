@@ -15,9 +15,7 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
 {
     use ConnectionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->resolveVersions();
@@ -128,9 +126,7 @@ EOD
         $this->connection->executeStatement('DROP SEQUENCE seq_temp_version');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 1;

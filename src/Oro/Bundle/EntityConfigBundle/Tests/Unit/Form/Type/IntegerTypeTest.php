@@ -11,6 +11,7 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
     /** @var IntegerType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

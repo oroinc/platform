@@ -16,6 +16,7 @@ class LayoutContextChangedListenerTest extends \PHPUnit\Framework\TestCase
 
     private LayoutContextChangedListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->twigLayoutRenderer = $this->createMock(TwigEnvironmentAwareLayoutRendererInterface::class);

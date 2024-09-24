@@ -10,9 +10,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class FallbackValueTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         $result = [
@@ -31,9 +29,7 @@ class FallbackValueTransformer implements DataTransformerInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

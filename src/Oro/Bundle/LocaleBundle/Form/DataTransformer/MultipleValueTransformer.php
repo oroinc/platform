@@ -28,9 +28,7 @@ class MultipleValueTransformer implements DataTransformerInterface
         $this->collectionField = $collectionField;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -53,9 +51,7 @@ class MultipleValueTransformer implements DataTransformerInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (null === $value) {

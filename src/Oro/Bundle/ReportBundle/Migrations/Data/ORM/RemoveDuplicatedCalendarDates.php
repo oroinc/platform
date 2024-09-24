@@ -11,9 +11,7 @@ use Oro\Bundle\ReportBundle\Entity\CalendarDate;
  */
 class RemoveDuplicatedCalendarDates extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $calendarDates = $manager->getRepository(CalendarDate::class)->findAll();

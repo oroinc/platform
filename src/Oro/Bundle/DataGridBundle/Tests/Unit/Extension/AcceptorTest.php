@@ -17,6 +17,7 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
     /** @var Acceptor */
     private $acceptor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->config = DatagridConfiguration::create([]);

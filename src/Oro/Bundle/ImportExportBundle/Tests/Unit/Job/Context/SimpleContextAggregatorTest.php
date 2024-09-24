@@ -18,6 +18,7 @@ class SimpleContextAggregatorTest extends \PHPUnit\Framework\TestCase
     /** @var SimpleContextAggregator */
     private $aggregator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);

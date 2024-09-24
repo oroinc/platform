@@ -376,6 +376,7 @@ class JobExecution
         return $this->logFile;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         $startTime = $this->formatDate($this->startTime);

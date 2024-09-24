@@ -17,6 +17,7 @@ class EnumNormalizerTest extends TestCase
     private EnumOptionsProvider|MockObject $enumOptionsProvider;
     private EnumNormalizer $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldHelper = $this->createMock(FieldHelper::class);

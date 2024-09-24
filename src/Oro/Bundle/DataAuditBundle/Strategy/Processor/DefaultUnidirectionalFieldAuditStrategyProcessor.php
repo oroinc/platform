@@ -26,6 +26,7 @@ class DefaultUnidirectionalFieldAuditStrategyProcessor implements EntityAuditStr
      * @throws MappingException
      * @throws ReflectionException
      */
+    #[\Override]
     public function processInverseCollections(array $sourceEntityData): array
     {
         $fieldData = [];
@@ -84,11 +85,13 @@ class DefaultUnidirectionalFieldAuditStrategyProcessor implements EntityAuditStr
         return $fieldsData;
     }
 
+    #[\Override]
     public function processChangedEntities(array $sourceEntityData): array
     {
         return $sourceEntityData;
     }
 
+    #[\Override]
     public function processInverseRelations(array $sourceEntityData): array
     {
         return [];

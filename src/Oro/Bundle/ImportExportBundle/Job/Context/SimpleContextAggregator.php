@@ -22,9 +22,7 @@ class SimpleContextAggregator implements ContextAggregatorInterface
         $this->contextRegistry = $contextRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAggregatedContext(JobExecution $jobExecution)
     {
         /** @var ContextInterface $context */
@@ -44,9 +42,7 @@ class SimpleContextAggregator implements ContextAggregatorInterface
         return $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType()
     {
         return self::TYPE;

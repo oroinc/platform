@@ -19,6 +19,7 @@ class UpdateEmailUserOwners extends AbstractFixture implements ContainerAwareInt
 {
     use ContainerAwareTrait;
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         if (!$this->container->get(ApplicationState::class)->isInstalled()) {

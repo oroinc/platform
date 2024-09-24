@@ -14,17 +14,13 @@ class RelatedEntityFieldFallbackValueConstraint extends Constraint
      */
     public $scalarValueConstraints = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return 'oro_entity.related_entity_field_fallback_value_validator';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultOption(): ?string
     {
         return 'scalarValueConstraints';

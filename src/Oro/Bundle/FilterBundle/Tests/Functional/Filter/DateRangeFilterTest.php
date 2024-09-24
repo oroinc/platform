@@ -18,6 +18,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DateRangeFilterTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

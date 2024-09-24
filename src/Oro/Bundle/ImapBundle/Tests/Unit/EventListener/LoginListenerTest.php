@@ -19,6 +19,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
     /** @var LoginListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->syncCredentialsManager = $this->createMock(SyncCredentialsIssueManager::class);

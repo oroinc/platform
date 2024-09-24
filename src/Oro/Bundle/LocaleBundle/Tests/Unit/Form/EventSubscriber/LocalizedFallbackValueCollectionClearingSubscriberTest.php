@@ -26,6 +26,7 @@ class LocalizedFallbackValueCollectionClearingSubscriberTest extends \PHPUnit\Fr
 
     private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = new LocalizedFallbackValueCollectionClearingSubscriber();

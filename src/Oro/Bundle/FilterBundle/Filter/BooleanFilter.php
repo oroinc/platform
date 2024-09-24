@@ -21,9 +21,7 @@ class BooleanFilter extends AbstractFilter
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         // static option for metadata
@@ -31,9 +29,7 @@ class BooleanFilter extends AbstractFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $formView = $this->getFormView();
@@ -59,9 +55,7 @@ class BooleanFilter extends AbstractFilter
         return $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         if (isset($data['value']) && !\is_int($data['value'])) {
@@ -71,9 +65,7 @@ class BooleanFilter extends AbstractFilter
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         $data = parent::parseData($data);
@@ -88,17 +80,13 @@ class BooleanFilter extends AbstractFilter
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         return $this->buildComparisonExpr($ds, $data['value'], $fieldName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return BooleanFilterType::class;

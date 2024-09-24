@@ -40,9 +40,7 @@ class FeatureCheckerStub extends FeatureChecker
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFeatureEnabled(string $feature, object|int|null $scopeIdentifier = null): bool
     {
         return
@@ -50,9 +48,7 @@ class FeatureCheckerStub extends FeatureChecker
             ?? parent::isFeatureEnabled($feature, $scopeIdentifier);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isResourceEnabled(
         string $resource,
         string $resourceType,

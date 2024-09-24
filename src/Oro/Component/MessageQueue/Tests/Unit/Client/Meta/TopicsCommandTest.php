@@ -20,6 +20,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 
     private TopicsCommand $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->topicRegistry = $this->createMock(TopicRegistry::class);

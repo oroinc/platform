@@ -24,6 +24,7 @@ abstract class MigrationExecutorTestCase extends \PHPUnit\Framework\TestCase
     /** @var OroDataCacheManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

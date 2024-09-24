@@ -24,6 +24,7 @@ class JobMiddleware implements MessageProducerMiddlewareInterface
         $this->jobProcessor = $jobProcessor;
     }
 
+    #[\Override]
     public function handle(Message $message): void
     {
         if ($this->hasMessageAttachedJob($message)) {

@@ -17,6 +17,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumVirtualFieldProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

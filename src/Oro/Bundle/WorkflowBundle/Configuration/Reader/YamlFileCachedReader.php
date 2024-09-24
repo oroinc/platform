@@ -10,9 +10,7 @@ class YamlFileCachedReader implements ConfigFileReaderInterface
     /** @var array */
     private $loadedFiles = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function read(\SplFileInfo $file): array
     {
         if (!$file->isReadable()) {

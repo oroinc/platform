@@ -92,6 +92,7 @@ class ThemeConfigurationController extends AbstractController
         );
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [

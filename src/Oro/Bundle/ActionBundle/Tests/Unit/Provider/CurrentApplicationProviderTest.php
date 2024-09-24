@@ -16,6 +16,7 @@ class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CurrentApplicationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

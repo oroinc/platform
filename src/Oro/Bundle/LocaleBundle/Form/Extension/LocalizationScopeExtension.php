@@ -16,9 +16,7 @@ class LocalizationScopeExtension extends AbstractTypeExtension
      */
     protected $extendedType;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (array_key_exists(self::SCOPE_FIELD, $options['scope_fields'])) {
@@ -33,9 +31,7 @@ class LocalizationScopeExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [ScopeType::class];

@@ -32,17 +32,13 @@ class IterableResultFactory implements IterableResultFactoryInterface
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatasourceInterface $dataSource): bool
     {
         return $dataSource instanceof OrmDatasource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createIterableResult(
         DatasourceInterface $dataSource,
         ActionConfiguration $actionConfiguration,

@@ -75,6 +75,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
     /** @var CompleteDescriptions */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -1119,7 +1120,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             'fields'           => [
                 'renamedField' => [
                     'property_path' => 'testField',
-                    'description'   => 'field description, {@inheritdoc}'
+                    'description' => 'field description, {@inheritdoc}'
                 ]
             ]
         ];
@@ -2438,7 +2439,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
-            'documentation'    => 'action documentation. {@inheritdoc}'
+            'documentation' => 'action documentation. {@inheritdoc}'
         ];
 
         $this->entityDescriptionProvider->expects(self::once())

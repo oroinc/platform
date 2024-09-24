@@ -26,6 +26,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
     /** @var ParameterBinder */
     private $parameterBinder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datagrid = $this->createMock(DatagridInterface::class);

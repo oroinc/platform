@@ -38,9 +38,7 @@ class ContentProviderManager implements ResetInterface
         $this->enabledProviderNames = $this->initialEnabledProviderNames = $enabledProviderNames;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->enabledProviderNames = $this->initialEnabledProviderNames;

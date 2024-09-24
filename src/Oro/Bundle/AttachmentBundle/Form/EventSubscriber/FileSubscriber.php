@@ -26,9 +26,7 @@ class FileSubscriber implements EventSubscriberInterface
         $this->validator = $validator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

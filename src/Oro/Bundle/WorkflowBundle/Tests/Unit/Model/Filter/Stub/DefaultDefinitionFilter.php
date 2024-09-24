@@ -10,6 +10,7 @@ class DefaultDefinitionFilter implements WorkflowDefinitionFilterInterface
     /**
      * {@iheritdoc}
      */
+    #[\Override]
     public function filter(Collection $workflowDefinitions)
     {
         return $workflowDefinitions;

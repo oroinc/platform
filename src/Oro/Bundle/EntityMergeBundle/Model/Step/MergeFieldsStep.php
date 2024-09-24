@@ -20,6 +20,7 @@ class MergeFieldsStep implements DependentMergeStepInterface
     /**
      * Merge fields
      */
+    #[\Override]
     public function run(EntityData $data)
     {
         foreach ($data->getFields() as $field) {
@@ -29,9 +30,7 @@ class MergeFieldsStep implements DependentMergeStepInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependentSteps()
     {
         return array('Oro\\Bundle\\EntityMergeBundle\\Model\\Step\\ValidateStep');

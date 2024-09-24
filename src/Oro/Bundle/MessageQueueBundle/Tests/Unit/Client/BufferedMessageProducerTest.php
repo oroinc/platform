@@ -26,6 +26,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
     /** @var BufferedMessageProducer */
     private $producer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->inner = $this->createMock(MessageProducerInterface::class);

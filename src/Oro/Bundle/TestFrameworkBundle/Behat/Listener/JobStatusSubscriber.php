@@ -39,9 +39,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
         $this->phpExecutablePath = (new PhpExecutableFinder())->find();
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

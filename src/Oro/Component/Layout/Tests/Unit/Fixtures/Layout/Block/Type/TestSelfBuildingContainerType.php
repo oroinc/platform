@@ -8,9 +8,7 @@ use Oro\Component\Layout\BlockBuilderInterface;
 
 class TestSelfBuildingContainerType extends AbstractContainerType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         $id = $builder->getId();
@@ -18,9 +16,7 @@ class TestSelfBuildingContainerType extends AbstractContainerType
             ->add($id . '_logo', $id, 'logo');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'test_self_building_container';

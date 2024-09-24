@@ -28,6 +28,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManagerInterface|mixed|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connector = $this->createMock(ImapConnector::class);

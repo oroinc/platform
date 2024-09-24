@@ -14,9 +14,7 @@ class TitleReaderStub implements ReaderInterface
         $this->data = $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTitle($route)
     {
         return array_key_exists($route, $this->data) ? $this->data[$route] : null;

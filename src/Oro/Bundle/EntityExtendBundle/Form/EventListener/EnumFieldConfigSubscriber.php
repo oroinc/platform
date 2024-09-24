@@ -49,17 +49,13 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
         $this->nameGenerator = $nameGenerator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

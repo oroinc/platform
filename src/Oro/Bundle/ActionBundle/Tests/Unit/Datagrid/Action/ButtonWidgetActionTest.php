@@ -14,6 +14,7 @@ class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonWidgetAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

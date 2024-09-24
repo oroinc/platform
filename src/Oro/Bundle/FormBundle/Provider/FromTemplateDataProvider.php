@@ -7,9 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FromTemplateDataProvider implements FormTemplateDataProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData($entity, FormInterface $form, Request $request)
     {
         return [

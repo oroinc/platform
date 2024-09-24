@@ -19,9 +19,7 @@ class ContextConfigAccessor implements ConfigAccessorInterface
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfig(string $className): ?EntityDefinitionConfig
     {
         $config = $this->context->getConfig();

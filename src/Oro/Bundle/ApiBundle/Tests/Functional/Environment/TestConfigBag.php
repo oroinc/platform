@@ -21,9 +21,7 @@ class TestConfigBag implements ConfigBagInterface
         $this->entityConfigMerger = $entityConfigMerger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassNames(string $version): array
     {
         $result = $this->configBag->getClassNames($version);
@@ -34,9 +32,7 @@ class TestConfigBag implements ConfigBagInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfig(string $className, string $version): ?array
     {
         $result = $this->configBag->getConfig($className, $version);

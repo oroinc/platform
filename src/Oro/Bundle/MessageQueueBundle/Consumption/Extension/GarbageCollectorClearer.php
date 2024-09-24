@@ -10,9 +10,7 @@ use Psr\Log\LoggerInterface;
  */
 class GarbageCollectorClearer implements ClearerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear(LoggerInterface $logger)
     {
         gc_collect_cycles();

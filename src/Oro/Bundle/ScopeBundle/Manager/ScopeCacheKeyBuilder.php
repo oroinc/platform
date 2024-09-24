@@ -10,9 +10,7 @@ use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
  */
 class ScopeCacheKeyBuilder implements ScopeCacheKeyBuilderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCacheKey(ScopeCriteria $criteria): ?string
     {
         return null;

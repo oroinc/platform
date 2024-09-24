@@ -14,6 +14,7 @@ class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCa
 
     private WebpAwareFilterRuntimeConfigProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerFilterRuntimeConfigProvider = $this->createMock(FilterRuntimeConfigProviderInterface::class);

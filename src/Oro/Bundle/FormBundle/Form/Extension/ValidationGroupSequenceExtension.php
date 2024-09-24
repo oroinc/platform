@@ -18,6 +18,7 @@ class ValidationGroupSequenceExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->addNormalizer(

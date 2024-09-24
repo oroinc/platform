@@ -31,105 +31,79 @@ class FakeRestResponse implements RestResponseInterface
         $this->body = $body;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRequestUrl()
     {
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBodyAsString()
     {
         return $this->body;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getStatusCode()
     {
         return $this->code;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHeader($header)
     {
         return $this->headers[$header];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHeaders()
     {
         return $this->headers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasHeader($header)
     {
         return array_key_exists($header, $this->headers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isClientError()
     {
         return $this->code > 399 && $this->code < 500;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isError()
     {
         return $this->code > 399 && $this->code < 600;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isInformational()
     {
         return $this->code < 200;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isRedirect()
     {
         return $this->code > 299 && $this->code < 400;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isServerError()
     {
         return $this->code > 499 && $this->code < 600;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSuccessful()
     {
         return $this->code < 400;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function json()
     {
         $data = json_decode((string) $this->body, true);
@@ -145,9 +119,7 @@ class FakeRestResponse implements RestResponseInterface
         return $data === null ? [] : $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReasonPhrase()
     {
         return 'OK';

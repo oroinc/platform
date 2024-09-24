@@ -26,9 +26,7 @@ class TotalHeaderHandler implements IncludeHandlerInterface
         $this->countQueryBuilderOptimizer = $countQueryOptimizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(Context $context)
     {
         return
@@ -41,9 +39,9 @@ class TotalHeaderHandler implements IncludeHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function handle(Context $context)
     {
         if ($context->has('totalCount')) {

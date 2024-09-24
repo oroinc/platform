@@ -31,6 +31,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SearchEntityConfigListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(SearchMappingProvider::class);

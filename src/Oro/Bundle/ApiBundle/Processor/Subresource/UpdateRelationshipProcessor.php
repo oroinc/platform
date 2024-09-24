@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationship\UpdateRelation
  */
 class UpdateRelationshipProcessor extends SubresourceProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): UpdateRelationshipContext
     {
         return new UpdateRelationshipContext($this->configProvider, $this->metadataProvider);

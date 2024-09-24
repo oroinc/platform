@@ -33,9 +33,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
         $this->setFormatter(new ConsoleFormatter());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isHandling(array $record): bool
     {
         return
@@ -43,9 +41,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
             && parent::isHandling($record);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(array $record): bool
     {
         return
@@ -78,9 +74,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return BaseConsoleHandler::getSubscribedEvents();

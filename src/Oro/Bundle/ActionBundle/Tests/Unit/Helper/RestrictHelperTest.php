@@ -11,6 +11,7 @@ class RestrictHelperTest extends \PHPUnit\Framework\TestCase
     /** @var RestrictHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = new RestrictHelper();

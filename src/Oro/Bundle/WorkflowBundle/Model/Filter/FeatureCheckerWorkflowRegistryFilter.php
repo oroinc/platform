@@ -20,9 +20,7 @@ class FeatureCheckerWorkflowRegistryFilter implements WorkflowDefinitionFilterIn
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(Collection $workflowDefinitions)
     {
         return $workflowDefinitions->filter(function (WorkflowDefinition $workflowDefinition) {

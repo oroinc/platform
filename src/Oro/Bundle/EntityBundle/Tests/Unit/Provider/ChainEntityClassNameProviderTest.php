@@ -13,6 +13,7 @@ class ChainEntityClassNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainEntityClassNameProvider */
     private $chainProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->providers = [

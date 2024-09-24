@@ -19,6 +19,7 @@ class RemoveEntitiesStepTest extends \PHPUnit\Framework\TestCase
     /** @var RemoveEntitiesStep */
     private $step;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

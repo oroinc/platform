@@ -14,17 +14,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TranslatableChoiceTypeExtension extends AbstractTypeExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [ChoiceType::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -32,9 +28,7 @@ class TranslatableChoiceTypeExtension extends AbstractTypeExtension
             ->setDefault('translatable_options', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if (!$options['translatable_groups']) {

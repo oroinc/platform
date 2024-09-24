@@ -30,17 +30,13 @@ class ActionButtonWidgetProvider implements WidgetProviderInterface
         $this->linkWidgetName      = $linkWidgetName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($object)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWidgets($object)
     {
         $result = [];

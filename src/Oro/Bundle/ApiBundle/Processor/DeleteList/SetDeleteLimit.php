@@ -18,9 +18,7 @@ class SetDeleteLimit implements ProcessorInterface
         $this->maxDeleteEntitiesLimit = $maxDeleteEntitiesLimit;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var DeleteListContext $context */

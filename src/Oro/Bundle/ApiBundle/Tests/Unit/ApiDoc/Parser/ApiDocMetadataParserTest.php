@@ -26,6 +26,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     /** @var ApiDocMetadataParser */
     private $parser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);

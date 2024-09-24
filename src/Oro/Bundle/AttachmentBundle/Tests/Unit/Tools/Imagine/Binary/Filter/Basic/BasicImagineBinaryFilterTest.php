@@ -12,6 +12,7 @@ class BasicImagineBinaryFilterTest extends \PHPUnit\Framework\TestCase
 
     private BasicImagineBinaryFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterManager = $this->createMock(FilterManager::class);

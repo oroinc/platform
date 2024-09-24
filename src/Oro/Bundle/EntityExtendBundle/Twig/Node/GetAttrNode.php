@@ -23,18 +23,13 @@ class GetAttrNode extends GetAttrExpression
 {
     protected static ?Inflector $inflector = null;
 
-    /**
-     * @inheritdoc
-     */
     public function __construct(array $nodes = [], array $attributes = [], int $lineno = 0, string $tag = null)
     {
         // Skip parent::__construct()
         Node::__construct($nodes, $attributes, $lineno, $tag);
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function compile(Compiler $compiler): void
     {
         $env = $compiler->getEnvironment();

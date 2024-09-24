@@ -17,9 +17,7 @@ class OroNavigationBundle implements Migration, ConnectionAwareInterface, Contai
     use ConnectionAwareTrait;
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_navigation_history');

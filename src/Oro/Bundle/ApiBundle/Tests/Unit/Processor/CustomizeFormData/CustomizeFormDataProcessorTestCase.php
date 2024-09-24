@@ -23,6 +23,7 @@ class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
 
     protected CustomizeFormDataContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = $this->createContext();

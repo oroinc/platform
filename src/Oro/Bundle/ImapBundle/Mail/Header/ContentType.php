@@ -37,9 +37,7 @@ class ContentType extends BaseContentType
     /** @var Headers */
     protected static $headers;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function fromString($headerLine)
     {
         $headerLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
@@ -82,9 +80,7 @@ class ContentType extends BaseContentType
         return self::$headers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setType($type)
     {
         $matches = [];

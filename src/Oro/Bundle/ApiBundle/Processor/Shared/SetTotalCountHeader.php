@@ -41,9 +41,7 @@ class SetTotalCountHeader implements ProcessorInterface
         $this->queryResolver = $queryResolver;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext|GetRelationshipContext|GetSubresourceContext $context */

@@ -18,6 +18,7 @@ class AssetConfigCacheWarmerTest extends TestCase
      */
     private $warmer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(AssetConfigCache::class);

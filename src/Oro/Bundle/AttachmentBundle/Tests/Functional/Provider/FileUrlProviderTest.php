@@ -11,6 +11,7 @@ class FileUrlProviderTest extends WebTestCase
 {
     private FileUrlProviderInterface $fileUrlProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateWsseAuthHeader());

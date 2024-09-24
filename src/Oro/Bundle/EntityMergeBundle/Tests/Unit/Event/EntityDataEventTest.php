@@ -13,6 +13,7 @@ class EntityDataEventTest extends \PHPUnit\Framework\TestCase
     /** @var EntityDataEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityData = $this->createMock(EntityData::class);

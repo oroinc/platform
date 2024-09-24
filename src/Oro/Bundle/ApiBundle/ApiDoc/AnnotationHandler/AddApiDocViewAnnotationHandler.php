@@ -19,9 +19,7 @@ class AddApiDocViewAnnotationHandler implements ApiDocAnnotationHandlerInterface
         $this->existingView = $existingView;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handle(ApiDoc $annotation, Route $route): void
     {
         $views = $annotation->getViews();

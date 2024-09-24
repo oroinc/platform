@@ -12,6 +12,7 @@ class AbstractLocalizedAuditStrategyProcessorTest extends TestCase
 {
     private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);

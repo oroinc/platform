@@ -15,6 +15,7 @@ class InsertFromSelectQueryExecutorTest extends WebTestCase
     /** @var InsertFromSelectQueryExecutor */
     private $queryExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

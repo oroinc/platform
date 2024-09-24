@@ -29,9 +29,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     private const ERROR_DETAIL = 'detail';
     private const ERROR_SOURCE = 'source';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDocument(): array
     {
         $result = null;
@@ -47,9 +45,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function convertCollectionToArray(
         iterable $collection,
         RequestType $requestType,
@@ -65,9 +61,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function convertObjectToArray(
         mixed $object,
         RequestType $requestType,
@@ -113,9 +107,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function convertErrorToArray(Error $error): array
     {
         $result = [];
@@ -143,17 +135,13 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function convertToEntityType(string $entityClass, RequestType $requestType): string
     {
         return $entityClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function tryConvertToEntityType(string $entityClass, RequestType $requestType): ?string
     {
         return $entityClass;
@@ -193,9 +181,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addLinkToResult(array &$result, string $name, LinkMetadataInterface $link): void
     {
         $href = $this->getLinkHref($link);
@@ -207,9 +193,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addMetaToCollectionResult(array &$result, string $name, mixed $value): void
     {
         // not supported
@@ -257,9 +241,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processRelatedObject(
         mixed $object,
         RequestType $requestType,
@@ -287,17 +269,13 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addRelatedObject(array $object): void
     {
         throw new \LogicException('The included objects are not supported by this document.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function hasIdentifierFieldsOnly(EntityMetadata $metadata): bool
     {
         if (\count($metadata->getMetaProperties()) > 0) {

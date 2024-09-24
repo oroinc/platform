@@ -11,6 +11,7 @@ class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $elementTransformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->elementTransformer = $this->createMock(DataTransformerInterface::class);

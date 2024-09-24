@@ -6,9 +6,7 @@ use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
 
 class TestChannelType implements ChannelInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return 'Test Channel';

@@ -42,9 +42,7 @@ class CurrentStepNameIsEqual extends AbstractCondition implements ContextAccesso
         $this->workflowManager = $workflowManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (array_key_exists('step_name', $options)) {
@@ -74,9 +72,7 @@ class CurrentStepNameIsEqual extends AbstractCondition implements ContextAccesso
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $mainEntity = $this->resolveValue($context, $this->mainEntity, false);
@@ -94,17 +90,13 @@ class CurrentStepNameIsEqual extends AbstractCondition implements ContextAccesso
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray(
@@ -116,9 +108,7 @@ class CurrentStepNameIsEqual extends AbstractCondition implements ContextAccesso
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode(

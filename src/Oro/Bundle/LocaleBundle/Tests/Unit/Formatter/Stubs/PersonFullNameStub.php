@@ -9,6 +9,7 @@ class PersonFullNameStub implements FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getFirstName()
     {
         return 'fn';
@@ -17,6 +18,7 @@ class PersonFullNameStub implements FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getLastName()
     {
         return 'ln';
@@ -25,6 +27,7 @@ class PersonFullNameStub implements FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getMiddleName()
     {
         return 'mn';
@@ -33,6 +36,7 @@ class PersonFullNameStub implements FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getNamePrefix()
     {
         return 'np';
@@ -41,6 +45,7 @@ class PersonFullNameStub implements FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getNameSuffix()
     {
         return 'ns';

@@ -68,9 +68,7 @@ class OrmDatasource implements DatasourceInterface, BindParametersInterface
         $this->queryExecutor = $queryExecutor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(DatagridInterface $grid, array $config)
     {
         $this->datagrid = $grid;
@@ -84,6 +82,7 @@ class OrmDatasource implements DatasourceInterface, BindParametersInterface
      *
      * @return ResultRecordInterface[]
      */
+    #[\Override]
     public function getResults()
     {
         $query = $this->getResultsQuery();
@@ -175,9 +174,7 @@ class OrmDatasource implements DatasourceInterface, BindParametersInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function bindParameters(array $datasourceToDatagridParameters, bool $append = true): void
     {
         if (!$this->datagrid) {

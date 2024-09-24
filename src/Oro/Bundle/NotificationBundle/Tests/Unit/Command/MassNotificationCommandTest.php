@@ -29,6 +29,7 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
     /** @var MassNotificationCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->sender = $this->createMock(MassNotificationSender::class);

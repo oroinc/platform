@@ -48,9 +48,7 @@ class AclAccessRule implements AccessRuleInterface
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         // do not apply this rule for related entities that are owner for the root entity
@@ -68,9 +66,7 @@ class AclAccessRule implements AccessRuleInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         $entityClass = $criteria->getEntityClass();

@@ -21,6 +21,7 @@ class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AuditGridImpersonationListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datagrid = $this->createMock(DatagridInterface::class);

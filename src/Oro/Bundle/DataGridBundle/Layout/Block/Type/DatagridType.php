@@ -37,9 +37,7 @@ class DatagridType extends AbstractContainerType
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -52,9 +50,7 @@ class DatagridType extends AbstractContainerType
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         if ($options['split_to_cells']) {
@@ -103,9 +99,7 @@ class DatagridType extends AbstractContainerType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, [
@@ -126,9 +120,7 @@ class DatagridType extends AbstractContainerType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

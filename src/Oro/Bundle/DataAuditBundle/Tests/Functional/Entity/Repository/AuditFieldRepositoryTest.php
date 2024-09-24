@@ -17,6 +17,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class AuditFieldRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

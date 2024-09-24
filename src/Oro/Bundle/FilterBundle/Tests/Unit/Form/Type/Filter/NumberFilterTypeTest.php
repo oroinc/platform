@@ -32,6 +32,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
 
     private string $defaultLocale;
 
+    #[\Override]
     protected function setUp(): void
     {
         $constraintFactory = new ConstraintFactory();
@@ -59,11 +60,13 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         $this->defaultLocale = \Locale::getDefault();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
     }
 
+    #[\Override]
     protected function getTypeExtensions(): array
     {
         return [
@@ -71,17 +74,13 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptionsDataProvider(): array
     {
         return [
@@ -111,6 +110,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     /**
      * @dataProvider bindDataProvider
      */
+    #[\Override]
     public function testBindData(
         array $bindData,
         array $formData,
@@ -130,9 +130,9 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function bindDataProvider(): array
     {
         return [

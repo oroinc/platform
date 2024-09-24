@@ -379,6 +379,7 @@ class TestAuditDataOwner implements
         $this->childrenManyToMany->removeElement($testAuditDataChild);
     }
 
+    #[\Override]
     public function __toString()
     {
         return 'ToStringTestAuditDataOwner';
@@ -436,9 +437,7 @@ class TestAuditDataOwner implements
         $this->additionalFields = $fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAdditionalFields()
     {
         return $this->additionalFields;

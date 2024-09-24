@@ -25,6 +25,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /** @var RestDocumentBuilder */
     private $documentBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST]);

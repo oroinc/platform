@@ -31,17 +31,13 @@ class GmailSearchStringManager extends AbstractSearchStringManager
         'received:after' => 'after'
     );
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getNameValueDelimiter()
     {
         return ':';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getKeyword($itemName)
     {
         if (!isset(static::$keywords[$itemName])) {
@@ -51,9 +47,7 @@ class GmailSearchStringManager extends AbstractSearchStringManager
         return static::$keywords[$itemName];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isAcceptableItem($name, $value, $match)
     {
         if (!isset(static::$keywords[$name])) {
@@ -66,17 +60,13 @@ class GmailSearchStringManager extends AbstractSearchStringManager
             || ($match === SearchQueryMatch::EXACT_MATCH);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildSearchString(SearchQueryExpr $searchQueryExpr)
     {
         return sprintf('"%s"', $this->processExpr($searchQueryExpr));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processSubQueryValue($itemName, SearchQueryExpr $value)
     {
         if ($value->isEmpty()) {
@@ -101,9 +91,7 @@ class GmailSearchStringManager extends AbstractSearchStringManager
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeOperator($operator)
     {
         if ($operator === 'NOT') {
@@ -113,9 +101,7 @@ class GmailSearchStringManager extends AbstractSearchStringManager
         return parent::normalizeOperator($operator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeValue($keyword, $value, $match)
     {
         $result = parent::normalizeValue($keyword, $value, $match);
@@ -133,6 +119,7 @@ class GmailSearchStringManager extends AbstractSearchStringManager
      * @param mixed $value
      * @return string
      */
+    #[\Override]
     protected function formatDate($value)
     {
         if ($value instanceof \DateTime) {

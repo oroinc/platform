@@ -14,15 +14,14 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $securityContext;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->securityContext = $this->createMock(TokenStorageInterface::class);
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createManager(): UserScopeManager
     {
         $manager = new UserScopeManager($this->doctrine, $this->cache, $this->dispatcher, $this->configBag);
@@ -31,17 +30,13 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
         return $manager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getScopedEntityName(): string
     {
         return 'user';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getScopedEntity(): User
     {
         $entity = new User();

@@ -10,9 +10,7 @@ class OroReportBundle implements Migration
 {
     const TABLE_NAME = 'oro_report';
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart

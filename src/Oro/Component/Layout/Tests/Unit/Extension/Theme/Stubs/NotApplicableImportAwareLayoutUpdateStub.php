@@ -14,24 +14,18 @@ class NotApplicableImportAwareLayoutUpdateStub implements
     ImportsAwareLayoutUpdateInterface,
     IsApplicableLayoutUpdateInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getImports()
     {
         return [new ImportedLayoutUpdate()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(ContextInterface $context)
     {
         return false;

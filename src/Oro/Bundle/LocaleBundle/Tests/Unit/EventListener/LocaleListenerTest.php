@@ -40,6 +40,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 
     private string $defaultLocale;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);
@@ -52,6 +53,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         $this->defaultLocale = \Locale::getDefault();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);

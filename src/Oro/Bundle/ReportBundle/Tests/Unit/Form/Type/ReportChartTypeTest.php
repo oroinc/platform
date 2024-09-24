@@ -21,9 +21,7 @@ class ReportChartTypeTest extends FormIntegrationTestCase
         $this->assertTrue($form->has('data_schema'));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $configProvider = $this->createMock(ConfigProvider::class);

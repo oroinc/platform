@@ -29,17 +29,13 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
      */
     protected $container;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $hasDefinitions = false;

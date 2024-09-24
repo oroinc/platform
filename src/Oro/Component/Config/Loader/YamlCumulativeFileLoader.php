@@ -11,9 +11,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlCumulativeFileLoader extends CumulativeFileLoader
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadFile($file)
     {
         return $this->parseFile($file);

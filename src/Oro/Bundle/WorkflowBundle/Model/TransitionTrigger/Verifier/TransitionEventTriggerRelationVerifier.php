@@ -8,10 +8,10 @@ use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 class TransitionEventTriggerRelationVerifier implements TransitionEventTriggerVerifierInterface
 {
     /**
-     * {@inheritdoc}
      *
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     public function verifyTrigger(TransitionEventTrigger $trigger)
     {
         $relatedEntity = $trigger->getWorkflowDefinition()->getRelatedEntity();

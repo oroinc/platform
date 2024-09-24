@@ -29,17 +29,13 @@ class DeleteTranslationKeysQuery extends ParametrizedMigrationQuery
         $this->translationKeys = $translationKeys;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Remove unused translation keys';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->deleteTranslationKeys($logger, $this->domain, $this->translationKeys);

@@ -10,9 +10,9 @@ use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientFactoryInterface
 class GuzzleRestClientFactory implements RestClientFactoryInterface
 {
     /**
-     * {@inheritdoc}
      * @see \GuzzleHttp\Client::applyOptions
      */
+    #[\Override]
     public function createRestClient($baseUrl, array $defaultOptions)
     {
         return new GuzzleRestClient($baseUrl, $defaultOptions);

@@ -17,12 +17,14 @@ class LoadEmailTemplateWithTranslationsData extends AbstractFixture implements
 {
     use ContainerAwareTrait;
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->removeDefaultTemplates($manager);
         $this->leadEmailTemplateWithTranslation($manager);
     }
 
+    #[\Override]
     public function getDependencies()
     {
         return [LoadLocalizationData::class];

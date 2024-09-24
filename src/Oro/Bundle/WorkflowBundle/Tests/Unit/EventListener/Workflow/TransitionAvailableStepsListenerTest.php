@@ -17,6 +17,7 @@ class TransitionAvailableStepsListenerTest extends TestCase
     private ExpressionFactory|MockObject $expressionFactory;
     private TransitionAvailableStepsListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->expressionFactory = $this->createMock(ExpressionFactory::class);

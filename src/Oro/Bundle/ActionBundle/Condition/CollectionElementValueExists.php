@@ -12,9 +12,7 @@ class CollectionElementValueExists extends AbstractComparison
 {
     const NAME = 'collection_element_value_exists';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (count($options) < 2) {
@@ -42,25 +40,19 @@ class CollectionElementValueExists extends AbstractComparison
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doCompare($collection, $needle)
     {
         return in_array($needle, $collection);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function resolveValue($context, $value, $strict = true)
     {
         if (!is_array($value)) {

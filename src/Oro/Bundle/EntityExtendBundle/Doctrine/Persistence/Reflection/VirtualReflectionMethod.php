@@ -39,6 +39,7 @@ class VirtualReflectionMethod extends \ReflectionMethod
         return new static($objectOrMethod, $method);
     }
 
+    #[\Override]
     public function getName(): string
     {
         if ($this->isRealMethod) {
@@ -48,6 +49,7 @@ class VirtualReflectionMethod extends \ReflectionMethod
         return $this->virtualMethod;
     }
 
+    #[\Override]
     public function isPublic(): bool
     {
         if ($this->isRealMethod) {
@@ -57,6 +59,7 @@ class VirtualReflectionMethod extends \ReflectionMethod
         return true;
     }
 
+    #[\Override]
     public function getNumberOfRequiredParameters(): int
     {
         if ($this->isRealMethod) {
@@ -78,11 +81,13 @@ class VirtualReflectionMethod extends \ReflectionMethod
         return $methodInfo['is_nullable'] ? 0 : 1;
     }
 
+    #[\Override]
     public function invoke($object, mixed ...$args): mixed
     {
         return $this->invokeArgs($object, $args);
     }
 
+    #[\Override]
     public function invokeArgs(?object $object, array $args): mixed
     {
         if ($this->isRealMethod) {

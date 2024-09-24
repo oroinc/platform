@@ -24,6 +24,7 @@ class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     /** @var GridViewApiEntityManager */
     private $gridViewApiEntityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->om = $this->createMock(ObjectManager::class);

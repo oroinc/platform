@@ -15,6 +15,7 @@ class InternalEmailFlagManagerLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var InternalEmailFlagManagerLoader */
     private $loader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->loader = new InternalEmailFlagManagerLoader();

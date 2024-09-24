@@ -37,7 +37,6 @@ class MassActionExtension extends AbstractExtension
     /** @var bool */
     protected $isMetadataVisited = false;
 
-    /** {@inheritdoc} */
     protected $excludedModes = [
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
@@ -52,18 +51,14 @@ class MassActionExtension extends AbstractExtension
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $this->isMetadataVisited = true;
         $data->offsetAddToArray(self::METADATA_ACTION_KEY, $this->getActionsMetadata($config));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         if (!$this->isMetadataVisited) {
@@ -92,9 +87,7 @@ class MassActionExtension extends AbstractExtension
         return $this->createAction($name, $config[self::ACTION_KEY][$name]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         /**

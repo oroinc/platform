@@ -10,9 +10,7 @@ use Oro\Bundle\EntityBundle\Handler\AbstractEntityDeleteHandler;
  */
 class EmailUserDeleteHandler extends AbstractEntityDeleteHandler
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function deleteWithoutFlush($entity, array $options): void
     {
         /** @var EmailUser $entity */

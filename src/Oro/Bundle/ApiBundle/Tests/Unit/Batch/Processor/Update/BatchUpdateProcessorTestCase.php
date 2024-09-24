@@ -13,6 +13,7 @@ class BatchUpdateProcessorTestCase extends \PHPUnit\Framework\TestCase
 
     protected BatchUpdateContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new BatchUpdateContext();

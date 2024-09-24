@@ -22,6 +22,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityWithFieldsProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);

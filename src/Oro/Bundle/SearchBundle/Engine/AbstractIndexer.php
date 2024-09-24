@@ -48,9 +48,7 @@ abstract class AbstractIndexer implements IndexerInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassesForReindex($class = null, array $context = [])
     {
         if (false == $class) {
@@ -70,9 +68,7 @@ abstract class AbstractIndexer implements IndexerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reindex($class = null, array $context = [])
     {
         if (false == $class) {

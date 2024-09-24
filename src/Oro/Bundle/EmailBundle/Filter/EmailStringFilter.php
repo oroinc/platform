@@ -14,9 +14,7 @@ use Oro\Bundle\FilterBundle\Filter\StringFilter;
  */
 class EmailStringFilter extends StringFilter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         /** @var $ds OrmFilterDatasourceAdapter $data */

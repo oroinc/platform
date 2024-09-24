@@ -11,49 +11,37 @@ class NormalizeString extends AbstractProcessor
 {
     public const REQUIREMENT = '.+';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDataTypeString(): string
     {
         return true === $this->getOption('allow_empty') ? 'string' : 'not empty string';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDataTypePluralString(): string
     {
         return true === $this->getOption('allow_empty') ? 'strings' : 'not empty strings';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function processRequirement(NormalizeValueContext $context): void
     {
         $context->setRequirement($this->getRequirement());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function normalizeValue(mixed $value): mixed
     {
         return $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function validateValue(string $value): void
     {
         parent::validateValue($value);

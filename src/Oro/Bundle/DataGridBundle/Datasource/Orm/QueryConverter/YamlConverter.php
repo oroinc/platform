@@ -15,9 +15,7 @@ class YamlConverter implements QueryConverterInterface
 {
     const MAX_ITERATIONS = 100;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function parse($value, ManagerRegistry $doctrine)
     {
         if (!is_array($value)) {
@@ -86,9 +84,7 @@ class YamlConverter implements QueryConverterInterface
         return $groupByHelper->getGroupByFields($groupBy, $select);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function dump(QueryBuilder $input)
     {
         return '';

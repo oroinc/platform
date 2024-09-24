@@ -16,17 +16,13 @@ class DataAccessorStub extends DataAccessor
         $this->data = $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($name): mixed
     {
         return $this->data[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($name): bool
     {
         return array_key_exists($name, $this->data);

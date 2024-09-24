@@ -22,9 +22,7 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFormatter($class, $property, $type)
     {
         switch ($type) {
@@ -62,9 +60,7 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessSorter($class, $property, $type)
     {
         if ($type === 'multiEnum') {
@@ -77,9 +73,7 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFilter($class, $property, $type)
     {
         switch ($type) {

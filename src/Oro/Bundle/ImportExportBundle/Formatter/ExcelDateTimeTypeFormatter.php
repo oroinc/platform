@@ -9,9 +9,7 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
  */
 class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTimeTypeConverterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToDateTime($value, $type)
     {
         switch ($type) {
@@ -97,9 +95,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
         return $this->convert($value, \IntlDateFormatter::NONE, $timeType, $locale, $timezone);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPattern($dateType, $timeType, $locale = null, $value = null)
     {
         $pattern = parent::getPattern($dateType, $timeType, $locale);

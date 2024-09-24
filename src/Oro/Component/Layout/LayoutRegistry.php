@@ -26,9 +26,7 @@ class LayoutRegistry implements LayoutRegistryInterface
     /** @var BlockTypeExtensionInterface[] */
     private $typeExtensions = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeNames(): array
     {
         $typeNames = [];
@@ -40,9 +38,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         return array_unique(array_merge(...$typeNames));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType($name)
     {
         if (!is_string($name)) {
@@ -70,9 +66,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         return $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeExtensions($name)
     {
         return isset($this->typeExtensions[$name])
@@ -80,9 +74,7 @@ class LayoutRegistry implements LayoutRegistryInterface
             : $this->loadTypeExtensions($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContextConfigurators()
     {
         $configurators = [];
@@ -97,9 +89,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         return $configurators;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findDataProvider($name)
     {
         if (!is_string($name)) {
@@ -124,9 +114,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         return $dataProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions($name, OptionsResolver $resolver)
     {
         $extensions = isset($this->typeExtensions[$name])
@@ -138,9 +126,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildBlock($name, BlockBuilderInterface $builder, Options $options)
     {
         $extensions = isset($this->typeExtensions[$name])
@@ -152,9 +138,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView($name, BlockView $view, BlockInterface $block, Options $options)
     {
         $extensions = isset($this->typeExtensions[$name])
@@ -166,9 +150,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView($name, BlockView $view, BlockInterface $block)
     {
         $extensions = isset($this->typeExtensions[$name])
@@ -180,9 +162,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateLayout($id, LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
         $extensions = $this->getExtensions();
@@ -196,9 +176,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $extensions = $this->getExtensions();

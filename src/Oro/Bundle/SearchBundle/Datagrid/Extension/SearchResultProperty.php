@@ -21,9 +21,7 @@ class SearchResultProperty extends TwigTemplateProperty
         $this->mappingProvider = $mappingProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue(ResultRecordInterface $record)
     {
         $entity = $record->getValue('entity');

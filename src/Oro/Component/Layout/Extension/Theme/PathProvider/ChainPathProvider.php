@@ -29,9 +29,7 @@ class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
         $this->sorted                 = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContext(ContextInterface $context)
     {
         $providers = $this->getProviders();
@@ -42,9 +40,7 @@ class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPaths(array $existingPaths)
     {
         $providers = $this->getProviders();

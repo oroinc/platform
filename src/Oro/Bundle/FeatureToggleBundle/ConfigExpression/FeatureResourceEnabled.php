@@ -38,22 +38,13 @@ class FeatureResourceEnabled extends AbstractCondition implements ContextAccesso
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'feature_resource_enabled';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Configuration examples:
-     *
-     * '@feature_resource_enabled': ['some_route', 'route']
-     * '@feature_resource_enabled': ['resource': 'some_route', 'resource_type': 'route', 'scope_identifier': $.scopeId]
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (array_key_exists('resource', $options)) {
@@ -81,9 +72,7 @@ class FeatureResourceEnabled extends AbstractCondition implements ContextAccesso
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         $params = [$this->resource, $this->resourceType];
@@ -94,9 +83,7 @@ class FeatureResourceEnabled extends AbstractCondition implements ContextAccesso
         return $this->convertToArray($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         $params = [$this->resource, $this->resourceType];
@@ -107,9 +94,7 @@ class FeatureResourceEnabled extends AbstractCondition implements ContextAccesso
         return $this->convertToPhpCode($params, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $resource = $this->resolveValue($context, $this->resource);

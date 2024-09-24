@@ -29,6 +29,7 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OwnershipMetadataProviderStub */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new OwnershipMetadataProviderStub($this);

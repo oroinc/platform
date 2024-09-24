@@ -18,17 +18,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implements Installation
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v1_14';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         // rename should not be performed during a fresh installation

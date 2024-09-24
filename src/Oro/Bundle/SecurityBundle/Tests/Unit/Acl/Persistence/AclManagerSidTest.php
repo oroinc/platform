@@ -14,6 +14,7 @@ class AclManagerSidTest extends \PHPUnit\Framework\TestCase
     /** @var AclSidManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclProvider = $this->createMock(MutableAclProvider::class);

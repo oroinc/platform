@@ -14,6 +14,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityOverrideProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityOverrideProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);

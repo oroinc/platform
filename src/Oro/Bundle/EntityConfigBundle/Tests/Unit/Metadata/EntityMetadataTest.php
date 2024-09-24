@@ -12,6 +12,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMetadata */
     private $classMetadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->classMetadata = new EntityMetadata(DemoEntity::class);

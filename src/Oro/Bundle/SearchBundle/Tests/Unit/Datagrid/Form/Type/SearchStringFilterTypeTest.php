@@ -15,6 +15,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
     /** @var SearchStringFilterType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator             = $this->createMockTranslator();
@@ -31,9 +32,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTestFormType(): AbstractType
     {
         return $this->type;
@@ -49,9 +48,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
         $this->assertEquals(TextFilterType::class, $this->type->getParent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptionsDataProvider(): array
     {
         return [
@@ -67,9 +64,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function bindDataProvider(): array
     {
         return [

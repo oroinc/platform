@@ -45,6 +45,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityReaderTestAdapter */
     private $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);

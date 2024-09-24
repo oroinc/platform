@@ -7,41 +7,31 @@ namespace Oro\Bundle\ApiBundle\Config\Extension;
  */
 abstract class AbstractConfigExtension implements ConfigExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationSections(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigureCallbacks(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPreProcessCallbacks(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPostProcessCallbacks(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationLoaders(): array
     {
         return [];

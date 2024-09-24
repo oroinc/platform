@@ -78,11 +78,13 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         $this->notificationsBag = new EmailSyncNotificationBag();
     }
 
+    #[\Override]
     public function setMessageProducer(MessageProducerInterface $producer): void
     {
         $this->producer = $producer;
     }
 
+    #[\Override]
     public function setTokenStorage(TokenStorageInterface $tokenStorage): void
     {
         $this->tokenStorage = $tokenStorage;
@@ -95,6 +97,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * @param EmailOrigin $origin
      * @return bool
      */
+    #[\Override]
     abstract public function supports(EmailOrigin $origin);
 
     /**
@@ -118,6 +121,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1): int
     {
         if (!$this->checkConfiguration()) {
@@ -188,6 +192,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      *
      * @throws \Exception
      */
+    #[\Override]
     public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null): void
     {
         if ($this->logger === null) {
@@ -224,6 +229,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      *
      * @return bool
      */
+    #[\Override]
     public function supportScheduleJob()
     {
         return false;
@@ -234,6 +240,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      *
      * @param int[] $originIds
      */
+    #[\Override]
     public function scheduleSyncOriginsJob(array $originIds)
     {
         if (! static::$messageQueueTopic) {

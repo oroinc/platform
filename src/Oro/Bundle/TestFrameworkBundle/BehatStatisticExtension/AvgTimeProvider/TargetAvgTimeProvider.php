@@ -4,9 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider
 
 class TargetAvgTimeProvider extends AbstractAvgTimeProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function calculate()
     {
         if (!$this->criteria->containsKey('target_branch')) {

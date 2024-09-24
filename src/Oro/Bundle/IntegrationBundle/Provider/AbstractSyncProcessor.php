@@ -52,9 +52,7 @@ abstract class AbstractSyncProcessor implements
         $this->setLogger($logger ?: new LoggerStrategy(new NullLogger()));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLoggerStrategy()
     {
         return $this->logger;

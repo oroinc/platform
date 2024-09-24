@@ -119,9 +119,7 @@ class MailboxHandler implements FormAwareInterface
         $this->form = $this->formFactory->create(self::FORM, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->form;

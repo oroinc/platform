@@ -67,6 +67,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configManager = $this->createMock(ConfigManager::class);

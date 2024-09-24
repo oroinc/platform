@@ -100,33 +100,25 @@ class EntityIdentifier implements \ArrayAccess
         unset($this->attributes[$name]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return $this->hasAttribute($offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         return $this->getAttribute($offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         $this->setAttribute($offset, $value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         $this->removeAttribute($offset);

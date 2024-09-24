@@ -20,9 +20,7 @@ class EnumSelectTypeStub extends EntityTypeStub
         parent::__construct($this->getEnumChoices($choices));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

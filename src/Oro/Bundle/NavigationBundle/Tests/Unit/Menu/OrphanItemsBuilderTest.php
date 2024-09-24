@@ -14,6 +14,7 @@ class OrphanItemsBuilderTest extends \PHPUnit\Framework\TestCase
 
     private OrphanItemsBuilder $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = new OrphanItemsBuilder();

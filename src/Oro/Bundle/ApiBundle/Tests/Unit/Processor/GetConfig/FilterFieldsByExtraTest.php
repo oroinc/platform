@@ -26,6 +26,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /** @var FilterFieldsByExtra */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

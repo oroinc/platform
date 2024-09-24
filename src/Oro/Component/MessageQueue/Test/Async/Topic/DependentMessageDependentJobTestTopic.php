@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DependentMessageDependentJobTestTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.message_queue.dependent_test_topic';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Test topic for dependent job from dependent message processor.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

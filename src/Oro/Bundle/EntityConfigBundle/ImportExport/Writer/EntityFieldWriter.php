@@ -33,9 +33,7 @@ class EntityFieldWriter implements ItemWriterInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items)
     {
         $translations = [];

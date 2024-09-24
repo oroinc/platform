@@ -22,6 +22,7 @@ class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
     /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $aclGroupProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

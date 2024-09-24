@@ -30,6 +30,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
     /** @var TitleService */
     private $titleService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->titleReaderRegistry = $this->createMock(TitleReaderRegistry::class);

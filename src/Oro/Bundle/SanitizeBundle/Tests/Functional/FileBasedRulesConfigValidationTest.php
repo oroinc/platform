@@ -15,6 +15,7 @@ class FileBasedRulesConfigValidationTest extends WebTestCase
 {
     private FileBasedProviderDecorator $fileBaseRulesProvider;
 
+    #[\Override]
     protected function setup(): void
     {
         $this->initClient();

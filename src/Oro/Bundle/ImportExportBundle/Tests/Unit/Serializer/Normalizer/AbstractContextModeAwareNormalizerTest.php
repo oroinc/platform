@@ -10,6 +10,7 @@ class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractContextModeAwareNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->normalizer = $this->getMockBuilder(AbstractContextModeAwareNormalizer::class)

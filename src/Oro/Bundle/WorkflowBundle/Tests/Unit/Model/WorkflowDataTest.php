@@ -15,6 +15,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowData */
     private $data;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->data = new WorkflowData();

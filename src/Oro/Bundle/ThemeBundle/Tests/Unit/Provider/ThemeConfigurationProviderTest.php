@@ -20,6 +20,7 @@ class ThemeConfigurationProviderTest extends TestCase
     private EntityManagerInterface|MockObject $em;
     private ThemeConfigurationProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

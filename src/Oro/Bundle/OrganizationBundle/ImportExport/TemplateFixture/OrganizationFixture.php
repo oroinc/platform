@@ -19,17 +19,13 @@ class OrganizationFixture extends AbstractTemplateRepository
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClass()
     {
         return 'Oro\Bundle\OrganizationBundle\Entity\Organization';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createEntity($key)
     {
         return new Organization();
@@ -39,6 +35,7 @@ class OrganizationFixture extends AbstractTemplateRepository
      * @param string       $key
      * @param Organization $entity
      */
+    #[\Override]
     public function fillEntityData($key, $entity)
     {
         switch ($key) {

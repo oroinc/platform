@@ -10,9 +10,7 @@ class LayoutRendererRegistry implements LayoutRendererRegistryInterface
     /** @var string */
     protected $defaultRendererName = '';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRenderer($name = null)
     {
         if (!$name) {
@@ -27,9 +25,7 @@ class LayoutRendererRegistry implements LayoutRendererRegistryInterface
         return $this->renderers[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasRenderer($name)
     {
         return isset($this->renderers[$name]);

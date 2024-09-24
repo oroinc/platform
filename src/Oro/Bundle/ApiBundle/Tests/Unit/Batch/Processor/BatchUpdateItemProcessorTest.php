@@ -26,6 +26,7 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var BatchUpdateItemProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);

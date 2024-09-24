@@ -29,9 +29,7 @@ class RemoveOutdatedEnumFieldQuery extends ParametrizedMigrationQuery
         $this->enumField = $enumField;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $sql = 'SELECT f.id, f.data
@@ -130,9 +128,7 @@ class RemoveOutdatedEnumFieldQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql, $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription(): string
     {
         return 'Remove outdated '. $this->enumField .' enum field data';

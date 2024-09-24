@@ -20,9 +20,7 @@ class RegisterJobsPass implements CompilerPassInterface
 {
     private ?NodeInterface $jobsConfig = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $registry = $container->getDefinition('oro_batch.connector.registry');

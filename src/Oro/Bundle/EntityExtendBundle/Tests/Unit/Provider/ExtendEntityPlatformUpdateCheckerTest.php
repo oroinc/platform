@@ -16,6 +16,7 @@ class ExtendEntityPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendEntityPlatformUpdateChecker */
     private $platformUpdateChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

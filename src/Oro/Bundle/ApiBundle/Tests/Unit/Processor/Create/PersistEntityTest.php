@@ -16,6 +16,7 @@ class PersistEntityTest extends CreateProcessorTestCase
     /** @var PersistEntity */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

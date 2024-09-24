@@ -34,9 +34,7 @@ use Oro\Bundle\ImapBundle\Mail\Headers;
  */
 abstract class HeaderWrap extends BaseHeaderWrap
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function mimeDecodeValue($value)
     {
         // unfold first, because iconv_mime_decode is discarding "\n" with no apparent reason
@@ -65,9 +63,6 @@ abstract class HeaderWrap extends BaseHeaderWrap
         return $result ? $result : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private static function isNotDecoded($originalValue, $value)
     {
         $startBlockPosition = strpos($value, '=?');

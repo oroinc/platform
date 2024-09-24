@@ -11,6 +11,7 @@ class UserApiKeyGenKeyTypeTest extends \PHPUnit\Framework\TestCase
     /** @var UserApiKeyGenKeyType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new UserApiKeyGenKeyType();

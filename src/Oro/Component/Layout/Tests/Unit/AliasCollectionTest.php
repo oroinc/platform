@@ -13,6 +13,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var AliasCollection */
     private $aliasCollection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aliasCollection = new AliasCollection();

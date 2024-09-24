@@ -10,9 +10,7 @@ use Oro\Component\EntitySerializer\EntityDataAccessor as BaseEntityDataAccessor;
  */
 class EntityDataAccessor extends BaseEntityDataAccessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createReflectionClass(string $className): \ReflectionClass
     {
         return new EntityReflectionClass($className);

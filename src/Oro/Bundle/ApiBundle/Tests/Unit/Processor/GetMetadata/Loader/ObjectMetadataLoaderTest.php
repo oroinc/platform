@@ -29,6 +29,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
     /** @var ObjectMetadataLoader */
     private $objectMetadataLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);

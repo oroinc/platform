@@ -10,6 +10,7 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var FallbackValueTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new FallbackValueTransformer();

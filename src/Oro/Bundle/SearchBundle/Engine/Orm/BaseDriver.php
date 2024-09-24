@@ -730,6 +730,7 @@ abstract class BaseDriver implements DBALPersisterInterface
     /**
      * Stores all data taken from Items given by 'writeItem' method
      */
+    #[\Override]
     public function flushWrites()
     {
         $connection = $this->getConnection();
@@ -751,6 +752,7 @@ abstract class BaseDriver implements DBALPersisterInterface
     /**
      * Adds AbstractItem of which data will be stored when 'flushWrites' method is called
      */
+    #[\Override]
     public function writeItem(AbstractItem $item)
     {
         $this->populateItem($item);

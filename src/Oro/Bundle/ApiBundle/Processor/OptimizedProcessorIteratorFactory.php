@@ -37,9 +37,7 @@ class OptimizedProcessorIteratorFactory implements
         $this->actionsWithApplicableCacheMap = array_fill_keys($actionsWithApplicableCache, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createProcessorIterator(
         array $processors,
         ComponentContextInterface $context,
@@ -68,9 +66,7 @@ class OptimizedProcessorIteratorFactory implements
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setProcessorBag(ProcessorBagInterface $processorBag): void
     {
         $this->processorBag = $processorBag;
@@ -80,9 +76,7 @@ class OptimizedProcessorIteratorFactory implements
         $this->applicableCaches = [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->applicableCaches = [];

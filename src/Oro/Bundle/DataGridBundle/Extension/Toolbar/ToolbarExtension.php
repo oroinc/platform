@@ -32,7 +32,6 @@ class ToolbarExtension extends AbstractExtension
     /** @var ConfigManager */
     private $cm;
 
-    /** {@inheritdoc} */
     protected $excludedModes = [
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
@@ -42,9 +41,7 @@ class ToolbarExtension extends AbstractExtension
         $this->cm = $cm;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $options = $config->offsetGetByPath(self::TOOLBAR_OPTION_PATH, []);
@@ -53,9 +50,7 @@ class ToolbarExtension extends AbstractExtension
         $config->offsetSetByPath(sprintf('%s[%s]', self::OPTIONS_PATH, 'toolbarOptions'), $configuration);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $result->offsetSetByPath('[options][hideToolbar]', false);
@@ -65,9 +60,7 @@ class ToolbarExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         /**

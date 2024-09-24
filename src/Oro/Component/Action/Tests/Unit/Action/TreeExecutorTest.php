@@ -13,6 +13,7 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var TreeExecutor */
     private $listAction;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listAction = new TreeExecutor();

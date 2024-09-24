@@ -18,6 +18,7 @@ class GetImportExportConfigurationExtensionTest extends \PHPUnit\Framework\TestC
     /** @var GetImportExportConfigurationExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationRegistry = $this->createMock(ImportExportConfigurationRegistryInterface::class);

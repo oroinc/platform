@@ -10,6 +10,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
     private ContainerBuilder $container;
     private OroLayoutExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

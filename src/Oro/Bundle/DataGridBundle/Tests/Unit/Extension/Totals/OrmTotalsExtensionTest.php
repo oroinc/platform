@@ -41,6 +41,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
     /** @var OrmTotalsExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = self::createMock(TranslatorInterface::class);

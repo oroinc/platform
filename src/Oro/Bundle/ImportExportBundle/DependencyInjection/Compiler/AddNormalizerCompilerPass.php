@@ -14,6 +14,7 @@ class AddNormalizerCompilerPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $serializerDef = $container->getDefinition('oro_importexport.serializer');

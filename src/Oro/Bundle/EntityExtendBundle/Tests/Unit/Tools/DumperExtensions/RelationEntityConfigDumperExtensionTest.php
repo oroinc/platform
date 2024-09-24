@@ -27,6 +27,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
     /** @var array */
     private $configs = [];
 
+    #[\Override]
     protected function setUp(): void
     {
         $configManager = $this->createMock(ConfigManager::class);

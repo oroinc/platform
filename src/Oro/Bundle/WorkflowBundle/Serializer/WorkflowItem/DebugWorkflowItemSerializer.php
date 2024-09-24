@@ -17,9 +17,7 @@ class DebugWorkflowItemSerializer implements WorkflowItemSerializerInterface
         $this->innerSerializer = $innerSerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function serialize(WorkflowItem $workflowItem): array
     {
         $serializedWorkflowItem = $this->innerSerializer->serialize($workflowItem);

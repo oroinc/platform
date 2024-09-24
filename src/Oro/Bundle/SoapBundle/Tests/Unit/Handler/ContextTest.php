@@ -26,6 +26,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /** @var Context */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->request = Request::create('test_uri');

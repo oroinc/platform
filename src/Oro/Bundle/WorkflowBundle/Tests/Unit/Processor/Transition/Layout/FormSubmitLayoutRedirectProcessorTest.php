@@ -17,6 +17,7 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
 {
     private FormSubmitLayoutRedirectProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $sameSiteUrlHelper = $this->createMock(SameSiteUrlHelper::class);

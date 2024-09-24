@@ -24,9 +24,7 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
     /** @var array [mask => group mask, ...] */
     private $permissionGroupMasks = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAccessLevel($mask, $permission = null, $object = null)
     {
         if (0 === $mask) {
@@ -40,9 +38,7 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
         return $this->getAccessLevelForMask($mask);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
         if ($mask === null) {
@@ -63,9 +59,7 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPermissionGroupMask($mask)
     {
         if (\array_key_exists($mask, $this->permissionGroupMasks)) {
@@ -85,9 +79,7 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function adaptRootMask($rootMask, $object)
     {
         $permissions = $this->getPermissions($rootMask, true);
@@ -119,9 +111,7 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
         return $rootMask;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validateMask($mask, $object, $permission = null)
     {
         if (0 === $mask) {
@@ -143,17 +133,13 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
         throw $this->createInvalidAclMaskException($mask, $object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaskBuilder($permission)
     {
         return clone $this->maskBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllMaskBuilders()
     {
         return [clone $this->maskBuilder];

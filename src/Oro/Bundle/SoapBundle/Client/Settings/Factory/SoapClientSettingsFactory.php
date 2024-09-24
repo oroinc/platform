@@ -7,9 +7,7 @@ use Oro\Bundle\SoapBundle\Client\Settings\SoapClientSettingsInterface;
 
 class SoapClientSettingsFactory implements SoapClientSettingsFactoryInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function create(
         $wsdlFilePath,
         string $methodName,

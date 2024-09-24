@@ -31,6 +31,7 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
     /** @var OptimizedProcessorBag */
     private $processorBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);

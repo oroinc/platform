@@ -108,9 +108,7 @@ class AclAttributeProvider extends PhpConfigProvider
         return $this->getStorage()->isKnownMethod($class, $method);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $storage = new AclAttributeStorage();
@@ -132,9 +130,7 @@ class AclAttributeProvider extends PhpConfigProvider
         return $storage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function assertLoaderConfig($config): void
     {
         if (!$config instanceof AclAttributeStorage) {

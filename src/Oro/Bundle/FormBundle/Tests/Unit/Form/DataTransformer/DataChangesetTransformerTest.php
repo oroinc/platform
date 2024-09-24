@@ -10,6 +10,7 @@ class DataChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 {
     private DataChangesetTransformer $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new DataChangesetTransformer();

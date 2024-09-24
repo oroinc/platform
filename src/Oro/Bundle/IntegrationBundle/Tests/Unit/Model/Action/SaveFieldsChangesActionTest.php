@@ -15,6 +15,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
     /** @var SaveFieldsChangesAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $contextAccessor = new ContextAccessor();

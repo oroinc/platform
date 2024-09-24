@@ -13,17 +13,13 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class BasicMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [BasicMessageTestTopic::getName()];

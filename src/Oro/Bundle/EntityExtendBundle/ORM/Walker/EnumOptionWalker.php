@@ -13,9 +13,7 @@ class EnumOptionWalker extends TreeWalkerAdapter
 {
     private const HINT = 'oro_entity_extend.enum_option';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST): void
     {
         /** @var Query $query */

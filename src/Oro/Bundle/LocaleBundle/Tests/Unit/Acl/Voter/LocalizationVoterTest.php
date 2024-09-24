@@ -27,6 +27,7 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationVoter */
     private $voter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(LocalizationRepository::class);

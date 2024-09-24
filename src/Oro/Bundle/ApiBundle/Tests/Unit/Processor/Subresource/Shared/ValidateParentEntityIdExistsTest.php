@@ -11,6 +11,7 @@ class ValidateParentEntityIdExistsTest extends GetSubresourceProcessorTestCase
     /** @var ValidateParentEntityIdExists */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -51,6 +51,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
     /** @var TestEmailSynchronizer */
     private $sync;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

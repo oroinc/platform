@@ -26,9 +26,7 @@ class TwigTemplateRenderer implements TemplateRendererInterface
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function render($template)
     {
         $templateWrapper = $this->env->createTemplate($template);

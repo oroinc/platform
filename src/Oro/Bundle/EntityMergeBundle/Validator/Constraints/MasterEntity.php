@@ -11,9 +11,7 @@ class MasterEntity extends Constraint
 {
     public string $message = 'Add entity before setting it as master.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

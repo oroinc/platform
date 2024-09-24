@@ -20,6 +20,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
  */
 final class ThemeConfigurationTypeTest extends FormIntegrationTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeConfigurationSubscriber = $this->createMock(ThemeConfigurationSubscriber::class);
@@ -148,6 +149,7 @@ final class ThemeConfigurationTypeTest extends FormIntegrationTestCase
         );
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         $themeConfigurationProvider = $this->createMock(ThemeConfigurationProvider::class);

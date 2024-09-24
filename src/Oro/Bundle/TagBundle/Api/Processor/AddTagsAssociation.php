@@ -21,9 +21,7 @@ class AddTagsAssociation implements ProcessorInterface
         $this->taggableHelper = $taggableHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

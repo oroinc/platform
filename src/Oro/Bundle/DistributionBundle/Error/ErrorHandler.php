@@ -9,6 +9,7 @@ use Symfony\Component\ErrorHandler\ErrorHandler as BaseErrorHandler;
  */
 class ErrorHandler extends BaseErrorHandler
 {
+    #[\Override]
     public static function register(BaseErrorHandler $handler = null, bool $replace = true): BaseErrorHandler
     {
         $errorLevel = error_reporting();
@@ -18,9 +19,7 @@ class ErrorHandler extends BaseErrorHandler
         return parent::register($handler, $replace);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleError(int $type, string $message, string $file, int $line): bool
     {
         if (error_reporting() !== 0) {

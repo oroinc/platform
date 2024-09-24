@@ -35,9 +35,7 @@ class EmailAssociationsDemoDataFixturesListener extends AbstractDemoDataFixtures
         $this->emailAddressVisibilityManager = $emailAddressVisibilityManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function afterEnableListeners(MigrationDataFixturesEvent $event)
     {
         $event->log('updating email owners');

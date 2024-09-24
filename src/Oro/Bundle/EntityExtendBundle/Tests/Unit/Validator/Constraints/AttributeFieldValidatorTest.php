@@ -20,6 +20,7 @@ class AttributeFieldValidatorTest extends ConstraintValidatorTestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeConfigProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
@@ -27,6 +28,7 @@ class AttributeFieldValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new AttributeFieldValidator(

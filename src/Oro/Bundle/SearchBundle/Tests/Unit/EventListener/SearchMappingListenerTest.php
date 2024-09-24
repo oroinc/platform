@@ -12,6 +12,7 @@ class SearchMappingListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $searchMappingProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(SearchMappingProvider::class);

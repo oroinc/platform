@@ -21,9 +21,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
 {
     private array $contextListeners = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         // configure the firewall map service to be able to disable listeners if API feature is disabled

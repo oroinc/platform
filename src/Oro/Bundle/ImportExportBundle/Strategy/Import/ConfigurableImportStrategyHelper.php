@@ -25,6 +25,7 @@ class ConfigurableImportStrategyHelper extends ImportStrategyHelper
 
     private ?EventDispatcherInterface $eventDispatcher = null;
 
+    #[\Override]
     public function importEntity($databaseEntity, $importedEntity, array $excludedProperties = []): void
     {
         parent::importEntity($databaseEntity, $importedEntity, $excludedProperties);
@@ -34,6 +35,7 @@ class ConfigurableImportStrategyHelper extends ImportStrategyHelper
         }
     }
 
+    #[\Override]
     protected function processImportedEntityProperty(
         object $targetEntity,
         object $sourceEntity,
@@ -179,6 +181,7 @@ class ConfigurableImportStrategyHelper extends ImportStrategyHelper
         return $classMetadata->getIdentifierValues($object);
     }
 
+    #[\Override]
     public function validateEntity($entity, $constraints = null, $groups = null)
     {
         $violations = $this->validator->validate($entity, $constraints, $groups);

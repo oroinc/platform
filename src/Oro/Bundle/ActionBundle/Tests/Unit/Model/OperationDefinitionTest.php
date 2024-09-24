@@ -12,6 +12,7 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var OperationDefinition */
     private $definition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->definition = new OperationDefinition();

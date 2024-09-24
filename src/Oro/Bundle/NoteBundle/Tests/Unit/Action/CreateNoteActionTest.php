@@ -29,6 +29,7 @@ class CreateNoteActionTest extends \PHPUnit\Framework\TestCase
     /** @var CreateNoteAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

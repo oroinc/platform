@@ -36,9 +36,7 @@ class LoadLanguageDemoData extends AbstractFixture
         self::LANG_FR_CA => 'fr_CA'
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var EntityManager $manager */

@@ -13,6 +13,7 @@ class IsCaptchaVerifiedValidatorTest extends ConstraintValidatorTestCase
 {
     private CaptchaServiceRegistry|MockObject $captchaServiceRegistry;
 
+    #[\Override]
     protected function createValidator()
     {
         $this->captchaServiceRegistry = $this->createMock(CaptchaServiceRegistry::class);

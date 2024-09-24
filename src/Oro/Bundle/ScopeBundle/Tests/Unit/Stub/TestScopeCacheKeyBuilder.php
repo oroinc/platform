@@ -10,9 +10,7 @@ class TestScopeCacheKeyBuilder implements ScopeCacheKeyBuilderInterface
 {
     use ScopeCacheKeyBuilderTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCacheKey(ScopeCriteria $criteria): ?string
     {
         return $this->buildCacheKey($criteria, 'testParam');

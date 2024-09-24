@@ -28,6 +28,7 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $product = new Product();

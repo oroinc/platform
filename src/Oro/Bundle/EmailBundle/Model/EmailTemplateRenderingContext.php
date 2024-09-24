@@ -20,6 +20,7 @@ class EmailTemplateRenderingContext extends ParameterBag implements ResetInterfa
         }
     }
 
+    #[\Override]
     public function reset(): void
     {
         $this->clear();

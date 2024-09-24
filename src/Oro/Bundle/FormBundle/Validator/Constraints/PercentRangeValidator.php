@@ -14,9 +14,7 @@ class PercentRangeValidator extends ConstraintValidator
 {
     private const COMPARISON_PRECISION = 12;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof PercentRange) {

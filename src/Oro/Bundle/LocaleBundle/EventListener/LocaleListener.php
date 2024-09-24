@@ -110,6 +110,7 @@ class LocaleListener implements EventSubscriberInterface
         $this->translatableListener->setTranslatableLocale($language);
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

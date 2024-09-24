@@ -8,6 +8,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserACLData;
 
 class PermissionConfigurableTest extends AbstractPermissionConfigurableTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -17,9 +18,7 @@ class PermissionConfigurableTest extends AbstractPermissionConfigurableTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurablePermissionCapabilitiesProvider(): array
     {
         return [
@@ -59,9 +58,7 @@ class PermissionConfigurableTest extends AbstractPermissionConfigurableTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurablePermissionEntitiesProvider(): array
     {
         return [
@@ -122,25 +119,19 @@ class PermissionConfigurableTest extends AbstractPermissionConfigurableTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRole(): AbstractRole
     {
         return $this->getReference(LoadUserACLData::ROLE_SYSTEM);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getGridName(): string
     {
         return 'role-permission-grid';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRouteName(): string
     {
         return 'oro_user_role_view';

@@ -17,6 +17,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeFamilyFormViewListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

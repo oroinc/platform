@@ -12,6 +12,7 @@ class JsonAggTest extends WebTestCase
 {
     private EntityManager $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = self::getContainer()->get('doctrine')->getManagerForClass(TestDecimalEntity::class);

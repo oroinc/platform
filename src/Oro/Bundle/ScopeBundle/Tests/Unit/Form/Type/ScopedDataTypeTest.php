@@ -17,6 +17,7 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
 
     private ScopedDataType $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $em = $this->createMock(EntityManager::class);
@@ -37,9 +38,7 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

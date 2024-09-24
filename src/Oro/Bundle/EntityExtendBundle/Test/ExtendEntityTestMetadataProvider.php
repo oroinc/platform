@@ -11,17 +11,13 @@ use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProviderInter
  */
 class ExtendEntityTestMetadataProvider implements ExtendEntityMetadataProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExtendEntityMetadata(string $class): ?ConfigInterface
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExtendEntityFieldsMetadata(string $class): array
     {
         return [];

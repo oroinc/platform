@@ -9,6 +9,7 @@ class DateTimeToCronFormatTransformer implements DateTimeToStringTransformerInte
      *
      * @return string
      */
+    #[\Override]
     public function transform(\DateTime $dateTime)
     {
         return sprintf(
@@ -25,6 +26,7 @@ class DateTimeToCronFormatTransformer implements DateTimeToStringTransformerInte
      *
      * @return \DateTime|null
      */
+    #[\Override]
     public function reverseTransform($string)
     {
         $dateTime = \DateTime::createFromFormat('i H d m *', $string, new \DateTimeZone('UTC'));

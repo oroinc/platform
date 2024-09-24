@@ -24,6 +24,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
     /** @var RoleMultiSelectType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
@@ -104,9 +105,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $searchHandler = $this->createMock(SearchHandlerInterface::class);

@@ -27,9 +27,7 @@ class RenameAttachmentAssociation implements
     use RenameExtensionAwareTrait;
     use ExtendNameGeneratorAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $helper = new RenameExtendedManyToOneAssociation20(

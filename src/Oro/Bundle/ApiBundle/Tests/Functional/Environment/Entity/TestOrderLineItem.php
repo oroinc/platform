@@ -51,9 +51,6 @@ class TestOrderLineItem implements TestFrameworkEntityInterface
         $this->order = $order;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProduct()
     {
         return $this->product;

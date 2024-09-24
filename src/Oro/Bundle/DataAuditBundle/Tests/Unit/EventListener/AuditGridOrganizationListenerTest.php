@@ -24,6 +24,7 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

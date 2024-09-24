@@ -21,9 +21,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
         $this->configCache = $configCache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityAlias($entityClass)
     {
         $this->ensureInitialized();
@@ -44,9 +42,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
         return new EntityAlias($aliases['alias'], $aliases['plural_alias']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassNames(): array
     {
         $this->ensureInitialized();

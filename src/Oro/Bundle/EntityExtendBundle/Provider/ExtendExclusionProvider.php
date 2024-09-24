@@ -21,9 +21,7 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredEntity($className)
     {
         if (!$this->configManager->hasConfig($className)) {
@@ -35,9 +33,7 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         if (!$this->configManager->hasConfig($metadata->name, $fieldName)) {
@@ -49,9 +45,7 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         if (!$this->configManager->hasConfig($metadata->name, $associationName)) {

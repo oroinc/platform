@@ -23,9 +23,7 @@ class AclAttributeLoader implements AclAttributeLoaderInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(AclAttributeStorage $storage, ResourcesContainerInterface $resourcesContainer): void
     {
         $controllerActions = [];

@@ -15,6 +15,7 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $virtualRelationsConfig;
 
+    #[\Override]
     protected function setUp(): void
     {
         $hierarchy = [

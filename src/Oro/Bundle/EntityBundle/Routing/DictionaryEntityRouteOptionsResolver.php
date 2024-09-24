@@ -52,9 +52,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
         $this->exclusions[] = $entityClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
         if ($route->getOption('group') !== self::ROUTE_GROUP) {

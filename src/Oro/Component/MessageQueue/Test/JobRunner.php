@@ -30,9 +30,7 @@ class JobRunner extends BaseJobRunner
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function runUnique($ownerId, $jobName, \Closure $runCallback)
     {
         $this->runUniqueJobs[] = ['ownerId' => $ownerId, 'jobName' => $jobName, 'runCallback' => $runCallback];
@@ -40,9 +38,7 @@ class JobRunner extends BaseJobRunner
         return call_user_func($runCallback, $this, new Job());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function runUniqueByMessage($message, \Closure $runCallback)
     {
         $jobName = $this->getJobNameByMessage($message);
@@ -50,9 +46,7 @@ class JobRunner extends BaseJobRunner
         return $this->runUnique($message->getMessageId(), $jobName, $runCallback);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getJobNameByMessage($message): string
     {
         $jobName = $message->getProperty(JobAwareTopicInterface::UNIQUE_JOB_NAME);
@@ -60,10 +54,10 @@ class JobRunner extends BaseJobRunner
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return mixed
      */
+    #[\Override]
     public function createDelayed($jobName, \Closure $startCallback)
     {
         $this->createDelayedJobs[] = ['jobName' => $jobName, 'runCallback' => $startCallback];
@@ -72,10 +66,10 @@ class JobRunner extends BaseJobRunner
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return mixed
      */
+    #[\Override]
     public function runDelayed($jobId, \Closure $runCallback)
     {
         $this->runDelayedJobs[] = ['jobId' => $jobId, 'runCallback' => $runCallback];

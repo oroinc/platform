@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RemoveConfigParameterCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         DependencyInjectionUtil::removeConfig($container);

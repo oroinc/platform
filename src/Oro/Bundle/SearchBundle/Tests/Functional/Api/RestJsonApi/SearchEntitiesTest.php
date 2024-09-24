@@ -16,6 +16,7 @@ class SearchEntitiesTest extends RestJsonApiTestCase
 {
     use RolePermissionExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

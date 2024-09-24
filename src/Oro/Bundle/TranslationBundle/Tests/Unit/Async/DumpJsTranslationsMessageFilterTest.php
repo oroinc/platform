@@ -10,6 +10,7 @@ class DumpJsTranslationsMessageFilterTest extends \PHPUnit\Framework\TestCase
 {
     private DumpJsTranslationsMessageFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filter = new DumpJsTranslationsMessageFilter();

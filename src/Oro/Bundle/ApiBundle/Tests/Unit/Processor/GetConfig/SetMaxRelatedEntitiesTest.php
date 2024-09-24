@@ -16,6 +16,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
     /** @var SetMaxRelatedEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -16,6 +16,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

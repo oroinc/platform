@@ -10,9 +10,7 @@ class ClientCompilerPass implements CompilerPassInterface
 {
     const CLIENT_SERVICE = 'test.client';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition(self::CLIENT_SERVICE)) {

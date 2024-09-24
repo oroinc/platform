@@ -12,9 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SetSuccessResponseStatusCode implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var OptionsContext $context */

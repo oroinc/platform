@@ -28,9 +28,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
         $this->alwaysString = $alwaysString;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform(mixed $id, EntityMetadata $metadata): mixed
     {
         if (ExtendHelper::isOutdatedEnumOptionEntity($metadata->getClassName())) {
@@ -44,9 +42,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
         return $this->alwaysString ? (string)$id : $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed
     {
         if (ExtendHelper::isOutdatedEnumOptionEntity($metadata->getClassName())) {

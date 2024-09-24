@@ -13,8 +13,8 @@ class ParameterBagNormalizer extends AbstractObjectNormalizer
     /**
      * @param ParameterBag $object
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
         return $object->get($attribute);
@@ -23,8 +23,8 @@ class ParameterBagNormalizer extends AbstractObjectNormalizer
     /**
      * @param ParameterBag $object
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function extractAttributes($object, $format = null, array $context = []): array
     {
         return $object->keys();
@@ -33,16 +33,14 @@ class ParameterBagNormalizer extends AbstractObjectNormalizer
     /**
      * @param ParameterBag $object
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
         $object->set($attribute, $value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof ParameterBag;

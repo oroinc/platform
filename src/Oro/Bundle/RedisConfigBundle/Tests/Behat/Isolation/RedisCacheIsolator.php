@@ -34,50 +34,50 @@ class RedisCacheIsolator implements IsolatorInterface
         $this->knownClients = $knownClients;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
         return \getenv(self::REDIS_ENABLED_ENV_VAR) === 'REDIS' && (bool)$this->knownClients;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName()
     {
         return 'Redis';
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
         $event->writeln('<info>Save Redis state</info>');
         $event->writeln($this->buildMessage($this->saveRedisState(), __FUNCTION__));
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         $event->writeln('<info>Restore Redis state</info>');
         $event->writeln($this->buildMessage($this->restoreRedisState(), __FUNCTION__));
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function terminate(AfterFinishTestsEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function restoreState(RestoreStateEvent $event)
     {
         $event->writeln('<info>Restore Redis state</info>');
         $event->writeln($this->buildMessage($this->restoreRedisState(), __FUNCTION__));
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isOutdatedState()
     {
         foreach ($this->getManipulators() as $manipulator) {
@@ -90,7 +90,7 @@ class RedisCacheIsolator implements IsolatorInterface
         return false;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTag()
     {
         return 'cache';

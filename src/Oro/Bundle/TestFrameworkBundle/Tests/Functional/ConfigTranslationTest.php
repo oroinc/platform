@@ -21,9 +21,7 @@ class ConfigTranslationTest extends WebTestCase
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

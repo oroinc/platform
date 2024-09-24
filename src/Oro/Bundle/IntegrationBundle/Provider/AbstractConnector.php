@@ -41,9 +41,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
         $this->contextMediator = $contextMediator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeFromContext(ContextInterface $context)
     {
         $this->transport = $this->contextMediator->getTransport($context, true);
@@ -76,6 +74,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
      *
      * @return bool
      */
+    #[\Override]
     public function supportsForceSync()
     {
         return false;

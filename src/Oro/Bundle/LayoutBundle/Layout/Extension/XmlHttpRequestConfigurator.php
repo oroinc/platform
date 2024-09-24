@@ -27,6 +27,7 @@ class XmlHttpRequestConfigurator implements ContextConfiguratorInterface
         $this->routes = $routes;
     }
 
+    #[\Override]
     public function configureContext(ContextInterface $context): void
     {
         if (!in_array($this->getRoute(), $this->routes, true)) {

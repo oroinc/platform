@@ -11,6 +11,7 @@ class LoadSegmentTypes extends AbstractFixture
     /**
      * Load available segment types
      */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $types = [SegmentType::TYPE_DYNAMIC, SegmentType::TYPE_STATIC];

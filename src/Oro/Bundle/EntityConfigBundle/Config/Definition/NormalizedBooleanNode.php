@@ -9,9 +9,7 @@ use Symfony\Component\Config\Definition\BooleanNode;
  */
 class NormalizedBooleanNode extends BooleanNode
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function preNormalize($value): bool
     {
         return (bool)$value;

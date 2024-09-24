@@ -12,6 +12,7 @@ class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var GridParamsExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension  = new GridParamsExtension();

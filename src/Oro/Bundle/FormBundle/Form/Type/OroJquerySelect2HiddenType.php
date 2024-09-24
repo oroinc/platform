@@ -46,9 +46,7 @@ class OroJquerySelect2HiddenType extends AbstractType
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $defaultConfig = [
@@ -188,6 +186,7 @@ class OroJquerySelect2HiddenType extends AbstractType
     /**
      * Set data-title attribute to element to show selected value
      */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         parent::buildView($view, $form, $options);
@@ -217,25 +216,18 @@ class OroJquerySelect2HiddenType extends AbstractType
         $view->vars = array_replace_recursive($view->vars, $vars);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return Select2HiddenType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_jqueryselect2_hidden';

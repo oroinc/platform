@@ -34,6 +34,7 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
     /** @var DigitalAssetType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
@@ -166,9 +167,7 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
         self::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -193,9 +192,7 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getTypeExtensions(): array
     {
         return array_merge(

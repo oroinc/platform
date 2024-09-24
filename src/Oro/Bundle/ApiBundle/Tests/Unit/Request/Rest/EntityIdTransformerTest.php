@@ -15,6 +15,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);

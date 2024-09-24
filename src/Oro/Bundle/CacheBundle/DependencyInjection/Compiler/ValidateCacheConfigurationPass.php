@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class ValidateCacheConfigurationPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $methodCalls = $container->getDefinition(CacheConfigurationPass::MANAGER_SERVICE_KEY)->getMethodCalls();

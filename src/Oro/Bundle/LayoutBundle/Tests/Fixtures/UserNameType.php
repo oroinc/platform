@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class UserNameType extends AbstractType
 {
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -15,9 +16,7 @@ class UserNameType extends AbstractType
             ->add('lastName', TextType::class, ['required' => true, 'label' => 'Last Name']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'user_name';

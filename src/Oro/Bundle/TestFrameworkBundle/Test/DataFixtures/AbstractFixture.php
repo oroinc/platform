@@ -60,25 +60,25 @@ abstract class AbstractFixture extends BaseAbstractFixture implements ContainerA
         }
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function setReference($name, $object)
     {
         $this->getReferenceRepositoryByClass(get_class($object))->setReference($name, $object);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function addReference($name, $object)
     {
         $this->getReferenceRepositoryByClass(get_class($object))->addReference($name, $object);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getReference($name, string $class = null)
     {
         return $this->getReferenceRepositoryByClass($class)->getReference($name, $class);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function hasReference($name, ?string $class = null)
     {
         return $this->getReferenceRepositoryByClass($class)->hasReference($name, $class);
@@ -247,9 +247,7 @@ abstract class AbstractFixture extends BaseAbstractFixture implements ContainerA
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;

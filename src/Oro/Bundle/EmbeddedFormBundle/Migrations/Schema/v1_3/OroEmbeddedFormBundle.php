@@ -9,9 +9,7 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\SetOwnershipTypeQuery;
 
 class OroEmbeddedFormBundle implements Migration
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->addOwner($schema);

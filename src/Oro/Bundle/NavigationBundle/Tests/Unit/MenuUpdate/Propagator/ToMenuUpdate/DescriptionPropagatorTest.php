@@ -20,6 +20,7 @@ class DescriptionPropagatorTest extends \PHPUnit\Framework\TestCase
 
     private DescriptionPropagator $propagator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->menuUpdateHelper = $this->createMock(MenuUpdateHelper::class);

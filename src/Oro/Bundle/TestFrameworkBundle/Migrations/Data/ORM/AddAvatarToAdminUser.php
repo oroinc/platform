@@ -17,9 +17,7 @@ class AddAvatarToAdminUser extends AbstractFixture implements ContainerAwareInte
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -27,9 +25,7 @@ class AddAvatarToAdminUser extends AbstractFixture implements ContainerAwareInte
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var UserManager $userManager */

@@ -56,9 +56,7 @@ class EntityCreationTransformer extends EntityToIdTransformer
         $this->allowEmptyProperty = $allowEmptyProperty;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {
@@ -74,9 +72,7 @@ class EntityCreationTransformer extends EntityToIdTransformer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createPropertyAccessor()
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();

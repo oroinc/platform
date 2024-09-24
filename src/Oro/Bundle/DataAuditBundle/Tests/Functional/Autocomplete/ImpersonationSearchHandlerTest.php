@@ -29,6 +29,7 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     /** @var AuditEntityMapper */
     private $auditEntityMapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

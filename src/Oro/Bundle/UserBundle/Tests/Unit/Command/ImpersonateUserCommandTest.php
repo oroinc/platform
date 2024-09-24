@@ -88,6 +88,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);

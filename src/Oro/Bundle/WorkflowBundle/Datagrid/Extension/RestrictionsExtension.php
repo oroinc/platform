@@ -35,17 +35,13 @@ class RestrictionsExtension extends AbstractExtension
         $this->restrictionsManager = $restrictionManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return 10;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -84,9 +80,7 @@ class RestrictionsExtension extends AbstractExtension
         return $this->entityClassName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $rows    = $result->getData();
@@ -169,9 +163,7 @@ class RestrictionsExtension extends AbstractExtension
         return $entityRestrictions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $properties = $config->offsetGetByPath(self::PROPERTIES_PATH, []);

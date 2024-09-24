@@ -29,9 +29,7 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
         $this->entityConfigMerger = $entityConfigMerger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassNames(string $version): array
     {
         $result = [];
@@ -42,9 +40,7 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
         return array_unique(array_merge(...$result));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfig(string $className, string $version): ?array
     {
         $cacheKey = $className . '|' . $version;
@@ -80,9 +76,7 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         foreach ($this->configBags as $configBag) {

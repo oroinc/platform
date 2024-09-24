@@ -15,6 +15,7 @@ class MaterializedViewByQueryFactoryTest extends OrmTestCase
     private EntityManagerInterface $em;
     private MaterializedViewByQueryFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

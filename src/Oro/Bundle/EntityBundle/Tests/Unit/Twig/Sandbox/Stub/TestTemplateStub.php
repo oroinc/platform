@@ -27,33 +27,25 @@ class TestTemplateStub extends Template
         $this->template = $template;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doDisplay(array $context, array $blocks = [])
     {
         echo $this->template;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDebugInfo()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSourceContext()
     {
         return new Source('stub', 'stub');

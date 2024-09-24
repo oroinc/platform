@@ -20,6 +20,7 @@ class SyncIntegrationProcessorTest extends WebTestCase
 
     private EntityManagerInterface $channelManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

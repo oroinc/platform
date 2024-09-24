@@ -93,9 +93,7 @@ class LoadSegmentWithToManyFiltersData extends AbstractLoadSegmentData
         ]
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getSegmentsData(): array
     {
         return self::$segments;

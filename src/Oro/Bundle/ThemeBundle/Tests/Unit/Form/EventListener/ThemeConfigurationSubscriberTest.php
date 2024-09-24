@@ -40,6 +40,7 @@ class ThemeConfigurationSubscriberTest extends TestCase
         ],
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = $this->createMock(ThemeConfigurationProvider::class);

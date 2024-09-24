@@ -14,6 +14,7 @@ class AclPrivilegeIdentityTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AclPrivilegeIdentityType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new AclPrivilegeIdentityType();

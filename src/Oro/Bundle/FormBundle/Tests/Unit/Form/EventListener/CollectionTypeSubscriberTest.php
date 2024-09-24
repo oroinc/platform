@@ -17,6 +17,7 @@ class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private CollectionTypeSubscriber $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = new CollectionTypeSubscriber();

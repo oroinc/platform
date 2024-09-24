@@ -19,11 +19,13 @@ class DigitsMaskProcessor implements ProcessorInterface
     ) {
     }
 
+    #[\Override]
     public static function getProcessorName(): string
     {
         return 'digits_mask';
     }
 
+    #[\Override]
     public function getIncompatibilityMessages(
         string $fieldName,
         ClassMetadata $metadata,
@@ -41,9 +43,7 @@ class DigitsMaskProcessor implements ProcessorInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSqls(
         string $fieldName,
         ClassMetadata $metadata,

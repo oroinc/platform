@@ -22,6 +22,7 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
     /** @var PrepareResultItemListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);

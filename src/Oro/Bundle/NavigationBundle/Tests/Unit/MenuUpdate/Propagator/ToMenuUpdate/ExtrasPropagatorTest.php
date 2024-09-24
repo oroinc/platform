@@ -16,6 +16,7 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
 
     private ExtrasPropagator $propagator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propagator = new ExtrasPropagator(new PropertyAccessor());

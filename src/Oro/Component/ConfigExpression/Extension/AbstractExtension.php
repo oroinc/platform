@@ -20,9 +20,7 @@ class AbstractExtension implements ExtensionInterface
      */
     private $expressions;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExpression($name)
     {
         if (null === $this->expressions) {
@@ -38,9 +36,7 @@ class AbstractExtension implements ExtensionInterface
         return $this->expressions[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasExpression($name)
     {
         if (null === $this->expressions) {

@@ -13,9 +13,7 @@ class ImpersonationLoginSourceProvider implements
     LoginSourceProviderForFailedRequestInterface,
     LoginSourceProviderForSuccessRequestInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLoginSourceForFailedRequest(
         AuthenticatorInterface $authenticator,
         \Exception $exception
@@ -27,9 +25,7 @@ class ImpersonationLoginSourceProvider implements
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLoginSourceForSuccessRequest(TokenInterface $token): ?string
     {
         if (is_a($token, ImpersonationTokenInterface::class)) {

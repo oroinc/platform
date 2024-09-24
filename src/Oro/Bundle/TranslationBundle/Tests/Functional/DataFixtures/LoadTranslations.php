@@ -28,17 +28,13 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
 
     const TRANSLATION_KEY_DOMAIN = 'test_domain';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadLanguages::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->createTranslationKey($manager, self::TRANSLATION_KEY_1, self::TRANSLATION_KEY_DOMAIN);

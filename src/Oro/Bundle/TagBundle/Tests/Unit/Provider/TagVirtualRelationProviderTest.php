@@ -20,6 +20,7 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TagVirtualRelationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->taggableHelper = $this->createMock(TaggableHelper::class);

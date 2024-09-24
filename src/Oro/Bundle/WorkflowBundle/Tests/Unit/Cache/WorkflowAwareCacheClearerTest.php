@@ -13,6 +13,7 @@ class WorkflowAwareCacheClearerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAwareCacheClearer */
     private $clearer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowAwareCache = $this->createMock(WorkflowAwareCache::class);

@@ -35,6 +35,7 @@ class NoteManagerTest extends TestCase
 
     private NoteManager $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

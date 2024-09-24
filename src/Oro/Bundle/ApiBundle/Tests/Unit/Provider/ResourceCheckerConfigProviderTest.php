@@ -12,6 +12,7 @@ class ResourceCheckerConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     private ResourceCheckerConfigProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new ResourceCheckerConfigProvider(

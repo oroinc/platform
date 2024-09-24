@@ -15,6 +15,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
     protected EntityDataAccessor $entityDataAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityDataAccessor = $this->createEntityDataAccessor();

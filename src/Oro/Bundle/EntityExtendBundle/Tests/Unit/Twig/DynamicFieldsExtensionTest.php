@@ -53,6 +53,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DynamicFieldsExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configManager = $this->createMock(ConfigManager::class);

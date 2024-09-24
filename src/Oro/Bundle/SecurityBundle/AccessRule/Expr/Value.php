@@ -30,9 +30,7 @@ class Value implements ExpressionInterface
         return $this->value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visit(Visitor $visitor)
     {
         return $visitor->walkValue($this);

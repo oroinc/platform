@@ -49,9 +49,7 @@ class LocaleSettings extends BaseLocaleSettings
         $this->currencyProvider = $currencyProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCurrencySymbolByCurrency(string $currencyCode = null, string $locale = null): string
     {
         // Returns currency ISO code when view type is `iso_code` or currency is not enabled.

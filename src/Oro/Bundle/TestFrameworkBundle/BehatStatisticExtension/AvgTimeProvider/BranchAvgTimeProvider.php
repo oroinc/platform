@@ -4,9 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider
 
 class BranchAvgTimeProvider extends AbstractAvgTimeProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function calculate()
     {
         $branch = $this->criteria->get('branch_name') ?: $this->criteria->get('single_branch_name');

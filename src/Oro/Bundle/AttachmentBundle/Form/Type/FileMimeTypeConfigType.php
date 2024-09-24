@@ -7,9 +7,7 @@ namespace Oro\Bundle\AttachmentBundle\Form\Type;
  */
 class FileMimeTypeConfigType extends MimeTypeConfigType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_attachment_mime_types_file';

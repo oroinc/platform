@@ -31,6 +31,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
         $this->container = $container;
     }
 
+    #[\Override]
     public function addGlobalOptions(Command $command)
     {
         $options = [
@@ -51,6 +52,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
         $this->addOptionsToCommand($command, $options);
     }
 
+    #[\Override]
     public function resolveGlobalOptions(InputInterface $input)
     {
         $user = $input->getParameterOption('--current-user');

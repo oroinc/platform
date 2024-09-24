@@ -21,9 +21,7 @@ class SetCorsMaxAge implements ProcessorInterface
         $this->corsSettings = $corsSettings;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var OptionsContext $context */

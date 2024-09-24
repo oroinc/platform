@@ -36,6 +36,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AclCache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $platform = $this->getMockBuilder(AbstractPlatform::class)

@@ -23,6 +23,7 @@ class WidgetModelTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetModel */
     private $widgetModel;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->widgetEntity = $this->createMock(Widget::class);

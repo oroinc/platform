@@ -33,9 +33,7 @@ class WsseEntryPoint implements AuthenticationEntryPointInterface
         $this->profile = $profile;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
         if ($authException instanceof AuthenticationException) {

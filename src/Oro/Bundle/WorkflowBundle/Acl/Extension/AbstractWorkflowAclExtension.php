@@ -31,9 +31,7 @@ abstract class AbstractWorkflowAclExtension extends AbstractSimpleAccessLevelAcl
         $this->workflowManager = $workflowManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getObjectClassName($object)
     {
         if ($object instanceof ObjectIdentityInterface) {

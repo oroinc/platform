@@ -59,9 +59,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
         $this->nameGenerator = $nameGenerator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -71,9 +69,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

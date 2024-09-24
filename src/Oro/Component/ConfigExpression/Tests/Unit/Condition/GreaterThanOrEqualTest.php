@@ -11,6 +11,7 @@ class GreaterThanOrEqualTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\GreaterThanOrEqual */
     protected $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\GreaterThanOrEqual();

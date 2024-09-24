@@ -19,6 +19,7 @@ class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var CommentAssociationHelper */
     private $commentAssociationHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -11,6 +11,7 @@ class ActionExecutorTest extends WebTestCase
 {
     private ActionExecutor $executor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -13,6 +13,7 @@ class BreadcrumbProviderTest extends \PHPUnit\Framework\TestCase
     /** @var BreadcrumbProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);

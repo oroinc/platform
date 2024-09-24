@@ -38,9 +38,7 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
         $this->reset();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->initializedExtensions = null;

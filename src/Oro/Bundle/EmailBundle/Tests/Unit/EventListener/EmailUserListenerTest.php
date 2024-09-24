@@ -26,6 +26,7 @@ class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailUserListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->webSocketSendProcessor = $this->createMock(WebSocketSendProcessor::class);

@@ -35,6 +35,7 @@ class FileFieldCompatibilityValidator extends ConstraintValidator
      * @param ExternalFile|SymfonyFile|null $value
      * @param Constraint $constraint
      */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof FileFieldCompatibility) {

@@ -6,17 +6,13 @@ use Oro\Bundle\SoapBundle\Form\Type\AbstractPatchableApiType;
 
 class RelatedEntityStandaloneCollectionApiType extends AbstractPatchableApiType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return RelatedEntityCollectionApiType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_related_entity_standalone_collection_api';

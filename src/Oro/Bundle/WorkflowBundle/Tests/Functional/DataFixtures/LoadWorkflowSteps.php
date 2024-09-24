@@ -26,9 +26,7 @@ class LoadWorkflowSteps extends AbstractFixture
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $definition = new WorkflowDefinition();

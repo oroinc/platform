@@ -12,12 +12,14 @@ class NotDangerousProtocolValidatorTest extends ConstraintValidatorTestCase
     /** @var UriSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $uriSecurityHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new NotDangerousProtocolValidator($this->uriSecurityHelper);

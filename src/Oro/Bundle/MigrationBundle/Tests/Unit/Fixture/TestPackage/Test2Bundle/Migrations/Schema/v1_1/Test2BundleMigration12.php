@@ -9,11 +9,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class Test2BundleMigration12 implements Migration, OrderedMigrationInterface
 {
+    #[\Override]
     public function getOrder()
     {
         return 1;
     }
 
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('test1table');

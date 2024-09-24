@@ -20,6 +20,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

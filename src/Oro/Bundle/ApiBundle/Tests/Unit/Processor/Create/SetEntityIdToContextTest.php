@@ -9,6 +9,7 @@ class SetEntityIdToContextTest extends CreateProcessorTestCase
 {
     private SetEntityIdToContext $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

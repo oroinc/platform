@@ -22,6 +22,7 @@ class ReversSyncIntegrationProcessorTest extends WebTestCase
 
     private SyncScheduler $syncScheduler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

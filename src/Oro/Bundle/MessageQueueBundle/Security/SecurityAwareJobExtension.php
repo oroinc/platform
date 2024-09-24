@@ -28,9 +28,7 @@ class SecurityAwareJobExtension extends AbstractExtension
         $this->jobManager = $jobManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function onPreRunUnique(Job $job): void
     {
         $token = $this->tokenStorage->getToken();

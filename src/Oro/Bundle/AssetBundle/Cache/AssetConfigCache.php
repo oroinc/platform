@@ -33,9 +33,7 @@ class AssetConfigCache implements WarmableInterface
         $this->themeManager = $themeManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUp(string $cacheDir): array
     {
         $config['paths'] = $this->getBundlesPath();

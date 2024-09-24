@@ -25,6 +25,7 @@ class RemoveWorkflowAwareEntitiesQuery extends ParametrizedMigrationQuery
         $this->tableName = $tableName;
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return \sprintf(
@@ -34,6 +35,7 @@ class RemoveWorkflowAwareEntitiesQuery extends ParametrizedMigrationQuery
         );
     }
 
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $qb = $this->connection->createQueryBuilder();

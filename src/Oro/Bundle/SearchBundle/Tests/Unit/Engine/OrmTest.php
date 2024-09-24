@@ -31,6 +31,7 @@ class OrmTest extends TestCase
     /** @var Orm */
     private $engine;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(SearchIndexRepository::class);

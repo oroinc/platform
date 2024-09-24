@@ -16,9 +16,7 @@ use Symfony\Component\Form\FormEvents;
  */
 class DateGroupingFormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

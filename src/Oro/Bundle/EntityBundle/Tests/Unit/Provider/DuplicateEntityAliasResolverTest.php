@@ -20,6 +20,7 @@ class DuplicateEntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     /** @var DuplicateEntityAliasResolver */
     private $duplicateResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

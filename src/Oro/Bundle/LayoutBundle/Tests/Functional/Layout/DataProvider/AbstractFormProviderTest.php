@@ -20,6 +20,7 @@ class AbstractFormProviderTest extends WebTestCase
     /** @var FormProviderStub */
     private $formProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -126,9 +126,7 @@ class HtmlFormatter extends AbstractFormatter
         $this->documentationProvider = $documentationProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function renderOne(array $data)
     {
         return $this->twig->render('@NelmioApiDoc/resource.html.twig', array_merge(
@@ -140,9 +138,7 @@ class HtmlFormatter extends AbstractFormatter
         ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function render(array $collection)
     {
         return $this->twig->render('@NelmioApiDoc/resources.html.twig', array_merge(

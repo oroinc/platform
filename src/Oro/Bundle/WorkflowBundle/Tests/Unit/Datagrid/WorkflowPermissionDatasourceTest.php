@@ -39,6 +39,7 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowPermissionDatasource */
     private $datasource;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

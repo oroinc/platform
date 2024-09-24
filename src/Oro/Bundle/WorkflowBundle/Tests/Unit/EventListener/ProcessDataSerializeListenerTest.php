@@ -25,6 +25,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessDataSerializeListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serializer = $this->getMockForAbstractClass(SerializerInterface::class);

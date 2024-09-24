@@ -16,6 +16,7 @@ class DataCollectorExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DataCollectorExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dataCollector = $this->createMock(LayoutDataCollector::class);

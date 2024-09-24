@@ -21,17 +21,13 @@ class LoadUsersWithSameEmailInLowercase extends AbstractFixture implements
 
     public const EMAIL = 'duplicated_email@example.com';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $userManager = $this->container->get('oro_user.manager');

@@ -14,6 +14,7 @@ class DeleteTargetFileIfAsyncOperationNotStartedTest extends UpdateListProcessor
     /** @var DeleteTargetFileIfAsyncOperationNotStarted */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

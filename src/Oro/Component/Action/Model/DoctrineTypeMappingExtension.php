@@ -7,9 +7,7 @@ class DoctrineTypeMappingExtension implements DoctrineTypeMappingExtensionInterf
     /** @var array */
     protected $doctrineTypeMappings = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addDoctrineTypeMapping($doctrineType, $attributeType, array $attributeOptions = [])
     {
         $this->doctrineTypeMappings[$doctrineType] = [
@@ -18,9 +16,7 @@ class DoctrineTypeMappingExtension implements DoctrineTypeMappingExtensionInterf
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDoctrineTypeMappings()
     {
         return $this->doctrineTypeMappings;

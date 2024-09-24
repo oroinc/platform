@@ -20,17 +20,13 @@ class PageCacheWarmer implements CacheWarmerInterface
     ) {
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         foreach ($this->pageRequestProviders as $pageRequestProvider) {

@@ -29,6 +29,7 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
     /** @var WorkflowTransitionSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
@@ -115,9 +116,7 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $choiceType = $this->createMock(OroChoiceType::class);

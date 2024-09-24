@@ -38,17 +38,13 @@ class RecalculateEmailVisibilityProcessor implements MessageProcessorInterface, 
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [RecalculateEmailVisibilityTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = $message->getBody();

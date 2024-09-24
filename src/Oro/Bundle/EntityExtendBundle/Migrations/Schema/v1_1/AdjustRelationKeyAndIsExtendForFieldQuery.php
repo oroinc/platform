@@ -24,9 +24,7 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
         $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -35,9 +33,7 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

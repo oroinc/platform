@@ -9,6 +9,7 @@ class MoneyValueTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var MoneyValueTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new MoneyValueTransformer();

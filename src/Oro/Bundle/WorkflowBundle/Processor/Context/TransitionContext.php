@@ -43,9 +43,7 @@ class TransitionContext extends Context
         $this->clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clear(): void
     {
         parent::clear();

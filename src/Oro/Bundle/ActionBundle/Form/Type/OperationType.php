@@ -35,25 +35,18 @@ class OperationType extends AbstractType
         $this->contextAccessor = $contextAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['data', 'operation']);
@@ -78,9 +71,7 @@ class OperationType extends AbstractType
         $resolver->setAllowedTypes('attribute_default_values', 'array');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->initialization($builder, $options);

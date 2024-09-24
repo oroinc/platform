@@ -18,6 +18,7 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var ContactInformationEmailsSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contactInformationEmailsProvider = $this->createMock(ContactInformationEmailsProvider::class);

@@ -29,9 +29,7 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
         $this->processorBag = $processorBag;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

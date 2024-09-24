@@ -30,6 +30,7 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FieldConfigModel */
     private $attribute;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfig = $this->createMock(ConfigInterface::class);

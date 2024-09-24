@@ -8,9 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 
 class LoadActivityTargets extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $targetOne = new TestActivityTarget();

@@ -15,9 +15,7 @@ class Configuration implements ConfigurationInterface
 {
     public const ROOT_NODE = 'actions';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

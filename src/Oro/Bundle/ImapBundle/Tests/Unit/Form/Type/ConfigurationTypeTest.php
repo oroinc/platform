@@ -49,6 +49,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $smtpSettingsChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->encryptor = new DefaultCrypter('someKey');
@@ -72,9 +73,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return array_merge(
@@ -95,9 +94,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getValidators(): array
     {
         $this->imapSettingsChecker->expects(self::any())

@@ -12,6 +12,7 @@ class NotEqualToTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\NotEqualTo */
     protected $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\NotEqualTo();

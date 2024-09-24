@@ -26,6 +26,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDefinitionEntityListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

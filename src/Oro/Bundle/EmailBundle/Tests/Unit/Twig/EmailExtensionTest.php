@@ -21,6 +21,7 @@ class EmailExtensionTest extends TestCase
 
     private EmailExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $managerRegistry = $this->createMock(ManagerRegistry::class);

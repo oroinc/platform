@@ -21,6 +21,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
     /** @var Configurable */
     private $configurableAction;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->assembler = $this->getMockBuilder(ActionAssembler::class)

@@ -18,6 +18,7 @@ class ChannelActionHandlerTransactionDecoratorTest extends \PHPUnit\Framework\Te
     /** @var ChannelActionHandlerTransactionDecorator */
     private $decorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

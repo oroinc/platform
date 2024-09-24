@@ -61,9 +61,7 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
         $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -71,9 +69,7 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
             && (bool)$request->get('formParentName', false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new DecodeFolderSubscriber());
@@ -121,9 +117,7 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
             ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

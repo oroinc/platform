@@ -13,6 +13,7 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailRecipientsProvider */
     private $emailRecipientsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

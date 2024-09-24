@@ -11,6 +11,7 @@ class AssertResultDataIsArrayTest extends GetListProcessorTestCase
     /** @var AssertResultDataIsArray */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -9,6 +9,7 @@ class TestCronCommandWithArbitraryName extends Command implements CronCommandSch
 {
     protected static $defaultName = 'test:cron:command:with:arbitrary:name';
 
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return '0 0 * * *';

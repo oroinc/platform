@@ -23,9 +23,7 @@ class TranslationLanguageJoinOptimizer extends WhereExpressionModifier
         return $this->languageCode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function processWhereExpression(mixed $expr): mixed
     {
         if (!$this->hasJoin('language')) {
@@ -54,9 +52,7 @@ class TranslationLanguageJoinOptimizer extends WhereExpressionModifier
         return $expr;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function walkComparison(Comparison $comparison): mixed
     {
         if (!$this->isLanguageCodeFilter($comparison)) {

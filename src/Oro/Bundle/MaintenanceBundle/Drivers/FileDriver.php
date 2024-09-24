@@ -22,17 +22,13 @@ class FileDriver extends AbstractDriver
         $this->options = $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createLock(): bool
     {
         return (bool) fopen($this->filePath, 'w+');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createUnlock(): bool
     {
         return unlink($this->filePath);
@@ -41,8 +37,8 @@ class FileDriver extends AbstractDriver
     /**
      * Return true if file exists
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function isExists(): bool
     {
         return file_exists($this->filePath);

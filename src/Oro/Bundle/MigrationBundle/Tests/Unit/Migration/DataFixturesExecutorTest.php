@@ -29,6 +29,7 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var DataFixturesExecutor */
     private $dataFixturesExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

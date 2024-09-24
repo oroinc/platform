@@ -15,9 +15,7 @@ class AddSearchEntityUrlLink implements ProcessorInterface
 {
     private const LINK_NAME = 'entityUrl';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */

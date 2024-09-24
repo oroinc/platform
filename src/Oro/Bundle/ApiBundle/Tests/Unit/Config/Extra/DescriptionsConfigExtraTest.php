@@ -9,6 +9,7 @@ class DescriptionsConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var DescriptionsConfigExtra */
     private $extra;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extra = new DescriptionsConfigExtra();

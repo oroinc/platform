@@ -14,17 +14,13 @@ class EntityReaderById extends BaseReader
     /** @var QueryBuilder */
     protected $qb;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSourceQueryBuilder(QueryBuilder $queryBuilder)
     {
         $this->qb = $queryBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeFromContext(ContextInterface $context)
     {
         if ($context->hasOption('entityName')) {

@@ -21,9 +21,7 @@ class OutdatedInsertEnumValuesQuery extends ParametrizedMigrationQuery
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription(): string|array
     {
         $logger = new ArrayLogger();
@@ -32,9 +30,7 @@ class OutdatedInsertEnumValuesQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $this->doExecute($logger);

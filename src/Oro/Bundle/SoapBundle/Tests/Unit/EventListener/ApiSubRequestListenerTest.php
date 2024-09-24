@@ -12,6 +12,7 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
 {
     private ApiSubRequestListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new ApiSubRequestListener();

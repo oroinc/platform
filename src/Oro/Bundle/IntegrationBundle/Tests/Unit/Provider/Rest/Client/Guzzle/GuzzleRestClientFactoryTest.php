@@ -11,6 +11,7 @@ class GuzzleRestClientFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var GuzzleRestClientFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new GuzzleRestClientFactory();

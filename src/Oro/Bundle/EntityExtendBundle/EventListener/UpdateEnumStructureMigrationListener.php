@@ -30,6 +30,7 @@ class UpdateEnumStructureMigrationListener implements ServiceSubscriberInterface
         $event->addMigration(new RefreshExtendEntityCacheMigration($this->container));
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [];

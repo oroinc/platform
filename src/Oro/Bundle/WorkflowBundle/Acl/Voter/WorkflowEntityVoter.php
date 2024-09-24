@@ -14,7 +14,6 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
-    /** {@inheritDoc} */
     protected $supportedAttributes = [BasicPermission::DELETE];
 
     private ContainerInterface $container;
@@ -25,9 +24,7 @@ class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscrib
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -35,17 +32,13 @@ class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscrib
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function supportsClass($class)
     {
         return $this->getPermissionRegistry()->supportsClass($class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
         $permissions = $this->getPermissionRegistry()->getPermissionByClassAndIdentifier($class, $identifier);

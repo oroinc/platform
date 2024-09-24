@@ -54,6 +54,7 @@ class DebugCommand extends AbstractDebugCommand
         $this->processorBag = $processorBag;
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -135,12 +136,14 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function getDefaultRequestType(): array
     {
         return ['any'];
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $showProcessors = $input->getOption('processors');

@@ -12,6 +12,7 @@ class AssertHasResultTest extends GetProcessorTestCase
     /** @var AssertHasResult */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

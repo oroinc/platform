@@ -34,6 +34,7 @@ class UpdateBaseEnumRelatedDataMigration implements Migration, ConnectionAwareIn
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $entityConfigs = $this->connection->fetchAllAssociative(

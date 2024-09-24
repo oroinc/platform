@@ -12,9 +12,7 @@ abstract class AbstractImportExportAction extends AbstractAction
      */
     abstract protected function getType();
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOptions()
     {
         $options = parent::getOptions();

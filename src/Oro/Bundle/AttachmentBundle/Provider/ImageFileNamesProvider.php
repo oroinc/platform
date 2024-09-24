@@ -22,9 +22,7 @@ class ImageFileNamesProvider implements FileNamesProviderInterface
         $this->imagePathProvider = $imagePathProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFileNames(File $file): array
     {
         $fileNames = [];

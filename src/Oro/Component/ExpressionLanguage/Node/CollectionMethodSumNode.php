@@ -11,11 +11,13 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class CollectionMethodSumNode extends AbstractCollectionMethodCallNode
 {
+    #[\Override]
     public static function getMethod(): string
     {
         return 'sum';
     }
 
+    #[\Override]
     public function compile(Compiler $compiler): void
     {
         $compiler
@@ -34,6 +36,7 @@ class CollectionMethodSumNode extends AbstractCollectionMethodCallNode
             ->raw('}, get_defined_vars())');
     }
 
+    #[\Override]
     protected function doEvaluate(iterable $evaluatedNode, array $functions, array $values, string $itemName): mixed
     {
         $result = 0;

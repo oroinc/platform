@@ -32,6 +32,7 @@ class ExtrasPropagator implements MenuItemToMenuUpdatePropagatorInterface
         $this->excludeKeys = $excludeKeys;
     }
 
+    #[\Override]
     public function isApplicable(MenuUpdateInterface $menuUpdate, ItemInterface $menuItem, string $strategy): bool
     {
         return in_array(
@@ -44,6 +45,7 @@ class ExtrasPropagator implements MenuItemToMenuUpdatePropagatorInterface
         );
     }
 
+    #[\Override]
     public function propagateFromMenuItem(
         MenuUpdateInterface $menuUpdate,
         ItemInterface $menuItem,

@@ -16,6 +16,7 @@ class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractAclManager|\PHPUnit\Framework\MockObject\MockObject */
     private $abstract;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->abstract = $this->getMockForAbstractClass(AbstractAclManager::class);

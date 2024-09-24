@@ -19,33 +19,25 @@ class RootJobStatusExtension extends AbstractExtension
         $this->rootJobStatusCalculator = $rootJobStatusCalculator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunUnique(Job $job)
     {
         $this->calculateJobStatusMessage($job);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunUnique(Job $job, $jobResult)
     {
         $this->calculateJobStatusMessage($job);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunDelayed(Job $job, $jobResult)
     {
         $this->calculateJobStatusMessage($job);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onError(Job $job)
     {
         $this->calculateJobStatusMessage($job);

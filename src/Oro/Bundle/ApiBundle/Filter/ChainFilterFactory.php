@@ -18,9 +18,7 @@ class ChainFilterFactory implements FilterFactoryInterface
         $this->factories = $factories;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createFilter(string $filterType, array $options = []): ?StandaloneFilter
     {
         foreach ($this->factories as $factory) {

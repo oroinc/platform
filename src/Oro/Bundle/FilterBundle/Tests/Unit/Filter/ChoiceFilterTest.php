@@ -14,6 +14,7 @@ class ChoiceFilterTest extends \PHPUnit\Framework\TestCase
     /** @var ChoiceFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

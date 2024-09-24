@@ -34,14 +34,17 @@ class TestEnumValue extends EnumOption
         $this->enumName = $name;
     }
 
+    #[\Override]
     public function get(string $name): mixed
     {
     }
 
+    #[\Override]
     public function set(string $name, mixed $value): static
     {
     }
 
+    #[\Override]
     public function setName(string $name): static
     {
         parent::setName($name);

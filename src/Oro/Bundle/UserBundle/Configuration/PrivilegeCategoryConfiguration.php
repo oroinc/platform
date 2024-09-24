@@ -12,9 +12,7 @@ class PrivilegeCategoryConfiguration implements ConfigurationInterface
 {
     public const ROOT_NODE = 'acl_categories';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

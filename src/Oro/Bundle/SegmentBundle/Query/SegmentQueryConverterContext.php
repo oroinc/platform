@@ -12,18 +12,14 @@ class SegmentQueryConverterContext extends QueryBuilderGroupingOrmQueryConverter
     /** @var string */
     private $aliasPrefix;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         parent::reset();
         $this->aliasPrefix = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function generateTableAlias(): string
     {
         $tableAlias = parent::generateTableAlias();

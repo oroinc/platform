@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoaderInterface
 {
+    #[\Override]
     public function loadEntity(
         EntityManagerInterface $em,
         ReferenceRepository $repository,
@@ -39,6 +40,7 @@ class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoad
         return [];
     }
 
+    #[\Override]
     public function getExpectedEntityName(
         ReferenceRepository $repository,
         string $entityClass,

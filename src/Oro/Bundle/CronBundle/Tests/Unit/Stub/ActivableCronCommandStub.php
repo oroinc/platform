@@ -12,17 +12,13 @@ class ActivableCronCommandStub extends Command implements
 {
     private bool $active = true;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return '*/1 * * * *';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isActive(): bool
     {
         return $this->active;

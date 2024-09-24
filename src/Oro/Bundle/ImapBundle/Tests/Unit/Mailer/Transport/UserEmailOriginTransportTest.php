@@ -35,6 +35,7 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
     private $transport;
     private TransportFactoryInterface $transportFactoryBase;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transportFactoryBase = $this->createMock(TransportFactoryInterface::class);

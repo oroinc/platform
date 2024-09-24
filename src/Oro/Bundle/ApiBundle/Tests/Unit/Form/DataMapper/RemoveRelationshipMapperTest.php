@@ -30,6 +30,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
     /** @var RemoveRelationshipMapper */
     private $mapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);

@@ -18,6 +18,7 @@ class MessageLoggerListener extends SymfonyMessageLoggerListener
         $this->ignoreReset = $ignoreReset;
     }
 
+    #[\Override]
     public function reset(): void
     {
         if (!$this->ignoreReset) {

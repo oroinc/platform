@@ -28,6 +28,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var RestDocIdentifierHandler */
     private $identifierHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST]);

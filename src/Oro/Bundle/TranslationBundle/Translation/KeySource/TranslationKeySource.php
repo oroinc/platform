@@ -38,17 +38,13 @@ class TranslationKeySource implements TranslationKeySourceInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplate()
     {
         return $this->keyTemplate->getTemplate();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData()
     {
         return $this->data;

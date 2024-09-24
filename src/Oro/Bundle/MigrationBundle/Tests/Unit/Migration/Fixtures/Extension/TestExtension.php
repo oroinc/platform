@@ -15,6 +15,7 @@ class TestExtension implements DatabasePlatformAwareInterface, NameGeneratorAwar
     private ?DbIdentifierNameGenerator $nameGenerator = null;
     private ?LoggerInterface $logger = null;
 
+    #[\Override]
     public function setDatabasePlatform(AbstractPlatform $platform): void
     {
         $this->platform = $platform;
@@ -25,6 +26,7 @@ class TestExtension implements DatabasePlatformAwareInterface, NameGeneratorAwar
         return $this->platform;
     }
 
+    #[\Override]
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator): void
     {
         $this->nameGenerator = $nameGenerator;
@@ -35,6 +37,7 @@ class TestExtension implements DatabasePlatformAwareInterface, NameGeneratorAwar
         return $this->nameGenerator;
     }
 
+    #[\Override]
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;

@@ -8,9 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CustomGridFieldValidatorCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $chainDefinition = $container->getDefinition($this->getService());
@@ -29,17 +27,11 @@ class CustomGridFieldValidatorCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTag()
     {
         return 'oro_entity.custom_grid_field_validator';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getService()
     {
         return 'oro_entity.manager.entity_field_validator';

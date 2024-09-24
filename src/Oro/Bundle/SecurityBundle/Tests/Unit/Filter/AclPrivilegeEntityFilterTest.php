@@ -13,6 +13,7 @@ class AclPrivilegeEntityFilterTest extends \PHPUnit\Framework\TestCase
     /** @var AclPrivilegeEntityFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filter = new AclPrivilegeEntityFilter();

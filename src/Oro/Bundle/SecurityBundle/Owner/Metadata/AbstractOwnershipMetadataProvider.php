@@ -25,9 +25,7 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata(?string $className): OwnershipMetadataInterface
     {
         if (null === $className) {
@@ -45,9 +43,7 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUpCache(?string $className = null): void
     {
         if ($className === null) {
@@ -60,9 +56,7 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clearCache(?string $className = null): void
     {
         if ($this->getCache()) {

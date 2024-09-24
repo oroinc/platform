@@ -36,6 +36,7 @@ class FieldConfigId implements ConfigIdInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getClassName()
     {
         return $this->className;
@@ -44,6 +45,7 @@ class FieldConfigId implements ConfigIdInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getScope()
     {
         return $this->scope;
@@ -76,22 +78,19 @@ class FieldConfigId implements ConfigIdInterface
     /**
      * @return string
      */
+    #[\Override]
     public function toString()
     {
         return sprintf('field_%s_%s_%s', $this->scope, str_replace('\\', '-', $this->className), $this->fieldName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function serialize()
     {
         return serialize([$this->className, $this->scope, $this->fieldName, $this->fieldType]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function unserialize($serialized)
     {
         [$this->className, $this->scope, $this->fieldName, $this->fieldType] = unserialize($serialized);

@@ -25,6 +25,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
     /** @var BaseContextListener|\PHPUnit\Framework\MockObject\MockObject */
     private $innerListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerListener = $this->getMockBuilder(\stdClass::class)

@@ -19,6 +19,7 @@ class TranslationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(TranslationRepository::class);

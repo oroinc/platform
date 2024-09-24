@@ -29,17 +29,13 @@ class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadTranslationUsers::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach (static::LANGUAGES as $language => $definition) {

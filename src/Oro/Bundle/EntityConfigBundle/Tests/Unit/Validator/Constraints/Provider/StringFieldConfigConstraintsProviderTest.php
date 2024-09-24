@@ -11,6 +11,7 @@ class StringFieldConfigConstraintsProviderTest extends \PHPUnit\Framework\TestCa
 {
     private FieldConfigId $configId;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configId = new FieldConfigId('test', \stdClass::class, 'field');

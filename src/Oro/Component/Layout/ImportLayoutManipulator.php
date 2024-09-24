@@ -36,9 +36,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         $this->import = $import;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function add(
         $id,
         $parentId,
@@ -63,9 +61,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function remove($id)
     {
         $this->replaceRoot($id);
@@ -76,9 +72,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function move($id, $parentId = null, $siblingId = null, $prepend = null)
     {
         $this
@@ -95,9 +89,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addAlias($alias, $id)
     {
         $this->replaceRoot($id);
@@ -110,9 +102,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeAlias($alias)
     {
         $this->replaceNamespace($alias);
@@ -122,9 +112,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOption($id, $optionName, $optionValue)
     {
         $this->replaceRoot($id);
@@ -135,9 +123,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function appendOption($id, $optionName, $optionValue)
     {
         $this->replaceRoot($id);
@@ -148,9 +134,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function subtractOption($id, $optionName, $optionValue)
     {
         $this->replaceRoot($id);
@@ -161,9 +145,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
     {
         $this->replaceRoot($id);
@@ -174,9 +156,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeOption($id, $optionName)
     {
         $this->replaceRoot($id);
@@ -187,9 +167,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function changeBlockType($id, $blockType, $optionsCallback = null)
     {
         $this->replaceRoot($id);
@@ -200,9 +178,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setBlockTheme($themes, $id = null)
     {
         $this->replaceRoot($id);
@@ -213,9 +189,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setFormTheme($themes)
     {
         $this->layoutManipulator->setFormTheme($themes);
@@ -223,9 +197,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clear()
     {
         $this->layoutManipulator->clear();

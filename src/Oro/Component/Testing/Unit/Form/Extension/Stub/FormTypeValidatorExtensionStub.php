@@ -21,9 +21,7 @@ class FormTypeValidatorExtensionStub extends BaseValidatorExtension
             : 'form';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -47,6 +45,7 @@ class FormTypeValidatorExtensionStub extends BaseValidatorExtension
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }
 
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];

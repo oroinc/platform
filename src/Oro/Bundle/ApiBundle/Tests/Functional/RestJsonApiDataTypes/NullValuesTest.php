@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class NullValuesTest extends DefaultAndNullTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function sendCreateRequest(array $data, bool $assertValid = true): Response
     {
         $data['data']['attributes']['withNotBlank'] = 'value';
@@ -21,9 +19,7 @@ class NullValuesTest extends DefaultAndNullTestCase
         return parent::sendCreateRequest($data, $assertValid);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function sendUpdateRequest(int $entityId, array $data, bool $assertValid = true): Response
     {
         $data['data']['attributes']['withNotBlank'] = 'value';

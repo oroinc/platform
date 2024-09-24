@@ -25,6 +25,7 @@ class AddressHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var AddressHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);

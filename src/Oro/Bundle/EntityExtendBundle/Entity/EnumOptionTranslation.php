@@ -30,6 +30,7 @@ class EnumOptionTranslation extends AbstractTranslation
     /**
      * @return string
      */
+    #[\Override]
     public function __toString(): string
     {
         return (string)$this->getId();

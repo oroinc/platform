@@ -8,6 +8,7 @@ class FileBasedLanguageHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = new FileBasedLanguageHelper(realpath(__DIR__ . '/translations'));

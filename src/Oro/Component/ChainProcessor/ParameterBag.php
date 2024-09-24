@@ -10,57 +10,43 @@ class ParameterBag extends AbstractParameterBag
     /** @var array [key => value, ...] */
     private array $items = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get(string $key): mixed
     {
         return $this->items[$key] ?? null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function set(string $key, mixed $value): void
     {
         $this->items[$key] = $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         return $this->items;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clear(): void
     {
         $this->items = [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function count(): int
     {
         return \count($this->items);

@@ -26,6 +26,7 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
     /** @var LocalizationConfigurator|\PHPUnit\Framework\MockObject\MockObject */
     private $configurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -120,9 +121,7 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject $localizationManager */

@@ -35,9 +35,7 @@ class CleanUpProcessorsCompilerPass implements CompilerPassInterface
         $this->processorRegistryServiceId = $processorRegistryServiceId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $simpleProcessors = [];

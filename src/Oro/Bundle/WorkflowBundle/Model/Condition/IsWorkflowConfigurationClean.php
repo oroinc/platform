@@ -26,33 +26,25 @@ class IsWorkflowConfigurationClean extends AbstractCondition implements ContextA
         $this->checker = $checker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray(null);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode(null, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (1 !== count($options)) {
@@ -72,9 +64,7 @@ class IsWorkflowConfigurationClean extends AbstractCondition implements ContextA
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         /** @var WorkflowDefinition $workflow */

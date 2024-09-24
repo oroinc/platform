@@ -21,6 +21,7 @@ class NonExtendedEntityBidirectionalValidatorTest extends ConstraintValidatorTes
     /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
     private $rootMock;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -115,9 +116,7 @@ class NonExtendedEntityBidirectionalValidatorTest extends ConstraintValidatorTes
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createValidator()
     {
         return new NonExtendedEntityBidirectionalValidator($this->configManager);

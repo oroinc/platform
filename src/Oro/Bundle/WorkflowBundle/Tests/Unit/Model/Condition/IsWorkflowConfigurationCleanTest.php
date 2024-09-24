@@ -18,6 +18,7 @@ class IsWorkflowConfigurationCleanTest extends \PHPUnit\Framework\TestCase
     /** @var IsWorkflowConfigurationClean */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->checker = $this->createMock(ConfigurationChecker::class);

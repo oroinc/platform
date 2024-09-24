@@ -21,41 +21,31 @@ class NormalizeEntityType extends AbstractProcessor
         $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypeString(): string
     {
         return 'entity class';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypePluralString(): string
     {
         return 'entity classes';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isValueNormalizationRequired(mixed $value): bool
     {
         return str_contains($value, '\\');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processNormalization(NormalizeValueContext $context): void
     {
         $this->entityAliasResolver = $this->entityAliasResolverRegistry
@@ -67,9 +57,7 @@ class NormalizeEntityType extends AbstractProcessor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeValue(mixed $value): mixed
     {
         return $this->entityAliasResolver->getPluralAlias($value);

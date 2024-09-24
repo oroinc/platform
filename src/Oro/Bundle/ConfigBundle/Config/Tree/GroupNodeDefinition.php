@@ -45,17 +45,13 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
         return $this->level;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function count(): int
     {
         return count($this->children);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         $this->resort();
@@ -63,9 +59,6 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
         return new \ArrayIterator($this->children);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isEmpty()
     {
         return !$this->children;

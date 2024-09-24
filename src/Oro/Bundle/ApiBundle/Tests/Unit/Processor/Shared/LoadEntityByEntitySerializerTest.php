@@ -32,6 +32,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
     /** @var LoadEntityByEntitySerializer */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

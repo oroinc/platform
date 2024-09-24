@@ -20,6 +20,7 @@ class ChartViewTest extends \PHPUnit\Framework\TestCase
     /** @var ChartView */
     private $chartView;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);

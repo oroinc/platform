@@ -13,9 +13,7 @@ use Symfony\Component\Form\FormEvents;
  */
 class ChangeRoleSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [FormEvents::SUBMIT => ['onSubmit', 10]];

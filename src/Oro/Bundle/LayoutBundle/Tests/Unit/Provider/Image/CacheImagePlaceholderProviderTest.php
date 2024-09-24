@@ -15,6 +15,7 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     private CacheImagePlaceholderProvider $decorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->imagePlaceholderProvider = $this->createMock(ImagePlaceholderProviderInterface::class);

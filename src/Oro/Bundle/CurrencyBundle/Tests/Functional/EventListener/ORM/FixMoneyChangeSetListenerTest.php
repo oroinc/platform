@@ -14,6 +14,7 @@ class FixMoneyChangeSetListenerTest extends WebTestCase
 {
     private DebugStack $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([]);

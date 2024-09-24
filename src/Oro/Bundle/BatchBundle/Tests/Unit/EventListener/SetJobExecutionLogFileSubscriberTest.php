@@ -17,6 +17,7 @@ class SetJobExecutionLogFileSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var SetJobExecutionLogFileSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(BatchLogHandler::class);

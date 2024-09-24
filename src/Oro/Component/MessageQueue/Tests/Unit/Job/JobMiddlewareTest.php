@@ -26,6 +26,7 @@ class JobMiddlewareTest extends \PHPUnit\Framework\TestCase
 
     private JobProcessor $jobProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

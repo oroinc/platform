@@ -14,6 +14,7 @@ class DynamicTranslationLoaderTest extends OrmTestCase
     private EntityManagerInterface $em;
     private DynamicTranslationLoader $loader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

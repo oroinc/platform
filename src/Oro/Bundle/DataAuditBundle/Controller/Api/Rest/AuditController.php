@@ -157,14 +157,13 @@ class AuditController extends RestGetController
      *
      * @return ApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_dataaudit.audit.manager.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getPreparedItem($entity, $resultFields = [])
     {
         /** @var Audit $entity */
@@ -223,6 +222,7 @@ class AuditController extends RestGetController
         return $auditableEntities;
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

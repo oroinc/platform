@@ -9,6 +9,7 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessDefinition */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new ProcessDefinition();

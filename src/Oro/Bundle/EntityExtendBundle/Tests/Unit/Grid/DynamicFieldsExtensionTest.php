@@ -39,6 +39,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
     /** @var SelectedFieldsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $selectedFieldsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -53,9 +54,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             ->willReturn([self::FIELD_NAME]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtension(): AbstractFieldsExtension
     {
         $extension = new DynamicFieldsExtension(
@@ -216,17 +215,13 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDatagridConfiguration(array $options = []): DatagridConfiguration
     {
         return DatagridConfiguration::create(array_merge($options, ['extended_entity_name' => self::ENTITY_NAME]));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function setExpectationForGetFields(
         string $className,
         string $fieldName,

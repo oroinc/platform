@@ -168,9 +168,7 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
         ]
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [
@@ -181,9 +179,7 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach (self::$menuUpdates as $menuUpdateReference => $data) {

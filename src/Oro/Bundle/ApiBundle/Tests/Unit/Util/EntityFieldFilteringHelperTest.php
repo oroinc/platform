@@ -25,6 +25,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldFilteringHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -13,6 +13,7 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var ContextRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = new ContextRegistry();

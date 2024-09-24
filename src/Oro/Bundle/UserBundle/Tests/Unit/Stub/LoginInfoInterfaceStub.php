@@ -23,25 +23,19 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /** @var string */
     protected $plainPassword;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLastLogin()
     {
         return $this->lastLogin;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLoginCount()
     {
         return $this->loginCount;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setLastLogin(\DateTime $time)
     {
         $this->lastLogin = $time;
@@ -49,9 +43,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setLoginCount($count)
     {
         $this->loginCount = $count;
@@ -59,9 +51,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setUsername($username): self
     {
         $this->username = $username;
@@ -69,9 +59,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPassword(?string $password): self
     {
         $this->password = $password;
@@ -79,17 +67,13 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSalt(): ?string
     {
         return 'salt';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPlainPassword(?string $password): self
     {
         $this->plainPassword = $password;
@@ -97,62 +81,48 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRoles(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getUserRoles(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getUsername()
     {
         return $this->username;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function eraseCredentials()
     {
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addUserRole(Role $role): self
     {
         return $this;
     }
 
+    #[\Override]
     public function getUserIdentifier(): string
     {
         return $this->getUserIdentifier();

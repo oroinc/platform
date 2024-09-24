@@ -15,6 +15,7 @@ class ExtendFieldFormOptionsDefaultProviderTest extends \PHPUnit\Framework\TestC
     /** @var ExtendFieldFormOptionsDefaultProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(EntityConfigManager::class);

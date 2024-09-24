@@ -13,9 +13,7 @@ class LoadEmbeddedFormData extends AbstractFixture implements DependentFixtureIn
 {
     public const EMBEDDED_FORM = 'embedded_form';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $embeddedForm = new EmbeddedForm();
@@ -31,9 +29,7 @@ class LoadEmbeddedFormData extends AbstractFixture implements DependentFixtureIn
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadOrganization::class];

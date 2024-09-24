@@ -64,11 +64,13 @@ class EnumOption implements Translatable, PriorityItem, EnumOptionInterface, Ext
         $this->default = $default;
     }
 
+    #[\Override]
     public function getId(): string
     {
         return $this->id;
     }
 
+    #[\Override]
     public function setPriority($priority): static
     {
         $this->priority = (int)$priority;
@@ -76,11 +78,13 @@ class EnumOption implements Translatable, PriorityItem, EnumOptionInterface, Ext
         return $this;
     }
 
+    #[\Override]
     public function getPriority(): int
     {
         return $this->priority;
     }
 
+    #[\Override]
     public function setDefault(bool $default): static
     {
         $this->default = $default;
@@ -88,16 +92,19 @@ class EnumOption implements Translatable, PriorityItem, EnumOptionInterface, Ext
         return $this;
     }
 
+    #[\Override]
     public function isDefault(): bool
     {
         return $this->default;
     }
 
+    #[\Override]
     public function getInternalId(): string
     {
         return $this->internalId;
     }
 
+    #[\Override]
     public function getEnumCode(): string
     {
         return $this->enumCode;
@@ -133,6 +140,7 @@ class EnumOption implements Translatable, PriorityItem, EnumOptionInterface, Ext
      *
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return $this->getDefaultName();

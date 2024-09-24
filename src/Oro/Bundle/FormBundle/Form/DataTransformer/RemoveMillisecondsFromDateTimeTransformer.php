@@ -20,17 +20,13 @@ class RemoveMillisecondsFromDateTimeTransformer implements DataTransformerInterf
         $this->innerTransformer = $innerTransformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return $this->innerTransformer->transform($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (is_string($value) && $value && preg_match(self::RFC_3339_PATTERN, $value, $matches)) {

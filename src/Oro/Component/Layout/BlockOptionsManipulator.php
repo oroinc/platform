@@ -25,17 +25,13 @@ class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setRawLayout(RawLayout $rawLayout)
     {
         $this->rawLayout = $rawLayout;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOption($id, $optionName, $optionValue)
     {
         $options = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
@@ -43,9 +39,7 @@ class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
         $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function appendOption($id, $optionName, $optionValue)
     {
         $options = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
@@ -63,9 +57,7 @@ class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
         $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function subtractOption($id, $optionName, $optionValue)
     {
         $options = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
@@ -83,9 +75,7 @@ class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
         $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
     {
         $options = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
@@ -103,9 +93,7 @@ class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
         $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeOption($id, $optionName)
     {
         $options = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);

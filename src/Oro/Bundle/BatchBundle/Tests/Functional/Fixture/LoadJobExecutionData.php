@@ -16,9 +16,7 @@ class LoadJobExecutionData extends AbstractFixture implements ContainerAwareInte
 
     private array $jobInstances = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $manager = $this->container->get('oro_batch.job.repository')->getJobManager();

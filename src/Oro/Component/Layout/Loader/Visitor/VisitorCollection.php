@@ -16,9 +16,7 @@ class VisitorCollection extends \ArrayIterator
         parent::__construct($conditions);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function append($value): void
     {
         $this->validate([$value]);

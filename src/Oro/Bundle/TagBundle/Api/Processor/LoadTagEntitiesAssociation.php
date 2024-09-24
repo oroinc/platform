@@ -31,9 +31,7 @@ class LoadTagEntitiesAssociation implements ProcessorInterface
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

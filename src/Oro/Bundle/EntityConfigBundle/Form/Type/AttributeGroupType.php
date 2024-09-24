@@ -22,9 +22,7 @@ class AttributeGroupType extends AbstractType
 {
     const NAME = 'oro_entity_config_attribute_group';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -39,6 +37,7 @@ class AttributeGroupType extends AbstractType
         $resolver->setRequired(['attributeEntityClass']);
     }
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -135,17 +134,12 @@ class AttributeGroupType extends AbstractType
         return $sortedChoices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

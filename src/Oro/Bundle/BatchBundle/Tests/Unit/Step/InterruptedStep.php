@@ -10,24 +10,18 @@ use Oro\Bundle\BatchBundle\Step\AbstractStep;
  */
 class InterruptedStep extends AbstractStep
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setConfiguration(array $config): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doExecute(StepExecution $stepExecution): void
     {
         $stepExecution->setTerminateOnly();

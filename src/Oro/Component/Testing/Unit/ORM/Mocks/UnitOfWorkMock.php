@@ -60,33 +60,25 @@ class UnitOfWorkMock extends UnitOfWork
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getScheduledEntityInsertions()
     {
         return $this->insertions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getScheduledEntityUpdates()
     {
         return $this->updates;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getScheduledEntityDeletions()
     {
         return $this->deletions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function & getEntityChangeSet($entity)
     {
         return $this->changeSets[spl_object_hash($entity)];
@@ -111,11 +103,13 @@ class UnitOfWorkMock extends UnitOfWork
         $this->collectionDeletions[] = $coll;
     }
 
+    #[\Override]
     public function getScheduledCollectionUpdates()
     {
         return $this->collectionUpdates;
     }
 
+    #[\Override]
     public function getScheduledCollectionDeletions()
     {
         return $this->collectionDeletions;

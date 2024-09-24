@@ -20,6 +20,7 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
 
     private SendEmailNotificationProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mailer = $this->createMock(MailerInterface::class);

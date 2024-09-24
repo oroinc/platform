@@ -31,9 +31,7 @@ class CreateEntity implements ProcessorInterface
         $this->entityInstantiator = $entityInstantiator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext $context */

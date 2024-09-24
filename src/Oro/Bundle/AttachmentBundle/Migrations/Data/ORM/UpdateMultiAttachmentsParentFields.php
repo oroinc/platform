@@ -20,9 +20,7 @@ class UpdateMultiAttachmentsParentFields extends AbstractFixture implements Cont
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         if (!$manager instanceof EntityManagerInterface) {

@@ -14,6 +14,7 @@ class ServiceContainerRealRefPassTest extends \PHPUnit\Framework\TestCase
     /** @var ServiceContainerRealRefPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ServiceContainerRealRefPass();

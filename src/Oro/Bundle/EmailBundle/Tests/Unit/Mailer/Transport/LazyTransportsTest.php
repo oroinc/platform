@@ -15,6 +15,7 @@ class LazyTransportsTest extends \PHPUnit\Framework\TestCase
     private TransportFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $transportFactory;
     private Transport $transport;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transportFactory = $this->createMock(TransportFactoryInterface::class);

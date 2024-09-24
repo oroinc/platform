@@ -15,6 +15,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
     /** @var Count */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new Count(new ContextAccessor());

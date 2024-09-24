@@ -13,7 +13,7 @@ class ArraySorterExtension extends AbstractSorterExtension
     const ASC_SORTING = 'ASC';
     const DESC_SORTING = 'DESC';
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -28,6 +28,7 @@ class ArraySorterExtension extends AbstractSorterExtension
      * @throws UnexpectedTypeException
      * @throws InvalidArgumentException
      */
+    #[\Override]
     protected function addSorterToDatasource(array $sorter, $direction, DatasourceInterface $datasource)
     {
         if (!$datasource instanceof ArrayDatasource) {

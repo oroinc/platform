@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ResolveDestinationPageTest extends BaseTestCase
 {
+    #[\Override]
     public function testExecute(): void
     {
         $entity = (object)[];

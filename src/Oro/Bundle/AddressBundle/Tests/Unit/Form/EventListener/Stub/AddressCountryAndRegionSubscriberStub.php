@@ -13,9 +13,7 @@ class AddressCountryAndRegionSubscriberStub extends AddressCountryAndRegionSubsc
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [];

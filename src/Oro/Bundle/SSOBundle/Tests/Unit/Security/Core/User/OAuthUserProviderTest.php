@@ -26,6 +26,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OAuthUserProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userProvider = $this->createMock(OAuthUserProviderInterface::class);

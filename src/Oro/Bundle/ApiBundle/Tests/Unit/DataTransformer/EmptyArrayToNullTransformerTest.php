@@ -9,6 +9,7 @@ class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EmptyArrayToNullTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new EmptyArrayToNullTransformer();

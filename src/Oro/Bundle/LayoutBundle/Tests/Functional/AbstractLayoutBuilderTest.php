@@ -20,6 +20,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
     /** @var ThemeResourceProvider */
     private $resourcesProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -31,9 +32,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
         $this->resourcesProvider = $container->get('oro_layout.tests.theme_extension.resource_provider.theme');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function tearDown(): void
     {
         $container = $this->getContainer();

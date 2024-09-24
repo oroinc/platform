@@ -28,6 +28,7 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var LoaderResolver */
     protected $loaderResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);

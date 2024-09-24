@@ -21,6 +21,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DeletedAttributeProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configModelManager = $this->createMock(ConfigModelManager::class);

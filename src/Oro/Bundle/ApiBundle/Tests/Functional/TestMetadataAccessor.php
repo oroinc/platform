@@ -20,9 +20,7 @@ class TestMetadataAccessor implements MetadataAccessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadata(string $className): ?EntityMetadata
     {
         return $this->metadata[$className] ?? null;

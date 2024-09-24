@@ -17,9 +17,7 @@ class MultipleFileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MultipleFileConstraintsProvider */
     private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);

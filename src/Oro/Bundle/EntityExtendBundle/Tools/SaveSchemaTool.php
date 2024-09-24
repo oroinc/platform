@@ -21,9 +21,6 @@ class SaveSchemaTool extends SchemaTool
     protected AbstractPlatform $platform;
     protected LoggerInterface $logger;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(ManagerRegistry $registry, LoggerInterface $logger)
     {
         $this->em = $registry->getManager();
@@ -33,9 +30,7 @@ class SaveSchemaTool extends SchemaTool
         parent::__construct($this->em);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUpdateSchemaSql(array $classes, $saveMode = false)
     {
         if (false === $saveMode) {

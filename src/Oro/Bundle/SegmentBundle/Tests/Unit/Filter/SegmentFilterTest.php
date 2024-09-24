@@ -87,6 +87,7 @@ class SegmentFilterTest extends OrmTestCase
     /** @var SegmentFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

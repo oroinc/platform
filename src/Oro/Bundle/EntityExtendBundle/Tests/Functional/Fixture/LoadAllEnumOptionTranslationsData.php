@@ -16,9 +16,7 @@ class LoadAllEnumOptionTranslationsData extends AbstractFixture implements Depen
 {
     private const array ENUM_OPTION_TRANSLATION_LANGUAGES = ['fr_FR'];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $translations = $manager->getRepository(Translation::class)->findBy([]);
@@ -38,9 +36,7 @@ class LoadAllEnumOptionTranslationsData extends AbstractFixture implements Depen
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [

@@ -35,6 +35,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     private AttachmentManager $attachmentManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);

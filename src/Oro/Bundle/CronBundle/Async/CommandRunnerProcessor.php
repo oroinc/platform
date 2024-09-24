@@ -36,9 +36,7 @@ class CommandRunnerProcessor implements
         $this->commandRunner = $commandRunner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();
@@ -82,9 +80,7 @@ class CommandRunnerProcessor implements
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [RunCommandTopic::getName(), RunCommandDelayedTopic::getName()];

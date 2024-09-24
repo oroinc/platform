@@ -37,9 +37,7 @@ class ServiceLocatorCompilerPass implements CompilerPassInterface
         $this->isServiceLocatorOptional = $isServiceLocatorOptional;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($this->isServiceLocatorOptional && !$container->hasDefinition($this->serviceLocatorServiceId)) {

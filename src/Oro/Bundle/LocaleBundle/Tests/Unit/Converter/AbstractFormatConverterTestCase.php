@@ -71,6 +71,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
         [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(DateTimeFormatterInterface::class);

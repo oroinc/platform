@@ -41,17 +41,13 @@ final class BlockBuilder implements BlockBuilderInterface
         $this->id = $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeName()
     {
         $blockType = $this->rawLayout->getProperty($this->id, RawLayout::BLOCK_TYPE, true);
@@ -61,25 +57,19 @@ final class BlockBuilder implements BlockBuilderInterface
             : $blockType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLayoutManipulator()
     {
         return $this->layoutManipulator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeHelper()
     {
         return $this->typeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContext()
     {
         return $this->context;

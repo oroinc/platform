@@ -18,6 +18,7 @@ class RenderTemplateTest extends \PHPUnit\Framework\TestCase
     /** @var RenderTemplate */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);

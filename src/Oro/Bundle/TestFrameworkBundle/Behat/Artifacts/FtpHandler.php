@@ -49,9 +49,7 @@ class FtpHandler implements ArtifactsHandlerInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function save($data)
     {
         $fileName = TokenGenerator::generateToken('image').'.png';
@@ -72,9 +70,7 @@ class FtpHandler implements ArtifactsHandlerInterface
         return rtrim($this->screenshotRemoteBaseUrl, '/').'/'.trim($fileName, '/');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getConfigKey()
     {
         return 'ftp';

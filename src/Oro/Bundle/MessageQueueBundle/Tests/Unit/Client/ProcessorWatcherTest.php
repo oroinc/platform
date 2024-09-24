@@ -14,9 +14,7 @@ class ProcessorWatcherTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessorWatcher */
     private $processorWatcher;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->bufferedProducer = $this->createMock(BufferedMessageProducer::class);

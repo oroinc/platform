@@ -56,9 +56,9 @@ class WorkflowEntityValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
      * @param WorkflowEntity $constraint
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!is_object($value)) {

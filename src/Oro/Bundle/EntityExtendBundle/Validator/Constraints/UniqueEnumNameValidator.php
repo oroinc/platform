@@ -28,9 +28,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {

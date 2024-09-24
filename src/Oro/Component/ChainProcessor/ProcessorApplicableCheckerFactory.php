@@ -8,9 +8,7 @@ namespace Oro\Component\ChainProcessor;
  */
 class ProcessorApplicableCheckerFactory implements ProcessorApplicableCheckerFactoryInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createApplicableChecker(): ChainApplicableChecker
     {
         $applicableChecker = new ChainApplicableChecker();

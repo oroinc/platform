@@ -26,9 +26,6 @@ trait DecoratedSqlWalkerTrait
      */
     private $outputResultModifiers = [];
 
-    /**
-     * {@inheritDoc}
-     */
     public function __construct($query, $parserResult, array $queryComponents)
     {
         parent::__construct($query, $parserResult, $queryComponents);
@@ -72,369 +69,231 @@ trait DecoratedSqlWalkerTrait
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkSelectClause($selectClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkFromClause($fromClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkFunction($function)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkOrderByClause($orderByClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkOrderByItem($orderByItem)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkHavingClause($havingClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkJoin($join)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkSelectExpression($selectExpression)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkQuantifiedExpression($qExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkSubselect($subselect)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkSubselectFromClause($subselectFromClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkSimpleSelectClause($simpleSelectClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkSimpleSelectExpression($simpleSelectExpression)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkAggregateExpression($aggExpression)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkGroupByClause($groupByClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkGroupByItem($groupByItem)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkUpdateStatement(AST\UpdateStatement $AST)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkDeleteStatement(AST\DeleteStatement $AST)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkDeleteClause(AST\DeleteClause $deleteClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkUpdateClause($updateClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkUpdateItem($updateItem)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkWhereClause($whereClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkConditionalExpression($condExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkConditionalTerm($condTerm)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkConditionalFactor($factor)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkConditionalPrimary($primary)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkExistsExpression($existsExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkCollectionMemberExpression($collMemberExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkEmptyCollectionComparisonExpression($emptyCollCompExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkNullComparisonExpression($nullCompExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkInExpression($inExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkInstanceOfExpression($instanceOfExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkLiteral($literal)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkBetweenExpression($betweenExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkLikeExpression($likeExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkStateFieldPathExpression($stateFieldPathExpression)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkComparisonExpression($compExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkInputParameter($inputParam)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkArithmeticExpression($arithmeticExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkArithmeticTerm($term)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkStringPrimary($stringPrimary)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkArithmeticFactor($factor)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkSimpleArithmeticExpression($simpleArithmeticExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkPathExpression($pathExpr)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function walkResultVariable($resultVariable)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());

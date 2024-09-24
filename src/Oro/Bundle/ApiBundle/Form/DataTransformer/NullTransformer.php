@@ -30,17 +30,13 @@ final class NullTransformer implements DataTransformerInterface
         return self::$instance;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         return $value;

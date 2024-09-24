@@ -26,9 +26,7 @@ class ExcludeChangeAttachmentSubresources implements ProcessorInterface
         $this->attachmentAssociationProvider = $attachmentAssociationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectSubresourcesContext $context */

@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class TranslatorDependencyPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $container->getDefinition('translator.default')

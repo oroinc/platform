@@ -20,6 +20,7 @@ class ImportExportTest extends WebTestCase
     /** @var FieldConfigModel[] */
     private $fields;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

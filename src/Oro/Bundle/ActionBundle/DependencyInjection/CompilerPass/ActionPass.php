@@ -21,18 +21,14 @@ class ActionPass extends AbstractPass
     /** @var ParameterBagInterface */
     private $parameterBag;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->parameterBag = $container->getParameterBag();
         $this->processTypes($container, self::ACTION_FACTORY_SERVICE_ID, self::ACTION_TAG);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function prepareDefinition(Definition $definition)
     {
         parent::prepareDefinition($definition);

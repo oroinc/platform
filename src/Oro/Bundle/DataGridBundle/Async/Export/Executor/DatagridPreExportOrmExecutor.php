@@ -57,6 +57,7 @@ class DatagridPreExportOrmExecutor implements DatagridPreExportExecutorInterface
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public function isSupported(DatagridInterface $datagrid, array $options): bool
     {
         return $datagrid->getDatasource() instanceof OrmDatasource && $this->tokenAccessor->getUserId();
@@ -70,6 +71,7 @@ class DatagridPreExportOrmExecutor implements DatagridPreExportExecutorInterface
      *
      * @return bool
      */
+    #[\Override]
     public function run(JobRunner $jobRunner, Job $job, DatagridInterface $datagrid, array $options): bool
     {
         if ($this->tokenAccessor->getUserId() === null) {

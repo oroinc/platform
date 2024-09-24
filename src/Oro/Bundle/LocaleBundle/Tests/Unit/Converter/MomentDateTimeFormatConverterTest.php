@@ -7,17 +7,13 @@ use Oro\Bundle\LocaleBundle\Converter\MomentDateTimeFormatConverter;
 
 class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createFormatConverter(): DateTimeFormatConverterInterface
     {
         return new MomentDateTimeFormatConverter($this->formatter, $this->translator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDateFormatDataProvider(): array
     {
         return [
@@ -30,9 +26,7 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTimeFormatDataProvider(): array
     {
         return [
@@ -45,9 +39,7 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDateTimeFormatDataProvider(): array
     {
         return [
@@ -75,9 +67,7 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDateFormatDayProvider(): array
     {
         return [

@@ -23,6 +23,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FileManager */
     private $fileManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->gaufretteFileManager = $this->createMock(GaufretteFileManager::class);

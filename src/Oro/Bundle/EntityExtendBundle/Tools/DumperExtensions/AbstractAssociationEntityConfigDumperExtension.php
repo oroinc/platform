@@ -71,9 +71,7 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
      */
     abstract protected function isTargetEntityApplicable(ConfigInterface $targetEntityConfig);
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($actionType)
     {
         if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {

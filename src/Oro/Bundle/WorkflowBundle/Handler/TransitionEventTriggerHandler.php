@@ -37,11 +37,11 @@ class TransitionEventTriggerHandler implements TransitionTriggerHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Doctrine\ORM\EntityNotFoundException
      * @throws \InvalidArgumentException
      * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException
      */
+    #[\Override]
     public function process(BaseTransitionTrigger $trigger, TransitionTriggerMessage $message)
     {
         $isWorkflowEnabledInFeatures = $this->featureChecker->isResourceEnabled(

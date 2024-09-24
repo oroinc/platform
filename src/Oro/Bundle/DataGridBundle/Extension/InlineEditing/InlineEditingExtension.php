@@ -14,7 +14,6 @@ class InlineEditingExtension extends AbstractExtension
 {
     private InlineEditingConfigurator $configurator;
 
-    /** {@inheritdoc} */
     protected $excludedModes = [
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
@@ -25,18 +24,21 @@ class InlineEditingExtension extends AbstractExtension
         $this->configurator = $configurator;
     }
 
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return parent::isApplicable($config)
             && $config->offsetGetByPath(Configuration::ENABLED_CONFIG_PATH);
     }
 
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $this->configurator->configureInlineEditingForGrid($config);
         $this->configurator->configureInlineEditingForSupportingColumns($config);
     }
 
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $data->offsetSet(

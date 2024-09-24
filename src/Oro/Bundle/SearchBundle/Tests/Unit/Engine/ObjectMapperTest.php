@@ -189,6 +189,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     protected function setUp(): void
     {
         $this->manufacturer = new Manufacturer();

@@ -18,6 +18,7 @@ class ResourceCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ResourceChecker */
     private $resourceChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

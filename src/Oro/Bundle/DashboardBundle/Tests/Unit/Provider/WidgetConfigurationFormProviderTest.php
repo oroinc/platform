@@ -13,6 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class WidgetConfigurationFormProviderTest extends FormIntegrationTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

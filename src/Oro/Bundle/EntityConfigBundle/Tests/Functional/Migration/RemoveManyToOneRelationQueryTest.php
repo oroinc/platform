@@ -18,6 +18,7 @@ class RemoveManyToOneRelationQueryTest extends WebTestCase
     /** @var ArrayLogger */
     private $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

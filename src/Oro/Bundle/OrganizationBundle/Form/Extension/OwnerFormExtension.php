@@ -95,9 +95,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -114,6 +112,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['ownership_disabled']) {
@@ -176,9 +175,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('ownership_disabled', false);

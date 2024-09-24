@@ -31,9 +31,6 @@ trait OrganizationAwareTokenTrait
         $this->organization = $organization;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
         // clone organization object to have another reference
@@ -51,9 +48,6 @@ trait OrganizationAwareTokenTrait
         return [$organization, ''];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $serialized): void
     {
         list($organization, $serializedTokenWithoutOrganization) = $serialized;

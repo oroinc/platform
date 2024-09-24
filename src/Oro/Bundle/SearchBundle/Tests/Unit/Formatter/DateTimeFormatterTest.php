@@ -10,6 +10,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var DateTimeFormatter */
     private $dateTimeFormatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dateTimeFormatter = new DateTimeFormatter();

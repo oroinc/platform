@@ -24,6 +24,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
     /** @var AvailableOwnerAccessRule */
     private $rule;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);

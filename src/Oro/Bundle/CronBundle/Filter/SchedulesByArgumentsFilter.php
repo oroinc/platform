@@ -12,6 +12,7 @@ class SchedulesByArgumentsFilter implements SchedulesByArgumentsFilterInterface
      *
      * @return Schedule[]
      */
+    #[\Override]
     public function filter(array $schedules, array $arguments)
     {
         $argsSchedule = new Schedule();

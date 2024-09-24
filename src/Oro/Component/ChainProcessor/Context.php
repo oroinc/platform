@@ -18,81 +18,61 @@ class Context extends ParameterBag implements ContextInterface
     private bool $resultExists = false;
     private ?string $checksum = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAction(): string
     {
         return $this->get(self::ACTION);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setAction(string $action): void
     {
         $this->set(self::ACTION, $action);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFirstGroup(): ?string
     {
         return $this->firstGroup;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setFirstGroup(?string $group): void
     {
         $this->firstGroup = $group;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLastGroup(): ?string
     {
         return $this->lastGroup;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setLastGroup(?string $group): void
     {
         $this->lastGroup = $group;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasSkippedGroups(): bool
     {
         return !empty($this->skippedGroups);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSkippedGroups(): array
     {
         return $this->skippedGroups;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resetSkippedGroups(): void
     {
         $this->skippedGroups = [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function skipGroup(string $group): void
     {
         if (!\in_array($group, $this->skippedGroups, true)) {
@@ -100,9 +80,7 @@ class Context extends ParameterBag implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function undoGroupSkipping(string $group): void
     {
         $key = array_search($group, $this->skippedGroups, true);
@@ -112,43 +90,33 @@ class Context extends ParameterBag implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasResult(): bool
     {
         return $this->resultExists;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getResult(): mixed
     {
         return $this->result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setResult(mixed $data): void
     {
         $this->result = $data;
         $this->resultExists = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeResult(): void
     {
         $this->result = null;
         $this->resultExists = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getChecksum(): string
     {
         if (null === $this->checksum) {
@@ -158,27 +126,21 @@ class Context extends ParameterBag implements ContextInterface
         return $this->checksum;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function set(string $key, mixed $value): void
     {
         parent::set($key, $value);
         $this->checksum = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function remove(string $key): void
     {
         parent::remove($key);
         $this->checksum = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clear(): void
     {
         parent::clear();

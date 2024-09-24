@@ -31,6 +31,7 @@ class SystemConfigTransportFactory implements TransportFactoryInterface
         $this->requestStack = $requestStack;
     }
 
+    #[\Override]
     public function create(Dsn $dsn): TransportInterface
     {
         $realDsn = $this->systemConfigTransportRealDsnProvider->getRealDsn($dsn);
@@ -43,6 +44,7 @@ class SystemConfigTransportFactory implements TransportFactoryInterface
     /**
      * Checks that dsn is "oro://system-config".
      */
+    #[\Override]
     public function supports(Dsn $dsn): bool
     {
         return $dsn->getScheme() === 'oro' && $dsn->getHost() === 'system-config';

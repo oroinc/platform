@@ -37,6 +37,7 @@ class LoadCountryData extends AbstractFixture
     /**
      * Load address types
      */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $repository = $manager->getRepository(Country::class);

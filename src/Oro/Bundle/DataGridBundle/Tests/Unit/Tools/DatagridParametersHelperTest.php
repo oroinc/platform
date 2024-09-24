@@ -14,6 +14,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridParametersHelper */
     private $datagridParametersHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datagridParameters = $this->createMock(ParameterBag::class);

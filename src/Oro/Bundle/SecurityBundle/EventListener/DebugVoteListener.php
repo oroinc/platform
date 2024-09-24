@@ -29,6 +29,7 @@ class DebugVoteListener extends VoteListener
     /**
      * Event dispatched by a voter during access manager decision.
      */
+    #[\Override]
     public function onVoterVote(VoteEvent $event): void
     {
         if ($this->isEnabled()) {
@@ -36,6 +37,7 @@ class DebugVoteListener extends VoteListener
         }
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return parent::getSubscribedEvents();

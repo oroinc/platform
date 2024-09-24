@@ -32,6 +32,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

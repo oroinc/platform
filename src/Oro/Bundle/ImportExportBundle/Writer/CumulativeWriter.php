@@ -36,6 +36,7 @@ class CumulativeWriter implements ItemWriterInterface, ClosableInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    #[\Override]
     public function write(array $items)
     {
         if ($this->skipFlush($items)) {
@@ -205,6 +206,7 @@ class CumulativeWriter implements ItemWriterInterface, ClosableInterface
             array_sum($scheduledCollectionDeletions);
     }
 
+    #[\Override]
     public function close()
     {
         $this->doWrite();

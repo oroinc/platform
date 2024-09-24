@@ -15,9 +15,7 @@ use Oro\Component\EntitySerializer\EntityConfigInterface;
  */
 class CompleteSorters extends CompleteSection
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
@@ -25,9 +23,7 @@ class CompleteSorters extends CompleteSection
         $this->complete($context->getSorters(), $context->getClassName(), $context->getResult());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function completeFields(
         EntityConfigInterface $section,
         string $entityClass,

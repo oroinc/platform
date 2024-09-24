@@ -9,9 +9,7 @@ use Oro\Bundle\SecurityBundle\AccessRule\Visitor;
  */
 class AccessDenied implements ExpressionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visit(Visitor $visitor)
     {
         return $visitor->walkAccessDenied($this);

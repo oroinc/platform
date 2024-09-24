@@ -17,6 +17,7 @@ class ObjectCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
      */
     private $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->converter = $this->createMock(ObjectCacheDataConverterInterface::class);

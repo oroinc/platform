@@ -16,6 +16,7 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var HelpExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->linkProvider = $this->createMock(HelpLinkProvider::class);

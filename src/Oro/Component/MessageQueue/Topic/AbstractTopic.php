@@ -9,6 +9,7 @@ use Oro\Component\MessageQueue\Client\MessagePriority;
  */
 abstract class AbstractTopic implements TopicInterface
 {
+    #[\Override]
     public function getDefaultPriority(string $queueName): string
     {
         return MessagePriority::NORMAL;

@@ -11,9 +11,7 @@ class DatabaseCheckerCompilerPass implements CompilerPassInterface
     const STATE_MANAGER_SERVICE     = 'oro_entity.database_checker.state_manager';
     const DATABASE_CHECKER_TAG_NAME = 'oro_entity.database_checker';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::STATE_MANAGER_SERVICE)) {

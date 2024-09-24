@@ -25,9 +25,7 @@ class DoctrineTypeGuesser extends AbstractFormGuesser
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function guessType($class, $property): ?TypeGuess
     {
         $metadata = $this->getMetadataForClass($class);

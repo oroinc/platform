@@ -12,6 +12,7 @@ class BlankTest extends \PHPUnit\Framework\TestCase
 {
     private Condition\Blank $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\Blank();

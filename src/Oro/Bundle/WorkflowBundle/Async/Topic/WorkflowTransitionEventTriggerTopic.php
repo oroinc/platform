@@ -14,16 +14,19 @@ class WorkflowTransitionEventTriggerTopic extends AbstractWorkflowTransitionTrig
 {
     public const NAME = 'oro_message_queue.transition_trigger_event_message';
 
+    #[\Override]
     public static function getName(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Process the workflow transition event trigger.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

@@ -21,6 +21,7 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
     /** @var MaintenanceListener */
     private $publisher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);

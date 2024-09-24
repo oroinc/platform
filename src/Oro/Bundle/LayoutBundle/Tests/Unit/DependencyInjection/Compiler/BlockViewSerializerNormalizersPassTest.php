@@ -12,6 +12,7 @@ class BlockViewSerializerNormalizersPassTest extends \PHPUnit\Framework\TestCase
 {
     private BlockViewSerializerNormalizersPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new BlockViewSerializerNormalizersPass();

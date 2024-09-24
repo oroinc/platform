@@ -72,6 +72,7 @@ class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, Clear
     /**
      * Warms up the cache of all entity alias resolvers.
      */
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->cache = [];
@@ -85,6 +86,7 @@ class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, Clear
     /**
      * Clears the cache of all entity alias resolvers.
      */
+    #[\Override]
     public function clearCache(): void
     {
         $this->cache = [];

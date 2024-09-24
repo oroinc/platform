@@ -15,9 +15,6 @@ class FileConstraintFromEntityFieldConfig extends Constraint
     /** @var string */
     protected $fieldName;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($options = null)
     {
         if (!isset($options['entityClass'])) {
@@ -31,9 +28,7 @@ class FileConstraintFromEntityFieldConfig extends Constraint
         parent::__construct($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;

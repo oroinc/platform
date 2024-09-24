@@ -18,6 +18,7 @@ class ConfigSettingsFormOptionsEventTest extends TestCase
 
     private ConfigSettingsFormOptionsEvent $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

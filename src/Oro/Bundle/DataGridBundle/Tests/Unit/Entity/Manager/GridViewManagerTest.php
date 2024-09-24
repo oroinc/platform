@@ -39,6 +39,7 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
     /** @var GridViewManager */
     private $gridViewManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->user = new User();

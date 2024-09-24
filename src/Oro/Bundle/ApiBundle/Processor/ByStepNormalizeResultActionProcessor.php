@@ -12,9 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ComponentContextInterface $context): void
     {
         /** @var ByStepNormalizeResultContext $context */
@@ -36,9 +34,9 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function executeProcessors(ComponentContextInterface $context): void
     {
         /** @var ByStepNormalizeResultContext $context */
@@ -82,9 +80,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function handleErrors(NormalizeResultContext $context, string $processorId, ?string $group): void
     {
         /** @var ByStepNormalizeResultContext $context */
@@ -96,9 +92,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
         parent::handleErrors($context, $processorId, $group);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function handleException(
         \Exception $e,
         NormalizeResultContext $context,
@@ -114,17 +108,13 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
         parent::handleException($e, $context, $processorId, $group);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isNormalizeResultEnabled(NormalizeResultContext $context): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeNormalizeResultProcessors(NormalizeResultContext $context): void
     {
         $context->setLastGroup(ApiActionGroup::NORMALIZE_RESULT);

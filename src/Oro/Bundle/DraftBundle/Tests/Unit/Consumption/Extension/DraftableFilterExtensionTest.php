@@ -18,6 +18,7 @@ class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DraftableFilterExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

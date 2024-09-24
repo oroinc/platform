@@ -50,6 +50,7 @@ class PlatformUpdateCommand extends AbstractCommand
         $this->doctrine = $doctrine;
     }
 
+    #[\Override]
     protected function configure()
     {
         $this
@@ -86,6 +87,7 @@ HELP
         parent::configure();
     }
 
+    #[\Override]
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         if ($this->getContainer()->getParameter('kernel.environment') === 'test') {
@@ -94,6 +96,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $commandExecutor = $this->getCommandExecutor($input, $output);

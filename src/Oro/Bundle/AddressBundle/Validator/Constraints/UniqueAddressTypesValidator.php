@@ -13,9 +13,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class UniqueAddressTypesValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {

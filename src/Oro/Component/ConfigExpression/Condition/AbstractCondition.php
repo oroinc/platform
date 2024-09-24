@@ -7,10 +7,10 @@ use Oro\Component\ConfigExpression\AbstractExpression;
 abstract class AbstractCondition extends AbstractExpression
 {
     /**
-     * {@inheritdoc}
      *
      * @return boolean
      */
+    #[\Override]
     protected function doEvaluate($context)
     {
         $result = $this->isConditionAllowed($context);

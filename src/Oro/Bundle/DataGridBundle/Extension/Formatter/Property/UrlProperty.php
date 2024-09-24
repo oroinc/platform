@@ -30,9 +30,7 @@ class UrlProperty extends AbstractProperty
         $this->router = $router;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRawValue(ResultRecordInterface $record)
     {
         $referenceType = $this->getOr(self::IS_ABSOLUTE_KEY, false)

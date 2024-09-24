@@ -19,6 +19,7 @@ class EmailAddressAssociationMetadataListenerTest extends \PHPUnit\Framework\Tes
     /** @var EmailAddressAssociationMetadataListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailAddressManager = $this->createMock(EmailAddressManager::class);

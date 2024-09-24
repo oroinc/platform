@@ -29,6 +29,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ThemeResourceProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->lastModificationDateProvider = $this->createMock(LastModificationDateProvider::class);

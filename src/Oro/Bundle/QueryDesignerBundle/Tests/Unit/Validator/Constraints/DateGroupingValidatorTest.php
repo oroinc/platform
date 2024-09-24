@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DateGroupingValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): DateGroupingValidator
     {
         return new DateGroupingValidator();

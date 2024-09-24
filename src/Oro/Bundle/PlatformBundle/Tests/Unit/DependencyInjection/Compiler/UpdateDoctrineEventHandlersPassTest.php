@@ -10,6 +10,7 @@ class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateDoctrineEventHandlersPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new UpdateDoctrineEventHandlersPass();

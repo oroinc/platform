@@ -20,26 +20,22 @@ class ThemeConfigurationFallbackProvider extends AbstractEntityFallbackProvider
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFallbackLabel(): string
     {
         return 'oro.theme.themeconfiguration.fallback.label';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFallbackEntityClass(): ?string
     {
         return null;
     }
 
     /**
-     * {@inheritdoc}
      * @throws FallbackFieldConfigurationMissingException
      */
+    #[\Override]
     public function getFallbackHolderEntity($object, $objectFieldName): mixed
     {
         $fallbackConfig = $this->getEntityConfig($object, $objectFieldName);

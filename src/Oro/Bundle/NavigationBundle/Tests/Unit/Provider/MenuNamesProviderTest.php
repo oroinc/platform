@@ -14,6 +14,7 @@ class MenuNamesProviderTest extends TestCase
 
     private MenuNamesProvider $provider;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProvider::class);

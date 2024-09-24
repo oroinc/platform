@@ -11,6 +11,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
 {
     private MetadataContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new MetadataContext();

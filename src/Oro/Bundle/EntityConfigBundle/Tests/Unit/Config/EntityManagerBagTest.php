@@ -14,6 +14,7 @@ class EntityManagerBagTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManagerBag */
     private $entityManagerBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

@@ -36,6 +36,7 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $bundle1 = new TestBundle1();

@@ -21,6 +21,7 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldFallbackValueNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resolver = $this->createMock(EntityFallbackResolver::class);

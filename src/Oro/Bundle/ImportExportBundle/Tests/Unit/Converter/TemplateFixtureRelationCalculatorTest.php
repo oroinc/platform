@@ -18,6 +18,7 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateFixtureRelationCalculator */
     private $calculator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->templateManager = $this->createMock(TemplateManager::class);

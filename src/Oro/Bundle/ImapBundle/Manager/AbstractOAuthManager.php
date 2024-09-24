@@ -25,25 +25,19 @@ abstract class AbstractOAuthManager implements OAuthManagerInterface
         $this->oauthProvider = $oauthProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAuthMode(): string
     {
         return 'XOAUTH2';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isAccessTokenExpired(UserEmailOrigin $origin): bool
     {
         return $origin->getAccessTokenExpiresAt() < new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessTokenWithCheckingExpiration(UserEmailOrigin $origin): ?string
     {
         $token = $origin->getAccessToken();
@@ -66,9 +60,7 @@ abstract class AbstractOAuthManager implements OAuthManagerInterface
         return $token;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function refreshAccessToken(UserEmailOrigin $origin): void
     {
         $refreshToken = $origin->getRefreshToken();

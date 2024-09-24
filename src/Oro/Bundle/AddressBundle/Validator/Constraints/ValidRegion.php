@@ -11,9 +11,7 @@ class ValidRegion extends Constraint
 {
     public $message = 'oro.address.validation.invalid_country_region';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

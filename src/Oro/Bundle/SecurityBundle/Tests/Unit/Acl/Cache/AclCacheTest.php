@@ -42,6 +42,7 @@ class AclCacheTest extends \PHPUnit\Framework\TestCase
 
     private AclCache $aclCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(PhpFileCache::class);

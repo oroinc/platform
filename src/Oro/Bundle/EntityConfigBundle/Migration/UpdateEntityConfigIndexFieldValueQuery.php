@@ -63,9 +63,7 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
         $this->replaceValue = $replaceValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -85,9 +83,7 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->updateEntityConfigIndexValue($logger);

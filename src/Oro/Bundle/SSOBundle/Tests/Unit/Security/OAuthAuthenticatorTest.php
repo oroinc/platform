@@ -39,6 +39,7 @@ class OAuthAuthenticatorTest extends TestCase
     private MockObject|OrganizationGuesser $organizationGuesser;
     private MockObject|OAuthTokenFactory $tokenFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->httpUtils = $this->createMock(HttpUtils::class);

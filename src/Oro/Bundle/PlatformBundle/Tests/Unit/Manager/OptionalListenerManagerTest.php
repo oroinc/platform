@@ -17,6 +17,7 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
     /** @var OptionalListenerManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->testListeners = [

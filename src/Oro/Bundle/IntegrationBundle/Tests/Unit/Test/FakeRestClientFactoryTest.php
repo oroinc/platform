@@ -19,6 +19,7 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var FakeRestClientFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new FakeRestClientFactory();

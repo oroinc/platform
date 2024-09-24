@@ -28,6 +28,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     /** @var CorrectSortValue */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

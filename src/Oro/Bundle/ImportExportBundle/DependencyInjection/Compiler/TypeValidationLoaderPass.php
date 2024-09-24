@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class TypeValidationLoaderPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('validator.builder')

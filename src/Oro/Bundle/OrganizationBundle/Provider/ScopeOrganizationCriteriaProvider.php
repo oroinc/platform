@@ -22,17 +22,13 @@ class ScopeOrganizationCriteriaProvider implements ScopeCriteriaProviderInterfac
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaField()
     {
         return self::ORGANIZATION;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValue()
     {
         $token = $this->tokenStorage->getToken();
@@ -43,9 +39,7 @@ class ScopeOrganizationCriteriaProvider implements ScopeCriteriaProviderInterfac
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValueType()
     {
         return Organization::class;

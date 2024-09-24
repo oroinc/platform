@@ -13,6 +13,7 @@ class InitializeConfigExtrasTest extends GetProcessorTestCase
     /** @var InitializeConfigExtras */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

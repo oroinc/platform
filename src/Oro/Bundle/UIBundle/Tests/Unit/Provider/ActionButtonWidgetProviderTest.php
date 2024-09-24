@@ -10,6 +10,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var PlaceholderProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $placeholderProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->placeholderProvider = $this->createMock(PlaceholderProvider::class);

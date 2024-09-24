@@ -25,6 +25,7 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListBodyListenerDecorator */
     private $decorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->request = new Request();

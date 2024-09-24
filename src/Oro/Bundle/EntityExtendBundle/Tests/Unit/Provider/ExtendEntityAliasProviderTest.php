@@ -27,6 +27,7 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendEntityAliasProvider */
     private $entityAliasProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configProvider = $this->createMock(EntityConfigurationProvider::class);

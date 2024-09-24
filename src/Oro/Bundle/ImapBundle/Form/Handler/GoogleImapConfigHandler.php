@@ -12,17 +12,13 @@ use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
  */
 class GoogleImapConfigHandler extends AbstractImapConfigHandler
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getManagerType(): string
     {
         return AccountTypeModel::ACCOUNT_TYPE_GMAIL;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isForceRefreshRequired(ConfigChangeSet $changeSet): bool
     {
         return $changeSet->isChanged('oro_google_integration.client_id')

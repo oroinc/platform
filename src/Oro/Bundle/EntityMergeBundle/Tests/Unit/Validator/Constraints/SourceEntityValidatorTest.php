@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class SourceEntityValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);

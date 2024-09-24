@@ -20,6 +20,7 @@ class ReCaptchaType extends AbstractType
     ) {
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         preg_match('/^([^\[]+)/', $view->vars['full_name'], $matches);
@@ -40,6 +41,7 @@ class ReCaptchaType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function getParent(): ?string
     {
         return HiddenType::class;
@@ -50,6 +52,7 @@ class ReCaptchaType extends AbstractType
         return $this->getBlockPrefix();
     }
 
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return static::NAME;

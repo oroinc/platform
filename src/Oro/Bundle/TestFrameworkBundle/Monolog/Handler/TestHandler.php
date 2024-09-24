@@ -13,6 +13,7 @@ class TestHandler extends SymfonyTestHandler
 {
     private bool $skipReset = false;
 
+    #[\Override]
     public function setSkipReset(bool $skipReset): void
     {
         $this->skipReset = $skipReset;
@@ -20,6 +21,7 @@ class TestHandler extends SymfonyTestHandler
         parent::setSkipReset($skipReset);
     }
 
+    #[\Override]
     public function clear(): void
     {
         if (!$this->skipReset) {

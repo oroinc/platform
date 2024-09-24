@@ -34,6 +34,7 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
     /** @var SaveSchemaTool|\PHPUnit\Framework\MockObject\MockObject */
     private $schemaTool;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

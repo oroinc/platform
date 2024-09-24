@@ -13,6 +13,7 @@ class SetDefaultMaxRelatedEntitiesTest extends GetListProcessorTestCase
     /** @var SetDefaultMaxRelatedEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

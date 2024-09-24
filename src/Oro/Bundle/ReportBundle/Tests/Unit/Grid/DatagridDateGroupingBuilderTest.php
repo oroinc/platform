@@ -33,6 +33,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridDateGroupingBuilder */
     private $datagridDateGroupingBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->config = DatagridConfiguration::create([]);

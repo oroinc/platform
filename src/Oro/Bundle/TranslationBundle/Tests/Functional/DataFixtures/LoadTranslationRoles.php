@@ -18,9 +18,7 @@ class LoadTranslationRoles extends AbstractFixture implements ContainerAwareInte
 
     const ROLE_TRANSLATOR = 'ROLE_TRANSLATOR';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $role = new Role(self::ROLE_TRANSLATOR);

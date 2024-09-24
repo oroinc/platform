@@ -43,9 +43,7 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilteredImage(File $file, string $filterName, string $format = ''): ?BinaryInterface
     {
         $content = $this->getImageContent($file, $filterName);
@@ -56,9 +54,7 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         return $this->filterImage($content, $filterName, $format, $file->getFilename());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilteredImageByPath(string $fileName, string $filterName, string $format = ''): ?BinaryInterface
     {
         $content = $this->getImageContentByPath($fileName, $filterName);
@@ -69,9 +65,7 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         return $this->filterImage($content, $filterName, $format, $fileName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilteredImageByContent(
         string $content,
         string $filterName,
@@ -80,9 +74,7 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         return $this->filterImage($content, $filterName, $format, null);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResizedImage(File $file, int $width, int $height, string $format = ''): ?BinaryInterface
     {
         return $this->getFilteredImage(
@@ -92,9 +84,7 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResizedImageByPath(
         string $fileName,
         int $width,
@@ -108,9 +98,7 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResizedImageByContent(
         string $content,
         int $width,

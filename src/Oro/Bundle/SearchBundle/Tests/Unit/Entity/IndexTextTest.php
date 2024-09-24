@@ -12,6 +12,7 @@ class IndexTextTest extends \PHPUnit\Framework\TestCase
      */
     private $index;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->index = new IndexText();

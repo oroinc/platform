@@ -113,6 +113,7 @@ class SegmentController extends RestController
      *
      * @return ApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_segment.segment_manager.api');
@@ -122,6 +123,7 @@ class SegmentController extends RestController
      * @return FormInterface
      * @throws \RuntimeException
      */
+    #[\Override]
     public function getForm()
     {
         throw new \RuntimeException('This method is not implemented yet.');
@@ -131,6 +133,7 @@ class SegmentController extends RestController
      * @return ApiFormHandler
      * @throws \RuntimeException
      */
+    #[\Override]
     public function getFormHandler()
     {
         throw new \RuntimeException('This method is not implemented yet.');

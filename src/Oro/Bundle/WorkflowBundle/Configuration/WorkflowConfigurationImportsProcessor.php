@@ -36,7 +36,7 @@ class WorkflowConfigurationImportsProcessor implements ConfigImportProcessorInte
     /** @var array|ImportFilterInterface  */
     protected $importFilters = [];
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function process(array $content, \SplFileInfo $contentSource): array
     {
         if (empty($content['imports']) || !is_array($content['imports'])) {
@@ -122,10 +122,10 @@ class WorkflowConfigurationImportsProcessor implements ConfigImportProcessorInte
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws \LogicException
      */
+    #[\Override]
     public function setParent(ConfigImportProcessorInterface $parentProcessor)
     {
         throw new \LogicException('Main processor can not have parent.');

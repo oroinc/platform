@@ -17,6 +17,7 @@ class TranslatedEmailTemplateProviderTest extends TestCase
 {
     private TranslatedEmailTemplateProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $propertyAccessor = new PropertyAccessor();

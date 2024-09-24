@@ -62,6 +62,7 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->blockConfig = new BlockConfig($this->blockCode);

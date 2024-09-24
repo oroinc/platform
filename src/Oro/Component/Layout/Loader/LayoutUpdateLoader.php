@@ -22,9 +22,7 @@ class LayoutUpdateLoader implements LayoutUpdateLoaderInterface
         $this->updateFileNamePatterns[] = $driver->getUpdateFilenamePattern($fileExt);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load($file)
     {
         $fileExt = pathinfo($file, PATHINFO_EXTENSION);
@@ -37,9 +35,7 @@ class LayoutUpdateLoader implements LayoutUpdateLoaderInterface
         return $driver->load($file);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUpdateFileNamePatterns()
     {
         return $this->updateFileNamePatterns;

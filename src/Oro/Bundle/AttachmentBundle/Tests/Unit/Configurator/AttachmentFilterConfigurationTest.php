@@ -19,6 +19,7 @@ class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentPostProcessorsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $attachmentPostProcessorsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterConfiguration = $this->createMock(FilterConfiguration::class);

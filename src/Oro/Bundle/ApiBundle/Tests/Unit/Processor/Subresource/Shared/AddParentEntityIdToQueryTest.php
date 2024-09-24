@@ -18,6 +18,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
 {
     private AddParentEntityIdToQuery $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

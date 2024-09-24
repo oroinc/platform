@@ -14,6 +14,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     private ConfigurationProvider $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $cacheFile = $this->getTempFile('NavigationConfigurationProvider');

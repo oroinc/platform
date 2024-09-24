@@ -19,6 +19,7 @@ class GaufretteResolverTest extends \PHPUnit\Framework\TestCase
     /** @var RequestContext|\PHPUnit\Framework\MockObject\MockObject */
     private $requestContext;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

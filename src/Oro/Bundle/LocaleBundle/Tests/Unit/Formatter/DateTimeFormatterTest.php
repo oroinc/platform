@@ -17,6 +17,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var DateTimeFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);

@@ -42,9 +42,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRecipients(EmailRecipientsProviderArgs $args)
     {
         if (!$args->getRelatedEntity()) {
@@ -111,9 +109,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         return $recipients;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSection(): string
     {
         return 'oro.email.autocomplete.contexts';

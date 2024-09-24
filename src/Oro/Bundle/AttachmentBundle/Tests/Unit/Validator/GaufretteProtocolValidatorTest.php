@@ -10,6 +10,7 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var ProtocolValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerValidator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerValidator = $this->createMock(ProtocolValidatorInterface::class);

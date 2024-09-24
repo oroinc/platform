@@ -9,6 +9,7 @@ class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentFiltersPurifier */
     private $segmentFiltersPurifier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->segmentFiltersPurifier = new SegmentFiltersPurifier();

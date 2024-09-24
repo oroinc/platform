@@ -10,6 +10,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityVariablesProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new EntityVariablesProvider();

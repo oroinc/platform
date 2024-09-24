@@ -20,9 +20,7 @@ class ArrayContains extends FunctionNode
     private Node|string $entityFieldPath;
     private InputParameter $value;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function parse(Parser $parser): void
     {
         $parser->match(Lexer::T_IDENTIFIER);
@@ -35,9 +33,7 @@ class ArrayContains extends FunctionNode
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSql(SqlWalker $sqlWalker): string
     {
         if (!$sqlWalker->getConnection()->getDatabasePlatform() instanceof PostgreSQL94Platform) {

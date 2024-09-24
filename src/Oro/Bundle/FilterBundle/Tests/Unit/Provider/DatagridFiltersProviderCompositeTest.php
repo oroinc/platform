@@ -14,6 +14,7 @@ class DatagridFiltersProviderCompositeTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridFiltersProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerProvider2;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerProvider1 = $this->createMock(DatagridFiltersProviderInterface::class);

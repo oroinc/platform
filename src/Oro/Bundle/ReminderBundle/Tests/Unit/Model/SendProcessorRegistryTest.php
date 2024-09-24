@@ -20,6 +20,7 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var SendProcessorRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processors = [];

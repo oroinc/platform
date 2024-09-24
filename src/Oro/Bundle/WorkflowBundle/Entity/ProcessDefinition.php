@@ -296,6 +296,7 @@ class ProcessDefinition implements DomainObjectInterface
      *
      * @return string
      */
+    #[\Override]
     public function getObjectIdentifier()
     {
         return $this->getName();

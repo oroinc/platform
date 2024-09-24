@@ -43,9 +43,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOrganization($domainObject)
     {
         return is_a(
@@ -55,9 +53,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isBusinessUnit($domainObject)
     {
         return is_a(
@@ -68,9 +64,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
     }
 
     /**
-     * {@inheritdoc}
      * @return bool
      */
+    #[\Override]
     public function isUser($domainObject)
     {
         return is_a(
@@ -81,11 +77,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isAssociatedWithOrganization($user, $domainObject, $organization = null)
     {
         $tree = $this->treeProvider->getTree();
@@ -155,11 +151,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
     {
         $tree = $this->treeProvider->getTree();
@@ -214,9 +210,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {
         $userId = $this->getObjectId($user);

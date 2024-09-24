@@ -29,9 +29,9 @@ class Configuration implements ConfigurationInterface
     public const string TURNSTILE_PRIVATE_KEY = 'turnstile_private_key';
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

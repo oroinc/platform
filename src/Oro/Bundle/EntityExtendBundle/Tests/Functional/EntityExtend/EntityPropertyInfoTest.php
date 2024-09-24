@@ -13,6 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class EntityPropertyInfoTest extends WebTestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         self::bootKernel();

@@ -6,38 +6,28 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
 
 class BufferedQueryResultIteratorStub extends \ArrayIterator implements BufferedQueryResultIteratorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSource()
     {
         return new \stdClass();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setBufferSize($bufferSize)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setPageCallback(callable $callback = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setPageLoadedCallback(callable $callback = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setHydrationMode($hydrationMode)
     {
     }

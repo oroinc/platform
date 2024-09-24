@@ -21,17 +21,13 @@ class UniqueEnumName extends Constraint
     /** @var string */
     public $fieldName;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return UniqueEnumNameValidator::ALIAS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRequiredOptions(): array
     {
         return ['entityClassName', 'fieldName'];

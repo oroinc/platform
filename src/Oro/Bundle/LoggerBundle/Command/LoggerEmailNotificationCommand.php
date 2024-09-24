@@ -32,12 +32,14 @@ class LoggerEmailNotificationCommand extends Command
         parent::__construct();
     }
 
+    #[\Override]
     public function isEnabled(): bool
     {
         return (bool) $this->configManager;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -67,6 +69,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

@@ -27,9 +27,7 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
         $this->typesRegistry = $typesRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

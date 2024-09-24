@@ -11,6 +11,7 @@ class GridFilterChoice extends GridFilterStringItem
      *
      * @param string|array $value
      */
+    #[\Override]
     public function setFilterValue($value)
     {
         /** @var Select2Entities $select2Element */

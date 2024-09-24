@@ -17,6 +17,7 @@ class DateTimeFormatConverterRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var DateTimeFormatConverterRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->converter1 = $this->createMock(DateTimeFormatConverterInterface::class);

@@ -7,9 +7,7 @@ use Oro\Bundle\ApiBundle\Util\FieldDqlExpressionProviderInterface;
 
 class FieldDqlExpressionProviderStub implements FieldDqlExpressionProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFieldDqlExpression(QueryBuilder $qb, string $fieldPath): ?string
     {
         return null;

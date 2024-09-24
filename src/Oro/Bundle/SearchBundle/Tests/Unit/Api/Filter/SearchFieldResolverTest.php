@@ -13,6 +13,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
     /** @var SearchFieldResolver */
     private $fieldResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldResolver = new SearchFieldResolver(

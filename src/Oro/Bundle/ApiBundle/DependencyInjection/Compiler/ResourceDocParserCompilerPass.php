@@ -22,9 +22,7 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
     private const DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID = 'oro_api.resource_doc_parser.template';
     private const RESOURCE_DOC_PARSER_TAG = 'oro.api.resource_doc_parser';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         // find resource documentation parsers

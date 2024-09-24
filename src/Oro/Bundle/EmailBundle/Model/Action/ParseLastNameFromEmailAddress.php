@@ -4,9 +4,7 @@ namespace Oro\Bundle\EmailBundle\Model\Action;
 
 class ParseLastNameFromEmailAddress extends AbstractParseEmailAddressAction
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $address = $this->contextAccessor->getValue($context, $this->address);

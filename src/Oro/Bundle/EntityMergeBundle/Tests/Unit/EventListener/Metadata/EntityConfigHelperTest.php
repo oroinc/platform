@@ -19,6 +19,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityConfigHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -23,9 +23,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $qb = $manager->getRepository(WorkflowDefinition::class)->createQueryBuilder('wd');
@@ -96,9 +94,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [

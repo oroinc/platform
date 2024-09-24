@@ -12,9 +12,7 @@ use Oro\Bundle\GaufretteBundle\FileManager;
  */
 class LoadDataFromFile extends BaseLoadDataFromFile
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadData(string $fileName, FileManager $fileManager): array
     {
         $sourceData = JsonUtil::decode($fileManager->getFileContent($fileName));

@@ -21,6 +21,7 @@ abstract class AbstractSelectedFieldsProviderTestCase extends \PHPUnit\Framework
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $parameterBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datagridStateProvider = $this->createMock(DatagridStateProviderInterface::class);

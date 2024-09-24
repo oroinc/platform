@@ -24,6 +24,7 @@ class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCas
     /** @var AttributeFamilyActionsConfiguration */
     private $attributeFamilyActionsConfiguration;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

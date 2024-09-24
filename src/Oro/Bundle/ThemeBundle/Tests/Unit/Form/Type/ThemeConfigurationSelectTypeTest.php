@@ -12,6 +12,7 @@ class ThemeConfigurationSelectTypeTest extends FormIntegrationTestCase
 {
     protected ?ThemeConfigurationSelectType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new ThemeConfigurationSelectType();

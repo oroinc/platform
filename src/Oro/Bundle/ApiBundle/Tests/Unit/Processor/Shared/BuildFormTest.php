@@ -12,6 +12,7 @@ class BuildFormTest extends FormProcessorTestCase
     /** @var BuildForm */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -16,9 +16,7 @@ class SkippedGaufretteFileSystemProvider implements SkippedGaufretteFileSystemPr
         $this->skippedFilesystems = $skippedFilesystems;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isFileSystemSkipped(string $fileSystem): bool
     {
         if (in_array($fileSystem, $this->skippedFilesystems, true)) {

@@ -36,49 +36,37 @@ class ClassSecurityMetadataStub implements ClassSecurityMetadata
         $this->fields = $fields;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassName(): string
     {
         return $this->className;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getGroup(): string
     {
         return $this->group;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return $this->label;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return $this->description;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCategory(): string
     {
         return $this->category;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFields(): array
     {
         return $this->fields;

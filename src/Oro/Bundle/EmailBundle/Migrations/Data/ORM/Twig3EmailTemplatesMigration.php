@@ -11,9 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  */
 class Twig3EmailTemplatesMigration extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $qb = $manager->getRepository(EmailTemplate::class)

@@ -20,6 +20,7 @@ class CommentLifecycleListenerTest extends TestCase
     /** @var TokenAccessorInterface|MockObject */
     private $tokenAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

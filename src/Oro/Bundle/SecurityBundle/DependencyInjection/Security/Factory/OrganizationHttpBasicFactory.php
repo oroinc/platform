@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class OrganizationHttpBasicFactory implements AuthenticatorFactoryInterface
 {
+    #[\Override]
     public function createAuthenticator(
         ContainerBuilder $container,
         string $firewallName,
@@ -32,11 +33,13 @@ class OrganizationHttpBasicFactory implements AuthenticatorFactoryInterface
         return $authenticatorId;
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return 'organization-http-basic';
     }
 
+    #[\Override]
     public function addConfiguration(NodeDefinition $builder)
     {
         $builder
@@ -46,6 +49,7 @@ class OrganizationHttpBasicFactory implements AuthenticatorFactoryInterface
             ->end();
     }
 
+    #[\Override]
     public function getPriority(): int
     {
         return -50;

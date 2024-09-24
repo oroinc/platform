@@ -31,6 +31,7 @@ class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var PostProcessStepExecutor */
     private $executor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobExecutor = $this->createMock(JobExecutor::class);

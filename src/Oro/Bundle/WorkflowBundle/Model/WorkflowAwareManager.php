@@ -42,17 +42,13 @@ class WorkflowAwareManager implements WorkflowAwareInterface
         return $this->workflowManager->getWorkflowItem($entity, $this->workflowName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setWorkflowName($workflowName)
     {
         $this->workflowName = $workflowName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWorkflowName()
     {
         return $this->workflowName;

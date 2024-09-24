@@ -12,9 +12,7 @@ class UpdateAclEntryFieldNameLength implements Migration, ContainerAwareInterfac
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $schema->getTable($this->container->getParameter('security.acl.dbal.entry_table_name'))

@@ -19,9 +19,7 @@ class WebsocketRouterConfigurationPass implements CompilerPassInterface
 
     private const WEBSOCKET_APP_ROUTING_CONFIG_PATH = '../config/oro/websocket_routing';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $configLoader = new CumulativeConfigLoader(

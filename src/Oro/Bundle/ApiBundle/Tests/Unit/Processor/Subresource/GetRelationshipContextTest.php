@@ -10,6 +10,7 @@ class GetRelationshipContextTest extends \PHPUnit\Framework\TestCase
 {
     private GetRelationshipContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new GetRelationshipContext(

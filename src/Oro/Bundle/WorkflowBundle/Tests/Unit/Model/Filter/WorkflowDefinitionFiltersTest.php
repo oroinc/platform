@@ -15,6 +15,7 @@ class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
 
     private WorkflowDefinitionFilters $filters;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

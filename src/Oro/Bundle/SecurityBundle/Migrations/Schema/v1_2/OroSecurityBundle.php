@@ -9,9 +9,7 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\RemovePermissionGroupNames;
 
 class OroSecurityBundle implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(new RemovePermissionGroupNames(['SHARE'], ['default']));

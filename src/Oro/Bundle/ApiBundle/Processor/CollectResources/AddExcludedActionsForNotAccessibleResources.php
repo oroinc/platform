@@ -18,9 +18,7 @@ class AddExcludedActionsForNotAccessibleResources implements ProcessorInterface
         $this->actionProcessorBag = $actionProcessorBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */

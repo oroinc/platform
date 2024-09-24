@@ -10,11 +10,13 @@ class FileManagerTest extends WebTestCase
     /** @var string */
     private $someFile;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         unlink($this->someFile);

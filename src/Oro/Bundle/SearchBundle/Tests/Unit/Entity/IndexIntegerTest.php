@@ -12,6 +12,7 @@ class IndexIntegerTest extends \PHPUnit\Framework\TestCase
      */
     private $index;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->index = new IndexInteger();

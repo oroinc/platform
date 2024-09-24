@@ -46,6 +46,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
     /** @var RolesChoicesForUserProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $rolesChoicesForUserProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

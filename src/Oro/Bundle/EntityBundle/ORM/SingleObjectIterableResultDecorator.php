@@ -23,43 +23,35 @@ class SingleObjectIterableResultDecorator implements \Iterator
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws HydrationException
      */
+    #[\Override]
     public function rewind(): void
     {
         $this->iterableResult->rewind();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->iterableResult->next();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function current(): mixed
     {
         $current = $this->iterableResult->current();
         return is_iterable($current) ? reset($current) : $current;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(): mixed
     {
         return $this->iterableResult->key();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         return $this->iterableResult->valid();

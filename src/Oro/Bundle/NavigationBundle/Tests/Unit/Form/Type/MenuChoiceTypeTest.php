@@ -17,6 +17,7 @@ class MenuChoiceTypeTest extends FormIntegrationTestCase
 
     private MenuChoiceType $menuChoiceType;
 
+    #[\Override]
     protected function getExtensions(): array
     {
         $menuNamesProvider = $this->createMock(MenuNamesProvider::class);

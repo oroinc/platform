@@ -21,6 +21,7 @@ class IdToEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var IdToEntityTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectManager = $this->createMock(ObjectManager::class);

@@ -10,6 +10,7 @@ class ConfigurationOptionFilterVisitorTest extends \PHPUnit\Framework\TestCase
 {
     private ConfigurationOptionFilterVisitor $visitor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->visitor = new ConfigurationOptionFilterVisitor();

@@ -9,6 +9,7 @@ class NonPrintableCharsStringSanitizerTest extends \PHPUnit\Framework\TestCase
     /** @var NonPrintableCharsStringSanitizer */
     private $sanitizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->sanitizer = new NonPrintableCharsStringSanitizer();

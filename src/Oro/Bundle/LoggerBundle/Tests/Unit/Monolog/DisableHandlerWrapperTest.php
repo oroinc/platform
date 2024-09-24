@@ -23,6 +23,7 @@ class DisableHandlerWrapperTest extends TestCase
 
     private DisableHandlerWrapper $wrapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->inner = $this->createMock(HandlerInterface::class);

@@ -20,6 +20,7 @@ class DumpConfigReferenceCommand extends Command
     protected static $defaultName = 'oro:entity:config:dump-reference';
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -37,6 +38,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output = new SymfonyStyle($input, $output);

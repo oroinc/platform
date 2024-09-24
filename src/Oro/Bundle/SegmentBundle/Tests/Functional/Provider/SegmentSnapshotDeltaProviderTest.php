@@ -12,6 +12,7 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
     /** @var SegmentSnapshotDeltaProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

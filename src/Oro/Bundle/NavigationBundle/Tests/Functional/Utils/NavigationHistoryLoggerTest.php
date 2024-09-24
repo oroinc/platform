@@ -17,9 +17,7 @@ class NavigationHistoryLoggerTest extends WebTestCase
     /** @var TokenAccessorInterface */
     private $tokenAccessor;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

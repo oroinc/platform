@@ -14,6 +14,7 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
     /** @var WindowsStateRequestManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

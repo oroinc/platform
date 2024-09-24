@@ -24,9 +24,7 @@ class FieldVisitor extends ExpressionVisitor
         return array_keys($this->fields);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison)
     {
         $field = $comparison->getField();
@@ -35,16 +33,12 @@ class FieldVisitor extends ExpressionVisitor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkValue(Value $value)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr)
     {
         $expressionList = $expr->getExpressionList();

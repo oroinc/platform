@@ -15,9 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension;
 
 class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtension(): AbstractFieldsExtension
     {
         $extension = new AdditionalFieldsExtension(
@@ -110,9 +108,7 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDatagridConfiguration(array $options = []): DatagridConfiguration
     {
         return DatagridConfiguration::create(
@@ -128,9 +124,7 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function setExpectationForGetFields(
         string $className,
         string $fieldName,

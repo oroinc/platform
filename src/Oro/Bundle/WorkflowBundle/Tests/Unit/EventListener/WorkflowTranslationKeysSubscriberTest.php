@@ -19,6 +19,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTranslationKeysSubscriber */
     private $translationKeysSubscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationManager = $this->createMock(TranslationManager::class);

@@ -19,33 +19,25 @@ final class QueryDesigner extends AbstractQueryDesigner
         $this->definition = $definition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntity()
     {
         return $this->entity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntity($entity)
     {
         $this->entity = $entity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefinition()
     {
         return $this->definition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDefinition($definition)
     {
         $this->definition = $definition;

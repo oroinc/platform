@@ -24,6 +24,7 @@ class StdModel implements \JsonSerializable
         $this->data = $data;
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         return ['error' => 'Object of this class must not be encoded to JSON'];

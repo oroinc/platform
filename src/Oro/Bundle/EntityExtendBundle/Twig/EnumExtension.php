@@ -23,6 +23,7 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
         $this->container = $container;
     }
 
+    #[\Override]
     public function getFilters(): array
     {
         return [
@@ -100,9 +101,7 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

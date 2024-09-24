@@ -52,9 +52,7 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPrimaryEmailsQb($fullNameQueryPart, array $excludedEmailNames = [], $query = null)
     {
         $qb = $this->createQueryBuilder('u');
@@ -89,9 +87,7 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
         return $qb;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSecondaryEmailsQb($fullNameQueryPart, array $excludedEmailNames = [], $query = null)
     {
         $qb = $this->createQueryBuilder('u');

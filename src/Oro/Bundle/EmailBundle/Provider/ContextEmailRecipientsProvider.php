@@ -16,9 +16,7 @@ class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
         $this->relatedEmailsProvider = $relatedEmailsProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRecipients(EmailRecipientsProviderArgs $args)
     {
         if (!$args->getRelatedEntity()) {
@@ -31,9 +29,7 @@ class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSection(): string
     {
         return 'oro.email.autocomplete.contexts';

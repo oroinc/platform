@@ -21,6 +21,7 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
     /** @var CommentPlaceholderFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->commentAssociationHelper = $this->createMock(CommentAssociationHelper::class);

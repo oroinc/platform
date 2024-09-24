@@ -50,9 +50,7 @@ class FixturesChecker implements HealthCheckerInterface
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [
@@ -76,17 +74,13 @@ class FixturesChecker implements HealthCheckerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFailure()
     {
         return !empty($this->errors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'fixtures';
@@ -118,9 +112,7 @@ class FixturesChecker implements HealthCheckerInterface
         $this->errors[] = $message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getErrors()
     {
         return $this->errors;

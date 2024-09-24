@@ -52,6 +52,7 @@ class DashboardModel implements EntityModelInterface
      *
      * @return Dashboard
      */
+    #[\Override]
     public function getEntity()
     {
         return $this->entity;

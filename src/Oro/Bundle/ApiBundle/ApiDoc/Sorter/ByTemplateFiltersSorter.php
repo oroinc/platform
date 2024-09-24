@@ -21,9 +21,7 @@ class ByTemplateFiltersSorter implements FiltersSorterInterface
         $this->addOtherFiltersToBegin = $addOtherFiltersToBegin;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function sortFilters(array $filters): array
     {
         ksort($filters);

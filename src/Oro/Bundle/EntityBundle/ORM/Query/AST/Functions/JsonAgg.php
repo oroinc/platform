@@ -19,9 +19,7 @@ class JsonAgg extends FunctionNode
     private const ORDER_KEY = 'order';
     private array $parameters = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function parse(Parser $parser): void
     {
         $parser->match(Lexer::T_IDENTIFIER);
@@ -38,6 +36,7 @@ class JsonAgg extends FunctionNode
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
 
+    #[\Override]
     public function getSql(SqlWalker $sqlWalker): string
     {
         $result = 'json_agg(';

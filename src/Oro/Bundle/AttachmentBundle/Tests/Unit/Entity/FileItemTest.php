@@ -14,6 +14,7 @@ class FileItemTest extends \PHPUnit\Framework\TestCase
     /** @var FileItem */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new FileItem();

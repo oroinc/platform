@@ -18,9 +18,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
 class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void
     {
         /** @var EntityManagerInterface $em */

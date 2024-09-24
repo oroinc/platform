@@ -13,6 +13,7 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var UniversalCacheKeyGenerator */
     private $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectCacheKeyGenerator = $this->createMock(ObjectCacheKeyGenerator::class);

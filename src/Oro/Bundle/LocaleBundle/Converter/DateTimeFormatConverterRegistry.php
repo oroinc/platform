@@ -69,9 +69,7 @@ class DateTimeFormatConverterRegistry implements ResetInterface
         return $this->converters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->converters = null;

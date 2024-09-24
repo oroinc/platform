@@ -21,6 +21,7 @@ class WebpAwareFilterRuntimeConfigProvider implements FilterRuntimeConfigProvide
         $this->webpConfiguration = $webpConfiguration;
     }
 
+    #[\Override]
     public function getRuntimeConfigForFilter(string $filterName, string $format = ''): array
     {
         $runtimeConfig = $this->innerFilterRuntimeConfigProvider->getRuntimeConfigForFilter($filterName, $format);

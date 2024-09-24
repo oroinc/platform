@@ -42,6 +42,7 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
     /** @var ImpersonationAuthenticator */
     private $authenticator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

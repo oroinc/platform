@@ -13,9 +13,7 @@ class IntegrationConfiguration implements ConfigurationInterface
     public const ROOT_NODE = 'integrations';
     public const FORM_NODE = 'form';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

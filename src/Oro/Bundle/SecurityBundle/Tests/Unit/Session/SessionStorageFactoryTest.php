@@ -17,6 +17,7 @@ class SessionStorageFactoryTest extends \PHPUnit\Framework\TestCase
 
     private SessionStorageFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerSessionStorageFactory = $this->createMock(SessionStorageFactoryInterface::class);

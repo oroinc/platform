@@ -10,18 +10,21 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
  */
 class EnumOptionListener extends AbstractEnumOptionListener
 {
+    #[\Override]
     public function postRemove(object $entity): void
     {
         parent::postRemove($entity);
         $this->actualizedEntityEnumOption($entity);
     }
 
+    #[\Override]
     public function postPersist(object $entity): void
     {
         parent::postPersist($entity);
         $this->setEntityToUpdateTranslation($entity);
     }
 
+    #[\Override]
     protected function invalidateCache(object $entity): void
     {
         if ($entity instanceof EnumOptionInterface) {
@@ -29,6 +32,7 @@ class EnumOptionListener extends AbstractEnumOptionListener
         }
     }
 
+    #[\Override]
     protected function getEntityTranslationInfo(object $entity): array
     {
         return $entity instanceof EnumOptionInterface

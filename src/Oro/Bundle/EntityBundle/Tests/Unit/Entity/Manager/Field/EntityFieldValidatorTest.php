@@ -23,6 +23,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldValidator */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->classMetadata = $this->createMock(ClassMetadata::class);

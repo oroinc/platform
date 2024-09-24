@@ -19,6 +19,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DateTimeExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new DateTimeExtension();

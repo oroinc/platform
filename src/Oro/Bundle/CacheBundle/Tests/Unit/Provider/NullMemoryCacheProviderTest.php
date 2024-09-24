@@ -9,6 +9,7 @@ class NullMemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
     /** @var NullMemoryCacheProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new NullMemoryCacheProvider();

@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
 class WorkflowItemListenerTest extends WorkflowTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([]);

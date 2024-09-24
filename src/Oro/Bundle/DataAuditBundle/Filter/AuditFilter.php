@@ -55,17 +55,13 @@ class AuditFilter extends EntityFilter
         $this->queryDesignerManager = $queryDesignerManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
@@ -216,17 +212,13 @@ class AuditFilter extends EntityFilter
         return $matches[0];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return FilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createForm(): FormInterface
     {
         return $this->formFactory->create($this->getFormType());

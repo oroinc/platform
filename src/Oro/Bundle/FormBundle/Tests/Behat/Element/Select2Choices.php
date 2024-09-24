@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
  */
 class Select2Choices extends Element
 {
+    #[\Override]
     public function getValue()
     {
         $valueElements = $this->getParent()->getParent()->findAll('css', 'li.select2-search-choice');

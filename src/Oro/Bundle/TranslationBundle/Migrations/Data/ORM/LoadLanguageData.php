@@ -21,17 +21,13 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadAdminUserData::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $user = $this->getUser($manager);

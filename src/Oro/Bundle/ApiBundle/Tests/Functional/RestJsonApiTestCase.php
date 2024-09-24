@@ -20,33 +20,30 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     protected const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
     protected const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequestType(): RequestType
     {
         return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getResponseContentType(): string
     {
         return self::JSON_API_CONTENT_TYPE;
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     protected function request(
         string $method,
         string $uri,
@@ -376,9 +373,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected static function isApplicableContentType(ResponseHeaderBag $headers): bool
     {
         return $headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE);

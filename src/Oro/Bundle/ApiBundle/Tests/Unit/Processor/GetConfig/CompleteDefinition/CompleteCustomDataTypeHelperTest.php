@@ -16,6 +16,7 @@ class CompleteCustomDataTypeHelperTest extends CompleteDefinitionHelperTestCase
     /** @var CompleteCustomDataTypeHelper */
     private $completeAssociationHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

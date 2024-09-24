@@ -37,6 +37,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     /** @var EntitySerializer */
     protected $serializer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

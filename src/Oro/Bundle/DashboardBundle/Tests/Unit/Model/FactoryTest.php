@@ -28,6 +28,7 @@ class FactoryTest extends \PHPUnit\Framework\TestCase
     /** @var Factory */
     private $dashboardFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

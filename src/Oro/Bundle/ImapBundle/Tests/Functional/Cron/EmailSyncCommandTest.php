@@ -28,6 +28,7 @@ class EmailSyncCommandTest extends WebTestCase
     /** @var ProtocolImap|\PHPUnit\Framework\MockObject\MockObject */
     private $protocol;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

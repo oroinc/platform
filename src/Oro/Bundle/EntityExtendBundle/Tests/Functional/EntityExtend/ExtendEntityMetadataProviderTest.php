@@ -11,6 +11,7 @@ class ExtendEntityMetadataProviderTest extends WebTestCase
 {
     protected ?ExtendEntityMetadataProvider $metadataProvider;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->bootKernel();

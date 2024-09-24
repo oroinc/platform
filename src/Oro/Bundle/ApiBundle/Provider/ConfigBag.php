@@ -21,9 +21,7 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
         $this->configFile = $configFile;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassNames(string $version): array
     {
         $this->ensureInitialized();
@@ -35,9 +33,7 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
         return array_keys($this->config[self::ENTITIES]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfig(string $className, string $version): ?array
     {
         $this->ensureInitialized();
@@ -45,9 +41,7 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
         return $this->config[self::ENTITIES][$className] ?? null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->config = null;

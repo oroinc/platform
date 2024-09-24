@@ -37,6 +37,7 @@ class NotificationAlertCleanupCommand extends Command
         $this->tokenAccessor = $tokenAccessor;
     }
 
+    #[\Override]
     protected function configure()
     {
         $this
@@ -67,6 +68,7 @@ HELP
             );
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

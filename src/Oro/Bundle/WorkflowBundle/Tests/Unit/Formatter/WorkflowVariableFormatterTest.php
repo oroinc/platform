@@ -16,6 +16,7 @@ class WorkflowVariableFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowVariableFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

@@ -17,6 +17,7 @@ class DefaultValuesListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultValuesListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

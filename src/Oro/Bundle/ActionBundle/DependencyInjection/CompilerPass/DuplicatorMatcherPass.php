@@ -14,6 +14,7 @@ class DuplicatorMatcherPass implements CompilerPassInterface
     /**
      * You can modify the container here before it is dumped to PHP code.
      */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::FACTORY_SERVICE_ID)) {

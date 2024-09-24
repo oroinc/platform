@@ -29,6 +29,7 @@ class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
     /** @var UniqueKeyCollectionType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

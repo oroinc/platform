@@ -19,9 +19,7 @@ class EventTriggerCacheClearer implements CacheClearerInterface
         $this->eventTriggerCaches[] = $eventTriggerCache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear($cacheDir)
     {
         foreach ($this->eventTriggerCaches as $eventTriggerCache) {

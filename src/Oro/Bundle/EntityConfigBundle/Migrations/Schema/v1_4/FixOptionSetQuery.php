@@ -9,17 +9,13 @@ use Psr\Log\LoggerInterface;
 
 class FixOptionSetQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Remove serialized objects from option set configuration. Should be executed in prod environment.';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $query = 'SELECT * FROM oro_entity_config_field WHERE type = ?';

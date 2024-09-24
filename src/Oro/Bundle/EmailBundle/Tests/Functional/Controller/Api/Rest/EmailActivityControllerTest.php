@@ -10,6 +10,7 @@ class EmailActivityControllerTest extends WebTestCase
     /** @var string */
     private $baseUrl;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateWsseAuthHeader());

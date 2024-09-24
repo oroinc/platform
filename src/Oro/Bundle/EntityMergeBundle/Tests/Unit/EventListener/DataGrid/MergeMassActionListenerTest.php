@@ -18,6 +18,7 @@ class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
     /** @var MergeMassActionListener */
     private $mergeMassActionListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);

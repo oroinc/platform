@@ -51,6 +51,7 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityContextApiEntityManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

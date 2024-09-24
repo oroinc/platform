@@ -25,6 +25,7 @@ class LocalizationFallbackStrategyTest extends OrmTestCase
     /** @var LocalizationFallbackStrategy */
     private $strategy;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

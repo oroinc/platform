@@ -22,6 +22,7 @@ class CustomizeFormDataEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /** @var CustomizeFormDataEventDispatcher */
     private $eventDispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->customizationHandler = $this->createMock(CustomizeFormDataHandler::class);

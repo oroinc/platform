@@ -8,9 +8,7 @@ namespace Oro\Bundle\ImapBundle\Provider;
  */
 class MicrosoftOAuthScopeProvider implements OAuthScopeProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessTokenScopes(string $tokenType): ?array
     {
         return [

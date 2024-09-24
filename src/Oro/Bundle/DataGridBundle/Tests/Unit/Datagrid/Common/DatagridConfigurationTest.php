@@ -17,6 +17,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridConfiguration */
     private $configuration;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configuration = DatagridConfiguration::create([]);

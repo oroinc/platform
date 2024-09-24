@@ -8,6 +8,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FixRestAnnotationsTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

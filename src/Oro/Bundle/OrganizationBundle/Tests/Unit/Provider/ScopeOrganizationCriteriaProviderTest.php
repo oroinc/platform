@@ -16,6 +16,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ScopeOrganizationCriteriaProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

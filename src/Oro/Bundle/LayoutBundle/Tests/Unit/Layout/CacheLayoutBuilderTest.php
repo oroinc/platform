@@ -25,6 +25,7 @@ class CacheLayoutBuilderTest extends LayoutBuilderTest
 
     protected $layoutBuilderWithoutCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(LayoutRegistryInterface::class);

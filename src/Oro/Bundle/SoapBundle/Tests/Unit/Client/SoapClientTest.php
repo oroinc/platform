@@ -14,6 +14,7 @@ class SoapClientTest extends \PHPUnit\Framework\TestCase
     /** @var SoapClient */
     private $client;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->clientFactory = $this->createMock(NativeSoapClientFactory::class);

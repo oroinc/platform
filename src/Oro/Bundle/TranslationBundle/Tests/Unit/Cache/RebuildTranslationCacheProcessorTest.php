@@ -29,6 +29,7 @@ class RebuildTranslationCacheProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var RebuildTranslationCacheProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);

@@ -26,6 +26,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
     /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private static $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -33,9 +34,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         self::$validator = $this->createMock(ValidatorInterface::class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

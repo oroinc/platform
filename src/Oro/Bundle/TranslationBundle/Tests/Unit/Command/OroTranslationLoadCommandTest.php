@@ -31,6 +31,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
     /** @var OroTranslationLoadCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);

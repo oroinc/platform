@@ -29,6 +29,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LoggedUserVariablesProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

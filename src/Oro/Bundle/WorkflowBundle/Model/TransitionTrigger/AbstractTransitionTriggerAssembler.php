@@ -21,9 +21,9 @@ abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAs
     abstract protected function verifyTrigger(BaseTransitionTrigger $trigger);
 
     /**
-     * {@inheritdoc}
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     public function assemble(array $options, $transitionName, WorkflowDefinition $workflowDefinition)
     {
         if (false === $this->canAssemble($options)) {

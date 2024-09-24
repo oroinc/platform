@@ -360,6 +360,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware
      * @param int|string $count
      * @return int
      */
+    #[\Override]
     protected function getCount($count)
     {
         switch (trim($count)) {

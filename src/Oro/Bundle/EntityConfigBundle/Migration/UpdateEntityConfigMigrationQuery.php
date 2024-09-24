@@ -22,17 +22,13 @@ class UpdateEntityConfigMigrationQuery implements MigrationQuery, ResetContainer
         $this->commandExecutor = $commandExecutor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Update entity configs';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->commandExecutor->runCommand(

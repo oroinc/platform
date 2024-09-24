@@ -13,6 +13,7 @@ class ExternalUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     private ExternalUrlProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerFileUrlProvider = $this->createMock(FileUrlProviderInterface::class);

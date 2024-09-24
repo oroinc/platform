@@ -17,6 +17,7 @@ class WidgetItemsFormSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetItemsFormSubscriber */
     private $widgetItemsFormSubscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

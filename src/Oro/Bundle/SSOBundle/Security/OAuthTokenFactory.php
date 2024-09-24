@@ -7,9 +7,7 @@ namespace Oro\Bundle\SSOBundle\Security;
  */
 class OAuthTokenFactory implements OAuthTokenFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create($accessToken, array $roles = [])
     {
         return new OAuthToken($accessToken, $roles);

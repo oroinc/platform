@@ -4,17 +4,13 @@ namespace Oro\Bundle\EmailBundle\Model;
 
 class CategorizedRecipient extends Recipient
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         if (!$this->entity || !$this->entity->getOrganization()) {

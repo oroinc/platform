@@ -11,6 +11,7 @@ class AddMasterRequestRouteListenerTest extends \PHPUnit\Framework\TestCase
 {
     private AddMasterRequestRouteListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new AddMasterRequestRouteListener();

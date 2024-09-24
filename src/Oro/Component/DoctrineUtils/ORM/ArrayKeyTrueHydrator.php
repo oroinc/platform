@@ -29,6 +29,7 @@ class ArrayKeyTrueHydrator extends AbstractHydrator
 {
     public const NAME = 'ArrayKeyTrueHydrator';
 
+    #[\Override]
     protected function hydrateAllData(): array
     {
         $result = [];

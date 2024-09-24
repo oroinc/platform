@@ -18,6 +18,7 @@ class RemoveEntitiesStep implements DependentMergeStepInterface
     /**
      * Merge fields
      */
+    #[\Override]
     public function run(EntityData $data)
     {
         $masterEntity = $data->getMasterEntity();
@@ -29,9 +30,7 @@ class RemoveEntitiesStep implements DependentMergeStepInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependentSteps()
     {
         return array('Oro\\Bundle\\EntityMergeBundle\\Model\\Step\\MergeFieldsStep');

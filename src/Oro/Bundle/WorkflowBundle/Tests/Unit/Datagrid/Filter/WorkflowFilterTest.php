@@ -24,6 +24,7 @@ class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

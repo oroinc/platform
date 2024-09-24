@@ -26,6 +26,7 @@ class BlockBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var BlockBuilder */
     private $blockBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->rawLayout = new RawLayout();

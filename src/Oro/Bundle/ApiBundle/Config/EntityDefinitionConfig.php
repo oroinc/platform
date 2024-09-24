@@ -56,10 +56,10 @@ class EntityDefinitionConfig extends EntityConfig
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function toArray(): array
     {
         $result = parent::toArray();
@@ -122,9 +122,7 @@ class EntityDefinitionConfig extends EntityConfig
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function __clone()
     {
         parent::__clone();
@@ -171,6 +169,7 @@ class EntityDefinitionConfig extends EntityConfig
      *
      * @return EntityDefinitionFieldConfig
      */
+    #[\Override]
     public function addField(string $fieldName, FieldConfigInterface $field = null): EntityDefinitionFieldConfig
     {
         if (null === $field) {
@@ -183,6 +182,7 @@ class EntityDefinitionConfig extends EntityConfig
     /**
      * Sets the configuration value.
      */
+    #[\Override]
     public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
@@ -790,6 +790,7 @@ class EntityDefinitionConfig extends EntityConfig
      *
      * @return int|null The requested maximum number of items, NULL or -1 if not limited
      */
+    #[\Override]
     public function getMaxResults(): ?int
     {
         return $this->get(ConfigUtil::MAX_RESULTS);
@@ -802,6 +803,7 @@ class EntityDefinitionConfig extends EntityConfig
      *
      * @param int|null $maxResults The maximum number of items, NULL or -1 to set unlimited
      */
+    #[\Override]
     public function setMaxResults(?int $maxResults): void
     {
         if (null === $maxResults) {

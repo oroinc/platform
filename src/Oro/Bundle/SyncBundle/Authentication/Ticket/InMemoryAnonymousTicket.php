@@ -13,6 +13,7 @@ class InMemoryAnonymousTicket implements UserInterface
     {
     }
 
+    #[\Override]
     public function getRoles(): array
     {
         return [];
@@ -28,6 +29,7 @@ class InMemoryAnonymousTicket implements UserInterface
         return '';
     }
 
+    #[\Override]
     public function eraseCredentials()
     {
     }
@@ -37,6 +39,7 @@ class InMemoryAnonymousTicket implements UserInterface
         return $this->getUserIdentifier();
     }
 
+    #[\Override]
     public function getUserIdentifier(): string
     {
         return $this->userIdentifier;

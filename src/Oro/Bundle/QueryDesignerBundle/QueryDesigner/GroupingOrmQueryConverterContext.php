@@ -24,9 +24,7 @@ class GroupingOrmQueryConverterContext extends QueryConverterContext
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         parent::reset();

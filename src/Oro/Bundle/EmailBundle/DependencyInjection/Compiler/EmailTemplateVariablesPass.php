@@ -24,9 +24,7 @@ class EmailTemplateVariablesPass implements CompilerPassInterface
     private const SCOPE_ATTR    = 'scope';
     private const PRIORITY_ATTR = 'priority';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $providers = [];

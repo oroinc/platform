@@ -9,9 +9,7 @@ abstract class AbstractParentEntitySearchHandler extends SearchHandler
 {
     const DELIMITER = ';';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         if ($searchById && str_contains($query, self::DELIMITER)) {
@@ -21,9 +19,7 @@ abstract class AbstractParentEntitySearchHandler extends SearchHandler
         return parent::search($query, $page, $perPage, $searchById);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function searchEntities($search, $firstResult, $maxResults)
     {
         if (!str_contains($search, self::DELIMITER)) {

@@ -29,6 +29,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeFamilyVoter */
     private $voter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->token = $this->createMock(TokenInterface::class);

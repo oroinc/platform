@@ -13,6 +13,7 @@ class CustomizeLoadedDataProcessorTestCase extends \PHPUnit\Framework\TestCase
 
     protected CustomizeLoadedDataContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = $this->createContext();

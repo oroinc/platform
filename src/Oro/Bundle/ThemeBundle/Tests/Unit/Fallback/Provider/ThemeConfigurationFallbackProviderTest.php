@@ -18,6 +18,7 @@ class ThemeConfigurationFallbackProviderTest extends TestCase
 
     private ThemeConfigurationFallbackProvider $themeConfigurationFallbackProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeConfigurationProvider = $this->createMock(ThemeConfigurationProvider::class);

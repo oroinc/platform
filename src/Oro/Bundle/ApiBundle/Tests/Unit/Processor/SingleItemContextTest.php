@@ -17,6 +17,7 @@ class SingleItemContextTest extends \PHPUnit\Framework\TestCase
     /** @var SingleItemContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

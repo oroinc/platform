@@ -12,9 +12,7 @@ class ConfigurableTypeTest extends ConfigurableBlockTestCase
     /** @var ConfigurableType */
     protected $type;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);

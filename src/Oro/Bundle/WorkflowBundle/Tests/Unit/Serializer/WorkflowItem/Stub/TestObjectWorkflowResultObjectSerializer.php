@@ -13,9 +13,7 @@ class TestObjectWorkflowResultObjectSerializer implements WorkflowResultObjectSe
         $this->innerSerializer = $innerSerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function serialize(object $object): ?array
     {
         if (!$object instanceof TestObject) {

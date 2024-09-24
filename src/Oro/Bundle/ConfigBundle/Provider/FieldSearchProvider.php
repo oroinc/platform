@@ -25,17 +25,13 @@ class FieldSearchProvider implements SearchProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($name)
     {
         return $this->configBag->getFieldsRoot($name) !== false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData($name)
     {
         $field = $this->configBag->getFieldsRoot($name);

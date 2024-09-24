@@ -17,6 +17,7 @@ class AddressTest extends RestJsonApiTestCase
     private const IS_REGION_REQUIRED         = false;
     private const COUNTRY_REGION_ADDRESS_REF = 'address1';
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

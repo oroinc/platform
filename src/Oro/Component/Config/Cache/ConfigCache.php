@@ -33,9 +33,7 @@ class ConfigCache extends ResourceCheckerConfigCache
         parent::__construct($file, $checkers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFresh(): bool
     {
         if (!$this->debug && is_file($this->getPath())) {
@@ -58,9 +56,7 @@ class ConfigCache extends ResourceCheckerConfigCache
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write($content, array $metadata = null): void
     {
         if (null !== $metadata && !$this->debug) {

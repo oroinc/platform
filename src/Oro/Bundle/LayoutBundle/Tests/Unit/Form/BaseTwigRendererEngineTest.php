@@ -15,6 +15,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
     /** @var BaseTwigRendererEngine */
     private $engine;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
@@ -128,9 +129,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         return $theme;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createRendererEngine()
     {
         return new BaseTwigRendererEngine([], $this->environment);

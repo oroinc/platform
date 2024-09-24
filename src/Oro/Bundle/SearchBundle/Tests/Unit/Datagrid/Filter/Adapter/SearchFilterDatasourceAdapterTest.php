@@ -19,6 +19,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $searchQuery;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchQuery = $this->createMock(SearchQueryInterface::class);

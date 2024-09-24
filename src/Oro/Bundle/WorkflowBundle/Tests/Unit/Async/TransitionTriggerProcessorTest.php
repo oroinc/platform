@@ -29,6 +29,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
 
     private SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectManager = $this->createMock(ObjectManager::class);

@@ -141,22 +141,19 @@ class ActivityEntityController extends RestController
      *
      * @return ActivityEntityApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_activity.manager.activity_entity.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_activity.form.handler.activity_entity.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDeleteHandler()
     {
         return $this->container->get('oro_activity.activity_entity_delete_handler.proxy');

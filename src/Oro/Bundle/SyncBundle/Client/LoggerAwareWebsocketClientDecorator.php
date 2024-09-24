@@ -26,9 +26,7 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
         $this->setLogger(new NullLogger());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function connect(): ?string
     {
         $result = null;
@@ -46,9 +44,7 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function disconnect(): bool
     {
         $result = $this->decoratedClient->disconnect();
@@ -60,17 +56,13 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isConnected(): bool
     {
         return $this->decoratedClient->isConnected();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function publish(string $topicUri, $payload, array $exclude = [], array $eligible = []): bool
     {
         $result = false;
@@ -90,9 +82,7 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prefix(string $prefix, string $uri): bool
     {
         $result = false;
@@ -110,9 +100,7 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function call(string $procUri, array $arguments = []): bool
     {
         $result = false;
@@ -130,9 +118,7 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function event(string $topicUri, $payload): bool
     {
         $result = false;

@@ -47,6 +47,7 @@ class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBodyAddListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

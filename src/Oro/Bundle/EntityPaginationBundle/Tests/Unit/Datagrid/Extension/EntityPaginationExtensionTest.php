@@ -11,6 +11,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EntityPaginationExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension  = new EntityPaginationExtension();

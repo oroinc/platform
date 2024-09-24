@@ -21,6 +21,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
     /** @var PersistIncludedEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

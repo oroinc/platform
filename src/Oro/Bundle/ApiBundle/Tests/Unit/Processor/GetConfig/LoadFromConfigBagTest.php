@@ -45,6 +45,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     /** @var LoadFromConfigBag */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

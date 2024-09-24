@@ -10,25 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CreateOpenApiSpecificationTopic extends AbstractTopic
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.api.create_open_api_specification';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Creates OpenAPI specification.';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

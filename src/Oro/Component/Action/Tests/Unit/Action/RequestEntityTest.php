@@ -27,6 +27,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
     /** @var RequestEntity */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();

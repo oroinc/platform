@@ -15,17 +15,20 @@ use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
  */
 class ActivityListEntityFieldExtension extends AbstractAssociationEntityFieldExtension
 {
+    #[\Override]
     public function isApplicable(EntityFieldProcessTransport $transport): bool
     {
         return $transport->getClass() === ActivityListEntityConfigDumperExtension::ENTITY_CLASS
             && AssociationNameGenerator::extractAssociationKind($transport->getName()) === $this->getRelationKind();
     }
 
+    #[\Override]
     public function getRelationKind(): ?string
     {
         return ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND;
     }
 
+    #[\Override]
     public function getRelationType(): string
     {
         return RelationType::MANY_TO_MANY;

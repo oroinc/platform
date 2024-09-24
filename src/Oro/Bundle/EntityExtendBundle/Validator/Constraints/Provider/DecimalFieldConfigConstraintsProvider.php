@@ -11,9 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
  */
 class DecimalFieldConfigConstraintsProvider implements FieldConfigConstraintsProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create(ConfigInterface $config): array
     {
         $constraints = [];

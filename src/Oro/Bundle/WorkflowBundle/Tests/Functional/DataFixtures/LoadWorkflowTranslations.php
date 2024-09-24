@@ -78,17 +78,13 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
     /** @var TranslationManager */
     protected $translationManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadTranslations::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $generator = new TranslationKeyGenerator();

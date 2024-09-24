@@ -34,6 +34,7 @@ class QueryValidatorTest extends ConstraintValidatorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
+    #[\Override]
     protected function createValidator(): QueryValidator
     {
         $this->configurationProvider = $this->createMock(ChainConfigurationProvider::class);

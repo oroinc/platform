@@ -10,9 +10,7 @@ use Oro\Component\MessageQueue\Consumption\Context;
  */
 class RejectMessageOnExceptionDbalExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onInterrupted(Context $context)
     {
         if (! $context->getException()) {

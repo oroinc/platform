@@ -24,6 +24,7 @@ class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var ApiDocMetadata */
     private $apiDocMetadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = 'testAction';

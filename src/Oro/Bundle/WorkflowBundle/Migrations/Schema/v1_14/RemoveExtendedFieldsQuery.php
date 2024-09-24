@@ -13,9 +13,7 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
     const PROPERTY_WORKFLOW_ITEM = 'workflowItem';
     const PROPERTY_WORKFLOW_STEP = 'workflowStep';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -24,9 +22,7 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->migrateConfigs($logger);

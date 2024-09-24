@@ -22,9 +22,7 @@ class ByInitialStateFilter extends AbstractFilter
         $this->initialStates = $initialStates;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function apply(ConfigInterface $config)
     {
         $configId  = $config->getId();

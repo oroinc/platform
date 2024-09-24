@@ -17,9 +17,7 @@ class ActivityEntityApiEntityManager extends ApiEntityManager
         $this->activityManager = $activityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
         return $this->activityManager->getActivityTargetsQueryBuilder(

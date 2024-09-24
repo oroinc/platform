@@ -77,6 +77,7 @@ class SessionAliasProvider implements MultiSessionAwareInterface
      * @return mixed
      * @throws \OutOfBoundsException
      */
+    #[\Override]
     public function getSessionName($alias)
     {
         if (isset($this->aliases[$alias])) {
@@ -92,6 +93,7 @@ class SessionAliasProvider implements MultiSessionAwareInterface
      * @param string $alias
      * @return bool
      */
+    #[\Override]
     public function hasRegisteredAlias($alias)
     {
         return isset($this->aliases[$alias]);
@@ -100,6 +102,7 @@ class SessionAliasProvider implements MultiSessionAwareInterface
     /**
      * @return array|string[]
      */
+    #[\Override]
     public function getAliases()
     {
         return $this->aliases;
@@ -110,6 +113,7 @@ class SessionAliasProvider implements MultiSessionAwareInterface
      * @param string $key
      * @param mixed $value
      */
+    #[\Override]
     public function saveSessionValue($sessionAlias, $key, $value)
     {
         $sessionName = $this->getSessionName($sessionAlias);
@@ -127,6 +131,7 @@ class SessionAliasProvider implements MultiSessionAwareInterface
      * @param null|mixed $default
      * @return mixed
      */
+    #[\Override]
     public function getSessionValue($sessionAlias, $key, $default = null)
     {
         $sessionName = $this->getSessionName($sessionAlias);

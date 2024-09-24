@@ -40,9 +40,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
         $this->queryHintResolver = $queryHintResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

@@ -42,6 +42,7 @@ class TranslatorCatalogueListenerTest extends WebTestCase
 
     private RegionTranslationRepository $regionTranslationRepository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

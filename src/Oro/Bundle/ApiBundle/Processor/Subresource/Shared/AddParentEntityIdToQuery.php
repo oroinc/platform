@@ -32,9 +32,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         $this->entityIdHelper = $entityIdHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

@@ -17,6 +17,7 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
     /** @var Redirect */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $router = $this->createMock(RouterInterface::class);

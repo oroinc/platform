@@ -20,9 +20,7 @@ class SerializerExtension extends BaseSerializerExtension implements ServiceSubs
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function serialize($object, $type = 'json', SerializationContext $context = null): string
     {
         if (null === $this->serializer) {
@@ -32,9 +30,7 @@ class SerializerExtension extends BaseSerializerExtension implements ServiceSubs
         return parent::serialize($object, $type, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

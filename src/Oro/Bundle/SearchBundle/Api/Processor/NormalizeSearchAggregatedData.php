@@ -26,9 +26,7 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
         $this->aggregationFilterName = $aggregationFilterName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

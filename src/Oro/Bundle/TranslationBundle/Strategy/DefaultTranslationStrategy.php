@@ -19,25 +19,19 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
         $this->applicationState = $applicationState;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'default';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLocaleFallbacks()
     {
         // default strategy has only one fallback to default locale

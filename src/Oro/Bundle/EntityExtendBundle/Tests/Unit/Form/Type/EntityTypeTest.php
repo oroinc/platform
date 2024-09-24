@@ -22,6 +22,7 @@ class EntityTypeTest extends FormIntegrationTestCase
 {
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $validator = new RecursiveValidator(
@@ -39,9 +40,7 @@ class EntityTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

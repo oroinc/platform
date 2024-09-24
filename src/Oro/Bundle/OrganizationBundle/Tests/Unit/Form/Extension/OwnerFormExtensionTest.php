@@ -88,6 +88,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
     private $entityOwnerAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -39,9 +39,7 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
         $this->editable = $editable;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if ($value !== null && !is_object($value)) {
@@ -76,9 +74,9 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function reverseTransform($value)
     {
         if ($value !== null && !is_array($value)) {

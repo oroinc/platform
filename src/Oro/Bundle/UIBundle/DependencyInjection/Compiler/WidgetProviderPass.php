@@ -25,9 +25,7 @@ class WidgetProviderPass implements CompilerPassInterface
         $this->tagName = $tagName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $providers = [];

@@ -15,17 +15,11 @@ class NumberBuilder extends AbstractConfigurationChildBuilder
         return 'number';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     #[\Override] protected function getTypeClass(): string
     {
         return NumberType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     #[\Override] protected function getDefaultOptions(): array
     {
         return [

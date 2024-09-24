@@ -24,6 +24,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attributeTypeRegistry = $this->createMock(AttributeTypeRegistry::class);
@@ -32,6 +33,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): AttributeConfigurationValidator
     {
         return new AttributeConfigurationValidator(

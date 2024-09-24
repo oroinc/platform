@@ -21,6 +21,7 @@ class EmailUserVirtualRelationsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailUserVirtualRelationsProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

@@ -15,9 +15,7 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class EmbedFormFieldTypeTest extends BlockTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $visibleExtension = new ConfigurableTypeExtension();

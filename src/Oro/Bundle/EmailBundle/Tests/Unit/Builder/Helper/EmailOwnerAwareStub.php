@@ -15,9 +15,7 @@ class EmailOwnerAwareStub implements EmailOwnerAwareInterface
         $this->emailOwner = $emailOwner;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEmailOwner(): EmailOwnerInterface
     {
         return $this->emailOwner;

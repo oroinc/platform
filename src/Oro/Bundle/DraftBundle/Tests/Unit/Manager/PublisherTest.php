@@ -19,6 +19,7 @@ class PublisherTest extends \PHPUnit\Framework\TestCase
      */
     private $publisher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->draftHelper = $this->createMock(DraftHelper::class);

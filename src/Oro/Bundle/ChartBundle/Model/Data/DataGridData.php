@@ -18,6 +18,7 @@ class DataGridData implements DataInterface
         $this->grid = $grid;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         if ($this->data) {

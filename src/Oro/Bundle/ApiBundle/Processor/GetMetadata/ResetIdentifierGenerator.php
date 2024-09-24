@@ -10,9 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ResetIdentifierGenerator implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */

@@ -12,9 +12,7 @@ class LoadSearchItemData extends LoadOrganization implements OrderedFixtureInter
 {
     const COUNT = 9;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         parent::load($manager);
@@ -55,9 +53,7 @@ class LoadSearchItemData extends LoadOrganization implements OrderedFixtureInter
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 4;

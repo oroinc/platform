@@ -18,9 +18,6 @@ class MultipleFileConstraintFromEntityFieldConfig extends Constraint
     /** @var string */
     public $message = 'oro.attachment.max_number_of_files.files';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($options = null)
     {
         if (!isset($options['entityClass'])) {
@@ -34,9 +31,7 @@ class MultipleFileConstraintFromEntityFieldConfig extends Constraint
         parent::__construct($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;

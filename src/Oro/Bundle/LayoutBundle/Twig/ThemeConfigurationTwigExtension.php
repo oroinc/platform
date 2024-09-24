@@ -15,6 +15,7 @@ class ThemeConfigurationTwigExtension extends AbstractExtension
     {
     }
 
+    #[\Override]
     public function getFunctions(): array
     {
         return [

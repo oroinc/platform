@@ -28,6 +28,7 @@ class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
     /** @var DraftRedirectAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -30,9 +30,7 @@ class DebugJsConstraintConvertersCommand extends Command
         $this->converters = $processors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table = new Table($output);

@@ -17,9 +17,7 @@ class DataTransformerCompilerPass implements CompilerPassInterface
     private const DATA_TRANSFORMER_REGISTRY_SERVICE_ID = 'oro_api.data_transformer_registry';
     private const DATA_TRANSFORMER_TAG = 'oro.api.data_transformer';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $services = [];

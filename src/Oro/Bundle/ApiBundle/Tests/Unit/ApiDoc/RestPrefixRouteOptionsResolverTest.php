@@ -15,6 +15,7 @@ class RestPrefixRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
     /** @var RestPrefixRouteOptionsResolver */
     private $routeOptionsResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $container = new Container();

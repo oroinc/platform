@@ -21,9 +21,7 @@ class PlatformExtension extends AbstractExtension implements ServiceSubscriberIn
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -36,9 +34,7 @@ class PlatformExtension extends AbstractExtension implements ServiceSubscriberIn
         return $this->getVersionHelper()->getVersion();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

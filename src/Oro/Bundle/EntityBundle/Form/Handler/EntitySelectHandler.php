@@ -24,9 +24,7 @@ class EntitySelectHandler extends SearchHandler
         parent::__construct('', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initDoctrinePropertiesByManagerRegistry(ManagerRegistry $managerRegistry)
     {
         $this->registry = $managerRegistry;
@@ -45,9 +43,7 @@ class EntitySelectHandler extends SearchHandler
         $this->currentField = $targetField;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         list($query, $targetEntity, $targetField) = explode(',', $query);
@@ -56,9 +52,7 @@ class EntitySelectHandler extends SearchHandler
         return parent::search($query, $page, $perPage, $searchById);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         $result = parent::convertItem($item);
@@ -70,9 +64,7 @@ class EntitySelectHandler extends SearchHandler
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function searchEntities($search, $firstResult, $maxResults)
     {
         $queryBuilder = $this->entityRepository->createQueryBuilder('e');
@@ -94,6 +86,7 @@ class EntitySelectHandler extends SearchHandler
     /**
      * @throws \RuntimeException
      */
+    #[\Override]
     protected function checkAllDependenciesInjected()
     {
         if (!$this->properties || !$this->currentField || !$this->entityRepository || !$this->idFieldName) {

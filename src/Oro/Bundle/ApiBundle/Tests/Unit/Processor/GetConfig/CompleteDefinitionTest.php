@@ -21,6 +21,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
     /** @var CompleteDefinition */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -109,9 +109,7 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
         return $nodeDefinition;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('configuration');

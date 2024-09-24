@@ -34,9 +34,7 @@ class AddHateoasLinksForEntity implements ProcessorInterface
         $this->resourcesProvider = $resourcesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */

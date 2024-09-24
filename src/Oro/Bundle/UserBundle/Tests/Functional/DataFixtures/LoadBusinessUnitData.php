@@ -13,17 +13,13 @@ class LoadBusinessUnitData extends AbstractFixture implements DependentFixtureIn
     public const BUSINESS_UNIT_1 = 'business_unit_1';
     public const BUSINESS_UNIT_2 = 'business_unit_2';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $businessUnits = [self::BUSINESS_UNIT_1, self::BUSINESS_UNIT_2];

@@ -16,6 +16,7 @@ class EmailAddressManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAddressManager */
     private $emailAddressManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

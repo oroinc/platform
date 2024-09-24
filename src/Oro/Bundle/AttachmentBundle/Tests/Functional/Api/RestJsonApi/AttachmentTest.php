@@ -11,6 +11,7 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
  */
 class AttachmentTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

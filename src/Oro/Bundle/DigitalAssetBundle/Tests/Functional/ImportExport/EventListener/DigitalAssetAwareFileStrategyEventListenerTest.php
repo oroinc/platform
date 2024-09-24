@@ -31,6 +31,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
     /** @var DigitalAssetAwareFileStrategyPersistEventListener */
     private $persistListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

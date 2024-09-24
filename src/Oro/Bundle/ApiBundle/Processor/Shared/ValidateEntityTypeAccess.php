@@ -39,9 +39,7 @@ class ValidateEntityTypeAccess implements ProcessorInterface
         $this->forcePermissionUsage = $forcePermissionUsage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DeleteAsyncOperationTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.api.delete_async_operation';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Deletes an asynchronous operation.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

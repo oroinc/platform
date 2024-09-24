@@ -13,9 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface;
  */
 class LoadCountriesAndRegions extends AbstractFixture implements InitialFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->loadCountries($manager);

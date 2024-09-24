@@ -15,6 +15,7 @@ class FixAddressesPrimarySubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var FixAddressesPrimarySubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = new FixAddressesPrimarySubscriber('owner.addresses');

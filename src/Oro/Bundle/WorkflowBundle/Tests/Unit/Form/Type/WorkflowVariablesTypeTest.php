@@ -30,6 +30,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     /** @var WorkflowVariablesType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
@@ -54,9 +55,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

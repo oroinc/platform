@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class UsernamePasswordOrganizationTokenFactory implements UsernamePasswordOrganizationTokenFactoryInterface
 {
+    #[\Override]
     public function create(
         AbstractUser $user,
         $firewallName,

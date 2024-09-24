@@ -6,9 +6,7 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\AbstractTwigSandboxConfi
 
 class TwigSandboxConfigurationPassStub extends AbstractTwigSandboxConfigurationPass
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFilters(): array
     {
         return [
@@ -17,9 +15,7 @@ class TwigSandboxConfigurationPassStub extends AbstractTwigSandboxConfigurationP
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFunctions(): array
     {
         return [
@@ -28,9 +24,7 @@ class TwigSandboxConfigurationPassStub extends AbstractTwigSandboxConfigurationP
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTags(): array
     {
         return [
@@ -39,9 +33,7 @@ class TwigSandboxConfigurationPassStub extends AbstractTwigSandboxConfigurationP
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

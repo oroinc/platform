@@ -26,9 +26,7 @@ class FormHandler implements FormHandlerInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process($data, FormInterface $form, Request $request)
     {
         $event = new FormProcessEvent($form, $data);

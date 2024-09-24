@@ -15,6 +15,7 @@ class RecipientListNotEmptyValidator extends ConstraintValidator
      * @param RecipientList $entity
      * @param RecipientListNotEmpty $constraint
      */
+    #[\Override]
     public function validate($entity, Constraint $constraint): void
     {
         if (!is_a($entity, RecipientList::class)) {

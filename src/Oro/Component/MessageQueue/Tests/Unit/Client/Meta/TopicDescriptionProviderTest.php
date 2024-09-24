@@ -10,6 +10,7 @@ class TopicDescriptionProviderTest extends \PHPUnit\Framework\TestCase
 {
     private TopicDescriptionProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $topicRegistry = $this->createMock(TopicRegistry::class);

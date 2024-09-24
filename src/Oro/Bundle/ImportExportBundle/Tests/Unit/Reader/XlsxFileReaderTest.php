@@ -22,6 +22,7 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
     /** @var XlsxFileReader */
     private $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);

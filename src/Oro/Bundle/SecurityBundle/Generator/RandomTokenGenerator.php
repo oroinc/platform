@@ -4,9 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Generator;
 
 class RandomTokenGenerator implements RandomTokenGeneratorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function generateToken($entropy = 256)
     {
         // Generate an URI safe base64 encoded string.

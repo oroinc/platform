@@ -21,6 +21,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
     /** @var SetCurrency */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

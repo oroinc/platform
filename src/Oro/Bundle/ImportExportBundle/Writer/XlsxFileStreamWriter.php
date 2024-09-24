@@ -32,9 +32,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
         return $this->writer;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function write(array $items): void
     {
         $rows = [];
@@ -57,9 +55,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
         $this->currentRow += count($rows) - 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context): void
     {
         if ($context->hasOption('firstLineIsHeader')) {
@@ -75,6 +71,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      * Write to file on close.
      * A little hacky but direct write is not possible because you cannot append data directly
      */
+    #[\Override]
     public function close(): void
     {
         if ($this->writer) {

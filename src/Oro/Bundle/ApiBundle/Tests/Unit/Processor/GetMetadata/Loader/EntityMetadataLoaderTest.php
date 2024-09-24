@@ -45,6 +45,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
     /** @var EntityMetadataLoader */
     private $entityMetadataLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

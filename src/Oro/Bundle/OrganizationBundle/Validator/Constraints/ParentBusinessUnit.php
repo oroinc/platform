@@ -15,17 +15,13 @@ class ParentBusinessUnit extends Constraint
 {
     public $message = "Business Unit cannot have a child as a Parent Business Unit.";
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return 'parent_business_unit_validator';
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

@@ -8,24 +8,25 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractTargetManyToManyCollectionTestCase extends AbstractCollectionTestCase
 {
+    #[\Override]
     protected function getCollectionEntityClass(): string
     {
         return TestCollectionItem::class;
     }
 
+    #[\Override]
     protected function getCollectionItemEntityClass(): string
     {
         return TestCollection::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isManyToMany(): bool
     {
         return true;
     }
 
+    #[\Override]
     public function testDeleteRelationship()
     {
         if (!$this->isOrphanRemoval()) {
@@ -56,6 +57,7 @@ abstract class AbstractTargetManyToManyCollectionTestCase extends AbstractCollec
         self::assertNotNull($em->find($this->getCollectionItemEntityClass(), $itemEntity2Id), 'Item2');
     }
 
+    #[\Override]
     public function testUpdateRelationshipWithRemoveItemFromCollection()
     {
         if (!$this->isOrphanRemoval()) {
@@ -86,6 +88,7 @@ abstract class AbstractTargetManyToManyCollectionTestCase extends AbstractCollec
         self::assertNotNull($em->find($this->getCollectionItemEntityClass(), $itemEntity2Id), 'Item2');
     }
 
+    #[\Override]
     public function testUpdateRelationshipWithRemoveAllItemsFromCollection()
     {
         if (!$this->isOrphanRemoval()) {
@@ -113,6 +116,7 @@ abstract class AbstractTargetManyToManyCollectionTestCase extends AbstractCollec
         self::assertNotNull($em->find($this->getCollectionItemEntityClass(), $itemEntity2Id), 'Item2');
     }
 
+    #[\Override]
     public function testUpdateWithRemoveItemFromCollection()
     {
         if (!$this->isOrphanRemoval()) {
@@ -157,6 +161,7 @@ abstract class AbstractTargetManyToManyCollectionTestCase extends AbstractCollec
         );
     }
 
+    #[\Override]
     public function testUpdateWithRemoveAllItemsFromCollection()
     {
         if (!$this->isOrphanRemoval()) {

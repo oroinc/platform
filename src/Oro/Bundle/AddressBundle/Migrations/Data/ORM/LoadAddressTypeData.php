@@ -13,9 +13,7 @@ class LoadAddressTypeData extends AbstractTranslatableEntityFixture
 {
     private const TRANSLATION_PREFIX = 'address_type';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function loadEntities(ObjectManager $manager): void
     {
         $addressTypeRepository = $manager->getRepository(AddressType::class);

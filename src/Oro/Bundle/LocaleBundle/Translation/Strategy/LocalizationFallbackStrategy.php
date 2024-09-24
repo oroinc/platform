@@ -27,25 +27,19 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
         $this->cacheProvider = $cacheProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return 'oro_localization_fallback_strategy';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLocaleFallbacks(): array
     {
         return $this->cacheProvider->get(self::CACHE_KEY, function () {
@@ -58,9 +52,7 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
         $this->cacheProvider->delete(self::CACHE_KEY);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         try {
@@ -73,9 +65,7 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return true;

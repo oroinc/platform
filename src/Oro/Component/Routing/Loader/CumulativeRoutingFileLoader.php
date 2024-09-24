@@ -37,17 +37,13 @@ class CumulativeRoutingFileLoader extends AbstractLoader
         $this->routeType         = $routeType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($resource, $type = null): bool
     {
         return $type === $this->routeType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getResources()
     {
         $resources = [];

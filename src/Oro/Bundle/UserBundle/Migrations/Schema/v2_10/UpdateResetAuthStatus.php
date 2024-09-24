@@ -18,9 +18,7 @@ class UpdateResetAuthStatus implements Migration, OutdatedExtendExtensionAwareIn
 {
     use OutdatedExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $options = new OroOptions();

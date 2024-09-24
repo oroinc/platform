@@ -40,6 +40,7 @@ class SvgIconsSupportProvider implements ResetInterface
         });
     }
 
+    #[\Override]
     public function reset(): void
     {
         $this->cache->clear(self::CACHE_KEY);

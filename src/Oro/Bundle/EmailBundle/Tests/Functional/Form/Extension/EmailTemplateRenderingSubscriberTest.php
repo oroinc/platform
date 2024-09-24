@@ -21,6 +21,7 @@ class EmailTemplateRenderingSubscriberTest extends WebTestCase
 
     private FormFactoryInterface $formFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -36,6 +37,7 @@ class EmailTemplateRenderingSubscriberTest extends WebTestCase
         $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $user = $this->getReference(LoadUserData::SIMPLE_USER);

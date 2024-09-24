@@ -53,9 +53,7 @@ class UserManager extends BaseUserManager
         $user->setAuthStatus($this->enumOptionsProvider->getEnumOptionByCode(self::AUTH_STATUS_ENUM_CODE, $authStatus));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateUser(UserInterface $user, bool $flush = true): void
     {
         // make sure user has a default status

@@ -33,9 +33,7 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
         $this->mink = $mink;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -31,17 +31,13 @@ class ButtonProviderExtensionStub implements ButtonProviderExtensionInterface
         };
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         return call_user_func($this->findCallback, $buttonSearchContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isAvailable(
         ButtonInterface $button,
         ButtonSearchContext $buttonSearchContext,
@@ -50,9 +46,7 @@ class ButtonProviderExtensionStub implements ButtonProviderExtensionInterface
         return call_user_func($this->isAvailableCallback, $button, $buttonSearchContext, $errors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(ButtonInterface $button)
     {
         return call_user_func($this->supportsCallback, $button);

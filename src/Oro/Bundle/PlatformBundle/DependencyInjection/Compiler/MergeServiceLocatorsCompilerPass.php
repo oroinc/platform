@@ -26,9 +26,9 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $serviceLocatorDefinition = $this->getServiceLocatorDefinition($container);

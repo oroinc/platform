@@ -15,17 +15,13 @@ class LoadUserEmailOriginData extends AbstractFixture implements DependentFixtur
     public const USER_EMAIL_ORIGIN_2 = 'user_email_origin.2';
     public const USER_EMAIL_ORIGIN_3 = 'user_email_origin.3';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadEmailData::class, LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $data = [

@@ -10,9 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class OrganizationRememberMeTokenFactory implements OrganizationRememberMeTokenFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create(UserInterface $user, $providerKey, $key, Organization $organization)
     {
         return new OrganizationRememberMeToken(

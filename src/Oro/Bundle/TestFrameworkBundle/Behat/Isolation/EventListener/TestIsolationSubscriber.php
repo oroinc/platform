@@ -60,9 +60,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

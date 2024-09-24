@@ -17,9 +17,7 @@ class EntityAdditionalFields implements AuditAdditionalFieldsInterface
         $this->fields = $fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAdditionalFields()
     {
         return $this->fields;

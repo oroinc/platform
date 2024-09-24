@@ -14,14 +14,13 @@ class CsvEchoWriter extends CsvFileStreamWriter
      *
      * @return resource
      */
+    #[\Override]
     protected function open()
     {
         return fopen($this->filePath, 'r+');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context)
     {
         $this->filePath = 'php://output';

@@ -19,9 +19,7 @@ class ChainTagGenerator implements TagGeneratorInterface
         $this->generators = $generators;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($data)
     {
         foreach ($this->generators as $generator) {
@@ -33,9 +31,7 @@ class ChainTagGenerator implements TagGeneratorInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         $tags = [];

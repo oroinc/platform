@@ -34,9 +34,7 @@ class IdentityConfigChoiceType extends AbstractConfigType
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(
@@ -56,9 +54,7 @@ class IdentityConfigChoiceType extends AbstractConfigType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -74,33 +70,24 @@ class IdentityConfigChoiceType extends AbstractConfigType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_importexport_identity_config_choice';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isReadOnly(Options $options)
     {
         return $this->isImmutable($options) || parent::isReadOnly($options);

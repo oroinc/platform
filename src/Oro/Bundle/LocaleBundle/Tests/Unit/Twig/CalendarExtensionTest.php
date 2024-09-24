@@ -20,6 +20,7 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var CalendarExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);

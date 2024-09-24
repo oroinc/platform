@@ -54,9 +54,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         $this->fileReflector = $fileReflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [
@@ -65,9 +63,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -116,9 +112,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         return $groups;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['dam_widget_enabled']) {
@@ -160,9 +154,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         $this->fileReflector->reflectFromDigitalAsset($file, $digitalAsset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if (!$options['dam_widget_enabled']) {

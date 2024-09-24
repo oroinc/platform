@@ -10,9 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class TextareaAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): AbstractType
     {
         $entityClassResolver = $this->createMock(EntityClassResolver::class);

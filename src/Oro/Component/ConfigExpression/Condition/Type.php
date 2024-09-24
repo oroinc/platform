@@ -9,9 +9,7 @@ class Type extends AbstractComparison
 {
     const NAME = 'type';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         parent::initialize($options);
@@ -23,17 +21,13 @@ class Type extends AbstractComparison
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doCompare($value, $type)
     {
         return gettype($value) === $type || $value instanceof $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getMessageParameters($context)
     {
         $left = $this->resolveValue($context, $this->left);
@@ -52,9 +46,7 @@ class Type extends AbstractComparison
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

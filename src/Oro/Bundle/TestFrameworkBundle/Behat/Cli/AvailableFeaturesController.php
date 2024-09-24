@@ -29,9 +29,7 @@ class AvailableFeaturesController implements Controller
         $this->specificationFinder = $specificationFinder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -43,9 +41,7 @@ class AvailableFeaturesController implements Controller
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('available-features')) {

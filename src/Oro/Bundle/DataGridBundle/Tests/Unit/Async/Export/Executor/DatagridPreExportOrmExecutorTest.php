@@ -42,6 +42,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
 
     private DatagridPreExportOrmExecutor $executor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);

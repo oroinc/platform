@@ -29,9 +29,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         $this->optionsManipulator->setRawLayout($this->rawLayout);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function add(
         $id,
         $parentId,
@@ -61,9 +59,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($id)
     {
         try {
@@ -83,9 +79,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function move($id, $parentId = null, $siblingId = null, $prepend = null)
     {
         try {
@@ -107,9 +101,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addAlias($alias, $id)
     {
         try {
@@ -130,9 +122,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeAlias($alias)
     {
         try {
@@ -152,9 +142,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOption($id, $optionName, $optionValue)
     {
         try {
@@ -181,9 +169,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function appendOption($id, $optionName, $optionValue)
     {
         try {
@@ -210,9 +196,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function subtractOption($id, $optionName, $optionValue)
     {
         try {
@@ -239,9 +223,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
     {
         try {
@@ -268,9 +250,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeOption($id, $optionName)
     {
         try {
@@ -297,9 +277,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function changeBlockType($id, $blockType, $optionsCallback = null)
     {
         try {
@@ -332,9 +310,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setBlockTheme($themes, $id = null)
     {
         try {
@@ -357,9 +333,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFormTheme($themes)
     {
         $this->rawLayout->setFormTheme($themes);
@@ -367,9 +341,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear()
     {
         $this->rawLayout->clear();
@@ -377,41 +349,31 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isEmpty()
     {
         return $this->rawLayout->isEmpty();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function has($id)
     {
         return $this->rawLayout->has($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolveId($id)
     {
         return $this->rawLayout->resolveId($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParentId($id)
     {
         return $this->rawLayout->getParentId($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isParentFor($parentId, $id)
     {
         return
@@ -420,25 +382,19 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
             && $this->rawLayout->getParentId($id) === $this->rawLayout->resolveId($parentId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasAlias($alias)
     {
         return $this->rawLayout->hasAlias($alias);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAliases($id)
     {
         return $this->rawLayout->getAliases($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType($id)
     {
         try {
@@ -460,9 +416,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOptions($id)
     {
         try {
@@ -480,9 +434,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRawLayout()
     {
         return $this->rawLayout;

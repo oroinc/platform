@@ -27,9 +27,7 @@ class ImageEncodedFormatter implements FormatterInterface
         $this->fileLocator = $fileLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($value, array $formatterArguments = [])
     {
         $altValue = $value->getOriginalFilename();
@@ -58,9 +56,7 @@ class ImageEncodedFormatter implements FormatterInterface
         return $this->getData($value->getMimeType(), $this->fileManager->getContent($value), $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultValue()
     {
         return $this->getData(

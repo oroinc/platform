@@ -42,6 +42,7 @@ class NotificationAlertListCommand extends Command
         $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
+    #[\Override]
     protected function configure()
     {
         $this
@@ -78,6 +79,7 @@ HELP
             );
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $builder = $this->getQueryBuilder();

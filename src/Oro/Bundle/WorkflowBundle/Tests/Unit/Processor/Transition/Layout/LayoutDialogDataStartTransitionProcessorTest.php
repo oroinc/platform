@@ -17,6 +17,7 @@ class LayoutDialogDataStartTransitionProcessorTest extends \PHPUnit\Framework\Te
     /** @var LayoutDialogDataStartTransitionProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new LayoutDialogDataStartTransitionProcessor();

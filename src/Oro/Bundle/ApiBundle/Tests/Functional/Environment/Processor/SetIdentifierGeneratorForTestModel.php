@@ -9,9 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class SetIdentifierGeneratorForTestModel implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */

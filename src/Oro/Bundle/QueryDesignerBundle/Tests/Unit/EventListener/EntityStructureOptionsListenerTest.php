@@ -18,6 +18,7 @@ class EntityStructureOptionsListenerTest extends TestCase
 
     private EntityAliasResolver|MockObject $entityAliasResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);

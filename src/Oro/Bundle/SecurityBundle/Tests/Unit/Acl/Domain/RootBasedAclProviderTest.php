@@ -34,6 +34,7 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RootBasedAclProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->baseProvider = $this->createMock(MutableAclProvider::class);

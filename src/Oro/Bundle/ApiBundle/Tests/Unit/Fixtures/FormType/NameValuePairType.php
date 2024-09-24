@@ -9,9 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NameValuePairType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -19,9 +17,7 @@ class NameValuePairType extends AbstractType
             ->add('value', TextType::class, $options['value_options']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -32,9 +28,7 @@ class NameValuePairType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'test_name_value_pair';

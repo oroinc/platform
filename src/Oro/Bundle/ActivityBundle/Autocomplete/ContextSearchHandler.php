@@ -100,9 +100,6 @@ class ContextSearchHandler implements ConverterInterface
         $this->class = $class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function search($query, $page, $perPage, $searchById = false)
     {
         if ($searchById) {
@@ -167,9 +164,7 @@ class ContextSearchHandler implements ConverterInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         $this->dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);

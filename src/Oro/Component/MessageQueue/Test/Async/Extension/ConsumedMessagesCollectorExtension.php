@@ -33,6 +33,7 @@ class ConsumedMessagesCollectorExtension extends AbstractExtension
         $this->loggerTestHandler = new TestHandler();
     }
 
+    #[\Override]
     public function onStart(Context $context): void
     {
         if (!$context->getLogger()) {
@@ -48,6 +49,7 @@ class ConsumedMessagesCollectorExtension extends AbstractExtension
     /**
      * Sets the common logger to message processors so their log records can be checked in tests.
      */
+    #[\Override]
     public function onPreReceived(Context $context): void
     {
         $messageProcessor = $context->getMessageProcessorName();
@@ -59,6 +61,7 @@ class ConsumedMessagesCollectorExtension extends AbstractExtension
         }
     }
 
+    #[\Override]
     public function onPostReceived(Context $context): void
     {
         $this->processed[] = clone $context;

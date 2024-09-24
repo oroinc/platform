@@ -196,6 +196,7 @@ class WidgetController extends AbstractFOSRestController
         return \Oro\Bundle\SidebarBundle\Entity\Widget::class;
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

@@ -18,6 +18,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
     /** @var OroHiddenNumberType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->numberFormatter = $this->createMock(NumberFormatter::class);
@@ -114,9 +115,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

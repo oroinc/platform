@@ -9,6 +9,7 @@ class ScheduleSyncAction extends AjaxAction
     /**
      * @return array
      */
+    #[\Override]
     public function getOptions()
     {
         $options = parent::getOptions();

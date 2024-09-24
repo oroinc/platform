@@ -54,6 +54,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     /**
      * @throws InvalidConfigurationException
      */
+    #[\Override]
     protected function initializeFromContext(ContextInterface $context)
     {
         if ($context->hasOption('entityName')) {
@@ -148,9 +149,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         return $qb;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIds($entityName, array $options = [])
     {
         /** @var EntityManager $entityManager */
@@ -286,6 +285,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         return $queryBuilder->getQuery();
     }
 
+    #[\Override]
     public function close(): void
     {
         $this->registry->getManager()->clear();

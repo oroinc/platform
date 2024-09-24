@@ -11,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());

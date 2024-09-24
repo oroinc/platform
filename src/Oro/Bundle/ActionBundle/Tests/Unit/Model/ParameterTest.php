@@ -12,6 +12,7 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
     /** @var Parameter */
     private $parameter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->parameter = new Parameter('test');

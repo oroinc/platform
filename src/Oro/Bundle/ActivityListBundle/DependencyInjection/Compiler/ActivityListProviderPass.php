@@ -15,9 +15,7 @@ class ActivityListProviderPass implements CompilerPassInterface
 {
     use PriorityTaggedLocatorTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $tagName = 'oro_activity_list.provider';

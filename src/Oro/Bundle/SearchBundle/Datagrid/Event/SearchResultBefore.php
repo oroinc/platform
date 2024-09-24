@@ -27,9 +27,7 @@ class SearchResultBefore extends Event implements GridEventInterface
         $this->query    = $query;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDatagrid()
     {
         return $this->datagrid;

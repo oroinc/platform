@@ -22,6 +22,7 @@ class OrmRelatedTestCase extends OrmTestCase
     /** @var string[] */
     protected $notManageableClassNames = [];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

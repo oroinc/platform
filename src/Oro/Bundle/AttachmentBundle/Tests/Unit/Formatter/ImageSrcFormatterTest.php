@@ -14,6 +14,7 @@ class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var ImageSrcFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(AttachmentManager::class);

@@ -13,9 +13,7 @@ use Twig\TwigFilter;
  */
 class OroSearchExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [

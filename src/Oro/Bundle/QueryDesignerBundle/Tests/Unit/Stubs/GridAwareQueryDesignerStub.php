@@ -21,26 +21,31 @@ class GridAwareQueryDesignerStub extends AbstractQueryDesigner implements GridQu
         $this->definition = $definition;
     }
 
+    #[\Override]
     public function getEntity()
     {
         return $this->entity;
     }
 
+    #[\Override]
     public function setEntity($entity)
     {
         $this->entity = $entity;
     }
 
+    #[\Override]
     public function getDefinition()
     {
         return $this->definition;
     }
 
+    #[\Override]
     public function setDefinition($definition)
     {
         $this->definition = $definition;
     }
 
+    #[\Override]
     public function getGridPrefix(): string
     {
         return self::GRID_PREFIX;

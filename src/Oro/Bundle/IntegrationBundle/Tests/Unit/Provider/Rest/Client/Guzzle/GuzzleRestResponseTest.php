@@ -22,6 +22,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     /** @var GuzzleRestResponse */
     private $response;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->sourceResponse = $this->createMock(Response::class);

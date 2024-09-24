@@ -24,6 +24,7 @@ class CryptedDataTransformerFactoryTest extends \PHPUnit\Framework\TestCase
      */
     private $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

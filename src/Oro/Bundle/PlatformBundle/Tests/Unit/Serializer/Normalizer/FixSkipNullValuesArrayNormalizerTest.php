@@ -10,6 +10,7 @@ class FixSkipNullValuesArrayNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var FixSkipNullValuesArrayNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->normalizer = new FixSkipNullValuesArrayNormalizer();

@@ -17,6 +17,7 @@ class TransitionAclResourceListenerTest extends TestCase
     private ExpressionFactory|MockObject $expressionFactory;
     private TransitionAclResourceListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->expressionFactory = $this->createMock(ExpressionFactory::class);

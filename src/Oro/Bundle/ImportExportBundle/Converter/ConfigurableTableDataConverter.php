@@ -50,6 +50,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     ) {
     }
 
+    #[\Override]
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
@@ -110,9 +111,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getHeaderConversionRules()
     {
         $this->initializeRules();
@@ -120,9 +119,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         return $this->headerConversionRules;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getBackendHeader()
     {
         $this->initialize();
@@ -130,9 +127,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         return $this->backendHeader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;

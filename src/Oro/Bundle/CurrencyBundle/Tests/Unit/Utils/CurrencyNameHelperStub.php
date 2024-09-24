@@ -12,9 +12,7 @@ class CurrencyNameHelperStub extends CurrencyNameHelper
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCurrencyName($currencyIsoCode, $nameViewStyle = null)
     {
         if (ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE === $nameViewStyle) {
@@ -28,9 +26,7 @@ class CurrencyNameHelperStub extends CurrencyNameHelper
         return Currencies::getSymbol($currencyIsoCode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCurrencyChoices($nameViewStyle = null)
     {
         return ['$' => 'USD', '€' => 'EUR'];

@@ -4,9 +4,7 @@ namespace Oro\Component\ConfigExpression\Condition;
 
 class EndWith extends AbstractComparison
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doCompare($left, $right)
     {
         $pattern = sprintf('/%s$/i', preg_quote($right));
@@ -14,9 +12,7 @@ class EndWith extends AbstractComparison
         return (bool) preg_match($pattern, $left);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'end_with';

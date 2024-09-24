@@ -10,11 +10,11 @@ use Symfony\Component\Validator\ConstraintValidator;
 class OptionalPriceValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
      *
      * @param Price $price
      * @param Constraint $constraint
      */
+    #[\Override]
     public function validate($price, Constraint $constraint)
     {
         if ($price->getValue() && !$price->getCurrency()) {

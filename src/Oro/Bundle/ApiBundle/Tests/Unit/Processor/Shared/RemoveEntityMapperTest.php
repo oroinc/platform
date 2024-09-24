@@ -11,6 +11,7 @@ class RemoveEntityMapperTest extends FormProcessorTestCase
     /** @var RemoveEntityMapper */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

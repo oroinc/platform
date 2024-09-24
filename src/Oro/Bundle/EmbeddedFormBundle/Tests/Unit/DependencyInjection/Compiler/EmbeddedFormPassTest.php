@@ -10,6 +10,7 @@ class EmbeddedFormPassTest extends \PHPUnit\Framework\TestCase
     /** @var EmbeddedFormPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new EmbeddedFormPass();

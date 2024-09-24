@@ -10,9 +10,7 @@ use Symfony\Component\Routing\Route;
 
 class TestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes): void
     {
         if ('rest_api' !== $route->getOption(RestRouteOptionsResolver::GROUP_OPTION)) {

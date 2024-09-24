@@ -14,16 +14,19 @@ class WorkflowTransitionCronTriggerTopic extends AbstractWorkflowTransitionTrigg
 {
     public const NAME = 'oro_message_queue.transition_trigger_cron_message';
 
+    #[\Override]
     public static function getName(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Process the workflow transition cron trigger.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

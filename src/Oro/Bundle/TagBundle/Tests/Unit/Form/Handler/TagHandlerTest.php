@@ -27,6 +27,7 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
 
     private Tag $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(Form::class);

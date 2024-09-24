@@ -24,9 +24,7 @@ class AddCommentAssociations implements ProcessorInterface
         $this->commentAssociationProvider = $commentAssociationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

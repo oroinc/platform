@@ -6,33 +6,25 @@ use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 
 class TestConnector implements ConnectorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel(): string
     {
         return 'test connector';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getImportEntityFQCN()
     {
         return 'testEntity';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getImportJobName()
     {
         return 'test job';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType()
     {
         return 'test Type';

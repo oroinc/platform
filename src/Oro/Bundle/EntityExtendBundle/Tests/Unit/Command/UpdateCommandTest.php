@@ -25,6 +25,7 @@ class UpdateCommandTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityExtendUpdateProcessor = $this->createMock(EntityExtendUpdateProcessor::class);

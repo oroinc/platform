@@ -14,9 +14,7 @@ class SelectBuilder extends AbstractChoiceBuilder
         return 'select';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildOption(FormBuilderInterface $builder, array $option): void
     {
         if (array_key_exists('default', $option) && $this->isMultipleSelect($option)) {
@@ -26,9 +24,7 @@ class SelectBuilder extends AbstractChoiceBuilder
         parent::buildOption($builder, $option);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDefaultOptions(): array
     {
         return [

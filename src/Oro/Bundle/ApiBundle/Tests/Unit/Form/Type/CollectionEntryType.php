@@ -9,9 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class CollectionEntryType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(

@@ -31,6 +31,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
     /** @var CustomAssociationCompleter */
     private $customAssociationCompleter;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

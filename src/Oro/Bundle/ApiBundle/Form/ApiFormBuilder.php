@@ -16,9 +16,7 @@ class ApiFormBuilder extends FormBuilder
 {
     private ?array $emptyViewTransformers = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addViewTransformer(
         DataTransformerInterface $viewTransformer,
         bool $forcePrepend = false
@@ -32,9 +30,7 @@ class ApiFormBuilder extends FormBuilder
         return parent::addViewTransformer($viewTransformer, $forcePrepend);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resetViewTransformers(): static
     {
         $this->emptyViewTransformers = null;
@@ -42,9 +38,7 @@ class ApiFormBuilder extends FormBuilder
         return parent::resetViewTransformers();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getViewTransformers(): array
     {
         $viewTransformers = parent::getViewTransformers();

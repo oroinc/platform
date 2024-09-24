@@ -33,9 +33,7 @@ class FormSubmitTemplateResponseProcessor implements ProcessorInterface
         $this->twig = $twig;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context)
     {
         /** @var TransitionContext $context */

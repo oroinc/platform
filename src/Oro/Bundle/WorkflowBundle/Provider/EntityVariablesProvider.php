@@ -10,17 +10,13 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
  */
 class EntityVariablesProvider implements EntityVariablesProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableDefinitions(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableGetters(): array
     {
         return [
@@ -35,9 +31,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableProcessors(string $entityClass): array
     {
         return [];

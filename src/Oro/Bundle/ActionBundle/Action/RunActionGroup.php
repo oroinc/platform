@@ -48,9 +48,6 @@ class RunActionGroup extends AbstractAction
         $this->errorsPath = new PropertyPath(self::ERRORS_DEFAULT_KEY);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(self::OPTION_ACTION_GROUP);
@@ -101,9 +98,7 @@ class RunActionGroup extends AbstractAction
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $this->options = $this->resolve($options);
@@ -113,9 +108,7 @@ class RunActionGroup extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         if (null === $this->executionArgs) {

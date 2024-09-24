@@ -15,6 +15,7 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
 {
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -50,9 +51,7 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
         self::assertEmpty($stuckRootJobDependent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDataFixturesExecutorEntityManager(): EntityManagerInterface
     {
         return $this->getEntityManager();

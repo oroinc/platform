@@ -15,9 +15,7 @@ abstract class AbstractEntityFallbackProvider implements EntityFallbackProviderI
     /** @var array */
     protected $entityConfigs = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFallbackSupported($object, $objectFieldName)
     {
         return true;

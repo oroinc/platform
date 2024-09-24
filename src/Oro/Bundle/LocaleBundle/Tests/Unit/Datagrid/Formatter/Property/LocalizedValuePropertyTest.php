@@ -11,6 +11,7 @@ class LocalizedValuePropertyTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizedValueProperty */
     private $property;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->property = new LocalizedValueProperty();

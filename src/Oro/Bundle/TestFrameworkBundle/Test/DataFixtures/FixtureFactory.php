@@ -4,9 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
 class FixtureFactory implements FixtureFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createFixture($fixtureId)
     {
         if (!class_exists($fixtureId)) {

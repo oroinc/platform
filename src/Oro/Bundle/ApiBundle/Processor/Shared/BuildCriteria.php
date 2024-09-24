@@ -17,9 +17,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class BuildCriteria implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

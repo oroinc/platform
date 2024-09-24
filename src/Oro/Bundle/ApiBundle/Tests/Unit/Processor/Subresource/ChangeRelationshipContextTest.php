@@ -10,6 +10,7 @@ class ChangeRelationshipContextTest extends \PHPUnit\Framework\TestCase
 {
     private ChangeRelationshipContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new ChangeRelationshipContext(

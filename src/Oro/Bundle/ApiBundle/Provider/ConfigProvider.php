@@ -87,9 +87,7 @@ class ConfigProvider implements ResetInterface
         return clone $config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->cache = [];

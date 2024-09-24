@@ -12,16 +12,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class IndexEntitiesByIdTopic extends AbstractTopic implements JobAwareTopicInterface
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.search.index_entities';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Index entities by id';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -30,6 +33,7 @@ class IndexEntitiesByIdTopic extends AbstractTopic implements JobAwareTopicInter
             ->addAllowedTypes('entityIds', ['string[]', 'int[]']);
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         $entityClass = $messageBody[MessageTransformerInterface::MESSAGE_FIELD_ENTITY_CLASS];

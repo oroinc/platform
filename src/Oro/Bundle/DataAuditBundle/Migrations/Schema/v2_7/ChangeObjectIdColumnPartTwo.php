@@ -9,9 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class ChangeObjectIdColumnPartTwo implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_audit');
@@ -23,9 +21,7 @@ class ChangeObjectIdColumnPartTwo implements Migration, OrderedMigrationInterfac
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder(): int
     {
         return 20;

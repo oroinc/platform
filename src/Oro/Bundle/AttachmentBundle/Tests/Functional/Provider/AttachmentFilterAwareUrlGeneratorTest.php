@@ -19,6 +19,7 @@ class AttachmentFilterAwareUrlGeneratorTest extends WebTestCase
     /** @var AttachmentFilterAwareUrlGenerator */
     private $attachmentUrlGenerator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

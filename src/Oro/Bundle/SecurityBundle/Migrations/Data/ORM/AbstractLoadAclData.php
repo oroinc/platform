@@ -26,14 +26,13 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
 
     const ALL_ROLES = '*';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadRolesData::class];
     }
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var AclManager $aclManager */

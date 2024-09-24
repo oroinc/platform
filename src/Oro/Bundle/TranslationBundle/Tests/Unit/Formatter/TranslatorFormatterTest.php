@@ -13,6 +13,7 @@ class TranslatorFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

@@ -15,6 +15,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerClearer */
     private $clearer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(Container::class);

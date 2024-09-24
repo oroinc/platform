@@ -70,6 +70,7 @@ class DynamicTranslationKeySource implements TranslationKeySourceInterface
      * @return string
      * @throws \LogicException
      */
+    #[\Override]
     public function getTemplate()
     {
         return $this->getKeyTemplate()->getTemplate();
@@ -78,6 +79,7 @@ class DynamicTranslationKeySource implements TranslationKeySourceInterface
     /**
      * @return array
      */
+    #[\Override]
     public function getData()
     {
         return $this->data;

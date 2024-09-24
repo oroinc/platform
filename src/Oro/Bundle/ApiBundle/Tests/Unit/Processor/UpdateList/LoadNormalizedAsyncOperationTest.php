@@ -25,6 +25,7 @@ class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
     /** @var LoadNormalizedAsyncOperation */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

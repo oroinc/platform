@@ -37,9 +37,7 @@ class PreBuild extends Event implements GridConfigurationEventInterface
         return $this->parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfig()
     {
         return $this->config;

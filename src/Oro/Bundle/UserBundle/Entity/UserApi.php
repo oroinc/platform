@@ -50,6 +50,7 @@ class UserApi implements UserApiKeyInterface
      *
      * @return bool
      */
+    #[\Override]
     public function isEnabled()
     {
         return $this->getUser()->isBelongToOrganization($this->getOrganization());
@@ -74,6 +75,7 @@ class UserApi implements UserApiKeyInterface
      *
      * @return string
      */
+    #[\Override]
     public function getApiKey()
     {
         return $this->apiKey;
@@ -98,6 +100,7 @@ class UserApi implements UserApiKeyInterface
      *
      * @return User
      */
+    #[\Override]
     public function getUser()
     {
         return $this->user;
@@ -132,6 +135,7 @@ class UserApi implements UserApiKeyInterface
      *
      * @return Organization
      */
+    #[\Override]
     public function getOrganization()
     {
         return $this->organization;
@@ -140,6 +144,7 @@ class UserApi implements UserApiKeyInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getId();

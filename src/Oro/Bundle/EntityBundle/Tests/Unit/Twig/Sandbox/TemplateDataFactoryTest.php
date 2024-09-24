@@ -20,6 +20,7 @@ class TemplateDataFactoryTest extends TestCase
 
     private TemplateDataFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->templateRendererConfigProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);

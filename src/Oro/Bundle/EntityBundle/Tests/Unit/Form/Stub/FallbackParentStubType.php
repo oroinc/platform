@@ -9,26 +9,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FallbackParentStubType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'fallback_parent_stub';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('fallback');
         $resolver->setDefaults(['data_class' => FallbackParentStub::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('valueWithFallback', EntityFieldFallbackValueType::class, $options['fallback']);

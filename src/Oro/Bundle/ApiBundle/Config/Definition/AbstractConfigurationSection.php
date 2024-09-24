@@ -12,17 +12,13 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
 {
     protected ConfigurationSettingsInterface $settings;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(string $section): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSettings(ConfigurationSettingsInterface $settings): void
     {
         $this->settings = $settings;

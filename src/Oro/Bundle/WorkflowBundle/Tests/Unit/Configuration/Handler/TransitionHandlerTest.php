@@ -11,6 +11,7 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = new TransitionHandler();

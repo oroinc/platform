@@ -49,10 +49,10 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function toArray(): array
     {
         $result = array_merge(

@@ -19,9 +19,7 @@ class ExtendEntityPlatformUpdateChecker implements PlatformUpdateCheckerInterfac
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function checkReadyToUpdate(): ?array
     {
         $entityClasses = [];

@@ -31,6 +31,7 @@ class EntityManagementGridActionExtensionTest extends TestCase
 
     private EntityManagementConfigVoter $voter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

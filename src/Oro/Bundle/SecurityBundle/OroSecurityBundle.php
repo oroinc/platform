@@ -24,9 +24,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroSecurityBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function boot(): void
     {
         parent::boot();
@@ -36,9 +34,7 @@ class OroSecurityBundle extends Bundle
         CryptedTextType::setCrypter($crypter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

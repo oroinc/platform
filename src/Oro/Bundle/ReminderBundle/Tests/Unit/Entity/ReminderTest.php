@@ -13,6 +13,7 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
     /** @var Reminder */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new Reminder();

@@ -18,9 +18,7 @@ class PostProcessorConfigExtension extends AbstractConfigExtension
         $this->postProcessorRegistry = $postProcessorRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigureCallbacks(): array
     {
         return [

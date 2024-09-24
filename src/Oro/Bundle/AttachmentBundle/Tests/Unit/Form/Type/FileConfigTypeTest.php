@@ -13,6 +13,7 @@ class FileConfigTypeTest extends \PHPUnit\Framework\TestCase
     /** @var FileConfigType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configManager = $this->createMock(ConfigManager::class);

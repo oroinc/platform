@@ -12,6 +12,7 @@ class ConstraintAsOptionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ConstraintAsOptionExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new ConstraintAsOptionExtension(new ConstraintFactory());

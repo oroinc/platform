@@ -31,6 +31,7 @@ class DefaultOwnerHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultOwnerHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

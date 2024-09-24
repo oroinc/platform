@@ -32,6 +32,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     /** @var IndexerQuery */
     private $query;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchIndexer = $this->createMock(Indexer::class);

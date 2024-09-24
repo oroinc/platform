@@ -10,9 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class DeleteTestResourceWithoutIdentifierEntity implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         $context->removeResult();

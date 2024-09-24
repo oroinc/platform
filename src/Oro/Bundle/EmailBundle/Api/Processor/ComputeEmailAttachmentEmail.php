@@ -13,9 +13,7 @@ class ComputeEmailAttachmentEmail implements ProcessorInterface
 {
     private const EMAIL_FIELD_NAME = 'email';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

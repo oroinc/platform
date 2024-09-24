@@ -21,6 +21,7 @@ class OrganizationRestrictionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationRestrictionProvider */
     private $organizationRestrictionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

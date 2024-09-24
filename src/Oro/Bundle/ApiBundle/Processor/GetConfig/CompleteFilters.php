@@ -44,9 +44,7 @@ class CompleteFilters extends CompleteSection
         $this->disallowRangeDataTypes = array_fill_keys($disallowRangeDataTypes, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
@@ -54,9 +52,7 @@ class CompleteFilters extends CompleteSection
         $this->complete($context->getFilters(), $context->getClassName(), $context->getResult());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function completeFields(
         EntityConfigInterface $section,
         string $entityClass,

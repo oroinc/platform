@@ -13,6 +13,7 @@ class EnumOptionRepositoryTest extends \PHPUnit\Framework\TestCase
     private const string ENUM_VALUE_CLASS_NAME = TestEnumValue::class;
     private EnumOptionRepository $repo;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repo = new EnumOptionRepository(

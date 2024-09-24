@@ -17,14 +17,13 @@ class AttributeType extends BaseType
         $this->name = $name;
     }
 
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $optionsResolver)
     {
         // Option "visible" should not have a default value

@@ -19,9 +19,7 @@ class BufferedQueryWithDoctrineIterableResultIterator extends BufferedQueryResul
      */
     private $innerIterator;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->current = null;
@@ -42,9 +40,7 @@ class BufferedQueryWithDoctrineIterableResultIterator extends BufferedQueryResul
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadNextPage(): bool
     {
         if ($this->pageCallback && $this->page !== -1) {

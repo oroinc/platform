@@ -26,6 +26,7 @@ class FlashMessageHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FlashMessageHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->session = $this->createMock(Session::class);

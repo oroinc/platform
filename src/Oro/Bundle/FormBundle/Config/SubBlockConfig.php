@@ -214,6 +214,7 @@ class SubBlockConfig implements FormConfigInterface
     /**
      * @return array
      */
+    #[\Override]
     public function toArray()
     {
         return [

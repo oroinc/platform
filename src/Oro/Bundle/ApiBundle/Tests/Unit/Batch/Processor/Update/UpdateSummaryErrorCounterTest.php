@@ -16,6 +16,7 @@ class UpdateSummaryErrorCounterTest extends BatchUpdateProcessorTestCase
     /** @var UpdateSummaryErrorCounter */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SampleTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'sample_topic';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Sample topic to test BuildTopicMetaRegistryPass.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
     }

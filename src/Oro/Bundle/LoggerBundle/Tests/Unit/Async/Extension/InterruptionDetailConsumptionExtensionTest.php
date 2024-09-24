@@ -21,6 +21,7 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
 
     private InterruptionDetailConsumptionExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

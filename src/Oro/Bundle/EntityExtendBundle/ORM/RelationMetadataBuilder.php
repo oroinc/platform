@@ -38,17 +38,13 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(ConfigInterface $extendConfig)
     {
         return $extendConfig->is('relation');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ClassMetadataBuilder $metadataBuilder, ConfigInterface $extendConfig)
     {
         $relations = $extendConfig->get('relation', false, []);

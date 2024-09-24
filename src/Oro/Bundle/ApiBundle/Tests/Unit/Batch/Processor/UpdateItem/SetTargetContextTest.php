@@ -17,6 +17,7 @@ class SetTargetContextTest extends BatchUpdateItemProcessorTestCase
 {
     private SetTargetContext $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

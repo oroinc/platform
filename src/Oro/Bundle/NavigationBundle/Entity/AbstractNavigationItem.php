@@ -52,6 +52,7 @@ abstract class AbstractNavigationItem implements
     /**
      * @return integer
      */
+    #[\Override]
     public function getId()
     {
         return $this->id;
@@ -128,6 +129,7 @@ abstract class AbstractNavigationItem implements
     /**
      * @return AbstractUser
      */
+    #[\Override]
     public function getUser()
     {
         return $this->user;
@@ -136,6 +138,7 @@ abstract class AbstractNavigationItem implements
     /**
      * Set entity properties
      */
+    #[\Override]
     public function setValues(array $values)
     {
         if (isset($values['title'])) {

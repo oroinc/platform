@@ -7,17 +7,13 @@ use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AssociationEntityConfig
 
 class AttachmentConfigDumperExtension extends AssociationEntityConfigDumperExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationEntityClass()
     {
         return AttachmentScope::ATTACHMENT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationScope()
     {
         return 'attachment';

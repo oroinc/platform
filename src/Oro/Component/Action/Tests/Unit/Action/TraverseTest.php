@@ -18,6 +18,7 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
     /** @var Traverse */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurableAction = $this->createMock(Configurable::class);

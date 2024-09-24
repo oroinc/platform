@@ -52,6 +52,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBodySynchronizer */
     private $synchronizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

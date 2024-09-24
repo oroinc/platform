@@ -33,6 +33,7 @@ class TransitionEventTriggerRepository extends ServiceEntityRepository implement
     /**
      * @return \Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger[]|EventTriggerInterface[]
      */
+    #[\Override]
     public function getAvailableEventTriggers()
     {
         return $this->findAllWithDefinitions();

@@ -34,9 +34,7 @@ class OrmMetadataFactoryClearer implements ClearerInterface
         $this->metadataFactoryServiceId = $metadataFactoryServiceId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear(LoggerInterface $logger)
     {
         if ($this->container->initialized($this->metadataFactoryServiceId)) {

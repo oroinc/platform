@@ -20,6 +20,7 @@ class WampClientFactory implements WampClientFactoryInterface, LoggerAwareInterf
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public function createClient(WebsocketClientParametersProviderInterface $clientParametersProvider): WampClient
     {
         $options = $clientParametersProvider->getContextOptions();

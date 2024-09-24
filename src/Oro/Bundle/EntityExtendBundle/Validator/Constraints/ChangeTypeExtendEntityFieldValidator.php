@@ -12,9 +12,7 @@ class ChangeTypeExtendEntityFieldValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.change_type_extend_entity_field';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         $this->assertValidatingValue($value);

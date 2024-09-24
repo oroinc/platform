@@ -16,6 +16,7 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var CommandExecutor */
     private $commandExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->commandExecutor = new CommandExecutor(self::CONSOLE_CMD_PATH, self::ENV);

@@ -11,12 +11,14 @@ class WorkflowAwareCacheTest extends WorkflowTestCase
     /** @var WorkflowAwareCache */
     private $cache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([]);
         $this->cache = self::getContainer()->get('oro_workflow.cache.entity_aware');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->cache->invalidateRelated();

@@ -34,9 +34,7 @@ class DefaultProcessor implements BoardProcessorInterface
     ) {
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getBoardOptions($boardConfig, DatagridConfiguration $datagridConfig)
     {
         $entityName = $datagridConfig->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
@@ -71,9 +69,7 @@ class DefaultProcessor implements BoardProcessorInterface
         return $result;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function processDatasource(
         DatasourceInterface $datasource,
         $boardData,
@@ -119,9 +115,7 @@ class DefaultProcessor implements BoardProcessorInterface
         }
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function processPaginationDatasource(
         DatasourceInterface $datasource,
         $boardData,

@@ -73,33 +73,25 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
         unset($this->metaProperties[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ConfigContext $context): void
     {
         $context->set(self::NAME, $this->metaProperties);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPropagable(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         return 'meta_properties:' . implode(',', array_keys($this->metaProperties));

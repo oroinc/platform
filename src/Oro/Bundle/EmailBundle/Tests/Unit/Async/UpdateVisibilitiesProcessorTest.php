@@ -30,6 +30,7 @@ class UpdateVisibilitiesProcessorTest extends OrmTestCase
     /** @var UpdateVisibilitiesProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

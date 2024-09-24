@@ -29,9 +29,7 @@ class SelectiveContextAggregator implements ContextAggregatorInterface
         $this->contextRegistry = $contextRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAggregatedContext(JobExecution $jobExecution)
     {
         /** @var ContextInterface $context */
@@ -53,9 +51,7 @@ class SelectiveContextAggregator implements ContextAggregatorInterface
         return $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType()
     {
         return self::TYPE;

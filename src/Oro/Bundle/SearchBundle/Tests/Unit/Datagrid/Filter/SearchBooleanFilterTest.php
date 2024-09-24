@@ -31,9 +31,7 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchBooleanFilter */
     private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

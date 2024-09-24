@@ -10,9 +10,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class FeatureConfigurationExtension implements ConfigurationExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function extendConfigurationTree(NodeBuilder $node)
     {
         $node

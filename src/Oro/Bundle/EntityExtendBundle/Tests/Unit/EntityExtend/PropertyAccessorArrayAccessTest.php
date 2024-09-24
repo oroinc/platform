@@ -13,6 +13,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
      */
     protected $propertyAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(

@@ -13,6 +13,7 @@ class FormTemplateDataProviderResolverTest extends \PHPUnit\Framework\TestCase
 
     private FormTemplateDataProviderResolver $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formTemplateDataProviderRegistry = $this->createMock(FormTemplateDataProviderRegistry::class);

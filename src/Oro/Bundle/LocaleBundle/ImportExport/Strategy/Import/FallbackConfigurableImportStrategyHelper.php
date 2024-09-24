@@ -16,6 +16,7 @@ use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
  */
 class FallbackConfigurableImportStrategyHelper extends ConfigurableImportStrategyHelper
 {
+    #[\Override]
     protected function processImportedEntityProperty(object $targetEntity, object $sourceEntity, string $property): void
     {
         $className = ClassUtils::getClass($targetEntity);

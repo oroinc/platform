@@ -14,6 +14,7 @@ class ConfigDefaultLocalizationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigDefaultLocalizationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);

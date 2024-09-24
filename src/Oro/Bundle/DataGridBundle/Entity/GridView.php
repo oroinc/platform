@@ -32,7 +32,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class GridView extends AbstractGridView
 {
     /**
-     * {@inheritdoc}
      * @var Collection<int, GridViewUser>
      */
     #[ORM\JoinTable(name: 'oro_grid_view_user_rel')]
@@ -45,17 +44,13 @@ class GridView extends AbstractGridView
     #[Assert\NotBlank]
     protected ?User $owner = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOwner()
     {
         return $this->owner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOwner(AbstractUser $owner = null)
     {
         $this->owner = $owner;

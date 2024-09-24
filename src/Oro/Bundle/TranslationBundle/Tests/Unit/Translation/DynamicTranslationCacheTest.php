@@ -26,6 +26,7 @@ class DynamicTranslationCacheTest extends \PHPUnit\Framework\TestCase
     /** @var DynamicTranslationCache */
     private $cache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheImpl = $this->createMock(CacheItemPoolInterface::class);

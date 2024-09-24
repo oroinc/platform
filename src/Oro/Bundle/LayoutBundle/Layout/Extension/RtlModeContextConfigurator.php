@@ -24,9 +24,7 @@ class RtlModeContextConfigurator implements ContextConfiguratorInterface
         $this->localizationProvider = $localizationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context): void
     {
         $context->getResolver()

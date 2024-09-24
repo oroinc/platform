@@ -16,6 +16,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
     /** @var IncreaseValue */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new IncreaseValue(new ContextAccessor());

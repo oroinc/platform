@@ -27,9 +27,7 @@ class ProcessorBagConfigProvider implements ProcessorBagConfigProviderInterface
         $this->processors = $processors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActions(): array
     {
         if (null === $this->actions) {
@@ -39,17 +37,13 @@ class ProcessorBagConfigProvider implements ProcessorBagConfigProviderInterface
         return $this->actions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroups(string $action): array
     {
         return $this->groups[$action] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProcessors(string $action): array
     {
         return $this->processors[$action] ?? [];

@@ -16,6 +16,7 @@ class ConfigMultipleFileValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigMultipleFileValidator */
     private $configValidator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);

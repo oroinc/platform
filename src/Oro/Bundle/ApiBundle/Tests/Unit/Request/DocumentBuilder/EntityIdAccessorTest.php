@@ -21,6 +21,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdAccessor */
     private $entityIdAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);

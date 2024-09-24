@@ -15,11 +15,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class WarningFormExtension extends AbstractTypeExtension
 {
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined([
@@ -27,6 +29,7 @@ class WarningFormExtension extends AbstractTypeExtension
         ]);
     }
 
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if (isset($options['warning'])) {

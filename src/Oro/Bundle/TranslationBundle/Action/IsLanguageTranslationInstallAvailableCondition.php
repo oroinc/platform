@@ -33,6 +33,7 @@ class IsLanguageTranslationInstallAvailableCondition extends AbstractLanguageCon
         parent::__construct($doctrine);
     }
 
+    #[\Override]
     protected function isConditionAllowed($context): bool
     {
         $language = $this->getLanguage($context);
@@ -52,6 +53,7 @@ class IsLanguageTranslationInstallAvailableCondition extends AbstractLanguageCon
         return null !== $this->translationMetricsProvider->getForLanguage($language->getCode());
     }
 
+    #[\Override]
     public function getName(): string
     {
         return 'is_language_translation_install_available';

@@ -40,9 +40,7 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
         $this->defaultOptions = $defaultOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -154,9 +152,7 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

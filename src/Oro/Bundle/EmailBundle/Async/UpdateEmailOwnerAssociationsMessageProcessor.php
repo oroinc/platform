@@ -40,9 +40,7 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = $message->getBody();
@@ -80,9 +78,7 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [UpdateEmailOwnerAssociationsTopic::getName()];

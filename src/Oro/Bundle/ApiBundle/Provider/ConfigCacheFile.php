@@ -24,9 +24,7 @@ class ConfigCacheFile extends BaseConfigCache implements WarmableConfigCacheInte
         $this->configCacheWarmer = $configCacheWarmer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->ensureDependenciesWarmedUp();

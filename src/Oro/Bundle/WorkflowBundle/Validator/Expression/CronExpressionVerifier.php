@@ -8,9 +8,7 @@ use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException
 
 class CronExpressionVerifier implements ExpressionVerifierInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function verify($expression)
     {
         try {

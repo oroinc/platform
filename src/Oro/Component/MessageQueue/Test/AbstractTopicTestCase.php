@@ -14,6 +14,7 @@ abstract class AbstractTopicTestCase extends \PHPUnit\Framework\TestCase
 {
     protected TopicInterface $topic;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->topic = $this->getTopic();

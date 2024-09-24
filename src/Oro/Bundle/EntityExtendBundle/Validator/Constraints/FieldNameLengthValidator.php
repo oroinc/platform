@@ -20,9 +20,7 @@ class FieldNameLengthValidator extends LengthValidator
         $this->nameGenerator = $nameGenerator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof FieldNameLength) {

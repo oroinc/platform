@@ -18,9 +18,7 @@ class MenuExtensionPassTest extends \PHPUnit\Framework\TestCase
     /** @var MenuExtensionPass */
     private $compiler;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

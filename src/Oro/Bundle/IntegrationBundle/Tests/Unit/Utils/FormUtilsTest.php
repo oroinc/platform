@@ -18,6 +18,7 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
     /** @var FormUtils */
     private $utils;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->typesRegistry = new TypesRegistry();

@@ -20,6 +20,7 @@ class FileApplicationsDataProviderTest extends \PHPUnit\Framework\TestCase
 
     private FileApplicationsDataProvider $dataProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileApplicationsProvider = $this->createMock(FileApplicationsProvider::class);

@@ -54,9 +54,7 @@ abstract class AbstractFilter implements FilterInterface
         $this->util = $util;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->name = null;
@@ -67,9 +65,7 @@ abstract class AbstractFilter implements FilterInterface
         $this->dataFieldName = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $this->name = $name;
@@ -89,8 +85,8 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * @param OrmFilterDatasourceAdapter $ds
-     * {@inheritDoc}
      */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $data = $this->parseData($data);
@@ -119,9 +115,7 @@ abstract class AbstractFilter implements FilterInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getForm()
     {
         if (null === $this->form) {
@@ -131,17 +125,13 @@ abstract class AbstractFilter implements FilterInterface
         return $this->form;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $formView = $this->getFormView();
@@ -165,9 +155,7 @@ abstract class AbstractFilter implements FilterInterface
         return $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolveOptions()
     {
         $this->params[FilterUtility::FORM_OPTIONS_KEY] = array_merge(
@@ -189,9 +177,7 @@ abstract class AbstractFilter implements FilterInterface
         $this->additionalOptions = [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setFilterState($state)
     {
         $this->state = $state;
@@ -199,9 +185,7 @@ abstract class AbstractFilter implements FilterInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFilterState()
     {
         return $this->state;

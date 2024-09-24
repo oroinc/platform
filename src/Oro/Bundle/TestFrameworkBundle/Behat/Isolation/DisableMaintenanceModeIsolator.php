@@ -10,35 +10,27 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
  */
 class DisableMaintenanceModeIsolator extends MaintenanceModeIsolator
 {
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
         $event->writeln('<comment>Disabling maintenance mode.</comment>');
         $this->runCommand('oro:maintenance:unlock');
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         $event->writeln('<comment>Enabling maintenance mode.</comment>');
         $this->runCommand('oro:maintenance:lock');
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getName()
     {
         return 'DisableMaintenanceMode';
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getTag()
     {
         return 'disable_maintenance_mode';

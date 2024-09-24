@@ -37,9 +37,7 @@ class DebugEmailTemplateCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -50,9 +48,7 @@ class DebugEmailTemplateCommand extends Command
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$input->getArgument('template')) {

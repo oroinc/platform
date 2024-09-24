@@ -15,17 +15,13 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
  */
 class UpdateLanguageOwner extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadLanguageData::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $user = $this->getUser($manager);

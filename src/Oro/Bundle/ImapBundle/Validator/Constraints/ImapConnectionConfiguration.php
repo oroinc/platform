@@ -11,9 +11,7 @@ class ImapConnectionConfiguration extends Constraint
 {
     public string $message = 'oro.imap.validator.configuration.connection.imap';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

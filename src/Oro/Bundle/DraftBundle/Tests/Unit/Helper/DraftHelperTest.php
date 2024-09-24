@@ -20,6 +20,7 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
 
     private DraftHelper $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

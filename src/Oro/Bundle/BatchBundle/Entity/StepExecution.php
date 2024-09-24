@@ -395,6 +395,7 @@ class StepExecution
         return $this->summary;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         $summary = 'id=%d, name=[%s], status=[%s], exitCode=[%s], exitDescription=[%s]';

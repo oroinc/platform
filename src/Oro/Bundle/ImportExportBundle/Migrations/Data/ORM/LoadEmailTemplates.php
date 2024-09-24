@@ -15,17 +15,13 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
     VersionedFixtureInterface,
     RenamedFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getVersion(): string
     {
         return '1.3';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPreviousClassNames(): array
     {
         return [
@@ -33,9 +29,7 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function findExistingTemplate(ObjectManager $manager, array $template): ?EmailTemplate
     {
         if (empty($template['params']['name'])) {
@@ -47,9 +41,7 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEmailsDir(): string
     {
         return $this->container
@@ -57,9 +49,7 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
             ->locateResource('@OroImportExportBundle/Migrations/Data/ORM/emails/importExport');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template): void
     {
         $oldTemplates = $this->getEmailTemplatesList($this->getPreviousEmailsDir());

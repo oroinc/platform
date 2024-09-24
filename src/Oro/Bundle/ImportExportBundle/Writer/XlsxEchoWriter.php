@@ -9,9 +9,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
  */
 class XlsxEchoWriter extends XlsxFileStreamWriter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context): void
     {
         $this->filePath = 'php://output';

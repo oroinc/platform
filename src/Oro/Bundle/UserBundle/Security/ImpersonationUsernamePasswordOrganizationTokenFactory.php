@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class ImpersonationUsernamePasswordOrganizationTokenFactory implements UsernamePasswordOrganizationTokenFactoryInterface
 {
+    #[\Override]
     public function create(
         AbstractUser $user,
         string $firewallName,

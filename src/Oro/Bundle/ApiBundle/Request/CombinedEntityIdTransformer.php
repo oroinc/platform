@@ -25,17 +25,13 @@ class CombinedEntityIdTransformer implements EntityIdTransformerInterface
         $this->requestType = $requestType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform(mixed $id, EntityMetadata $metadata): mixed
     {
         return $this->mainTransformer->transform($id, $metadata);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed
     {
         $resolver = null;

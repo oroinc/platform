@@ -9,9 +9,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
  */
 class PercentFilter extends NumberRangeFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY]             = 'number-range';
@@ -21,9 +19,7 @@ class PercentFilter extends NumberRangeFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         $data = parent::parseData($data);

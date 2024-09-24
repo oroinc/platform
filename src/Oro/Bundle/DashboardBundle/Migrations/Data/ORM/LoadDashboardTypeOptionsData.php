@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\Fixture\AbstractEnumFixture;
  */
 class LoadDashboardTypeOptionsData extends AbstractEnumFixture
 {
+    #[\Override]
     protected function getData(): array
     {
         return [
@@ -16,11 +17,13 @@ class LoadDashboardTypeOptionsData extends AbstractEnumFixture
         ];
     }
 
+    #[\Override]
     protected function getDefaultValue(): string
     {
         return 'widgets';
     }
 
+    #[\Override]
     protected function getEnumCode(): string
     {
         return 'dashboard_type';

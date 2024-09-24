@@ -19,6 +19,7 @@ class SessionAliasAwareInitializer implements ContextInitializer
         $this->provider = $provider;
     }
 
+    #[\Override]
     public function initializeContext(Context $context)
     {
         if ($context instanceof SessionAliasProviderAwareInterface) {

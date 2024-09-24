@@ -10,6 +10,7 @@ class AjaxMassActionTest extends \PHPUnit\Framework\TestCase
     /** @var AjaxMassAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new AjaxMassAction();

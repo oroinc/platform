@@ -10,9 +10,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
  */
 class QueryExecutor implements QueryExecutorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(DatagridInterface $datagrid, Query $query, $executeFunc = null)
     {
         if (null === $executeFunc) {

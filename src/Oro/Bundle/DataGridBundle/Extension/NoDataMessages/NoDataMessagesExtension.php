@@ -40,9 +40,7 @@ class NoDataMessagesExtension extends AbstractExtension
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $this->translateEmptyGridMessageIfExist($config);

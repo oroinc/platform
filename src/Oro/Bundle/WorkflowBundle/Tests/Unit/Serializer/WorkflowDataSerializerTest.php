@@ -12,6 +12,7 @@ class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDataSerializer */
     private $serializer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serializer = new WorkflowDataSerializer();

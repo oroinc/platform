@@ -31,9 +31,7 @@ class FiltersStateProvider extends AbstractStateProvider
         $this->datagridParametersHelper = $datagridParametersHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getState(DatagridConfiguration $datagridConfiguration, ParameterBag $datagridParameters): array
     {
         $state = [];
@@ -61,9 +59,7 @@ class FiltersStateProvider extends AbstractStateProvider
         return $this->sanitizeState($state, $this->getFiltersConfig($datagridConfiguration));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getStateFromParameters(
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters
@@ -77,9 +73,7 @@ class FiltersStateProvider extends AbstractStateProvider
         return $this->sanitizeState($state, $this->getFiltersConfig($datagridConfiguration));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultState(DatagridConfiguration $datagridConfiguration): array
     {
         $state = $this->getDefaultFiltersState($datagridConfiguration);
@@ -112,9 +106,6 @@ class FiltersStateProvider extends AbstractStateProvider
         return $state;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function getFromParameters(ParameterBag $datagridParameters): array
     {
         $filtersState = (array) $this->datagridParametersHelper

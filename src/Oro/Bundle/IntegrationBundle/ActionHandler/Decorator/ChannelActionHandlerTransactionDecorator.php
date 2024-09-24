@@ -26,9 +26,7 @@ class ChannelActionHandlerTransactionDecorator implements ChannelActionHandlerIn
         $this->actionHandler = $actionHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleAction(Channel $channel)
     {
         $this->entityManager->beginTransaction();

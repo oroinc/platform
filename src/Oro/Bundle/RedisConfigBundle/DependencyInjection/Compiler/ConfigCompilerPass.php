@@ -19,6 +19,7 @@ class ConfigCompilerPass implements CompilerPassInterface
     private const URL_CACHE_STORAGE   = 'storage';
     private const URL_CACHE_KEY_VALUE = 'key_value';
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         if ($this->isRedisEnabledForCache($container)

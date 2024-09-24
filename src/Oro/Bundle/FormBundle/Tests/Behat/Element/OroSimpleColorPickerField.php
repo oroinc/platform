@@ -9,9 +9,7 @@ class OroSimpleColorPickerField extends Element
 {
     use AllowedColorsMapping;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($value)
     {
         $colorHexCode = $this->getHexByColorName($value);

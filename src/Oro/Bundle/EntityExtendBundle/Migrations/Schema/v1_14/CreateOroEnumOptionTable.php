@@ -19,6 +19,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class CreateOroEnumOptionTable implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createOroEnumTable($schema);

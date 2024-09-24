@@ -16,6 +16,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
     /** @var CollectionType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new CollectionType();

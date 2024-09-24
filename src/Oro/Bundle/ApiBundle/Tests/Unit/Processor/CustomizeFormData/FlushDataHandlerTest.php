@@ -44,6 +44,7 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var FlushDataHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->customizeFormDataEventDispatcher = $this->createMock(CustomizeFormDataEventDispatcher::class);

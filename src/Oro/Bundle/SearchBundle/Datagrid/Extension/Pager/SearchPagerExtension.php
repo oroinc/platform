@@ -23,9 +23,7 @@ class SearchPagerExtension extends OrmPagerExtension
         $this->pager = $pager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -33,9 +31,7 @@ class SearchPagerExtension extends OrmPagerExtension
             && SearchDatasource::TYPE === $config->getDatasourceType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);

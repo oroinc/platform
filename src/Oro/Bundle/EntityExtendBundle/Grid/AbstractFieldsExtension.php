@@ -35,9 +35,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config): bool
     {
         return
@@ -45,9 +43,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
             && $config->isOrmDatasource();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config): void
     {
         $fields = $this->getFields($config);
@@ -213,9 +209,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority(): int
     {
         return 250;

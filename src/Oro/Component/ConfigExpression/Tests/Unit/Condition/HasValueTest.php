@@ -11,6 +11,7 @@ class HasValueTest extends \PHPUnit\Framework\TestCase
 {
     private Condition\HasValue $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\HasValue();

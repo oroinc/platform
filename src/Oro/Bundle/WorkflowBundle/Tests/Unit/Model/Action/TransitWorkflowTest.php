@@ -22,6 +22,7 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
     /** @var TransitWorkflow */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);

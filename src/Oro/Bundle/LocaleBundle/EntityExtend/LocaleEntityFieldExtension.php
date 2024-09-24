@@ -312,6 +312,7 @@ EOF;
         $transport->setProcessed(true);
     }
 
+    #[\Override]
     public function get(EntityFieldProcessTransport $transport): void
     {
         $properties = $this->getProperties($transport);
@@ -321,6 +322,7 @@ EOF;
         }
     }
 
+    #[\Override]
     public function set(EntityFieldProcessTransport $transport): void
     {
         $properties = $this->getProperties($transport);
@@ -333,6 +335,7 @@ EOF;
         }
     }
 
+    #[\Override]
     public function call(EntityFieldProcessTransport $transport): void
     {
         if (str_starts_with($transport->getName(), 'get')) {
@@ -374,6 +377,7 @@ EOF;
         }
     }
 
+    #[\Override]
     public function propertyExists(EntityFieldProcessTransport $transport): void
     {
         $properties = $this->getProperties($transport);
@@ -383,6 +387,7 @@ EOF;
         }
     }
 
+    #[\Override]
     public function methodExists(EntityFieldProcessTransport $transport): void
     {
         $exists = false;
@@ -409,6 +414,7 @@ EOF;
         }
     }
 
+    #[\Override]
     protected function getMethodsData(EntityFieldProcessTransport $transport): array
     {
         return array_merge(
@@ -418,6 +424,7 @@ EOF;
         );
     }
 
+    #[\Override]
     public function getMethods(EntityFieldProcessTransport $transport): array
     {
         return array_keys($this->getMethodsData($transport));

@@ -46,7 +46,7 @@ class CloneEntity extends CloneObject
         $this->logger       = $logger != null ? $logger : new NullLogger();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     protected function cloneObject($context)
     {
         $target = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_TARGET]);

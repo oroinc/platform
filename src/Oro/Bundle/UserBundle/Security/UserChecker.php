@@ -25,9 +25,7 @@ class UserChecker implements UserCheckerInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function checkPostAuth(SymfonyUserInterface $user): void
     {
         if (!$user instanceof User) {
@@ -54,9 +52,7 @@ class UserChecker implements UserCheckerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function checkPreAuth(SymfonyUserInterface $user): void
     {
         if (!$user instanceof User) {

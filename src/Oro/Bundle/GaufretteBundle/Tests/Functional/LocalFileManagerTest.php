@@ -24,6 +24,7 @@ class LocalFileManagerTest extends WebTestCase
     /** @var FileManager */
     private $fileManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -38,6 +39,7 @@ class LocalFileManagerTest extends WebTestCase
         $this->fileManager = self::getContainer()->get('oro_gaufrette.tests.local_file_manager');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->clearStorage();

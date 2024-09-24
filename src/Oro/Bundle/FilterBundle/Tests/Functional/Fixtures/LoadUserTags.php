@@ -24,17 +24,13 @@ class LoadUserTags extends AbstractFixture implements DependentFixtureInterface,
         'u3@example.com' => [],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserWithBUAndOrganization::class, LoadOrganization::class, LoadUser::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $tokenStorage = $this->container->get('security.token_storage');

@@ -40,6 +40,7 @@ class DashboardController extends AbstractFOSRestController
         return $this->container->get('doctrine')->getManager();
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

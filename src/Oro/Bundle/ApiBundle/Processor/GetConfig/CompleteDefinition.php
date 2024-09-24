@@ -49,9 +49,7 @@ class CompleteDefinition implements ProcessorInterface
         $this->objectDefinitionHelper = $objectDefinitionHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

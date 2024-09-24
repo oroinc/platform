@@ -24,9 +24,7 @@ class JsValidationExtension extends AbstractTypeExtension
         $this->constraintsProvider = $constraintsProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $this->addDataValidationOptionalGroupAttributes($view, $options);

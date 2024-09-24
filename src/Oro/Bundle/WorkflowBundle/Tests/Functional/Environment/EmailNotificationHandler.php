@@ -19,9 +19,7 @@ class EmailNotificationHandler extends BaseEmailNotificationHandler
         $this->handleCount = 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(NotificationEvent $event, array $matchedNotifications): void
     {
         $this->handleCount++;

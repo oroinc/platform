@@ -23,6 +23,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $managerMock;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerMock = $this->createMock(AttributeManager::class);
@@ -31,9 +32,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

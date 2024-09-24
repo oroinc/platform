@@ -23,6 +23,7 @@ class ActualizeEntityEnumOptionsCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure(): void
     {
         $this->setHidden()
@@ -34,6 +35,7 @@ class ActualizeEntityEnumOptionsCommand extends Command
     /**
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->entityEnumOptionsActualizer->run(

@@ -19,6 +19,7 @@ class SortersStateProviderTest extends AbstractStateProviderTest
     /** @var SortersStateProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -17,9 +17,7 @@ class ThemeContextConfigurator implements ContextConfiguratorInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()

@@ -52,6 +52,7 @@ class BlockFactoryTest extends LayoutTestCase
     /** @var BlockFactory */
     private $blockFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = new LayoutRegistry();

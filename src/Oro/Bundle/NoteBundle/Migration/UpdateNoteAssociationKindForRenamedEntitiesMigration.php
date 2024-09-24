@@ -35,9 +35,7 @@ abstract class UpdateNoteAssociationKindForRenamedEntitiesMigration implements
      */
     protected $nameGenerator;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $updateNoteAssociationKindQuery = new UpdateNoteAssociationKindQuery(
@@ -57,25 +55,19 @@ abstract class UpdateNoteAssociationKindForRenamedEntitiesMigration implements
      */
     abstract protected function getRenamedEntitiesNames(Schema $schema);
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setActivityExtension(ActivityExtension $activityExtension)
     {
         $this->activityExtension = $activityExtension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setExtendExtension(ExtendExtension $extendExtension)
     {
         $this->extendExtension = $extendExtension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;
@@ -84,8 +76,8 @@ abstract class UpdateNoteAssociationKindForRenamedEntitiesMigration implements
     /**
      * Notes should be migrated after all tables rename migration will be executed
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getOrder()
     {
         return 200;

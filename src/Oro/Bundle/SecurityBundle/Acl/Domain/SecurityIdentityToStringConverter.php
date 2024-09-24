@@ -11,9 +11,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  */
 class SecurityIdentityToStringConverter implements SecurityIdentityToStringConverterInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function convert(SecurityIdentityInterface $sid): string
     {
         if ($sid instanceof UserSecurityIdentity) {

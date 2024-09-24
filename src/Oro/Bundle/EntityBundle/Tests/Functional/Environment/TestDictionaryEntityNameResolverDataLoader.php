@@ -29,6 +29,7 @@ class TestDictionaryEntityNameResolverDataLoader implements TestEntityNameResolv
         $this->propertyAccessor = $propertyAccessor;
     }
 
+    #[\Override]
     public function loadEntity(
         EntityManagerInterface $em,
         ReferenceRepository $repository,
@@ -49,6 +50,7 @@ class TestDictionaryEntityNameResolverDataLoader implements TestEntityNameResolv
         return $this->innerDataLoader->loadEntity($em, $repository, $entityClass);
     }
 
+    #[\Override]
     public function getExpectedEntityName(
         ReferenceRepository $repository,
         string $entityClass,

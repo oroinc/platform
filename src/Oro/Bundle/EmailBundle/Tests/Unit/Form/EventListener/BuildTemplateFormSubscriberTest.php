@@ -22,6 +22,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var BuildTemplateFormSubscriber */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

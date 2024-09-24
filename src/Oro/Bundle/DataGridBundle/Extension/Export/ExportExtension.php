@@ -30,9 +30,7 @@ class ExportExtension extends AbstractExtension
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config): bool
     {
         if (!parent::isApplicable($config) || !$this->isGranted()) {
@@ -46,9 +44,7 @@ class ExportExtension extends AbstractExtension
             || (\is_array($options) && !empty($options));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config): void
     {
         // validate configuration and fill default values

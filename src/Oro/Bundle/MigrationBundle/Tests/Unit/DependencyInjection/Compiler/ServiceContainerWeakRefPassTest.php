@@ -16,6 +16,7 @@ class ServiceContainerWeakRefPassTest extends \PHPUnit\Framework\TestCase
     /** @var ServiceContainerWeakRefPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ServiceContainerWeakRefPass();

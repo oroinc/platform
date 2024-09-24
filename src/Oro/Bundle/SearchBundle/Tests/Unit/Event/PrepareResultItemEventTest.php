@@ -13,6 +13,7 @@ class PrepareResultItemEventTest extends \PHPUnit\Framework\TestCase
     /** @var PrepareResultItemEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resultItem = $this->createMock(Item::class);

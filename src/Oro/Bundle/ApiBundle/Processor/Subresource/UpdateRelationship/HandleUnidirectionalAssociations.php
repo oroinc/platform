@@ -20,9 +20,7 @@ class HandleUnidirectionalAssociations implements ProcessorInterface
         $this->handler = $handler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */

@@ -41,9 +41,7 @@ class JobManager implements JobManagerInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function saveJobWithLock(Job $job, \Closure $lockCallback): void
     {
         if (!$job->getId()) {
@@ -73,9 +71,9 @@ class JobManager implements JobManagerInterface
     }
 
     /**
-     * {@inheritdoc}
      * @throws DuplicateJobException
      */
+    #[\Override]
     public function saveJob(Job $job): void
     {
         $em = $this->getEntityManager();
@@ -105,9 +103,7 @@ class JobManager implements JobManagerInterface
         $em->refresh($job);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setCancelledStatusForChildJobs(
         Job $rootJob,
         array $statuses,

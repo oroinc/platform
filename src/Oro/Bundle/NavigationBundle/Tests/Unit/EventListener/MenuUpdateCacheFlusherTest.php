@@ -26,6 +26,7 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
     /** @var MenuUpdateCacheFlusher */
     private $flusher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(MenuUpdateRepository::class);

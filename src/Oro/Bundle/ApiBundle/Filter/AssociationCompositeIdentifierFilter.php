@@ -11,25 +11,19 @@ class AssociationCompositeIdentifierFilter extends CompositeIdentifierFilter imp
 {
     private ?string $field = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setField(string $field): void
     {
         $this->field = $field;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getField(): ?string
     {
         return $this->field;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFieldPath(string $fieldName): string
     {
         return sprintf('%s.%s', $this->getField(), parent::getFieldPath($fieldName));

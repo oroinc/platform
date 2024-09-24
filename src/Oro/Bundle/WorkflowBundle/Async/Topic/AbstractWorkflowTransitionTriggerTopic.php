@@ -13,6 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractWorkflowTransitionTriggerTopic extends AbstractTopic
 {
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

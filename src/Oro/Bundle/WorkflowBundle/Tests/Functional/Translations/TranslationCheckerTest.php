@@ -11,6 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslationCheckerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

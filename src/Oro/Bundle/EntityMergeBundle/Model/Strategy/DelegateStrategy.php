@@ -21,17 +21,13 @@ class DelegateStrategy implements StrategyInterface
         $this->strategies = $strategies;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'delegate';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function merge(FieldData $fieldData)
     {
         $strategy = $this->findStrategy($fieldData);
@@ -45,9 +41,7 @@ class DelegateStrategy implements StrategyInterface
         $strategy->merge($fieldData);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(FieldData $fieldData)
     {
         return $this->findStrategy($fieldData) !== null;

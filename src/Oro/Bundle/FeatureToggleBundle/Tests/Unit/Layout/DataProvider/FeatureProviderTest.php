@@ -13,6 +13,7 @@ class FeatureProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureProvider */
     private $dataProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

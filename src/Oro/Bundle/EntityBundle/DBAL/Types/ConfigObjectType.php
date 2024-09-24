@@ -11,13 +11,13 @@ class ConfigObjectType extends JsonArrayType
 {
     const TYPE = 'config_object';
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName()
     {
         return self::TYPE;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if (null === $value) {
@@ -36,6 +36,7 @@ class ConfigObjectType extends JsonArrayType
      * @return mixed
      * @throws ConversionException
      */
+    #[\Override]
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         if (null === $value) {

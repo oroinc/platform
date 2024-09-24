@@ -7,9 +7,7 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 
 class AclVoterTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

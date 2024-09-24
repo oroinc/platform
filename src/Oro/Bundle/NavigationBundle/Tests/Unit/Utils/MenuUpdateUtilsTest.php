@@ -14,6 +14,7 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
 
     private MenuUpdateHelper|\PHPUnit\Framework\MockObject\MockObject $menuUpdateHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->menuUpdateHelper = $this->createMock(MenuUpdateHelper::class);

@@ -21,9 +21,7 @@ class UnchangeableFieldValidator extends ConstraintValidator
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         $entityClass = $this->context->getClassName();

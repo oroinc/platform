@@ -16,6 +16,7 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -82,9 +83,7 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
         $form->configureOptions($resolver);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $emailAddressRecipients = new EmailAddressRecipientsType($this->configManager);

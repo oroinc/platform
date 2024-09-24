@@ -24,6 +24,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     /** @var FormFactoryInterface */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

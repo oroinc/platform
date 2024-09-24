@@ -62,9 +62,7 @@ class GetterMetadata extends MemberMetadata
         parent::__construct($class, $method, $property);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __sleep(): array
     {
         return array_merge(parent::__sleep(), ['methodType']);
@@ -102,9 +100,7 @@ class GetterMetadata extends MemberMetadata
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     protected function newReflectionMember($objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         if ($this->methodType === self::METHOD_REAL) {
@@ -114,9 +110,7 @@ class GetterMetadata extends MemberMetadata
         return ReflectionVirtualProperty::create($this->getPropertyName());
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getPropertyValue($containingValue): mixed
     {
         if ($this->methodType === self::METHOD_REAL) {

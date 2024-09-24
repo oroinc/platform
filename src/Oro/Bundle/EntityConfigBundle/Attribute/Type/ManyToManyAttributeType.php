@@ -29,41 +29,31 @@ class ManyToManyAttributeType implements AttributeTypeInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSearchable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSortable(FieldConfigModel $attribute)
     {
         return $this->isAttributeLocalizable($attribute);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         return $this->getFilterableValue($attribute, $originalValue, $localization);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($this->isAttributeLocalizable($attribute)) {
@@ -80,9 +70,7 @@ class ManyToManyAttributeType implements AttributeTypeInterface
         return implode(' ', $values);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($this->isAttributeLocalizable($attribute)) {

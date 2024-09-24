@@ -21,6 +21,7 @@ class DeletedAttributeRelationProcessorTest extends WebTestCase
 
     private DeletedAttributeRelationProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -24,11 +24,13 @@ class DecoratorMigrationQueryExecutor implements MigrationQueryExecutorInterface
         $this->configurationHandler = $configurationHandler;
     }
 
+    #[\Override]
     public function getConnection(): Connection
     {
         return $this->migrationQueryExecutor->getConnection();
     }
 
+    #[\Override]
     public function setLogger(LoggerInterface $logger): void
     {
         $this->migrationQueryExecutor->setLogger($logger);
@@ -40,6 +42,7 @@ class DecoratorMigrationQueryExecutor implements MigrationQueryExecutorInterface
      * @param string|MigrationQuery $query
      * @param bool                  $dryRun
      */
+    #[\Override]
     public function execute($query, $dryRun): void
     {
         if ($query instanceof ConfigurationHandlerAwareInterface) {

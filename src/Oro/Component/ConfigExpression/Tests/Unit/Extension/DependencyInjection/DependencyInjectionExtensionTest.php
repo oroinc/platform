@@ -18,6 +18,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $serviceIds;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serviceIds = ['test' => 'expression_service'];

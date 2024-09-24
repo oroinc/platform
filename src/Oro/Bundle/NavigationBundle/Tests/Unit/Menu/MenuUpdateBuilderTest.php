@@ -23,6 +23,7 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
 
     private MenuUpdateBuilder $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->menuUpdateProvider = $this->createMock(MenuUpdateProviderInterface::class);

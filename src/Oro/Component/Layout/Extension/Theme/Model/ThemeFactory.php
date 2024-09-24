@@ -17,9 +17,7 @@ class ThemeFactory implements ThemeFactoryInterface
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create($themeName, array $themeDefinition)
     {
         $theme = new Theme(

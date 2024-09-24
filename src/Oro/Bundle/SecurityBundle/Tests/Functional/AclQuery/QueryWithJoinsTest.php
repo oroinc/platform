@@ -13,9 +13,7 @@ use Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityPe
  */
 class QueryWithJoinsTest extends AclTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -24,6 +24,7 @@ class LocalizedFallBackValueExtensionExtensionTest extends \PHPUnit\Framework\Te
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $classMetaData = $this->getEntity(

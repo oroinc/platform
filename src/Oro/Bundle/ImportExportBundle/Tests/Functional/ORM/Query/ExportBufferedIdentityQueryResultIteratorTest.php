@@ -9,6 +9,7 @@ use Oro\Bundle\ImportExportBundle\ORM\Query\ExportBufferedIdentityQueryResultIte
 
 class ExportBufferedIdentityQueryResultIteratorTest extends AbstractBufferedIdentityQueryResultIteratorTest
 {
+    #[\Override]
     public function getIterator(QueryBuilder $queryBuilder): AbstractBufferedQueryResultIterator
     {
         return new ExportBufferedIdentityQueryResultIterator($queryBuilder);

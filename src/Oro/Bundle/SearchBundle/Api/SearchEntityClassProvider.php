@@ -21,9 +21,7 @@ class SearchEntityClassProvider implements SearchEntityClassProviderInterface
         $this->resourcesProvider = $resourcesProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessibleEntityClasses(string $version, RequestType $requestType): array
     {
         $entityClasses = $this->searchIndexer->getEntitiesListAliases();
@@ -36,9 +34,7 @@ class SearchEntityClassProvider implements SearchEntityClassProviderInterface
         return $entityClasses;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAllowedEntityClasses(string $version, RequestType $requestType): array
     {
         $entityClasses = $this->getAccessibleEntityClasses($version, $requestType);

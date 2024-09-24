@@ -37,9 +37,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         $this->reuseExistingEntity = $reuseExistingEntity;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext|UpdateContext $context */

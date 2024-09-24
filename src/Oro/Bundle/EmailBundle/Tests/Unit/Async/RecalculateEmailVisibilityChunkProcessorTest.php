@@ -41,6 +41,7 @@ class RecalculateEmailVisibilityChunkProcessorTest extends \PHPUnit\Framework\Te
     /** @var RecalculateEmailVisibilityChunkProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

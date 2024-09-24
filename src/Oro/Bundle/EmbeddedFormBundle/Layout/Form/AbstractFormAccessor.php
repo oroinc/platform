@@ -24,25 +24,19 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
     /** @var bool */
     private $paramsInitialized = false;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getForm()->getName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getId()
     {
         return $this->getView()->vars['id'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAction()
     {
         $this->ensureParamsInitialized();
@@ -64,9 +58,7 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
         $this->action = FormAction::createByRoute($route, $routeParams);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMethod()
     {
         $this->ensureParamsInitialized();
@@ -82,9 +74,7 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
         $this->method = $method;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEnctype()
     {
         $this->ensureParamsInitialized();
@@ -100,9 +90,7 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
         $this->enctype = $enctype;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getView($fieldPath = null)
     {
         $result = $this->getFormView();
@@ -115,17 +103,13 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProcessedFields()
     {
         return $this->processedFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setProcessedFields($processedFields)
     {
         $this->processedFields = $processedFields;

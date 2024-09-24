@@ -8,17 +8,13 @@ use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class StubEntityClassNameProvider implements EntityClassNameProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClassName(string $entityClass): ?string
     {
         return $this->isTestEntity($entityClass) ? $entityClass : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClassPluralName(string $entityClass): ?string
     {
         return $this->isTestEntity($entityClass) ? $entityClass : null;

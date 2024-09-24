@@ -62,6 +62,7 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityListFilter */
     private $activityListFilter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

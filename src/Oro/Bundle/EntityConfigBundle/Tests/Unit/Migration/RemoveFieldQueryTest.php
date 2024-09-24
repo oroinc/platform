@@ -15,6 +15,7 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connector = $this->createMock(Connection::class);

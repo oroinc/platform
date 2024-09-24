@@ -24,9 +24,7 @@ class BuildCollectionFormBuilder extends BuildFormBuilder
         $this->enableAdderAndRemover = $enableAdderAndRemover;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
     {
         $entryDataClass = $context->getClassName();

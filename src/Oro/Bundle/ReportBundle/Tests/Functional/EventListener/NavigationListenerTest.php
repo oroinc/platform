@@ -15,6 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class NavigationListenerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

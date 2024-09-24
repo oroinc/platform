@@ -19,17 +19,13 @@ class ActionsConfigExtension extends AbstractConfigExtension
         $this->actionProcessorBag = $actionProcessorBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationSections(): array
     {
         return [ConfigUtil::ACTIONS => new ActionsConfiguration($this->actionProcessorBag->getActions())];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationLoaders(): array
     {
         return [ConfigUtil::ACTIONS => new ActionsConfigLoader()];

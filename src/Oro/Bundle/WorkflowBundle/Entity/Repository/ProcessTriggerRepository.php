@@ -82,9 +82,7 @@ class ProcessTriggerRepository extends ServiceEntityRepository implements EventT
         return $queryBuilder->getQuery()->execute();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAvailableEventTriggers()
     {
         return $this->findAllWithDefinitions(null, false);

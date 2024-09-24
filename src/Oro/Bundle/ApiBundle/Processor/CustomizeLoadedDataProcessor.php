@@ -11,17 +11,13 @@ use Oro\Component\ChainProcessor\ProcessorIterator;
  */
 class CustomizeLoadedDataProcessor extends ByStepActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): CustomizeLoadedDataContext
     {
         return new CustomizeLoadedDataContext();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getProcessors(ContextInterface $context): ProcessorIterator
     {
         $action = $context->getAction();

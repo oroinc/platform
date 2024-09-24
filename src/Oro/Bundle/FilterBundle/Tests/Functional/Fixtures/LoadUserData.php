@@ -34,9 +34,7 @@ class LoadUserData extends AbstractFixture
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $createdUsers = [];

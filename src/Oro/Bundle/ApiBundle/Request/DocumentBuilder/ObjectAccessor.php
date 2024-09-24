@@ -10,33 +10,25 @@ class ObjectAccessor implements ObjectAccessorInterface
     /** @var ObjectAccessorInterface[] */
     private array $accessors = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassName(mixed $object): ?string
     {
         return $this->getObjectAccessor($object)->getClassName($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue(mixed $object, string $propertyName): mixed
     {
         return $this->getObjectAccessor($object)->getValue($object, $propertyName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasProperty(mixed $object, string $propertyName): bool
     {
         return $this->getObjectAccessor($object)->hasProperty($object, $propertyName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray(mixed $object): array
     {
         return $this->getObjectAccessor($object)->toArray($object);

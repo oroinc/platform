@@ -15,6 +15,7 @@ class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var UserGridFieldValidator */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

@@ -31,6 +31,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
     /** @var SetLocationHeader */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

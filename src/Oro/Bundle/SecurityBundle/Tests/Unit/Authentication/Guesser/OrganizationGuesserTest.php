@@ -12,6 +12,7 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
 {
     private OrganizationGuesser $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->guesser = new OrganizationGuesser();

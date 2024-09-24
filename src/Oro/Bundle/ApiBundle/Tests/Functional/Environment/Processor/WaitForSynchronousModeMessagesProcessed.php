@@ -22,9 +22,7 @@ class WaitForSynchronousModeMessagesProcessed implements ProcessorInterface
         self::$container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */

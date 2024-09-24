@@ -14,6 +14,7 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AdditionalAttrExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new AdditionalAttrExtension();

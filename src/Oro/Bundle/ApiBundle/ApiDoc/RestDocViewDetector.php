@@ -93,9 +93,7 @@ class RestDocViewDetector implements ResetInterface
         return $this->requestType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->setView();

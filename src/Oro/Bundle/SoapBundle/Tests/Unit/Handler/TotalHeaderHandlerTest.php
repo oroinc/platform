@@ -34,6 +34,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
+    #[\Override]
     protected function setUp(): void
     {
         $optimizer = $this->createMock(CountQueryBuilderOptimizer::class);

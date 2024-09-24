@@ -29,6 +29,7 @@ class QueryHintResolver implements QueryHintResolverInterface
     /**
      * Resolves query hints
      */
+    #[\Override]
     public function resolveHints(Query $query, array $hints = [])
     {
         if (!empty($hints)) {

@@ -7,6 +7,7 @@ namespace Oro\Bundle\AttachmentBundle\Provider;
  */
 class FilterRuntimeConfigDefaultProvider implements FilterRuntimeConfigProviderInterface
 {
+    #[\Override]
     public function getRuntimeConfigForFilter(string $filterName, string $format = ''): array
     {
         if ($format) {

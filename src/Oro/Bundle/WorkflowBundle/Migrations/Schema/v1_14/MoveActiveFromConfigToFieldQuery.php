@@ -9,9 +9,7 @@ use Psr\Log\LoggerInterface;
 
 class MoveActiveFromConfigToFieldQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -23,9 +21,7 @@ class MoveActiveFromConfigToFieldQuery extends ParametrizedMigrationQuery
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->migrateConfigs($logger);

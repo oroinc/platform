@@ -27,6 +27,7 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
 
     private EmailTemplateRepository|MockObject $emailTemplateRepo;
 
+    #[\Override]
     protected function setUp(): void
     {
         $managerRegistry = $this->createMock(ManagerRegistry::class);

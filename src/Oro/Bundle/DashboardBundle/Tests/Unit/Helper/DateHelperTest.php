@@ -28,6 +28,7 @@ class DateHelperTest extends OrmTestCase
 
     private DateHelper $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $settings = $this->createMock(LocaleSettings::class);

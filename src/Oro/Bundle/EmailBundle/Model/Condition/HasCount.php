@@ -19,9 +19,7 @@ class HasCount extends AbstractCondition implements ContextAccessorAwareInterfac
     protected $operation;
     protected $value;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $countable = $this->resolveValue($context, $this->countable);
@@ -45,14 +43,13 @@ class HasCount extends AbstractCondition implements ContextAccessorAwareInterfac
      *
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return 'has_count';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (count($options) !== 2) {

@@ -30,6 +30,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

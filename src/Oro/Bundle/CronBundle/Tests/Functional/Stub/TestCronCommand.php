@@ -9,6 +9,7 @@ class TestCronCommand extends Command implements CronCommandScheduleDefinitionIn
 {
     protected static $defaultName = 'oro:cron:test:usual';
 
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return '0 0 * * *';

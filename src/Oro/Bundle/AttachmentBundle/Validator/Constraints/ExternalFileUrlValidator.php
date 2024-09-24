@@ -26,6 +26,7 @@ class ExternalFileUrlValidator extends ConstraintValidator
      * @param ExternalFile|string|null $value ExternalFile model or external URL
      * @param ExternalFileUrl $constraint
      */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof ExternalFileUrl) {

@@ -13,9 +13,7 @@ class OroIntegrationBundle implements Migration, ChangeTypeExtensionAwareInterfa
 {
     use ChangeTypeExtensionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->changeTypeExtension->changePrimaryKeyType(

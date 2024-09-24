@@ -27,17 +27,13 @@ class RemoveProcessesQuery implements MigrationQuery, ConnectionAwareInterface
         $this->names = (array) $names;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Removes visibility processes from all "process" tables';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $sql = "DELETE FROM oro_process_definition WHERE name in (?)";

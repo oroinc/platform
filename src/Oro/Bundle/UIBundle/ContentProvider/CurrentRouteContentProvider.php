@@ -17,9 +17,7 @@ class CurrentRouteContentProvider implements ContentProviderInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContent()
     {
         $request = $this->requestStack->getCurrentRequest();

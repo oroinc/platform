@@ -17,6 +17,7 @@ class AbstractRestTransportTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractRestTransport|\PHPUnit\Framework\MockObject\MockObject */
     private $transport;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->clientFactory = $this->createMock(RestClientFactoryInterface::class);

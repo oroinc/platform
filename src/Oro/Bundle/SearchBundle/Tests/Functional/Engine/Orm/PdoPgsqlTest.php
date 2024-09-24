@@ -18,17 +18,13 @@ class PdoPgsqlTest extends AbstractDriverTest
         $this->assertTrue(strpos($recordString, 'to_tsvector') > 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDriver()
     {
         return new PdoPgsql();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function assertInitConfiguration(Configuration $configuration)
     {
         $this->assertEquals(
@@ -42,9 +38,7 @@ class PdoPgsqlTest extends AbstractDriverTest
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function assertTruncateQueries(array $queries)
     {
         $expectedQueries = [

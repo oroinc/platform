@@ -10,9 +10,7 @@ use Oro\Component\ChainProcessor\ActionProcessor;
  */
 class CollectResourcesProcessor extends ActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): CollectResourcesContext
     {
         return new CollectResourcesContext();

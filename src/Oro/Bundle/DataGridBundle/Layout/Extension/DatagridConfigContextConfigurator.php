@@ -22,8 +22,8 @@ class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
     /**
      * Sets grid config for given grid name(-s) into layout context
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         if (!$context->has('grid_config')) {

@@ -13,11 +13,13 @@ class ExcludeLogByMessageHandler implements HandlerInterface
     {
     }
 
+    #[\Override]
     public function isHandling(array $record): bool
     {
         return true;
     }
 
+    #[\Override]
     public function handle(array $record): bool
     {
         $logMessage = $record['message'] ?? '';
@@ -34,6 +36,7 @@ class ExcludeLogByMessageHandler implements HandlerInterface
         return false;
     }
 
+    #[\Override]
     public function handleBatch(array $records): void
     {
         foreach ($records as $record) {
@@ -41,6 +44,7 @@ class ExcludeLogByMessageHandler implements HandlerInterface
         }
     }
 
+    #[\Override]
     public function close(): void
     {
     }

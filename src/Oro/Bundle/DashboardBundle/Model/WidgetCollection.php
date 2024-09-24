@@ -25,9 +25,7 @@ class WidgetCollection extends AbstractLazyCollection
         $this->factory   = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doInitialize()
     {
         $widgets = array();

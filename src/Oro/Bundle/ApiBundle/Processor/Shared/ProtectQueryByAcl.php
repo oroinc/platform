@@ -33,9 +33,7 @@ class ProtectQueryByAcl implements ProcessorInterface
         $this->permission = $permission;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

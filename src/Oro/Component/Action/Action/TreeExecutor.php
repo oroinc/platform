@@ -48,9 +48,7 @@ class TreeExecutor extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         foreach ($this->actions as $actionConfig) {
@@ -68,9 +66,7 @@ class TreeExecutor extends AbstractAction
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         return $this;

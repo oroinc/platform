@@ -11,17 +11,13 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
  */
 class BatchUpdateItemProcessor extends ByStepNormalizeResultActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): BatchUpdateItemContext
     {
         return new BatchUpdateItemContext();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getLogContext(NormalizeResultContext $context): array
     {
         /** @var BatchUpdateItemContext $context */

@@ -35,9 +35,7 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $data = $message->getBody();
@@ -59,9 +57,7 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [SendAutoResponseTopic::getName()];

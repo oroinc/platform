@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateEmailVisibilitiesForOrganizationChunkTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.update_email_visibilities_for_organization_chunk';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Update visibilities for specific emails for organization';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

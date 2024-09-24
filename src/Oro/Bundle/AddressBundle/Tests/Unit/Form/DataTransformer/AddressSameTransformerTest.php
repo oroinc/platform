@@ -11,6 +11,7 @@ class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
 {
     private AddressSameTransformer $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new AddressSameTransformer(

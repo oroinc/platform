@@ -68,9 +68,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         return $this->entityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntityManager(EntityManagerInterface $em)
     {
         if (!$this->disconnected) {
@@ -79,9 +77,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllMetadata()
     {
         $logger = $this->getProfilingLogger();
@@ -119,9 +115,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         return $this->getCache();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadataFor($className)
     {
         $logger = $this->getProfilingLogger();
@@ -147,6 +141,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         return $result;
     }
 
+    #[\Override]
     protected function initializeReflection(ClassMetadataInterface $class, ReflectionService $reflService)
     {
         $className = $class->getName();
@@ -156,9 +151,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         parent::initializeReflection($class, $reflService);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isTransient($class)
     {
         $logger = $this->getProfilingLogger();

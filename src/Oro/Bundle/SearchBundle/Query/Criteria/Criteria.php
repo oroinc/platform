@@ -13,9 +13,7 @@ class Criteria extends BaseCriteria
     /** @var ExpressionBuilder */
     private static $expressionBuilder;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function expr()
     {
         if (self::$expressionBuilder === null) {

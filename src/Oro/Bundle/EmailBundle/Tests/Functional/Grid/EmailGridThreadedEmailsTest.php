@@ -11,6 +11,7 @@ class EmailGridThreadedEmailsTest extends AbstractDatagridTestCase
     /** @var User */
     private $user;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader('simple_user', 'simple_password'));
@@ -22,6 +23,7 @@ class EmailGridThreadedEmailsTest extends AbstractDatagridTestCase
     /**
      * @dataProvider gridProvider
      */
+    #[\Override]
     public function testGrid(array $requestData)
     {
         $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['_pager']['_per_page'] = 100;
@@ -29,9 +31,7 @@ class EmailGridThreadedEmailsTest extends AbstractDatagridTestCase
         parent::testGrid($requestData);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function gridProvider(): array
     {
         return [

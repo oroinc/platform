@@ -23,9 +23,7 @@ class OpenApiSpecificationEntitiesSelectType extends AbstractType
         $this->entityProvider = $entityProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['view_field']);
@@ -46,9 +44,7 @@ class OpenApiSpecificationEntitiesSelectType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['configs']['component'] = 'autocomplete-openapi-specification-entities';
@@ -56,17 +52,13 @@ class OpenApiSpecificationEntitiesSelectType extends AbstractType
         $this->updateSelectedData($view, $options);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_openapi_specification_entities_select';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;

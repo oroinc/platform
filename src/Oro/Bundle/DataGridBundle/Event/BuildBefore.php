@@ -29,17 +29,13 @@ class BuildBefore extends Event implements GridEventInterface, GridConfiguration
         $this->config     = $config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDatagrid()
     {
         return $this->datagrid;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfig()
     {
         return $this->config;

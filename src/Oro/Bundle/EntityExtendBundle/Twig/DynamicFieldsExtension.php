@@ -33,9 +33,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
     private ?ConfigProvider $entityConfigProvider = null;
     private ?ConfigProvider $viewConfigProvider = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -102,9 +100,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
         return $this->container->get('oro_featuretoggle.checker.feature_checker');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFields($entity, $entityClass = null)
     {
         if (null === $entityClass) {
@@ -133,9 +129,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
         return $dynamicRows;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getField($entity, FieldConfigModel $field)
     {
         $fieldConfig = $this->getExtendConfigProvider()

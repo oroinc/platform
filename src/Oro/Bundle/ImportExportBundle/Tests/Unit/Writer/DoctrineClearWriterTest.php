@@ -20,6 +20,7 @@ class DoctrineClearWriterTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineClearWriter */
     private $writer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

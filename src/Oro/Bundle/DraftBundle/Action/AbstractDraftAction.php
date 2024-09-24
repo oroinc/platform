@@ -20,6 +20,7 @@ abstract class AbstractDraftAction extends AbstractAction
      */
     protected $options;
 
+    #[\Override]
     public function initialize(array $options): ActionInterface|static
     {
         $this->options = $this->getOptionResolver()->resolve($options);

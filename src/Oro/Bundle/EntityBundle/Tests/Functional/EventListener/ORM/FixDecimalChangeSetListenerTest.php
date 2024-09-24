@@ -16,6 +16,7 @@ class FixDecimalChangeSetListenerTest extends WebTestCase
 {
     private DebugStack $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([]);

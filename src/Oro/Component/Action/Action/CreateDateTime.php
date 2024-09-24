@@ -15,6 +15,7 @@ class CreateDateTime extends AbstractDateAction
      *
      * @return \DateTime
      */
+    #[\Override]
     protected function createDateTime($context)
     {
         return new \DateTime(
@@ -23,9 +24,7 @@ class CreateDateTime extends AbstractDateAction
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['time'])) {

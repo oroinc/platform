@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class UpsertViaCreateActionTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -26,9 +26,7 @@ class UserScopeCacheKeyBuilder implements ScopeCacheKeyBuilderInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCacheKey(ScopeCriteria $criteria): ?string
     {
         $token = $this->tokenStorage->getToken();

@@ -15,6 +15,7 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
 
     private ConfigUpdateEvent $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->event = new ConfigUpdateEvent(self::CHANGE_SET, self::SCOPE, self::SCOPE_ID);

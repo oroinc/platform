@@ -25,6 +25,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
 
     private ConfigurationProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->getDoctrine(

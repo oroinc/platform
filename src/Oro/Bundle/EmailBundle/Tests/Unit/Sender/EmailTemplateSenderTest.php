@@ -23,6 +23,7 @@ class EmailTemplateSenderTest extends TestCase
 
     private EmailTemplateSender $sender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailModelFromEmailTemplateFactory = $this->createMock(EmailModelFromEmailTemplateFactory::class);

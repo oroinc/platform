@@ -17,9 +17,7 @@ class OrmPagerExtension extends AbstractPagerExtension
     /** @var Pager */
     protected $pager;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -29,9 +27,7 @@ class OrmPagerExtension extends AbstractPagerExtension
             && !$config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         /** @var OrmDatasource $datasource */

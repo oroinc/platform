@@ -12,6 +12,7 @@ class NormalizeValueContextTest extends \PHPUnit\Framework\TestCase
 {
     private NormalizeValueContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new NormalizeValueContext();

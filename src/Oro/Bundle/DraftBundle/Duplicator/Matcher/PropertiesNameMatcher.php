@@ -22,9 +22,7 @@ class PropertiesNameMatcher implements Matcher
         $this->properties = $properties;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function matches($object, $property): bool
     {
         return in_array($property, $this->properties);

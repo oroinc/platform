@@ -11,9 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ChartSettingsType extends ConfigProviderAwareType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $chartConfig = $this->getChartConfig($options);
@@ -26,9 +24,7 @@ class ChartSettingsType extends ConfigProviderAwareType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['chart_name']);
@@ -38,17 +34,13 @@ class ChartSettingsType extends ConfigProviderAwareType
         $resolver->setAllowedTypes('chart_config', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_chart_setting';

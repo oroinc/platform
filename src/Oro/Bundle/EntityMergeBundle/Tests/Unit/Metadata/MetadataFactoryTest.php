@@ -12,6 +12,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
     private MetadataFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new MetadataFactory();

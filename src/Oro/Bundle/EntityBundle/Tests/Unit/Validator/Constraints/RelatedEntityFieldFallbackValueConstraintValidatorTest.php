@@ -23,6 +23,7 @@ class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintV
     /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $contextualValidator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resolver = $this->createMock(EntityFallbackResolver::class);
@@ -30,11 +31,13 @@ class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintV
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): RelatedEntityFieldFallbackValueConstraintValidator
     {
         return new RelatedEntityFieldFallbackValueConstraintValidator($this->resolver);
     }
 
+    #[\Override]
     protected function createContext(): ExecutionContext
     {
         $context = parent::createContext();

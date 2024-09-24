@@ -22,6 +22,7 @@ class DoctrineAclCacheListenerTest extends WebTestCase
     /** @var DoctrineAclCacheListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

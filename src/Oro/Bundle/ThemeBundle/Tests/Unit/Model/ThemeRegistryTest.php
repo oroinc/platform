@@ -23,6 +23,7 @@ class ThemeRegistryTest extends TestCase
 
     private ThemeRegistry $themeRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeRegistry = new ThemeRegistry(self::THEME_SETTINGS);

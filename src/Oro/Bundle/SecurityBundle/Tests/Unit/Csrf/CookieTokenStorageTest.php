@@ -22,6 +22,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
      */
     private $storage;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

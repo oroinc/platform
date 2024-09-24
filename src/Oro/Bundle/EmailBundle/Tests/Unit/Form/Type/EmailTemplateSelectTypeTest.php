@@ -14,6 +14,7 @@ class EmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var EmailTemplateSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new EmailTemplateSelectType();

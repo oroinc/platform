@@ -42,6 +42,7 @@ abstract class RemoveAssociationQuery extends ParametrizedMigrationQuery impleme
 
     private bool $isSchemaUpdateRequired = false;
 
+    #[\Override]
     public function getDescription(): string
     {
         return \sprintf(
@@ -61,6 +62,7 @@ abstract class RemoveAssociationQuery extends ParametrizedMigrationQuery impleme
      * @throws \Doctrine\DBAL\DBALException on any database errors
      * @throws \LogicException if the source entity is not a configurable entity
      */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $sourceEntityRow = $this->connection->fetchAssociative(
@@ -112,6 +114,7 @@ abstract class RemoveAssociationQuery extends ParametrizedMigrationQuery impleme
         }
     }
 
+    #[\Override]
     public function isUpdateRequired(): bool
     {
         return $this->isSchemaUpdateRequired;

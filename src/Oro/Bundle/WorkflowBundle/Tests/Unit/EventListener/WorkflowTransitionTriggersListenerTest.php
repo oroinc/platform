@@ -26,6 +26,7 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTransitionTriggersAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $assembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->assembler = $this->createMock(WorkflowTransitionTriggersAssembler::class);

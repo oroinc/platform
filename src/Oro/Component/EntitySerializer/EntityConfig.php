@@ -102,6 +102,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Indicates whether the configuration of at least one field exists.
      */
+    #[\Override]
     public function hasFields(): bool
     {
         return !empty($this->fields);
@@ -112,6 +113,7 @@ class EntityConfig implements EntityConfigInterface
      *
      * @return FieldConfig[] [field name => config, ...]
      */
+    #[\Override]
     public function getFields(): array
     {
         return $this->fields;
@@ -120,6 +122,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Checks whether the configuration of a field exists.
      */
+    #[\Override]
     public function hasField(string $fieldName): bool
     {
         return isset($this->fields[$fieldName]);
@@ -128,6 +131,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Gets the configuration of a field.
      */
+    #[\Override]
     public function getField(string $fieldName): ?FieldConfig
     {
         return $this->fields[$fieldName] ?? null;
@@ -136,6 +140,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Gets the configuration of existing field or adds new field with a given name.
      */
+    #[\Override]
     public function getOrAddField(string $fieldName): FieldConfig
     {
         $field = $this->getField($fieldName);
@@ -150,6 +155,7 @@ class EntityConfig implements EntityConfigInterface
      * Finds the configuration of the field by its name or property path.
      * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
      */
+    #[\Override]
     public function findField(string $fieldName, bool $findByPropertyPath = false): ?FieldConfig
     {
         return FindFieldUtil::doFindField($this->fields, $fieldName, $findByPropertyPath);
@@ -160,6 +166,7 @@ class EntityConfig implements EntityConfigInterface
      * This method can be useful when a field was renamed and you need to find
      * the name of the result field by the name defined in an entity.
      */
+    #[\Override]
     public function findFieldNameByPropertyPath(string $propertyPath): ?string
     {
         return FindFieldUtil::doFindFieldNameByPropertyPath($this->fields, $propertyPath);
@@ -168,6 +175,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Adds the configuration of a field.
      */
+    #[\Override]
     public function addField(string $fieldName, ?FieldConfigInterface $field = null): FieldConfig
     {
         if (null === $field) {
@@ -182,6 +190,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Removes the configuration of a field.
      */
+    #[\Override]
     public function removeField(string $fieldName): void
     {
         unset($this->fields[$fieldName]);
@@ -190,6 +199,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Indicates whether the exclusion policy is set explicitly.
      */
+    #[\Override]
     public function hasExclusionPolicy(): bool
     {
         return null !== $this->exclusionPolicy;
@@ -200,6 +210,7 @@ class EntityConfig implements EntityConfigInterface
      *
      * @return string An exclusion strategy, e.g. "none" or "all"
      */
+    #[\Override]
     public function getExclusionPolicy(): string
     {
         return $this->exclusionPolicy ?? ConfigUtil::EXCLUSION_POLICY_NONE;
@@ -211,6 +222,7 @@ class EntityConfig implements EntityConfigInterface
      * @param string|null $exclusionPolicy An exclusion strategy, e.g. "none" or "all",
      *                                     or NULL to remove this option
      */
+    #[\Override]
     public function setExclusionPolicy(?string $exclusionPolicy): void
     {
         $this->exclusionPolicy = $exclusionPolicy;
@@ -219,6 +231,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Indicates whether all fields are not configured explicitly should be excluded.
      */
+    #[\Override]
     public function isExcludeAll(): bool
     {
         return ConfigUtil::EXCLUSION_POLICY_ALL === $this->exclusionPolicy;
@@ -227,6 +240,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Sets the exclusion strategy to exclude all fields are not configured explicitly.
      */
+    #[\Override]
     public function setExcludeAll(): void
     {
         $this->exclusionPolicy = ConfigUtil::EXCLUSION_POLICY_ALL;
@@ -235,6 +249,7 @@ class EntityConfig implements EntityConfigInterface
     /**
      * Sets the exclusion strategy to exclude only fields are marked as excluded.
      */
+    #[\Override]
     public function setExcludeNone(): void
     {
         $this->exclusionPolicy = ConfigUtil::EXCLUSION_POLICY_NONE;

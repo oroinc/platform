@@ -27,9 +27,7 @@ class ActionsPass implements CompilerPassInterface
         $this->tagName = $tagName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $services = $this->findAndSortTaggedServices($this->tagName, 'type', $container);

@@ -16,9 +16,7 @@ class EmbedFormType extends AbstractType
     const NAME = 'embed_form';
     const FIELD_SEPARATOR = '_';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -42,9 +40,7 @@ class EmbedFormType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         $this->addBlockType(
@@ -99,9 +95,7 @@ class EmbedFormType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
@@ -137,9 +131,7 @@ class EmbedFormType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent()
     {
         return ContainerType::NAME;

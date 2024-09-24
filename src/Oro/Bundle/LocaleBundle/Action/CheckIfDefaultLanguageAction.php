@@ -34,6 +34,7 @@ class CheckIfDefaultLanguageAction extends AbstractLanguageResultAction
         $this->configManager = $configManager;
     }
 
+    #[\Override]
     protected function executeAction($context): void
     {
         $result = null;

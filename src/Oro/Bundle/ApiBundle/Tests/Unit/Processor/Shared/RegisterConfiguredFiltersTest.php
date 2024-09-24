@@ -32,6 +32,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
     /** @var RegisterConfiguredFilters */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -26,22 +26,19 @@ class LoadEmailTemplateData extends AbstractFixture implements ContainerAwareInt
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadUserData::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $owner = $this->getReference(self::OWNER_USER_REFERENCE);

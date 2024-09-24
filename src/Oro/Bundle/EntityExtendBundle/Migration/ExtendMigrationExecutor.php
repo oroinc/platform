@@ -23,9 +23,7 @@ class ExtendMigrationExecutor extends MigrationExecutorWithNameGenerator
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setExtensionManager(MigrationExtensionManager $extensionManager): void
     {
         parent::setExtensionManager($extensionManager);
@@ -36,9 +34,7 @@ class ExtendMigrationExecutor extends MigrationExecutorWithNameGenerator
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createSchemaObject(
         array $tables = [],
         array $sequences = [],

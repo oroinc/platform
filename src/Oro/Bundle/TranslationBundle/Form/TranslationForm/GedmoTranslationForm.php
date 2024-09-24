@@ -51,9 +51,7 @@ class GedmoTranslationForm extends AbstractTranslationForm
         return $this->gedmoConfig[$translatableClass];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTranslationClass($translatableClass)
     {
         $gedmoConfig = $this->getGedmoConfig($translatableClass);
@@ -65,6 +63,7 @@ class GedmoTranslationForm extends AbstractTranslationForm
      * @param string $translatableClass
      * @return array
      */
+    #[\Override]
     protected function getTranslatableFields($translatableClass)
     {
         $gedmoConfig = $this->getGedmoConfig($translatableClass);

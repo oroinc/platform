@@ -31,9 +31,7 @@ class DocumentationProvider implements DocumentationProviderInterface
         $this->fileLocator = $fileLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDocumentation(RequestType $requestType): ?string
     {
         if (false === strrpos($this->resource, '.md')) {

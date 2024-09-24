@@ -23,6 +23,7 @@ class ExcludeChangeCommentSubresourcesTest extends \PHPUnit\Framework\TestCase
     /** @var CollectSubresourcesContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->commentAssociationProvider = $this->createMock(CommentAssociationProvider::class);

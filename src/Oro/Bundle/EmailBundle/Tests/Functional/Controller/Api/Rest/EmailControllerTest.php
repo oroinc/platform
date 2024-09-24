@@ -22,6 +22,7 @@ class EmailControllerTest extends WebTestCase
         'receivedAt' => '2015-06-19T12:17:51Z'
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

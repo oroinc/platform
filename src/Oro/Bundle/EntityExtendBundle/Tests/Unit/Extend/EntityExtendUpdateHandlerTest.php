@@ -24,6 +24,7 @@ class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityExtendUpdateProcessor = $this->createMock(EntityExtendUpdateProcessor::class);

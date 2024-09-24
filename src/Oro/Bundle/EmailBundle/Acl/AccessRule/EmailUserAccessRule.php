@@ -25,17 +25,13 @@ class EmailUserAccessRule implements AccessRuleInterface
         $this->builder = $builder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         $viewPublicConditionData = $this->builder->getAclConditionData(EmailUser::class);

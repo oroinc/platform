@@ -9,9 +9,6 @@ class LayoutContextHolder
     /** @var ContextInterface|null */
     protected $context;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContext()
     {
         return $this->context;

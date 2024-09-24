@@ -9,9 +9,7 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
 {
     const NAME = 'skip_empty_periods';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'select';
@@ -19,9 +17,7 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $data = $this->parseData($data);

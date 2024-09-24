@@ -25,9 +25,7 @@ class DumpJsTranslationsMessageProcessor implements MessageProcessorInterface, T
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $locales = $this->dumper->getAllLocales();
@@ -49,9 +47,7 @@ class DumpJsTranslationsMessageProcessor implements MessageProcessorInterface, T
         return self::ACK;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [DumpJsTranslationsTopic::getName()];

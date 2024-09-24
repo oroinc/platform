@@ -19,9 +19,7 @@ class EmailHolderTestEntity implements EmailHolderInterface
         $this->testField = $testField;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmail(): string
     {
         return 'test@test.com';

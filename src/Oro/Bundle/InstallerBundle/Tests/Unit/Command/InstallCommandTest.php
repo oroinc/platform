@@ -36,6 +36,7 @@ class InstallCommandTest extends TestCase
         $this->assertProducedWarning($commandTester, 'All data will be lost');
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $container = $this->createMock(ContainerInterface::class);

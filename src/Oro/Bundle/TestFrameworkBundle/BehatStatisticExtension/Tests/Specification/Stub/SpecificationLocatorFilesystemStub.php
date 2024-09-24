@@ -9,17 +9,13 @@ use Behat\Testwork\Suite\Suite;
 
 class SpecificationLocatorFilesystemStub implements SpecificationLocator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLocatorExamples()
     {
         return 'Return iterator with features found in paths specified in constructor. For unit tests only';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function locateSpecifications(Suite $suite, $locator = null)
     {
         $features = [];

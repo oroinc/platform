@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsFromSortersP
 
 class SelectedFieldsFromSortersProviderTest extends AbstractSelectedFieldsProviderTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -14,9 +15,7 @@ class SelectedFieldsFromSortersProviderTest extends AbstractSelectedFieldsProvid
         $this->provider = new SelectedFieldsFromSortersProvider($this->datagridStateProvider);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function mockGetConfiguration(array $configuration): void
     {
         $this->datagridConfiguration->expects(self::once())

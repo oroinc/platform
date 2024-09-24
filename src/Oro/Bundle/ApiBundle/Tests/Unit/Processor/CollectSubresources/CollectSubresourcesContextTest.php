@@ -10,6 +10,7 @@ class CollectSubresourcesContextTest extends \PHPUnit\Framework\TestCase
 {
     private CollectSubresourcesContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new CollectSubresourcesContext();

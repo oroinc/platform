@@ -23,6 +23,7 @@ class AssociationCompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCa
     /** @var AssociationCompositeIdentifierFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->idTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);

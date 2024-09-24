@@ -35,6 +35,7 @@ abstract class AbstractLanguageCondition extends AbstractCondition implements Co
      * @throws InvalidParameterException if the language argument is missing, or is not a language code and not
      *                                 a context property path, or if there is more that one argument provided.
      */
+    #[\Override]
     public function initialize(array $options): self
     {
         if (1 !== \count($options)) {

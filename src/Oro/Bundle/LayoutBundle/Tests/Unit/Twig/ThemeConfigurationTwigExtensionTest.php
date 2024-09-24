@@ -13,6 +13,7 @@ final class ThemeConfigurationTwigExtensionTest extends TestCase
 
     private ThemeConfigurationTwigExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->generalProvider = $this->createMock(GeneralProvider::class);

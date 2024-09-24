@@ -18,9 +18,7 @@ class TitleSerializedContentProvider implements ContentProviderInterface
         $this->titleService = $titleService;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContent()
     {
         return $this->titleService->getSerialized();

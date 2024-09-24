@@ -13,6 +13,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     private FeatureToggleConfiguration $configuration;
 
+    #[\Override]
     protected function setUp(): void
     {
         $extension = $this->createMock(ConfigurationExtensionInterface::class);

@@ -17,6 +17,7 @@ class MaxNestedLevel extends Constraint
 
     public string $message = 'oro.navigation.validator.menu_update.max_nested_level.message';
 
+    #[\Override]
     public function getTargets(): array|string
     {
         return self::CLASS_CONSTRAINT;

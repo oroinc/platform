@@ -17,6 +17,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var FormOptionsAssembler */
     private $assembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationPass = $this->createMock(ConfigurationPassInterface::class);

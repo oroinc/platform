@@ -12,6 +12,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
     private const TEST_ENUM_1_CLASS = 'Extend\Entity\EV_Api_Enum1';
     private const TEST_ENUM_2_CLASS = 'Extend\Entity\EV_Api_Enum2';
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -18,6 +18,7 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
 
     protected ConfigLoaderFactory $configLoaderFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configLoaderFactory = new ConfigLoaderFactory(new ConfigExtensionRegistry());

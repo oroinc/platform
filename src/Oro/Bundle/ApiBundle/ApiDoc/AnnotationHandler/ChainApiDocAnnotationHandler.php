@@ -21,9 +21,7 @@ class ChainApiDocAnnotationHandler implements ApiDocAnnotationHandlerInterface
         $this->handlers = $handlers;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handle(ApiDoc $annotation, Route $route): void
     {
         foreach ($this->handlers as $handler) {

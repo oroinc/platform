@@ -16,9 +16,7 @@ class AddFormErrorInFlushDataEvents implements ProcessorInterface
 {
     public const FORM_ERROR_PREFIX = 'FLUSH_DATA FORM ERROR - ';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

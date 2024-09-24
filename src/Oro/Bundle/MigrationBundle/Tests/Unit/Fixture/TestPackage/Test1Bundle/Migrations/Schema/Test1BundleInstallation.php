@@ -8,17 +8,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class Test1BundleInstallation implements Installation
 {
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getMigrationVersion()
     {
         return "v1_0";
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');

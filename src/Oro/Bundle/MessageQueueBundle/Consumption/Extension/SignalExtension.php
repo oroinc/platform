@@ -20,9 +20,7 @@ class SignalExtension extends AbstractExtension
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context)
     {
         if (!extension_loaded('pcntl')) {
@@ -38,6 +36,7 @@ class SignalExtension extends AbstractExtension
         $this->interruptConsumption = false;
     }
 
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         pcntl_signal_dispatch();
@@ -45,9 +44,7 @@ class SignalExtension extends AbstractExtension
         $this->interruptExecutionIfNeeded($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         pcntl_signal_dispatch();
@@ -55,9 +52,7 @@ class SignalExtension extends AbstractExtension
         $this->interruptExecutionIfNeeded($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onIdle(Context $context)
     {
         pcntl_signal_dispatch();

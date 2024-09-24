@@ -12,16 +12,19 @@ use Symfony\Component\Validator\Validation;
  */
 class SendEmailNotificationTemplateTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.notification.send_notification_email_template';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Email notification with template to be sent';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

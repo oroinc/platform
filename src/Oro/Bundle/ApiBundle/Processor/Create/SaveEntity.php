@@ -26,9 +26,7 @@ class SaveEntity implements ProcessorInterface
         $this->flushDataHandler = $flushDataHandler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext $context */

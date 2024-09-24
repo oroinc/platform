@@ -21,6 +21,7 @@ class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetEntitySelectConverter */
     private $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $entityNameResolver = $this->createMock(EntityNameResolver::class);

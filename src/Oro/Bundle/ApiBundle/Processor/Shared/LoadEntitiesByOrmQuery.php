@@ -23,9 +23,7 @@ class LoadEntitiesByOrmQuery implements ProcessorInterface
         $this->queryHintResolver = $queryHintResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */

@@ -32,16 +32,19 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         $this->emailEntityBuilder = $emailEntityBuilder;
     }
 
+    #[\Override]
     public function supports(EmailOrigin $origin)
     {
         return true;
     }
 
+    #[\Override]
     protected function getEmailOriginClass()
     {
         return self::EMAIL_ORIGIN_ENTITY;
     }
 
+    #[\Override]
     protected function createSynchronizationProcessor($origin)
     {
         return new TestEmailSynchronizationProcessor(
@@ -51,6 +54,7 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         );
     }
 
+    #[\Override]
     protected function getCurrentUtcDateTime()
     {
         return $this->now;

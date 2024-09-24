@@ -26,6 +26,7 @@ class PdoPgsql extends BaseDriver
     /**
      * Init additional doctrine functions
      */
+    #[\Override]
     public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
         $ormConfig = $em->getConfiguration();
@@ -62,6 +63,7 @@ class PdoPgsql extends BaseDriver
      * @return string
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
         $useFieldName = $searchCondition['fieldName'] !== '*';
@@ -144,6 +146,7 @@ class PdoPgsql extends BaseDriver
      *
      * @return string
      */
+    #[\Override]
     protected function createContainsStringQuery($index, $useFieldName = true)
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
@@ -213,6 +216,7 @@ class PdoPgsql extends BaseDriver
      *
      * @return string
      */
+    #[\Override]
     protected function createNotContainsStringQuery($index, $useFieldName = true)
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
@@ -266,6 +270,7 @@ class PdoPgsql extends BaseDriver
      * @param QueryBuilder $qb
      * @param string $index
      */
+    #[\Override]
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
@@ -280,9 +285,7 @@ class PdoPgsql extends BaseDriver
         $qb->setParameter(sprintf('quotedValue%s', $index), $parameter->getValue());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
     {
         $query = parent::getTruncateQuery($dbPlatform, $tableName);

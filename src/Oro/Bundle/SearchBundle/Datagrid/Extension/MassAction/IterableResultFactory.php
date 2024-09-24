@@ -19,17 +19,13 @@ use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
  */
 class IterableResultFactory implements IterableResultFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatasourceInterface $dataSource): bool
     {
         return $dataSource instanceof SearchDatasource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createIterableResult(
         DatasourceInterface $dataSource,
         ActionConfiguration $actionConfiguration,

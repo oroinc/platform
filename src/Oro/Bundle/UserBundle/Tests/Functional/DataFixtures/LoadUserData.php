@@ -38,17 +38,13 @@ class LoadUserData extends AbstractFixture implements
 
     const CONFIRMATION_TOKEN = 'confirmation_token';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadOrganization::class, LoadBusinessUnit::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $userManager = $this->container->get('oro_user.manager');

@@ -61,17 +61,13 @@ class UpdateEntityConfigEntityValueQuery implements
         $this->replaceValue = $replaceValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Set specific row value in oro_entity_config_index_value table';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         // update field itself

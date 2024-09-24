@@ -19,6 +19,7 @@ class GoogleOAuthUserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var GoogleOAuthUserProvider */
     private $userProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);

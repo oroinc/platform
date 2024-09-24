@@ -13,6 +13,7 @@ class RemoveTotalCountHeaderTest extends GetListProcessorTestCase
     /** @var RemoveTotalCountHeader */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

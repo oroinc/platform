@@ -16,9 +16,7 @@ class LoadAuditData extends AbstractFixture implements ContainerAwareInterface, 
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var User $user */
@@ -49,9 +47,7 @@ class LoadAuditData extends AbstractFixture implements ContainerAwareInterface, 
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadUserData::class];

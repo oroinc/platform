@@ -15,9 +15,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
  */
 class UpdateAttachmentsParentFields extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         if (!$manager instanceof EntityManagerInterface) {

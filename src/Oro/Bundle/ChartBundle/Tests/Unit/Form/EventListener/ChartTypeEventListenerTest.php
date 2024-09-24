@@ -11,6 +11,7 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ChartTypeEventListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new ChartTypeEventListener();

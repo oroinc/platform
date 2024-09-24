@@ -11,6 +11,7 @@ class CurrencyTypeTest extends \PHPUnit\Framework\TestCase
     /** @var CurrencyType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new CurrencyType();

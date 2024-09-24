@@ -51,6 +51,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->producer = $this->createMock(MessageProducerInterface::class);

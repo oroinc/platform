@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Attribute\Fixtures\Controller\Cla
 
 class ExtendedFromAbstractController extends AbstractController
 {
+    #[\Override]
     protected function getResponse()
     {
         return '';

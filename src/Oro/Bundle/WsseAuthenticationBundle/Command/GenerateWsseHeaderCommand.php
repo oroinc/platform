@@ -33,6 +33,7 @@ class GenerateWsseHeaderCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure()
     {
         $this->addArgument('apiKey', InputArgument::REQUIRED, 'User API key')
@@ -47,6 +48,7 @@ class GenerateWsseHeaderCommand extends Command
      * @throws \InvalidArgumentException
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $apiKey = $input->getArgument('apiKey');

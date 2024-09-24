@@ -34,6 +34,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTe
     /** @var ValidateParentEntityAccess */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class HasAdderAndRemoverValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): HasAdderAndRemoverValidator
     {
         return new HasAdderAndRemoverValidator();

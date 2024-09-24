@@ -19,6 +19,7 @@ class StartWorkflowItemProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var StartWorkflowItemProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

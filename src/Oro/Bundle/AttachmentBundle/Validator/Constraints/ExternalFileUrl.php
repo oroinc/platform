@@ -27,6 +27,7 @@ class ExternalFileUrl extends Constraint
 
     public string $emptyRegExpMessage = '';
 
+    #[\Override]
     public function getTargets(): array
     {
         return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];

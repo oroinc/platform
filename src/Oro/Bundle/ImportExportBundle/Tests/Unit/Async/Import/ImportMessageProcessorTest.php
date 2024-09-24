@@ -33,6 +33,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private ImportMessageProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->importHandler = $this->createMock(ImportHandler::class);

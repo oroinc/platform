@@ -22,6 +22,7 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractTemplateRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $templateRepository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityRegistry = new TemplateEntityRegistry();

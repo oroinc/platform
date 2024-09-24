@@ -17,6 +17,7 @@ class ExtendFieldFormOptionsDefaultProvider implements ExtendFieldFormOptionsPro
         $this->entityConfigManager = $entityConfigManager;
     }
 
+    #[\Override]
     public function getOptions(string $className, string $fieldName): array
     {
         $className = CachedClassUtils::getRealClass($className);

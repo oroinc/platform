@@ -25,6 +25,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
     private SecurityAwareConsumptionExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

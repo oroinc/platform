@@ -26,9 +26,7 @@ class SmtpSettingsProvider implements SmtpSettingsProviderInterface
         $this->applicationState = $applicationState;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSmtpSettings(object|int|null $scopeIdentifier = null): SmtpSettings
     {
         if (!$this->applicationState->isInstalled()) {

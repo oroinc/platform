@@ -17,9 +17,7 @@ class EntityWorkflowResultObjectSerializer implements WorkflowResultObjectSerial
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function serialize(object $object): ?array
     {
         if (!$this->doctrineHelper->isManageableEntity($object)) {

@@ -22,9 +22,7 @@ class BlockThemeNode extends Node
         parent::__construct(['block' => $block, 'resources' => $resources], [], $lineno, $tag);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile(Compiler $compiler)
     {
         $compiler

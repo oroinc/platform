@@ -35,6 +35,7 @@ abstract class EnumValueListenerTestCase extends \PHPUnit\Framework\TestCase
     /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $messageProducer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

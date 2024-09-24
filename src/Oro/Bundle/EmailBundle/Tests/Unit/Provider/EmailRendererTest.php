@@ -38,6 +38,7 @@ class EmailRendererTest extends TestCase
 
     private EmailRenderer $renderer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->templateRenderer = $this->createMock(TemplateRenderer::class);

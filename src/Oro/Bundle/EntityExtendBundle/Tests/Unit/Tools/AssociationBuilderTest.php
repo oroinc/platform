@@ -32,6 +32,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var RelationBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $relationBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

@@ -95,6 +95,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var Inflector */
     private $inflector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tree = new OwnerTree();

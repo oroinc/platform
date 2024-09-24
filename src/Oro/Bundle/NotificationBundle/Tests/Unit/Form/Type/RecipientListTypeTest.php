@@ -11,6 +11,7 @@ class RecipientListTypeTest extends \PHPUnit\Framework\TestCase
     /** @var RecipientListType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new RecipientListType();

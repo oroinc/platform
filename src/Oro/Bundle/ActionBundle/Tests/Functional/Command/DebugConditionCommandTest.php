@@ -6,17 +6,13 @@ use Oro\Bundle\ActionBundle\Command\DebugConditionCommand;
 
 class DebugConditionCommandTest extends AbstractDebugCommandTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFactoryServiceId(): string
     {
         return 'oro_action.expression.factory';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getCommandName(): string
     {
         return DebugConditionCommand::getDefaultName();

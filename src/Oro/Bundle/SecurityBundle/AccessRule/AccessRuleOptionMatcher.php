@@ -31,9 +31,7 @@ class AccessRuleOptionMatcher implements AccessRuleOptionMatcherInterface
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function matches(Criteria $criteria, string $optionName, $optionValue): bool
     {
         if (null === $this->specialOptions) {

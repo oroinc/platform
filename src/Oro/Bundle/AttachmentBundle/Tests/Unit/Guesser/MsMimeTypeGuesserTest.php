@@ -19,11 +19,13 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
         'type'     => ''
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->guesser = new MsMimeTypeGuesser();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         foreach ($this->files as $file) {

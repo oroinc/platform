@@ -17,6 +17,7 @@ class ResolveDestinationPageListenerTest extends TestCase
     private ActionFactoryInterface|MockObject $actionFactory;
     private ResolveDestinationPageListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);

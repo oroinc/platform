@@ -31,6 +31,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowTranslationHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);

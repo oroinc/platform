@@ -15,6 +15,7 @@ class ActualizeEnumOptionTranslationsCommandTest extends WebTestCase
 
     private Connection $connection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

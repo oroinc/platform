@@ -33,6 +33,7 @@ class LocalizedFallbackValueCollectionClearingSubscriber implements EventSubscri
      */
     private array $snapshots = [];
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

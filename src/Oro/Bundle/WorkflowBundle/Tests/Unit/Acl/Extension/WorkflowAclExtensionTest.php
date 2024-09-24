@@ -56,6 +56,7 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAclExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);

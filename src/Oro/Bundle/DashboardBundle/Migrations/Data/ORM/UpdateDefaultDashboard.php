@@ -10,17 +10,13 @@ use Doctrine\Persistence\ObjectManager;
  */
 class UpdateDefaultDashboard extends AbstractDashboardFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadDashboardData::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $mainDashboard = $this->findAdminDashboardModel($manager, 'main');

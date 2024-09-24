@@ -12,17 +12,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AutocompletePasswordTypeExtension extends AbstractTypeExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [PasswordType::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setNormalizer('attr', function (Options $options, $value) {

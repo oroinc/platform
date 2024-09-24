@@ -15,9 +15,7 @@ class DynamicFieldsExtensionStub extends DynamicFieldsOptionsExtension
         $this->fieldsConfiguration = $fieldsConfiguration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($this->fieldsConfiguration as $field) {
@@ -25,9 +23,7 @@ class DynamicFieldsExtensionStub extends DynamicFieldsOptionsExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

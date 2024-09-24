@@ -90,9 +90,7 @@ class AppBundle extends Bundle
         TransactionWatcherConfigurator::registerConnectionProxies($kernel->getCacheDir());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

@@ -136,9 +136,7 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
         return [$definitionsData, $triggersData];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getConfigFilePattern()
     {
         return $this->configFilePattern;

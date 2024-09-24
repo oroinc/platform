@@ -13,6 +13,7 @@ class PictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
 
     private PictureSourcesProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentManager = $this->createMock(AttachmentManager::class);

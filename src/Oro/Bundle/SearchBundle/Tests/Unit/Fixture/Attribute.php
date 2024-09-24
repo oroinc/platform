@@ -11,6 +11,7 @@ class Attribute
         $this->code = $code;
     }
 
+    #[\Override]
     public function __toString()
     {
         return (string) $this->code;

@@ -14,6 +14,7 @@ class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigExpressions */
     private $language;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->language = new ConfigExpressions();

@@ -80,6 +80,7 @@ class WorkflowAwareCache implements EventSubscriberInterface
         $this->cache->delete(self::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY);
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

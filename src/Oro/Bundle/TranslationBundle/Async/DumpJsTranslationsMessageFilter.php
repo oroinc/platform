@@ -11,9 +11,7 @@ use Oro\Bundle\TranslationBundle\Async\Topic\DumpJsTranslationsTopic;
  */
 class DumpJsTranslationsMessageFilter implements MessageFilterInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(MessageBuffer $buffer): void
     {
         $hasDumpJsTranslationsMessage = false;

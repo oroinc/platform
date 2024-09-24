@@ -75,49 +75,37 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
         $this->maskBuilder = new MaskBuilder();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtensionKey()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($type, $id)
     {
         return $this->getExtensionKey() === $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFieldExtension()
     {
         return $this->transitionAclExtension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClasses()
     {
         return $this->workflowMetadataProvider->getMetadata();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         return $this->permissions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
         if (!$this->isSupportedObject($object)) {
@@ -127,9 +115,7 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
         return $this->isAccessGranted($triggeredMask, $object, $securityToken);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getObjectIdentity($val)
     {
         if (\is_string($val)) {
@@ -148,33 +134,25 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
         return $this->fromDomainObject($val);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaskPattern($mask)
     {
         return MaskBuilder::getPatternFor($mask);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getServiceBits($mask)
     {
         return $mask & MaskBuilder::SERVICE_BITS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeServiceBits($mask)
     {
         return $mask & MaskBuilder::REMOVE_SERVICE_BITS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getValidMasks($object)
     {
         if ($object instanceof ObjectIdentity && $object->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {

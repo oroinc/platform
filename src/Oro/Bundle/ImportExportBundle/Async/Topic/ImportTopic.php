@@ -11,16 +11,19 @@ class ImportTopic extends AbstractImportTopic
 {
     public const NAME = 'oro.importexport.import';
 
+    #[\Override]
     public static function getName(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Imports a file';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

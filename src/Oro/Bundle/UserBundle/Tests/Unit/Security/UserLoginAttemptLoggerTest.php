@@ -30,6 +30,7 @@ class UserLoginAttemptLoggerTest extends \PHPUnit\Framework\TestCase
     /** @var UserLoginAttemptLogger */
     private $attemptlogger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userInfoProvider = $this->createMock(UserLoggingInfoProviderInterface::class);

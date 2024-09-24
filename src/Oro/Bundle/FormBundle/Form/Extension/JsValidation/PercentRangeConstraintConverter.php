@@ -12,19 +12,17 @@ use Symfony\Component\Validator\Constraints\Range;
  */
 class PercentRangeConstraintConverter implements ConstraintConverterInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(Constraint $constraint, ?FormInterface $form = null): bool
     {
         return $constraint instanceof PercentRange;
     }
 
     /**
-     * {@inheritDoc}
      *
      * @param PercentRange $constraint
      */
+    #[\Override]
     public function convertConstraint(Constraint $constraint, ?FormInterface $form = null): ?Constraint
     {
         $options = [

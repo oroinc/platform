@@ -11,9 +11,7 @@ use Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType;
 
 class UpdateTaxonomyFormType implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(

@@ -20,6 +20,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurableEntityNameProvider */
     private $entityNameProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadata = $this->createMock(ClassMetadata::class);

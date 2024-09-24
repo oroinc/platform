@@ -18,6 +18,7 @@ class OroTranslationDumpCommandTest extends WebTestCase
     private string $tempDir;
     private static FileManager $fileManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -25,11 +26,13 @@ class OroTranslationDumpCommandTest extends WebTestCase
         $this->tempDir = $this->getTempDir('translation_dump_command');
     }
 
+    #[\Override]
     public static function assertFileExists(string $filename, string $message = ''): void
     {
         self::assertTrue(self::$fileManager->hasFile($filename), $message);
     }
 
+    #[\Override]
     public static function assertStringEqualsFile(
         string $expectedFile,
         string $actualString,

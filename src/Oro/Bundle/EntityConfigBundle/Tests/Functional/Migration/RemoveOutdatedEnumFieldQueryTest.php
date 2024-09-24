@@ -14,6 +14,7 @@ class RemoveOutdatedEnumFieldQueryTest extends WebTestCase
     private Connection $connection;
     private ArrayLogger $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -45,9 +45,7 @@ class Configuration implements ConfigurationInterface
 
     const PROCESSOR_KEY = 'processor';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('board');

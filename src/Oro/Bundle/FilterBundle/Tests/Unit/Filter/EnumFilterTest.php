@@ -25,6 +25,7 @@ class EnumFilterTest extends OrmTestCase
     /** @var EnumFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

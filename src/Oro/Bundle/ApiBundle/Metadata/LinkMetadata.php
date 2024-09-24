@@ -23,6 +23,7 @@ abstract class LinkMetadata implements LinkMetadataInterface
      * @throws LinkHrefResolvingFailedException when it is not possible to resolve the link's URL
      *                                          because of not enough data to build the URL
      */
+    #[\Override]
     abstract public function getHref(DataAccessorInterface $dataAccessor): ?string;
 
     /**
@@ -33,9 +34,7 @@ abstract class LinkMetadata implements LinkMetadataInterface
         $this->metaProperties = ConfigUtil::cloneObjects($this->metaProperties);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $result = [];
@@ -47,33 +46,25 @@ abstract class LinkMetadata implements LinkMetadataInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetaProperties(): array
     {
         return $this->metaProperties;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasMetaProperty(string $metaPropertyName): bool
     {
         return isset($this->metaProperties[$metaPropertyName]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetaProperty(string $metaPropertyName): ?MetaAttributeMetadata
     {
         return $this->metaProperties[$metaPropertyName] ?? null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addMetaProperty(MetaAttributeMetadata $metaProperty): MetaAttributeMetadata
     {
         $this->metaProperties[$metaProperty->getName()] = $metaProperty;
@@ -81,9 +72,7 @@ abstract class LinkMetadata implements LinkMetadataInterface
         return $metaProperty;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeMetaProperty(string $metaPropertyName): void
     {
         unset($this->metaProperties[$metaPropertyName]);

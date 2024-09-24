@@ -12,9 +12,7 @@ class YamlFileLoader extends BaseLoader
 {
     public const TYPE = 'oro_websocket_routing_yaml';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path): void
     {
         if (is_array($config['handler']) && array_key_exists('callback', $config['handler'])) {
@@ -37,9 +35,7 @@ class YamlFileLoader extends BaseLoader
         parent::parseRoute($collection, $name, $config, $path);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function doSupports($resource, string $type = null): bool
     {
         return \is_string($resource)

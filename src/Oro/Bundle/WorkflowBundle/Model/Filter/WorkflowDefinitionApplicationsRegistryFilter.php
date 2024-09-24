@@ -16,9 +16,7 @@ class WorkflowDefinitionApplicationsRegistryFilter implements WorkflowDefinition
         $this->currentApplicationProvider = $currentApplicationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(Collection $workflowDefinitions)
     {
         $currentApplication = $this->currentApplicationProvider->getCurrentApplication();

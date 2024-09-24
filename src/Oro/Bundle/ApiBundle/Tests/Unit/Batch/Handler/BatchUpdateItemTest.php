@@ -22,6 +22,7 @@ class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
     /** @var BatchUpdateItem */
     private $batchUpdateItem;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = $this->getMockBuilder(BatchUpdateItemProcessor::class)

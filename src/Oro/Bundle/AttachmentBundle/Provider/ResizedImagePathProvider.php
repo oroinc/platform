@@ -16,9 +16,7 @@ class ResizedImagePathProvider implements ResizedImagePathProviderInterface
         $this->fileUrlProvider = $fileUrlProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPathForResizedImage(File $entity, int $width, int $height, string $format = ''): string
     {
         return $this->normalizePath(
@@ -26,9 +24,7 @@ class ResizedImagePathProvider implements ResizedImagePathProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPathForFilteredImage(File $entity, string $filterName, string $format = ''): string
     {
         return $this->normalizePath(

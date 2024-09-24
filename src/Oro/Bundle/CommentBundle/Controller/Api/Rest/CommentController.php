@@ -215,6 +215,7 @@ class CommentController extends RestController
     /**
      * @return FormInterface
      */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_comment.form.comment.api');
@@ -225,6 +226,7 @@ class CommentController extends RestController
      *
      * @return CommentApiManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_comment.comment.api_manager');
@@ -233,14 +235,13 @@ class CommentController extends RestController
     /**
      * @return ApiFormHandler
      */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_comment.api.form.handler');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function fixFormData(array &$data, $entity)
     {
         parent::fixFormData($data, $entity);

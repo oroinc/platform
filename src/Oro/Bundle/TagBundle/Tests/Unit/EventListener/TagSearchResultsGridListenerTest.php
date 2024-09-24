@@ -32,6 +32,7 @@ class TagSearchResultsGridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var TagSearchResultsGridListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->parameters = $this->createMock(ParameterBag::class);

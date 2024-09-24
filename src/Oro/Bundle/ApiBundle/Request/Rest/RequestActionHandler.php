@@ -40,25 +40,19 @@ class RequestActionHandler extends BaseRequestActionHandler
         $this->viewHandler = $viewHandler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getRequestHeaders(Request $request): AbstractParameterBag
     {
         return new RestRequestHeaders($request);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getRequestFilters(Request $request): FilterValueAccessorInterface
     {
         return $this->filterValueAccessorFactory->create($request);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function prepareContext(Context $context, Request $request): void
     {
         parent::prepareContext($context, $request);
@@ -67,9 +61,7 @@ class RequestActionHandler extends BaseRequestActionHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildResponse(Context $context, Request $request): Response
     {
         $view = View::create($context->getResult());

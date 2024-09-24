@@ -14,9 +14,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class NeqOrEmptyComparisonExpression implements ComparisonExpressionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
         string $field,

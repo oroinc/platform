@@ -41,6 +41,7 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConnectionControllerManager */
     private $controllerManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

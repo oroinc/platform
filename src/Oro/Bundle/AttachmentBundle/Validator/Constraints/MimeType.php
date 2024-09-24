@@ -17,9 +17,6 @@ class MimeType extends Constraint
     /** @var string */
     public $type = 'any';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($options = null)
     {
         parent::__construct($options);
@@ -30,17 +27,13 @@ class MimeType extends Constraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultOption(): ?string
     {
         return 'type';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

@@ -12,6 +12,7 @@ use ReflectionMethod;
  */
 class EntityReflectionClass extends \ReflectionClass
 {
+    #[\Override]
     public function getProperties(?int $filter = null): array
     {
         $properties = parent::getProperties($filter);
@@ -25,6 +26,7 @@ class EntityReflectionClass extends \ReflectionClass
         return $properties;
     }
 
+    #[\Override]
     public function hasProperty($name): bool
     {
         if ($this->isNotExtendEntity()) {
@@ -34,6 +36,7 @@ class EntityReflectionClass extends \ReflectionClass
         return EntityPropertyInfo::propertyExists($this->getName(), $name);
     }
 
+    #[\Override]
     public function getProperty($name): \ReflectionProperty
     {
         if ($this->isNotExtendEntity()) {
@@ -62,6 +65,7 @@ class EntityReflectionClass extends \ReflectionClass
         return !is_subclass_of($this->getName(), ExtendEntityInterface::class);
     }
 
+    #[\Override]
     public function hasMethod($name): bool
     {
         if ($this->isNotExtendEntity()) {
@@ -71,6 +75,7 @@ class EntityReflectionClass extends \ReflectionClass
         return EntityPropertyInfo::methodExists($this->getName(), $name);
     }
 
+    #[\Override]
     public function getMethod($name): ReflectionMethod
     {
         if ($this->isNotExtendEntity()) {
@@ -94,6 +99,7 @@ class EntityReflectionClass extends \ReflectionClass
         );
     }
 
+    #[\Override]
     public function getMethods($filter = null): array
     {
         $methods = parent::getMethods($filter);

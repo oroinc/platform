@@ -13,9 +13,7 @@ use Oro\Bundle\FilterBundle\Filter\EntityFilter;
  */
 class WorkflowNameFilter extends EntityFilter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         return false;

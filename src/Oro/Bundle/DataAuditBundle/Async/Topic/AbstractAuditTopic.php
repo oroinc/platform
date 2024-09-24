@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractAuditTopic extends AbstractTopic
 {
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

@@ -16,9 +16,7 @@ class FullNameSearchHandler extends SearchHandler
         $this->entityNameResolver = $entityNameResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         $result = parent::convertItem($item);

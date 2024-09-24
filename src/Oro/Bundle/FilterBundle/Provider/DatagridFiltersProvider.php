@@ -25,9 +25,7 @@ class DatagridFiltersProvider implements DatagridFiltersProviderInterface
         $this->applicableDatasourceType = $applicableDatasourceType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDatagridFilters(DatagridConfiguration $gridConfig): array
     {
         if ($gridConfig->getDatasourceType() !== $this->applicableDatasourceType) {

@@ -13,6 +13,7 @@ class EntityPoolTest extends \PHPUnit\Framework\TestCase
     /** @var EntityPool */
     private $entityPool;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

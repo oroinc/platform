@@ -20,6 +20,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
 
     private OrmPagerExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->pager = $this->createMock(Pager::class);

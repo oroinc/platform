@@ -12,33 +12,25 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
 {
     public const NAME = 'descriptions';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ConfigContext $context): void
     {
         // no any modifications of the ConfigContext is required
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPropagable(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         return self::NAME;

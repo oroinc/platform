@@ -22,6 +22,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
      *
      * @return string
      */
+    #[\Override]
     public function getType()
     {
         return $this->type;
@@ -30,6 +31,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
     /**
      * Returns label for UI
      */
+    #[\Override]
     public function getLabel(): string
     {
         return $this->label;
@@ -40,6 +42,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
      *
      * @return string
      */
+    #[\Override]
     public function getImportJobName()
     {
         return $this->job;
@@ -50,6 +53,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
      *
      * @return string
      */
+    #[\Override]
     public function getImportEntityFQCN()
     {
         return $this->entityName;
@@ -60,6 +64,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
      *
      * @return \Iterator
      */
+    #[\Override]
     protected function getConnectorSource()
     {
         return new TestIterator();
@@ -71,6 +76,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
      *
      * @return bool
      */
+    #[\Override]
     public function isAllowed(Channel $integration, array $processedConnectorsStatuses)
     {
         return $this->allowed;
@@ -81,6 +87,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
      *
      * @return integer
      */
+    #[\Override]
     public function getOrder()
     {
         return $this->order;

@@ -7,9 +7,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 
 class MergeIterableResult extends IterableResult
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getIterationStrategy()
     {
         if (null === $this->iterationStrategy) {

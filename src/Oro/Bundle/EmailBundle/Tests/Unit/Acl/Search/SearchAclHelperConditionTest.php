@@ -18,6 +18,7 @@ class SearchAclHelperConditionTest extends \PHPUnit\Framework\TestCase
     /** @var SearchAclHelperCondition */
     private $searchAclHelperCondition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclConditionDataBuilder = $this->createMock(AclConditionDataBuilderInterface::class);

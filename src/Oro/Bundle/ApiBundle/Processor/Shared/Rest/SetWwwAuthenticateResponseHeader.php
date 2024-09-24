@@ -16,9 +16,7 @@ class SetWwwAuthenticateResponseHeader implements ProcessorInterface
 {
     private const WWW_AUTHENTICATE_HEADER = 'WWW-Authenticate';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

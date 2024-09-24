@@ -15,6 +15,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridConfigContextConfigurator */
     private $contextConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dataGridManager = $this->createMock(ManagerInterface::class);

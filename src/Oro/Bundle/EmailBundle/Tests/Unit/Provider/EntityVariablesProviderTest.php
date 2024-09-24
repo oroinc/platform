@@ -40,6 +40,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityVariablesProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

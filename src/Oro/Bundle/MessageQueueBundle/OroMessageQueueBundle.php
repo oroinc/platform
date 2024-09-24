@@ -27,9 +27,7 @@ class OroMessageQueueBundle extends Bundle
 {
     use TaggedServiceTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

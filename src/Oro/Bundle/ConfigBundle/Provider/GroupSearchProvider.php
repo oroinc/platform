@@ -20,17 +20,13 @@ class GroupSearchProvider implements SearchProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($name)
     {
         return $this->configBag->getGroupsNode($name) !== false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData($name)
     {
         $group = $this->configBag->getGroupsNode($name);

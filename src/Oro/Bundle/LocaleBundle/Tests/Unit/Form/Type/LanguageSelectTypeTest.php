@@ -26,6 +26,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
     /** @var LanguageSelectType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
@@ -124,9 +125,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $choiceType = $this->createMock(OroChoiceType::class);

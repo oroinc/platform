@@ -50,17 +50,13 @@ class Context implements ContextInterface, BatchContextInterface
         $this->configuration = $configuration;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addError($message)
     {
         $this->errors[] = $message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addErrors(array $messages)
     {
         foreach ($messages as $message) {
@@ -68,17 +64,13 @@ class Context implements ContextInterface, BatchContextInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getErrors()
     {
         return $this->errors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addPostponedRow(array $row)
     {
         $this->postponedRows[] = $row;
@@ -86,9 +78,7 @@ class Context implements ContextInterface, BatchContextInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addPostponedRows(array $rows)
     {
         foreach ($rows as $row) {
@@ -98,17 +88,13 @@ class Context implements ContextInterface, BatchContextInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPostponedRows()
     {
         return $this->postponedRows;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFailureExceptions()
     {
         return array_map(
@@ -132,9 +118,7 @@ class Context implements ContextInterface, BatchContextInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementReadCount($incrementBy = 1)
     {
         $incrementedRead = $this->getOption('incremented_read', true);
@@ -143,123 +127,91 @@ class Context implements ContextInterface, BatchContextInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReadCount()
     {
         return $this->getValue('read_count');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementReadOffset()
     {
         $this->setValue('read_offset', (int)$this->getValue('read_offset') + 1);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReadOffset()
     {
         return $this->getValue('read_offset');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementAddCount($incrementBy = 1)
     {
         $this->setValue('add_count', (int)$this->getValue('add_count') + $incrementBy);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAddCount()
     {
         return $this->getValue('add_count');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementUpdateCount($incrementBy = 1)
     {
         $this->setValue('update_count', (int)$this->getValue('update_count') + $incrementBy);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * return $errors;
-     */
+    #[\Override]
     public function getUpdateCount()
     {
         return $this->getValue('update_count');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementReplaceCount($incrementBy = 1)
     {
         $this->setValue('replace_count', (int)$this->getValue('replace_count') + $incrementBy);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReplaceCount()
     {
         return $this->getValue('replace_count');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementDeleteCount($incrementBy = 1)
     {
         $this->setValue('delete_count', (int)$this->getValue('delete_count') + $incrementBy);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDeleteCount()
     {
         return $this->getValue('delete_count');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementErrorEntriesCount($incrementBy = 1)
     {
         $this->setValue('error_entries_count', (int)$this->getValue('error_entries_count') + $incrementBy);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getErrorEntriesCount()
     {
         return $this->getValue('error_entries_count');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($name, $value)
     {
         $this->values[$name] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($name)
     {
         return isset($this->values[$name])
@@ -267,25 +219,19 @@ class Context implements ContextInterface, BatchContextInterface
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration()
     {
         return $this->configuration;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasOption($name)
     {
         return isset($this->configuration[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOption($name, $default = null)
     {
         if ($this->hasOption($name)) {
@@ -295,9 +241,7 @@ class Context implements ContextInterface, BatchContextInterface
         return $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeOption($name)
     {
         if ($this->hasOption($name)) {
@@ -305,17 +249,13 @@ class Context implements ContextInterface, BatchContextInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBatchSize()
     {
         return $this->getValue(self::OPTION_BATCH_SIZE);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBatchNumber()
     {
         return $this->getValue('batch_number');

@@ -12,9 +12,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class AddEventNameColumn implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_notification_email_notif');
@@ -23,9 +21,7 @@ class AddEventNameColumn implements Migration, OrderedMigrationInterface
         $queries->addPostQuery(new MigrateEventNamesQuery());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 1;

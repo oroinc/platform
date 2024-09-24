@@ -22,6 +22,7 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
     /** @var GeneratedValueStrategyListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->event = $this->createMock(LoadClassMetadataEventArgs::class);

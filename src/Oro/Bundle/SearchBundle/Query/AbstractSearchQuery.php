@@ -36,6 +36,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      *
      * @return mixed|Result
      */
+    #[\Override]
     public function getResult()
     {
         if (!$this->result) {
@@ -45,17 +46,13 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this->result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute()
     {
         return $this->getResult()->getElements();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getQuery()
     {
         return $this->query;
@@ -69,9 +66,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         $this->query = $query;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFirstResult($firstResult)
     {
         $this->query->getCriteria()->setFirstResult($firstResult);
@@ -79,17 +74,13 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFirstResult()
     {
         return $this->query->getCriteria()->getFirstResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setMaxResults($maxResults)
     {
         $this->query->getCriteria()->setMaxResults($maxResults);
@@ -97,25 +88,19 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaxResults()
     {
         return $this->query->getCriteria()->getMaxResults();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTotalCount()
     {
         return $this->getResult()->getRecordsCount();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortBy()
     {
         $orderings = $this->query->getCriteria()->getOrderings();
@@ -130,9 +115,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $fieldName === null ? null : Criteria::explodeFieldTypeName($fieldName)[1];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortOrder()
     {
         $orders = $this->query
@@ -146,9 +129,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return array_pop($orders);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT)
     {
         if (str_contains($fieldName, '.')) {
@@ -164,9 +145,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addSelect($fieldName, $enforcedFieldType = null)
     {
         $this->query->addSelect($fieldName, $enforcedFieldType);
@@ -174,9 +153,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFrom()
     {
         $from = $this->query->getFrom();
@@ -184,9 +161,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return false !== $from ? $from : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFrom($entities)
     {
         $this->query->from($entities);
@@ -194,9 +169,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addWhere(Expression $expression, $type = self::WHERE_AND)
     {
         if (self::WHERE_AND === $type) {
@@ -208,41 +181,31 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSelectAliases()
     {
         return $this->query->getSelectAliases();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSelect()
     {
         return $this->query->getSelect();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSelectDataFields()
     {
         return $this->query->getSelectDataFields();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteria()
     {
         return $this->query->getCriteria();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addAggregate($name, $field, $function, array $parameters = [])
     {
         $this->query->addAggregate($name, $field, $function, $parameters);
@@ -250,14 +213,13 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAggregations()
     {
         return $this->query->getAggregations();
     }
 
+    #[\Override]
     public function setHint(string $name, $value): self
     {
         $this->query->setHint($name, $value);
@@ -265,16 +227,19 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this;
     }
 
+    #[\Override]
     public function getHint(string $name)
     {
         return $this->query->getHint($name);
     }
 
+    #[\Override]
     public function hasHint(string $name): bool
     {
         return $this->query->hasHint($name);
     }
 
+    #[\Override]
     public function getHints(): array
     {
         return $this->query->getHints();

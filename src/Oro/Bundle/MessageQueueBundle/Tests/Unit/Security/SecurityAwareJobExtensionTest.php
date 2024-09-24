@@ -25,6 +25,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var SecurityAwareJobExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

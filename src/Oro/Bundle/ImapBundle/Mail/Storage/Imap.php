@@ -86,7 +86,6 @@ class Imap extends \Laminas\Mail\Storage\Imap
     private $onConvertError;
 
     /**
-     * {@inheritdoc}
      * @param array|Imap|ProtocolImap $params mail reader specific parameters
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -193,6 +192,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
      * @throws \Laminas\Mail\Protocol\Exception\RuntimeException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function getFolders($rootFolder = null)
     {
         $folders = $this->protocol->listMailbox((string)$rootFolder);
@@ -264,9 +264,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMessage($id)
     {
         return $this->createMessageObject(
@@ -383,9 +381,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
         return $isUid ? array_keys($result[1]) : array_values($result[1]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function selectFolder($globalName)
     {
         if ((string)$this->currentFolder === (string)$globalName && $this->uidValidity !== null) {
@@ -405,9 +401,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
         $this->uidValidity = $selectResponse['uidvalidity'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close()
     {
         if ($this->ignoreCloseCommand) {
@@ -417,9 +411,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
         parent::close();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNumberByUniqueId($id)
     {
         if (!$this->uniqueIds) {
@@ -492,9 +484,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
         return $message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRawContent($id, $part = null)
     {
         if ($part !== null) {

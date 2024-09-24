@@ -12,9 +12,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
  */
 class OrganizationGuesser implements OrganizationGuesserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guess(AbstractUser $user): ?Organization
     {
         $organization = $user->getOrganization();

@@ -9,6 +9,7 @@ use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\WebsocketRouterConfigurat
  */
 class WebsocketRouterConfigurationPassStub extends WebsocketRouterConfigurationPass
 {
+    #[\Override]
     protected function getAppConfigPath(): string
     {
         return '../../config/oro/websocket_routing';

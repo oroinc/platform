@@ -26,9 +26,7 @@ abstract class BuildResultDocument implements ProcessorInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

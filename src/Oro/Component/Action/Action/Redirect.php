@@ -42,9 +42,7 @@ class Redirect extends AssignUrl
         $this->urlAttribute = $redirectPath;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         parent::executeAction($context);
@@ -61,8 +59,8 @@ class Redirect extends AssignUrl
      *  - route_parameters (optional) - route parameters
      *  - new_tab (optional) - mark should be URL open in new browser tab
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['url']) && empty($options['route'])) {
@@ -83,6 +81,7 @@ class Redirect extends AssignUrl
      * @param mixed $context
      * @return string|null
      */
+    #[\Override]
     protected function getUrl($context)
     {
         if ($this->getRoute($context)) {

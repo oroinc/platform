@@ -18,6 +18,7 @@ class HasActiveIntegrationTest extends TestCase
     /** @var HasActiveIntegration */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

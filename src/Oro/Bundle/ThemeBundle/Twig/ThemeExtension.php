@@ -22,9 +22,7 @@ class ThemeExtension extends AbstractExtension implements ServiceSubscriberInter
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -61,9 +59,7 @@ class ThemeExtension extends AbstractExtension implements ServiceSubscriberInter
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

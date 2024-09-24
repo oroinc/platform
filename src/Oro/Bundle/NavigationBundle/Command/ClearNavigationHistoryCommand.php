@@ -32,9 +32,7 @@ class ClearNavigationHistoryCommand extends Command implements CronCommandSchedu
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         // 00:05 every day
@@ -42,6 +40,7 @@ class ClearNavigationHistoryCommand extends Command implements CronCommandSchedu
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure()
     {
         $this
@@ -68,6 +67,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         try {

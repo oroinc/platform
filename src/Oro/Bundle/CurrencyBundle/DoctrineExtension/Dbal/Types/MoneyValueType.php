@@ -9,15 +9,13 @@ class MoneyValueType extends MoneyType
 {
     const TYPE = 'money_value';
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName()
     {
         return static::TYPE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         return $value;

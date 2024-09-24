@@ -19,9 +19,7 @@ class NullMessageProcessor implements MessageProcessorInterface
         $this->missingMessageProcessorName = $missingMessageProcessorName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         if ($this->missingMessageProcessorName) {

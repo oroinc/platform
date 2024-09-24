@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): ScheduleIntervalsIntersectionValidator
     {
         return new ScheduleIntervalsIntersectionValidator();

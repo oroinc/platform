@@ -16,6 +16,7 @@ class SetUserEmailOriginTransportListenerTest extends \PHPUnit\Framework\TestCas
 {
     private SetUserEmailOriginTransportListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new SetUserEmailOriginTransportListener('sample_transport');

@@ -27,6 +27,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityLoader */
     private $entityLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

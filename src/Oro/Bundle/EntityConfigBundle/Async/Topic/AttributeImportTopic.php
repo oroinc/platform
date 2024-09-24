@@ -12,11 +12,13 @@ class AttributeImportTopic extends ImportTopic
 {
     public const NAME = 'oro_entity_config.importexport.attribute.import';
 
+    #[\Override]
     public static function getName(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

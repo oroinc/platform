@@ -9,9 +9,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroCurrencyBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

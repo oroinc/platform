@@ -18,6 +18,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigTypeHelper */
     private $typeHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

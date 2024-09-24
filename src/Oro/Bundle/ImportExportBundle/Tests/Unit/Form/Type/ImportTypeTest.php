@@ -21,6 +21,7 @@ class ImportTypeTest extends FormIntegrationTestCase
     /** @var ImportType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistry::class);
@@ -92,9 +93,7 @@ class ImportTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

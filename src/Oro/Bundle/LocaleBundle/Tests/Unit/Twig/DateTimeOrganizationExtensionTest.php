@@ -25,6 +25,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DateTimeOrganizationExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(DateTimeFormatterInterface::class);

@@ -46,25 +46,19 @@ class Options implements \ArrayAccess, \Iterator
         throw new \OutOfBoundsException(sprintf('Argument "%s" not found.', $offset));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         return $this->offsetExists($offset) ? $this->get($offset) : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         if (is_array($value)) {
@@ -77,9 +71,7 @@ class Options implements \ArrayAccess, \Iterator
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         if (array_key_exists($offset, $this->options)) {
@@ -128,41 +120,31 @@ class Options implements \ArrayAccess, \Iterator
         return $this->offsetExists($offset) && $this->offsetGet($offset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         reset($this->options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function current(): mixed
     {
         return current($this->options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(): mixed
     {
         return key($this->options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function next(): void
     {
         next($this->options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         return key($this->options) !== null;

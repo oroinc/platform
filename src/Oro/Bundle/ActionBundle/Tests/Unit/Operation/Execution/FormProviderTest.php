@@ -22,6 +22,7 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FormProvider */
     private $formProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = OperationExecutionType::class;

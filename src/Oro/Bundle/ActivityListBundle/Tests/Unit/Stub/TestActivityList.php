@@ -9,6 +9,7 @@ class TestActivityList extends ActivityList
     /**
      * @param int $id
      */
+    #[\Override]
     public function setId($id)
     {
         $this->id = $id;

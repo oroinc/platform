@@ -25,6 +25,7 @@ class AttributeImportStrategy extends EntityFieldImportStrategy
      * @param FieldConfigModel $entity
      * @return null|FieldConfigModel
      */
+    #[\Override]
     protected function processEntity(FieldConfigModel $entity)
     {
         $this->configHelper->addToFieldConfigModel($entity, ['attribute' => ['is_attribute' => true]]);
@@ -32,6 +33,7 @@ class AttributeImportStrategy extends EntityFieldImportStrategy
         return parent::processEntity($entity);
     }
 
+    #[\Override]
     protected function getValidationGroups(): array
     {
         return array_merge(parent::getValidationGroups(), ['AttributeField']);

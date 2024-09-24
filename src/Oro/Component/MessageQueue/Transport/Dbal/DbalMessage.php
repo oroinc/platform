@@ -14,17 +14,13 @@ class DbalMessage extends Message implements DbalMessageInterface
      */
     private $id;
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function setId(int $id): void
     {
         $this->id = $id;

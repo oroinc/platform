@@ -53,6 +53,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     /** @var DynamicAttributesExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

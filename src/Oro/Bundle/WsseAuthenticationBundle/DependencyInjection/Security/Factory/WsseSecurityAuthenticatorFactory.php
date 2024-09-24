@@ -22,9 +22,7 @@ class WsseSecurityAuthenticatorFactory implements AuthenticatorFactoryInterface
     private const HASHER = 'oro_wsse_authentication.hasher';
     private const AUTHENTICATOR = 'oro_wsse_authentication.security.core.authentication.authenticator.wsse';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addConfiguration(NodeDefinition $builder): void
     {
         $builder
@@ -44,6 +42,7 @@ class WsseSecurityAuthenticatorFactory implements AuthenticatorFactoryInterface
             ->end();
     }
 
+    #[\Override]
     public function createAuthenticator(
         ContainerBuilder $container,
         string $firewallName,
@@ -66,14 +65,13 @@ class WsseSecurityAuthenticatorFactory implements AuthenticatorFactoryInterface
         return $authenticatorId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getKey(): string
     {
         return 'wsse';
     }
 
+    #[\Override]
     public function getPriority(): int
     {
         return 0;

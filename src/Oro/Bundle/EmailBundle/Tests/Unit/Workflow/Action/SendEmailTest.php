@@ -38,6 +38,7 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
 
     private SendEmail $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

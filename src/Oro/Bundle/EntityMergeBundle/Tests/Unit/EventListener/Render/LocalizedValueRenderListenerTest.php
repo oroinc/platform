@@ -35,6 +35,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizedValueRenderListener */
     private $target;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->addressFormatter = $this->createMock(AddressFormatter::class);

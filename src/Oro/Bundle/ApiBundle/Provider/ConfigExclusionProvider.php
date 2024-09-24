@@ -33,9 +33,7 @@ class ConfigExclusionProvider extends ChainExclusionProvider
         $this->systemConfigExclusionProvider = $systemConfigExclusionProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredEntity($className)
     {
         if (isset($this->entityCache[$className])) {
@@ -56,9 +54,7 @@ class ConfigExclusionProvider extends ChainExclusionProvider
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         if (isset($this->fieldCache[$metadata->name][$fieldName])) {
@@ -82,9 +78,7 @@ class ConfigExclusionProvider extends ChainExclusionProvider
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         if (isset($this->fieldCache[$metadata->name][$associationName])) {

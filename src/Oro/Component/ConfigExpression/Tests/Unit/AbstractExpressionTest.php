@@ -12,6 +12,7 @@ class AbstractExpressionTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractExpression */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new class() extends AbstractExpression {

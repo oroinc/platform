@@ -15,9 +15,7 @@ class QueryFactory implements QueryFactoryInterface
         $this->indexer = $indexer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create(array $config = [])
     {
         return new IndexerQuery(

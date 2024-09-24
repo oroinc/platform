@@ -6,9 +6,7 @@ use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 
 class TestDefaultFormatter implements FormatterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($value, array $formatterArguments = [])
     {
         return sprintf(
@@ -18,9 +16,7 @@ class TestDefaultFormatter implements FormatterInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultValue()
     {
         return 'test_default_value';

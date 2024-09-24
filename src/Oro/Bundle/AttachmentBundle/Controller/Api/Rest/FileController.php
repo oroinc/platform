@@ -45,16 +45,13 @@ class FileController extends RestGetController
      *
      * @return ApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_attachment.manager.file.api');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Implement a view handler for FOS Rest Bundle in BAP-8351.
-     */
+    #[\Override]
     protected function buildResponse($data, $action, $contextValues = [], $status = Response::HTTP_OK)
     {
         if ($status === Response::HTTP_OK) {

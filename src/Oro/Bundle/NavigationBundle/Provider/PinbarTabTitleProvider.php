@@ -24,9 +24,7 @@ class PinbarTabTitleProvider implements PinbarTabTitleProviderInterface
         $this->titleService = $titleService;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTitles(AbstractNavigationItem $navigationItem, string $className = PinbarTab::class): array
     {
         if (!$navigationItem->getTitle()) {

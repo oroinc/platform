@@ -23,6 +23,7 @@ class ConfigurationChildBuilderStub implements ConfigurationChildBuilderInterfac
     {
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $formOptions, array $themeOption): void
     {
     }

@@ -78,9 +78,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTokenParsers()
     {
         return [
@@ -88,9 +86,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -110,9 +106,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -687,9 +681,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         return \is_string($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

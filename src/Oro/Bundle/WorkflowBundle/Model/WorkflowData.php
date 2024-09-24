@@ -12,9 +12,6 @@ class WorkflowData extends AbstractStorage
      */
     protected $mapping;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(array $data = [])
     {
         parent::__construct($data);
@@ -35,9 +32,7 @@ class WorkflowData extends AbstractStorage
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getMappedPath($propertyPath)
     {
         if ($propertyPath instanceof PropertyPathInterface) {

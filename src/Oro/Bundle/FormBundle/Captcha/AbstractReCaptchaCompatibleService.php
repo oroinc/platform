@@ -28,11 +28,13 @@ abstract class AbstractReCaptchaCompatibleService implements CaptchaServiceInter
 
     abstract protected function getSurveyUrl(): string;
 
+    #[\Override]
     public function isConfigured(): bool
     {
         return $this->getPrivateKey() && $this->getPublicKey();
     }
 
+    #[\Override]
     public function isVerified($value): bool
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -62,6 +64,7 @@ abstract class AbstractReCaptchaCompatibleService implements CaptchaServiceInter
         }
     }
 
+    #[\Override]
     public function getPublicKey(): ?string
     {
         return $this->configManager->get($this->getPublicKeyConfigKey());

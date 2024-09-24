@@ -43,6 +43,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     private EntityClassResolver $entityClassResolver;
     private CriteriaConnector $criteriaConnector;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

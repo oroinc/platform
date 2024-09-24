@@ -11,9 +11,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
  */
 class ConsoleCommandListener extends BaseListener
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         if ($event->getCommand() instanceof CronCommandScheduleDefinitionInterface) {

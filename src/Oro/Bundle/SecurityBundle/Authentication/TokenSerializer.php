@@ -21,6 +21,7 @@ class TokenSerializer implements TokenSerializerInterface
     {
     }
 
+    #[\Override]
     public function serialize(TokenInterface $token): string
     {
         if ($token instanceof OrganizationAwareTokenInterface) {
@@ -39,6 +40,7 @@ class TokenSerializer implements TokenSerializerInterface
         throw new InvalidTokenSerializationException('An error occurred during token serialization.');
     }
 
+    #[\Override]
     public function deserialize(string $value): TokenInterface
     {
         $unpacked = $this->unpack($value);

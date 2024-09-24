@@ -22,17 +22,13 @@ class GridViewUser extends AbstractGridViewUser
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     protected ?User $user = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUser()
     {
         return $this->user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setUser(AbstractUser $user = null)
     {
         $this->user = $user;

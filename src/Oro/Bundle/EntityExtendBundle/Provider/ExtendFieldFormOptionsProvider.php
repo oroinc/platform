@@ -15,6 +15,7 @@ class ExtendFieldFormOptionsProvider implements ExtendFieldFormOptionsProviderIn
         $this->providers = $providers;
     }
 
+    #[\Override]
     public function getOptions(string $className, string $fieldName): array
     {
         $options = [];

@@ -12,6 +12,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
 {
     private NoElements $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new NoElements();

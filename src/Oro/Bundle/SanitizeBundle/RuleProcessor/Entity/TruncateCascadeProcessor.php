@@ -14,14 +14,13 @@ class TruncateCascadeProcessor implements ProcessorInterface
     {
     }
 
+    #[\Override]
     public static function getProcessorName(): string
     {
         return 'truncate_cascade';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSqls(ClassMetadata $metadata, array $sanitizeRuleOptions = []): array
     {
         $quotedTableName = $this->connection->quoteIdentifier($metadata->getTableName());

@@ -24,6 +24,7 @@ class MultiEnumFilterTest extends OrmTestCase
     /** @var MultiEnumFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

@@ -22,9 +22,7 @@ class MenuContentProvider implements ContentProviderInterface
         $this->menu = $menu;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getContent()
     {
         return $this->menuExtension->render($this->menu);

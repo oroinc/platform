@@ -12,6 +12,7 @@ class SetOperationFlagsTest extends FormProcessorTestCase
 {
     private SetOperationFlags $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

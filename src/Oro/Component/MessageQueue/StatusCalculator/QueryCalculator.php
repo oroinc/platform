@@ -26,17 +26,13 @@ class QueryCalculator extends AbstractStatusCalculator
         $this->entityClass = $entityClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(Job $rootJob)
     {
         $this->rootJob = $rootJob;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function calculateRootJobProgress()
     {
         $childJobStatusCounts = $this->getJobRepository()->getChildStatusesWithJobCountByRootJob($this->rootJob);
@@ -54,17 +50,13 @@ class QueryCalculator extends AbstractStatusCalculator
         return $this->doJobProgressCalculation($processed, $childrenCount);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clean()
     {
         $this->rootJob = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getChildrenInternalJobStatusCountList()
     {
         $childJobStatusCounts = $this->getJobRepository()->getChildStatusesWithJobCountByRootJob($this->rootJob);

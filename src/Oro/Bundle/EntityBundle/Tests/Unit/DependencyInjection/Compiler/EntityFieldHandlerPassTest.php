@@ -11,6 +11,7 @@ class EntityFieldHandlerPassTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldHandlerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new EntityFieldHandlerPass();

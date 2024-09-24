@@ -12,6 +12,7 @@ class LoadConfigValue extends AbstractFixture
 {
     const FILENAME = 'config_value.yml';
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $config = $this->getConfig(

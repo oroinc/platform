@@ -23,6 +23,7 @@ class PreImportMessageProcessorTest extends WebTestCase
     /** @var PreImportMessageProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->markTestSkipped('Re-factor in BAP-13063');

@@ -12,9 +12,7 @@ use Psr\Log\LoggerInterface;
  */
 class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription(): array|string
     {
         $logger = new ArrayLogger();
@@ -24,9 +22,7 @@ class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $this->doExecute($logger);

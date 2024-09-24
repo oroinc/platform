@@ -19,6 +19,7 @@ class GenderTypeTest extends FormIntegrationTestCase
 
     private GenderType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $genderProvider = $this->createMock(GenderProvider::class);
@@ -30,9 +31,7 @@ class GenderTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

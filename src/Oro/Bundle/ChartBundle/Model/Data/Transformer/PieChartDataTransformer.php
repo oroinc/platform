@@ -30,6 +30,7 @@ class PieChartDataTransformer implements TransformerInterface
      *
      * @return DataInterface
      */
+    #[\Override]
     public function transform(DataInterface $data, array $chartOptions)
     {
         $inputKey = $chartOptions['settings'][self::FRACTION_INPUT_DATA_FIELD];

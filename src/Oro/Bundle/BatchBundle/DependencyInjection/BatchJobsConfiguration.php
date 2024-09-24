@@ -11,9 +11,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class BatchJobsConfiguration implements ConfigurationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('connector');

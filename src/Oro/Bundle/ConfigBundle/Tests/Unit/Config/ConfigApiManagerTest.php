@@ -24,6 +24,7 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigApiManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ProviderInterface::class);

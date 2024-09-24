@@ -32,9 +32,7 @@ class WorkflowTransitionSelectType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined('workflowName');
@@ -60,9 +58,7 @@ class WorkflowTransitionSelectType extends AbstractType
             }
         );
     }
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         /** @var ChoiceView $choiceView */
@@ -75,25 +71,18 @@ class WorkflowTransitionSelectType extends AbstractType
             $choiceView->label = sprintf('%s (%s)', $translatedLabel, $choiceView->value);
         }
     }
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return OroChoiceType::class;

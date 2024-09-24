@@ -36,6 +36,7 @@ class UserEmailOriginTransportFactory implements TransportFactoryInterface
         $this->requestStack = $requestStack;
     }
 
+    #[\Override]
     public function create(Dsn $dsn): TransportInterface
     {
         return new UserEmailOriginTransport(
@@ -49,6 +50,7 @@ class UserEmailOriginTransportFactory implements TransportFactoryInterface
     /**
      * Checks that dsn is "oro://user-email-origin".
      */
+    #[\Override]
     public function supports(Dsn $dsn): bool
     {
         return $dsn->getScheme() === 'oro' && $dsn->getHost() === 'user-email-origin';

@@ -23,6 +23,7 @@ class DatasourceBindParametersListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DatasourceBindParametersListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->event = $this->createMock(BuildAfter::class);

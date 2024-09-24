@@ -11,6 +11,7 @@ class TransitionButtonProviderExtensionTest extends TransitionButtonProviderExte
     /**
      * @return string
      */
+    #[\Override]
     protected function getApplication()
     {
         return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
@@ -19,6 +20,7 @@ class TransitionButtonProviderExtensionTest extends TransitionButtonProviderExte
     /**
      * @return AbstractButtonProviderExtension
      */
+    #[\Override]
     protected function createExtension()
     {
         return new TransitionButtonProviderExtension(

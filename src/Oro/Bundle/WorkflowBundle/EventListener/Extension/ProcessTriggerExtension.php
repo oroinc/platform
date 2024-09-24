@@ -61,9 +61,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         $this->messageProducer = $messageProducer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function schedule($entity, $event, array $changeSet = null)
     {
         $entityClass = ClassUtils::getClass($entity);
@@ -103,6 +101,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ObjectManager $manager)
     {
         // handle processes
@@ -164,9 +163,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear($entityClass = null)
     {
         parent::clear($entityClass);
@@ -253,6 +250,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
     /**
      * @return ProcessTriggerRepository
      */
+    #[\Override]
     protected function getRepository()
     {
         return $this->doctrineHelper->getEntityRepositoryForClass(ProcessTrigger::class);

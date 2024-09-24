@@ -13,9 +13,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer as BaseGetSet
  */
 class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getAttributeValue(
         object $object,
         string $attribute,
@@ -32,6 +30,7 @@ class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
         return $value;
     }
 
+    #[\Override]
     protected function setAttributeValue(
         object $object,
         string $attribute,
@@ -47,9 +46,7 @@ class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isAllowedAttribute(
         $classOrObject,
         string $attribute,
@@ -142,6 +139,7 @@ class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
             && (str_starts_with($method->name, 'set') || ($method->name === 'get'));
     }
 
+    #[\Override]
     protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
     {
         $reflectionObject = new EntityReflectionClass($object);

@@ -10,6 +10,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ResourceDocProvider */
     private $resourceDocProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resourceDocProvider = new ResourceDocProvider();

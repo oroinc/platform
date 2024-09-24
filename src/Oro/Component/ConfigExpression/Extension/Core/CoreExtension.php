@@ -8,9 +8,7 @@ use Oro\Component\ConfigExpression\Func;
 
 class CoreExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadExpressions()
     {
         return [

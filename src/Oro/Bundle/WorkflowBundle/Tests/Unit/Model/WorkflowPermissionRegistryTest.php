@@ -34,6 +34,7 @@ class WorkflowPermissionRegistryTest extends TestCase
     /** @var WorkflowPermissionRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclRepository = $this->createMock(WorkflowEntityAclRepository::class);

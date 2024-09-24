@@ -9,6 +9,7 @@ class TransitionAttributeLabelTemplate extends TransitionAttributeTemplate
 {
     const NAME = 'transition_attribute_label';
 
+    #[\Override]
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.label';

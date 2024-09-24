@@ -13,6 +13,7 @@ class TranslationMessageSanitizerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationMessageSanitizer */
     private $sanitizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);

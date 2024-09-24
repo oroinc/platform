@@ -8,6 +8,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 class LoadEnumsData extends AbstractFixture
 {
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         for ($i = 0; $i <= 4; $i++) {

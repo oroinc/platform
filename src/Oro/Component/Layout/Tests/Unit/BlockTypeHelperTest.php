@@ -17,6 +17,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var BlockTypeHelper */
     private $typeHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(LayoutRegistryInterface::class);

@@ -16,25 +16,19 @@ abstract class AbstractComparison extends AbstractCondition implements ContextAc
     /** @var mixed */
     protected $right;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray([$this->left, $this->right]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode([$this->left, $this->right], $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (2 !== count($options)) {
@@ -62,9 +56,7 @@ abstract class AbstractComparison extends AbstractCondition implements ContextAc
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getMessageParameters($context)
     {
         return [
@@ -73,9 +65,7 @@ abstract class AbstractComparison extends AbstractCondition implements ContextAc
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         return $this->doCompare(

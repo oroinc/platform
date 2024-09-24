@@ -17,6 +17,7 @@ class ConfigurableTypeExtension extends AbstractBlockTypeExtension
     /**
      * @return mixed
      */
+    #[\Override]
     public function getExtendedType()
     {
         if ($this->extendedType === null) {

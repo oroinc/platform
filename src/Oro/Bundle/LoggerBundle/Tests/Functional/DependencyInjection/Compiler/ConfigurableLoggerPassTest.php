@@ -26,9 +26,7 @@ class ConfigurableLoggerPassTest extends WebTestCase
 {
     private RequestStack $requestStack;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -21,9 +21,7 @@ class DoctrineConnectionPingPass implements CompilerPassInterface
         $this->doctrineConnectionName = $doctrineConnectionName;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition(self::DEFINITION_NAME)) {

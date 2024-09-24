@@ -8,6 +8,7 @@ use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultMod
 
 class HintExtensionTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

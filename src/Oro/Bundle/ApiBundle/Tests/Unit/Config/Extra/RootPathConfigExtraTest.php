@@ -11,6 +11,7 @@ class RootPathConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var RootPathConfigExtra */
     private $extra;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extra = new RootPathConfigExtra(self::PATH);

@@ -14,6 +14,7 @@ class EmailTemplateGridHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EmailTemplateGridHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityProvider = $this->createMock(EntityProvider::class);

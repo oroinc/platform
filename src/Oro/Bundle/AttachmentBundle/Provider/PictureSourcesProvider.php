@@ -20,8 +20,8 @@ class PictureSourcesProvider implements PictureSourcesProviderInterface
     /**
      * Computes the original filtered image url for `src` attribute of the <img> tag.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getFilteredPictureSources(?File $file, string $filterName = 'original'): array
     {
         $sources = [
@@ -40,8 +40,8 @@ class PictureSourcesProvider implements PictureSourcesProviderInterface
     /**
      * Computes the original resized image url for `src` attribute of the <img> tag.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getResizedPictureSources(?File $file, int $width, int $height): array
     {
         $sources = [

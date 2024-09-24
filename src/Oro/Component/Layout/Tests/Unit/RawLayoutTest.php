@@ -23,6 +23,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
 {
     private RawLayout $rawLayout;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->rawLayout = new RawLayout();

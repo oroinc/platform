@@ -39,9 +39,7 @@ class ScheduleSendEmailTemplate extends AbstractSendEmailTemplate
         $this->messageProducer = $messageProducer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context): void
     {
         $from = $this->getEmailAddress($context, $this->options['from']);

@@ -21,9 +21,7 @@ class RequestWatcher implements EventSubscriberInterface
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

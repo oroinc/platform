@@ -15,6 +15,7 @@ class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ActionMetadataFactory */
     private $actionMetadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

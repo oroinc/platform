@@ -21,9 +21,7 @@ class VerbosityFilterHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var VerbosityFilterHandler */
     private $handler;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();

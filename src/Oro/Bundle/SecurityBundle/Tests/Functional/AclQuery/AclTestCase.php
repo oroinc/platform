@@ -15,9 +15,7 @@ class AclTestCase extends WebTestCase
 {
     use RolePermissionExtension;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -10,6 +10,7 @@ class AttributeHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = new AttributeHandler();

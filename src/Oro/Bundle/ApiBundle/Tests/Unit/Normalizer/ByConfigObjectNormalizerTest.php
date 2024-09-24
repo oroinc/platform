@@ -49,6 +49,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
     /** @var ObjectNormalizer */
     private $objectNormalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

@@ -12,17 +12,13 @@ class MultiEnumSnapshotField extends Constraint
     /** @var string */
     public $duplicateFieldMessage = 'This multi-select name is duplicated a field.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return MultiEnumSnapshotFieldValidator::ALIAS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

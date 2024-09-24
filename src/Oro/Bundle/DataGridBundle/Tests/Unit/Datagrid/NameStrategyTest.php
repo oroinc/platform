@@ -18,6 +18,7 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var NameStrategy */
     private $nameStrategy;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();

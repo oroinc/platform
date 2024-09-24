@@ -113,9 +113,7 @@ class WorkflowAttributesType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->addEventListeners($builder, $options);
@@ -350,8 +348,8 @@ class WorkflowAttributesType extends AbstractType
      * - "workflow"                 - optional, instance of Workflow
      * - "disable_attribute_fields" - optional, a flag to disable all attributes fields
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['workflow_item']);
@@ -428,17 +426,12 @@ class WorkflowAttributesType extends AbstractType
         return $this->propertyAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

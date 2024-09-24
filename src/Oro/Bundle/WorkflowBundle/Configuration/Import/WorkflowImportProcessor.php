@@ -33,7 +33,7 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
         $this->configFinderBuilder = $configFinderBuilder;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function setParent(ConfigImportProcessorInterface $parentProcessor)
     {
         $this->parent = $parentProcessor;
@@ -49,7 +49,7 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
         return $this->inProgress;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function process(array $content, \SplFileInfo $contentSource): array
     {
         $this->inProgress = $contentSource;

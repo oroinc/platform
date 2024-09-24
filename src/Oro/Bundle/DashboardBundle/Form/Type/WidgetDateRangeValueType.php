@@ -13,25 +13,18 @@ class WidgetDateRangeValueType extends AbstractType
 {
     const NAME = 'oro_type_widget_date_range_value';
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -55,9 +48,7 @@ class WidgetDateRangeValueType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $children                     = $form->all();
@@ -65,9 +56,7 @@ class WidgetDateRangeValueType extends AbstractType
         $view->vars['value']['end']   = $children['end']->getViewData();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

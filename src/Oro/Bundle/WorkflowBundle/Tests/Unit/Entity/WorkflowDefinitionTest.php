@@ -22,6 +22,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDefinition */
     private $workflowDefinition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowDefinition = new WorkflowDefinition();

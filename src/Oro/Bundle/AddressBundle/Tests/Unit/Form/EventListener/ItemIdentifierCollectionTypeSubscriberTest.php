@@ -14,6 +14,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
     /** @var ItemIdentifierCollectionTypeSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = new ItemIdentifierCollectionTypeSubscriber('iso2Code');

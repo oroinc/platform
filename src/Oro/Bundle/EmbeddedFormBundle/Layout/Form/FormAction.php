@@ -79,9 +79,7 @@ class FormAction implements \ArrayAccess, ContextItemInterface
         return new self([self::ROUTE_NAME => $routeName, self::ROUTE_PARAMETERS => $routeParameters]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toString()
     {
         if (isset($this->data[self::PATH])) {
@@ -128,17 +126,13 @@ class FormAction implements \ArrayAccess, ContextItemInterface
         return empty($this->data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($name): mixed
     {
         return $this->data[$name] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($name): bool
     {
         return isset($this->data[$name]);
@@ -151,6 +145,7 @@ class FormAction implements \ArrayAccess, ContextItemInterface
      * @param mixed  $value
      * @throws \BadMethodCallException always as changing data is not allowed
      */
+    #[\Override]
     public function offsetSet($name, $value): void
     {
         throw new \BadMethodCallException('Not supported');
@@ -162,6 +157,7 @@ class FormAction implements \ArrayAccess, ContextItemInterface
      * @param string $name
      * @throws \BadMethodCallException always as removing data is not allowed
      */
+    #[\Override]
     public function offsetUnset($name): void
     {
         throw new \BadMethodCallException('Not supported');
@@ -172,9 +168,7 @@ class FormAction implements \ArrayAccess, ContextItemInterface
         $this->data = $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHash()
     {
         return md5($this->toString());

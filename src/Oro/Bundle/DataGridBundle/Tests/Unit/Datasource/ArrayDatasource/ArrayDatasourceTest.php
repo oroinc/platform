@@ -46,6 +46,7 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
     /** @var ArrayDatasource */
     private $arrayDatasource;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->arrayDatasource = new ArrayDatasource();

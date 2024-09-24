@@ -54,9 +54,7 @@ class OrganizationSearchHandler implements SearchHandlerInterface
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         $user = $this->tokenAccessor->getUser();
@@ -79,25 +77,19 @@ class OrganizationSearchHandler implements SearchHandlerInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProperties()
     {
         return $this->displayFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityName()
     {
         return $this->className;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         $result = [];

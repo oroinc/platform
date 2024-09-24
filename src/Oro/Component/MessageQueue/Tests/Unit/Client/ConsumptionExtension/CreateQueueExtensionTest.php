@@ -18,6 +18,7 @@ class CreateQueueExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var CreateQueueExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(DriverInterface::class);

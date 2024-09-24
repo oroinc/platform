@@ -55,17 +55,13 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
         $this->fileLocator = $fileLocator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getActionDocumentation(string $className, string $actionName): ?string
     {
         return $this->getDocumentation($className, ConfigUtil::ACTIONS, $actionName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFieldDocumentation(
         string $className,
         string $fieldName,
@@ -74,17 +70,13 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
         return $this->getDocumentation($className, ConfigUtil::FIELDS, $fieldName, $actionName ?: 'common');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFilterDocumentation(string $className, string $filterName): ?string
     {
         return $this->getDocumentation($className, ConfigUtil::FILTERS, $filterName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSubresourceDocumentation(
         string $className,
         string $subresourceName,
@@ -93,9 +85,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
         return $this->getDocumentation($className, ConfigUtil::SUBRESOURCES, $subresourceName, $actionName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function registerDocumentationResource(string $resource): bool
     {
         if (!str_ends_with($resource, '.md')) {

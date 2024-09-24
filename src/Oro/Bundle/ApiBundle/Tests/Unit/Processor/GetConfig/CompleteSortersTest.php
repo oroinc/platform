@@ -26,6 +26,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
     /** @var CompleteSorters */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

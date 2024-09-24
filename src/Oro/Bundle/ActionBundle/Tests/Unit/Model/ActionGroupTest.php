@@ -28,6 +28,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     /** @var ActionGroup */
     private $actionGroup;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);

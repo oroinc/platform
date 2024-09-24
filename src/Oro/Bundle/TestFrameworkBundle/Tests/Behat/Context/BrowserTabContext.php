@@ -14,9 +14,7 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
     /** @var BrowserTabManager */
     private $browserTabManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setBrowserTabManager(BrowserTabManager $browserTabManager)
     {
         $this->browserTabManager = $browserTabManager;

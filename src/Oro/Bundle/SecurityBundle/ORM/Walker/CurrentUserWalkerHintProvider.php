@@ -20,9 +20,7 @@ class CurrentUserWalkerHintProvider implements QueryWalkerHintProviderInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHints($params)
     {
         $securityContext = [];

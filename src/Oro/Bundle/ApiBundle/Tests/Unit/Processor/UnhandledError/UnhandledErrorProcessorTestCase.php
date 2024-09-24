@@ -14,6 +14,7 @@ class UnhandledErrorProcessorTestCase extends \PHPUnit\Framework\TestCase
 
     protected Context $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new Context(

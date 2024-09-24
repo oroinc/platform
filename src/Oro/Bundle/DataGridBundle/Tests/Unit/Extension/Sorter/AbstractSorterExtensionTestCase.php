@@ -22,6 +22,7 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var AbstractSorterExtension */
     protected $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->sortersStateProvider = $this->createMock(SortersStateProvider::class);

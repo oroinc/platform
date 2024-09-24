@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RootJobStoppedTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.message_queue.job.root_job_stopped';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Root job is stopped';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

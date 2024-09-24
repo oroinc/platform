@@ -13,6 +13,7 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $metadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadata = $this->createMock(FieldMetadata::class);

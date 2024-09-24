@@ -12,6 +12,7 @@ class TextTypeCastTest extends \PHPUnit\Framework\TestCase
     /** @var IntegerTypeCast */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = new TextTypeCast();

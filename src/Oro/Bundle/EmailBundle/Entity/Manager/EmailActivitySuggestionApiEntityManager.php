@@ -21,9 +21,7 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function find($id)
     {
         // force load from and to email addresses by one query

@@ -34,9 +34,7 @@ class ServiceExists extends AbstractCondition implements ContextAccessorAwareInt
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $serviceName = (string) $this->resolveValue($context, $this->propertyPath);
@@ -44,17 +42,13 @@ class ServiceExists extends AbstractCondition implements ContextAccessorAwareInt
         return $this->container->has($serviceName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return static::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $option = reset($options);
@@ -63,17 +57,13 @@ class ServiceExists extends AbstractCondition implements ContextAccessorAwareInt
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray([$this->propertyPath]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode([$this->propertyPath], $factoryAccessor);

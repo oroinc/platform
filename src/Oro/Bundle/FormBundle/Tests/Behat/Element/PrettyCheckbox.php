@@ -6,9 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class PrettyCheckbox extends Element
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($value)
     {
         $checkbox = $this->find('css', 'input[type=checkbox]');

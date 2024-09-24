@@ -25,17 +25,13 @@ class ExtendSchemaUpdateRemoveNamespacedAssets extends AbstractVisitor
      */
     private $schema;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function acceptSchema(Schema $schema)
     {
         $this->schema = $schema;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function acceptTable(Table $table)
     {
         if (!$table->isInDefaultNamespace($this->schema->getName())) {
@@ -43,9 +39,7 @@ class ExtendSchemaUpdateRemoveNamespacedAssets extends AbstractVisitor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function acceptSequence(Sequence $sequence)
     {
         if (!$sequence->isInDefaultNamespace($this->schema->getName())) {
@@ -53,9 +47,7 @@ class ExtendSchemaUpdateRemoveNamespacedAssets extends AbstractVisitor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function acceptForeignKey(Table $localTable, ForeignKeyConstraint $fkConstraint)
     {
         // do nothing here

@@ -11,6 +11,7 @@ class SystemDefinitionFilter implements WorkflowDefinitionFilterInterface, Syste
     /**
      * {@iheritdoc}
      */
+    #[\Override]
     public function filter(Collection $workflowDefinitions)
     {
         return $workflowDefinitions;

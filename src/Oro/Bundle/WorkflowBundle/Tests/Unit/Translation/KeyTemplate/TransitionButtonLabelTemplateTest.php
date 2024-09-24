@@ -6,9 +6,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionButtonLabelTempl
 
 class TransitionButtonLabelTemplateTest extends TemplateTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateInstance()
     {
         return new TransitionButtonLabelTemplate();
@@ -19,11 +17,13 @@ class TransitionButtonLabelTemplateTest extends TemplateTestCase
         $this->assertName(TransitionButtonLabelTemplate::NAME);
     }
 
+    #[\Override]
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.transition.{{ transition_name }}.button_label');
     }
 
+    #[\Override]
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'transition_name']);

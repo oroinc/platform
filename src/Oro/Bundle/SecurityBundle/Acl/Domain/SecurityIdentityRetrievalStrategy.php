@@ -14,9 +14,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStrategyInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSecurityIdentities(TokenInterface $token)
     {
         $sids = [];

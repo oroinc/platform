@@ -18,9 +18,7 @@ abstract class AbstractTriggerCronScheduler implements LoggerAwareInterface
         $this->setLogger(new NullLogger());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLogger(LoggerInterface $logger)
     {
         if ($this->deferredScheduler instanceof LoggerAwareInterface) {

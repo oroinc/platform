@@ -28,6 +28,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionProcessor */
     protected $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->expressionLanguage = new ExpressionLanguage();

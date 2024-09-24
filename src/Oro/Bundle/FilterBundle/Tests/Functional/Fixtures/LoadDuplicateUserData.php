@@ -30,9 +30,7 @@ class LoadDuplicateUserData extends AbstractFixture
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach (self::$users as $data) {

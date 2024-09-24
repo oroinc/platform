@@ -25,9 +25,7 @@ class ValidatePaging implements ProcessorInterface
         $this->maxEntitiesLimit = $maxEntitiesLimit;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipCo
  */
 class GetRelationshipProcessor extends SubresourceProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): GetRelationshipContext
     {
         return new GetRelationshipContext($this->configProvider, $this->metadataProvider);

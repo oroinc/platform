@@ -27,9 +27,7 @@ final class BehatStatisticExtension implements TestworkExtension
     const AVG_STRATEGY_TAG  = 'avg_strategy';
     const AVG_STRATEGY_AWARE_TAG = 'avg_strategy_aware';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(ExtensionManager $extensionManager)
     {
         /** @var OutputExtension $outputExtension */
@@ -37,9 +35,7 @@ final class BehatStatisticExtension implements TestworkExtension
         $outputExtension->registerFormatterFactory(new StatisticFormatterFactory());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(ArrayNodeDefinition $builder)
     {
         $builder
@@ -66,9 +62,7 @@ final class BehatStatisticExtension implements TestworkExtension
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ContainerBuilder $container, array $config)
     {
         $container->setParameter('oro_behat_statistic.connection', $config['connection']);
@@ -156,9 +150,7 @@ final class BehatStatisticExtension implements TestworkExtension
         return $envConfig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->addGeneratorsToConfigurationRegistry($container);
@@ -251,9 +243,7 @@ final class BehatStatisticExtension implements TestworkExtension
             ->addMethodCall('setSkip', [true]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigKey()
     {
         return 'behat_statistic';

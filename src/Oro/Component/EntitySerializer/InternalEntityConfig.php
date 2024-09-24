@@ -10,25 +10,19 @@ final class InternalEntityConfig extends EntityConfig
 {
     private array $cache = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         return array_merge(parent::toArray(), $this->cache);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function has(string $key): bool
     {
         return \array_key_exists($key, $this->cache) || parent::has($key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (\array_key_exists($key, $this->cache)) {
@@ -38,17 +32,13 @@ final class InternalEntityConfig extends EntityConfig
         return parent::get($key, $defaultValue);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function set(string $key, mixed $value): void
     {
         $this->cache[$key] = $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function remove(string $key): void
     {
         unset($this->cache[$key]);

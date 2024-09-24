@@ -26,6 +26,7 @@ class TagsGuesser implements GuesserInterface
         $this->entityRoutingHelper = $entityRoutingHelper;
     }
 
+    #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];

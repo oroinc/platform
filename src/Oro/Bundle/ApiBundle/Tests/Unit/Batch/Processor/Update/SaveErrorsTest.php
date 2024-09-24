@@ -34,6 +34,7 @@ class SaveErrorsTest extends BatchUpdateProcessorTestCase
     /** @var SaveErrors */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

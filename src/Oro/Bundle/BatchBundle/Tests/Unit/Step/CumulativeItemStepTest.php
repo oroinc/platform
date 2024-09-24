@@ -18,6 +18,7 @@ class CumulativeItemStepTest extends \PHPUnit\Framework\TestCase
 
     private CumulativeItemStep $itemStep;
 
+    #[\Override]
     protected function setUp(): void
     {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);

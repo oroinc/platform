@@ -13,9 +13,7 @@ class FlashMessagesContentProvider implements ContentProviderInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContent()
     {
         return $this->requestStack->getSession()->getFlashBag()->all();

@@ -15,9 +15,7 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var User|null $user */

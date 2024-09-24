@@ -35,6 +35,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
     /** @var ExpandRelatedEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

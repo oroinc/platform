@@ -16,17 +16,13 @@ class RemoveInvalidFieldConfigQuery implements MigrationQuery, ConnectionAwareIn
 
     const LIMIT = 100;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Removes invalid configs from field configs';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $steps = ceil($this->getEntityConfigFieldsCount() / static::LIMIT);

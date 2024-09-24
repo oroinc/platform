@@ -17,17 +17,13 @@ class MigrateFilteredAttachments implements FixtureInterface, ContainerAwareInte
     use ContainerAwareTrait;
     protected const PREFIX = 'attachment/resize';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVersion(): string
     {
         return '1.0';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $migrationService = $this->getMigrationService();

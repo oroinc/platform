@@ -9,9 +9,7 @@ use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
  */
 class IdentifierHydrator extends AbstractHydrator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function hydrateAllData()
     {
         $result = [];
@@ -22,9 +20,7 @@ class IdentifierHydrator extends AbstractHydrator
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hydrateRow()
     {
         $column = $this->_stmt->fetchOne();

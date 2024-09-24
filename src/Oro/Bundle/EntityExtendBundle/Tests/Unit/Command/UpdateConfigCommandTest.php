@@ -20,6 +20,7 @@ class UpdateConfigCommandTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateConfigCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extendConfigDumper = $this->createMock(ExtendConfigDumper::class);

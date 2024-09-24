@@ -27,6 +27,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRoutingHelper */
     private $entityRoutingHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

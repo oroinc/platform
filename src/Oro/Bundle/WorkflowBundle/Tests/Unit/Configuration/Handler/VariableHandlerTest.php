@@ -10,6 +10,7 @@ class VariableHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var VariableHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = new VariableHandler();

@@ -14,6 +14,7 @@ class RequestPredefinedLanguageCodeResolverTest extends \PHPUnit\Framework\TestC
     /** @var RequestPredefinedLanguageCodeResolver */
     private $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

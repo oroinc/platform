@@ -24,9 +24,7 @@ class DynamicTranslationProvider implements DynamicTranslationProviderInterface
         $this->cache = $cache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTranslation(string $id, string $domain, string $locale): string
     {
         $this->ensureTranslationsLoaded($locale);
@@ -43,9 +41,7 @@ class DynamicTranslationProvider implements DynamicTranslationProviderInterface
         return $this->translations[$locale][$domain][$id];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasTranslation(string $id, string $domain, string $locale): bool
     {
         $this->ensureTranslationsLoaded($locale);
@@ -53,9 +49,7 @@ class DynamicTranslationProvider implements DynamicTranslationProviderInterface
         return isset($this->translations[$locale][$domain][$id]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTranslations(string $domain, string $locale): array
     {
         $this->ensureTranslationsLoaded($locale);
@@ -63,17 +57,13 @@ class DynamicTranslationProvider implements DynamicTranslationProviderInterface
         return $this->translations[$locale][$domain] ?? [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setFallbackLocales(array $locales): void
     {
         $this->fallbackLocales = $locales;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUp(array $locales): void
     {
         $this->cache->delete($locales);

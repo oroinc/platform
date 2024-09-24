@@ -20,6 +20,7 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
     /** @var DownloadLinksType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->assetHelper = $this->createMock(Packages::class);

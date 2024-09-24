@@ -33,17 +33,13 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [ExportTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function handleExport(array $body)
     {
         if (isset($body['organizationId'])) {
@@ -62,9 +58,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getMessageBody(MessageInterface $message)
     {
         return $message->getBody();
