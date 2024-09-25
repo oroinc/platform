@@ -13,7 +13,8 @@ use Symfony\Component\Form\FormView;
  */
 class CheckboxBuilder extends AbstractConfigurationChildBuilder
 {
-    #[\Override] public static function getType(): string
+    #[\Override]
+    public static function getType(): string
     {
         return 'checkbox';
     }

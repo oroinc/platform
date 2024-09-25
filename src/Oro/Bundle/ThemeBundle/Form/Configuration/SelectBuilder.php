@@ -9,7 +9,8 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SelectBuilder extends AbstractChoiceBuilder
 {
-    #[\Override] public static function getType(): string
+    #[\Override]
+    public static function getType(): string
     {
         return 'select';
     }

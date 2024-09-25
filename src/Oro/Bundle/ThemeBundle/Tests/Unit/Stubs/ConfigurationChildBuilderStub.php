@@ -9,17 +9,20 @@ use Symfony\Component\Form\FormView;
 
 class ConfigurationChildBuilderStub implements ConfigurationChildBuilderInterface
 {
-    #[\Override] public static function getType(): string
+    #[\Override]
+    public static function getType(): string
     {
         return 'type';
     }
 
-    #[\Override] public function supports(array $option): bool
+    #[\Override]
+    public function supports(array $option): bool
     {
         return $option['type'] === self::getType();
     }
 
-    #[\Override] public function buildOption(FormBuilderInterface $builder, array $option): void
+    #[\Override]
+    public function buildOption(FormBuilderInterface $builder, array $option): void
     {
     }
 
