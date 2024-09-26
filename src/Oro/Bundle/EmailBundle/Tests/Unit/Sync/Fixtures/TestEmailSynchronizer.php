@@ -76,6 +76,11 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         return $this->findOriginToSync($maxConcurrentTasks, $minExecPeriodInMin);
     }
 
+    public function callFindOrigin($originId)
+    {
+        return $this->findOrigin($originId);
+    }
+
     public function callResetHangedOrigins()
     {
         $this->resetHangedOrigins();
