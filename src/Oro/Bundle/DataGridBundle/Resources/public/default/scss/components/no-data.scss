@@ -1,10 +1,13 @@
 /* @theme: default; */
 
 .no-data {
-    display: none;
     margin: $no-data-offset;
     padding: $no-data-inner-offset;
 
     text-align: $no-data-text-align;
     color: $no-data-color;
+
+    &:not(.show) {
+        display: none;
+    }
 }

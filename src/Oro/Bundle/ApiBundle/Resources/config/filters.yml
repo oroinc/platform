@@ -73,6 +73,11 @@ services:
             - '@oro_api.expanded_association_provider'
             - '@oro_api.entity_override_provider_registry'
 
+    oro_api.filter_factory.nested_association:
+        class: Oro\Bundle\ApiBundle\Filter\NestedAssociationFilterFactory
+        arguments:
+            - '@oro_api.entity_alias_resolver_registry'
+
     oro_api.query.expression_visitor_factory:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory
         arguments:
