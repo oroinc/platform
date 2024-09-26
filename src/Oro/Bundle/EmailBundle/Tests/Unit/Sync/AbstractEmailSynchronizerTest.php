@@ -24,6 +24,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -76,6 +77,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             $this->notificationAlertManager
         );
         $this->sync->setLogger($this->logger);
+        $this->sync->setTokenStorage($this->createMock(TokenStorageInterface::class));
     }
 
     public function testSyncNoOrigin(): void
@@ -95,6 +97,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
         $sync->setLogger($this->logger);
+        $sync->setTokenStorage($this->createMock(TokenStorageInterface::class));
 
         $sync->expects(self::once())
             ->method('getCurrentUtcDateTime')
@@ -143,6 +146,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
         $sync->setLogger($this->logger);
+        $sync->setTokenStorage($this->createMock(TokenStorageInterface::class));
 
         $sync->expects(self::once())
             ->method('getCurrentUtcDateTime')
@@ -193,6 +197,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
         $sync->setLogger($this->logger);
+        $sync->setTokenStorage($this->createMock(TokenStorageInterface::class));
 
         $sync->expects(self::once())
             ->method('getCurrentUtcDateTime')
@@ -231,6 +236,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
         $sync->setLogger($this->logger);
+        $sync->setTokenStorage($this->createMock(TokenStorageInterface::class));
 
         $sync->expects(self::never())
             ->method('getCurrentUtcDateTime');
@@ -271,6 +277,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
         $sync->setLogger($this->logger);
+        $sync->setTokenStorage($this->createMock(TokenStorageInterface::class));
 
         $sync->expects(self::once())
             ->method('getCurrentUtcDateTime')
@@ -317,6 +324,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
         $sync->setLogger($this->logger);
+        $sync->setTokenStorage($this->createMock(TokenStorageInterface::class));
 
         $sync->expects(self::once())
             ->method('getCurrentUtcDateTime')
@@ -627,6 +635,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
         $sync->setLogger($this->logger);
+        $sync->setTokenStorage($this->createMock(TokenStorageInterface::class));
 
         $sync->expects(self::never())
             ->method('getCurrentUtcDateTime');
@@ -643,5 +652,68 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('process');
 
         $sync->callDoSyncOrigin($origin);
+    }
+
+    public function testFindOrigin(): void
+    {
+        $originId = 34;
+        $origin = new TestEmailOrigin($originId);
+        $origin->setSyncCode(AbstractEmailSynchronizer::SYNC_CODE_SUCCESS);
+
+        $q = $this->createMock(AbstractQuery::class);
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with('o')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('where')
+            ->with('o.isActive = :isActive AND o.id = :id')
+            ->willReturn($qb);
+        $qb->expects(self::exactly(2))
+            ->method('andWhere')
+            ->withConsecutive(
+                ['(o.isSyncEnabled is NULL or o.isSyncEnabled = :isSyncEnabled)'],
+                [self::isInstanceOf(Expr\Orx::class)],
+            )
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('leftJoin')
+            ->with('o.owner', 'owner')
+            ->willReturn($qb);
+        $qb->expects(self::exactly(4))
+            ->method('setParameter')
+            ->withConsecutive(
+                ['isActive', true],
+                ['isSyncEnabled', true],
+                ['id', $originId],
+                ['isOwnerEnabled', true]
+            )
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('setMaxResults')
+            ->with(1)
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($q);
+        $qb->expects(self::once())
+            ->method('expr')
+            ->willReturn(new Expr());
+
+        $q->expects(self::once())
+            ->method('getResult')
+            ->willReturn([$origin]);
+
+        $this->em->expects(self::once())
+            ->method('getRepository')
+            ->with(TestEmailSynchronizer::EMAIL_ORIGIN_ENTITY)
+            ->willReturn($repo);
+
+        $result = $this->sync->callFindOrigin($originId);
+
+        $this->assertSame($origin, $result);
     }
 }

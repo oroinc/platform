@@ -19,7 +19,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Abstract class for the email synchronizer.
@@ -35,37 +34,18 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     const SYNC_CODE_SUCCESS    = 3;
     const SYNC_CODE_IN_PROCESS_FORCE = 4;
 
-    /** @var string */
-    protected static $messageQueueTopic;
+    protected static string $messageQueueTopic = '';
+    protected string $clearInterval = 'P1D';
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var KnownEmailAddressCheckerFactory */
-    protected $knownEmailAddressCheckerFactory;
-
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
-
-    /** @var KnownEmailAddressCheckerInterface */
-    private $knownEmailAddressChecker;
-
-    private NotificationAlertManager $notificationAlertManager;
-
+    protected ManagerRegistry $doctrine;
+    protected KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory;
+    protected TokenStorageInterface $tokenStorage;
     protected EmailSyncNotificationBag $notificationsBag;
 
-    /** @var TokenInterface */
-    private $currentToken;
+    private NotificationAlertManager $notificationAlertManager;
+    private ?KnownEmailAddressCheckerInterface $knownEmailAddressChecker = null;
+    private ?MessageProducerInterface $producer = null;
 
-    /** @var MessageProducerInterface */
-    private $producer;
-
-    /** @var string */
-    protected $clearInterval = 'P1D';
-
-    /**
-     * Constructor
-     */
     protected function __construct(
         ManagerRegistry $doctrine,
         KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
@@ -88,42 +68,22 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     public function setTokenStorage(TokenStorageInterface $tokenStorage): void
     {
         $this->tokenStorage = $tokenStorage;
-        $this->currentToken = $tokenStorage->getToken();
     }
 
-    /**
-     * Returns TRUE if this class supports synchronization of the given origin.
-     *
-     * @param EmailOrigin $origin
-     * @return bool
-     */
     #[\Override]
-    abstract public function supports(EmailOrigin $origin);
+    abstract public function supports(EmailOrigin $origin): bool;
 
     /**
-     * Performs a synchronization of emails for one email origin.
-     * Algorithm how an email origin is selected see in findOriginToSync method.
-     *
-     * @param int $maxConcurrentTasks   The maximum number of synchronization jobs running in the same time
-     * @param int $minExecIntervalInMin The minimum time interval (in minutes) between two synchronizations
-     *                                  of the same email origin
-     * @param int $maxExecTimeInMin     The maximum execution time (in minutes)
-     *                                  Set -1 to unlimited
-     *                                  Defaults to -1
-     * @param int $maxTasks             The maximum number of email origins which can be synchronized
-     *                                  Set -1 to unlimited
-     *                                  Defaults to 1
-     *
-     * @return int
-     *
-     * @throws \Exception
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1): int
-    {
+    public function sync(
+        int $maxConcurrentTasks,
+        int $minExecIntervalInMin,
+        int $maxExecTimeInMin = -1,
+        int $maxTasks = 1
+    ): int {
         if (!$this->checkConfiguration()) {
             $this->logger->info('Exit because synchronization was not configured or disabled.');
             return 0;
@@ -184,14 +144,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         return 0;
     }
 
-    /**
-     * Performs a synchronization of emails for the given email origins.
-     *
-     * @param int[]                                 $originIds
-     * @param SynchronizationProcessorSettings|null $settings
-     *
-     * @throws \Exception
-     */
     #[\Override]
     public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null): void
     {
@@ -224,24 +176,14 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         $this->assertSyncSuccess($failedOriginIds);
     }
 
-    /**
-     * Schedule origins sync job
-     *
-     * @return bool
-     */
     #[\Override]
-    public function supportScheduleJob()
+    public function supportScheduleJob(): bool
     {
         return false;
     }
 
-    /**
-     * Schedule origins sync job
-     *
-     * @param int[] $originIds
-     */
     #[\Override]
-    public function scheduleSyncOriginsJob(array $originIds)
+    public function scheduleSyncOriginsJob(array $originIds): void
     {
         if (! static::$messageQueueTopic) {
             throw new \LogicException('Message queue topic is not set');
@@ -259,10 +201,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Checks configuration
      * This method can be used for preliminary check if the synchronization can be launched
-     *
-     * @return bool
      */
-    protected function checkConfiguration()
+    protected function checkConfiguration(): bool
     {
         return true;
     }
@@ -272,7 +212,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null)
+    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null): void
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
@@ -321,7 +261,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         EmailOrigin $origin,
         AbstractEmailSynchronizationProcessor $processor,
         SynchronizationProcessorSettings $settings = null
-    ) {
+    ): void {
         $inProcessCode = $settings && $settings->isForceMode()
             ? self::SYNC_CODE_IN_PROCESS_FORCE : self::SYNC_CODE_IN_PROCESS;
         if ($this->changeOriginSyncState($origin, $inProcessCode)) {
@@ -340,9 +280,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * Switches the security context to the given organization
      * Should be deleted after email sync process will be refactored
      */
-    protected function impersonateOrganization(Organization $organization = null)
+    protected function impersonateOrganization(Organization $organization = null): void
     {
-        if ($this->currentToken === null && $organization) {
+        if ($this->tokenStorage->getToken() === null && $organization) {
             $this->tokenStorage->setToken(
                 new OrganizationToken($organization)
             );
@@ -351,10 +291,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Returns default entity manager
-     *
-     * @return EntityManager
      */
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManager
     {
         /** @var EntityManager $em */
         $em = $this->doctrine->getManager();
@@ -369,7 +307,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Makes sure $this->knownEmailAddressChecker initialized
      */
-    protected function getKnownEmailAddressChecker()
+    protected function getKnownEmailAddressChecker(): KnownEmailAddressCheckerInterface
     {
         if (!$this->knownEmailAddressChecker) {
             $this->knownEmailAddressChecker = $this->knownEmailAddressCheckerFactory->create();
@@ -383,10 +321,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Gets entity name implementing EmailOrigin
-     *
-     * @return string
      */
-    abstract protected function getEmailOriginClass();
+    abstract protected function getEmailOriginClass(): string;
 
     /**
      * Creates a processor is used to synchronize emails
@@ -394,7 +330,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * @param object $origin An instance of class implementing EmailOrigin entity
      * @return AbstractEmailSynchronizationProcessor
      */
-    abstract protected function createSynchronizationProcessor($origin);
+    abstract protected function createSynchronizationProcessor(object $origin): AbstractEmailSynchronizationProcessor;
 
     /**
      * Updates a state of the given email origin
@@ -484,9 +420,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * @param int $maxConcurrentTasks   The maximum number of synchronization jobs running in the same time
      * @param int $minExecIntervalInMin The minimum time interval (in minutes) between two synchronizations
      *                                  of the same email origin
-     * @return EmailOrigin
      */
-    protected function findOriginToSync($maxConcurrentTasks, $minExecIntervalInMin)
+    protected function findOriginToSync(int $maxConcurrentTasks, int $minExecIntervalInMin): ?EmailOrigin
     {
         $this->logger->info('Finding an email origin ...');
 
@@ -556,7 +491,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Modifies QueryBuilder to filter origins by enabled owner
      */
-    protected function addOwnerFilter(QueryBuilder $queryBuilder)
+    protected function addOwnerFilter(QueryBuilder $queryBuilder): void
     {
         $expr = $queryBuilder->expr();
 
@@ -577,20 +512,17 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Finds active email origin by its id
-     *
-     * @param int $originId
-     * @return EmailOrigin|null
      */
-    protected function findOrigin($originId)
+    protected function findOrigin(int $originId): ?EmailOrigin
     {
         $this->logger->info(sprintf('Finding an email origin (id: %d) ...', $originId));
 
         $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $queryBuilder = $repo->createQueryBuilder('o')
             ->where('o.isActive = :isActive AND o.id = :id')
-            ->andWhere('o.isSyncEnabled != :isSyncEnabled')
+            ->andWhere('(o.isSyncEnabled is NULL or o.isSyncEnabled = :isSyncEnabled)')
             ->setParameter('isActive', true)
-            ->setParameter('isSyncEnabled', false)
+            ->setParameter('isSyncEnabled', true)
             ->setParameter('id', $originId)
             ->setMaxResults(1);
 
@@ -613,7 +545,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Marks outdated "In Process" origins as "Failure" if exist
      */
-    protected function resetHangedOrigins()
+    protected function resetHangedOrigins(): void
     {
         $this->logger->info('Resetting hanged email origins ...');
 
@@ -637,10 +569,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Gets a DateTime object that is set to the current date and time in UTC.
-     *
-     * @return \DateTime
      */
-    protected function getCurrentUtcDateTime()
+    protected function getCurrentUtcDateTime(): \DateTime
     {
         return new \DateTime('now', new \DateTimeZone('UTC'));
     }
@@ -655,7 +585,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * @throws \Exception
      */
-    private function assertSyncSuccess(array $failedOriginIds)
+    private function assertSyncSuccess(array $failedOriginIds): void
     {
         if ($failedOriginIds) {
             throw new \Exception(
