@@ -581,9 +581,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $queryBuilder = $repo->createQueryBuilder('o')
             ->where('o.isActive = :isActive AND o.id = :id')
-            ->andWhere('o.isSyncEnabled != :isSyncEnabled')
+            ->andWhere('(o.isSyncEnabled is NULL or o.isSyncEnabled = :isSyncEnabled)')
             ->setParameter('isActive', true)
-            ->setParameter('isSyncEnabled', false)
+            ->setParameter('isSyncEnabled', true)
             ->setParameter('id', $originId)
             ->setMaxResults(1);
 
