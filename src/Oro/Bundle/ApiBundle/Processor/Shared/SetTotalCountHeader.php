@@ -65,7 +65,7 @@ class SetTotalCountHeader implements ProcessorInterface
         }
     }
 
-    private function getTotalCount(Context $context, ?callable $totalCountCallback): ?int
+    private function getTotalCount(ContextInterface $context, ?callable $totalCountCallback): ?int
     {
         if (null !== $totalCountCallback) {
             return $this->executeTotalCountCallback($totalCountCallback);
