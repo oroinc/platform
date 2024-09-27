@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * When the import is complete, it sends an event notifying you of the completion.
@@ -17,8 +17,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class FinishImportProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    public function __construct(private EventDispatcher $eventDispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
     #[\Override]
