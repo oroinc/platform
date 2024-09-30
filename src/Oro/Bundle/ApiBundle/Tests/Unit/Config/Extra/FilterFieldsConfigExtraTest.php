@@ -9,7 +9,9 @@ class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     private const FIELD_FILTERS = [
         'products'   => ['id', 'code'],
-        'categories' => ['name']
+        'categories' => ['name'],
+        'users' => [],
+        'organizations' => null
     ];
 
     /** @var FilterFieldsConfigExtra */
@@ -28,7 +30,7 @@ class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFieldFilters()
     {
-        self::assertEquals(
+        self::assertSame(
             self::FIELD_FILTERS,
             $this->extra->getFieldFilters()
         );
@@ -38,7 +40,7 @@ class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
     {
         $context = new ConfigContext();
         $this->extra->configureContext($context);
-        self::assertEquals(
+        self::assertSame(
             self::FIELD_FILTERS,
             $context->get(FilterFieldsConfigExtra::NAME)
         );
@@ -52,7 +54,7 @@ class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
     public function testCacheKeyPart()
     {
         self::assertEquals(
-            'fields:products(id,code)categories(name)',
+            'fields:products(id,code)categories(name)users()organizations',
             $this->extra->getCacheKeyPart()
         );
     }

@@ -47,9 +47,9 @@ class RequestActionHandler extends BaseRequestActionHandler
     }
 
     #[\Override]
-    protected function getRequestFilters(Request $request): FilterValueAccessorInterface
+    protected function getRequestFilters(Request $request, string $action): FilterValueAccessorInterface
     {
-        return $this->filterValueAccessorFactory->create($request);
+        return $this->filterValueAccessorFactory->create($request, $action);
     }
 
     #[\Override]
