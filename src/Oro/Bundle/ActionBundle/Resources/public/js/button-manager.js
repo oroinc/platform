@@ -113,6 +113,7 @@ define(function(require) {
                 const options = this._getDialogOptions();
                 if (this.options.showDialog) {
                     loadModules(this.options.jsDialogWidget, function(Widget) {
+                        console.log(options);
                         const _widget = new Widget(options);
                         Backbone.listenTo(_widget, 'formSave', response => {
                             this.isFormSaveInProgress = true;
