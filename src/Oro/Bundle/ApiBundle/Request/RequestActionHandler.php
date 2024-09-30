@@ -125,6 +125,7 @@ abstract class RequestActionHandler
         /** @var CreateContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
+        $context->setFilterValues($this->getRequestFilters($request));
         $context->setRequestData($this->getRequestData($request));
 
         $processor->process($context);
@@ -142,6 +143,7 @@ abstract class RequestActionHandler
         /** @var UpdateContext $context */
         $context = $processor->createContext();
         $this->preparePrimaryContext($context, $request);
+        $context->setFilterValues($this->getRequestFilters($request));
         $id = $this->getRequestParameter($request, 'id');
         $context->setId($id);
         $context->setRequestId($id);
@@ -201,6 +203,7 @@ abstract class RequestActionHandler
         /** @var ChangeSubresourceContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
+        $context->setFilterValues($this->getRequestFilters($request));
         $context->setRequestData($this->getRequestData($request));
 
         $processor->process($context);
@@ -221,6 +224,7 @@ abstract class RequestActionHandler
         /** @var ChangeSubresourceContext $context */
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
+        $context->setFilterValues($this->getRequestFilters($request));
         $context->setRequestData($this->getRequestData($request));
 
         $processor->process($context);

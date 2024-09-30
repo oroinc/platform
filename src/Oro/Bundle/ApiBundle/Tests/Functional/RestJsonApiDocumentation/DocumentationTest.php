@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\DocumentationTestTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestUniqueKeyIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
@@ -100,6 +101,48 @@ class DocumentationTest extends RestJsonApiTestCase
 
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('simple_data_types_filters.yml', 'documentation');
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testFiltersForCreateActionWhenFieldsAndIncludeFiltersAreDisabledForThisAction()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        $expectedData = $this->loadYamlData(
+            'filters_for_create_when_fields_and_include_disabled.yml',
+            'documentation'
+        );
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testFiltersForCreateAction()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        $expectedData = $this->loadYamlData('filters_for_create.yml', 'documentation');
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testFiltersForUpdateAction()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::UPDATE);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        $expectedData = $this->loadYamlData('filters_for_update.yml', 'documentation');
         self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
     }
 

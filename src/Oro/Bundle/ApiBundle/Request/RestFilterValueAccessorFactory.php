@@ -29,10 +29,21 @@ class RestFilterValueAccessorFactory
      */
     public function create(Request $request): FilterValueAccessorInterface
     {
-        return new RestFilterValueAccessor(
+        $filterValueAccessor = new RestFilterValueAccessor(
             $request,
             $this->operatorPattern,
             $this->operators
         );
+        // the filter values can be sent in the request body only for the "delete_list" API action
+        // or when the HTTP method is overridden, e.g. via the "X-HTTP-Method-Override" header (for example
+        // for a case when GET HTTP request is sent via POST method due to a lot of filters
+        // and the query string length limitation)
+        if (Request::METHOD_DELETE === $request->getRealMethod()
+            || $request->getMethod() !== $request->getRealMethod()
+        ) {
+            $filterValueAccessor->enableRequestBodyParsing();
+        }
+
+        return $filterValueAccessor;
     }
 }

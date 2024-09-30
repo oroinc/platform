@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
-use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -161,13 +163,134 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isFormValidationSkipped());
     }
 
+    public function testSetConfigExtras()
+    {
+        $normalizedExpandRelatedEntitiesConfigExtra = new ExpandRelatedEntitiesConfigExtra(['association1']);
+        $normalizedFilterFieldsConfigExtra = new FilterFieldsConfigExtra(['entity1' => ['field1']]);
+        $normalizedMetaPropertiesConfigExtra = new MetaPropertiesConfigExtra();
+        $normalizedMetaPropertiesConfigExtra->addMetaProperty('property1', 'string');
+        $normalizedAnotherConfigExtra = new TestConfigExtra('extra1');
+        $this->context->setNormalizedEntityConfigExtras([
+            $normalizedExpandRelatedEntitiesConfigExtra,
+            $normalizedFilterFieldsConfigExtra,
+            $normalizedMetaPropertiesConfigExtra,
+            $normalizedAnotherConfigExtra
+        ]);
+        self::assertSame(
+            [
+                $normalizedExpandRelatedEntitiesConfigExtra,
+                $normalizedFilterFieldsConfigExtra,
+                $normalizedMetaPropertiesConfigExtra,
+                $normalizedAnotherConfigExtra
+            ],
+            $this->context->getNormalizedEntityConfigExtras()
+        );
+        self::assertSame([], $this->context->getConfigExtras());
+
+        $expandRelatedEntitiesConfigExtra = new ExpandRelatedEntitiesConfigExtra(['association2']);
+        $filterFieldsConfigExtra = new FilterFieldsConfigExtra(['entity2' => ['field2']]);
+        $metaPropertiesConfigExtra = new MetaPropertiesConfigExtra();
+        $metaPropertiesConfigExtra->addMetaProperty('property2', 'string');
+        $anotherConfigExtra = new TestConfigExtra('extra2');
+        $this->context->setConfigExtras([
+            $expandRelatedEntitiesConfigExtra,
+            $filterFieldsConfigExtra,
+            $metaPropertiesConfigExtra,
+            $anotherConfigExtra
+        ]);
+        self::assertSame(
+            [
+                $expandRelatedEntitiesConfigExtra,
+                $filterFieldsConfigExtra,
+                $metaPropertiesConfigExtra,
+                $normalizedAnotherConfigExtra
+            ],
+            $this->context->getNormalizedEntityConfigExtras()
+        );
+        self::assertEquals(
+            [
+                new ExpandRelatedEntitiesConfigExtra([]),
+                new FilterFieldsConfigExtra(['entity2' => null]),
+                $anotherConfigExtra
+            ],
+            $this->context->getConfigExtras()
+        );
+    }
+
+    public function testAddAndRemoveConfigExtra()
+    {
+        $normalizedExpandRelatedEntitiesConfigExtra = new ExpandRelatedEntitiesConfigExtra(['association1']);
+        $normalizedFilterFieldsConfigExtra = new FilterFieldsConfigExtra(['entity1' => ['field1']]);
+        $normalizedMetaPropertiesConfigExtra = new MetaPropertiesConfigExtra();
+        $normalizedMetaPropertiesConfigExtra->addMetaProperty('property1', 'string');
+        $normalizedAnotherConfigExtra = new TestConfigExtra('extra1');
+        $this->context->setNormalizedEntityConfigExtras([
+            $normalizedExpandRelatedEntitiesConfigExtra,
+            $normalizedFilterFieldsConfigExtra,
+            $normalizedMetaPropertiesConfigExtra,
+            $normalizedAnotherConfigExtra
+        ]);
+        self::assertSame(
+            [
+                $normalizedExpandRelatedEntitiesConfigExtra,
+                $normalizedFilterFieldsConfigExtra,
+                $normalizedMetaPropertiesConfigExtra,
+                $normalizedAnotherConfigExtra
+            ],
+            $this->context->getNormalizedEntityConfigExtras()
+        );
+        self::assertSame([], $this->context->getConfigExtras());
+
+        $expandRelatedEntitiesConfigExtra = new ExpandRelatedEntitiesConfigExtra(['association2']);
+        $filterFieldsConfigExtra = new FilterFieldsConfigExtra(['entity2' => ['field2']]);
+        $metaPropertiesConfigExtra = new MetaPropertiesConfigExtra();
+        $metaPropertiesConfigExtra->addMetaProperty('property2', 'string');
+        $anotherConfigExtra = new TestConfigExtra('extra2');
+        $this->context->addConfigExtra($expandRelatedEntitiesConfigExtra);
+        $this->context->addConfigExtra($filterFieldsConfigExtra);
+        $this->context->addConfigExtra($metaPropertiesConfigExtra);
+        $this->context->addConfigExtra($anotherConfigExtra);
+        self::assertSame(
+            [
+                $expandRelatedEntitiesConfigExtra,
+                $filterFieldsConfigExtra,
+                $metaPropertiesConfigExtra,
+                $normalizedAnotherConfigExtra
+            ],
+            $this->context->getNormalizedEntityConfigExtras()
+        );
+        self::assertEquals(
+            [
+                new ExpandRelatedEntitiesConfigExtra([]),
+                new FilterFieldsConfigExtra(['entity2' => null]),
+                $anotherConfigExtra
+            ],
+            $this->context->getConfigExtras()
+        );
+
+        $this->context->removeConfigExtra($expandRelatedEntitiesConfigExtra->getName());
+        $this->context->removeConfigExtra($filterFieldsConfigExtra->getName());
+        $this->context->removeConfigExtra($metaPropertiesConfigExtra->getName());
+        $this->context->removeConfigExtra($anotherConfigExtra->getName());
+        self::assertSame(
+            [
+                $normalizedExpandRelatedEntitiesConfigExtra,
+                $normalizedFilterFieldsConfigExtra,
+                $normalizedMetaPropertiesConfigExtra,
+                $normalizedAnotherConfigExtra
+            ],
+            $this->context->getNormalizedEntityConfigExtras()
+        );
+        self::assertSame([], $this->context->getConfigExtras());
+    }
+
     public function testNormalizedEntityConfigExtras()
     {
         self::assertSame([], $this->context->getNormalizedEntityConfigExtras());
 
-        $extras = [$this->createMock(ConfigExtraInterface::class)];
-        $this->context->setNormalizedEntityConfigExtras($extras);
-        self::assertSame($extras, $this->context->getNormalizedEntityConfigExtras());
+        $configExtra = new TestConfigExtra('extra1');
+        $this->context->setNormalizedEntityConfigExtras([$configExtra]);
+        self::assertSame([$configExtra], $this->context->getNormalizedEntityConfigExtras());
     }
 
     public function testGetAllEntities()

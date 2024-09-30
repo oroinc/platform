@@ -16,7 +16,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     private function getRestFilterValueAccessor(Request $request): RestFilterValueAccessor
     {
-        return new RestFilterValueAccessor(
+        $accessor = new RestFilterValueAccessor(
             $request,
             '(!|<|>|%21|%3C|%3E)?(=|%3D)|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(\*|~|\^|\$|%2A|%7E|%5E|%24)',
             [
@@ -37,6 +37,9 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                 FilterOperator::EMPTY_VALUE     => null
             ]
         );
+        $accessor->enableRequestBodyParsing();
+
+        return $accessor;
     }
 
     private function getFilterValue(string $path, mixed $value, string $operator, string $sourceKey): FilterValue
@@ -1127,6 +1130,28 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 
         self::assertCount(1, $accessor->getAll());
         self::assertEquals($this->getFilterValue('prm1', 'val1', 'eq', 'prm1'), $accessor->get('prm1'));
+
+        self::assertEquals(
+            'prm1=val1',
+            $accessor->getQueryString()
+        );
+    }
+
+    public function testFilterFromRequestBodyShouldByIgnoredWhenRequestBodyParsingDisabled()
+    {
+        $request = Request::create(
+            'http://test.com?prm1=val1',
+            'DELETE',
+            ['prm1' => ['neq' => 'val2', 'eq' => 'val3']]
+        );
+        $accessor = $this->getRestFilterValueAccessor($request);
+        $accessor->disableRequestBodyParsing();
+
+        self::assertCount(1, $accessor->getAll());
+        self::assertEquals(
+            $this->getFilterValue('prm1', 'val1', 'eq', 'prm1'),
+            $accessor->get('prm1')
+        );
 
         self::assertEquals(
             'prm1=val1',
