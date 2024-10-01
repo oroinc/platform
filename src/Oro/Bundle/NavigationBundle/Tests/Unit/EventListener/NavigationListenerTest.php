@@ -21,6 +21,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationListener */
     private $navigationListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

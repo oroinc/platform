@@ -41,9 +41,7 @@ class LoadEntityByDataLoader implements ProcessorInterface
         $this->isDataNormalized = $isDataNormalized;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

@@ -7,9 +7,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class BusinessUnitOwnerValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         $owner = $value->getOwner();

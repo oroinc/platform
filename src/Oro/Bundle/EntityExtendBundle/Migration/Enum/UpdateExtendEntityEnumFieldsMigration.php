@@ -29,6 +29,7 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
     {
     }
 
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $entityConfigs = $this->connection->fetchAllAssociative(

@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateEmailBodyTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro_email.migrate_email_body';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Updates email body with plain text representation.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

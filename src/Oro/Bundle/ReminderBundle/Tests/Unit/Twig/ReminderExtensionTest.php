@@ -30,6 +30,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ReminderExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

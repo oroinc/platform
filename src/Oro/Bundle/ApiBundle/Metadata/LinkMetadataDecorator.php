@@ -14,17 +14,13 @@ abstract class LinkMetadataDecorator implements LinkMetadataInterface
         $this->link = $link;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {
         return $this->link->getHref($dataAccessor);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $result = $this->link->toArray();
@@ -33,41 +29,31 @@ abstract class LinkMetadataDecorator implements LinkMetadataInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetaProperties(): array
     {
         return $this->link->getMetaProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasMetaProperty(string $metaPropertyName): bool
     {
         return $this->link->hasMetaProperty($metaPropertyName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetaProperty(string $metaPropertyName): ?MetaAttributeMetadata
     {
         return $this->link->getMetaProperty($metaPropertyName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addMetaProperty(MetaAttributeMetadata $metaProperty): MetaAttributeMetadata
     {
         return $this->link->addMetaProperty($metaProperty);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeMetaProperty(string $metaPropertyName): void
     {
         $this->link->removeMetaProperty($metaPropertyName);

@@ -16,6 +16,7 @@ class FixMoneyChangeSetListener extends FixDecimalChangeSetListener
     /**
      * @return string[]
      */
+    #[\Override]
     protected function getSupportedTypes(): array
     {
         return [

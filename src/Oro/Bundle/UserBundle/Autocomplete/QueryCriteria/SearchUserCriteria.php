@@ -10,9 +10,7 @@ use Doctrine\ORM\QueryBuilder;
  */
 class SearchUserCriteria extends SearchCriteria
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addSearchCriteria(QueryBuilder $queryBuilder, $search)
     {
         $queryBuilder

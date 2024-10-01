@@ -20,6 +20,7 @@ class ImapSettingsCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ImapSettingsChecker */
     private $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connectorFactory = $this->createMock(ImapConnectorFactory::class);

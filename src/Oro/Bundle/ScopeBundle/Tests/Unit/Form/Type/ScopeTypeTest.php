@@ -19,6 +19,7 @@ class ScopeTypeTest extends \PHPUnit\Framework\TestCase
     /** @var ScopeType */
     private $scopeType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->scopeManager = $this->createMock(ScopeManager::class);

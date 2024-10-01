@@ -40,6 +40,7 @@ class SaveAndReturnActionFormTemplateDataProvider implements FormTemplateDataPro
         return $this;
     }
 
+    #[\Override]
     public function getData($entity, FormInterface $form, Request $request)
     {
         $data = [

@@ -20,9 +20,7 @@ class MessageCollector implements MessageProducerInterface
         $this->messageProducer = $messageProducer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send($topic, $message)
     {
         if (null !== $this->messageProducer) {

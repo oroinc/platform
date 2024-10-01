@@ -34,17 +34,13 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($actionType)
     {
         return $actionType === ExtendConfigDumper::ACTION_PRE_UPDATE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preUpdate()
     {
         $ownershipConfigProvider = $this->configManager->getProvider('ownership');

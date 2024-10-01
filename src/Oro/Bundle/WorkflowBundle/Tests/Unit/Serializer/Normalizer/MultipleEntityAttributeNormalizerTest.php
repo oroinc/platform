@@ -34,6 +34,7 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var MultipleEntityAttributeNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

@@ -31,25 +31,18 @@ class PreExportMessageProcessorStub extends PreExportMessageProcessorAbstract
         $this->messageBody = $messageBody;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getJobUniqueName(array $body): string
     {
         return $this->jobUniqueName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExportingEntityIds(array $body): array
     {
         return $this->exportingEntityIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDelayedJobCallback(array $body, array $ids = [])
     {
         $closure = function () {
@@ -58,17 +51,13 @@ class PreExportMessageProcessorStub extends PreExportMessageProcessorAbstract
         return $closure;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getMessageBody(MessageInterface $message): array
     {
         return $this->messageBody;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [];

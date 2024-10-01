@@ -20,9 +20,7 @@ class AttributesApplicableChecker extends MatchApplicableChecker
         $this->attributes = $attributes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         $result = self::ABSTAIN;

@@ -39,9 +39,7 @@ class FlushDataHandler implements FlushDataHandlerInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function flushData(EntityManagerInterface $entityManager, FlushDataHandlerContext $context): void
     {
         $successfullyFlushed = false;

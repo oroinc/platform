@@ -25,17 +25,13 @@ class MassActionResponse implements MassActionResponseInterface
         $this->options    = $options;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOptions()
     {
         return $this->options;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOption($name)
     {
         return isset($this->options[$name]) ? $this->options[$name] : null;
@@ -44,6 +40,7 @@ class MassActionResponse implements MassActionResponseInterface
     /**
      * @return boolean
      */
+    #[\Override]
     public function isSuccessful()
     {
         return $this->successful;
@@ -52,6 +49,7 @@ class MassActionResponse implements MassActionResponseInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getMessage()
     {
         return $this->message;

@@ -26,6 +26,7 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
     private IsLanguageTranslationUpdateAvailableCondition $condition2;
     private IsLanguageTranslationUpdateAvailableCondition $condition3;
 
+    #[\Override]
     protected function setUp(): void
     {
         $tomorrow = new \DateTime('tomorrow');

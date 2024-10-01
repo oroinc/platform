@@ -16,6 +16,7 @@ class DraftPermissionHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DraftPermissionHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessor::class);

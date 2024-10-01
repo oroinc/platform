@@ -13,6 +13,7 @@ class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainPathProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new ChainPathProvider();

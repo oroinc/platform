@@ -54,17 +54,13 @@ class OroTestFrameworkExtension implements TestworkExtension
     private const PATH_SUFFIX = '/Features';
     private const CONTEXT_CLASS_SUFFIX = 'Tests\Behat\Context\FeatureContext';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigKey(): string
     {
         return 'oro_test';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(ExtensionManager $extensionManager)
     {
         $envPath = '.env-app';
@@ -83,9 +79,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $minkExtension->registerDriverFactory(new OroSelenium2Factory());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(ArrayNodeDefinition $builder)
     {
         $builder
@@ -112,9 +106,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             ->end();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ContainerBuilder $container, array $config)
     {
         $this->loadBootstrap($container);
@@ -144,9 +136,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->addCompilerPass(new DecoratorServicePass());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->get(SymfonyExtension::KERNEL_ID)->registerBundles();

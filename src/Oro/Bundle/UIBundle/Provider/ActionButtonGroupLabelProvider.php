@@ -23,13 +23,7 @@ class ActionButtonGroupLabelProvider implements LabelProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Parameters:
-     *      groupName
-     *      entityClass
-     */
+    #[\Override]
     public function getLabel(array $parameters)
     {
         $label = self::DEFAULT_GROUP === $parameters['groupName']

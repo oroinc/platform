@@ -39,9 +39,7 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = $message->getBody();
@@ -68,9 +66,7 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [IndexEntityTopic::getName()];

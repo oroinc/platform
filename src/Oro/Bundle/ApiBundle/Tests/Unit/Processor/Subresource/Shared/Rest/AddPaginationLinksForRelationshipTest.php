@@ -27,6 +27,7 @@ class AddPaginationLinksForRelationshipTest extends GetSubresourceProcessorTestC
     /** @var AddPaginationLinksForRelationship */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -23,6 +23,7 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var RequestAuthorizationChecker */
     private $requestAuthorizationChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

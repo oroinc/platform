@@ -13,6 +13,7 @@ class GridViewRepositoryTest extends AbstractDataGridRepositoryTest
     /** @var GridViewRepository */
     protected $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -20,9 +21,7 @@ class GridViewRepositoryTest extends AbstractDataGridRepositoryTest
         $this->repository = self::getContainer()->get('doctrine')->getRepository(GridView::class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getUserReference(): string
     {
         return LoadUser::USER;

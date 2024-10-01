@@ -155,8 +155,8 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     /**
      * Overrides parent method to add ability to set socket context.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function connect(string $target = '/'): string
     {
         $this->target = '/' . ltrim($target, '/');
@@ -188,6 +188,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      *
      * @throws WebsocketException if the connection could not be disconnected cleanly
      */
+    #[\Override]
     public function disconnect(): bool
     {
         if (false === $this->connected) {
@@ -230,6 +231,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         return true;
     }
 
+    #[\Override]
     public function isConnected(): bool
     {
         return $this->connected;
@@ -242,8 +244,8 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      *
      * @see http://wamp.ws/spec#prefix_message
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function prefix(string $prefix, string $uri): void
     {
         $this->logger->info(sprintf('Establishing prefix "%s" for URI "%s"', $prefix, $uri));
@@ -260,6 +262,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      *
      * @param array|mixed $args Arguments for the message either as an array or variadic set of parameters
      */
+    #[\Override]
     public function call(string $procUri, $args): void
     {
         if (!\is_array($args)) {
@@ -292,6 +295,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      * @param string[] $exclude
      * @param string[] $eligible
      */
+    #[\Override]
     public function publish(string $topicUri, string $payload, array $exclude = [], array $eligible = []): void
     {
         $payload = json_decode($payload, JSON_OBJECT_AS_ARRAY);
@@ -314,8 +318,8 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      * The EVENT message contains the topicURI, the topic under which the event was published,
      * and event, the PubSub event payload.
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function event(string $topicUri, string $payload): void
     {
         $payload = json_decode($payload, JSON_OBJECT_AS_ARRAY);

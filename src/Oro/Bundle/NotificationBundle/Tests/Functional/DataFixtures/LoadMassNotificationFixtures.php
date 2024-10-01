@@ -11,9 +11,7 @@ class LoadMassNotificationFixtures extends AbstractFixture
     /** @var ObjectManager */
     protected $em;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->em = $manager;

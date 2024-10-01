@@ -25,9 +25,7 @@ class SearchEntityFilterType extends AbstractType
         $this->localizationHelper = $localizationHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -51,17 +49,13 @@ class SearchEntityFilterType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return EntityFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_search_type_entity_filter';

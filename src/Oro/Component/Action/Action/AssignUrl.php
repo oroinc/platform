@@ -34,9 +34,7 @@ class AssignUrl extends AbstractAction
         $this->router = $router;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $this->contextAccessor->setValue($context, $this->urlAttribute, $this->getUrl($context));
@@ -56,8 +54,8 @@ class AssignUrl extends AbstractAction
      *  - route (optional) - route used to generate url
      *  - route_parameters (optional) - route parameters
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['route'])) {

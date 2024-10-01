@@ -75,17 +75,13 @@ class ContextsExtension extends AbstractExtension
         $this->router = $router;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return 100;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -95,9 +91,7 @@ class ContextsExtension extends AbstractExtension
             && in_array($this->getEntityClassName($config), $this->activityManager->getActivityTypes(), true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $entityClassName = $this->getEntityClassName($config);
@@ -111,9 +105,7 @@ class ContextsExtension extends AbstractExtension
         $config->offsetSetByPath(self::GRID_COLUMNS_PATH, array_merge($columns, $column));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $ids = array_map(

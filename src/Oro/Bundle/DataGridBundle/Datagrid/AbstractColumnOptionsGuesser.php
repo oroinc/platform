@@ -4,25 +4,19 @@ namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 class AbstractColumnOptionsGuesser implements ColumnOptionsGuesserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFormatter($class, $property, $type)
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessSorter($class, $property, $type)
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFilter($class, $property, $type)
     {
         return null;

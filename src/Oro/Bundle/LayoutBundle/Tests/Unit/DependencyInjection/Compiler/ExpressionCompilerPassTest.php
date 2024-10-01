@@ -10,6 +10,7 @@ class ExpressionCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     private ExpressionCompilerPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ExpressionCompilerPass();

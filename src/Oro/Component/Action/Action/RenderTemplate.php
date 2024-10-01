@@ -33,9 +33,7 @@ class RenderTemplate extends AbstractAction
         $this->twig = $twig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $this->options = $this->getOptionResolver()->resolve($options);
@@ -43,9 +41,7 @@ class RenderTemplate extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $params = [];

@@ -30,17 +30,13 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
 
     private ContainerInterface $container;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $registry = [];
@@ -83,9 +79,7 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadLanguageDemoData::class];

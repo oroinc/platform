@@ -13,9 +13,7 @@ class AclGroupProvidersPass implements CompilerPassInterface
 {
     use PriorityTaggedLocatorTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $services = $this->findAndSortTaggedServices('oro_security.acl.group_provider', 'alias', $container);

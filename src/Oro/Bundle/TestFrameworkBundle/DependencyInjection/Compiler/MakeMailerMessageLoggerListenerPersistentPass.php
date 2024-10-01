@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class MakeMailerMessageLoggerListenerPersistentPass extends RegisterPersistentServicesPass
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         parent::process($container);
@@ -20,6 +21,7 @@ class MakeMailerMessageLoggerListenerPersistentPass extends RegisterPersistentSe
             ->setPublic(true);
     }
 
+    #[\Override]
     protected function getPersistentServices(ContainerBuilder $container): array
     {
         return ['mailer.message_logger_listener'];

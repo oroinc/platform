@@ -27,6 +27,7 @@ class AddPaginationLinksForSubresourceTest extends GetSubresourceProcessorTestCa
     /** @var AddPaginationLinksForSubresource */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

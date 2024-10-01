@@ -42,6 +42,7 @@ class StubScope extends Scope
      * @param array $args
      * @return mixed
      */
+    #[\Override]
     public function __call($name, $args)
     {
         if (str_starts_with($name, 'get')) {

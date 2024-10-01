@@ -21,6 +21,7 @@ class NoAccessToSecurityContextRelatedAssociationsTest extends RestJsonApiTestCa
 {
     use RolePermissionExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

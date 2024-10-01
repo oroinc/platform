@@ -18,9 +18,7 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
      */
     private $configuration = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTimeBeforeStaleForJobName($jobName)
     {
         return $this->checkKeyByJobNameOrItsPart($jobName)

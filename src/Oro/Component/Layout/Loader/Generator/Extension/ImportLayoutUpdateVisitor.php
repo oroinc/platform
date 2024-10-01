@@ -17,6 +17,7 @@ use Oro\Component\Layout\Model\LayoutUpdateImport;
  */
 class ImportLayoutUpdateVisitor implements VisitorInterface
 {
+    #[\Override]
     public function startVisit(VisitContext $visitContext): void
     {
         $class = $visitContext->getClass();
@@ -63,6 +64,7 @@ CODE
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function endVisit(VisitContext $visitContext): void
     {
     }

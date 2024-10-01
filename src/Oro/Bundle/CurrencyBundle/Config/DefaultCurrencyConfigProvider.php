@@ -21,9 +21,7 @@ class DefaultCurrencyConfigProvider implements CurrencyProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultCurrency()
     {
         return $this->configManager->get(CurrencyConfig::getConfigKeyByName(
@@ -31,9 +29,7 @@ class DefaultCurrencyConfigProvider implements CurrencyProviderInterface
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCurrencyList()
     {
         return (array) $this->getDefaultCurrency();

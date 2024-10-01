@@ -46,9 +46,7 @@ class SubresourceContext extends Context
     private ?ConfigExtraCollection $parentConfigExtras = null;
     private ?MetadataExtraCollection $parentMetadataExtras = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function initialize(): void
     {
         parent::initialize();
@@ -148,9 +146,7 @@ class SubresourceContext extends Context
         return $associationMetadata->getBaseTargetClassName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getManageableEntityClass(DoctrineHelper $doctrineHelper): ?string
     {
         $entityClass = $this->getClassName();
@@ -251,9 +247,7 @@ class SubresourceContext extends Context
         $this->parentConfigExtras->removeConfigExtra($extraName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setHateoas(bool $flag): void
     {
         parent::setHateoas($flag);

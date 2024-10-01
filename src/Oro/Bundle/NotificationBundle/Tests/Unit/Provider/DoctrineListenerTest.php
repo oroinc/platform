@@ -21,6 +21,7 @@ class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityPool = $this->createMock(EntityPool::class);

@@ -12,6 +12,7 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var HintExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $queryHintResolver = $this->createMock(QueryHintResolver::class);

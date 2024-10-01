@@ -24,9 +24,6 @@ class OrganizationToken extends AbstractToken implements OrganizationAwareTokenI
         $this->setOrganization($organization);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCredentials()
     {
         return ''; // anonymous credentials

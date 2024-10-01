@@ -14,6 +14,7 @@ class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MixinConfigurationHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigurationProviderInterface::class);

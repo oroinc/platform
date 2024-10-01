@@ -12,9 +12,7 @@ class Configuration implements ConfigurationInterface
 {
     const ROOT_NODE = 'oro_sanitize';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

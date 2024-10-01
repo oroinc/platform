@@ -17,9 +17,7 @@ class SecurityTokenProvider implements SecurityTokenProviderInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getToken(): ?TokenInterface
     {
         return $this->tokenStorage->getToken();

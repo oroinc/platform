@@ -16,6 +16,7 @@ class DataSourcesPassTest extends \PHPUnit\Framework\TestCase
     private Definition $builder;
     private DataSourcesPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

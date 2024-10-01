@@ -24,9 +24,7 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var CommandRunnerProcessor */
     private $commandRunnerProcessor;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

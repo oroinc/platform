@@ -32,6 +32,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
 
     private Job $job;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRepository = $this->createMock(JobRepositoryInterface::class);

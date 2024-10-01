@@ -18,6 +18,7 @@ class UnderlyingAclCacheTest extends \PHPUnit\Framework\TestCase
     /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheItem;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheProvider = $this->createMock(CacheItemPoolInterface::class);

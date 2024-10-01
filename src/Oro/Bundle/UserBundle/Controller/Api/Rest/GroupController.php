@@ -123,9 +123,7 @@ class GroupController extends RestController
         return $this->handleDeleteRequest($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function transformEntityField($field, &$value)
     {
         switch ($field) {
@@ -154,9 +152,7 @@ class GroupController extends RestController
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getPreparedItem($entity, $resultFields = [])
     {
         $result = parent::getPreparedItem($entity);
@@ -166,25 +162,19 @@ class GroupController extends RestController
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_user.group_manager.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_user.form.group.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_user.form.handler.group.api');

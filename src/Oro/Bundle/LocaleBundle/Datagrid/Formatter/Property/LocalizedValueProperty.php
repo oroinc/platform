@@ -10,9 +10,7 @@ class LocalizedValueProperty extends AbstractProperty
     const NAME = 'localized_value';
     const ALLOW_EMPTY = 'allow_empty';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRawValue(ResultRecordInterface $record)
     {
         return $record->getValue($this->get(self::NAME_KEY));

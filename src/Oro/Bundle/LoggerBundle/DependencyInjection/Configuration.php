@@ -15,9 +15,7 @@ class Configuration implements ConfigurationInterface
     public const EMAIL_NOTIFICATION_RECIPIENTS = 'email_notification_recipients';
     public const EMAIL_NOTIFICATION_SUBJECT = 'email_notification_subject';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

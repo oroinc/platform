@@ -18,6 +18,7 @@ class EntityAuditStrategyDelegateProcessorTest extends TestCase
 
     private EntityAuditStrategyDelegateProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(EntityAuditStrategyProcessorRegistry::class);

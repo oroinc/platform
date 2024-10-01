@@ -39,17 +39,13 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
         $this->fileNameProvider = $fileNameProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [UpdateListFinishTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);

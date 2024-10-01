@@ -11,9 +11,7 @@ class RequiredRegion extends Constraint
 {
     public $message = 'State is required for country {{ country }}';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

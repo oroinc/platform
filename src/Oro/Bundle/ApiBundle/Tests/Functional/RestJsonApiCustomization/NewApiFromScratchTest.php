@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class NewApiFromScratchTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -23,9 +24,7 @@ class NewApiFromScratchTest extends RestJsonApiTestCase
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequestType(): RequestType
     {
         $requestType = parent::getRequestType();
@@ -34,9 +33,7 @@ class NewApiFromScratchTest extends RestJsonApiTestCase
         return $requestType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function request(
         string $method,
         string $uri,

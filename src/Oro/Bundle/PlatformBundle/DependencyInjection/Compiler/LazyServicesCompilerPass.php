@@ -13,9 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class LazyServicesCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $configLoader = new CumulativeConfigLoader(

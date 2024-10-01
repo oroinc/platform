@@ -41,9 +41,7 @@ class ValidateParentEntityAccess implements ProcessorInterface
         $this->queryHintResolver = $queryHintResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

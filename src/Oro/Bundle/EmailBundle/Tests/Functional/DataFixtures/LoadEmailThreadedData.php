@@ -16,17 +16,13 @@ class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInt
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserData::class, LoadUser::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->loadEmails($manager, $this->loadEmailTemplates());

@@ -37,9 +37,7 @@ abstract class AbstractPagerExtension extends AbstractExtension
         $this->pager = clone $this->pager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         if ($this->getParameters()->has(PagerInterface::PAGER_ROOT_PARAM)) {
@@ -71,9 +69,7 @@ abstract class AbstractPagerExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $onePage = $config->offsetGetByPath(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH, false);
@@ -87,9 +83,7 @@ abstract class AbstractPagerExtension extends AbstractExtension
         $result->setTotalRecords($totalRecords);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $defaultPage = 1;
@@ -108,18 +102,14 @@ abstract class AbstractPagerExtension extends AbstractExtension
         $data->offsetAddToArray('state', $state);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         // Pager should proceed closest to end of accepting chain
         return -240;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setParameters(ParameterBag $parameters)
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {

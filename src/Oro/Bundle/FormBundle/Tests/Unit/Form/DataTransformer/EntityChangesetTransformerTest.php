@@ -15,6 +15,7 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityChangesetTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

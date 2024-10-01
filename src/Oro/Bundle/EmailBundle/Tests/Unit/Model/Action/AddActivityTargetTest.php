@@ -22,6 +22,7 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
     /** @var AddActivityTarget */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

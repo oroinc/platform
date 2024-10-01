@@ -18,6 +18,7 @@ class EmailNotificationControllerTest extends WebTestCase
     private const EVENT_NAME = 'oro.workflow.event.notification.workflow_transition';
     private const TRANSITION_NAME = 'starting_point_transition';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

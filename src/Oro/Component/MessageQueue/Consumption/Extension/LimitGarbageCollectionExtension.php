@@ -18,11 +18,13 @@ class LimitGarbageCollectionExtension extends AbstractExtension
         $this->garbageCollectionLimit = $garbageCollectionLimit;
     }
 
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         $this->checkGarbageCollectionLimit($context);
     }
 
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $this->checkGarbageCollectionLimit($context);

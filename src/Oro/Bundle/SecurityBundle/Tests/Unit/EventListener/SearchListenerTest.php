@@ -19,6 +19,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SearchListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);

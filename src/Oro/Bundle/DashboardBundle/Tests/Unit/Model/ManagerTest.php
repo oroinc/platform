@@ -53,6 +53,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Manager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = $this->createMock(Factory::class);

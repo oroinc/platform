@@ -22,6 +22,7 @@ class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
     /** @var CommandWithArgsFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $tokenizer = new CommandArgsTokenizer();

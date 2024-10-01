@@ -8,9 +8,7 @@ use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
 class AclPrivilegeEntityFilter implements AclPrivilegeConfigurableFilterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(AclPrivilege $aclPrivilege, ConfigurablePermission $configurablePermission)
     {
         $entityClass = ObjectIdentityHelper::getClassFromIdentityString($aclPrivilege->getIdentity()->getId());
@@ -24,9 +22,7 @@ class AclPrivilegeEntityFilter implements AclPrivilegeConfigurableFilterInterfac
         return $aclPrivilege->hasPermissions();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSupported(AclPrivilege $aclPrivileges)
     {
         $identity = $aclPrivileges->getIdentity();

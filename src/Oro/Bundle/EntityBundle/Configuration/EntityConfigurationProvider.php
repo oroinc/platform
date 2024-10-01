@@ -29,9 +29,7 @@ class EntityConfigurationProvider extends PhpArrayConfigProvider
         return $config[$sectionName] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];

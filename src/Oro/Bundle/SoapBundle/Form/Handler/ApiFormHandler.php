@@ -34,9 +34,7 @@ class ApiFormHandler implements FormAwareInterface
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->form;

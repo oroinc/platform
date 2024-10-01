@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CustomizeFormDataExtendabilityTest extends RestJsonApiUpdateListTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

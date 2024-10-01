@@ -10,9 +10,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class FilenameWithoutPathValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createValidator(): FilenameWithoutPathValidator
     {
         return new FilenameWithoutPathValidator();

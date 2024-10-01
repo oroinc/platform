@@ -29,9 +29,7 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $this->clearManager->setLogger($this->logger);
@@ -55,9 +53,7 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [ClearInactiveMailboxTopic::getName()];

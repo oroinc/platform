@@ -22,9 +22,7 @@ class FileUrlProvider implements FileUrlProviderInterface
         $this->filenameProvider = $filenameProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFileUrl(
         File $file,
         string $action = self::FILE_ACTION_GET,
@@ -37,9 +35,7 @@ class FileUrlProvider implements FileUrlProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResizedImageUrl(
         File $file,
         int $width,
@@ -59,9 +55,7 @@ class FileUrlProvider implements FileUrlProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilteredImageUrl(
         File $file,
         string $filterName,

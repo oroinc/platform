@@ -31,33 +31,24 @@ class OroMoneyType extends AbstractType
         $this->numberFormatter = $numberFormatter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return MoneyType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $currencyCode = $this->localeSettings->getCurrency();
@@ -75,9 +66,7 @@ class OroMoneyType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $currency = $options['currency'];

@@ -18,6 +18,7 @@ class ResourceFileImportProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $parentProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);

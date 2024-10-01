@@ -19,9 +19,7 @@ class ProcessorRegistry implements ProcessorRegistryInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProcessor(string $processorId): ProcessorInterface
     {
         return $this->container->get($processorId);

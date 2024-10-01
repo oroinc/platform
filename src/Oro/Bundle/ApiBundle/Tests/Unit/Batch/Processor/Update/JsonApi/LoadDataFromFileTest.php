@@ -15,6 +15,7 @@ class LoadDataFromFileTest extends BatchUpdateProcessorTestCase
     /** @var LoadDataFromFile */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

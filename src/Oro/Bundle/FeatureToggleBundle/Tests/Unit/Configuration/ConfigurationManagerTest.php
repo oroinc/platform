@@ -16,6 +16,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationManager */
     private $configurationManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProvider::class);

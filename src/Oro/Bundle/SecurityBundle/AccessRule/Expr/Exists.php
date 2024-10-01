@@ -31,9 +31,7 @@ class Exists implements ExpressionInterface
         return $this->expression;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visit(Visitor $visitor)
     {
         return $visitor->walkExists($this);

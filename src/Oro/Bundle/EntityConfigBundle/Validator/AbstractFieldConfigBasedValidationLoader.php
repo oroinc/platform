@@ -32,9 +32,7 @@ abstract class AbstractFieldConfigBasedValidationLoader extends AbstractLoader
         $this->constraintsMapping[$fieldType] = $constraintData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (!$this->isClassApplicable($metadata)) {

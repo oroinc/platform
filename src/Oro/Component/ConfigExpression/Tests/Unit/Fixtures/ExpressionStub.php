@@ -27,16 +27,12 @@ class ExpressionStub implements ExpressionInterface
         $this->message = $message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function evaluate($context, \ArrayAccess $errors = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setMessage($message)
     {
         $this->message = $message;
@@ -44,9 +40,7 @@ class ExpressionStub implements ExpressionInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $this->options = $options;
@@ -70,25 +64,19 @@ class ExpressionStub implements ExpressionInterface
         return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'test';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return '';

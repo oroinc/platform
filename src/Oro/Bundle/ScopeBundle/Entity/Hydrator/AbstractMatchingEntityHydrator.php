@@ -25,6 +25,7 @@ abstract class AbstractMatchingEntityHydrator extends AbstractHydrator
     /**
      * @return array
      */
+    #[\Override]
     protected function hydrateAllData()
     {
         $rows = $this->_stmt->fetchAllAssociative();

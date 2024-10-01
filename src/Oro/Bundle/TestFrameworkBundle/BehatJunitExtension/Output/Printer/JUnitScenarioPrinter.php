@@ -38,9 +38,6 @@ final class JUnitScenarioPrinter
         $this->durationListener = $durationListener;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function printOpenTag(
         Formatter $formatter,
         FeatureNode $feature,

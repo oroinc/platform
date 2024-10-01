@@ -15,9 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SkipDefaultSearchTextOrdering implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

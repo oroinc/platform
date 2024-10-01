@@ -50,9 +50,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
      */
     abstract protected function addSorterToDatasource(array $sorter, $direction, DatasourceInterface $datasource);
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         $columns = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
@@ -62,9 +60,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
             && is_array($columns);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $this->validateConfiguration(
@@ -73,9 +69,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $sortersConfig = $this->getSorters($config);
@@ -98,9 +92,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $toolbarSort = $config->offsetGetByPath(Configuration::TOOLBAR_SORTING_PATH, false);
@@ -165,9 +157,7 @@ abstract class AbstractSorterExtension extends AbstractExtension
         $data->offsetAddToArray('initialState', ['sorters' => $initialSortersState]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         // should visit after all extensions

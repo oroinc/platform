@@ -10,11 +10,13 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class FinishImportTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new FinishImportTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         return [
@@ -49,6 +51,7 @@ class FinishImportTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

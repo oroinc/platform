@@ -58,6 +58,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
     private array $operatorNameMap;
     /** @var array [operator short name => operator name, ...] */
     private array $operatorShortNameMap;
+    private bool $enableRequestBodyParsing = false;
 
     public function __construct(Request $request, array $operatorNameMap)
     {
@@ -71,19 +72,27 @@ class RestFilterValueAccessor extends FilterValueAccessor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    public function enableRequestBodyParsing(): void
+    {
+        $this->enableRequestBodyParsing = true;
+    }
+
+    public function disableRequestBodyParsing(): void
+    {
+        $this->enableRequestBodyParsing = false;
+    }
+
+    #[\Override]
     protected function initialize(): void
     {
         parent::initialize();
-        $this->parseRequestBody();
+        if ($this->enableRequestBodyParsing) {
+            $this->parseRequestBody();
+        }
         $this->parseQueryString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function normalizeOperator(?string $operator): string
     {
         $operator = parent::normalizeOperator($operator);

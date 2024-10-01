@@ -48,6 +48,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DatabaseHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -21,9 +21,7 @@ class MailboxOriginValidator extends ConstraintValidator
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof MailboxOrigin) {

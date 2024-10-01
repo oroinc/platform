@@ -91,9 +91,7 @@ class EntityToIdTransformer implements DataTransformerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -107,9 +105,7 @@ class EntityToIdTransformer implements DataTransformerInterface
         return $this->propertyAccessor->getValue($value, $this->propertyPath);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

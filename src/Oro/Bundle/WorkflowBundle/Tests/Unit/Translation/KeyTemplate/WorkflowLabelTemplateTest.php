@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
 class WorkflowLabelTemplateTest extends TemplateTestCase
 {
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplateInstance()
     {
         return new WorkflowLabelTemplate();
@@ -17,11 +17,13 @@ class WorkflowLabelTemplateTest extends TemplateTestCase
         $this->assertName(WorkflowLabelTemplate::NAME);
     }
 
+    #[\Override]
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.label');
     }
 
+    #[\Override]
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name']);

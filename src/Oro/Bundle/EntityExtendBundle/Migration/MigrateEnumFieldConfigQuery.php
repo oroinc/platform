@@ -18,6 +18,7 @@ class MigrateEnumFieldConfigQuery extends RemoveOutdatedEnumFieldQuery
         parent::__construct($entityClass, $enumField);
     }
 
+    #[\Override]
     protected function deleteEnumData(LoggerInterface $logger, string $id, string $data): ?string
     {
         $enumClass = null;
@@ -75,6 +76,7 @@ class MigrateEnumFieldConfigQuery extends RemoveOutdatedEnumFieldQuery
         return $enumClass;
     }
 
+    #[\Override]
     protected function updateEntityData(LoggerInterface $logger, string $enumClass, string $data): void
     {
         $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];

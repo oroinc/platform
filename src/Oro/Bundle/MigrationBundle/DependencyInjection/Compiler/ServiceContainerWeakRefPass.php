@@ -25,11 +25,11 @@ use Symfony\Component\DependencyInjection\Reference;
 class ServiceContainerWeakRefPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('oro_migration.service_container')) {

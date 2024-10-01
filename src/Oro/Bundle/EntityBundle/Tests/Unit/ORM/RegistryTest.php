@@ -25,6 +25,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
     /** @var Registry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

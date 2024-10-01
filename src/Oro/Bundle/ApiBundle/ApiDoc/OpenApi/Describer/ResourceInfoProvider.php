@@ -38,9 +38,7 @@ class ResourceInfoProvider implements ResourceInfoProviderInterface, ResetInterf
         $this->valueNormalizer = $valueNormalizer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->untypedEntityType = [];
@@ -48,9 +46,7 @@ class ResourceInfoProvider implements ResourceInfoProviderInterface, ResetInterf
         $this->subresources = [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClass(string $entityType): ?string
     {
         return ValueNormalizerUtil::tryConvertToEntityClass(
@@ -60,9 +56,7 @@ class ResourceInfoProvider implements ResourceInfoProviderInterface, ResetInterf
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityType(string $entityClass): ?string
     {
         return ValueNormalizerUtil::tryConvertToEntityType(
@@ -72,6 +66,7 @@ class ResourceInfoProvider implements ResourceInfoProviderInterface, ResetInterf
         );
     }
 
+    #[\Override]
     public function isUntypedEntityType(string $entityType): bool
     {
         $view = $this->docViewDetector->getView();
@@ -82,9 +77,7 @@ class ResourceInfoProvider implements ResourceInfoProviderInterface, ResetInterf
         return $entityType === $this->untypedEntityType[$view];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isResourceWithoutIdentifier(string $entityType): bool
     {
         $view = $this->docViewDetector->getView();
@@ -97,9 +90,7 @@ class ResourceInfoProvider implements ResourceInfoProviderInterface, ResetInterf
         return isset($this->resourcesWithoutIdentifier[$view][$entityType]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isCollectionSubresource(string $entityType, string $associationName): bool
     {
         $subresource = $this->getSubresource($entityType, $associationName);
@@ -107,9 +98,7 @@ class ResourceInfoProvider implements ResourceInfoProviderInterface, ResetInterf
         return null !== $subresource && $subresource->isCollection();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSubresourceTargetEntityType(string $entityType, string $associationName): ?string
     {
         $targetEntityClass = $this->getSubresource($entityType, $associationName)?->getTargetClassName();

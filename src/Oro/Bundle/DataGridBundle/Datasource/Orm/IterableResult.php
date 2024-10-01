@@ -10,9 +10,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
  */
 class IterableResult extends BufferedIdentityQueryResultIterator implements IterableResultInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function next(): void
     {
         parent::next();

@@ -39,9 +39,7 @@ class Select extends Element
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($value)
     {
         $this->setValueWithRetry($value);
@@ -90,6 +88,7 @@ class Select extends Element
     /**
      * @return string|null
      */
+    #[\Override]
     public function getValue()
     {
         $text = null;

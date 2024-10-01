@@ -20,6 +20,7 @@ class StaticSegmentManagerTest extends WebTestCase
     /** @var StaticSegmentManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

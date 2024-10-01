@@ -28,6 +28,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     /** @var EntityPaginationNavigation */
     private $navigation;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

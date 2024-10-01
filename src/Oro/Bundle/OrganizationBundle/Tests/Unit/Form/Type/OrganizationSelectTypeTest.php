@@ -11,6 +11,7 @@ class OrganizationSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new OrganizationSelectType();

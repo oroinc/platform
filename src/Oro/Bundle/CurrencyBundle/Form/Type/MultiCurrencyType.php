@@ -25,19 +25,19 @@ class MultiCurrencyType extends PriceType
     /**
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $isRequired = $this->isRequired($options);
@@ -85,18 +85,14 @@ class MultiCurrencyType extends PriceType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
         $resolver->setDefaults(['value_constraints' => [],]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['currencyRates'] = [];

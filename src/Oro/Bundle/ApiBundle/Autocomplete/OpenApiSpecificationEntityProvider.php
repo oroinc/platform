@@ -30,9 +30,7 @@ class OpenApiSpecificationEntityProvider implements OpenApiSpecificationEntityPr
         $this->docViewDetector = $docViewDetector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntities(string $view): array
     {
         $previousView = $this->docViewDetector->getView();

@@ -13,17 +13,13 @@ class LoadImpersonationData extends AbstractFixture implements DependentFixtureI
     public const IMPERSONATION_SIMPLE_USER = 'impersonation_simple_user';
     public const IMPERSONATION_SIMPLE_USER_EXPIRED = 'impersonation_simple_user_expired';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserData::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var User $simpleUser */

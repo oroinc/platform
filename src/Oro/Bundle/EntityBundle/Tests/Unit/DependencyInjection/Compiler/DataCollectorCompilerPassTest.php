@@ -21,6 +21,7 @@ class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     private DataCollectorCompilerPass $compilerPass;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compilerPass = new DataCollectorCompilerPass();

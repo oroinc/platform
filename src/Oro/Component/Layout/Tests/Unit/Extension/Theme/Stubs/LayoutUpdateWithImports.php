@@ -12,13 +12,12 @@ class LayoutUpdateWithImports implements LayoutUpdateInterface, ImportsAwareLayo
     /**
      * @return array
      */
+    #[\Override]
     public function getImports()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
     }

@@ -19,9 +19,7 @@ class LoadEntityStructures implements ProcessorInterface
         $this->entityStructureProvider = $entityStructureProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var GetListContext $context */

@@ -12,6 +12,7 @@ class AssertNotHasErrorsTest extends GetListProcessorTestCase
     /** @var AssertNotHasErrors */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -13,6 +13,7 @@ class TranslatorProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorProvider */
     private $translatorProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);

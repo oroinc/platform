@@ -15,6 +15,7 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var FixAddressesTypesSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = new FixAddressesTypesSubscriber('owner.addresses');

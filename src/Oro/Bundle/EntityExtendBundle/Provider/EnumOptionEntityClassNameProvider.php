@@ -14,9 +14,7 @@ class EnumOptionEntityClassNameProvider implements EntityClassNameProviderInterf
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClassName(string $entityClass): ?string
     {
         $className = $this->innerProvider->getEntityClassName($entityClass);
@@ -27,6 +25,7 @@ class EnumOptionEntityClassNameProvider implements EntityClassNameProviderInterf
         return $className;
     }
 
+    #[\Override]
     public function getEntityClassPluralName(string $entityClass): ?string
     {
         return $this->innerProvider->getEntityClassPluralName($entityClass);

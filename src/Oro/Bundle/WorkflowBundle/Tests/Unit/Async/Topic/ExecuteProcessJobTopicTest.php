@@ -12,11 +12,13 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class ExecuteProcessJobTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new ExecuteProcessJobTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         return [
@@ -24,6 +26,7 @@ class ExecuteProcessJobTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

@@ -385,9 +385,6 @@ class AclPrivilegeRepository
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldPermissionMasks($permissions, AclExtensionInterface $extension, array $maskBuilders)
     {
         // check if there are no full field permissions and add missing to calculate correct masks.

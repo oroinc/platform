@@ -19,6 +19,7 @@ class IterableResultFactoryTest extends SearchBundleWebTestCase
 {
     private const GRID_NAME = 'test-search-grid';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

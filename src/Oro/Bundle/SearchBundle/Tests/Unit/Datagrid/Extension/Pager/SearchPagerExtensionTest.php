@@ -21,6 +21,7 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var SearchPagerExtension */
     private $pagerExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datagridConfig = $this->createMock(DatagridConfiguration::class);

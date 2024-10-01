@@ -17,6 +17,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityConfigListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailRendererConfigProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);

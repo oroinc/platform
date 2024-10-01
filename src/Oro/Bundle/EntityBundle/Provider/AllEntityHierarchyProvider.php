@@ -33,9 +33,7 @@ class AllEntityHierarchyProvider extends AbstractEntityHierarchyProvider
         $this->managerBag = $managerBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeHierarchy()
     {
         $managers = $this->managerBag->getManagers();

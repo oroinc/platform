@@ -14,6 +14,7 @@ class AttributeConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeConfigHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);

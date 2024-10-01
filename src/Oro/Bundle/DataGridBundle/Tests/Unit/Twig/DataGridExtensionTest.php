@@ -49,6 +49,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DataGridExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(ManagerInterface::class);

@@ -10,6 +10,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
     /** @var MessageBuffer */
     private $buffer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->buffer = new MessageBuffer();

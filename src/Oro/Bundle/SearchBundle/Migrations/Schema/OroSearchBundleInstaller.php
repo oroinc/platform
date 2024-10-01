@@ -23,17 +23,13 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
     use DatabasePlatformAwareTrait;
     use MysqlVersionCheckTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v1_10';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/

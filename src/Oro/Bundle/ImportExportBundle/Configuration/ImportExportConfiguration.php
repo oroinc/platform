@@ -33,137 +33,103 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     const FIELD_IMPORT_ADDITIONAL_NOTICES = 'importAdditionalNotices';
     const FIELD_IMPORT_PROCESSOR_TOPIC_NAME = 'importProcessorTopicName';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRouteOptions(): array
     {
         return $this->get(self::FIELD_ROUTE_OPTIONS, []);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClass(): string
     {
         return $this->get(self::FIELD_ENTITY_CLASS, '');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFilePrefix()
     {
         return $this->get(self::FIELD_FILE_PREFIX);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExportJobName()
     {
         return $this->get(self::FIELD_EXPORT_JOB_NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExportProcessorAlias()
     {
         return $this->get(self::FIELD_EXPORT_PROCESSOR_ALIAS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExportButtonLabel()
     {
         return $this->get(self::FIELD_EXPORT_BUTTON_LABEL);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExportPopupTitle()
     {
         return $this->get(self::FIELD_EXPORT_POPUP_TITLE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExportTemplateJobName()
     {
         return $this->get(self::FIELD_EXPORT_TEMPLATE_JOB_NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExportTemplateProcessorAlias()
     {
         return $this->get(self::FIELD_EXPORT_TEMPLATE_PROCESSOR_ALIAS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getImportJobName()
     {
         return $this->get(self::FIELD_IMPORT_JOB_NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getImportProcessorAlias()
     {
         return $this->get(self::FIELD_IMPORT_PROCESSOR_ALIAS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getImportEntityLabel()
     {
         return $this->get(self::FIELD_IMPORT_ENTITY_LABEL);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getImportValidationJobName()
     {
         return $this->get(self::FIELD_IMPORT_VALIDATION_JOB_NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getImportValidationButtonLabel()
     {
         return $this->get(self::FIELD_IMPORT_VALIDATION_BUTTON_LABEL);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getImportStrategyTooltip()
     {
         return $this->get(self::FIELD_IMPORT_STRATEGY_TOOLTIP);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getImportProcessorsToConfirmationMessage(): array
     {
         return $this->get(self::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE, []);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getImportAdditionalNotices(): array
     {
         return $this->get(self::FIELD_IMPORT_ADDITIONAL_NOTICES, []);

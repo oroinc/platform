@@ -61,9 +61,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         $this->debug = $debug;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -71,9 +69,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($this->isApplicable($options)) {
@@ -124,6 +120,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         }
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!$this->isApplicable($options)) {
@@ -165,9 +162,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -255,6 +250,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
     /**
      * Does not return any values ​​since the extension has a specific using.
      */
+    #[\Override]
     public static function getExtendedTypes(): array
     {
         return [FormType::class];

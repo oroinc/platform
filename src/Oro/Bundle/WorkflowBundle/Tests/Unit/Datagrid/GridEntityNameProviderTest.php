@@ -24,6 +24,7 @@ class GridEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var GridEntityNameProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

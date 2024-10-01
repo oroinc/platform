@@ -20,6 +20,7 @@ class ImportsAwareLayoutUpdateVisitor implements VisitorInterface
         $this->imports = $imports;
     }
 
+    #[\Override]
     public function startVisit(VisitContext $visitContext): void
     {
         $class = $visitContext->getClass();
@@ -30,6 +31,7 @@ class ImportsAwareLayoutUpdateVisitor implements VisitorInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function endVisit(VisitContext $visitContext): void
     {
     }

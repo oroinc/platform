@@ -29,11 +29,13 @@ use Predis\Command\ScriptCommand;
  */
 class FreeLockCommand extends ScriptCommand
 {
+    #[\Override]
     public function getKeysCount()
     {
         return 1;
     }
 
+    #[\Override]
     public function getScript()
     {
         return <<<LUA

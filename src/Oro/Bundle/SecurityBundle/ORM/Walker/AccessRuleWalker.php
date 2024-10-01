@@ -23,9 +23,7 @@ class AccessRuleWalker extends TreeWalkerAdapter
     /** @var QueryComponentCollection */
     private $queryComponents;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
         $query = $this->_getQuery();

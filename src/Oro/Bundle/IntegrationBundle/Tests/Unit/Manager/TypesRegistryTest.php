@@ -26,6 +26,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var TypesRegistry */
     private $typesRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transport1 = $this->createMock(TransportInterface::class);

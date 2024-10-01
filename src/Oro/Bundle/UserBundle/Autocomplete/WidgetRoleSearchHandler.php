@@ -11,9 +11,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
  */
 class WidgetRoleSearchHandler extends SearchHandler
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getEntitiesByIds(array $entityIds)
     {
         /** @var QueryBuilder $queryBuilder */

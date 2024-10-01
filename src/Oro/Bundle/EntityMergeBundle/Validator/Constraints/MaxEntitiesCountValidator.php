@@ -12,9 +12,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class MaxEntitiesCountValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof MaxEntitiesCount) {

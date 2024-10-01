@@ -21,6 +21,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
 {
     private BatchUpdateContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new BatchUpdateContext();

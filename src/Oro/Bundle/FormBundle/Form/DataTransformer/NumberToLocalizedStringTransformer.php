@@ -32,9 +32,7 @@ class NumberToLocalizedStringTransformer extends Symfony54NumberToLocalizedStrin
         parent::__construct($scale, $grouping, $roundingMode, $locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value): string
     {
         if (null === $value) {
@@ -52,9 +50,7 @@ class NumberToLocalizedStringTransformer extends Symfony54NumberToLocalizedStrin
         return $this->numberFormatter->formatDecimal($value, $attributes, [], [], $this->locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value): string|float|int|null
     {
         if (null === $value || '' === $value) {
@@ -111,6 +107,7 @@ class NumberToLocalizedStringTransformer extends Symfony54NumberToLocalizedStrin
      *
      * @return int|float
      */
+    #[\Override]
     protected function castParsedValue($value): float|int
     {
         return $value;

@@ -21,6 +21,7 @@ class RunMultipleConsumersController implements Controller
         $this->subscriber = $subscriber;
     }
 
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command->addOption(
@@ -32,6 +33,7 @@ class RunMultipleConsumersController implements Controller
         );
     }
 
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('consumers')) {

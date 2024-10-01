@@ -50,6 +50,7 @@ class UsernamePasswordOrganizationAuthenticator extends FormLoginAuthenticator
         $this->organizationGuesser = $organizationGuesser;
     }
 
+    #[\Override]
     public function authenticate(Request $request): Passport
     {
         $passport = parent::authenticate($request);
@@ -63,6 +64,7 @@ class UsernamePasswordOrganizationAuthenticator extends FormLoginAuthenticator
         return $passport;
     }
 
+    #[\Override]
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         if (null === $this->tokenFactory) {
@@ -87,6 +89,7 @@ class UsernamePasswordOrganizationAuthenticator extends FormLoginAuthenticator
         );
     }
 
+    #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         if ($exception instanceof BadCredentialsException && isset($this->errorMessageOptions[$this->firewallName])) {

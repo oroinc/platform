@@ -27,9 +27,7 @@ class NameOrOrganization extends Constraint
      */
     public $parentFormName;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

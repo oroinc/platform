@@ -19,6 +19,7 @@ class SetCaseSensitivityForFilterTest extends GetListProcessorTestCase
     /** @var SetCaseSensitivityForFilter */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

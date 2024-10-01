@@ -329,8 +329,8 @@ class ObjectMapper extends AbstractMapper
     /**
      * Keep HTML in text fields except all_text* fields
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function clearTextValue($fieldName, $value)
     {
         if (str_starts_with($fieldName, Indexer::TEXT_ALL_DATA_FIELD)) {

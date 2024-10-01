@@ -38,9 +38,7 @@ class WidgetDefinitionProvider extends PhpArrayConfigProvider
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $config = [];

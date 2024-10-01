@@ -34,9 +34,7 @@ use Laminas\Mail\Header\GenericHeader as BaseGenericHeader;
  */
 class GenericHeader extends BaseGenericHeader
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function fromString($headerLine)
     {
         [$name, $value] = self::splitHeaderLine($headerLine);
@@ -46,11 +44,7 @@ class GenericHeader extends BaseGenericHeader
         return $header;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Simplify validation - avoid validation exception of header name and value
-     */
+    #[\Override]
     public static function splitHeaderLine($headerLine)
     {
         $parts = explode(':', $headerLine, 2);

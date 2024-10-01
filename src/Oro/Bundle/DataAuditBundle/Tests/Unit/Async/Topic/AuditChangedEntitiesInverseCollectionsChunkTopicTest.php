@@ -9,11 +9,13 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class AuditChangedEntitiesInverseCollectionsChunkTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new AuditChangedEntitiesInverseCollectionsChunkTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         $time = time();
@@ -87,6 +89,7 @@ class AuditChangedEntitiesInverseCollectionsChunkTopicTest extends AbstractTopic
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

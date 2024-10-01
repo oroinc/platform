@@ -25,6 +25,7 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
 
     private Context $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobProcessor = $this->createMock(JobProcessor::class);

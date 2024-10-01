@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class FallbackFieldConfiguration implements FieldConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'fallback';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

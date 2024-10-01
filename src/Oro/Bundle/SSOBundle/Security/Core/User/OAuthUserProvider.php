@@ -24,9 +24,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
         $this->userChecker = $userChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
         $username = $response->getUsername();

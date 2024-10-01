@@ -74,31 +74,37 @@ class WebsocketClientParametersProvider implements WebsocketClientParametersProv
         $this->validateAndNormalizeContextOptions();
     }
 
+    #[\Override]
     public function getHost(): string
     {
         return $this->host;
     }
 
+    #[\Override]
     public function getPort(): int
     {
         return $this->port;
     }
 
+    #[\Override]
     public function getPath(): string
     {
         return $this->path;
     }
 
+    #[\Override]
     public function getTransport(): string
     {
         return $this->transport;
     }
 
+    #[\Override]
     public function getContextOptions(): array
     {
         return $this->contextOptions;
     }
 
+    #[\Override]
     public function getUserAgent(): ?string
     {
         return $this->userAgent;

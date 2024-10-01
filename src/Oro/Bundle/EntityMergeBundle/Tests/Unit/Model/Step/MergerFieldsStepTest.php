@@ -21,6 +21,7 @@ class MergerFieldsStepTest extends \PHPUnit\Framework\TestCase
     /** @var MergeFieldsStep */
     private $step;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->strategy = $this->createMock(StrategyInterface::class);

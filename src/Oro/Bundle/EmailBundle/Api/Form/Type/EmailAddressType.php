@@ -16,9 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class EmailAddressType extends AbstractType
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -30,9 +28,7 @@ class EmailAddressType extends AbstractType
             ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

@@ -11,48 +11,36 @@ class GlobalScopeManager extends AbstractScopeManager
 {
     public const SCOPE_NAME = 'app';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getScopedEntityName(): string
     {
         return self::SCOPE_NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getScopeIdFromEntity(object $entity): int
     {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getScopeId(): int
     {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setScopeId(?int $scopeId): void
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isSupportedScopeEntity(object $entity): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getScopeEntityIdValue(object $entity): int
     {
         throw new \LogicException(sprintf('"%s" is not supported.', ClassUtils::getClass($entity)));

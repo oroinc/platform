@@ -42,9 +42,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [
@@ -214,9 +212,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

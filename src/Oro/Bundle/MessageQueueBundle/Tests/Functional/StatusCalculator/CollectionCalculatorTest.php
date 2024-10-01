@@ -14,6 +14,7 @@ use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
  */
 class CollectionCalculatorTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -21,6 +22,7 @@ class CollectionCalculatorTest extends WebTestCase
         $this->loadFixtures([LoadJobData::class]);
     }
 
+    #[\Override]
     protected function getDataFixturesExecutorEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);

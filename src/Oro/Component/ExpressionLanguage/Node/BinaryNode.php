@@ -38,6 +38,7 @@ class BinaryNode extends Node
         );
     }
 
+    #[\Override]
     public function compile(Compiler $compiler)
     {
         // [CUSTOM LINES]
@@ -83,6 +84,7 @@ class BinaryNode extends Node
         ;
     }
 
+    #[\Override]
     public function evaluate(array $functions, array $values)
     {
         // [CUSTOM LINES]
@@ -180,6 +182,7 @@ class BinaryNode extends Node
         }
     }
 
+    #[\Override]
     public function toArray()
     {
         return ['(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')'];

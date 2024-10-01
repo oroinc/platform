@@ -35,9 +35,7 @@ abstract class RestGetController extends AbstractFOSRestController implements
 {
     const ITEMS_PER_PAGE = 10;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleGetListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [], $joins = [])
     {
         $manager    = $this->getManager();
@@ -84,9 +82,7 @@ abstract class RestGetController extends AbstractFOSRestController implements
         return $this->buildResponse($result, self::ACTION_LIST, $responseContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleGetRequest($id)
     {
         $manager = $this->getManager();
@@ -451,6 +447,7 @@ abstract class RestGetController extends AbstractFOSRestController implements
         return $enumFields;
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

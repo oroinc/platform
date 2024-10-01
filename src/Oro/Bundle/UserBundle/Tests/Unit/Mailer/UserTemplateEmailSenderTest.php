@@ -22,6 +22,7 @@ class UserTemplateEmailSenderTest extends TestCase
 
     private UserTemplateEmailSender $sender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->notificationSettingsModel = $this->createMock(NotificationSettings::class);

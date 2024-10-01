@@ -11,6 +11,7 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationChecker */
     private $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->checker = new ConfigurationChecker(new ContextAccessor());

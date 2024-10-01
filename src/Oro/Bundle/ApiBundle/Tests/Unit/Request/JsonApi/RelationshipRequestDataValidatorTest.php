@@ -12,6 +12,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var RelationshipRequestDataValidator */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

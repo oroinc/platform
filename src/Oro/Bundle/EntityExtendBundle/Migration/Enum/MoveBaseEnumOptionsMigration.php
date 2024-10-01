@@ -35,6 +35,7 @@ class MoveBaseEnumOptionsMigration implements Migration, ConnectionAwareInterfac
      */
     private array $languageIdMap = [];
 
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $entityConfigs = $this->connection->fetchAllAssociative(

@@ -15,17 +15,13 @@ class Trim extends AbstractFunction
     /** @var mixed */
     protected $charlist;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'trim';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         $params = [$this->value];
@@ -36,9 +32,7 @@ class Trim extends AbstractFunction
         return $this->convertToArray($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         $params = [$this->value];
@@ -49,9 +43,7 @@ class Trim extends AbstractFunction
         return $this->convertToPhpCode($params, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $count = count($options);
@@ -69,9 +61,7 @@ class Trim extends AbstractFunction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getMessageParameters($context)
     {
         return [
@@ -80,9 +70,7 @@ class Trim extends AbstractFunction
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doEvaluate($context)
     {
         $value = $this->resolveValue($context, $this->value);

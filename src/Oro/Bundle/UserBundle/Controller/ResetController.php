@@ -302,9 +302,7 @@ class ResetController extends AbstractController
         return $this->container->get(UserManager::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

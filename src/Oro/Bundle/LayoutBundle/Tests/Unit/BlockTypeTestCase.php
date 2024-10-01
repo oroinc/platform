@@ -11,9 +11,7 @@ use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
  */
 abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);

@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateVisibilitiesForOrganizationTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.update_visibilities_for_organization';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Update visibilities for emails and email addresses for organization';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

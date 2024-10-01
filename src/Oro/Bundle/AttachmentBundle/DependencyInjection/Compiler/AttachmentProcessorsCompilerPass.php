@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AttachmentProcessorsCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $pngquantBinaryPath = $this->getResolvedBinaryPath($container, ProcessorHelper::PNGQUANT);

@@ -16,6 +16,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
     /** @var ValidateIncludedDataDependencies */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

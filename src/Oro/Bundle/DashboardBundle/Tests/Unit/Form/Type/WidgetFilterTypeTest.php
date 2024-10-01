@@ -61,9 +61,7 @@ class WidgetFilterTypeTest extends TypeTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [

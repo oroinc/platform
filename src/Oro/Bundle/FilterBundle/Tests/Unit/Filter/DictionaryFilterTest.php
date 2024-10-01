@@ -28,6 +28,7 @@ class DictionaryFilterTest extends OrmTestCase
     /** @var DictionaryFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

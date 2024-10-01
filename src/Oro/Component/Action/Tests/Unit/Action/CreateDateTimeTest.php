@@ -14,6 +14,7 @@ class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
     /** @var CreateDateTime */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new CreateDateTime(new ContextAccessor());

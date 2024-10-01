@@ -38,10 +38,10 @@ class DbalConnection implements ConnectionInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return DbalSession
      */
+    #[\Override]
     public function createSession()
     {
         return new DbalSession($this);
@@ -71,9 +71,7 @@ class DbalConnection implements ConnectionInterface
         return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close()
     {
         $this->connection->close();

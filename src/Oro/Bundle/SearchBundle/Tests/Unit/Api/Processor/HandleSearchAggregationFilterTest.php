@@ -14,6 +14,7 @@ class HandleSearchAggregationFilterTest extends GetListProcessorTestCase
     /** @var HandleSearchAggregationFilter */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

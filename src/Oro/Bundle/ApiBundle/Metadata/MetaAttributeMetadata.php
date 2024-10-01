@@ -31,9 +31,7 @@ class MetaAttributeMetadata implements ToArrayInterface
         $this->propertyPath = $propertyPath;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $result = ['name' => $this->name];

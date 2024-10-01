@@ -13,17 +13,13 @@ class CollectionCalculator extends AbstractStatusCalculator
     /** @var Job */
     private $rootJob;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(Job $rootJob)
     {
         $this->rootJob = $rootJob;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function calculateRootJobProgress()
     {
         $childJobs = $this->rootJob->getChildJobs();
@@ -48,17 +44,13 @@ class CollectionCalculator extends AbstractStatusCalculator
         return $this->doJobProgressCalculation($processed, $numberOfChildren);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clean()
     {
         $this->rootJob = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getChildrenInternalJobStatusCountList()
     {
         $internalJobStatusCountList = $this->getFullInternalStatusCountList([]);

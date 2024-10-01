@@ -89,9 +89,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [UpdateListTopic::getName()];
@@ -108,11 +106,11 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);

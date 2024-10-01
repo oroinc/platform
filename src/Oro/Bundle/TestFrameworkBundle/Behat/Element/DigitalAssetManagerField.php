@@ -12,17 +12,13 @@ class DigitalAssetManagerField extends Element implements SuiteAwareInterface
     /** @var Suite */
     private $suite;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSuite(Suite $suite): void
     {
         $this->suite = $suite;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($filename): void
     {
         $this->open();

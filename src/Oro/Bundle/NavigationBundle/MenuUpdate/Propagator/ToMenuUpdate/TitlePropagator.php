@@ -22,11 +22,13 @@ class TitlePropagator implements MenuItemToMenuUpdatePropagatorInterface
         $this->menuUpdateHelper = $menuUpdateHelper;
     }
 
+    #[\Override]
     public function isApplicable(MenuUpdateInterface $menuUpdate, ItemInterface $menuItem, string $strategy): bool
     {
         return $strategy === self::STRATEGY_FULL;
     }
 
+    #[\Override]
     public function propagateFromMenuItem(
         MenuUpdateInterface $menuUpdate,
         ItemInterface $menuItem,

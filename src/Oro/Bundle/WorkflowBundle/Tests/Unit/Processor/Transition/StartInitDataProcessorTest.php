@@ -16,6 +16,7 @@ class StartInitDataProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var StartInitDataProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->buttonContextProvider = $this->createMock(ButtonSearchContextProvider::class);

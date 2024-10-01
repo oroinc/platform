@@ -13,6 +13,7 @@ class AddressTypeTest extends AddressFormExtensionTestCase
 {
     private AddressType $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new AddressType(
@@ -23,9 +24,7 @@ class AddressTypeTest extends AddressFormExtensionTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [

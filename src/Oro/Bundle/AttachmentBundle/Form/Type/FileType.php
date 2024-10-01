@@ -36,9 +36,7 @@ class FileType extends AbstractType
         $this->eventSubscriber = $eventSubscriber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['isExternalFile']) {
@@ -75,6 +73,7 @@ class FileType extends AbstractType
         $event->getForm()->remove('owner');
     }
 
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['allowDelete'] = $options['allowDelete'];
@@ -82,6 +81,7 @@ class FileType extends AbstractType
         $view->vars['attachmentViewOptions']['isExternalFile'] = $options['isExternalFile'];
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['attachmentViewOptions']['fileSelector'] = '#' . $view['file']->vars['id'];
@@ -90,9 +90,7 @@ class FileType extends AbstractType
         $view->vars['label_attr']['for'] = $view['file']->vars['id'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -129,9 +127,7 @@ class FileType extends AbstractType
         return $option;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_file';

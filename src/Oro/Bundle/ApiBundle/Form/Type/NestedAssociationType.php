@@ -32,9 +32,7 @@ class NestedAssociationType extends AbstractType
         $this->entityLoader = $entityLoader;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -44,9 +42,7 @@ class NestedAssociationType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver

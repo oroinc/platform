@@ -14,6 +14,7 @@ class DisableUpsertOperationTest extends UpdateProcessorTestCase
 {
     private DisableUpsertOperation $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

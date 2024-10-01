@@ -6,17 +6,13 @@ use Oro\Bundle\SoapBundle\Form\Type\AbstractPatchableApiType;
 
 class TagStandaloneCollectionApiType extends AbstractPatchableApiType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return TagCollectionApiType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_tag_standalone_collection_api';

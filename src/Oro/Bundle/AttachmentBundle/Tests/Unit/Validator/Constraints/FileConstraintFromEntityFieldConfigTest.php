@@ -12,6 +12,7 @@ class FileConstraintFromEntityFieldConfigTest extends \PHPUnit\Framework\TestCas
     /** @var FileConstraintFromEntityFieldConfig */
     private $constraint;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->constraint = new FileConstraintFromEntityFieldConfig(

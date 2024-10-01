@@ -17,6 +17,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ClassAttributeExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $encoderRegistry = $this->createMock(ExpressionEncoderRegistry::class);

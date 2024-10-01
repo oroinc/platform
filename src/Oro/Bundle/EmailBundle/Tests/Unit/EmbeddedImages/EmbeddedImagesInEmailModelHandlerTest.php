@@ -20,6 +20,7 @@ class EmbeddedImagesInEmailModelHandlerTest extends \PHPUnit\Framework\TestCase
 
     private EmbeddedImagesInEmailModelHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->embeddedImagesExtractor = $this->createMock(EmbeddedImagesExtractor::class);

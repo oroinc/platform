@@ -38,9 +38,7 @@ class AclProtectedQueryFactory extends QueryFactory
         $this->requestType = $requestType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getQuery(QueryBuilder $qb, EntityConfig $config): Query
     {
         if (null === $this->requestType) {

@@ -14,9 +14,7 @@ class CustomImageFilterProvidersCompilerPass implements CompilerPassInterface
     private const IMAGE_LOADER_PROVIDER_SERVICE_ID = 'oro_layout.loader.image_filter';
     private const TAG_NAME = 'layout.image_filter.provider';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $imageFilterDef = $container->findDefinition(self::IMAGE_LOADER_PROVIDER_SERVICE_ID);

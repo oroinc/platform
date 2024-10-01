@@ -22,9 +22,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FieldSearchProvider */
     private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->configBag = $this->createMock(ConfigBag::class);

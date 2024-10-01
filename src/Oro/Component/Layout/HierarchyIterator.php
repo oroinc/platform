@@ -42,41 +42,31 @@ class HierarchyIterator implements \Iterator
             : $this->iterator->getSubIterator($depth - 1)->key();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function current(): mixed
     {
         return $this->iterator->key();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(): mixed
     {
         return $this->iterator->key();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         return $this->iterator->valid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->iterator->next();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         $this->iterator->rewind();

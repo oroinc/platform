@@ -20,9 +20,7 @@ class CalendarFactory implements CalendarFactoryInterface, ServiceSubscriberInte
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCalendar($locale = null, $language = null)
     {
         /** @var Calendar $result */
@@ -32,9 +30,7 @@ class CalendarFactory implements CalendarFactoryInterface, ServiceSubscriberInte
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

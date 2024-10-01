@@ -18,9 +18,7 @@ class ObjectIdentityRetrievalStrategy implements ObjectIdentityRetrievalStrategy
         $this->objectIdentityFactory = $objectIdentityFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getObjectIdentity($domainObject)
     {
         if ($domainObject instanceof DomainObjectWrapper) {

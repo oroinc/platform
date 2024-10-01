@@ -43,6 +43,7 @@ class QueueConsumerTest extends \PHPUnit\Framework\TestCase
 
     private Message $message;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->messageConsumer = $this->createMock(MessageConsumerInterface::class);

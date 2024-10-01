@@ -18,9 +18,7 @@ class TwigPostProcessor implements PostProcessorInterface, ServiceSubscriberInte
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(mixed $value, array $options): mixed
     {
         if (null === $value) {
@@ -34,9 +32,7 @@ class TwigPostProcessor implements PostProcessorInterface, ServiceSubscriberInte
         return $this->getTwig()->render($options['template'], $twigContent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         /**

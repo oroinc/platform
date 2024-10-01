@@ -26,6 +26,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultOwnerSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->user = $this->createMock(AbstractUser::class);

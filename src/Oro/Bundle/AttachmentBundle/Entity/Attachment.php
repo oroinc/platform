@@ -211,6 +211,7 @@ class Attachment implements ExtendEntityInterface
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
+    #[\Override]
     public function __toString()
     {
         if ($this->getFile()) {

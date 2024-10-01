@@ -19,21 +19,25 @@ class OroGenericSuite implements Suite
         return $this->projectDir;
     }
 
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function getSettings(): array
     {
         return $this->settings;
     }
 
+    #[\Override]
     public function hasSetting($key): bool
     {
         return array_key_exists($key, $this->settings);
     }
 
+    #[\Override]
     public function getSetting($key): mixed
     {
         if (!$this->hasSetting($key)) {

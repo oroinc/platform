@@ -14,6 +14,7 @@ use Oro\Bundle\TagBundle\Entity\Tagging;
  */
 class TagTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -22,6 +23,7 @@ class TagTest extends RestJsonApiTestCase
         ]);
     }
 
+    #[\Override]
     protected function postFixtureLoad()
     {
         $em = $this->getEntityManager();

@@ -26,6 +26,7 @@ class EntityConfigId implements ConfigIdInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getClassName()
     {
         return $this->className;
@@ -34,6 +35,7 @@ class EntityConfigId implements ConfigIdInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getScope()
     {
         return $this->scope;
@@ -42,22 +44,19 @@ class EntityConfigId implements ConfigIdInterface
     /**
      * @return string
      */
+    #[\Override]
     public function toString()
     {
         return sprintf('entity_%s_%s', $this->scope, str_replace('\\', '-', $this->className));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function serialize()
     {
         return serialize([$this->className, $this->scope]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function unserialize($serialized)
     {
         [$this->className, $this->scope] = unserialize($serialized);

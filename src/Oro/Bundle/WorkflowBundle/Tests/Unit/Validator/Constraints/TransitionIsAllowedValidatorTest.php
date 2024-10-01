@@ -18,6 +18,7 @@ class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
     /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(WorkflowRegistry::class);
@@ -25,6 +26,7 @@ class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new TransitionIsAllowedValidator($this->registry);

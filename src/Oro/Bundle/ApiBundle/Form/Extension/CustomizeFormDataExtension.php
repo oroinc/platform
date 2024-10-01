@@ -35,9 +35,7 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
         $this->customizationHandler = $customizationHandler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (empty($options['data_class'])) {
@@ -54,9 +52,7 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
         $this->addEventListeners($builder);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
@@ -64,9 +60,7 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
             ->setAllowedTypes(CustomizeFormDataHandler::API_CONTEXT, ['null', FormContext::class]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];

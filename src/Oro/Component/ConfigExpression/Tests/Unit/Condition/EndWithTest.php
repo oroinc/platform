@@ -10,6 +10,7 @@ class EndWithTest extends \PHPUnit\Framework\TestCase
 {
     protected $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\EndWith();

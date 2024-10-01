@@ -12,9 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class LoadEnumOptionsData extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
 

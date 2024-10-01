@@ -24,9 +24,7 @@ class FieldAccessor extends BaseFieldAccessor
         $this->requestType = $requestType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFieldsToSelect(string $entityClass, EntityConfig $config, bool $withAssociations = false): array
     {
         $fields = parent::getFieldsToSelect($entityClass, $config, $withAssociations);

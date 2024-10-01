@@ -26,9 +26,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FallbackValueTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

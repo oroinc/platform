@@ -18,9 +18,7 @@ class OroEmbeddedFormExtension extends Extension implements PrependExtensionInte
     private const CSRF_TOKEN_STORAGE_SERVICE_ID = 'oro_embedded_form.csrf_token_storage';
     private const DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID = 'oro_embedded_form.csrf_token_cache';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
@@ -42,9 +40,7 @@ class OroEmbeddedFormExtension extends Extension implements PrependExtensionInte
             ->replaceArgument(0, new Reference($csrfTokenCacheServiceId));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         // X-Frame-Options header should be removed from embedded forms

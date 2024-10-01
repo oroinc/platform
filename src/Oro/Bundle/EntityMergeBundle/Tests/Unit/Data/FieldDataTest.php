@@ -18,6 +18,7 @@ class FieldDataTest extends \PHPUnit\Framework\TestCase
     /** @var FieldData */
     private $fieldData;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityData = $this->createMock(EntityData::class);

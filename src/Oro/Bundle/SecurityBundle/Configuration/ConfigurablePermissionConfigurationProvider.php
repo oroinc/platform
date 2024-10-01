@@ -30,9 +30,7 @@ class ConfigurablePermissionConfigurationProvider extends PhpArrayConfigProvider
         return $this->doGetConfig();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];

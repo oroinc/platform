@@ -62,9 +62,7 @@ class EmailOriginController extends RestGetController
         return $this->handleGetRequest($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email_origin.api');

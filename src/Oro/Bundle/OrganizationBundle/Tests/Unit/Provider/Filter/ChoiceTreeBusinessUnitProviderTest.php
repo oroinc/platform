@@ -35,6 +35,7 @@ class ChoiceTreeBusinessUnitProviderTest extends TestCase
     /** @var AbstractQuery|MockObject */
     private $query;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

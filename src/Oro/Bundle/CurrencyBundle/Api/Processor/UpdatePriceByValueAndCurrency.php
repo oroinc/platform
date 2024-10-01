@@ -15,9 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class UpdatePriceByValueAndCurrency implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

@@ -9,6 +9,7 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
     /** @var TagDefinitionConverter */
     private $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->converter = new TagDefinitionConverter();

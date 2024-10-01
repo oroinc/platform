@@ -18,9 +18,7 @@ class EnumOption extends Constraint
      */
     public $message = 'This value should contain only alphabetic symbols, underscore, hyphen, spaces and numbers.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT];

@@ -19,6 +19,7 @@ class EmailModelSenderTest extends WebTestCase
 {
     private EmailModelSender $emailModelSender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

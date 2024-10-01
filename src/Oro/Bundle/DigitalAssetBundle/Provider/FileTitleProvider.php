@@ -33,9 +33,7 @@ class FileTitleProvider implements FileTitleProviderInterface
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTitle(File $file, Localization $localization = null): string
     {
         /** @var DigitalAsset|null $digitalAsset */

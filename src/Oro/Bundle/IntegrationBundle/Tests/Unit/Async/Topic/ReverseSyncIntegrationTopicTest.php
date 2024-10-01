@@ -10,11 +10,13 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class ReverseSyncIntegrationTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new ReverseSyncIntegrationTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         $fullOptionsSet = [
@@ -44,6 +46,7 @@ class ReverseSyncIntegrationTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

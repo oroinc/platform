@@ -26,33 +26,25 @@ class ImapEmailMicrosoftOAuthManager extends AbstractOAuthManager
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getType(): string
     {
         return AccountTypeModel::ACCOUNT_TYPE_MICROSOFT;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isOAuthEnabled(): bool
     {
         return (bool)$this->configManager->get('oro_imap.enable_microsoft_imap');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConnectionFormTypeClass(): string
     {
         return ConfigurationMicrosoftType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOriginDefaults(UserEmailOrigin $origin): void
     {
         $origin->setImapHost(Office365Imap::DEFAULT_IMAP_HOST);
@@ -66,9 +58,7 @@ class ImapEmailMicrosoftOAuthManager extends AbstractOAuthManager
         $origin->setAccountType(AccountTypeModel::ACCOUNT_TYPE_MICROSOFT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getRefreshAccessTokenScopes(): ?array
     {
         return [

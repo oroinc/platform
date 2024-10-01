@@ -17,6 +17,7 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainDictionaryValueListProvider */
     private $chainProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider1 = $this->createMock(DictionaryValueListProviderInterface::class);

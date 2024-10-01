@@ -23,6 +23,7 @@ class WebpAwareImageResizeManager implements ImageResizeManagerInterface
         $this->webpConfiguration = $webpConfiguration;
     }
 
+    #[\Override]
     public function resize(
         File $file,
         int $width,
@@ -37,6 +38,7 @@ class WebpAwareImageResizeManager implements ImageResizeManagerInterface
         return $this->innerImageResizeManager->resize($file, $width, $height, $format, $forceUpdate);
     }
 
+    #[\Override]
     public function applyFilter(
         File $file,
         string $filterName,

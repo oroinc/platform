@@ -20,6 +20,7 @@ class PrepareContextTitleListenerTest extends \PHPUnit\Framework\TestCase
     /** @var PrepareContextTitleListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);

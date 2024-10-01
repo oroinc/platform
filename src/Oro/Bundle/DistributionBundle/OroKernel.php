@@ -48,9 +48,7 @@ abstract class OroKernel extends Kernel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeBundles(): void
     {
         // clear state of CumulativeResourceManager
@@ -73,9 +71,7 @@ abstract class OroKernel extends Kernel
             });
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerBundles(): iterable
     {
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
@@ -281,9 +277,7 @@ abstract class OroKernel extends Kernel
         return ($p1 < $p2) ? -1 : 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function boot(): void
     {
         $phpVersion = phpversion();
@@ -299,9 +293,7 @@ abstract class OroKernel extends Kernel
         parent::boot();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass): void
     {
         // cache the container
@@ -345,6 +337,7 @@ abstract class OroKernel extends Kernel
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     protected function initializeContainer(): void
     {
         \Doctrine\Deprecations\Deprecation::disable();
@@ -508,18 +501,14 @@ abstract class OroKernel extends Kernel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reboot($warmupDir): void
     {
         $this->warmupDir = $warmupDir;
         parent::reboot($warmupDir);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getContainerBuilder(): ContainerBuilder
     {
         $container = new ExtendedContainerBuilder();

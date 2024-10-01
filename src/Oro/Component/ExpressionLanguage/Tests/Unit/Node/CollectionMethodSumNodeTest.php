@@ -13,6 +13,7 @@ use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
 class CollectionMethodSumNodeTest extends AbstractNodeTest
 {
+    #[\Override]
     public function getEvaluateData(): array
     {
         $variables = [
@@ -92,6 +93,7 @@ class CollectionMethodSumNodeTest extends AbstractNodeTest
         ];
     }
 
+    #[\Override]
     public function getCompileData(): array
     {
         return [
@@ -144,6 +146,7 @@ class CollectionMethodSumNodeTest extends AbstractNodeTest
         return $arguments;
     }
 
+    #[\Override]
     public function getDumpData(): array
     {
         return [

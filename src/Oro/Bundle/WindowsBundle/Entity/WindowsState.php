@@ -18,9 +18,7 @@ class WindowsState extends AbstractWindowsState
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     protected ?UserInterface $user = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setUser(UserInterface $user)
     {
         $this->user = $user;
@@ -28,9 +26,7 @@ class WindowsState extends AbstractWindowsState
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUser()
     {
         return $this->user;

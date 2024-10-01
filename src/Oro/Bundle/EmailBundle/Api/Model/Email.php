@@ -81,6 +81,7 @@ class Email implements EntityHolderInterface
         }
     }
 
+    #[\Override]
     public function getEntity(): ?EmailEntity
     {
         return $this->entity;

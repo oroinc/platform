@@ -23,6 +23,7 @@ class ImapEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $repoImapEmail;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connector = $this->createMock(ImapConnector::class);

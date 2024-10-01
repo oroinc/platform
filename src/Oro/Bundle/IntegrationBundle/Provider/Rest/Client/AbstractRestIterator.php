@@ -57,17 +57,13 @@ abstract class AbstractRestIterator implements \Iterator
         $this->client = $client;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function current(): mixed
     {
         return $this->current;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->offset++;
@@ -80,17 +76,13 @@ abstract class AbstractRestIterator implements \Iterator
         $this->position++;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(): int
     {
         return $this->position;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         if (!$this->firstLoaded) {
@@ -100,9 +92,7 @@ abstract class AbstractRestIterator implements \Iterator
         return null !== $this->current;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         $this->firstLoaded  = false;
@@ -115,9 +105,6 @@ abstract class AbstractRestIterator implements \Iterator
         $this->next();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count()
     {
         if (!$this->firstLoaded) {

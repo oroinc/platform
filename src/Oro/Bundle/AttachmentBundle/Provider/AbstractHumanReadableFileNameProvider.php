@@ -28,6 +28,7 @@ abstract class AbstractHumanReadableFileNameProvider implements FileNameProvider
         $this->filenameExtensionHelper = $filenameExtensionHelper;
     }
 
+    #[\Override]
     public function getFileName(File $file): string
     {
         if (!$this->isApplicable($file)) {
@@ -37,6 +38,7 @@ abstract class AbstractHumanReadableFileNameProvider implements FileNameProvider
         return $this->getNameWithFormat($file);
     }
 
+    #[\Override]
     public function getFilteredImageName(File $file, string $filterName, string $format = ''): string
     {
         if (!$this->isApplicable($file)) {
@@ -46,6 +48,7 @@ abstract class AbstractHumanReadableFileNameProvider implements FileNameProvider
         return $this->getNameWithFormat($file, $format);
     }
 
+    #[\Override]
     public function getResizedImageName(File $file, int $width, int $height, string $format = ''): string
     {
         if (!$this->isApplicable($file)) {

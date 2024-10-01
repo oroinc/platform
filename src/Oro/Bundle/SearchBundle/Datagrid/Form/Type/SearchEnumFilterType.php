@@ -11,9 +11,7 @@ class SearchEnumFilterType extends AbstractType
 {
     const NAME = 'oro_search_type_enum_filter';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setNormalizer(
@@ -26,25 +24,18 @@ class SearchEnumFilterType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return EnumFilterType::class;

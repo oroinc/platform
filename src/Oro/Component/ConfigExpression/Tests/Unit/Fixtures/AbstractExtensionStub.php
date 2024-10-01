@@ -17,9 +17,7 @@ class AbstractExtensionStub extends AbstractExtension
         $this->loadedExpressions = $loadedExpressions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadExpressions()
     {
         return $this->loadedExpressions;

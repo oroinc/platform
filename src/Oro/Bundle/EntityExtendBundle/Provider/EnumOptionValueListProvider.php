@@ -20,17 +20,13 @@ class EnumOptionValueListProvider implements DictionaryValueListProviderInterfac
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(string $className): bool
     {
         return $className == EnumOption::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getValueListQueryBuilder(string $className): QueryBuilder
     {
         /** @var EntityManagerInterface $em */
@@ -41,9 +37,7 @@ class EnumOptionValueListProvider implements DictionaryValueListProviderInterfac
             ->from($className, 'e');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSerializationConfig(string $className): array
     {
         $fields = [];
@@ -67,9 +61,7 @@ class EnumOptionValueListProvider implements DictionaryValueListProviderInterfac
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSupportedEntityClasses(): array
     {
         return [EnumOption::class];

@@ -15,6 +15,7 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
     /** @var CopyValues */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new CopyValues(new ContextAccessor());

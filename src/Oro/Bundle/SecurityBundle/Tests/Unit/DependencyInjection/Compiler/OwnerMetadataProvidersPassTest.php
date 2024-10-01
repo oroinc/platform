@@ -19,6 +19,7 @@ class OwnerMetadataProvidersPassTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerMetadataProvidersPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

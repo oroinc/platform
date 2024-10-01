@@ -20,9 +20,7 @@ class EntityFallbackFieldsStoragePass implements CompilerPassInterface
         $this->classes = $classes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $storage = $container->getDefinition('oro_locale.storage.entity_fallback_fields_storage');

@@ -24,30 +24,22 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class BehatJunitExtension implements TestworkExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(ExtensionManager $extensionManager)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(ArrayNodeDefinition $builder)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ContainerBuilder $container, array $config)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $definition = new Definition(
@@ -97,9 +89,7 @@ class BehatJunitExtension implements TestworkExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigKey()
     {
         return 'test_junit';

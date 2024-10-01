@@ -21,6 +21,7 @@ class AddressStub implements NameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;

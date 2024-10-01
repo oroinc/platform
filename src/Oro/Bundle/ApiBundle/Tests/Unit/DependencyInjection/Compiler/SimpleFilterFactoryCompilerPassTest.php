@@ -17,6 +17,7 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var SimpleFilterFactoryCompilerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new SimpleFilterFactoryCompilerPass();

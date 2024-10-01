@@ -12,6 +12,7 @@ class ScopeCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var ScopeCollection */
     private $collection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->collection = new ScopeCollection();

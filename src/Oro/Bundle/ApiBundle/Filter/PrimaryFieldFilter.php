@@ -61,9 +61,7 @@ class PrimaryFieldFilter extends ComparisonFilter
         $this->primaryFlagField = $fieldName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createExpression(FilterValue $value = null): ?Expression
     {
         if (null === $value) {

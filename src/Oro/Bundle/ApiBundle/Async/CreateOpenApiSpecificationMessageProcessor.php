@@ -37,17 +37,13 @@ class CreateOpenApiSpecificationMessageProcessor implements MessageProcessorInte
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [CreateOpenApiSpecificationTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $messageBody = $message->getBody();

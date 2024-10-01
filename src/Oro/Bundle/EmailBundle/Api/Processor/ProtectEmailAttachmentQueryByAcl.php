@@ -22,9 +22,7 @@ class ProtectEmailAttachmentQueryByAcl implements ProcessorInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

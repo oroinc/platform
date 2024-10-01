@@ -73,6 +73,7 @@ class TransitionCronTrigger extends BaseTransitionTrigger
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return sprintf(
@@ -85,9 +86,7 @@ class TransitionCronTrigger extends BaseTransitionTrigger
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isEqualAdditionalFields(BaseTransitionTrigger $trigger)
     {
         return $trigger instanceof static

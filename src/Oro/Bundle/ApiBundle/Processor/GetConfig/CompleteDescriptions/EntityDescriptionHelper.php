@@ -65,9 +65,7 @@ class EntityDescriptionHelper implements ResetInterface
         $this->maxDeleteEntitiesLimit = $maxDeleteEntitiesLimit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->singularEntityDescriptions = [];

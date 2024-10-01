@@ -22,6 +22,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
     /** @var EntityNestedAssociationMetadataFactory */
     private $entityNestedAssociationMetadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->nestedAssociationMetadataHelper = $this->createMock(NestedAssociationMetadataHelper::class);

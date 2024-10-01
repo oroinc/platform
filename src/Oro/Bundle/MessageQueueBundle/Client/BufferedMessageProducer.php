@@ -39,9 +39,7 @@ class BufferedMessageProducer implements MessageProducerInterface
         $this->filter = $filter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send($topic, $message)
     {
         if ($this->enableBufferingNestingLevel > 0) {

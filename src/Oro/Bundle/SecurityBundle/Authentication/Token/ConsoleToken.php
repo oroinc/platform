@@ -11,17 +11,11 @@ class ConsoleToken extends AbstractToken implements OrganizationAwareTokenInterf
 {
     use RolesAndOrganizationAwareTokenTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(array $roles = [])
     {
         parent::__construct($this->initRoles($roles));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCredentials()
     {
         return ''; // anonymous credentials

@@ -28,9 +28,7 @@ class RequestEntity extends AbstractAction
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         if (!empty($this->options['identifier'])) {
@@ -42,9 +40,7 @@ class RequestEntity extends AbstractAction
         $this->contextAccessor->setValue($context, $this->options['attribute'], $entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['class'])) {

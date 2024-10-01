@@ -22,9 +22,7 @@ class TicketProvider implements TicketProviderInterface
         $this->secret = $secret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function generateTicket(?UserInterface $user = null): string
     {
         $created = date('c');

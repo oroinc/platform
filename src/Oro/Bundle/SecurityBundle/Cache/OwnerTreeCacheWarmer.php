@@ -17,17 +17,13 @@ class OwnerTreeCacheWarmer implements CacheWarmerInterface
         $this->treeProvider = $treeProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUp($cacheDir)
     {
         $this->treeProvider->warmUpCache();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOptional()
     {
         return true;

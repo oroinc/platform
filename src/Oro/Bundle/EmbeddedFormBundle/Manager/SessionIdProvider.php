@@ -25,9 +25,7 @@ class SessionIdProvider implements SessionIdProviderInterface
         $this->sessionIdFieldName = $sessionIdFieldName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSessionId()
     {
         $sessionId = null;

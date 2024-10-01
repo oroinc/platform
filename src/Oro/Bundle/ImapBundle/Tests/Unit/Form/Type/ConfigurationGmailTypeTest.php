@@ -33,6 +33,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
     /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $oauthManagerRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -66,9 +67,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return array_merge(

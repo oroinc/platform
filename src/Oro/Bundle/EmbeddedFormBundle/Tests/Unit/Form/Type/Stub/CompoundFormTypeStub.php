@@ -7,9 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CompoundFormTypeStub extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('text');

@@ -18,6 +18,7 @@ abstract class AbstractDatagridTestCase extends WebTestCase
 
     protected bool $isRealGridRequest = true;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

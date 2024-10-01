@@ -7,49 +7,37 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
  */
 abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createContext(): GroupingOrmQueryConverterContext
     {
         return new GroupingOrmQueryConverterContext();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function context(): GroupingOrmQueryConverterContext
     {
         return parent::context();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function beginWhereGroup(): void
     {
         $this->context()->beginFilterGroup();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function endWhereGroup(): void
     {
         $this->context()->endFilterGroup();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addWhereOperator(string $operator): void
     {
         $this->context()->addFilterOperator($operator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addWhereCondition(
         string $entityClass,
         string $tableAlias,

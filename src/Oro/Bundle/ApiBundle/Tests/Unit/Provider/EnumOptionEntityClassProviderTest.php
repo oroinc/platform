@@ -17,6 +17,7 @@ class EnumOptionEntityClassProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumOptionEntityClassProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -13,6 +13,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var HierarchyCollection */
     private $hierarchyCollection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->hierarchyCollection = new HierarchyCollection();

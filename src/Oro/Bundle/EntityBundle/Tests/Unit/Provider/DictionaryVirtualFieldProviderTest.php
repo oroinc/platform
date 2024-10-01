@@ -29,6 +29,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DictionaryVirtualFieldProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

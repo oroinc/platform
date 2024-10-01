@@ -17,6 +17,7 @@ class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
      */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);

@@ -31,9 +31,7 @@ abstract class AbstractHashEmailMigration extends AbstractEmailFixture
      */
     abstract protected function getEmailHashesToUpdate(): array;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function findExistingTemplate(ObjectManager $manager, array $template)
     {
         if (empty($template['params']['name'])) {
@@ -46,9 +44,7 @@ abstract class AbstractHashEmailMigration extends AbstractEmailFixture
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
     {
         foreach ($this->getEmailHashesToUpdate() as $templateName => $contentHashes) {

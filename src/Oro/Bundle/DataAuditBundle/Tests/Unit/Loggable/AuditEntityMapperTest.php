@@ -14,6 +14,7 @@ class AuditEntityMapperTest extends \PHPUnit\Framework\TestCase
     /** @var AuditEntityMapper */
     private $mapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mapper = new AuditEntityMapper();

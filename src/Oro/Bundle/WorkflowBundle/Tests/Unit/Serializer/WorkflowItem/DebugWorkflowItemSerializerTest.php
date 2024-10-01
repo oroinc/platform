@@ -14,6 +14,7 @@ class DebugWorkflowItemSerializerTest extends \PHPUnit\Framework\TestCase
     /** @var DebugWorkflowItemSerializer */
     private $serializer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerSerializer = $this->createMock(WorkflowItemSerializerInterface::class);

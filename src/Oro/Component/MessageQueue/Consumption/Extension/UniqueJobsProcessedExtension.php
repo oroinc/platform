@@ -16,6 +16,7 @@ class UniqueJobsProcessedExtension extends AbstractExtension
         $this->jobManager = $jobManager;
     }
 
+    #[\Override]
     public function onIdle(Context $context)
     {
         if (empty($this->jobManager->getUniqueJobs())) {

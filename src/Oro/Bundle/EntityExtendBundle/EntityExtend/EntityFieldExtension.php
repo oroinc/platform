@@ -191,6 +191,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         return $result;
     }
 
+    #[\Override]
     public function get(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isPropertyExists($transport)) {
@@ -203,9 +204,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         $transport->setResult($result);
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function set(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isPropertyExists($transport)) {
@@ -221,9 +220,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function call(EntityFieldProcessTransport $transport): void
     {
         $this->processGetCall($transport);
@@ -323,9 +320,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function isset(EntityFieldProcessTransport $transport): void
     {
         if (is_object($transport->getObject()) &&
@@ -344,9 +339,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         $transport->setResult(true);
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function propertyExists(EntityFieldProcessTransport $transport): void
     {
         if ($this->isPropertyExists($transport)) {
@@ -355,9 +348,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function methodExists(EntityFieldProcessTransport $transport): void
     {
         $rules = [
@@ -383,6 +374,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
     }
 
+    #[\Override]
     protected function getMethodsData(EntityFieldProcessTransport $transport): array
     {
         return array_merge(
@@ -393,6 +385,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         );
     }
 
+    #[\Override]
     public function getMethods(EntityFieldProcessTransport $transport): array
     {
         return array_keys($this->getMethodsData($transport));

@@ -10,21 +10,25 @@ use Oro\Bundle\FormBundle\Form\Type\HCaptchaType;
  */
 class HCaptchaService extends AbstractReCaptchaCompatibleService
 {
+    #[\Override]
     public function getFormType(): string
     {
         return HCaptchaType::class;
     }
 
+    #[\Override]
     protected function getPublicKeyConfigKey(): string
     {
         return Configuration::getConfigKey(Configuration::HCAPTCHA_PUBLIC_KEY);
     }
 
+    #[\Override]
     protected function getPrivateKeyConfigKey(): string
     {
         return Configuration::getConfigKey(Configuration::HCAPTCHA_PRIVATE_KEY);
     }
 
+    #[\Override]
     protected function getSurveyUrl(): string
     {
         return 'https://hcaptcha.com/siteverify';

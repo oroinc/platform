@@ -49,9 +49,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         $this->safeExceptions[] = AuthenticationException::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExceptionStatusCode(\Exception $exception): ?int
     {
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
@@ -78,17 +76,13 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         return Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExceptionCode(\Exception $exception): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExceptionType(\Exception $exception): ?string
     {
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
@@ -113,9 +107,9 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function getExceptionText(\Exception $exception): ?string
     {
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);

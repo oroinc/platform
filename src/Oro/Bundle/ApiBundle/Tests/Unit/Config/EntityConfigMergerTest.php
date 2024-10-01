@@ -14,6 +14,7 @@ class EntityConfigMergerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityConfigMerger */
     private $entityConfigMerger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configExtensionRegistry = $this->createMock(ConfigExtensionRegistry::class);

@@ -20,6 +20,7 @@ class PlaceholderRendererTest extends TestCase
 
     private PlaceholderRenderer $placeholderRenderer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->layoutManager = $this->createMock(LayoutManager::class);

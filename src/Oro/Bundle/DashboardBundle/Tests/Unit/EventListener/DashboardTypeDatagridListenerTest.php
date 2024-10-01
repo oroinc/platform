@@ -22,6 +22,7 @@ class DashboardTypeDatagridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DashboardTypeDatagridListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(EnumOptionRepository::class);

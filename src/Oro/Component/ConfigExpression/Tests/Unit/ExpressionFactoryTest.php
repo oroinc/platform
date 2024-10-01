@@ -22,6 +22,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);

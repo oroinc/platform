@@ -13,17 +13,13 @@ use Oro\Bundle\SidebarBundle\Entity\Widget;
  */
 class UpdateSidebarWidgetsWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganizationAndBusinessUnitData::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->update($manager, Widget::class);

@@ -21,9 +21,7 @@ class NonExtendedEntityBidirectionalValidator extends ConstraintValidator
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         $config = $this->configManager->getEntityConfig('extend', $value['target_entity']);

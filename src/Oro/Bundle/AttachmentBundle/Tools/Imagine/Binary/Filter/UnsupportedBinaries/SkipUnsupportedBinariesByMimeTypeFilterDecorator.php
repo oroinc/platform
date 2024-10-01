@@ -20,6 +20,7 @@ class SkipUnsupportedBinariesByMimeTypeFilterDecorator implements ImagineBinaryF
         $this->unsupportedMimeTypes = $unsupportedMimeTypes;
     }
 
+    #[\Override]
     public function applyFilter(BinaryInterface $binary, string $filter, array $runtimeConfig = []): ?BinaryInterface
     {
         if (!$this->isApplicable($binary)) {
@@ -29,6 +30,7 @@ class SkipUnsupportedBinariesByMimeTypeFilterDecorator implements ImagineBinaryF
         return $this->decoratedFilter->applyFilter($binary, $filter, $runtimeConfig);
     }
 
+    #[\Override]
     public function apply(BinaryInterface $binary, array $runtimeConfig): ?BinaryInterface
     {
         if (!$this->isApplicable($binary)) {

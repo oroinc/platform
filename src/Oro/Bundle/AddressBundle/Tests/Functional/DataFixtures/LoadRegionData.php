@@ -34,6 +34,7 @@ class LoadRegionData extends AbstractFixture
     /**
      * Load address types
      */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $repository = $manager->getRepository(Region::class);

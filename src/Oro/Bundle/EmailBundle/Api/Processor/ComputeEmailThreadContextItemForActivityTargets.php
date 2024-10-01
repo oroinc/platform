@@ -31,9 +31,7 @@ class ComputeEmailThreadContextItemForActivityTargets implements ProcessorInterf
         $this->valueNormalizer = $valueNormalizer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

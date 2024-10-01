@@ -9,6 +9,7 @@ class ThemeTest extends TestCase
 {
     private Theme $theme;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->theme = new Theme('test');

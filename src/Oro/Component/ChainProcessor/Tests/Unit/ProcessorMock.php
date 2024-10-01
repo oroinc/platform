@@ -27,9 +27,7 @@ class ProcessorMock implements ProcessorInterface
         return $this->callback;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         if (null !== $this->callback) {

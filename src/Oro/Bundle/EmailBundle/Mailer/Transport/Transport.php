@@ -33,9 +33,7 @@ class Transport implements TransportInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         try {
@@ -71,6 +69,7 @@ class Transport implements TransportInterface, LoggerAwareInterface
         return $sentMessage;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->transport;

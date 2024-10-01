@@ -185,9 +185,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         return [preg_replace('/^SELECT id FROM/', 'DELETE FROM', $sql), $params, $types];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createAcl(ObjectIdentityInterface $oid)
     {
         if (false !== $this->retrieveObjectIdentityPrimaryKey($oid)) {
@@ -215,9 +213,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         return $this->findAcl($oid);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function deleteAcl(ObjectIdentityInterface $oid)
     {
         $this->connection->beginTransaction();
@@ -272,9 +268,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         $this->connection->executeStatement($sql, $params, $types);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findAcls(array $oids, array $sids = [])
     {
         $result = parent::findAcls($oids, $sids);
@@ -316,6 +310,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function propertyChanged($sender, $propertyName, $oldValue, $newValue)
     {
         if (!$sender instanceof MutableAclInterface && !$sender instanceof EntryInterface) {
@@ -386,11 +381,11 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function updateAcl(MutableAclInterface $acl)
     {
         if (!$this->propertyChanges->contains($acl)) {

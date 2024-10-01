@@ -13,9 +13,9 @@ class ModelNormalizer implements ModelNormalizerInterface
     private const READ_ONLY_NOTE = '<p><strong>The read-only field. A passed value will be ignored.</strong></p>';
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function normalizeModel(array $model, string $action, bool $isResponseModel): array
     {
         foreach ($model as $name => $item) {

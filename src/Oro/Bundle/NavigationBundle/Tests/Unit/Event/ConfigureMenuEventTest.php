@@ -17,6 +17,7 @@ class ConfigureMenuEventTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigureMenuEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = $this->createMock(FactoryInterface::class);

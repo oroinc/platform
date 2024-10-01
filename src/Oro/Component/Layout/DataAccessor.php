@@ -27,9 +27,7 @@ class DataAccessor implements DataAccessorInterface
         return $this->offsetGet($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($name): mixed
     {
         $dataProvider = $this->getDataProvider($name);
@@ -43,9 +41,7 @@ class DataAccessor implements DataAccessorInterface
         throw new InvalidArgumentException(sprintf('Could not load the data provider "%s".', $name));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($name): bool
     {
         return
@@ -53,17 +49,13 @@ class DataAccessor implements DataAccessorInterface
             || $this->context->data()->has($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetSet($name, $value): void
     {
         throw new \BadMethodCallException('Not supported');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetUnset($name): void
     {
         throw new \BadMethodCallException('Not supported');

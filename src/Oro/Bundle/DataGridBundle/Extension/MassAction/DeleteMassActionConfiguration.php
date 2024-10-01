@@ -12,9 +12,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class DeleteMassActionConfiguration implements ConfigurationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('delete');

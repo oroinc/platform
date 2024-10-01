@@ -9,17 +9,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroTranslationBundle implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/

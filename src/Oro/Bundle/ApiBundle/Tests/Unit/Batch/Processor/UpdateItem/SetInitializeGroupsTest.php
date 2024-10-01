@@ -13,6 +13,7 @@ class SetInitializeGroupsTest extends BatchUpdateItemProcessorTestCase
     /** @var SetInitializeGroups */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

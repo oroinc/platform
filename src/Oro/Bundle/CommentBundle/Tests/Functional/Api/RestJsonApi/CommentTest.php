@@ -11,6 +11,7 @@ use Oro\Bundle\CommentBundle\Entity\Comment;
  */
 class CommentTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

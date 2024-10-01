@@ -35,9 +35,7 @@ class RemoveEntity extends AbstractAction
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $value = $this->contextAccessor->getValue($context, $this->target);
@@ -54,9 +52,7 @@ class RemoveEntity extends AbstractAction
         $this->getEntityManager(ClassUtils::getClass($value))->remove($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (1 == count($options)) {

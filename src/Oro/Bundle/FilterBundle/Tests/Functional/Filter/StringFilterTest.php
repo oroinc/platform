@@ -18,6 +18,7 @@ class StringFilterTest extends WebTestCase
 {
     private StringFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

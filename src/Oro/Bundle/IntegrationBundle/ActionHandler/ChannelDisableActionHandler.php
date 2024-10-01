@@ -17,9 +17,7 @@ class ChannelDisableActionHandler implements ChannelActionHandlerInterface
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleAction(Channel $channel)
     {
         $channel->setPreviouslyEnabled($channel->isEnabled());

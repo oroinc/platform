@@ -49,6 +49,7 @@ class RawConfigurationProvider implements RawConfigurationProviderInterface, War
         $this->gridCacheUtils = $gridCacheUtils;
     }
 
+    #[\Override]
     public function getRawConfiguration(string $gridName): ?array
     {
         $this->ensureRawConfigurationLoaded($gridName);
@@ -56,9 +57,7 @@ class RawConfigurationProvider implements RawConfigurationProviderInterface, War
         return $this->rawConfiguration[$gridName] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->hasCache = false;

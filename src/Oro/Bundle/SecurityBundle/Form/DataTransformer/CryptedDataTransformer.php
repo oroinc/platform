@@ -25,9 +25,7 @@ class CryptedDataTransformer implements DataTransformerInterface, LoggerAwareInt
         $this->crypter = $crypter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -46,9 +44,7 @@ class CryptedDataTransformer implements DataTransformerInterface, LoggerAwareInt
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

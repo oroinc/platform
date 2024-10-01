@@ -39,41 +39,31 @@ class Indexer implements IndexerInterface
         $this->transformer = $transformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function save($entity, array $context = [])
     {
         return $this->doIndex($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function delete($entity, array $context = [])
     {
         return $this->doIndex($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resetIndex($class = null, array $context = [])
     {
         throw new \LogicException('Method is not implemented');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassesForReindex($class = null, array $context = [])
     {
         throw new \LogicException('Method is not implemented');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reindex($class = null, array $context = [])
     {
         if (is_array($class)) {

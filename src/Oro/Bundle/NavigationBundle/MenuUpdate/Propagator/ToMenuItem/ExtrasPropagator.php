@@ -19,6 +19,7 @@ class ExtrasPropagator implements MenuUpdateToMenuItemPropagatorInterface
         $this->localizationHelper = $localizationHelper;
     }
 
+    #[\Override]
     public function isApplicable(ItemInterface $menuItem, MenuUpdateInterface $menuUpdate, string $strategy): bool
     {
         return in_array(
@@ -31,6 +32,7 @@ class ExtrasPropagator implements MenuUpdateToMenuItemPropagatorInterface
         );
     }
 
+    #[\Override]
     public function propagateFromMenuUpdate(
         ItemInterface $menuItem,
         MenuUpdateInterface $menuUpdate,

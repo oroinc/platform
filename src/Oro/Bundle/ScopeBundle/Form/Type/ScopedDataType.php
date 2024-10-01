@@ -27,17 +27,12 @@ class ScopedDataType extends AbstractType
      */
     protected $registry;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
@@ -48,9 +43,7 @@ class ScopedDataType extends AbstractType
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
@@ -69,9 +62,7 @@ class ScopedDataType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!empty($options[self::PRELOADED_SCOPES_OPTION])) {
@@ -102,9 +93,7 @@ class ScopedDataType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars[self::SCOPES_OPTION] = $form->getConfig()->getOption(self::SCOPES_OPTION);

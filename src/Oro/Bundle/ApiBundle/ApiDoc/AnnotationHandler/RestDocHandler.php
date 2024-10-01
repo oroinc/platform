@@ -52,9 +52,7 @@ class RestDocHandler implements HandlerInterface
         $this->statusCodesHandler = $statusCodesHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method): void
     {
         if ($route->getOption(RestRouteOptionsResolver::GROUP_OPTION) !== $this->routeGroup

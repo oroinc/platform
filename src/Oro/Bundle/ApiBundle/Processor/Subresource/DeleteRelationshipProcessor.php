@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\DeleteRelation
  */
 class DeleteRelationshipProcessor extends SubresourceProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): DeleteRelationshipContext
     {
         return new DeleteRelationshipContext($this->configProvider, $this->metadataProvider);

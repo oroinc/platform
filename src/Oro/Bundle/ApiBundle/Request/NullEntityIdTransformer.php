@@ -27,17 +27,13 @@ class NullEntityIdTransformer implements EntityIdTransformerInterface
         return self::$instance;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform(mixed $id, EntityMetadata $metadata): mixed
     {
         return $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed
     {
         return $value;

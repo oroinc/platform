@@ -32,6 +32,7 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
     /** @var LayoutRegistry */
     protected $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new LayoutContext();

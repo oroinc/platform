@@ -12,6 +12,7 @@ class AnyOfTest extends WebTestCase
 {
     private EntityManager $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = self::getContainer()
@@ -19,6 +20,7 @@ class AnyOfTest extends WebTestCase
             ->getManagerForClass(EntityFieldFallbackValue::class);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         unset($this->entityManager);

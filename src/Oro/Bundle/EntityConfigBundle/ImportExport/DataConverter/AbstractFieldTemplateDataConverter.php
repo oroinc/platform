@@ -16,9 +16,7 @@ abstract class AbstractFieldTemplateDataConverter extends EntityFieldDataConvert
         $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getBackendHeader()
     {
         $header = $this->getMainHeaders();
@@ -52,9 +50,7 @@ abstract class AbstractFieldTemplateDataConverter extends EntityFieldDataConvert
         return $this->fieldTypeProvider->getFieldProperties($fieldType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function fillEmptyColumns(array $header, array $data)
     {
         $dataDiff = array_diff(array_keys($data), $header);

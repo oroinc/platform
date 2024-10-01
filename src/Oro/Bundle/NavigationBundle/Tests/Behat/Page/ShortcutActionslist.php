@@ -6,9 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Page;
 
 class ShortcutActionslist extends Page
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function open(array $parameters = [])
     {
         $documentElement = $this->elementFactory->getPage();

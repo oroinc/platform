@@ -13,6 +13,7 @@ class SetTransformGroupsTest extends BatchUpdateItemProcessorTestCase
     /** @var SetTransformGroups */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

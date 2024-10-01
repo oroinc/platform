@@ -37,9 +37,7 @@ class Options extends BaseOptions
         $this->ipAddressProvider = $ipAddressProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getHandlers(): array
     {
         $handlers = parent::getHandlers();

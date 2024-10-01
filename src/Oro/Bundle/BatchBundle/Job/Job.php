@@ -36,6 +36,7 @@ class Job implements JobInterface
     /**
      * Get the job's name
      */
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
@@ -173,6 +174,7 @@ class Job implements JobInterface
     /**
      * To string
      */
+    #[\Override]
     public function __toString(): string
     {
         return get_class($this) . ': [name=' . $this->name . ']';
@@ -184,6 +186,7 @@ class Job implements JobInterface
      *
      * @see Job::execute(JobExecution)
      */
+    #[\Override]
     final public function execute(JobExecution $jobExecution): void
     {
         $this->dispatchJobExecutionEvent(EventInterface::BEFORE_JOB_EXECUTION, $jobExecution);

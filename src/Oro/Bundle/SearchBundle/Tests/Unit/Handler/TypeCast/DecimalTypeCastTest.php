@@ -11,6 +11,7 @@ class DecimalTypeCastTest extends \PHPUnit\Framework\TestCase
     /** @var DecimalTypeCast */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = new DecimalTypeCast();

@@ -31,6 +31,7 @@ abstract class AbstractCollectionMethodCallNode extends Node
 
     abstract public static function getMethod(): string;
 
+    #[\Override]
     public function evaluate(array $functions, array $values)
     {
         $evaluatedNode = $this->nodes['node']->evaluate($functions, $values);
@@ -90,6 +91,7 @@ abstract class AbstractCollectionMethodCallNode extends Node
         return self::$inflector;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return [$this->nodes['node'], '.', $this->nodes['attribute'], '(', $this->nodes['arguments'], ')'];

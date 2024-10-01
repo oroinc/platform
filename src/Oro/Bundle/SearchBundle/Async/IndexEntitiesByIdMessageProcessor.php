@@ -43,17 +43,13 @@ class IndexEntitiesByIdMessageProcessor implements
         $this->indexer = $indexer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         return $this->runUnique($message->getBody(), $message) ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [IndexEntitiesByIdTopic::getName()];

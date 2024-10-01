@@ -33,17 +33,13 @@ class ConsoleErrorHandler extends HandlerWrapper
         $this->consumerState = $consumerState;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isHandling(array $record): bool
     {
         return $this->consumerState->isConsumptionStarted() && parent::isHandling($record);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(array $record): bool
     {
         return $this->consumerState->isConsumptionStarted() && parent::handle($record);
@@ -54,6 +50,7 @@ class ConsoleErrorHandler extends HandlerWrapper
         $this->handler->clear();
     }
 
+    #[\Override]
     public function reset()
     {
         // Clearing all buffered records because the BufferHandler flushes them to the output before resetting.

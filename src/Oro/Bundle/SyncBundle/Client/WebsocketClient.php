@@ -34,11 +34,11 @@ class WebsocketClient implements WebsocketClientInterface
     }
 
     /**
-     * {@inheritDoc}
      *
      * @throws WebsocketException
      * @throws BadResponseException
      */
+    #[\Override]
     public function connect(): ?string
     {
         $urlInfo = parse_url($this->clientParametersProvider->getPath()) + ['path' => '', 'query' => ''];
@@ -49,29 +49,25 @@ class WebsocketClient implements WebsocketClientInterface
         return $this->getWampClient()->connect($pathWithTicket);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function disconnect(): bool
     {
         return $this->getWampClient()->disconnect();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isConnected(): bool
     {
         return $this->getWampClient()->isConnected();
     }
 
     /**
-     * {@inheritDoc}
      *
      * @throws WebsocketException
      * @throws BadResponseException
      * @throws ValidationFailedException
      */
+    #[\Override]
     public function publish(string $topicUri, $payload, array $exclude = [], array $eligible = []): bool
     {
         $this->validatePayload($payload);
@@ -83,11 +79,11 @@ class WebsocketClient implements WebsocketClientInterface
     }
 
     /**
-     * {@inheritDoc}
      *
      * @throws WebsocketException
      * @throws BadResponseException
      */
+    #[\Override]
     public function prefix(string $prefix, string $uri): bool
     {
         $this->ensureClientConnected();
@@ -97,11 +93,11 @@ class WebsocketClient implements WebsocketClientInterface
     }
 
     /**
-     * {@inheritDoc}
      *
      * @throws WebsocketException
      * @throws BadResponseException
      */
+    #[\Override]
     public function call(string $procUri, array $arguments = []): bool
     {
         $this->ensureClientConnected();
@@ -111,12 +107,12 @@ class WebsocketClient implements WebsocketClientInterface
     }
 
     /**
-     * {@inheritDoc}
      *
      * @throws WebsocketException
      * @throws BadResponseException
      * @throws ValidationFailedException
      */
+    #[\Override]
     public function event(string $topicUri, $payload): bool
     {
         $this->validatePayload($payload);

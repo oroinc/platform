@@ -17,6 +17,7 @@ class EmailGridTest extends AbstractDatagridTestCase
     /** @var OroClassMetadataFactory */
     private $metadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader('simple_user', 'simple_password'));
@@ -26,6 +27,7 @@ class EmailGridTest extends AbstractDatagridTestCase
         $this->metadataFactory = $this->getContainer()->get('oro_entity_extend.orm.metadata_factory');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -38,6 +40,7 @@ class EmailGridTest extends AbstractDatagridTestCase
     /**
      * @dataProvider gridProvider
      */
+    #[\Override]
     public function testGrid(array $requestData)
     {
         $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['_pager']['_per_page'] = 100;
@@ -45,9 +48,7 @@ class EmailGridTest extends AbstractDatagridTestCase
         parent::testGrid($requestData);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function gridProvider(): array
     {
         return [

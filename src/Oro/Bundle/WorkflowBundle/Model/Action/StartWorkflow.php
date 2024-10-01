@@ -35,8 +35,8 @@ class StartWorkflow extends ComponentAbstractAction
      *  - transition (optional) - start transition name (can be an attribute)
      *  - data (optional) - list of additional workflow item parameters
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['name'])) {
@@ -59,9 +59,7 @@ class StartWorkflow extends ComponentAbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $workflowName = $this->getName($context);

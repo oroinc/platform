@@ -15,9 +15,7 @@ class ScheduleIntervalStub implements ScheduleIntervalInterface
      */
     private $holder;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getScheduleIntervalsHolder()
     {
         return $this->holder;

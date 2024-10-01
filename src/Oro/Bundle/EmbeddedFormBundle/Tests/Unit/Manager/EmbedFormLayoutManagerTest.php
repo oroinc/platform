@@ -24,6 +24,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmbedFormLayoutManager */
     private $embedFormLayoutManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->layoutManager = $this->createMock(LayoutManager::class);

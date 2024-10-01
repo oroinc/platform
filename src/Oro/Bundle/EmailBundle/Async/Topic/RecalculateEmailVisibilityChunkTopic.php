@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RecalculateEmailVisibilityChunkTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.recalculate_email_visibility_chunk';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Recalculate the visibility of email users by given ids';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

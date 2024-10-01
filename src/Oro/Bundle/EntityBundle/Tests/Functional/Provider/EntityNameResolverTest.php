@@ -19,6 +19,7 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 
 class EntityNameResolverTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         self::markTestSkipped(

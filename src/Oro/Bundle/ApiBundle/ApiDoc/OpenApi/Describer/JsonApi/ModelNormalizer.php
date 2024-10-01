@@ -19,9 +19,7 @@ class ModelNormalizer implements ModelNormalizerInterface
         $this->innerModelNormalizer = $innerModelNormalizer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function normalizeModel(array $model, string $action, bool $isResponseModel): array
     {
         $model = $this->innerModelNormalizer->normalizeModel($model, $action, $isResponseModel);

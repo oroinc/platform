@@ -10,9 +10,7 @@ use Twig\Extension\AbstractExtension;
  */
 class GetAttributeNodeExtension extends AbstractExtension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNodeVisitors()
     {
         return [new GetAttrNodeVisitor()];

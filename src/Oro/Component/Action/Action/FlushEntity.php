@@ -45,9 +45,7 @@ class FlushEntity extends AbstractAction
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (array_key_exists(self::OPTION_KEY_ENTITY, $options)) {
@@ -60,9 +58,9 @@ class FlushEntity extends AbstractAction
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Exception
      */
+    #[\Override]
     protected function executeAction($context)
     {
         $entity = $this->getEntity($context);

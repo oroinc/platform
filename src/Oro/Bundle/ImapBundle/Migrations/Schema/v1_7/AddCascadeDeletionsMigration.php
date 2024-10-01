@@ -11,9 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class AddCascadeDeletionsMigration implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $imapEmailTable = $schema->getTable('oro_email_imap');

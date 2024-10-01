@@ -26,9 +26,7 @@ class ConstraintAsOptionExtension extends AbstractTypeExtension
         $this->constraintFactory = $constraintFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('constraints', []);

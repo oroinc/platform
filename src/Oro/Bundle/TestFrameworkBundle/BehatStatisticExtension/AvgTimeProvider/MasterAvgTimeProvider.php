@@ -4,9 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider
 
 class MasterAvgTimeProvider extends AbstractAvgTimeProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function calculate()
     {
         $criteria = [

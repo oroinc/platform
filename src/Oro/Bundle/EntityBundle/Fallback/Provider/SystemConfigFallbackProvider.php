@@ -20,9 +20,9 @@ class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
     }
 
     /**
-     * {@inheritdoc}
      * @throws FallbackFieldConfigurationMissingException
      */
+    #[\Override]
     public function getFallbackHolderEntity($object, $objectFieldName): mixed
     {
         $fallbackConfig = $this->getEntityConfig($object, $objectFieldName);
@@ -66,17 +66,13 @@ class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
         return $this->configManager->get($systemConfig[self::CONFIG_NAME_KEY]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFallbackLabel(): string
     {
         return 'oro.entity.fallback.system_config.label';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFallbackEntityClass(): ?string
     {
         return null;

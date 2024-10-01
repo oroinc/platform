@@ -10,6 +10,7 @@ class SetCorsAllowMethodsTest extends OptionsProcessorTestCase
     /** @var SetCorsAllowMethods */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

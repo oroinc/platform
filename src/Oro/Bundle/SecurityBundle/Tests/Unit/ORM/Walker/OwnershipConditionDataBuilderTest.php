@@ -71,6 +71,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerTree */
     private $tree;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tree = new OwnerTree();

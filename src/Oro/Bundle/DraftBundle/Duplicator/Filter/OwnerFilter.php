@@ -29,6 +29,7 @@ class OwnerFilter implements Filter
      * @param string $property
      * @param callable $objectCopier
      */
+    #[\Override]
     public function apply($object, $property, $objectCopier): void
     {
         $user = $this->tokenStorage->getToken()->getUser();

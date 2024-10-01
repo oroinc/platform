@@ -28,15 +28,14 @@ class EnumValueTypeTest extends FormIntegrationTestCase
     /** @var EnumValueType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new EnumValueType($this->getConfigProvider());
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $validator = new RecursiveValidator(

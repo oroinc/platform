@@ -9,9 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class GridTest extends WebTestCase
 {
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient(

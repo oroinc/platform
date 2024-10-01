@@ -13,6 +13,7 @@ class LoadDefaultDataForComputedAssociationTest extends GetSubresourceProcessorO
 {
     private LoadDefaultDataForComputedAssociation $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -8,9 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class RemoveDaemonMonitorSchedule implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPostQuery("DELETE FROM oro_cron_schedule WHERE command = 'oro:cron:daemon'");

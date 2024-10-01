@@ -16,6 +16,7 @@ class EntityAuditStrategyDelegateProcessor implements EntityAuditStrategyProcess
         $this->registry = $registry;
     }
 
+    #[\Override]
     public function processInverseCollections(array $sourceEntityData): array
     {
         $sourceEntityClass = $sourceEntityData['entity_class'] ?? "";
@@ -25,6 +26,7 @@ class EntityAuditStrategyDelegateProcessor implements EntityAuditStrategyProcess
             : $this->registry->getDefaultProcessor()->processInverseCollections($sourceEntityData);
     }
 
+    #[\Override]
     public function processChangedEntities(array $sourceEntityData): array
     {
         $sourceEntityClass = $sourceEntityData['entity_class'] ?? "";
@@ -34,6 +36,7 @@ class EntityAuditStrategyDelegateProcessor implements EntityAuditStrategyProcess
             : $this->registry->getDefaultProcessor()->processChangedEntities($sourceEntityData);
     }
 
+    #[\Override]
     public function processInverseRelations(array $sourceEntityData): array
     {
         $sourceEntityClass = $sourceEntityData['entity_class'] ?? "";

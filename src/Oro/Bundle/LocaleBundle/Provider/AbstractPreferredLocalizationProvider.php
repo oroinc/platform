@@ -15,9 +15,7 @@ abstract class AbstractPreferredLocalizationProvider implements PreferredLocaliz
      */
     abstract protected function getPreferredLocalizationForEntity($entity): ?Localization;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPreferredLocalization($entity): ?Localization
     {
         if (!$this->supports($entity)) {

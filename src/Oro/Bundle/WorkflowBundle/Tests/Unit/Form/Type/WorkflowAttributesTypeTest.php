@@ -51,6 +51,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     /** @var WorkflowAttributesType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
@@ -85,9 +86,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

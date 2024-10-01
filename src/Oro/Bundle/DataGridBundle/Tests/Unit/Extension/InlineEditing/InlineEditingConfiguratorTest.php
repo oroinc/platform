@@ -24,6 +24,7 @@ class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var InlineEditingConfigurator */
     private $configurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->guesser = $this->createMock(InlineEditColumnOptionsGuesser::class);

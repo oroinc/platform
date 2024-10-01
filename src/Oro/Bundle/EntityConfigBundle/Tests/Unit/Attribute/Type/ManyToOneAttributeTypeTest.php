@@ -11,6 +11,7 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -18,17 +19,13 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         return new ManyToOneAttributeType($this->entityNameResolver, $this->doctrineHelper);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurationMethodsDataProvider(): array
     {
         return [

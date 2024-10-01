@@ -18,9 +18,7 @@ class SessionPass implements CompilerPassInterface
 {
     public const HTTP_KERNEL_DECORATOR_SERVICE = 'oro_security.http_kernel.session_path';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->decorateHttpKernel($container);

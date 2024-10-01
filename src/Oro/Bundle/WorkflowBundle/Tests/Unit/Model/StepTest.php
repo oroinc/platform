@@ -9,6 +9,7 @@ class StepTest extends \PHPUnit\Framework\TestCase
     /** @var Step */
     private $step;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->step = new Step();

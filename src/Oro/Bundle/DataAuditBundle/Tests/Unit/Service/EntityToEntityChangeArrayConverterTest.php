@@ -20,6 +20,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
     /** @var EntityToEntityChangeArrayConverter */
     private $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = $this->createMock(AuditFieldTypeProvider::class);

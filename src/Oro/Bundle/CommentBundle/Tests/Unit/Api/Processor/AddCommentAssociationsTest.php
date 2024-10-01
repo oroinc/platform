@@ -16,6 +16,7 @@ class AddCommentAssociationsTest extends ConfigProcessorTestCase
     /** @var AddCommentAssociations */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -32,17 +32,13 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [SendEmailTemplateTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $messageBody = $message->getBody();

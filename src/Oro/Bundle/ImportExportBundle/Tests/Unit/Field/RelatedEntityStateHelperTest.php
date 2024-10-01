@@ -26,6 +26,7 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
     /** @var RelatedEntityStateHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldHelper = $this->createMock(FieldHelper::class);

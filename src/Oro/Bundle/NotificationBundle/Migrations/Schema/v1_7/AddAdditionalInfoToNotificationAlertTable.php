@@ -11,9 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class AddAdditionalInfoToNotificationAlertTable implements Migration
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_notification_alert');

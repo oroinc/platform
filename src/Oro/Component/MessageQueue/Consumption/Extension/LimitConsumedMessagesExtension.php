@@ -36,18 +36,14 @@ class LimitConsumedMessagesExtension extends AbstractExtension
         $this->messageConsumed = 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         // this is added here to handle an edge case. when a user sets zero as limit.
         $this->checkMessageLimit($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $this->messageConsumed++;

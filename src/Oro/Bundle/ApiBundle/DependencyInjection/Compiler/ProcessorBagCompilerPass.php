@@ -60,9 +60,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     private const COLLECTION_ATTRIBUTE = 'collection';
     private const EVENT_ATTRIBUTE = 'event';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $groups = [];

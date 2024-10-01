@@ -32,6 +32,7 @@ class SearchHandler extends BaseSearchHandler
      *
      * @return array
      */
+    #[\Override]
     protected function searchIds($search, $firstResult, $maxResults)
     {
         // Result returned can be either string or integer, because used different search engines(elasticsearch or orm).
@@ -57,9 +58,7 @@ class SearchHandler extends BaseSearchHandler
         return $ids;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         return [

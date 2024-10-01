@@ -9,8 +9,8 @@ class IntlDateTimeFormatConverter extends AbstractDateTimeFormatConverter
     /**
      * Returns INTL format without convert
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     protected function convertFormat($format)
     {
         return $format;

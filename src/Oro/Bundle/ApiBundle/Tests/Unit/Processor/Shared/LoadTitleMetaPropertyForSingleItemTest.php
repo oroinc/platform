@@ -28,6 +28,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
     /** @var LoadTitleMetaPropertyForCollection */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

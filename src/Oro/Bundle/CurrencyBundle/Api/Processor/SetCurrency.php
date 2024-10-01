@@ -27,9 +27,7 @@ class SetCurrency implements ProcessorInterface
         $this->currencyFieldName = $currencyFieldName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

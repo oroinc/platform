@@ -17,9 +17,7 @@ class ArrayToStringTransformer extends AbstractArrayToStringTransformer
         $this->allowNull = $allowNull;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value || [] === $value) {
@@ -33,9 +31,7 @@ class ArrayToStringTransformer extends AbstractArrayToStringTransformer
         return $this->transformArrayToString($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if ('' === $value || '[]' === $value || null === $value) {

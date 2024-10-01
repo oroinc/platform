@@ -9,9 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class LimitResultsListenerTest extends SearchBundleWebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

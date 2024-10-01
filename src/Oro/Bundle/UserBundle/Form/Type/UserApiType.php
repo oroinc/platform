@@ -24,9 +24,7 @@ class UserApiType extends UserType
         $this->userConfigManager = $userConfigManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addEntityFields(FormBuilderInterface $builder): void
     {
         parent::addEntityFields($builder);
@@ -46,9 +44,7 @@ class UserApiType extends UserType
             ->addEventSubscriber(new PatchSubscriber());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
@@ -71,17 +67,13 @@ class UserApiType extends UserType
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'user';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function addInviteUserField(FormBuilderInterface $builder): void
     {
     }

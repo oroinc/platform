@@ -17,9 +17,7 @@ class CheckRequestType extends BaseCheckRequestType
 {
     private const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function checkRequestType(Context $context): bool
     {
         $detected = false;

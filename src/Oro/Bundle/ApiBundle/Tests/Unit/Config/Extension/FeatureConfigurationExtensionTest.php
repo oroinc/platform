@@ -17,6 +17,7 @@ class FeatureConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureConfigurationExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ResourceCheckerConfigProvider::class);

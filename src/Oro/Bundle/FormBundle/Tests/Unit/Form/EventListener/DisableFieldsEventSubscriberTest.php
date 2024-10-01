@@ -22,6 +22,7 @@ class DisableFieldsEventSubscriberTest extends TestCase
 
     private DisableFieldsEventSubscriber $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->expressionLanguage = $this->createMock(ExpressionLanguage::class);

@@ -19,9 +19,7 @@ class SqlWalkerPass implements CompilerPassInterface
 
     public const TAG_NAME = 'oro_entity.sql_walker';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $doctrineConfiguration = $container->getDefinition('doctrine.orm.configuration');

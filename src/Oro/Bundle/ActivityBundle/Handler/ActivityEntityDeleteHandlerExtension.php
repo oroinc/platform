@@ -24,9 +24,7 @@ class ActivityEntityDeleteHandlerExtension implements ActivityEntityDeleteHandle
         $this->accessDeniedExceptionFactory = $accessDeniedExceptionFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertDeleteGranted($entity, $targetEntity): void
     {
         if (!$this->authorizationChecker->isGranted('EDIT', $entity)) {

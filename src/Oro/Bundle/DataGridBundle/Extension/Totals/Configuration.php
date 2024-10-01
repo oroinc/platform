@@ -25,9 +25,7 @@ class Configuration implements ConfigurationInterface
 
     public const TOTALS_EXTEND_KEY           = 'extends';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('totals');

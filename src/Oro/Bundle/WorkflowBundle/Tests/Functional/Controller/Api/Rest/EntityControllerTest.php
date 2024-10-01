@@ -10,6 +10,7 @@ class EntityControllerTest extends WebTestCase
     /** @var EntityWithFieldsProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

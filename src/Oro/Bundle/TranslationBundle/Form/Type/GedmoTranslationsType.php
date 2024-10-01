@@ -48,9 +48,9 @@ class GedmoTranslationsType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Exception
      */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Simple way is enough
@@ -81,17 +81,13 @@ class GedmoTranslationsType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['simple_way'] = !$options['inherit_data'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $translatableListener = $this->translationForm->getGedmoTranslatableListener();

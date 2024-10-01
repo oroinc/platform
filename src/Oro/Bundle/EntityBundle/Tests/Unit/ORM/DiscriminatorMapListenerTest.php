@@ -12,6 +12,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DiscriminatorMapListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new DiscriminatorMapListener();

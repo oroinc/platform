@@ -15,6 +15,7 @@ class UserAgentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var UserAgentProvider */
     private $userAgentProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

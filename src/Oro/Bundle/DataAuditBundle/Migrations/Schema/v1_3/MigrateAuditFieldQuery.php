@@ -18,17 +18,13 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 
     const LIMIT = 100;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Copy audit data into oro_audit_field table.';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $steps = ceil($this->getAuditCount() / static::LIMIT);

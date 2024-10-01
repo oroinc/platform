@@ -27,17 +27,13 @@ abstract class AbstractResendHandler extends AbstractHandler
         $this->targetLogger = $targetLogger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isHandling(array $record): bool
     {
         return $this->isResendRequired($record);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(array $record): bool
     {
         if ($this->isResendRequired($record)) {

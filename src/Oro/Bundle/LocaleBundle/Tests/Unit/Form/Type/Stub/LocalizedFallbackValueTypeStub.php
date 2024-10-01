@@ -11,17 +11,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizedFallbackValueTypeStub extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'stub_localized_fallback_value';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -30,9 +26,7 @@ class LocalizedFallbackValueTypeStub extends AbstractType
             ->add('localization', EntityTypeStub::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['data_class' => LocalizedFallbackValue::class]);

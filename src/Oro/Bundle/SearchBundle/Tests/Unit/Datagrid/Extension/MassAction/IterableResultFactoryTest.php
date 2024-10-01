@@ -15,6 +15,7 @@ class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var IterableResultFactory */
     private $iterableResultFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->iterableResultFactory = new IterableResultFactory();

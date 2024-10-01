@@ -152,9 +152,7 @@ class RoleController extends RestController
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function transformEntityField($field, &$value)
     {
         switch ($field) {
@@ -171,25 +169,19 @@ class RoleController extends RestController
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_user.role_manager.api');
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_user.form.role.api');
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_user.form.handler.role.api');

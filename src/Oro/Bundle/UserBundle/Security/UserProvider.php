@@ -26,9 +26,7 @@ class UserProvider implements UserProviderInterface
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadUserByIdentifier(string $username): UserInterface
     {
         $user = $this->userLoader->loadUser($username);
@@ -39,9 +37,7 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function refreshUser(UserInterface $user): UserInterface
     {
         $userClass = $this->userLoader->getUserClass();
@@ -78,9 +74,7 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsClass($class): bool
     {
         return is_a($class, $this->userLoader->getUserClass(), true);

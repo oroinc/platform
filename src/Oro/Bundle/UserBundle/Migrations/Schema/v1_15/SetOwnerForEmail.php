@@ -9,17 +9,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class SetOwnerForEmail implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrder(): int
     {
         return 1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->addOwnerToEmailUserTable($schema);

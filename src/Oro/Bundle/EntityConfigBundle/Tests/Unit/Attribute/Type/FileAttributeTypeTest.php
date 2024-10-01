@@ -7,17 +7,13 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType;
 
 class FileAttributeTypeTest extends AttributeTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         return new FileAttributeType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurationMethodsDataProvider(): array
     {
         return [

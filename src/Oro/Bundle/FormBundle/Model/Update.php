@@ -69,25 +69,25 @@ class Update implements UpdateInterface
         return $this;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function handle(Request $request)
     {
         return $this->handler->process($this->formData, $this->form, $request);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplateData(Request $request)
     {
         return $this->templateDataProvider->getData($this->formData, $this->form, $request);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getForm()
     {
         return $this->form;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getFormData()
     {
         return $this->formData;

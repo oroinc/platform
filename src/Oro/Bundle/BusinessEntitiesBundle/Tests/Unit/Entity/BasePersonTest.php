@@ -13,6 +13,7 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
 
     private BasePerson $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new BasePerson();

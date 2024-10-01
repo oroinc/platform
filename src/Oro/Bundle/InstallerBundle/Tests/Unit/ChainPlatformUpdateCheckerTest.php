@@ -19,6 +19,7 @@ class ChainPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ChainPlatformUpdateChecker */
     private $chainChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->checker1 = $this->createMock(PlatformUpdateCheckerInterface::class);

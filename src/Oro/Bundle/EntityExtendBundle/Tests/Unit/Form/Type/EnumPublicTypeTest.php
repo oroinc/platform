@@ -19,6 +19,7 @@ class EnumPublicTypeTest extends TypeTestCase
     /** @var EnumPublicType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

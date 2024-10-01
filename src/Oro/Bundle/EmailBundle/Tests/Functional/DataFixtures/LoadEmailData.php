@@ -18,17 +18,13 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserData::class, LoadUser::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $dataDir = $this->container

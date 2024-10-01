@@ -34,10 +34,10 @@ class StartAsyncOperation implements ProcessorInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */

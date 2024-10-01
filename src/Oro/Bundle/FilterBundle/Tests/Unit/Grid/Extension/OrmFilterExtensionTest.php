@@ -17,6 +17,7 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
     /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
     private $datasource;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

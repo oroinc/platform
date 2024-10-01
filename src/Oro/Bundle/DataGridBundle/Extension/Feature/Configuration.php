@@ -7,9 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('features');

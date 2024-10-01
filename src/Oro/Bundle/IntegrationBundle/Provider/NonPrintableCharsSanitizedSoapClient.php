@@ -9,9 +9,7 @@ use Oro\Bundle\IntegrationBundle\Utils\NonPrintableCharsStringSanitizer;
  */
 class NonPrintableCharsSanitizedSoapClient extends \SoapClient
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function __doRequest($request, $location, $action, $version, $one_way = 0): ?string
     {
         $response = parent::__doRequest($request, $location, $action, $version, $one_way);
@@ -21,9 +19,7 @@ class NonPrintableCharsSanitizedSoapClient extends \SoapClient
         return $response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function __soapCall(
         $function_name,
         $arguments,

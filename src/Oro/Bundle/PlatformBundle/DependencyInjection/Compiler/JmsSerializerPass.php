@@ -20,9 +20,7 @@ class JmsSerializerPass implements CompilerPassInterface
 
     private const FOS_REST_JMS_SERIALIZER_FLATTEN_EXCEPTION_HANDLER = 'fos_rest.serializer.flatten_exception_handler';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition('jms_serializer.serializer')) {

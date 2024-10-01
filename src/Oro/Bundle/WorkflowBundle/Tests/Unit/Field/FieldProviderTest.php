@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
 class FieldProviderTest extends EntityFieldProviderTest
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -29,6 +30,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         $this->provider->setEnumVirtualFieldProvider($this->enumVirtualFieldProvider);
     }
 
+    #[\Override]
     public function fieldsWithRelationsExpectedDataProvider(): array
     {
         return [
@@ -60,6 +62,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         ];
     }
 
+    #[\Override]
     public function getFieldsWithRelationsAndDeepLevelDataProvider(): array
     {
         return [
@@ -91,6 +94,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         ];
     }
 
+    #[\Override]
     public function getFieldsWithRelationsAndDeepLevelAndEntityDetailsDataProvider(): array
     {
         return [
@@ -122,6 +126,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         ];
     }
 
+    #[\Override]
     public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelations(): array
     {
         return [
@@ -153,6 +158,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         ];
     }
 
+    #[\Override]
     public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetailsDataProvider(): array
     {
         return [
@@ -184,6 +190,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         ];
     }
 
+    #[\Override]
     public function getFieldsWithRelationsAndDeepLevelAndWithUnidirectional(): array
     {
         return [
@@ -224,6 +231,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         ];
     }
 
+    #[\Override]
     public function getFieldsWithVirtualRelationsAndEnumsDataProvider(): array
     {
         $expectedResult = [
@@ -263,6 +271,7 @@ class FieldProviderTest extends EntityFieldProviderTest
         return $expectedResult;
     }
 
+    #[\Override]
     public function relationsExpectedDataProvider(): array
     {
         return [

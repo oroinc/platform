@@ -9,6 +9,7 @@ class WorkflowVariableFormOptionTemplate extends WorkflowVariableTemplate
 {
     const NAME = 'workflow_variable_form_option';
 
+    #[\Override]
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.{{ option_name }}';
@@ -17,6 +18,7 @@ class WorkflowVariableFormOptionTemplate extends WorkflowVariableTemplate
     /**
      * @return array
      */
+    #[\Override]
     public function getRequiredKeys()
     {
         return array_merge(parent::getRequiredKeys(), ['option_name']);

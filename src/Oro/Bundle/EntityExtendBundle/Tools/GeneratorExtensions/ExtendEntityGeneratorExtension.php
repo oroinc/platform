@@ -30,11 +30,13 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function supports(array $schema): bool
     {
         return true;
     }
 
+    #[\Override]
     public function generate(array $schema, ClassGenerator $class): void
     {
         if (!empty($schema['inherit'])) {

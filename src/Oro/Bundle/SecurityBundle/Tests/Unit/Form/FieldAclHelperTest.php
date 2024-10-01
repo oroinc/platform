@@ -39,6 +39,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
     /** @var FieldAclHelper */
     private $fieldAclHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

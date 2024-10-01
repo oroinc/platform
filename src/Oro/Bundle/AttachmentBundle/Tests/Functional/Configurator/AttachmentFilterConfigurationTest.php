@@ -15,6 +15,7 @@ class AttachmentFilterConfigurationTest extends WebTestCase
     /** @var AttachmentFilterConfiguration */
     private $attachmentFilterConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

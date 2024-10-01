@@ -10,9 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
  */
 class EnumEntityNameProvider implements EntityNameProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if (!$entity instanceof EnumOptionInterface) {
@@ -22,9 +20,7 @@ class EnumEntityNameProvider implements EntityNameProviderInterface
         return $entity->getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if (!is_a($className, EnumOptionInterface::class, true)) {

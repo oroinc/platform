@@ -12,9 +12,7 @@ use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchIterableResult;
  */
 class SearchSourceFilteredEntityIdentityReader implements FilteredEntityIdentityReaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIds(DatagridInterface $datagrid, string $entityName, array $options): array
     {
         $datasource = $datagrid->getAcceptedDatasource();
@@ -34,9 +32,7 @@ class SearchSourceFilteredEntityIdentityReader implements FilteredEntityIdentity
         return $filteredEntitiesIds ?: [0];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridInterface $datagrid, string $className, array $options): bool
     {
         return $datagrid->getDatasource() instanceof SearchDatasource;

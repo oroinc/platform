@@ -18,6 +18,7 @@ class GlobalOptionsProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var GlobalOptionsProviderRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->firstProvider = $this->createMock(GlobalOptionsProviderInterface::class);

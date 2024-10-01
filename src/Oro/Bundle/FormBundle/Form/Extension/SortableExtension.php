@@ -14,6 +14,7 @@ class SortableExtension extends AbstractTypeExtension
 
     const POSITION_FIELD_NAME = '_position';
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['sortable']) {
@@ -30,6 +31,7 @@ class SortableExtension extends AbstractTypeExtension
         ]);
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

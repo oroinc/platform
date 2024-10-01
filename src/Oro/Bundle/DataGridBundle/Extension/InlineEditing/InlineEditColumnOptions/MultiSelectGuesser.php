@@ -11,9 +11,7 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration as Config;
  */
 class MultiSelectGuesser extends ChoicesGuesser
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
@@ -48,6 +46,7 @@ class MultiSelectGuesser extends ChoicesGuesser
         return $result;
     }
 
+    #[\Override]
     protected function getDefaultEditorView(): string
     {
         return 'oroform/js/app/views/editor/multi-checkbox-editor-view';

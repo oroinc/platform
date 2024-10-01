@@ -11,6 +11,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
     /** @var DefaultColumnFilteringOptionsGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->guesser = new DefaultColumnFilteringOptionsGuesser();

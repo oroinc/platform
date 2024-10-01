@@ -31,9 +31,7 @@ class GuessMimeTypeByFileContentFactory implements ImagineBinaryByFileContentFac
         $this->mimeTypes = $mimeTypes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createImagineBinary(string $content): BinaryInterface
     {
         $mimeType = $this->mimeTypeGuesser->guess($content);

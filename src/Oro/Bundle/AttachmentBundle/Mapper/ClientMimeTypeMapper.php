@@ -11,11 +11,13 @@ class ClientMimeTypeMapper implements ClientMimeTypeMapperInterface
         'application/x-zip-compressed' => 'application/zip'
     ];
 
+    #[\Override]
     public function addMapping(string $originalMimeType, string $returnedMimeType): void
     {
         $this->map[$originalMimeType] = $returnedMimeType;
     }
 
+    #[\Override]
     public function getMimeType(string $originalMimeType): string
     {
         return $this->map[$originalMimeType] ?? $originalMimeType;

@@ -13,25 +13,19 @@ class DefaultAccessor implements AccessorInterface
 {
     private ?PropertyAccessorInterface $propertyAccessor = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'default';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($entity, FieldMetadata $metadata)
     {
         return $metadata->isDefinedBySourceEntity();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($entity, FieldMetadata $metadata)
     {
         if ($metadata->has('getter')) {
@@ -44,9 +38,7 @@ class DefaultAccessor implements AccessorInterface
             ->getValue($entity, $this->getPropertyPath($metadata));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($entity, FieldMetadata $metadata, $value)
     {
         if ($metadata->has('setter')) {

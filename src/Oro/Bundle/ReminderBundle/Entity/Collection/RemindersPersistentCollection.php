@@ -49,9 +49,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
         $this->identifier = $identifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doInitialize()
     {
         if (!$this->collection) {
@@ -61,9 +59,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function add($element)
     {
         $result = parent::add($element);
@@ -71,9 +67,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear()
     {
         $this->initialize();
@@ -83,9 +77,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($key)
     {
         $removed = parent::remove($key);
@@ -95,9 +87,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
         return $removed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeElement($element)
     {
         $removed = parent::removeElement($element);
@@ -107,9 +97,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
         return $removed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function set($key, $value)
     {
         if (null === $key) {
@@ -130,33 +118,25 @@ class RemindersPersistentCollection extends AbstractLazyCollection
         return $this->snapshot;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($offset)
     {
         return $this->containsKey($offset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         return $this->get($offset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         $this->set($offset, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         $this->remove($offset);

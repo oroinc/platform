@@ -29,6 +29,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $entityFieldsMetadata = [];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityMetadata = $this->createMock(EntityMetadata::class);

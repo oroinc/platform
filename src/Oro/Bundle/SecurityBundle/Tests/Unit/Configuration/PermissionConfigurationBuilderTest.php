@@ -29,6 +29,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionConfigurationBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $repository = $this->createMock(EntityRepository::class);

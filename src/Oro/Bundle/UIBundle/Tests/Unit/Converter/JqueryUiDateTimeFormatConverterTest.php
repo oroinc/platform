@@ -8,17 +8,13 @@ use Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter;
 
 class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createFormatConverter(): DateTimeFormatConverterInterface
     {
         return new JqueryUiDateTimeFormatConverter($this->formatter, $this->translator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDateFormatDataProvider(): array
     {
         return [
@@ -33,9 +29,7 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTimeFormatDataProvider(): array
     {
         return [
@@ -50,9 +44,7 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDateTimeFormatDataProvider(): array
     {
         return [
@@ -87,9 +79,7 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDateFormatDayProvider(): array
     {
         return [

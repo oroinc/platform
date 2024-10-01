@@ -12,6 +12,7 @@ class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private $gcEnabled;
 
+    #[\Override]
     protected function setUp(): void
     {
         if (!function_exists('gc_status')) {
@@ -24,6 +25,7 @@ class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
         gc_collect_cycles();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         gc_collect_cycles();

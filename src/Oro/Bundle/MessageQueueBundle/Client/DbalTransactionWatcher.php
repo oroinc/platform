@@ -19,17 +19,13 @@ class DbalTransactionWatcher implements TransactionWatcherInterface
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onTransactionStarted()
     {
         $this->producer->enableBuffering();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onTransactionCommitted()
     {
         try {
@@ -40,9 +36,7 @@ class DbalTransactionWatcher implements TransactionWatcherInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onTransactionRolledback()
     {
         $this->producer->clearBuffer();

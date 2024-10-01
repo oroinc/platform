@@ -29,9 +29,7 @@ class MultipleFileSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var MultipleFileSubscriber */
     private $subscriber;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->validator = $this->createMock(ConfigMultipleFileValidator::class);

@@ -65,9 +65,7 @@ class LoadDigitalAssetData extends AbstractFixture implements DependentFixtureIn
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -75,9 +73,7 @@ class LoadDigitalAssetData extends AbstractFixture implements DependentFixtureIn
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $user = $this->getFirstUser($manager);

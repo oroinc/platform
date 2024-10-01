@@ -8,9 +8,7 @@ use Psr\Log\LoggerInterface;
 
 class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
         $segments = $this->connection->createQueryBuilder()

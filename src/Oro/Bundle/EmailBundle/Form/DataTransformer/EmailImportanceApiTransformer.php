@@ -9,9 +9,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class EmailImportanceApiTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -36,9 +34,7 @@ class EmailImportanceApiTransformer implements DataTransformerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

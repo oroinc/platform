@@ -7,9 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Page;
 
 class RoleView extends Page
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function open(array $parameters = [])
     {
         $this->getMainMenu()->openAndClick('System/ User Management/ Roles');

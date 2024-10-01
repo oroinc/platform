@@ -37,6 +37,7 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
         $this->auditConfigProvider = $auditConfigProvider;
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         try {
@@ -133,6 +134,7 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
         );
     }
 
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [AuditChangedEntitiesInverseCollectionsChunkTopic::getName()];

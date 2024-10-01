@@ -20,25 +20,19 @@ class TraceableActionProcessor implements ActionProcessorInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAction(): string
     {
         return $this->actionProcessor->getAction();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createContext(): Context
     {
         return $this->actionProcessor->createContext();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         $this->logger->startAction($this->getAction());

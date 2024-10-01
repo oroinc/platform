@@ -100,6 +100,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->renderer = new DataBlockRenderer();

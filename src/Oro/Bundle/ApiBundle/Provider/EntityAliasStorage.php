@@ -21,9 +21,7 @@ class EntityAliasStorage extends BaseEntityAliasStorage
         $this->configFiles = $configFiles;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDuplicateAliasHelpMessage()
     {
         if (empty($this->configFiles)) {
@@ -49,9 +47,7 @@ class EntityAliasStorage extends BaseEntityAliasStorage
             . 'and register it with "oro_entity.alias_provider" tag in DI container.';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function validateAlias($entityClass, $value, $isPluralAlias)
     {
         if (!preg_match('/^[a-z][a-z0-9\-\_]*$/D', $value)) {

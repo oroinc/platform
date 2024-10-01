@@ -18,6 +18,7 @@ class ImageEncodedFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var ImageEncodedFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

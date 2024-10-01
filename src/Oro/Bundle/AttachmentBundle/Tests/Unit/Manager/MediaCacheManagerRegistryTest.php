@@ -21,6 +21,7 @@ class MediaCacheManagerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var MediaCacheManagerRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileAccessControlChecker = $this->createMock(FileAccessControlChecker::class);

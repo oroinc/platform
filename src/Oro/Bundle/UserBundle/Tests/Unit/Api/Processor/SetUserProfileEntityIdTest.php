@@ -17,6 +17,7 @@ class SetUserProfileEntityIdTest extends GetProcessorTestCase
     /** @var SetUserProfileEntityId */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -14,6 +14,7 @@ class WebpStrategyExtensionTest extends \PHPUnit\Framework\TestCase
 
     private WebpStrategyExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->webpConfiguration = $this->createMock(WebpConfiguration::class);

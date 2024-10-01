@@ -18,6 +18,7 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
 {
     private ?VisitorCollection $visitorCollection = null;
 
+    #[\Override]
     public function generate(
         string $className,
         GeneratorData $data,
@@ -62,6 +63,7 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
         return "<?php\n\n" . $class->print();
     }
 
+    #[\Override]
     public function getVisitorCollection(): ?VisitorCollection
     {
         return $this->visitorCollection;

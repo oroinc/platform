@@ -16,6 +16,7 @@ class ContainsPrimaryValidator extends ConstraintValidator
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {

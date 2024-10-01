@@ -45,9 +45,7 @@ class JsLogSubscriber implements EventSubscriberInterface
         $this->logFile = $this->logDir.DIRECTORY_SEPARATOR.'behat_'.LogType::BROWSER.'.log';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

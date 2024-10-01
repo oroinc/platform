@@ -18,9 +18,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 abstract class RemoveInfoRecords implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

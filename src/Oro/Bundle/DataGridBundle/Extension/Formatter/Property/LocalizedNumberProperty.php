@@ -19,6 +19,7 @@ class LocalizedNumberProperty extends AbstractLocalizedProperty
     /**
      * @return NumberFormatter
      */
+    #[\Override]
     protected function getFormatter()
     {
         return $this->formatter;

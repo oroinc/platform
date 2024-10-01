@@ -30,6 +30,7 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
 
     private ImportVisitor $visitor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->loader = $this->createMock(LayoutUpdateLoaderInterface::class);

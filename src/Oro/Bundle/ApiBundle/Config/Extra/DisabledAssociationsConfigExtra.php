@@ -13,33 +13,25 @@ class DisabledAssociationsConfigExtra implements ConfigExtraInterface
 {
     public const NAME = 'disabled_associations';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureContext(ConfigContext $context): void
     {
         // no any modifications of the ConfigContext is required
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isPropagable(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         return self::NAME;

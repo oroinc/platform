@@ -13,6 +13,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var NullValueTransformer */
     private $nullValueTransformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerTransformer = $this->createMock(DataTransformerInterface::class);

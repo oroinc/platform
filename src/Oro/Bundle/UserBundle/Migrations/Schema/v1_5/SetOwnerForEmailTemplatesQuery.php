@@ -9,9 +9,7 @@ use Psr\Log\LoggerInterface;
 
 class SetOwnerForEmailTemplatesQuery extends ParametrizedSqlMigrationQuery
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
         $qb = $this->connection->createQueryBuilder()

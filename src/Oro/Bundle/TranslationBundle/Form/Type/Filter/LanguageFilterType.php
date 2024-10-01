@@ -21,33 +21,24 @@ class LanguageFilterType extends AbstractType
         $this->formatter = $formatter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return EntityFilterType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         foreach ($view->children['value']->vars['choices'] as $choiceView) {

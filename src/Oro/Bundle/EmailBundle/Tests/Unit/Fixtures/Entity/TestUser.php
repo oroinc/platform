@@ -28,35 +28,42 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
         $this->organization = $organization;
     }
 
+    #[\Override]
     public function getOrganization()
     {
         return $this->organization;
     }
 
+    #[\Override]
     public function setOrganization(OrganizationInterface $organization)
     {
         $this->organization = $organization;
     }
 
+    #[\Override]
     public function getEmail()
     {
         return $this->email;
     }
 
+    #[\Override]
     public function getFirstname()
     {
         return $this->firstName;
     }
 
+    #[\Override]
     public function getLastname()
     {
         return $this->lastName;
     }
 
+    #[\Override]
     public function getEmailFields()
     {
     }
 
+    #[\Override]
     public function getId()
     {
         return $this->id;
@@ -72,6 +79,7 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
         return $this->firstName . ' ' . $this->lastName;
     }
 
+    #[\Override]
     public function getRoles(): array
     {
     }
@@ -88,10 +96,12 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
     {
     }
 
+    #[\Override]
     public function eraseCredentials()
     {
     }
 
+    #[\Override]
     public function getUserIdentifier(): string
     {
         return '';

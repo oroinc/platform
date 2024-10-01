@@ -12,9 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 abstract class SetGroups implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateItemContext $context */

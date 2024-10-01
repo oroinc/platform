@@ -27,9 +27,7 @@ class WorkflowActivationMigrationQuery extends ParametrizedMigrationQuery
         $this->isActive = $isActive;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $logger = $logger ?: new NullLogger();
@@ -48,9 +46,7 @@ class WorkflowActivationMigrationQuery extends ParametrizedMigrationQuery
         $statement->executeQuery();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return sprintf(

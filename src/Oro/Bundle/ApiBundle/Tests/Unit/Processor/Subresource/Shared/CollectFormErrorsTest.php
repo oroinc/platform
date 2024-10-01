@@ -17,6 +17,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
 {
     private CollectFormErrors $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

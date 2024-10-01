@@ -14,6 +14,7 @@ class ConditionPassTest extends \PHPUnit\Framework\TestCase
     /** @var ConditionPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ConditionPass();

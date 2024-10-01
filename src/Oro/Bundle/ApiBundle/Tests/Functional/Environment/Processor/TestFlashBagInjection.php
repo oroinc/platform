@@ -18,9 +18,7 @@ class TestFlashBagInjection implements ProcessorInterface
         $this->flashBagDependedService = $flashBagDependedService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
     }

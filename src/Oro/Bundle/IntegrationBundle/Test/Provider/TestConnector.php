@@ -16,26 +16,31 @@ class TestConnector extends AbstractConnector implements TwoWaySyncConnectorInte
     private const JOB_IMPORT = 'integration_test_import';
     private const JOB_EXPORT = 'integration_test_export';
 
+    #[\Override]
     public function getType(): string
     {
         return self::TYPE;
     }
 
+    #[\Override]
     public function getLabel(): string
     {
         return 'oro_integration.connector.test.label';
     }
 
+    #[\Override]
     public function getImportJobName(): string
     {
         return self::JOB_IMPORT;
     }
 
+    #[\Override]
     public function getImportEntityFQCN(): string
     {
         return \stdClass::class;
     }
 
+    #[\Override]
     protected function getConnectorSource(): \Iterator
     {
         return new TestIterator();
@@ -46,6 +51,7 @@ class TestConnector extends AbstractConnector implements TwoWaySyncConnectorInte
         return true;
     }
 
+    #[\Override]
     public function getExportJobName(): string
     {
         return self::JOB_EXPORT;

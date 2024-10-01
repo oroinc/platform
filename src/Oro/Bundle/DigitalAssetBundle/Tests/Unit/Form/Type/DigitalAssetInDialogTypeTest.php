@@ -32,6 +32,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
     private DigitalAssetInDialogType $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new DigitalAssetInDialogType();
@@ -230,9 +231,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         self::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -257,9 +256,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTypeExtensions(): array
     {
         return array_merge(
@@ -271,9 +268,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getValidators(): array
     {
         return [

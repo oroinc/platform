@@ -14,6 +14,7 @@ class GetSetMethodNormalizerTest extends WebTestCase
 
     private Serializer $serializer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

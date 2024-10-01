@@ -31,6 +31,7 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowStartListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->systemWorkflowManager = $this->createMock(WorkflowManager::class);

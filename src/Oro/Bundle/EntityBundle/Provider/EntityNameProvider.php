@@ -39,9 +39,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if (!$this->isFormatSupported($format)) {
@@ -77,9 +75,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if (!$this->isFormatSupported($format)) {

@@ -16,6 +16,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
     /** @var Configurable */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->assembler = $this->createMock(ExpressionAssembler::class);

@@ -72,9 +72,7 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         return $this->names;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRelatedEntityRules(
         $entityName,
         $singleRelationDeepLevel,
@@ -110,9 +108,7 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         return $rules;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRelatedEntityRulesAndBackendHeaders(
         $entityName,
         $singleRelationDeepLevel,
@@ -223,6 +219,7 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         return [$rules, $backendHeaders];
     }
 
+    #[\Override]
     protected function getFieldHeader($entityName, $field): string
     {
         if (!is_array($field) || !array_key_exists('name', $field)) {

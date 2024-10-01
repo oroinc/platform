@@ -25,9 +25,7 @@ class ReportChartSchemaType extends AbstractType
         $this->manager = $manager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['data_schema'] as $schemaOptions) {
@@ -58,34 +56,25 @@ class ReportChartSchemaType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['attr']['data-page-component-view'] = self::VIEW_MODULE_NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['data_schema']);
         $resolver->setAllowedTypes('data_schema', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_report_chart_data_schema';

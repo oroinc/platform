@@ -51,9 +51,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
         $this->extendEntityConfigProvider = $extendEntityConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($actionType)
     {
         return $actionType === ExtendConfigDumper::ACTION_PRE_UPDATE
@@ -61,11 +59,11 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function preUpdate()
     {
         $enumConfigProvider = $this->configManager->getProvider('enum');
@@ -147,10 +145,10 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     }
 
     /**
-     * {@inheritdoc}
      * @throws \ReflectionException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function postUpdate()
     {
         $extendConfigProvider = $this->configManager->getProvider('extend');

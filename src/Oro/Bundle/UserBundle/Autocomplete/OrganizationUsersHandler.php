@@ -29,9 +29,7 @@ class OrganizationUsersHandler extends UserSearchHandler
         $this->searchUserCriteria = $searchCriteria;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function findById($query)
     {
         $entityIds = explode(',', $query);
@@ -43,9 +41,7 @@ class OrganizationUsersHandler extends UserSearchHandler
         return $queryBuilder->getQuery()->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function searchEntities($search, $firstResult, $maxResults)
     {
         $queryBuilder = $this->getBasicQueryBuilder();

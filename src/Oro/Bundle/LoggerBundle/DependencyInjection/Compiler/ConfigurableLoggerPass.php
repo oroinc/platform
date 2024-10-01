@@ -16,9 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ConfigurableLoggerPass implements CompilerPassInterface
 {
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $configuration = $container->getExtension('monolog')->getConfiguration([], $container);

@@ -41,6 +41,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
     /** @var ErrorCompleter */
     private $errorCompleter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->exceptionTextExtractor = $this->createMock(ExceptionTextExtractorInterface::class);

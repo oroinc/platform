@@ -58,9 +58,7 @@ class FiltersSorterRegistry implements ResetInterface
         return $sorter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->cache = [];

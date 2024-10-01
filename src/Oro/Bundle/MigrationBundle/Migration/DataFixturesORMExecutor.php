@@ -18,9 +18,7 @@ class DataFixturesORMExecutor extends ORMExecutor implements LocalizationOptions
     /** @var callable|null */
     private $progressCallback = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(array $fixtures, $append = false)
     {
         $em = $this->getObjectManager();
@@ -66,6 +64,7 @@ class DataFixturesORMExecutor extends ORMExecutor implements LocalizationOptions
         }
     }
 
+    #[\Override]
     public function log($message)
     {
         $logger = $this->logger;

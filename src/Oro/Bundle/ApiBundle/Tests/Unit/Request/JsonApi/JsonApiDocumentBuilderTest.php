@@ -28,6 +28,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /** @var JsonApiDocumentBuilder */
     private $documentBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);

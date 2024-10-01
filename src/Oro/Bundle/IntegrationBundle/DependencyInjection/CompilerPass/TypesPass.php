@@ -15,9 +15,7 @@ class TypesPass implements CompilerPassInterface
     const TRANSPORT_TYPES_TAG_NAME = 'oro_integration.transport';
     const CONNECTOR_TYPES_TAG_NAME = 'oro_integration.connector';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $manager = $container->getDefinition(self::MANAGER_ID);

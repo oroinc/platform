@@ -51,9 +51,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
         $this->extensionState = $extensionState;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function switchToDefaultFormExtension(): void
     {
         if ($this->switchCounter > 0) {
@@ -65,9 +63,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function switchToApiFormExtension(): void
     {
         if (0 === $this->switchCounter) {
@@ -87,9 +83,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
         $this->setPrivatePropertyValue('guesser', false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getType(string $name): ResolvedFormTypeInterface
     {
         // prevent using of not registered in API form types

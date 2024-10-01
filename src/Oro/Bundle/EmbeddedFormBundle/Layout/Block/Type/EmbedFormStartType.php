@@ -14,9 +14,7 @@ class EmbedFormStartType extends AbstractFormType
 
     const SHORT_NAME = 'start';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -31,9 +29,7 @@ class EmbedFormStartType extends AbstractFormType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions(
@@ -45,11 +41,11 @@ class EmbedFormStartType extends AbstractFormType
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
@@ -117,9 +113,7 @@ class EmbedFormStartType extends AbstractFormType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

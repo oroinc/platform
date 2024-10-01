@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class WorkflowStartListenerTest extends WorkflowTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

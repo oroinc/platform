@@ -21,6 +21,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainVirtualFieldProvider */
     private $chainProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $highPriorityProvider = $this->createMock(VirtualFieldProviderInterface::class);

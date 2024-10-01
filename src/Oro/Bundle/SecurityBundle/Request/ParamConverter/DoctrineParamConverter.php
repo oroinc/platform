@@ -60,6 +60,7 @@ class DoctrineParamConverter extends BaseParamConverter
      *
      * @throws AccessDeniedException When User doesn't have permission to the object
      */
+    #[\Override]
     public function apply(Request $request, ParamConverter $configuration)
     {
         $request->attributes->set('_oro_access_checked', false);
@@ -84,13 +85,9 @@ class DoctrineParamConverter extends BaseParamConverter
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * The default Symfony's implementation is overridden to avoid loading
-     * all entity managers if an entity belongs to the default manager.
-     * Also avoid unnecessary "isTransient" call if the entity manager name is not configured.
      * @see \Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter::supports
      */
+    #[\Override]
     public function supports(ParamConverter $configuration)
     {
         if (null === $this->registry) {

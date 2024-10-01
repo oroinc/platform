@@ -9,17 +9,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class ArrayAccessor implements ObjectAccessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassName(mixed $object): ?string
     {
         return $object[ConfigUtil::CLASS_NAME] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue(mixed $object, string $propertyName): mixed
     {
         if (!$this->hasProperty($object, $propertyName)) {
@@ -29,9 +25,7 @@ class ArrayAccessor implements ObjectAccessorInterface
         return $object[$propertyName];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasProperty(mixed $object, string $propertyName): bool
     {
         // ignore "metadata" items
@@ -42,9 +36,7 @@ class ArrayAccessor implements ObjectAccessorInterface
         return \array_key_exists($propertyName, $object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray(mixed $object): array
     {
         // remove "metadata" items

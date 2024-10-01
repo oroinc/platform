@@ -12,6 +12,7 @@ class AddressTypeFixtureTest extends \PHPUnit\Framework\TestCase
     /** @var AddressTypeFixture */
     private $fixture;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fixture = new AddressTypeFixture();

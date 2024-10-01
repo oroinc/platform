@@ -14,9 +14,7 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
 {
     private const RESOURCES_FOLDER_PATTERN = '[a-zA-Z][a-zA-Z0-9_\-:]*';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
@@ -119,6 +117,7 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
         return $paths;
     }
 
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         if ('test' === $container->getParameter('kernel.environment')) {

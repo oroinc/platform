@@ -34,9 +34,7 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports()
     {
         foreach ($this->ownershipDecisionMakers as $ownershipDecisionMaker) {
@@ -48,33 +46,25 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isOrganization($domainObject)
     {
         return $this->getSupportedOwnershipDecisionMaker()->isOrganization($domainObject);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isBusinessUnit($domainObject)
     {
         return $this->getSupportedOwnershipDecisionMaker()->isBusinessUnit($domainObject);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isUser($domainObject)
     {
         return $this->getSupportedOwnershipDecisionMaker()->isUser($domainObject);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isAssociatedWithOrganization($user, $domainObject, $organization = null)
     {
         return $this->getSupportedOwnershipDecisionMaker()->isAssociatedWithOrganization(
@@ -84,9 +74,7 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
     {
         return $this->getSupportedOwnershipDecisionMaker()->isAssociatedWithBusinessUnit(
@@ -97,9 +85,7 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {
         return $this->getSupportedOwnershipDecisionMaker()->isAssociatedWithUser(

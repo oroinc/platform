@@ -17,17 +17,13 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class SearchStringFilter extends AbstractFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return SearchStringFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
@@ -56,9 +52,7 @@ class SearchStringFilter extends AbstractFilter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         throw new \BadMethodCallException('Not implemented');

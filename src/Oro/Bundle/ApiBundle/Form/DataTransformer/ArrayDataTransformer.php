@@ -10,9 +10,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ArrayDataTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -26,9 +24,7 @@ class ArrayDataTransformer implements DataTransformerInterface
         return $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if ('' === $value) {

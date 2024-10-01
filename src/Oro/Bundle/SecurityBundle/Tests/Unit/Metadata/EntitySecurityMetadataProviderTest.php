@@ -44,6 +44,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntitySecurityMetadataProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

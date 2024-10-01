@@ -28,17 +28,13 @@ class WebpConfigurationStub extends WebpConfiguration
         $this->stubWebpStrategy = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getWebpQuality(): int
     {
         return $this->webpConfiguration->getWebpQuality();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isEnabledIfSupported(): bool
     {
         if (null !== $this->stubWebpStrategy) {
@@ -48,9 +44,7 @@ class WebpConfigurationStub extends WebpConfiguration
         return $this->webpConfiguration->isEnabledIfSupported();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isEnabledForAll(): bool
     {
         if (null !== $this->stubWebpStrategy) {
@@ -60,9 +54,7 @@ class WebpConfigurationStub extends WebpConfiguration
         return $this->webpConfiguration->isEnabledForAll();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isDisabled(): bool
     {
         if (null !== $this->stubWebpStrategy) {

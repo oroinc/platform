@@ -14,31 +14,23 @@ class TestContext implements ContextInterface
      */
     private $postponedRows = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addError($message)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addErrors(array $messages)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getErrors()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addPostponedRow(array $row)
     {
         $this->postponedRows[] = $row;
@@ -46,9 +38,7 @@ class TestContext implements ContextInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addPostponedRows(array $rows)
     {
         foreach ($rows as $row) {
@@ -58,163 +48,119 @@ class TestContext implements ContextInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPostponedRows()
     {
         return $this->postponedRows;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFailureExceptions()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementReadCount($incrementBy = 1)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReadCount()
     {
         return 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementReadOffset()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReadOffset()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementAddCount($incrementBy = 1)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAddCount()
     {
         return 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementUpdateCount($incrementBy = 1)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUpdateCount()
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementReplaceCount($incrementBy = 1)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReplaceCount()
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementDeleteCount($incrementBy = 1)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDeleteCount()
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function incrementErrorEntriesCount($incrementBy = 1)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getErrorEntriesCount()
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($name, $value)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($name)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasOption($name)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOption($name, $default = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeOption($name)
     {
     }

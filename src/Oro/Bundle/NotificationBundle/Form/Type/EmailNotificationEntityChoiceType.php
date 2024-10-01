@@ -8,17 +8,13 @@ class EmailNotificationEntityChoiceType extends EntityChoiceType
 {
     const NAME = 'oro_email_notification_entity_choice';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

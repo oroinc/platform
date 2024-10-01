@@ -14,6 +14,7 @@ class ActionData extends AbstractStorage implements EntityAwareInterface
     /**
      * @return object
      */
+    #[\Override]
     public function getEntity()
     {
         return $this->get('data');

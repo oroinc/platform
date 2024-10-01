@@ -43,6 +43,7 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityRepository = $this->createMock(WorkflowDefinitionRepository::class);

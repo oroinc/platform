@@ -15,6 +15,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var LinkMetadataDecorator */
     private $decorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->linkMetadata = $this->createMock(LinkMetadataInterface::class);

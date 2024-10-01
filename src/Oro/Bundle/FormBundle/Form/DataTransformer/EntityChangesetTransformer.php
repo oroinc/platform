@@ -31,17 +31,13 @@ class EntityChangesetTransformer implements DataTransformerInterface
         $this->class = $class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

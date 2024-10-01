@@ -23,9 +23,7 @@ class AddressHandler implements FormHandlerInterface
         $this->manager = $manager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process($entity, FormInterface $form, Request $request)
     {
         $form->setData($entity);

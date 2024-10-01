@@ -40,6 +40,7 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
         $this->eventName = $eventName;
     }
 
+    #[\Override]
     public function getMappingConfig(): array
     {
         if (null === $this->configuration) {
@@ -55,12 +56,14 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
         return $this->configuration;
     }
 
+    #[\Override]
     public function clearCache(): void
     {
         $this->configuration = null;
         $this->cache->deleteItem($this->getCacheKey());
     }
 
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->configuration = null;

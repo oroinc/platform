@@ -12,17 +12,13 @@ class ResourcesContainer implements ResourcesContainerInterface
     /** @var ResourceInterface[] [entity class => ResourceInterface, ...] */
     private $resources = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResources(): array
     {
         return $this->resources;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addResource(ResourceInterface $resource): void
     {
         $this->resources[] = $resource;

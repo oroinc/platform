@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
  */
 class NoteTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

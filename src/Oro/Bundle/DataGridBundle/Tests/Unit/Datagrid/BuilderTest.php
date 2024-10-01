@@ -34,6 +34,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     /** @var MemoryCacheProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $memoryCacheProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->memoryCacheProvider = $this->createMock(MemoryCacheProviderInterface::class);

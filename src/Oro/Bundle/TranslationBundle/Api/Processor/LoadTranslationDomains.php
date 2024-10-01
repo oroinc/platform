@@ -19,9 +19,7 @@ class LoadTranslationDomains implements ProcessorInterface
         $this->translationDomainRepository = $translationDomainRepository;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */

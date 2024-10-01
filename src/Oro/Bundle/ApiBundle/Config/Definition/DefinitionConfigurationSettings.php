@@ -16,17 +16,13 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
         $this->settings = $settings;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtraSections(): array
     {
         return $this->settings->getExtraSections();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigureCallbacks(string $section): array
     {
         $callbacks = $this->settings->getConfigureCallbacks($section);
@@ -37,17 +33,13 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
         return $callbacks;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPreProcessCallbacks(string $section): array
     {
         return $this->settings->getPreProcessCallbacks($section);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPostProcessCallbacks(string $section): array
     {
         return $this->settings->getPostProcessCallbacks($section);

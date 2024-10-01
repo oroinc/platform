@@ -22,6 +22,7 @@ class ImpersonationAuthenticatorTest extends WebTestCase
     /** @var ImpersonationAuthenticator */
     private $authenticator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

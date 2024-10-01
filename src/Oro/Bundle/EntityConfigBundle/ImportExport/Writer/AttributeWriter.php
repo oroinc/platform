@@ -24,6 +24,7 @@ class AttributeWriter extends EntityFieldWriter
      * @param FieldConfigModel $fieldConfigModel
      * @param string $state
      */
+    #[\Override]
     protected function setExtendData(FieldConfigModel $fieldConfigModel, $state)
     {
         parent::setExtendData($fieldConfigModel, $state);

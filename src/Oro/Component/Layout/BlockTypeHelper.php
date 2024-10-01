@@ -21,9 +21,7 @@ class BlockTypeHelper implements BlockTypeHelperInterface
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isInstanceOf($blockType, $targetName)
     {
         $name = $this->ensureInitialized($blockType);
@@ -31,9 +29,7 @@ class BlockTypeHelper implements BlockTypeHelperInterface
         return isset($this->nameMap[$name][$targetName]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeNames($blockType)
     {
         $name = $this->ensureInitialized($blockType);
@@ -41,9 +37,7 @@ class BlockTypeHelper implements BlockTypeHelperInterface
         return $this->names[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypes($blockType)
     {
         $name = $this->ensureInitialized($blockType);

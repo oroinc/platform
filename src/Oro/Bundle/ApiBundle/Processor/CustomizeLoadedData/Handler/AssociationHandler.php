@@ -56,9 +56,7 @@ class AssociationHandler extends EntityHandler
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createCustomizationContext(array $context): CustomizeLoadedDataContext
     {
         $customizationContext = parent::createCustomizationContext($context);
@@ -73,9 +71,7 @@ class AssociationHandler extends EntityHandler
         return $customizationContext;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isRedundantHandler(callable $handler): bool
     {
         return

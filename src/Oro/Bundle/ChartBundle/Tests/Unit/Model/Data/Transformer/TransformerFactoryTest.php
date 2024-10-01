@@ -15,6 +15,7 @@ class TransformerFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var TransformerFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

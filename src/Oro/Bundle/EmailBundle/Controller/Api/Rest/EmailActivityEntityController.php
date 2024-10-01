@@ -48,17 +48,13 @@ class EmailActivityEntityController extends RestGetController
         return $this->handleGetListRequest($page, $limit, $criteria);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email_activity_entity.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getPreparedItem($entity, $resultFields = [])
     {
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {

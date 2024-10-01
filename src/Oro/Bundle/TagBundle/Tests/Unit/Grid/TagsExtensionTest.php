@@ -42,6 +42,7 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TagsExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tagManager = $this->createMock(TagManager::class);

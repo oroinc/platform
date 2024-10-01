@@ -18,6 +18,7 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var ImageLinkFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(AttachmentManager::class);

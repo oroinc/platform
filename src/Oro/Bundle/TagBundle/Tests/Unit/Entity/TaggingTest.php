@@ -12,6 +12,7 @@ class TaggingTest extends \PHPUnit\Framework\TestCase
     /** @var Tagging */
     private $tagging;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tagging = new Tagging();

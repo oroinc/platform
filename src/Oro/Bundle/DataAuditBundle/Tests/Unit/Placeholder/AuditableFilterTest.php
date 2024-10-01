@@ -16,6 +16,7 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
     /** @var AuditableFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

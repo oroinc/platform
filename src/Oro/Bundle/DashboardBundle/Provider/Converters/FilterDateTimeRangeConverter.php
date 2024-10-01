@@ -28,9 +28,7 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
         $this->dateHelper = $dateHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getViewValue($value)
     {
         $convertedValue = $this->converter->getConvertedValue([], $value);
@@ -38,9 +36,7 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
         return $this->converter->getViewValue($convertedValue);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         if (null === $value &&
@@ -72,9 +68,7 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
         return parent::getConvertedValue($widgetConfig, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormValue(array $converterAttributes, $value)
     {
         if (null === $value &&

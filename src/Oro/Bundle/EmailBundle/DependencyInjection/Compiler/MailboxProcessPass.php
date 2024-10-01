@@ -8,9 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class MailboxProcessPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->has('oro_email.mailbox.process_storage')) {

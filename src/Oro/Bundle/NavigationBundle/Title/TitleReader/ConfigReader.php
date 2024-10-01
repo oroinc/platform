@@ -17,9 +17,7 @@ class ConfigReader implements ReaderInterface
         $this->configurationProvider = $configurationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTitle($route)
     {
         return $this->configurationProvider->getTitle($route);

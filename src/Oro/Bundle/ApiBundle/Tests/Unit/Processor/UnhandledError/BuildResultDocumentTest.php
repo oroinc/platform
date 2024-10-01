@@ -22,6 +22,7 @@ class BuildResultDocumentTest extends UnhandledErrorProcessorTestCase
     /** @var BuildResultDocument */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

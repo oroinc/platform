@@ -30,17 +30,13 @@ class ClearLoggerExtension extends AbstractExtension
         $this->persistentLoggers = $persistentLoggers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $this->clear();
     }
 
-    /**
-     *{@inheritdoc}
-     */
+    #[\Override]
     public function onIdle(Context $context)
     {
         $this->clear();

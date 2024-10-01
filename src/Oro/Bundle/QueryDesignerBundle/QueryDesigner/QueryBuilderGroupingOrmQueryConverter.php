@@ -7,33 +7,25 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
  */
 abstract class QueryBuilderGroupingOrmQueryConverter extends GroupingOrmQueryConverter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createContext(): QueryBuilderGroupingOrmQueryConverterContext
     {
         return new QueryBuilderGroupingOrmQueryConverterContext();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function context(): QueryBuilderGroupingOrmQueryConverterContext
     {
         return parent::context();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addFromStatement(string $entityClass, string $tableAlias): void
     {
         $this->context()->getQueryBuilder()->from($entityClass, $tableAlias);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addJoinStatement(
         ?string $joinType,
         string $join,

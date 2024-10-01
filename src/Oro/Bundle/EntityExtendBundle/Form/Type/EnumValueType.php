@@ -29,9 +29,7 @@ class EnumValueType extends AbstractType
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -52,9 +50,7 @@ class EnumValueType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['allow_delete'] = $this->isDeletable($form);
@@ -92,9 +88,7 @@ class EnumValueType extends AbstractType
         return !in_array($data['id'], $configById->get('immutable_codes', false, []));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -105,17 +99,12 @@ class EnumValueType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_enum_value';

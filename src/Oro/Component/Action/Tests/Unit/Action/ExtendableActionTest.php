@@ -24,6 +24,7 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendableAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);

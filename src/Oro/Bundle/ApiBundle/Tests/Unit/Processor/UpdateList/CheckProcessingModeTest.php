@@ -9,6 +9,7 @@ class CheckProcessingModeTest extends UpdateListProcessorTestCase
 {
     private CheckProcessingMode $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -147,6 +147,7 @@ class LocalizationManager implements ClearableConfigCacheInterface
         return null;
     }
 
+    #[\Override]
     public function clearCache(): void
     {
         $this->cacheProvider->clear();

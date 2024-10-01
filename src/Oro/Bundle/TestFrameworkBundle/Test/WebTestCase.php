@@ -111,6 +111,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /** @var bool */
     private static $initClientAllowed = false;
 
+    #[\Override]
     protected function setUp(): void
     {
     }
@@ -127,6 +128,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * In order to disable kernel shutdown
      * @see \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::tearDown
      */
+    #[\Override]
     protected function tearDown(): void
     {
     }
@@ -167,9 +169,7 @@ abstract class WebTestCase extends BaseWebTestCase
         self::resetClient();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function run(TestResult $result = null): TestResult
     {
         self::$initClientAllowed = true;
@@ -288,9 +288,7 @@ abstract class WebTestCase extends BaseWebTestCase
         return self::$afterInitClientMethods[$className];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected static function createKernel(array $options = []): KernelInterface
     {
         if (!array_key_exists('environment', $options)) {
@@ -1019,7 +1017,9 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function jsonToArray(string $json): array
     {
-        return (array)json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        return $json
+            ? (array)json_decode($json, true, 512, JSON_THROW_ON_ERROR)
+            : [];
     }
 
     /**

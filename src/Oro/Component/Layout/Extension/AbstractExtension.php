@@ -68,9 +68,7 @@ abstract class AbstractExtension implements ExtensionInterface
      */
     private $dataProviders;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeNames(): array
     {
         if (null === $this->types) {
@@ -80,9 +78,7 @@ abstract class AbstractExtension implements ExtensionInterface
         return array_keys($this->types);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType($name)
     {
         if (null === $this->types) {
@@ -98,9 +94,7 @@ abstract class AbstractExtension implements ExtensionInterface
         return $this->types[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasType($name)
     {
         if (null === $this->types) {
@@ -110,9 +104,7 @@ abstract class AbstractExtension implements ExtensionInterface
         return isset($this->types[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeExtensions($name)
     {
         if (null === $this->typeExtensions) {
@@ -124,9 +116,7 @@ abstract class AbstractExtension implements ExtensionInterface
             : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasTypeExtensions($name)
     {
         if (null === $this->typeExtensions) {
@@ -136,9 +126,7 @@ abstract class AbstractExtension implements ExtensionInterface
         return !empty($this->typeExtensions[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLayoutUpdates(LayoutItemInterface $item)
     {
         $idOrAlias = $item->getAlias() ?: $item->getId();
@@ -149,9 +137,7 @@ abstract class AbstractExtension implements ExtensionInterface
             : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasLayoutUpdates(LayoutItemInterface $item)
     {
         $idOrAlias = $item->getAlias() ?: $item->getId();
@@ -160,9 +146,7 @@ abstract class AbstractExtension implements ExtensionInterface
         return !empty($layoutUpdates[$idOrAlias]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContextConfigurators()
     {
         if (null === $this->contextConfigurators) {
@@ -172,9 +156,7 @@ abstract class AbstractExtension implements ExtensionInterface
         return $this->contextConfigurators;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasContextConfigurators()
     {
         if (null === $this->contextConfigurators) {
@@ -184,9 +166,7 @@ abstract class AbstractExtension implements ExtensionInterface
         return !empty($this->contextConfigurators);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDataProvider($name)
     {
         if (null === $this->dataProviders) {
@@ -202,9 +182,7 @@ abstract class AbstractExtension implements ExtensionInterface
         return $this->dataProviders[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasDataProvider($name)
     {
         if (null === $this->dataProviders) {

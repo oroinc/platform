@@ -12,6 +12,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var SyncProcessorRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = new SyncProcessorRegistry();

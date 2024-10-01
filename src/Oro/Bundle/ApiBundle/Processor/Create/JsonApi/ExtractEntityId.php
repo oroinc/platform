@@ -20,9 +20,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ExtractEntityId implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext&SingleItemContext $context */

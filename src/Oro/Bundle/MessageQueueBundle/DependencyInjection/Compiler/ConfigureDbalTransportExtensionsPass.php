@@ -12,9 +12,7 @@ class ConfigureDbalTransportExtensionsPass implements CompilerPassInterface
 {
     const EXTENSION_TAG = 'oro_message_queue.consumption.extension';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->markExtensionPersistent(

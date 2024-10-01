@@ -15,18 +15,14 @@ use Oro\Component\Layout\StringOptionValueBuilder;
  */
 class ClassAttributeExtension extends AbstractBlockTypeExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         $this->normalizeClassAttribute($view, 'attr');
         $this->normalizeClassAttribute($view, 'label_attr');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtendedType()
     {
         return BaseType::NAME;

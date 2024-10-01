@@ -20,17 +20,13 @@ class DataTransformerExtension extends AbstractTypeExtension
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['data_transformer']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!empty($options['data_transformer'])) {

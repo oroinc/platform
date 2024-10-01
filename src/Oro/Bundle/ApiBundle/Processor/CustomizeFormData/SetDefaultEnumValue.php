@@ -34,9 +34,7 @@ class SetDefaultEnumValue implements ProcessorInterface
         $this->enumCode = $enumCode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

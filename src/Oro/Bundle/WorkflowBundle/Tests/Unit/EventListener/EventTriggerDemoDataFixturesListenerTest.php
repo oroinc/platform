@@ -14,6 +14,7 @@ class EventTriggerDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCa
     /** @var EventTriggerDemoDataFixturesListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);

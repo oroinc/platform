@@ -23,6 +23,7 @@ class NamePartsGuesserTest extends TestCase
     private ?ExtendEntityMetadataProvider $extendEntityMetadataProvider = null;
     private ?ProcessorHelper $processorHelper = null;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->md5ProcessorMock = self::createMock(Md5Processor::class);

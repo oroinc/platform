@@ -15,6 +15,7 @@ class ConfigLogTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigLogDiff */
     private $configLogDiff;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configLog = new ConfigLog();

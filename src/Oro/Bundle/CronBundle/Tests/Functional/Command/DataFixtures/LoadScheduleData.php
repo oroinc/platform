@@ -22,9 +22,7 @@ class LoadScheduleData extends AbstractFixture
         ]
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->schedules as $config) {

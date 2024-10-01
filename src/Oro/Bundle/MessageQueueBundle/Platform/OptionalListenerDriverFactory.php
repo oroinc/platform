@@ -26,6 +26,7 @@ class OptionalListenerDriverFactory implements DriverFactoryInterface
         $this->optionalListenerManager = $optionalListenerManager;
     }
 
+    #[\Override]
     public function create(ConnectionInterface $connection, Config $config)
     {
         return new OptionalListenerDriver(

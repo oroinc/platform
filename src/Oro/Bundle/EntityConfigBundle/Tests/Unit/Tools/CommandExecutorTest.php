@@ -20,6 +20,7 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var CommandExecutor */
     private $commandExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dataCacheManager = $this->createMock(OroDataCacheManager::class);

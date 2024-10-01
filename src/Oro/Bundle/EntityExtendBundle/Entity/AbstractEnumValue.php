@@ -79,6 +79,7 @@ abstract class AbstractEnumValue implements Translatable, PriorityItem
      *
      * @return AbstractEnumValue
      */
+    #[\Override]
     public function setPriority($priority)
     {
         $this->priority = (int)$priority;
@@ -89,6 +90,7 @@ abstract class AbstractEnumValue implements Translatable, PriorityItem
     /**
      * @return int
      */
+    #[\Override]
     public function getPriority()
     {
         return $this->priority;
@@ -140,6 +142,7 @@ abstract class AbstractEnumValue implements Translatable, PriorityItem
      *
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->name;

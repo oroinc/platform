@@ -28,25 +28,18 @@ class FilterType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('type', $options['operator_type'], $this->createOperatorOptions($options));
@@ -78,9 +71,7 @@ class FilterType extends AbstractType
         return array_merge(array('required' => false), $options['field_options']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $children                     = $form->all();
@@ -91,9 +82,7 @@ class FilterType extends AbstractType
         $view->vars['show_filter']    = $options['show_filter'];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

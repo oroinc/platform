@@ -19,6 +19,7 @@ class EmailRendererTest extends WebTestCase
 
     private TestActivity $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

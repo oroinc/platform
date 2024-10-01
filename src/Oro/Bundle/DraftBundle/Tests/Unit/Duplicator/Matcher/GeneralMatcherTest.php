@@ -13,6 +13,7 @@ class GeneralMatcherTest extends \PHPUnit\Framework\TestCase
     /** @var GeneralMatcher */
     private $matcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->matcher = new GeneralMatcher();

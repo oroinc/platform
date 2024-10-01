@@ -7,17 +7,13 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Type\IntegerAttributeType;
 
 class IntegerAttributeTypeTest extends AttributeTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         return new IntegerAttributeType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurationMethodsDataProvider(): array
     {
         return [

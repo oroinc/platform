@@ -18,6 +18,7 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
     /** @var Substring */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new Substring(new ContextAccessor());

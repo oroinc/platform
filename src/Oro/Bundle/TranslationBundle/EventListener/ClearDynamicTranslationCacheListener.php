@@ -69,6 +69,7 @@ class ClearDynamicTranslationCacheListener implements ServiceSubscriberInterface
         $this->scheduledLocales[$languageCode] = true;
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

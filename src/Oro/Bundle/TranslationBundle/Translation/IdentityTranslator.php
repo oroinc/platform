@@ -25,6 +25,7 @@ class IdentityTranslator implements TranslatorInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public function trans($id, array $parameters = [], $domain = null, $locale = null): string
     {
         try {

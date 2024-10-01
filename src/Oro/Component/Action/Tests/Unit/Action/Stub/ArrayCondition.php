@@ -10,9 +10,7 @@ class ArrayCondition extends ArrayCollection implements ExpressionInterface
     /** @var string */
     private $message;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function evaluate($context, \ArrayAccess $errors = null)
     {
         $result = $this->isConditionAllowed($context);
@@ -20,17 +18,12 @@ class ArrayCondition extends ArrayCollection implements ExpressionInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessage()
     {
         return $this->message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setMessage($message)
     {
         $this->message = $message;
@@ -42,6 +35,7 @@ class ArrayCondition extends ArrayCollection implements ExpressionInterface
      * @param array $options
      * @return ExpressionInterface
      */
+    #[\Override]
     public function initialize(array $options)
     {
         foreach ($options as $key => $value) {
@@ -57,17 +51,13 @@ class ArrayCondition extends ArrayCollection implements ExpressionInterface
         return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'array';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return '';

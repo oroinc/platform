@@ -20,6 +20,7 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
     /** @var CompleteErrors */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -20,9 +20,7 @@ class NormalizeFilters extends NormalizeSection
 {
     private const IDENTIFIER_FILTER_NAME = 'id';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

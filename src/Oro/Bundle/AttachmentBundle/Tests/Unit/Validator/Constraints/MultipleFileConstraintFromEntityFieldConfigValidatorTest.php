@@ -15,12 +15,14 @@ class MultipleFileConstraintFromEntityFieldConfigValidatorTest extends Constrain
     /** @var MultipleFileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $constraintsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->constraintsProvider = $this->createMock(MultipleFileConstraintsProvider::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new MultipleFileConstraintFromEntityFieldConfigValidator($this->constraintsProvider);

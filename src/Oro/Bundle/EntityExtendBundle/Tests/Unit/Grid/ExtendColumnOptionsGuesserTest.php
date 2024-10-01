@@ -22,6 +22,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendColumnOptionsGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -11,6 +11,7 @@ class TitleTranslatorTest extends \PHPUnit\Framework\TestCase
     /** @var TitleTranslator */
     private $titleTranslator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

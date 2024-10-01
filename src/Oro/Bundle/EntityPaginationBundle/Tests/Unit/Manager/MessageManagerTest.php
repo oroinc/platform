@@ -28,6 +28,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     /** @var MessageManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());

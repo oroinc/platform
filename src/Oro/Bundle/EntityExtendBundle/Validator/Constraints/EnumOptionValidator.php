@@ -13,9 +13,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EnumOptionValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($entity, Constraint $constraint)
     {
         if ($entity instanceof EnumOptionEntity) {

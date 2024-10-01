@@ -20,9 +20,7 @@ class RolesChoicesForUserProvider implements RolesChoicesForUserProviderInterfac
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRoles(): array
     {
         $qb = $this->doctrine->getRepository(Role::class)
@@ -32,9 +30,7 @@ class RolesChoicesForUserProvider implements RolesChoicesForUserProviderInterfac
         return $this->aclHelper->apply($qb)->getResult();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getChoiceLabel(Role $role): string
     {
         return $role->getLabel();

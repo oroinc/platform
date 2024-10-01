@@ -74,9 +74,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
         $this->batchSize = $sizeOfBatch;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $this->getMessageBody($message);

@@ -27,17 +27,13 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(Segment $segment): Query
     {
         return $this->getQueryBuilder($segment)->getQuery();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getQueryBuilder(Segment $segment): QueryBuilder
     {
         return $this->segmentQueryConverterFactory->createInstance()

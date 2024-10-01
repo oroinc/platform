@@ -10,6 +10,7 @@ class PublicEmailOwnerProviderTest extends \PHPUnit\Framework\TestCase
     /** @var PublicEmailOwnerProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new PublicEmailOwnerProvider([\stdClass::class]);

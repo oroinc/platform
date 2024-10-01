@@ -54,6 +54,7 @@ class FilesystemMap implements \IteratorAggregate, FilesystemMapInterface
      *
      * @throw \InvalidArgumentException if the filesystem does not exist
      */
+    #[\Override]
     public function get($name)
     {
         if (!$this->has($name)) {
@@ -68,11 +69,13 @@ class FilesystemMap implements \IteratorAggregate, FilesystemMapInterface
      *
      * @return bool
      */
+    #[\Override]
     public function has($name)
     {
         return isset($this->maps[$name]);
     }
 
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->maps);

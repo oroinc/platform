@@ -10,9 +10,7 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
  */
 class BuildListResultDocument extends BuildResultDocument
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context): void
     {
         $documentBuilder->setDataCollection(

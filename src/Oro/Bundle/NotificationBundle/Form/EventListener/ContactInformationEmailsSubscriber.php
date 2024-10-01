@@ -23,9 +23,7 @@ class ContactInformationEmailsSubscriber implements EventSubscriberInterface
         $this->contactInformationEmailsProvider = $contactInformationEmailsProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -24,9 +24,7 @@ class SetCaseSensitivityForFilter implements ProcessorInterface
         $this->sensitivityConfigOptionName = $sensitivityConfigOptionName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

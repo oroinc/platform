@@ -7,9 +7,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 
 class EmailBodyEntityNameProvider implements EntityNameProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if (!$entity instanceof EmailBody) {
@@ -19,9 +17,7 @@ class EmailBodyEntityNameProvider implements EntityNameProviderInterface
         return $entity->getBodyIsText() ? $entity->getTextBody() : $entity->getBodyContent();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if ($className !== EmailBody::class) {

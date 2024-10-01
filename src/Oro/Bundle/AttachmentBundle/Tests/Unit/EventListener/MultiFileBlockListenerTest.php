@@ -33,6 +33,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
     /** @var MultiFileBlockListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

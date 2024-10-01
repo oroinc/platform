@@ -34,17 +34,13 @@ class UpdateVisibilitiesProcessor implements MessageProcessorInterface, TopicSub
         $this->jobRunner = $jobRunner;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [UpdateVisibilitiesTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $result = $this->jobRunner->runUniqueByMessage(

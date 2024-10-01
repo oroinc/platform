@@ -16,9 +16,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class SearchEnumFilter extends EnumFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         parent::init($name, $params);
@@ -26,9 +24,7 @@ class SearchEnumFilter extends EnumFilter
         $this->params[FilterUtility::FRONTEND_TYPE_KEY] = 'multiselect';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
@@ -41,9 +37,7 @@ class SearchEnumFilter extends EnumFilter
         return $this->applyRestrictions($ds, $data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         throw new \BadMethodCallException('Not implemented');
@@ -58,9 +52,7 @@ class SearchEnumFilter extends EnumFilter
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return SearchEnumFilterType::class;

@@ -37,6 +37,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
     /** @var ProcessIncludedEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

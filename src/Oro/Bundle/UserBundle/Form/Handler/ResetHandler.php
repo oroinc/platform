@@ -26,9 +26,7 @@ class ResetHandler extends AbstractUserHandler
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function onSuccess(User $user)
     {
         $user
@@ -45,6 +43,7 @@ class ResetHandler extends AbstractUserHandler
         );
     }
 
+    #[\Override]
     protected function onFail(User $user): void
     {
         $this->logger->notice(

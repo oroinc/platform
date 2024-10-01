@@ -11,9 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType as SymfonyIntegerType
 
 class IntegerTypeTest extends AbstractConfigTypeTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): AbstractType
     {
         return new IntegerType(

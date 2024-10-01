@@ -21,6 +21,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
     /** @var ComputeFileContent */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -8,9 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChartSettingsCollectionType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['chart_configs'] as $chartName => $chartConfig) {
@@ -25,9 +23,7 @@ class ChartSettingsCollectionType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['chart_configs']);
@@ -35,17 +31,12 @@ class ChartSettingsCollectionType extends AbstractType
         $resolver->setAllowedTypes('chart_configs', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_chart_settings_collection';

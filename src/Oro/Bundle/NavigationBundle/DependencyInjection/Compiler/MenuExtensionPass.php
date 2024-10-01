@@ -14,9 +14,7 @@ class MenuExtensionPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $extensions = $container->findTaggedServiceIds('oro_navigation.menu_extension');

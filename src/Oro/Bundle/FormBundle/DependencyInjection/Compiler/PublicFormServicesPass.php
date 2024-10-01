@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class PublicFormServicesPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('form.factory')->setPublic(true);

@@ -18,6 +18,7 @@ class TagsDictionaryFilterTest extends WebTestCase
 {
     private TagsDictionaryFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

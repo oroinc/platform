@@ -19,6 +19,7 @@ class PreExportMessageProcessor extends BasePreExportMessageProcessor
 
     private CacheItemPoolInterface $cache;
 
+    #[\Override]
     protected function getBatchSize(): int
     {
         $cache = $this->getCache();

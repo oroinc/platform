@@ -10,6 +10,7 @@ class SetEntityClassTest extends BatchUpdateItemProcessorTestCase
     /** @var SetEntityClass */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

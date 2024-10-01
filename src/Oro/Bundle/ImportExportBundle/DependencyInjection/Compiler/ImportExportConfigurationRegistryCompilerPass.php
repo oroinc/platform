@@ -18,9 +18,7 @@ class ImportExportConfigurationRegistryCompilerPass implements CompilerPassInter
      */
     const SERVICE_TAG = 'oro_importexport.configuration';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->has(self::REGISTRY_SERVICE)) {

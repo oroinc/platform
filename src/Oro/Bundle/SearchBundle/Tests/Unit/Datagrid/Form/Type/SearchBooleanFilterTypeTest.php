@@ -16,6 +16,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     /** @var SearchBooleanFilterType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
@@ -31,9 +32,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTestFormType(): AbstractType
     {
         return $this->type;
@@ -50,17 +49,13 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
         self::assertTrue($result['field_options']['multiple']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptionsDataProvider(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function bindDataProvider(): array
     {
         return [

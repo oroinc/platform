@@ -10,9 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactoryInterface;
  */
 class ProcessorApplicableCheckerFactory implements ProcessorApplicableCheckerFactoryInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createApplicableChecker(): ChainApplicableChecker
     {
         $applicableChecker = new ChainApplicableChecker();

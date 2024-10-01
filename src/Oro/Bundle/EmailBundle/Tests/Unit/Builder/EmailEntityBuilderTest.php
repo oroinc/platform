@@ -38,6 +38,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailEntityBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->batch = $this->createMock(EmailEntityBatchProcessor::class);

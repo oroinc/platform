@@ -20,6 +20,7 @@ class StartTransitionEventTest extends \PHPUnit\Framework\TestCase
     /** @var StartTransitionEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transition = $this->createMock(Transition::class);

@@ -13,9 +13,7 @@ class ProcessorsPass implements CompilerPassInterface
     const SYNC_PROCESSOR_REGISTRY = 'oro_integration.processor_registry';
     const INTEGRATION_NAME = 'integration';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $syncProcessors = $container->findTaggedServiceIds(self::SYNC_PROCESSOR_TAG);

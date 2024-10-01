@@ -47,25 +47,19 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, 
         $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->entityReader->setStepExecution($stepExecution);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function read()
     {
         return $this->entityReader->read();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIds($entityName, array $options = [])
     {
         if (!isset($options[self::FILTERED_RESULTS_GRID])) {

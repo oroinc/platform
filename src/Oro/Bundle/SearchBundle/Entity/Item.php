@@ -17,9 +17,7 @@ use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 #[ORM\HasLifecycleCallbacks]
 class Item extends AbstractItem
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function saveItemData($objectData)
     {
         $this->saveData($objectData, $this->textFields, new IndexText(), SearchQuery::TYPE_TEXT);

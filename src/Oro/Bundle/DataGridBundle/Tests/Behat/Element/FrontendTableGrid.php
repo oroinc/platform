@@ -19,9 +19,7 @@ class FrontendTableGrid extends Table implements GridMappedChildInterface
         return count($rows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMappedChildElementName($name)
     {
         return $name;

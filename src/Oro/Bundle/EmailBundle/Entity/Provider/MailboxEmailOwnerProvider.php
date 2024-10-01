@@ -13,17 +13,13 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
  */
 class MailboxEmailOwnerProvider implements EmailOwnerProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmailOwnerClass(): string
     {
         return Mailbox::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findEmailOwner(EntityManagerInterface $em, string $email): ?EmailOwnerInterface
     {
         $qb = $em->createQueryBuilder()
@@ -39,9 +35,7 @@ class MailboxEmailOwnerProvider implements EmailOwnerProviderInterface
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrganizations(EntityManagerInterface $em, string $email): array
     {
         $qb = $em->createQueryBuilder()
@@ -63,9 +57,7 @@ class MailboxEmailOwnerProvider implements EmailOwnerProviderInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmails(EntityManagerInterface $em, int $organizationId): iterable
     {
         $qb = $em->createQueryBuilder()

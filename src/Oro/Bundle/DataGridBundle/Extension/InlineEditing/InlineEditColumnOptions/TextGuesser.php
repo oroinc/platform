@@ -18,9 +18,7 @@ class TextGuesser implements GuesserInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);

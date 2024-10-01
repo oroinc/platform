@@ -79,9 +79,7 @@ class AclProvider implements AclProviderInterface
         $this->sidConverter = $converter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findChildren(ObjectIdentityInterface $parentOid, $directChildrenOnly = false)
     {
         [$sql, $params, $types] = $this->getFindChildrenSql($parentOid, $directChildrenOnly);
@@ -94,20 +92,18 @@ class AclProvider implements AclProviderInterface
         return $children;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findAcl(ObjectIdentityInterface $oid, array $sids = [])
     {
         return $this->findAcls([$oid], $sids)->offsetGet($oid);
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function findAcls(array $oids, array $sids = [])
     {
         $result = new \SplObjectStorage();

@@ -10,21 +10,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AuditChangedEntitiesInverseRelationsTopic extends AbstractAuditTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.data_audit.entities_inversed_relations_changed';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Create audit entries for entity inverse relations';
     }
 
+    #[\Override]
     public function getDefaultPriority(string $queueName): string
     {
         return MessagePriority::VERY_LOW;
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

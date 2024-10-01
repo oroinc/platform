@@ -47,6 +47,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
 
     private OptionsResolver $optionsResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->definition = $this->createMock(OperationDefinition::class);

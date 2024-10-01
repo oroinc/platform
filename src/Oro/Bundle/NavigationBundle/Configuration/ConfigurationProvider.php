@@ -85,9 +85,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $config = [];

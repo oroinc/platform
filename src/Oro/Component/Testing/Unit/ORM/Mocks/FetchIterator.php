@@ -24,42 +24,32 @@ class FetchIterator implements \Iterator
         $this->statement = $statement;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function current(): mixed
     {
         return $this->row;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->row = $this->statement->fetch();
         $this->key++;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(): int
     {
         return $this->key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         return false !== $this->row;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         $this->next();

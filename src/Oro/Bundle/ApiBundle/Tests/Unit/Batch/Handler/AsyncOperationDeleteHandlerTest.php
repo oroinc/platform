@@ -29,6 +29,7 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var AsyncOperationDeleteHandler */
     private $deleteHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $extension = new EntityDeleteHandlerExtension();

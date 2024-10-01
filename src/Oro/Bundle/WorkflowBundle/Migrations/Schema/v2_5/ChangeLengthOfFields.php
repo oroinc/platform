@@ -13,9 +13,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class ChangeLengthOfFields implements Migration
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPreQuery(new CheckDataLengthOfFields());

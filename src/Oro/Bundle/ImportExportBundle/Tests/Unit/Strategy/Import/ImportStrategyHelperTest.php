@@ -62,6 +62,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ImportStrategyHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

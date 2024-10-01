@@ -9,6 +9,7 @@ class FalseTest extends \PHPUnit\Framework\TestCase
 {
     private Condition\FalseCondition $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\FalseCondition();

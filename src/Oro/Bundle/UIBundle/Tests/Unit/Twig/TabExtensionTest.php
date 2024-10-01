@@ -34,6 +34,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TabExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);

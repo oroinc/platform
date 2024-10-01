@@ -21,9 +21,7 @@ class LoadEnumOptionTranslationsData extends AbstractFixture implements Dependen
 
     public const string LANGUAGE_CODE = 'fr_FR';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $language = $manager->getRepository(Language::class)->findOneBy(['code' => self::LANGUAGE_CODE]);
@@ -54,9 +52,7 @@ class LoadEnumOptionTranslationsData extends AbstractFixture implements Dependen
         return $translationKey;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [

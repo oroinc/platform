@@ -18,17 +18,13 @@ class ChainAclGroupProvider implements AclGroupProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getGroup()
     {
         $provider = $this->getSupportedProvider();

@@ -10,33 +10,25 @@ class NormalizeBoolean extends AbstractProcessor
 {
     public const REQUIREMENT = '0|1|true|false|yes|no';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypeString(): string
     {
         return 'boolean';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypePluralString(): string
     {
         return 'booleans';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeValue(mixed $value): mixed
     {
         switch ($value) {

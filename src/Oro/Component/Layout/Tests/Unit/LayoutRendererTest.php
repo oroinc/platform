@@ -18,6 +18,7 @@ class LayoutRendererTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutRenderer */
     private $renderer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerRenderer = $this->createMock(FormRendererInterface::class);

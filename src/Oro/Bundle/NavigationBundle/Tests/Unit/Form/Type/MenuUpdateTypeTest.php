@@ -29,6 +29,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     private const TEST_URI = 'http://test_uri';
     private const TEST_ACL_RESOURCE_ID = 'test_acl_resource_id';
 
+    #[\Override]
     protected function getExtensions(): array
     {
         $registry = $this->createMock(ManagerRegistry::class);
@@ -52,9 +53,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getValidators(): array
     {
         $uriSecurityHelper = $this->createMock(UriSecurityHelper::class);

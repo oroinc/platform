@@ -9,9 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class UserImportExportConfigurationProvider implements ImportExportConfigurationProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get(): ImportExportConfigurationInterface
     {
         return new ImportExportConfiguration([

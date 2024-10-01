@@ -16,6 +16,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
 
     private string $bundleDir;
 
+    #[\Override]
     protected function setUp(): void
     {
         $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));

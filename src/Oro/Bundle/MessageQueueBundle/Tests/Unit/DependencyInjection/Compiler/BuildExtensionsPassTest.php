@@ -13,6 +13,7 @@ class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
 {
     private BuildExtensionsPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new BuildExtensionsPass();

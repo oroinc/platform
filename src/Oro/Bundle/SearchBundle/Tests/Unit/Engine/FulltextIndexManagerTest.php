@@ -19,6 +19,7 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FulltextIndexManager */
     private $indexManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

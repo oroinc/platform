@@ -43,9 +43,7 @@ class OriginTransformer implements DataTransformerInterface
         $this->className = EmailOrigin::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -59,9 +57,7 @@ class OriginTransformer implements DataTransformerInterface
         return $value->getId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

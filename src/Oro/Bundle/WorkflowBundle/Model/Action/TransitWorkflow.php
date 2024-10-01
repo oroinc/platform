@@ -55,9 +55,7 @@ class TransitWorkflow extends ComponentAbstractAction
         $this->workflowManager = $workflowManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $entity = $this->contextAccessor->getValue($context, $this->entity);
@@ -85,9 +83,7 @@ class TransitWorkflow extends ComponentAbstractAction
             $this->workflowManager->transit($workflowItem, $transition);
         }
     }
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $this->entity = $this->getOptionValue($options, 'entity', self::OPTION_INDEX_ENTITY, true);

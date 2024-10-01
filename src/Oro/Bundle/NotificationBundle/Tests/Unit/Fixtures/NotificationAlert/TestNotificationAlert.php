@@ -15,25 +15,19 @@ class TestNotificationAlert implements NotificationAlertInterface
         $this->alertData = $alertData;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getId(): string
     {
         return 'test_id';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSourceType(): string
     {
         return $this->sourceType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         return $this->alertData;

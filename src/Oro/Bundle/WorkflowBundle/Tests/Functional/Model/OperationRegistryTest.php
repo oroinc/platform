@@ -25,6 +25,7 @@ class OperationRegistryTest extends WebTestCase
     /** @var OperationRegistry */
     private $operationRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -38,6 +39,7 @@ class OperationRegistryTest extends WebTestCase
         $this->operationRegistry = $this->getContainer()->get('oro_action.operation_registry');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->configModifier->resetCache();

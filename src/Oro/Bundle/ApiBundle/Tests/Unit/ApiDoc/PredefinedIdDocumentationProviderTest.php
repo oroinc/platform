@@ -14,6 +14,7 @@ class PredefinedIdDocumentationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var PredefinedIdDocumentationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityIdResolverRegistry = $this->createMock(EntityIdResolverRegistry::class);

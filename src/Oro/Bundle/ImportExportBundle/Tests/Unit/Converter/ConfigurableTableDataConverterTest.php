@@ -226,6 +226,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurableTableDataConverter */
     private $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);

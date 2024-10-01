@@ -11,9 +11,7 @@ class LoadScopeUserData extends AbstractFixture implements DependentFixtureInter
 {
     const SIMPLE_USER_SCOPE = 'simple_user_scope';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [
@@ -21,9 +19,7 @@ class LoadScopeUserData extends AbstractFixture implements DependentFixtureInter
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $scope = new Scope();

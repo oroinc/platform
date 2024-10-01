@@ -19,25 +19,19 @@ class RestAnnotationReader implements Reader
         $this->innerReader = $innerReader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassAnnotations(\ReflectionClass $class)
     {
         return $this->innerReader->getClassAnnotations($class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassAnnotation(\ReflectionClass $class, $annotationName)
     {
         return $this->innerReader->getClassAnnotation($class, $annotationName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMethodAnnotations(\ReflectionMethod $method)
     {
         $annotations = [];
@@ -50,9 +44,7 @@ class RestAnnotationReader implements Reader
         return $annotations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMethodAnnotation(\ReflectionMethod $method, $annotationName)
     {
         $annotation = $this->innerReader->getMethodAnnotation($method, $annotationName);
@@ -63,17 +55,13 @@ class RestAnnotationReader implements Reader
         return $this->processMethodAnnotation($annotation);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPropertyAnnotations(\ReflectionProperty $property)
     {
         return $this->innerReader->getPropertyAnnotations($property);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPropertyAnnotation(\ReflectionProperty $property, $annotationName)
     {
         return $this->innerReader->getPropertyAnnotation($property, $annotationName);

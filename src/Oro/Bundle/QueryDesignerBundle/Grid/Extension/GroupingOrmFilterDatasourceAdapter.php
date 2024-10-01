@@ -22,9 +22,7 @@ class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
         $this->expressionBuilder = new ExpressionBuilder();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addRestriction($restriction, $condition, $isComputed = false)
     {
         $this->expressionBuilder->addRestriction(new Restriction($restriction, $condition, $isComputed));

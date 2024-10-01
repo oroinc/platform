@@ -14,9 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddTranslationIdToQuery implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */

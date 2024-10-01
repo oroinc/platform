@@ -19,9 +19,7 @@ class FiltersConfiguration extends AbstractConfigurationSection
         $this->filterOperatorRegistry = $filterOperatorRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(NodeBuilder $node): void
     {
         $sectionName = 'filters';

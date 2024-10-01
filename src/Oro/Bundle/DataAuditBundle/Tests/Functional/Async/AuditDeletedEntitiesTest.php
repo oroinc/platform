@@ -22,6 +22,7 @@ class AuditDeletedEntitiesTest extends WebTestCase
     /** @var AuditChangedEntitiesProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

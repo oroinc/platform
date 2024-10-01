@@ -21,6 +21,7 @@ class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChoiceTreeUserProvider */
     private $choiceTreeUserProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

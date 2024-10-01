@@ -195,9 +195,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             ?? new ReflectionExtractor(['set'], null, null, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($objectOrArray, $propertyPath): mixed
     {
         $zval = [
@@ -222,9 +220,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         return $propertyValues[\count($propertyValues) - 1][self::VALUE];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
         if (\is_object($objectOrArray) && false === strpbrk((string)$propertyPath, '.[')) {
@@ -365,9 +361,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isReadable($objectOrArray, $propertyPath): bool
     {
         if (!$propertyPath instanceof PropertyPathInterface) {
@@ -388,9 +382,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isWritable($objectOrArray, $propertyPath): bool
     {
         $propertyPath = $this->getPropertyPath($propertyPath);

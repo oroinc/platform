@@ -47,6 +47,7 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FieldHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);

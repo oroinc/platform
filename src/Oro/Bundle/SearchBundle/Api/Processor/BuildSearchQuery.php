@@ -43,9 +43,7 @@ class BuildSearchQuery implements ProcessorInterface
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */

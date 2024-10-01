@@ -11,6 +11,7 @@ class StartTransitionButtonProviderExtensionTest extends StartTransitionButtonPr
     /**
      * @return string
      */
+    #[\Override]
     protected function getApplication()
     {
         return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
@@ -19,6 +20,7 @@ class StartTransitionButtonProviderExtensionTest extends StartTransitionButtonPr
     /**
      * @return AbstractButtonProviderExtension
      */
+    #[\Override]
     protected function createExtension()
     {
         return new StartTransitionButtonProviderExtension(

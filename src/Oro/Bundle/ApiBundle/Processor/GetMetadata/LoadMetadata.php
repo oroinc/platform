@@ -32,9 +32,7 @@ class LoadMetadata implements ProcessorInterface
         $this->associationMetadataLoader = $associationMetadataLoader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */

@@ -32,6 +32,7 @@ class ThemeValidateConfigurationCommand extends Command
     /**
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -49,6 +50,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $symfonyStyle = new SymfonyStyle($input, $output);

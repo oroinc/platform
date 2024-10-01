@@ -19,9 +19,7 @@ class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
     /** @var MultiFileType */
     private $type;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventSubscriber = $this->createMock(EventSubscriberInterface::class);

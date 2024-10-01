@@ -46,6 +46,7 @@ class WidgetConfigsTest extends TestCase
     /** @var WidgetConfigs */
     private $widgetConfigs;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

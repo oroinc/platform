@@ -19,6 +19,7 @@ abstract class CleanupStorageCommandAbstract extends Command implements CronComm
     protected const DEFAULT_PERIOD = 14; // days
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -44,6 +45,7 @@ HELP
         ;
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $period = (int)$input->getOption('interval');

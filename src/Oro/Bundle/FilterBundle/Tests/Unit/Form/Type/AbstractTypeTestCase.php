@@ -25,6 +25,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     /** @var FormExtensionInterface[] */
     protected $formExtensions = [];
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,6 +35,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         }
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -118,9 +120,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 
     abstract protected function getTestFormType(): AbstractType;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return array_merge(

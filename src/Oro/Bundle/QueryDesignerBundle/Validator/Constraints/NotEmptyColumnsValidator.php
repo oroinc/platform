@@ -14,9 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class NotEmptyColumnsValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof NotEmptyColumns) {

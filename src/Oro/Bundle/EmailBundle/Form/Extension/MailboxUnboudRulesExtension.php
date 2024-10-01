@@ -26,9 +26,7 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $unboundRules = $builder->create('unboundRules', HiddenType::class, [
@@ -57,9 +55,7 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [MailboxType::class];

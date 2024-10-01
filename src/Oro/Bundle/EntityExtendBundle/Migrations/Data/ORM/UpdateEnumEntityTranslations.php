@@ -38,14 +38,13 @@ class UpdateEnumEntityTranslations extends AbstractFixture implements VersionedF
     /** @var TranslationManager */
     private $translationManager;
 
+    #[\Override]
     public function getVersion()
     {
         return '1.0';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         if ($this->container->get(ApplicationState::class)->isInstalled()) {

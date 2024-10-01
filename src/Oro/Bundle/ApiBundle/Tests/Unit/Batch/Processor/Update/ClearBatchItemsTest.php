@@ -10,6 +10,7 @@ class ClearBatchItemsTest extends BatchUpdateProcessorTestCase
     /** @var ClearBatchItems */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

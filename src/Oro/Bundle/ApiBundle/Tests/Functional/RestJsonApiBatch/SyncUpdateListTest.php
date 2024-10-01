@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SyncUpdateListTest extends RestJsonApiSyncUpdateListTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

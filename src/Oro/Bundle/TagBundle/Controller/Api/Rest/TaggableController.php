@@ -53,17 +53,13 @@ class TaggableController extends RestController
         return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $entityId, 'entity' => $entity]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_tag.tag.manager.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_tag.form.handler.taggable.api');

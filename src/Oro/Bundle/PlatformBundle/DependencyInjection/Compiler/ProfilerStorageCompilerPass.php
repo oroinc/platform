@@ -14,9 +14,7 @@ use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
  */
 class ProfilerStorageCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         // PhpStan extractor has a bad performance and we don't use its features yet, so we disable it

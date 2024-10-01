@@ -55,6 +55,7 @@ class OwnerFormSubscriber implements EventSubscriberInterface
     /**
      * @return array
      */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return array(

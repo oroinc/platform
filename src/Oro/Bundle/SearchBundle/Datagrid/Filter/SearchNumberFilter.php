@@ -15,6 +15,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class SearchNumberFilter extends AbstractFilter
 {
+    #[\Override]
     public function init($name, array $params)
     {
         if (isset($params['field_options']['type'])) {
@@ -24,9 +25,7 @@ class SearchNumberFilter extends AbstractFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
@@ -36,9 +35,7 @@ class SearchNumberFilter extends AbstractFilter
         return $this->applyRestrictions($ds, $this->parseData($data));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         throw new \BadMethodCallException('Not implemented');
@@ -90,9 +87,7 @@ class SearchNumberFilter extends AbstractFilter
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
@@ -105,9 +100,7 @@ class SearchNumberFilter extends AbstractFilter
         return $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return NumberFilterType::class;

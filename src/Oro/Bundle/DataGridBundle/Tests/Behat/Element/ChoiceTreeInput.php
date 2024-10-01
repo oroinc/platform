@@ -8,9 +8,7 @@ use WebDriver\Key;
 
 class ChoiceTreeInput extends Element
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue()
     {
         $valueElements = $this->getParent()->getParent()->findAll('css', 'li.select2-search-choice');
@@ -20,9 +18,7 @@ class ChoiceTreeInput extends Element
         }, $valueElements);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($values)
     {
         $this->getDriver()->waitForAjax();
@@ -85,6 +81,7 @@ class ChoiceTreeInput extends Element
     /**
      * Focus on input and wait until it will be focused
      */
+    #[\Override]
     public function focus()
     {
         $mask = $this->getPage()->find('css', '#select2-drop-mask');

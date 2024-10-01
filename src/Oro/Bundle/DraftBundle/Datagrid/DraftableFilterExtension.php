@@ -33,9 +33,7 @@ class DraftableFilterExtension extends AbstractExtension
         $this->draftAccessRule = $draftAccessRule;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config): bool
     {
         return
@@ -43,9 +41,7 @@ class DraftableFilterExtension extends AbstractExtension
             && $config->offsetGetByPath(self::SHOW_DRAFTS_CONFIG_PATH, false) !== false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $from = $config->getOrmQuery()->getFrom();
@@ -59,9 +55,7 @@ class DraftableFilterExtension extends AbstractExtension
         $this->draftAccessRule->setEnabled(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         if ($this->className) {

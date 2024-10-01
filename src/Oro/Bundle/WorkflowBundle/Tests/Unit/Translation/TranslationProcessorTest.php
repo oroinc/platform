@@ -17,6 +17,7 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);

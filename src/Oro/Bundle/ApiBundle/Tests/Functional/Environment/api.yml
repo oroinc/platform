@@ -80,6 +80,9 @@ api:
             actions:
                 get_list:
                     page_size: 3
+                create:
+                    disable_inclusion: true
+                    disable_fieldset: true
                 update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
             exclude: false # see Oro\Bundle\ApiBundle\Tests\Functional\Environment\EntityExclusionProvider

@@ -27,6 +27,7 @@ class ThemeCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -46,6 +47,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $themes = $this->themeRegistry->getAllThemes();

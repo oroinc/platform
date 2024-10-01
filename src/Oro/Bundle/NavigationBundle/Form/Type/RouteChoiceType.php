@@ -42,6 +42,7 @@ class RouteChoiceType extends AbstractType
         $this->cache = $cache;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('menu_name');
@@ -191,11 +192,13 @@ class RouteChoiceType extends AbstractType
         return $this->getBlockPrefix();
     }
 
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public function getParent(): string
     {
         return Select2ChoiceType::class;

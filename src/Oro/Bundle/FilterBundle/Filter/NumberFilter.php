@@ -11,9 +11,6 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStrin
  */
 class NumberFilter extends AbstractFilter
 {
-    /**
-     * {@inheritDoc}
-     */
     protected $joinOperators = [
         FilterUtility::TYPE_NOT_EMPTY => FilterUtility::TYPE_EMPTY,
         NumberFilterType::TYPE_NOT_EQUAL => NumberFilterType::TYPE_EQUAL,
@@ -22,17 +19,13 @@ class NumberFilter extends AbstractFilter
     /** @var NumberToLocalizedStringTransformer */
     private $valueTransformer;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return NumberFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
@@ -48,9 +41,7 @@ class NumberFilter extends AbstractFilter
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         if (!isset($data['value']) || '' === $data['value']) {
@@ -77,9 +68,7 @@ class NumberFilter extends AbstractFilter
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         if (!\is_array($data)) {
@@ -248,9 +237,7 @@ class NumberFilter extends AbstractFilter
         return (bool)preg_match('/(?<![\w:.])(\w+)\s*\(/im', $filter);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $metadata = parent::getMetadata();

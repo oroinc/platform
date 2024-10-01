@@ -40,6 +40,7 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
     /**
      * @return array|\Symfony\Component\Form\FormTypeInterface[]
      */
+    #[\Override]
     protected function loadTypes(): array
     {
         return [

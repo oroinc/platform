@@ -33,9 +33,7 @@ class AddOwnerValidator implements ProcessorInterface
         $this->ownerConstraintClass = $ownerConstraintClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

@@ -7,31 +7,23 @@ use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
 class TestTransportProvider implements TransportInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSettingsEntityFQCN()
     {
         return 'Oro\Bundle\TestFrameworkBundle\Entity\TestIntegrationTransport';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(Transport $transportEntity)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSettingsFormType()
     {
     }

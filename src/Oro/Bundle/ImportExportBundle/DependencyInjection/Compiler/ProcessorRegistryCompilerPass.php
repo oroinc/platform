@@ -12,9 +12,7 @@ class ProcessorRegistryCompilerPass implements CompilerPassInterface
     const PROCESSOR_REGISTRY_SERVICE = 'oro_importexport.processor.registry';
     const PROCESSOR_TAG              = 'oro_importexport.processor';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $processors = $this->findProcessorTaggedServiceIds($container);

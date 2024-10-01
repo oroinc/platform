@@ -12,6 +12,7 @@ class DebugWorkflowItemSerializerPassTest extends \PHPUnit\Framework\TestCase
 {
     private DebugWorkflowItemSerializerPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new DebugWorkflowItemSerializerPass();

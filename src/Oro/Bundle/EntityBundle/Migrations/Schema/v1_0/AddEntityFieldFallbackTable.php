@@ -7,9 +7,6 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class AddEntityFieldFallbackTable
 {
-    /**
-     * {@inheritdoc}
-     */
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/

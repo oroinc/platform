@@ -12,17 +12,13 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
  */
 class DatagridCallbackActionProvider implements DatagridActionProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasActions(DatagridConfiguration $configuration)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function applyActions(DatagridConfiguration $configuration)
     {
         $actionConfiguration = $configuration->offsetGetOr(ActionExtension::ACTION_CONFIGURATION_KEY);

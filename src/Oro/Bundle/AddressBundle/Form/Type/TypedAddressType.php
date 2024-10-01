@@ -15,9 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TypedAddressType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['single_form'] && $options['all_addresses_property_path']) {
@@ -50,9 +48,7 @@ class TypedAddressType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -63,25 +59,18 @@ class TypedAddressType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return AddressType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_typed_address';

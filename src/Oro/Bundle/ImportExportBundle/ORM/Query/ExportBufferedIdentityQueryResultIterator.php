@@ -28,11 +28,13 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
     private int $position = -1;
     private bool $load = true;
 
+    #[\Override]
     public function key(): int
     {
         return $this->position;
     }
 
+    #[\Override]
     public function next(): void
     {
         $this->offset++;
@@ -45,6 +47,7 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
         $this->current = $this->rows[$this->offset] ?? null;
     }
 
+    #[\Override]
     public function current(): mixed
     {
         $this->load();
@@ -52,6 +55,7 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
         return parent::current();
     }
 
+    #[\Override]
     public function valid(): bool
     {
         $this->load();
@@ -59,6 +63,7 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
         return parent::valid();
     }
 
+    #[\Override]
     public function rewind(): void
     {
         $this->offset = $this->page = $this->position = -1;
@@ -69,6 +74,7 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
         $this->getIterationStrategy()->initializeDataQuery($this->getQuery());
     }
 
+    #[\Override]
     public function count(): int
     {
         if (null === $this->totalCount) {
@@ -127,6 +133,7 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
         }
     }
 
+    #[\Override]
     protected function initializeQuery(Query $query): void
     {
         $this->maxResults = $query->getMaxResults();
@@ -166,6 +173,7 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
         return $this->iterationStrategy ?? new IdentifierIterationStrategy();
     }
 
+    #[\Override]
     public function setBufferSize($bufferSize): self
     {
         parent::setBufferSize($bufferSize);

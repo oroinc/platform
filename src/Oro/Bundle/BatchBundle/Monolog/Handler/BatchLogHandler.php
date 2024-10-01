@@ -53,9 +53,7 @@ class BatchLogHandler extends StreamHandler
         return sprintf('%s/%s', $this->logDir, $filename);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $record): void
     {
         if (!$this->isActive) {

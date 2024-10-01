@@ -38,6 +38,7 @@ class AccessRuleWalkerTest extends OrmTestCase
     private DynamicAccessRule $rule;
     private AccessRuleExecutor $accessRuleExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

@@ -32,6 +32,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
     /** @var FieldDqlExpressionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldDqlExpressionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

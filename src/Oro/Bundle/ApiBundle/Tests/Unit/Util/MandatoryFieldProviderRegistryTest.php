@@ -19,6 +19,7 @@ class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var MandatoryFieldProviderRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider1 = $this->createMock(MandatoryFieldProviderInterface::class);

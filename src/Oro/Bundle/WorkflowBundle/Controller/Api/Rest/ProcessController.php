@@ -91,6 +91,7 @@ class ProcessController extends AbstractFOSRestController
         return $this->container->get('doctrine')->getManagerForClass(ProcessDefinition::class);
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

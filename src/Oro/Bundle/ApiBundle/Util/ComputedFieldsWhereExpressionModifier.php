@@ -13,9 +13,7 @@ class ComputedFieldsWhereExpressionModifier extends WhereExpressionModifier
 {
     private ?array $computedFieldExpressions = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function updateQuery(QueryBuilder $qb): void
     {
         try {
@@ -25,9 +23,7 @@ class ComputedFieldsWhereExpressionModifier extends WhereExpressionModifier
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function walkComparison(Comparison $comparison): mixed
     {
         $field = $comparison->getLeftExpr();

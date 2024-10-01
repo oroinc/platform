@@ -88,6 +88,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mappingProvider = $this->createMock(SearchMappingProvider::class);

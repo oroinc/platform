@@ -18,9 +18,7 @@ class TableWithNameGenerator extends Table
         parent::__construct($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addIndex(array $columnNames, $indexName = null, array $flags = [], array $options = [])
     {
         if (!$indexName) {
@@ -33,9 +31,7 @@ class TableWithNameGenerator extends Table
         return parent::addIndex($columnNames, $indexName, $flags, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addUniqueIndex(array $columnNames, $indexName = null, array $options = [])
     {
         if (!$indexName) {
@@ -49,9 +45,7 @@ class TableWithNameGenerator extends Table
         return parent::addUniqueIndex($columnNames, $indexName, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addForeignKeyConstraint(
         $foreignTable,
         array $localColumnNames,

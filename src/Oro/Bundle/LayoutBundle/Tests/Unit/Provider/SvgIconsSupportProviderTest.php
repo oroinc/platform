@@ -21,6 +21,7 @@ final class SvgIconsSupportProviderTest extends TestCase
 
     private SvgIconsSupportProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeManager = $this->createMock(ThemeManager::class);

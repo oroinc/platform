@@ -19,6 +19,7 @@ class ClearDynamicTranslationCacheImportListenerTest extends \PHPUnit\Framework\
     /** @var ClearDynamicTranslationCacheImportListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dynamicTranslationCache = $this->createMock(DynamicTranslationCache::class);

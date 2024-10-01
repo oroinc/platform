@@ -20,17 +20,13 @@ class OroMessageQueueBundleInstaller implements Installation, DatabasePlatformAw
     use DatabasePlatformAwareTrait;
     use ConnectionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v1_11';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createDbalQueueTable($schema);

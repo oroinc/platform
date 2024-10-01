@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);

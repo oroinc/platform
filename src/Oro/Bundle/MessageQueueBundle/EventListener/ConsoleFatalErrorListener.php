@@ -48,9 +48,7 @@ class ConsoleFatalErrorListener implements EventSubscriberInterface
         return $command instanceof ConsumeMessagesCommand || $command instanceof TransportConsumeMessagesCommand;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

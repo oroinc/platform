@@ -22,6 +22,7 @@ class DefaultUnidirectionalFieldAuditStrategyProcessorTest extends TestCase
 
     protected EntityAuditStrategyProcessorInterface $strategyProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

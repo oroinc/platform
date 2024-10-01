@@ -6,12 +6,6 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\MatchApplicableChecker as BaseMatchApplicableChecker;
 
-/**
- * {@inheritDoc}
- * Also this applicable checker can check whether a value in the context
- * is instance of a value of processor's attribute.
- * Such attributes should be marked as "class" related attributes.
- */
 class MatchApplicableChecker extends BaseMatchApplicableChecker
 {
     /** @var array [attribute name => true, ...] */
@@ -36,9 +30,7 @@ class MatchApplicableChecker extends BaseMatchApplicableChecker
         $this->classAttributes[$attribute] = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isMatchScalars(mixed $value, mixed $contextValue, string $name): bool
     {
         return isset($this->classAttributes[$name]) && \is_string($value) && $value

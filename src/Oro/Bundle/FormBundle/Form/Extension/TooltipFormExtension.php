@@ -43,17 +43,13 @@ class TooltipFormExtension extends AbstractTypeExtension
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined($this->optionalParameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if (!$form->getParent()) {

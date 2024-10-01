@@ -46,9 +46,7 @@ class LoadEntityIdsBySearchQuery implements LoadEntityIdsQueryInterface
         $this->hasMore = $hasMore;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityIds(): array
     {
         $entityIds = [];
@@ -61,9 +59,7 @@ class LoadEntityIdsBySearchQuery implements LoadEntityIdsQueryInterface
         return $entityIds;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityTotalCount(): int
     {
         return $this->getSearchResult()->getRecordsCount();

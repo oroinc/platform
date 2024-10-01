@@ -14,6 +14,7 @@ class FilteredEntityReaderTest extends WebTestCase
 {
     private FilteredEntityReader $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
@@ -22,6 +23,7 @@ class FilteredEntityReaderTest extends WebTestCase
         $this->reader = self::getContainer()->get('oro_datagrid.importexport.export_filtered_reader');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         self::getContainer()->get('security.token_storage')->setToken(null);

@@ -14,9 +14,7 @@ class BaseType extends AbstractType
 {
     const NAME = 'block';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $optionsResolver)
     {
         $optionsResolver->setDefaults([
@@ -34,9 +32,7 @@ class BaseType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions(
@@ -72,9 +68,7 @@ class BaseType extends AbstractType
         BlockUtils::populateComputedViewVars($view->vars, $block->getContext()->getHash());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         if (empty($view->vars['class_prefix']) && $view->parent) {
@@ -107,17 +101,13 @@ class BaseType extends AbstractType
         $view->vars['blocks'] = $view->blocks;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent()
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

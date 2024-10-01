@@ -25,6 +25,7 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmbeddedFormManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formRegistry = $this->createMock(FormRegistryInterface::class);

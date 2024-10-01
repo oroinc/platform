@@ -10,9 +10,7 @@ class FormExtensionState implements FormExtensionCheckerInterface
 {
     private bool $isApiFormExtensionActivated = false;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApiFormExtensionActivated(): bool
     {
         return $this->isApiFormExtensionActivated;

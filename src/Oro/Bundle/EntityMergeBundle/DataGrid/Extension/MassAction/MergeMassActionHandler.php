@@ -26,9 +26,7 @@ class MergeMassActionHandler implements MassActionHandlerInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(MassActionHandlerArgs $args): MassActionResponseInterface
     {
         $massAction = $args->getMassAction();

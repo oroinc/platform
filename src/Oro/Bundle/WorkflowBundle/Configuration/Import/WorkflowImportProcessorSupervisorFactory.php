@@ -24,7 +24,7 @@ class WorkflowImportProcessorSupervisorFactory implements ImportProcessorFactory
         $this->configFinderBuilder = $configFinderBuilder;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable($import): bool
     {
         $import = (array)$import;
@@ -32,7 +32,7 @@ class WorkflowImportProcessorSupervisorFactory implements ImportProcessorFactory
         return count($import) === 3 && isset($import['workflow'], $import['as'], $import['replace']);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function create($import): ConfigImportProcessorInterface
     {
         if (!$this->isApplicable($import)) {

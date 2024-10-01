@@ -7,17 +7,13 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository;
 
 class CountryFixture extends AbstractTemplateRepository
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClass()
     {
         return 'Oro\Bundle\AddressBundle\Entity\Country';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createEntity($key)
     {
         return new Country($key);
@@ -27,6 +23,7 @@ class CountryFixture extends AbstractTemplateRepository
      * @param string $key
      * @param Country $entity
      */
+    #[\Override]
     public function fillEntityData($key, $entity)
     {
         if ($key === 'US') {

@@ -40,6 +40,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendOptionsParser */
     private $extendOptionsParser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);

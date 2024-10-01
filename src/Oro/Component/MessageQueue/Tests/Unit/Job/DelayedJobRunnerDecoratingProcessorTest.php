@@ -14,6 +14,7 @@ class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit\Framework\TestCas
 
     private DelayedJobRunnerDecoratingProcessor $decoratorProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $jobRunner = new JobRunner();

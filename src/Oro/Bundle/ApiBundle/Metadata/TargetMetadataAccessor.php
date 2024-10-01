@@ -54,9 +54,7 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
         $this->configExtras = $configExtras;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTargetMetadata(string $targetClassName, ?string $associationPath): ?EntityMetadata
     {
         if (!$this->isExpandRequested($associationPath)) {

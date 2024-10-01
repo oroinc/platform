@@ -337,6 +337,7 @@ class Channel implements OrganizationAwareInterface
      *
      * @return $this
      */
+    #[\Override]
     public function setOrganization(OrganizationInterface $organization)
     {
         $this->organization = $organization;
@@ -347,6 +348,7 @@ class Channel implements OrganizationAwareInterface
     /**
      * @return OrganizationInterface
      */
+    #[\Override]
     public function getOrganization()
     {
         return $this->organization;
@@ -411,6 +413,7 @@ class Channel implements OrganizationAwareInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getName();

@@ -34,9 +34,7 @@ class DuplicateQueriesDataCollector extends DataCollector
         $this->loggers[$name] = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         foreach ($this->loggers as $name => $logger) {
@@ -51,9 +49,7 @@ class DuplicateQueriesDataCollector extends DataCollector
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return 'duplicate_queries';
@@ -108,9 +104,7 @@ class DuplicateQueriesDataCollector extends DataCollector
         return array_sum(array_map('count', $queries));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->data = [

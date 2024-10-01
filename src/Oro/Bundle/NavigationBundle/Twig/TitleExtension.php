@@ -29,9 +29,7 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -41,9 +39,7 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTokenParsers()
     {
         return [
@@ -165,9 +161,7 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
         return null !== $request ? $request->get('_route') : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

@@ -27,6 +27,7 @@ class ActualizedEntityEnumOptionsProcessor implements
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         try {
@@ -50,6 +51,7 @@ class ActualizedEntityEnumOptionsProcessor implements
         return self::ACK;
     }
 
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [ActualizeEntityEnumOptionsTopic::getName()];

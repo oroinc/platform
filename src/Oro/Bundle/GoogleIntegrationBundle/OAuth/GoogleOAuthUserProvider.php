@@ -28,25 +28,19 @@ class GoogleOAuthUserProvider implements OAuthUserProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isEnabled(): bool
     {
         return (bool)$this->configManager->get('oro_google_integration.enable_sso');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAllowedDomains(): array
     {
         return (array)$this->configManager->get('oro_google_integration.sso_domains');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function findUser(UserResponseInterface $response): ?UserInterface
     {
         $username = $response->getUserIdentifier();

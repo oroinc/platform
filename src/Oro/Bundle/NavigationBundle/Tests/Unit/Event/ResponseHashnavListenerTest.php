@@ -34,6 +34,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ResponseHashnavListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->response = new Response();

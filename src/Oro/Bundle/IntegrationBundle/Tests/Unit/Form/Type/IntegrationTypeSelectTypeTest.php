@@ -21,6 +21,7 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var IntegrationTypeSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(TypesRegistry::class);

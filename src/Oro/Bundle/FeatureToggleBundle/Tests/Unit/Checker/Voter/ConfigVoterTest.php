@@ -18,6 +18,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigVoter */
     private $configVoter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -16,6 +16,7 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit\Framework\TestCase
 
     private Definition $registryDefinition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new BuildMessageProcessorRegistryPass();

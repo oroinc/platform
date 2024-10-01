@@ -34,9 +34,6 @@ use Laminas\Mail\Header\Exception\InvalidArgumentException;
  */
 class ContentTransferEncoding extends BaseContentTransferEncoding
 {
-    /**
-     * {@inheritdoc}
-     */
     protected static $allowedTransferEncodings = [
         '7bit',
         '8bit',
@@ -51,9 +48,7 @@ class ContentTransferEncoding extends BaseContentTransferEncoding
          */
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setTransferEncoding($transferEncoding)
     {
         // Per RFC 1521, the value of the header is not case sensitive

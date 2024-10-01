@@ -34,9 +34,7 @@ class SearchResultAfter extends Event implements GridEventInterface
         $this->records  = $records;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDatagrid()
     {
         return $this->datagrid;

@@ -37,6 +37,7 @@ class MigrateImagesCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -58,6 +59,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Starting attachments migration');

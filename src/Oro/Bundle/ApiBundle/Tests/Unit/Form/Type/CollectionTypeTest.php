@@ -13,9 +13,7 @@ use Symfony\Component\Validator\Validation;
 
 class CollectionTypeTest extends ApiFormTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

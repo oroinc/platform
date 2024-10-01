@@ -21,6 +21,7 @@ class ThemeConfigurationHandlerTest extends TestCase
 
     private ObjectManager|MockObject $manager;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->requestParameters = [

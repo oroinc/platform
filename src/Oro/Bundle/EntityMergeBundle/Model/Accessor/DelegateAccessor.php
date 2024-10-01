@@ -21,33 +21,25 @@ class DelegateAccessor implements AccessorInterface
         $this->accessors = $accessors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'delegate';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($entity, FieldMetadata $metadata)
     {
         return $this->findAccessor($entity, $metadata) !== null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($entity, FieldMetadata $metadata)
     {
         return $this->getAccessor($entity, $metadata)->getValue($entity, $metadata);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($entity, FieldMetadata $metadata, $value)
     {
         $this->getAccessor($entity, $metadata)->setValue($entity, $metadata, $value);

@@ -14,6 +14,7 @@ class ReflectionProperty extends \ReflectionProperty
         $this->values = $values;
     }
 
+    #[\Override]
     public function getValue($object = null): mixed
     {
         return $this->values[spl_object_hash($object)];

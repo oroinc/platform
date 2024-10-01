@@ -15,9 +15,7 @@ use Doctrine\ORM\Query\TreeWalkerAdapter;
  */
 class PreciseOrderByWalker extends TreeWalkerAdapter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
         $rootEntityClass = null;

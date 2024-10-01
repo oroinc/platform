@@ -296,6 +296,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    #[\Override]
     public static function setUpBeforeClass(): void
     {
         self::$stopwatch = new Stopwatch();
@@ -311,6 +312,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         if (self::ENABLE_TESTS && self::SHOW_DURATIONS) {

@@ -11,6 +11,7 @@ class FileHeadersListenerTest extends \PHPUnit\Framework\TestCase
     /** @var FileHeadersListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new FileHeadersListener();

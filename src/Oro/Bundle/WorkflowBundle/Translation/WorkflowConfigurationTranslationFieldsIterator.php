@@ -27,9 +27,9 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         $context = new \ArrayObject([]);

@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class EnumEntityConfiguration implements EntityConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'enum';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

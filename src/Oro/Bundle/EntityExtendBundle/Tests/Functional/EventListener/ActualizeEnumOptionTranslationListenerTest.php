@@ -12,6 +12,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class ActualizeEnumOptionTranslationListenerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

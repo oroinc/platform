@@ -13,9 +13,7 @@ abstract class ParametrizedMigrationQuery implements MigrationQuery, ConnectionA
      */
     protected $connection;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setConnection(Connection $connection)
     {
         $this->connection = $connection;

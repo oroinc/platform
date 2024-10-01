@@ -35,9 +35,7 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         $this->extendedAssociationProvider = $extendedAssociationProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function completeCustomDataType(
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition,

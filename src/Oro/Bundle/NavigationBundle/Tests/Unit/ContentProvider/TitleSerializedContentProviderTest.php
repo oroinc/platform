@@ -13,6 +13,7 @@ class TitleSerializedContentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TitleSerializedContentProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->titleService = $this->createMock(TitleServiceInterface::class);

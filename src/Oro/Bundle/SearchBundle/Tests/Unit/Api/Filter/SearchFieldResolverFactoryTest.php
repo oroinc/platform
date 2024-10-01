@@ -14,6 +14,7 @@ class SearchFieldResolverFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var SearchFieldResolverFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);

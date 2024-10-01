@@ -11,6 +11,7 @@ class DeleteAction extends AbstractAction
      */
     protected $requiredOptions = ['link'];
 
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (!isset($options['confirmation'])) {

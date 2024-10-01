@@ -18,6 +18,7 @@ class EntityStateCheckerTest extends TestCase
 
     private EntityStateChecker $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

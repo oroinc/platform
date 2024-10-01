@@ -17,6 +17,7 @@ class PredefinedLanguageCodeResolverRegistryTest extends \PHPUnit\Framework\Test
     /** @var PredefinedLanguageCodeResolverRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resolver1 = $this->createMock(PredefinedLanguageCodeResolverInterface::class);

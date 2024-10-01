@@ -17,6 +17,7 @@ class CurrentRouteContentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CurrentRouteContentProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->request = new Request();

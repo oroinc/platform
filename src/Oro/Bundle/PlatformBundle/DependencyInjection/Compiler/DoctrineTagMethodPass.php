@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class DoctrineTagMethodPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $events = [

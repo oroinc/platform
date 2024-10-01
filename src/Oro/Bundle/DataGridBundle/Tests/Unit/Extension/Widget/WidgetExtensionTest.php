@@ -18,6 +18,7 @@ class WidgetExtensionTest extends TestCase
 
     private WidgetExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

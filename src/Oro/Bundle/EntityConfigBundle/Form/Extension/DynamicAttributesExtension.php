@@ -52,9 +52,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -64,9 +62,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$this->isApplicable($options)) {
@@ -89,9 +85,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!$this->isApplicable($options)) {

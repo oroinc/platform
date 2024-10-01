@@ -8,17 +8,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroCronBundleInstaller implements Installation
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v2_1';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/

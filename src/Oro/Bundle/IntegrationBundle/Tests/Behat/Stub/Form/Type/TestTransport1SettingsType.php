@@ -21,6 +21,7 @@ class TestTransport1SettingsType extends AbstractType
      * @throws InvalidOptionsException
      * @throws MissingOptionsException
      */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -36,6 +37,7 @@ class TestTransport1SettingsType extends AbstractType
     /**
      * @throws AccessException
      */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -46,6 +48,7 @@ class TestTransport1SettingsType extends AbstractType
     /**
      * @return string
      */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::BLOCK_PREFIX;

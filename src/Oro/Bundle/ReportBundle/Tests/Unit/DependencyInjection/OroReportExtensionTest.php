@@ -11,6 +11,7 @@ class OroReportExtensionTest extends \PHPUnit\Framework\TestCase
     private ContainerBuilder $container;
     private OroReportExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

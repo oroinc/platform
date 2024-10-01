@@ -18,6 +18,7 @@ class EmailActivityTest extends WebTestCase
 {
     use PublicEmailOwnerTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

@@ -12,9 +12,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AclVoter extends AclVoterDecorator
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         if ($subject instanceof EmailUser && $subject->isEmailPrivate()) {

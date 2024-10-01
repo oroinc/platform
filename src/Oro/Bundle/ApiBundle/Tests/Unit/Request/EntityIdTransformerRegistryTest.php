@@ -25,6 +25,7 @@ class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdTransformerRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer1 = $this->createMock(EntityIdTransformerInterface::class);

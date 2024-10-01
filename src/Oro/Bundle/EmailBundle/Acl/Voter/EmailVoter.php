@@ -42,9 +42,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -77,9 +75,9 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function vote(TokenInterface $token, $object, array $attributes): int
     {
         if (!is_object($object)) {

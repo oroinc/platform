@@ -14,13 +14,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 class EventDispatcher extends ImmutableEventDispatcher
 {
     /**
-     * {@inheritdoc}
      *
      * @param GridEventInterface|GridConfigurationEventInterface|Event $event
      * @return GridEventInterface|GridConfigurationEventInterface|Event
      *
      * @throws InvalidArgumentException
      */
+    #[\Override]
     public function dispatch(object $event, string $eventName = null): object
     {
         /** @var DatagridConfiguration $config */

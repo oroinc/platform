@@ -30,6 +30,7 @@ class EntityReaderByIdTest extends OrmTestCase
     /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $exportQueryProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);

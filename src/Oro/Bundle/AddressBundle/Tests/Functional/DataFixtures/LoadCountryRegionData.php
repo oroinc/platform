@@ -27,9 +27,7 @@ class LoadCountryRegionData extends AbstractFixture implements DependentFixtureI
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->data as $regionReference => $countryReference) {
@@ -44,9 +42,7 @@ class LoadCountryRegionData extends AbstractFixture implements DependentFixtureI
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [

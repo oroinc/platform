@@ -18,9 +18,7 @@ class CurrencyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         $this->currencyHelper = $currencyHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFilter($class, $property, $type)
     {
         if ('currency' === $type) {

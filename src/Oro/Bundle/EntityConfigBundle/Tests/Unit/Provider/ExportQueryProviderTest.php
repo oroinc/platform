@@ -20,6 +20,7 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ExportQueryProvider */
     private $exportQueryProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(EntityConfigManager::class);

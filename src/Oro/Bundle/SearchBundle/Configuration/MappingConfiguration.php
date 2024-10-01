@@ -35,9 +35,7 @@ class MappingConfiguration implements ConfigurationInterface
         Indexer::RELATION_MANY_TO_MANY
     );
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

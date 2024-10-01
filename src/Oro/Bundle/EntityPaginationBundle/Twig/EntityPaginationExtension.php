@@ -59,9 +59,7 @@ class EntityPaginationExtension extends AbstractExtension implements ServiceSubs
         return $this->container->get(RequestStack::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -120,9 +118,7 @@ class EntityPaginationExtension extends AbstractExtension implements ServiceSubs
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

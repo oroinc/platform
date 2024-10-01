@@ -21,6 +21,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     /** @var ObjectMetadataFactory */
     private $objectMetadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extendedAssociationProvider = $this->createMock(ExtendedAssociationProvider::class);

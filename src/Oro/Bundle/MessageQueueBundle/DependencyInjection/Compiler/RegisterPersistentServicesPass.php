@@ -10,9 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 abstract class RegisterPersistentServicesPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $persistentServices = $this->getPersistentServices($container);

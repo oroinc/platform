@@ -40,6 +40,7 @@ class TestTransport1Settings extends Transport
     /**
      * @return ParameterBag
      */
+    #[\Override]
     public function getSettingsBag()
     {
         return new ParameterBag();

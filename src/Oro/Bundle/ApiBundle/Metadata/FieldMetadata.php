@@ -10,9 +10,7 @@ class FieldMetadata extends PropertyMetadata
     private bool $nullable = false;
     private ?int $maxLength = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $result = parent::toArray();

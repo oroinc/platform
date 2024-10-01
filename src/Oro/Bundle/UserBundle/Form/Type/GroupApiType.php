@@ -11,17 +11,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class GroupApiType extends GroupType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function addEntityFields(FormBuilderInterface $builder)
     {
         $builder->addEventSubscriber(new PatchSubscriber());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -29,17 +24,13 @@ class GroupApiType extends GroupType
         $resolver->setDefaults(['csrf_protection' => false]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'group';

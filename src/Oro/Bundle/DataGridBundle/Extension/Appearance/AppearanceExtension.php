@@ -37,9 +37,7 @@ class AppearanceExtension extends AbstractExtension
         $this->translator     = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         if (!parent::isApplicable($config)) {
@@ -51,6 +49,7 @@ class AppearanceExtension extends AbstractExtension
         return count($options) > 0;
     }
 
+    #[\Override]
     public function setParameters(ParameterBag $parameters)
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
@@ -72,9 +71,7 @@ class AppearanceExtension extends AbstractExtension
         parent::setParameters($parameters);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $configs = $config->offsetGetOr(self::APPEARANCE_CONFIG_PATH, []);
@@ -98,9 +95,7 @@ class AppearanceExtension extends AbstractExtension
         }
     }
 
-    /**
-    * {@inheritDoc}
-    */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $options = $config->offsetGetOr(static::APPEARANCE_CONFIG_PATH, []);

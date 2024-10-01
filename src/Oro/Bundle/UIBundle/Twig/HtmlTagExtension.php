@@ -25,9 +25,7 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -82,9 +80,7 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
         return $this->getHtmlTagHelper()->escape($string);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

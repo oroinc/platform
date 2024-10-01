@@ -41,17 +41,13 @@ class ContainerClearer implements ClearerInterface, ChainExtensionAwareInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setChainExtension(ExtensionInterface $chainExtension)
     {
         $this->rootChainExtension = $chainExtension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear(LoggerInterface $logger)
     {
         $logger->info('Reset the container');

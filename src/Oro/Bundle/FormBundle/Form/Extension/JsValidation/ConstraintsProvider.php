@@ -25,9 +25,7 @@ class ConstraintsProvider implements ConstraintsProviderInterface
         $this->constraintConverter = $constraintConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormConstraints(FormInterface $form)
     {
         $constraints = $this->getMetadataConstraints($form);

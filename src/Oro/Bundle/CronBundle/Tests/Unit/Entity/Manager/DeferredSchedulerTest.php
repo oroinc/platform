@@ -33,6 +33,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
     /** @var DeferredScheduler */
     private $deferredScheduler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->scheduleManager = $this->createMock(ScheduleManager::class);

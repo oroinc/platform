@@ -64,6 +64,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private PreImportMessageProcessor $preImportMessageProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

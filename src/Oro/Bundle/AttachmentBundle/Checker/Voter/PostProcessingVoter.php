@@ -23,9 +23,7 @@ class PostProcessingVoter implements VoterInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * @inhericDoc
-     */
+    #[\Override]
     public function vote($feature, $scopeIdentifier = null): int
     {
         if ($feature === self::ATTACHMENT_POST_PROCESSING) {

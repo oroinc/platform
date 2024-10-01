@@ -18,6 +18,7 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
 
     private Context $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->consumerHeartbeat = $this->createMock(ConsumerHeartbeat::class);

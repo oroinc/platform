@@ -15,6 +15,7 @@ abstract class AbstractTranslationImportStrategyTest extends WebTestCase
     /** @var AbstractImportStrategy */
     private $strategy;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

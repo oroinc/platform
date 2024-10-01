@@ -41,9 +41,7 @@ class ActivityAssociationProvider implements ResetInterface
         $this->resourcesProvider = $resourcesProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->activityAssociations = [];

@@ -7,33 +7,25 @@ namespace Oro\Bundle\EntityConfigBundle\Tools\BackupManager;
  */
 class NullEntityConfigBackupManager implements EntityConfigBackupManagerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isEnabled(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function makeBackup(): void
     {
         throw new \BadMethodCallException('Not implemented');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function restoreFromBackup(): void
     {
         throw new \BadMethodCallException('Not implemented');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function dropBackup(): void
     {
         throw new \BadMethodCallException('Not implemented');

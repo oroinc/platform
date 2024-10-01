@@ -15,6 +15,7 @@ class SelectedFieldsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     private $datagridParameters;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datagridConfiguration = $this->createMock(DatagridConfiguration::class);

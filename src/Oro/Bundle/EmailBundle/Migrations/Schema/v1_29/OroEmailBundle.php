@@ -16,9 +16,7 @@ class OroEmailBundle implements Migration, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         // We should not do anything if text_body field already exists.

@@ -37,6 +37,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigHelper */
     private $configHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

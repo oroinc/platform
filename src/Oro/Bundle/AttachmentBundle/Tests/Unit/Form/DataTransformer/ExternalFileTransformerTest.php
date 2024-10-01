@@ -22,6 +22,7 @@ class ExternalFileTransformerTest extends \PHPUnit\Framework\TestCase
 
     private ExternalFileTransformer $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configFileValidator = $this->createMock(ConfigFileValidator::class);

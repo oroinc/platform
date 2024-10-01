@@ -29,9 +29,7 @@ class AliceFileFixture extends AliceFixture implements DependentFixtureInterface
         return $this->fileName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         $data = Yaml::parse(file_get_contents($this->loader->locateFile($this->fileName)));
@@ -63,9 +61,7 @@ class AliceFileFixture extends AliceFixture implements DependentFixtureInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadData()
     {
         return $this->loader->load([$this->fileName]);

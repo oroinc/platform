@@ -24,9 +24,7 @@ class EmailNotificationSender implements NotificationSenderInterface
         $this->emailTemplateSender = $emailTemplateSender;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function sendNotification(UserEmailOrigin $emailOrigin)
     {
         $originOwner = $emailOrigin->getOwner();

@@ -15,6 +15,7 @@ class RemoveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
     /** @var RemoveFieldsChangesAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new RemoveFieldsChangesAction(new ContextAccessor());

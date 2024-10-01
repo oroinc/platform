@@ -12,11 +12,11 @@ use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 class Imap extends \Laminas\Mail\Protocol\Imap
 {
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function fetch($items, $from, $to = null, $uid = false)
     {
         if (is_array($from)) {
@@ -91,9 +91,7 @@ class Imap extends \Laminas\Mail\Protocol\Imap
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function connect($host, $port = null, $ssl = false)
     {
         parent::connect($host, $port, $ssl);
@@ -104,9 +102,6 @@ class Imap extends \Laminas\Mail\Protocol\Imap
 
     // @codingStandardsIgnoreStart
 
-    /**
-     * {@inheritdoc}
-     */
     protected function _nextLine()
     {
         $line = fgets($this->socket);
@@ -124,11 +119,11 @@ class Imap extends \Laminas\Mail\Protocol\Imap
     // @codingStandardsIgnoreEnd
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function decodeLine($line)
     {
         $tokens = [];
@@ -218,9 +213,7 @@ class Imap extends \Laminas\Mail\Protocol\Imap
         return $tokens;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function listMailbox($reference = '', $mailbox = '*')
     {
         $result = [];

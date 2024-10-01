@@ -32,6 +32,7 @@ class SearchResultProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SearchResultProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->indexer = $this->createMock(Indexer::class);

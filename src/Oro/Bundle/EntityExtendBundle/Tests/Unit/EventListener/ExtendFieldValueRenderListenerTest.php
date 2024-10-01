@@ -42,6 +42,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendFieldValueRenderListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManger = $this->createMock(ConfigManager::class);

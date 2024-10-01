@@ -18,6 +18,7 @@ class ContentFileDataTransformer implements ContentFileDataTransformerInterface
     ) {
     }
 
+    #[\Override]
     public function setFileName(string $fileName): void
     {
         $this->fileName = $fileName;
@@ -26,6 +27,7 @@ class ContentFileDataTransformer implements ContentFileDataTransformerInterface
     /**
      * @param null|string $value
      */
+    #[\Override]
     public function transform(mixed $value): ?File
     {
         if ($value === null) {
@@ -45,6 +47,7 @@ class ContentFileDataTransformer implements ContentFileDataTransformerInterface
     /**
      * @param null|File $value
      */
+    #[\Override]
     public function reverseTransform(mixed $value): ?string
     {
         if ($value === null || (!$value->getFile() && $value?->isEmptyFile())) {

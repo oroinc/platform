@@ -19,9 +19,7 @@ class Router extends BaseRouter
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function redirect(mixed $context): RedirectResponse
     {
         $request = $this->requestStack->getCurrentRequest();

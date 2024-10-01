@@ -38,6 +38,7 @@ class AclProtectedEntityLoaderTest extends OrmRelatedTestCase
     /** @var AclProtectedEntityLoader */
     private $entityLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

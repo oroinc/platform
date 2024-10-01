@@ -32,9 +32,7 @@ class DependentMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->dependentJobService = $dependentJobService;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         if ($message->getProperty(Config::PARAMETER_TOPIC_NAME) === DependentMessageDependentJobTestTopic::getName()) {
@@ -70,9 +68,7 @@ class DependentMessageProcessor implements MessageProcessorInterface, TopicSubsc
         return $this->jobRunner->runUnique($ownerId, $jobName, $closure);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [DependentMessageTestTopic::getName(), DependentMessageDependentJobTestTopic::getName()];

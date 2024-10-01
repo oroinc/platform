@@ -19,9 +19,7 @@ class SubresourcesConfigLoader extends AbstractConfigLoader
 
     private ?ActionsConfigLoader $actionsConfigLoader = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(array $config): mixed
     {
         $subresources = new SubresourcesConfig();

@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class GroupNodeConditionsValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): GroupNodeConditionsValidator
     {
         return new GroupNodeConditionsValidator();

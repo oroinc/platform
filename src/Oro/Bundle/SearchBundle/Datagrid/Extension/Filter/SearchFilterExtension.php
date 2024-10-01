@@ -14,9 +14,7 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapte
  */
 class SearchFilterExtension extends AbstractFilterExtension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -25,9 +23,7 @@ class SearchFilterExtension extends AbstractFilterExtension
             && null !== $config->offsetGetByPath(Configuration::COLUMNS_PATH);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if (!$datasource instanceof SearchDatasource) {

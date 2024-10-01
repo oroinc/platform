@@ -11,9 +11,7 @@ use Symfony\Component\OptionsResolver\Options;
  */
 class AttributeFileType extends ConfigurableType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

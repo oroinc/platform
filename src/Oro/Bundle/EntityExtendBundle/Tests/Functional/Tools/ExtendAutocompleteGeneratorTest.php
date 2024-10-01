@@ -17,6 +17,7 @@ class ExtendAutocompleteGeneratorTest extends WebTestCase
 {
     private DocBlockFactory $docBlockFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

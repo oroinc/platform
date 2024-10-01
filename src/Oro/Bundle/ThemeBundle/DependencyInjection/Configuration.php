@@ -12,9 +12,7 @@ class Configuration implements ConfigurationInterface
     public const ROOT_NAME = 'oro_theme';
     public const THEME_CONFIGURATION = 'theme_configuration';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NAME);

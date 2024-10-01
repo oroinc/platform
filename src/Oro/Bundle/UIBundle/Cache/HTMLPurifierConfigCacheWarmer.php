@@ -23,9 +23,7 @@ class HTMLPurifierConfigCacheWarmer implements CacheWarmerInterface
         $this->htmlTagProvider = $htmlTagProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         foreach ($this->htmlTagProvider->getScopes() as $scope) {
@@ -39,9 +37,7 @@ class HTMLPurifierConfigCacheWarmer implements CacheWarmerInterface
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return false;

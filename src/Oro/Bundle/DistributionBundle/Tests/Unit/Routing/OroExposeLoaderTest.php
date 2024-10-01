@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Route;
 
 class OroExposeLoaderTest extends AbstractLoaderTest
 {
+    #[\Override]
     public function getLoader(): OroExposeLoader
     {
         $loader = new OroExposeLoader($this->kernel, $this->routeOptionsResolver);
@@ -16,6 +17,7 @@ class OroExposeLoaderTest extends AbstractLoaderTest
         return $loader;
     }
 
+    #[\Override]
     public function getLoaderWithoutEventDispatcher(): OroExposeLoader
     {
         $loader = new OroExposeLoader($this->kernel, $this->routeOptionsResolver);
@@ -29,6 +31,7 @@ class OroExposeLoaderTest extends AbstractLoaderTest
         self::assertTrue($this->getLoader()->supports(null, 'oro_expose'));
     }
 
+    #[\Override]
     public function loadDataProvider(): array
     {
         return [

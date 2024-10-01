@@ -23,6 +23,7 @@ class FormInitListenerTest extends TestCase
     private EventDispatcher|MockObject $eventDispatcher;
     private FormInitListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);

@@ -19,17 +19,13 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
 {
     use ExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v1_8';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/

@@ -29,6 +29,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $activityListManager = ActivityListManager::class;

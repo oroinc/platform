@@ -10,6 +10,7 @@ class PublicMediaDirectoryRequirementsProviderTest extends \PHPUnit\Framework\Te
     private string $mediaDirectory;
     private PublicMediaDirectoryRequirementsProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $projectDirectory = sys_get_temp_dir();
@@ -21,6 +22,7 @@ class PublicMediaDirectoryRequirementsProviderTest extends \PHPUnit\Framework\Te
         mkdir($this->tempDir, 0777, true);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         chmod($this->tempDir, 0777);

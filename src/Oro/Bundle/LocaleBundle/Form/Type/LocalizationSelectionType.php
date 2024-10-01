@@ -33,9 +33,7 @@ class LocalizationSelectionType extends AbstractType
         $this->localizationChoicesProvider = $localizationChoicesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -50,9 +48,7 @@ class LocalizationSelectionType extends AbstractType
         $resolver->setAllowedTypes(Configuration::ENABLED_LOCALIZATIONS, ['null', 'array']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $localizationChoices = $this->getLocalizationChoices($options[Configuration::ENABLED_LOCALIZATIONS]);
@@ -65,25 +61,18 @@ class LocalizationSelectionType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return static::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return OroChoiceType::class;

@@ -17,6 +17,7 @@ class RoleManagerTest extends \PHPUnit\Framework\TestCase
 
     private $role;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

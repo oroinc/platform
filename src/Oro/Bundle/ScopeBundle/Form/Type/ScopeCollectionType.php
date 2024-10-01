@@ -16,14 +16,13 @@ class ScopeCollectionType extends AbstractType
 {
     const NAME = 'oro_scope_collection';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return CollectionType::class;
     }
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function ($event) {
@@ -35,9 +34,7 @@ class ScopeCollectionType extends AbstractType
         }, -255);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -50,17 +47,12 @@ class ScopeCollectionType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

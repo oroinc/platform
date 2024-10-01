@@ -23,9 +23,7 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

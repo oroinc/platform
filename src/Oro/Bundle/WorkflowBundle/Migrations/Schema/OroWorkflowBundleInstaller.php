@@ -20,17 +20,13 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 {
     use ExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v2_6';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/

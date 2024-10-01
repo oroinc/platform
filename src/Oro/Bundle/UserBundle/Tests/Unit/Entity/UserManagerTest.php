@@ -37,6 +37,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
     /** @var UserManager */
     private $userManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userLoader = $this->createMock(UserLoaderInterface::class);

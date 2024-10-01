@@ -36,10 +36,10 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws InvalidConnectorException
      */
+    #[\Override]
     public function process(Integration $integration, $connector, array $parameters = [])
     {
         if (!$integration->isEnabled()) {
@@ -142,9 +142,7 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
         return $status;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function formatResultMessage(ContextInterface $context = null)
     {
         return sprintf(
@@ -154,9 +152,6 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function assertValidConnector(ConnectorInterface $connector)
     {
         if (!($connector instanceof TwoWaySyncConnectorInterface)) {

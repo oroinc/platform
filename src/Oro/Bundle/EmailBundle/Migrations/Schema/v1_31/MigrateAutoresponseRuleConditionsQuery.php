@@ -20,9 +20,7 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
     const AUTO_RESPONSE_RULE_TABLE = 'oro_email_auto_response_rule';
     const AUTO_RESPONSE_RULE_CONDITION_TABLE = 'oro_email_response_rule_cond';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $steps = ceil($this->getAutoresponseRuleCount() / static::LIMIT);
@@ -39,9 +37,7 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Migrates data from table "oro_email_response_rule_cond" into "oro_email_auto_response_rule"';

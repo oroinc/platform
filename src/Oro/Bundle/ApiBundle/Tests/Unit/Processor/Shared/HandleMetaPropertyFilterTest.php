@@ -25,6 +25,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
     /** @var HandleMetaPropertyFilter */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

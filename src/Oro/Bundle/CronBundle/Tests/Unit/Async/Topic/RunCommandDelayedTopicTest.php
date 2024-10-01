@@ -7,6 +7,7 @@ use Oro\Component\MessageQueue\Topic\TopicInterface;
 
 class RunCommandDelayedTopicTest extends RunCommandTopicTest
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new RunCommandDelayedTopic();

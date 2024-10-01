@@ -17,9 +17,7 @@ class CallbackFormHandler implements FormHandlerInterface
         $this->callback = $callback;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($data, FormInterface $form, Request $request)
     {
         return call_user_func($this->callback, $data, $form, $request);

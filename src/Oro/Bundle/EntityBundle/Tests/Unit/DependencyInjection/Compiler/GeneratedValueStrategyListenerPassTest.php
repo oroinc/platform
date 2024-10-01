@@ -10,6 +10,7 @@ class GeneratedValueStrategyListenerPassTest extends \PHPUnit\Framework\TestCase
     /** @var GeneratedValueStrategyListenerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new GeneratedValueStrategyListenerPass();

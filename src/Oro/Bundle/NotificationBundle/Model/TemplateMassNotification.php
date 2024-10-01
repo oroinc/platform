@@ -50,25 +50,19 @@ class TemplateMassNotification implements TemplateEmailNotificationInterface, Se
         $this->subject = $subject;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateCriteria(): EmailTemplateCriteria
     {
         return $this->emailTemplateCriteria;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRecipients(): iterable
     {
         return $this->recipients;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntity()
     {
         return null;
@@ -79,9 +73,7 @@ class TemplateMassNotification implements TemplateEmailNotificationInterface, Se
         return $this->subject;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSender(): ?From
     {
         return $this->sender;

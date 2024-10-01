@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class RecipientListNotEmptyValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): RecipientListNotEmptyValidator
     {
         return new RecipientListNotEmptyValidator();

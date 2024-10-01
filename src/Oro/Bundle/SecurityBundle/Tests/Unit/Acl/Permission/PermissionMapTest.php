@@ -12,6 +12,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionMap */
     private $map;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->map = new PermissionMap(

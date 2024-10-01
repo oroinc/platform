@@ -26,6 +26,7 @@ class ActualizeEnumOptionTranslationsCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure(): void
     {
         $this->setHidden()
@@ -36,6 +37,7 @@ class ActualizeEnumOptionTranslationsCommand extends Command
     /**
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $locale = $input->getOption('locale');

@@ -33,6 +33,7 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
     /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

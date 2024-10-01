@@ -10,6 +10,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 class DecimalTypeCast extends AbstractTypeCastingHandler
 {
+    #[\Override]
     public function castValue(mixed $value): mixed
     {
         if ($this->isSupported($value)) {
@@ -19,11 +20,13 @@ class DecimalTypeCast extends AbstractTypeCastingHandler
         return parent::castValue($value);
     }
 
+    #[\Override]
     public function isSupported($value): bool
     {
         return is_numeric($value);
     }
 
+    #[\Override]
     public static function getType(): string
     {
         return Query::TYPE_DECIMAL;

@@ -11,33 +11,25 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  */
 class EnumAttributeType implements AttributeTypeInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSearchable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSortable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($originalValue === null) {
@@ -53,8 +45,8 @@ class EnumAttributeType implements AttributeTypeInterface
     /**
      * Enum is uses array representation as in general it may combine multiple values
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($originalValue === null) {
@@ -69,9 +61,7 @@ class EnumAttributeType implements AttributeTypeInterface
         return [$key => 1];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($originalValue === null) {

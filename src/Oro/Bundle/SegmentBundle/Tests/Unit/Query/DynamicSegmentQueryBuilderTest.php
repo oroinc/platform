@@ -41,6 +41,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
     /** @var FormFactoryInterface */
     private $formFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

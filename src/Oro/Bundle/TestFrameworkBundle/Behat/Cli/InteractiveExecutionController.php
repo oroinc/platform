@@ -28,9 +28,7 @@ class InteractiveExecutionController implements Controller
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command->addOption(
@@ -41,9 +39,7 @@ class InteractiveExecutionController implements Controller
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('interactive')) {

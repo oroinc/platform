@@ -22,6 +22,7 @@ class EmailTemplateProviderTest extends TestCase
 
     private EmailTemplateProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailTemplateLoader = $this->createMock(EmailTemplateLoaderInterface::class);

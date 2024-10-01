@@ -123,6 +123,7 @@ class AclCache implements AclCacheInterface
     /**
      * Removes an ACL from the cache by the reference OID.
      */
+    #[\Override]
     public function evictFromCacheByIdentity(ObjectIdentityInterface $oid): void
     {
         if ($this->underlyingCache->isUnderlying($oid)) {
@@ -143,6 +144,7 @@ class AclCache implements AclCacheInterface
     /**
      * Removes all ACLs from the cache.
      */
+    #[\Override]
     public function clearCache(): void
     {
         if ($this->cache instanceof CacheInterface) {
@@ -280,33 +282,25 @@ class AclCache implements AclCacheInterface
         return [$classFieldAces, $objectFieldAces];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function evictFromCacheById($primaryKey)
     {
         throw new \BadMethodCallException('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFromCacheById($primaryKey)
     {
         throw new \BadMethodCallException('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFromCacheByIdentity(ObjectIdentityInterface $oid)
     {
         throw new \BadMethodCallException('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function putInCache(AclInterface $acl)
     {
         throw new \BadMethodCallException('Not implemented');

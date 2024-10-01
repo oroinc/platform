@@ -27,6 +27,7 @@ class CacheCheckCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure()
     {
         $this
@@ -57,6 +58,7 @@ HELP
      * @noinspection PhpMissingParentCallCommonInspection
      * @throws \Exception
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Check extended entity configs');

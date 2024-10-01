@@ -14,6 +14,7 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
 
     private ThemePathProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeManager = $this->createMock(ThemeManager::class);

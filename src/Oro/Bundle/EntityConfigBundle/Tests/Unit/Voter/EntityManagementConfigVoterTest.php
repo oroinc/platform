@@ -19,6 +19,7 @@ class EntityManagementConfigVoterTest extends TestCase
 
     private TokenInterface $token;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->token = $this->createMock(TokenInterface::class);

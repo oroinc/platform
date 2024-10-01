@@ -16,9 +16,7 @@ class ProfilingEntityManager extends OroEntityManager
     /** @var array */
     private $loggingHydrators;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function newHydrator($hydrationMode)
     {
         $hydrators = $this->getLoggingHydrators();
@@ -32,9 +30,7 @@ class ProfilingEntityManager extends OroEntityManager
         return parent::newHydrator($hydrationMode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function persist($entity)
     {
         $logger = $this->getProfilingLogger();
@@ -47,9 +43,7 @@ class ProfilingEntityManager extends OroEntityManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function detach($entity)
     {
         $logger = $this->getProfilingLogger();
@@ -62,9 +56,7 @@ class ProfilingEntityManager extends OroEntityManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function merge($entity)
     {
         $logger = $this->getProfilingLogger();
@@ -79,9 +71,7 @@ class ProfilingEntityManager extends OroEntityManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function refresh($entity, ?int $lockMode = null)
     {
         $logger = $this->getProfilingLogger();
@@ -94,9 +84,7 @@ class ProfilingEntityManager extends OroEntityManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($entity)
     {
         $logger = $this->getProfilingLogger();
@@ -109,9 +97,7 @@ class ProfilingEntityManager extends OroEntityManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flush($entity = null)
     {
         $logger = $this->getProfilingLogger();

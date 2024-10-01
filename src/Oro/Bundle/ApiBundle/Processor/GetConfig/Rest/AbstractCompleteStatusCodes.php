@@ -14,9 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class AbstractCompleteStatusCodes extends AbstractAddStatusCodes
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

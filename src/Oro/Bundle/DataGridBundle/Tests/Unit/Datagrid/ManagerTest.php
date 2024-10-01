@@ -28,6 +28,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Manager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);

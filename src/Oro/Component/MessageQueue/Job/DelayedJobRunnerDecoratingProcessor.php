@@ -32,6 +32,7 @@ class DelayedJobRunnerDecoratingProcessor implements MessageProcessorInterface, 
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $messageBody = $message->getBody();

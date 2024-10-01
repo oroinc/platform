@@ -30,9 +30,7 @@ class QueryDefinitionValidator extends ConstraintValidator
         $this->fieldProvider = $fieldProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof QueryDefinition) {

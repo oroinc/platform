@@ -25,9 +25,7 @@ class ExtendTable extends TableWithNameGenerator
         parent::__construct($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createColumnObject(array $args)
     {
         $args['tableName'] = $this->getName();
@@ -42,6 +40,7 @@ class ExtendTable extends TableWithNameGenerator
      *
      * @return \Doctrine\DBAL\Schema\Table
      */
+    #[\Override]
     public function addOption($name, $value)
     {
         if ($name === OroOptions::KEY) {
@@ -77,9 +76,7 @@ class ExtendTable extends TableWithNameGenerator
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addColumn($columnName, $typeName, array $options = [])
     {
         $oroOptions = null;
@@ -112,9 +109,7 @@ class ExtendTable extends TableWithNameGenerator
         return $column;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function dropColumn($columnName)
     {
         $this->extendOptionsManager->removeColumnOptions($this->getName(), $columnName);

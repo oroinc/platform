@@ -16,6 +16,7 @@ class SetGaufretteFilesystemsLazyPassTest extends \PHPUnit\Framework\TestCase
     /** @var SetGaufretteFilesystemsLazyPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

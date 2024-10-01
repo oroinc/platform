@@ -17,6 +17,7 @@ class ProcessHandleEventTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessHandleEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processTrigger = $this->createMock(ProcessTrigger::class);

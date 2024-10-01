@@ -25,6 +25,7 @@ class MergeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MergeExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->accessor = $this->createMock(AccessorInterface::class);

@@ -15,6 +15,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMetadata */
     private $metadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineMetadata = $this->createMock(DoctrineMetadata::class);

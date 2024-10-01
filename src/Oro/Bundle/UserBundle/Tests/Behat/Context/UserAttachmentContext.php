@@ -76,6 +76,7 @@ class UserAttachmentContext extends AttachmentContext
         return $user;
     }
 
+    #[\Override]
     protected function assertResponseSuccess(ResponseInterface $response): void
     {
         $attachmentManager = $this->getAppContainer()->get('oro_attachment.manager');
@@ -84,6 +85,7 @@ class UserAttachmentContext extends AttachmentContext
         self::assertTrue($attachmentManager->isImageType($response->getHeader('Content-Type')[0]));
     }
 
+    #[\Override]
     protected function assertResponseFail(ResponseInterface $response): void
     {
         self::assertContains($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_FORBIDDEN]);

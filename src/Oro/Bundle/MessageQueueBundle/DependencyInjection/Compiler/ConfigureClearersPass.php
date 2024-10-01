@@ -13,9 +13,7 @@ class ConfigureClearersPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('oro_message_queue.consumption.container_reset_extension')

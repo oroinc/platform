@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AddSupportedFieldTypesCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $container->getDefinition('oro_entity_extend.field_type_provider')

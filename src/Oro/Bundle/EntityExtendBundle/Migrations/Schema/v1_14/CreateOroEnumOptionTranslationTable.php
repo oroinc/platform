@@ -12,6 +12,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class CreateOroEnumOptionTranslationTable implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->createTable('oro_enum_option_trans');

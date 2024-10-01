@@ -16,6 +16,7 @@ class DependencyInitializerTest extends \PHPUnit\Framework\TestCase
     /** @var DependencyInitializer */
     private $initializer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new Container();

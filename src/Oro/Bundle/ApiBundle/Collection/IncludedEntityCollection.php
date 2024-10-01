@@ -118,6 +118,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     /**
      * Gets the number of entities in the collection
      */
+    #[\Override]
     public function count(): int
     {
         return $this->collection->count();
@@ -187,6 +188,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     /**
      * Gets an iterator to get all objects from the collection.
      */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator(array_values($this->collection->getAll()));

@@ -11,6 +11,7 @@ class OrganizationAwareAccessRuleTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationRestrictionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $organizationRestrictionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->organizationRestrictionProvider = $this->createMock(OrganizationRestrictionProviderInterface::class);

@@ -11,9 +11,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class SortersConfiguration extends AbstractConfigurationSection
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(NodeBuilder $node): void
     {
         $sectionName = 'sorters';

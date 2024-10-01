@@ -11,9 +11,7 @@ class UpdateFileRelation extends ParametrizedMigrationQuery
 {
     const ENTITY_PATH = 'Oro\\Bundle\\AttachmentBundle\\Entity\\File';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -22,16 +20,13 @@ class UpdateFileRelation extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)

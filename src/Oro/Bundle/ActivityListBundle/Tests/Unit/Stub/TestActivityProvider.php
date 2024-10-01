@@ -17,9 +17,7 @@ class TestActivityProvider implements
     /** @var object[] */
     private $targets;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicableTarget($entityClass, $accessible = true)
     {
         if ($entityClass === self::SUPPORTED_TARGET_CLASS_NAME) {
@@ -29,56 +27,42 @@ class TestActivityProvider implements
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSubject($entity)
     {
         return $entity->subject;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription($entity)
     {
         return $entity->description;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplate()
     {
         return 'test_template.js.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRoutes($entity)
     {
         return ['delete' => 'test_delete_route'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActivityId($entity)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable($entity)
     {
         return $entity instanceof \stdClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargetEntities($entity)
     {
         return $this->targets;
@@ -92,69 +76,52 @@ class TestActivityProvider implements
         $this->targets = $targets;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData(ActivityList $activityList)
     {
         return ['test_data'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrganization($entity)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isCommentsEnabled($entityClass)
     {
         return true;
     }
 
+    #[\Override]
     public function getActivityOwners($entity, ActivityList $activityList)
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isActivityListApplicable(ActivityList $activityList): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCreatedAt($entity)
     {
         return $entity->createdAt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUpdatedAt($entity)
     {
         return $entity->updatedAt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUpdatedBy($entity)
     {
         return $entity->updatedBy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOwner($entity)
     {
         return $entity->owner;

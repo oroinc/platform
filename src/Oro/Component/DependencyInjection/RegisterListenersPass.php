@@ -101,6 +101,7 @@ class RegisterListenersPass implements CompilerPassInterface
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->dispatcherService) && !$container->hasAlias($this->dispatcherService)) {

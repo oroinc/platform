@@ -18,6 +18,7 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
 
     private RedeliveryMessageExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(DriverInterface::class);

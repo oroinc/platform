@@ -10,9 +10,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroLocaleBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

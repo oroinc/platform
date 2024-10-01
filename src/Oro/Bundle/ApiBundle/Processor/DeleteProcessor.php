@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
  */
 class DeleteProcessor extends RequestActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): DeleteContext
     {
         return new DeleteContext($this->configProvider, $this->metadataProvider);

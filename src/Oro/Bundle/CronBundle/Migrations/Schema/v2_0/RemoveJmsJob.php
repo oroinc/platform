@@ -8,9 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class RemoveJmsJob implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $schema->dropTable('jms_job_dependencies');

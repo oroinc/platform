@@ -24,9 +24,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $this->dictionaryProvider = $dictionaryProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolveEntityClass($entityName, $isPluralAlias = false)
     {
         try {
@@ -41,17 +39,13 @@ class DictionaryApiEntityManager extends ApiEntityManager
         return $entityClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getSerializationConfig()
     {
         return $this->dictionaryProvider->getSerializationConfig($this->class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
         $qb = $this->dictionaryProvider->getValueListQueryBuilder($this->class);

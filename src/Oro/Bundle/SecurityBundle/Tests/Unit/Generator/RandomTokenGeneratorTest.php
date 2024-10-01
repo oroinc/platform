@@ -9,6 +9,7 @@ class RandomTokenGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var RandomTokenGenerator */
     private $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->generator = new RandomTokenGenerator();

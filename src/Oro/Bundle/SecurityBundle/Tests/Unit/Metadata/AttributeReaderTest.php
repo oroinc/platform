@@ -14,6 +14,7 @@ class AttributeReaderTest extends TestCase
     public const REFLECTION_CLASS_NAME = AccountController::class;
     private AttributeReader $reader;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->reader = new AttributeReader();

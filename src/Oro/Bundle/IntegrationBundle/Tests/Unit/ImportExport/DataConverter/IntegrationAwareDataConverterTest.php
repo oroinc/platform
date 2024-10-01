@@ -10,6 +10,7 @@ class IntegrationAwareDataConverterTest extends \PHPUnit\Framework\TestCase
     /** @var IntegrationAwareDataConverter|\PHPUnit\Framework\MockObject\MockObject */
     private $dataConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dataConverter = $this->getMockForAbstractClass(IntegrationAwareDataConverter::class);

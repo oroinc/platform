@@ -10,33 +10,25 @@ class NormalizeDecimal extends AbstractProcessor
 {
     public const REQUIREMENT = '-?\d*\.?\d+';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypeString(): string
     {
         return 'decimal';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypePluralString(): string
     {
         return 'decimals';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeValue(mixed $value): mixed
     {
         $normalizedValue = $value;

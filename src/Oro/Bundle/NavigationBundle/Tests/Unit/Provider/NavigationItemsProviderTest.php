@@ -29,6 +29,7 @@ class NavigationItemsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationItemsProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

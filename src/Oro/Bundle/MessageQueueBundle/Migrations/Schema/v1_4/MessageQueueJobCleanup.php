@@ -14,9 +14,7 @@ use Oro\Component\MessageQueue\Job\Job;
  */
 class MessageQueueJobCleanup implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $dateIntervalForStatusSuccess = (new \DateTime("-2 weeks", new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');

@@ -85,9 +85,9 @@ class JsonPartialFileParser extends Parser
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function parse(): void
     {
         $privatePropertyAccessor = $this->privatePropertyAccessor;

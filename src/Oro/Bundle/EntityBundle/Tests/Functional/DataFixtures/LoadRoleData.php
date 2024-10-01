@@ -13,17 +13,13 @@ class LoadRoleData extends AbstractFixture implements ContainerAwareInterface
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $roleTest1 = new Role();

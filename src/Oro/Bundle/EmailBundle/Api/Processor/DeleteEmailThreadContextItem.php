@@ -26,9 +26,7 @@ class DeleteEmailThreadContextItem implements ProcessorInterface
         $this->deleteHandler = $deleteHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var DeleteContext $context */

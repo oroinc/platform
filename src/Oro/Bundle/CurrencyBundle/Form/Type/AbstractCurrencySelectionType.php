@@ -49,9 +49,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
         $this->currencyNameHelper = $currencyNameHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -97,11 +95,13 @@ abstract class AbstractCurrencySelectionType extends AbstractType
         });
     }
 
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['hidden_field'] = (count($options['choices']) <= 1);
     }
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
@@ -163,9 +163,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceType::class;

@@ -53,9 +53,7 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
         return $this->container->get('fragment.handler');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -127,9 +125,7 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

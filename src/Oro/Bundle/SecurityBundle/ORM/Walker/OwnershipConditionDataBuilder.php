@@ -58,9 +58,7 @@ class OwnershipConditionDataBuilder implements AclConditionDataBuilderInterface
         $this->aclGroupProvider = $aclGroupProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAclConditionData(
         string $entityClassName,
         string|array $permissions = 'VIEW',

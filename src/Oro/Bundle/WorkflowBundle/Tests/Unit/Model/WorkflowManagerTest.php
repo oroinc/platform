@@ -54,6 +54,7 @@ class WorkflowManagerTest extends TestCase
 
     private WorkflowManager $workflowManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

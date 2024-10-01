@@ -17,17 +17,13 @@ class ResetTransformDataTransformer implements DataTransformerInterface
         $this->transformer = $transformer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         return $this->transformer->reverseTransform($value);

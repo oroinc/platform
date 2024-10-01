@@ -14,6 +14,7 @@ class CompoundGuesser implements GuesserInterface
     {
     }
 
+    #[\Override]
     public function guessProcessor(string $fieldName, ClassMetadata $metadata): ?ProcessorInterface
     {
         foreach ($this->guessers as $guesser) {

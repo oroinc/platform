@@ -16,9 +16,7 @@ abstract class AbstractFormType extends AbstractType
 {
     const SHORT_NAME = '';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -31,9 +29,7 @@ abstract class AbstractFormType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['form', 'form_name', 'instance_name']);

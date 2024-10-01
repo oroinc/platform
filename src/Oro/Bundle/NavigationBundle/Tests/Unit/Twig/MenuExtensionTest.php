@@ -36,6 +36,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MenuExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);

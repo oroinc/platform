@@ -23,6 +23,7 @@ class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
     /** @var IdentityConfigChoiceType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

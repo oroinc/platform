@@ -11,6 +11,7 @@ class EntityFieldFallbackValueHeadersListenerTest extends \PHPUnit\Framework\Tes
     /** @var EntityFieldFallbackValueHeadersListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new EntityFieldFallbackValueHeadersListener();

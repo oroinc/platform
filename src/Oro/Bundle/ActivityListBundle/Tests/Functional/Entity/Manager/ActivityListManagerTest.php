@@ -13,6 +13,7 @@ class ActivityListManagerTest extends WebTestCase
 {
     private ActivityListManager $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

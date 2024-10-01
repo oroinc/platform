@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 
 class ViewListStub extends AbstractViewsList
 {
+    #[\Override]
     public function getList()
     {
         $list = new ArrayCollection();
@@ -21,6 +22,7 @@ class ViewListStub extends AbstractViewsList
         return $list;
     }
 
+    #[\Override]
     public function getViewsList()
     {
         return [];

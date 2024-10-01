@@ -9,6 +9,7 @@ class PageStateControllerTest extends WebTestCase
 {
     private static array $entity = [];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

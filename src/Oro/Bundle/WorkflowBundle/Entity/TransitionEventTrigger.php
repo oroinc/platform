@@ -34,9 +34,7 @@ class TransitionEventTrigger extends BaseTransitionTrigger implements EventTrigg
     #[ORM\Column(name: 'relation', type: Types::TEXT, length: 1024, nullable: true)]
     protected ?string $relation = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClass()
     {
         if ($this->entityClass) {
@@ -57,9 +55,7 @@ class TransitionEventTrigger extends BaseTransitionTrigger implements EventTrigg
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEvent()
     {
         return $this->event;
@@ -76,9 +72,7 @@ class TransitionEventTrigger extends BaseTransitionTrigger implements EventTrigg
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getField()
     {
         return $this->field;
@@ -161,6 +155,7 @@ class TransitionEventTrigger extends BaseTransitionTrigger implements EventTrigg
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return sprintf(
@@ -175,9 +170,7 @@ class TransitionEventTrigger extends BaseTransitionTrigger implements EventTrigg
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isEqualAdditionalFields(BaseTransitionTrigger $trigger)
     {
         return $trigger instanceof static

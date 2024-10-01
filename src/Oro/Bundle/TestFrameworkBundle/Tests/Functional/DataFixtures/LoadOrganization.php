@@ -14,9 +14,7 @@ class LoadOrganization extends AbstractFixture implements InitialFixtureInterfac
 {
     public const ORGANIZATION = 'organization';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $organization = $manager->getRepository(Organization::class)

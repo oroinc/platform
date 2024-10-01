@@ -21,9 +21,7 @@ class UserPredefinedLanguageCodeResolver implements PredefinedLanguageCodeResolv
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription(): string
     {
         return <<<MARKDOWN
@@ -31,9 +29,7 @@ class UserPredefinedLanguageCodeResolver implements PredefinedLanguageCodeResolv
 MARKDOWN;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolve(): string
     {
         $localization = $this->localizationManager->getLocalizationData(

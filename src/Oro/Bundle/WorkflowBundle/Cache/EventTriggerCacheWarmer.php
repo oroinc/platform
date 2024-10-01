@@ -19,9 +19,7 @@ class EventTriggerCacheWarmer implements CacheWarmerInterface
         $this->eventTriggerCaches[] = $eventTriggerCache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         foreach ($this->eventTriggerCaches as $eventTriggerCache) {
@@ -33,6 +31,7 @@ class EventTriggerCacheWarmer implements CacheWarmerInterface
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function isOptional(): bool
     {
         return true;

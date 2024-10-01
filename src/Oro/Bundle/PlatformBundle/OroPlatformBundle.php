@@ -18,9 +18,7 @@ class OroPlatformBundle extends Bundle
 {
     public const PACKAGE_NAME = 'oro/platform';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

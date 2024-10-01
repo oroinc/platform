@@ -13,10 +13,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class RegionTextValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
      * @param AbstractAddress $entity
      * @param RegionText      $constraint
      */
+    #[\Override]
     public function validate($entity, Constraint $constraint)
     {
         if (null === $entity) {

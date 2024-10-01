@@ -28,8 +28,8 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
     /**
      * @param EnumOptionInterface $object
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = []): ?array
     {
         if (!$object instanceof EnumOptionInterface) {
@@ -50,9 +50,7 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $reflection = new \ReflectionClass($type);
@@ -72,17 +70,13 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
         return $reflection->newInstanceArgs($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return is_a($type, EnumOptionInterface::class, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof EnumOptionInterface;

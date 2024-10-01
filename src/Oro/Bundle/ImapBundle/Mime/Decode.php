@@ -36,9 +36,9 @@ use Oro\Bundle\ImapBundle\Mail\Headers;
 class Decode extends BaseDecode
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public static function splitMessage($message, &$headers, &$body, $EOL = Mime::LINEEND, $strict = false)
     {
         if ($message instanceof Headers) {

@@ -19,9 +19,7 @@ class ChainPlatformUpdateChecker implements PlatformUpdateCheckerInterface
         $this->checkers = $checkers;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function checkReadyToUpdate(): ?array
     {
         $messages = [];

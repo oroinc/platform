@@ -21,17 +21,13 @@ class DataCollectorExtension extends AbstractBlockTypeExtension
         $this->dataCollector = $dataCollector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         $this->dataCollector->collectBlockView($block, $view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtendedType()
     {
         return BaseType::NAME;

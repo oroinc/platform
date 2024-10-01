@@ -32,6 +32,7 @@ class LoadUpsertEntityTest extends UpdateProcessorTestCase
     /** @var LoadUpsertEntity */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

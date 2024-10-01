@@ -28,11 +28,13 @@ class LocalizedFallBackValueExtension extends AbstractDuplicatorExtension
         $this->managerRegistry = $managerRegistry;
     }
 
+    #[\Override]
     public function getFilter(): Filter
     {
         return new DoctrineCollectionFilter();
     }
 
+    #[\Override]
     public function getMatcher(): Matcher
     {
         $source = $this->getContext()->offsetGet('source');
@@ -41,6 +43,7 @@ class LocalizedFallBackValueExtension extends AbstractDuplicatorExtension
         return new PropertiesNameMatcher($properties);
     }
 
+    #[\Override]
     public function isSupport(DraftableInterface $source): bool
     {
         $properties = $this->getLocalizedFallbackValueProperties($source);

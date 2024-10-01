@@ -12,9 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ExceptionListener extends BaseExceptionListener
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setTargetPath(Request $request): void
     {
         $session = $request->hasSession() ? $request->getSession() : null;

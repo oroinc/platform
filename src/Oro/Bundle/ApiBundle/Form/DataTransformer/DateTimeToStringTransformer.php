@@ -32,9 +32,7 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         $this->withDate = $withDate;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -48,9 +46,7 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         return $this->transformValue($value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!\is_string($value)) {

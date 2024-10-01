@@ -20,6 +20,7 @@ class DumpTranslationToFilesCommandTest extends WebTestCase
     private string $tempDir;
     private TranslationReader $translationReader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

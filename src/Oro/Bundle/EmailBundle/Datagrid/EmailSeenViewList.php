@@ -7,9 +7,7 @@ use Oro\Bundle\EmailBundle\Model\SeenType;
 
 class EmailSeenViewList extends EmailFolderViewList
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getViewsList()
     {
         $parentArray = parent::getViewsList();

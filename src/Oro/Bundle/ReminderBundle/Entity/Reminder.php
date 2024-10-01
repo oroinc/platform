@@ -494,6 +494,7 @@ class Reminder implements ExtendEntityInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->subject;

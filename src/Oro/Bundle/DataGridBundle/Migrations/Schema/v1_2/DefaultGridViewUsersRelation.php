@@ -8,9 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class DefaultGridViewUsersRelation implements Migration
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->createTable('oro_grid_view_user');

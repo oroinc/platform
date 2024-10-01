@@ -49,9 +49,7 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
         $this->entityClass        = $entityClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getViewValue($value)
     {
         $entities = $this->getEntities($value);
@@ -92,9 +90,7 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
         return $this->aclHelper->apply($qb)->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         if ($value === null) {
@@ -104,9 +100,7 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
         return parent::getConvertedValue($widgetConfig, $value, $config, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormValue(array $config, $value)
     {
         if ($value === null) {

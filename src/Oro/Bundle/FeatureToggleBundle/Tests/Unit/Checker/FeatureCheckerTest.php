@@ -21,6 +21,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureChecker */
     private $featureChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureDecisionManager = $this->createMock(FeatureDecisionManagerInterface::class);

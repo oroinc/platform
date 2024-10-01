@@ -17,6 +17,7 @@ class MessageProcessorRouterExtensionTest extends \PHPUnit\Framework\TestCase
 
     private MessageProcessorRouterExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new MessageProcessorRouterExtension(

@@ -22,9 +22,7 @@ class BlockViewVarsNormalizer implements BlockViewVarsNormalizerInterface
     private const CACHE_KEY = 'cache_key';
     private const CACHE = 'cache';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function normalize(array &$vars, array $context): void
     {
         $this->unsetDefaults($vars);
@@ -35,9 +33,7 @@ class BlockViewVarsNormalizer implements BlockViewVarsNormalizerInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function denormalize(array &$vars, array $context): void
     {
         $this->populateDefaults($vars);

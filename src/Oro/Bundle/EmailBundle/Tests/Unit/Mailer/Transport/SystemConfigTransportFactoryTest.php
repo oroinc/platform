@@ -16,6 +16,7 @@ class SystemConfigTransportFactoryTest extends \PHPUnit\Framework\TestCase
     private SystemConfigTransportFactory $factory;
     private TransportFactoryInterface $transportFactoryBase;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transportFactoryBase = $this->createMock(TransportFactoryInterface::class);

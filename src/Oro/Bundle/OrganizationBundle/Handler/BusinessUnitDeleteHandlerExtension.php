@@ -20,9 +20,7 @@ class BusinessUnitDeleteHandlerExtension extends AbstractEntityDeleteHandlerExte
         $this->ownerDeletionManager = $ownerDeletionManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertDeleteGranted($entity): void
     {
         /** @var BusinessUnit $entity */

@@ -18,6 +18,7 @@ class PersonAllNamePartsStub implements
     /**
      * @return string
      */
+    #[\Override]
     public function getFirstName()
     {
         return 'fn';
@@ -26,6 +27,7 @@ class PersonAllNamePartsStub implements
     /**
      * @return string
      */
+    #[\Override]
     public function getLastName()
     {
         return 'ln';
@@ -34,6 +36,7 @@ class PersonAllNamePartsStub implements
     /**
      * @return string
      */
+    #[\Override]
     public function getMiddleName()
     {
         return 'mn';
@@ -42,6 +45,7 @@ class PersonAllNamePartsStub implements
     /**
      * @return string
      */
+    #[\Override]
     public function getNamePrefix()
     {
         return 'np';
@@ -50,6 +54,7 @@ class PersonAllNamePartsStub implements
     /**
      * @return string
      */
+    #[\Override]
     public function getNameSuffix()
     {
         return 'ns';

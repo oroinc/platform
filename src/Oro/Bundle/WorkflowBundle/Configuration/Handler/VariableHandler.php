@@ -6,9 +6,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class VariableHandler extends AbstractHandler
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handle(array $configuration)
     {
         $rawVarDefinitions = [];

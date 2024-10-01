@@ -141,9 +141,7 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDayFormat($locale = null)
     {
         return $this->convertFormat(
@@ -172,25 +170,19 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
         return trim(preg_replace($regexp, '', $format));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDateFormat($dateFormat = null, $locale = null)
     {
         return $this->getFormat($dateFormat, \IntlDateFormatter::NONE, $locale);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTimeFormat($timeFormat = null, $locale = null)
     {
         return $this->getFormat(\IntlDateFormatter::NONE, $timeFormat, $locale);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDateTimeFormat($dateFormat = null, $timeFormat = null, $locale = null)
     {
         return $this->getFormat($dateFormat, $timeFormat, $locale);

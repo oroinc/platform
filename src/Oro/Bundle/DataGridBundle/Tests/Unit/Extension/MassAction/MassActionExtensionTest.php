@@ -34,6 +34,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MassActionExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionFactory = $this->createMock(MassActionFactory::class);

@@ -14,9 +14,7 @@ class CreateBatchApiLockTable implements Migration, ConnectionAwareInterface
 {
     use ConnectionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /**

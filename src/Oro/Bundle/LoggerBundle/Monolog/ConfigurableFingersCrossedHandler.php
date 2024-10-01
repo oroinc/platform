@@ -21,6 +21,7 @@ class ConfigurableFingersCrossedHandler extends FingersCrossedHandler
         $this->config = $config;
     }
 
+    #[\Override]
     public function handle(array $record): bool
     {
         if (!$this->config?->isActive()) {
@@ -38,6 +39,7 @@ class ConfigurableFingersCrossedHandler extends FingersCrossedHandler
         return false === $this->bubble;
     }
 
+    #[\Override]
     public function reset()
     {
         $this->config->reset();

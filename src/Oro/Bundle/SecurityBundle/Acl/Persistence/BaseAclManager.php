@@ -13,9 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class BaseAclManager implements AclSidInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSid($identity)
     {
         if (is_string($identity)) {

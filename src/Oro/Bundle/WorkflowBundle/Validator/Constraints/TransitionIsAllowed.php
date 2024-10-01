@@ -53,17 +53,13 @@ class TransitionIsAllowed extends Constraint
         return $this->transitionName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return TransitionIsAllowedValidator::ALIAS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

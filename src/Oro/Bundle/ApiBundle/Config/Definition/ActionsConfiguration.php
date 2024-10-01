@@ -25,9 +25,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->sectionName = $sectionName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configure(NodeBuilder $node): void
     {
         /** @var NodeBuilder $actionNode */
@@ -65,9 +63,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->configureActionNode($actionNode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(string $section): bool
     {
         return 'entities.entity' === $section;

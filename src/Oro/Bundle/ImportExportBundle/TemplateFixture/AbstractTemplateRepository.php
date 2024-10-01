@@ -11,17 +11,13 @@ abstract class AbstractTemplateRepository implements
     /** @var TemplateManager */
     protected $templateManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setTemplateManager(TemplateManager $templateManager)
     {
         $this->templateManager = $templateManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntity($key)
     {
         $this->ensureEntityRegistered($key);
@@ -30,9 +26,7 @@ abstract class AbstractTemplateRepository implements
             ->getEntity($this->getEntityClass(), $key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function fillEntityData($key, $entity)
     {
         // just throw an exception to indicate that derived class cannot fill data to the given entity

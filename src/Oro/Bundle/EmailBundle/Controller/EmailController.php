@@ -1069,9 +1069,7 @@ class EmailController extends AbstractController
         return $this->container->get(DoctrineHelper::class)->getEntity($scopeClass, $scopeId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

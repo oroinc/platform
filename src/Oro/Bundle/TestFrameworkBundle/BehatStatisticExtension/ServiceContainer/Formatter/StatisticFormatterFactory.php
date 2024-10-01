@@ -21,6 +21,7 @@ final class StatisticFormatterFactory implements FormatterFactory
     /**
      * Builds formatter configuration.
      */
+    #[\Override]
     public function buildFormatter(ContainerBuilder $container)
     {
         $this->defineStatisticModels($container);
@@ -31,6 +32,7 @@ final class StatisticFormatterFactory implements FormatterFactory
     /**
      * Processes formatter configuration.
      */
+    #[\Override]
     public function processFormatter(ContainerBuilder $container)
     {
         $subscriber = $container->getDefinition('behat_statistic.listener.feature_statistic_subscriber');

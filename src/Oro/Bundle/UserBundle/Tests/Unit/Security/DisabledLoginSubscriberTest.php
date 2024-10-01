@@ -22,6 +22,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private User $user;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->user = new User();

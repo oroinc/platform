@@ -9,6 +9,7 @@ class AdditionalEntityCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var AdditionalEntityCollection */
     private $collection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->collection = new AdditionalEntityCollection();

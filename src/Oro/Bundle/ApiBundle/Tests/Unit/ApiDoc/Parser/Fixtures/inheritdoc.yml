@@ -14,7 +14,7 @@ Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
       update: '<p>Description for NAME field for CREATE and UPDATE actions</p>'
       delete: '<p>Description for NAME field for DELETE action</p><p>An additional NAME field description for DELETE action.</p>'
     createdat:
-      common: '<p>{@inheritdoc}</p><p>An additional CREATED_AT field description.</p>'
+        common: '<p>{@inheritdoc}</p><p>An additional CREATED_AT field description.</p>'
   filters:
     id: 'Description for ID filter'
     name: 'Description for NAME filter'

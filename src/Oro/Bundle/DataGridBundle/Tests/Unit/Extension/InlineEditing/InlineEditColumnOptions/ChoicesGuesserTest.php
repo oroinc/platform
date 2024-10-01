@@ -20,6 +20,7 @@ class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var ChoicesGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

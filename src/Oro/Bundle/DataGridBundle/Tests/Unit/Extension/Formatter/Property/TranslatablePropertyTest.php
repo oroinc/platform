@@ -12,6 +12,7 @@ class TranslatablePropertyTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatableProperty */
     private $property;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

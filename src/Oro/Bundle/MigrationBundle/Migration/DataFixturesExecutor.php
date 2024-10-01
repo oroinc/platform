@@ -37,9 +37,7 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface, Localizatio
         $this->formattingCode = $formattingCode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(array $fixtures, string $fixturesType, ?callable $progressCallback = null): void
     {
         $event = new MigrationDataFixturesEvent($this->em, $fixturesType, $this->logger);
@@ -57,9 +55,7 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface, Localizatio
         $this->eventDispatcher->dispatch($event, MigrationEvents::DATA_FIXTURES_POST_LOAD);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLogger($logger)
     {
         $this->logger = $logger;

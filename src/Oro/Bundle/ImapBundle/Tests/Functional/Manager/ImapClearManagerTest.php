@@ -24,9 +24,7 @@ class ImapClearManagerTest extends WebTestCase
     /** @var ImapClearManager */
     private $manager;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -30,6 +30,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
     /** @var AttributeFamilyExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

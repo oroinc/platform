@@ -767,6 +767,7 @@ class SqlQueryBuilder
      *
      * @return string The string representation of this query builder.
      */
+    #[\Override]
     public function __toString()
     {
         return $this->getSQL();

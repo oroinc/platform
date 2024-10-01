@@ -18,6 +18,7 @@ class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationContextResolver */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

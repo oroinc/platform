@@ -26,6 +26,7 @@ class DisableFilterHandlerWrapperTest extends TestCase
 
     private DisableFilterHandlerWrapper $wrapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->inner = $this->createMock(FilterHandler::class);

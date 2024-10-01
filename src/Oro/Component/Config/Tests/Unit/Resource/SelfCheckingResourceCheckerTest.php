@@ -10,6 +10,7 @@ class SelfCheckingResourceCheckerTest extends \PHPUnit\Framework\TestCase
 {
     private SymfonySelfCheckingResourceChecker|\PHPUnit\Framework\MockObject\MockObject $innerResourceChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerResourceChecker = $this->createMock(SymfonySelfCheckingResourceChecker::class);

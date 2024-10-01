@@ -36,9 +36,7 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
         $this->tokenSerializer = $tokenSerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function onPreReceived(Context $context): void
     {
         if (isset($this->securityAgnosticProcessors[$context->getMessageProcessorName()])) {
@@ -70,9 +68,7 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context): void
     {
         // reset the security context after processing of each message

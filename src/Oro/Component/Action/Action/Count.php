@@ -10,9 +10,7 @@ class Count extends AbstractAction
     /** @var array */
     protected $options = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!isset($options['value'])) {
@@ -31,9 +29,7 @@ class Count extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $value = $this->contextAccessor->getValue($context, $this->options['value']);

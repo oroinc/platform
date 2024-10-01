@@ -28,6 +28,7 @@ class EnumNameTypeTest extends TypeTestCase
     /** @var ExtendDbIdentifierNameGenerator */
     private $nameGenerator;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

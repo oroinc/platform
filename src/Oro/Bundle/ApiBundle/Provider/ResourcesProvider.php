@@ -272,9 +272,7 @@ class ResourcesProvider implements ResetInterface
         $this->resourcesCache->clear();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->resources = [];

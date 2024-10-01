@@ -36,6 +36,7 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
     /* @var AttributeGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formRegistry = $this->createMock(FormRegistry::class);

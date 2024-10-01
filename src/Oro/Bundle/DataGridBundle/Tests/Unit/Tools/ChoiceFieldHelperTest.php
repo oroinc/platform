@@ -24,6 +24,7 @@ class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ChoiceFieldHelper */
     private $choiceHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclHelper = $this->createMock(AclHelper::class);

@@ -50,6 +50,7 @@ class Variable implements EntityParameterInterface
      *
      * @return Variable
      */
+    #[\Override]
     public function setType($type)
     {
         $this->type = $type;
@@ -62,6 +63,7 @@ class Variable implements EntityParameterInterface
      *
      * @return string
      */
+    #[\Override]
     public function getType()
     {
         return $this->type;
@@ -72,6 +74,7 @@ class Variable implements EntityParameterInterface
      *
      * @return Variable
      */
+    #[\Override]
     public function setEntityAcl(array $entityAcl)
     {
         $this->entityAcl = $entityAcl;
@@ -82,6 +85,7 @@ class Variable implements EntityParameterInterface
     /**
      * @return bool
      */
+    #[\Override]
     public function isEntityUpdateAllowed()
     {
         return !array_key_exists('update', $this->entityAcl) || $this->entityAcl['update'];
@@ -90,6 +94,7 @@ class Variable implements EntityParameterInterface
     /**
      * @return bool
      */
+    #[\Override]
     public function isEntityDeleteAllowed()
     {
         return !array_key_exists('delete', $this->entityAcl) || $this->entityAcl['delete'];
@@ -122,6 +127,7 @@ class Variable implements EntityParameterInterface
      *
      * @return Variable
      */
+    #[\Override]
     public function setLabel($label)
     {
         $this->label = $label;
@@ -134,6 +140,7 @@ class Variable implements EntityParameterInterface
      *
      * @return string
      */
+    #[\Override]
     public function getLabel()
     {
         return $this->label;
@@ -146,6 +153,7 @@ class Variable implements EntityParameterInterface
      *
      * @return Variable
      */
+    #[\Override]
     public function setName($name)
     {
         $this->name = $name;
@@ -158,6 +166,7 @@ class Variable implements EntityParameterInterface
      *
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;
@@ -170,6 +179,7 @@ class Variable implements EntityParameterInterface
      *
      * @return Variable
      */
+    #[\Override]
     public function setOptions(array $options)
     {
         $this->options = $options;
@@ -182,6 +192,7 @@ class Variable implements EntityParameterInterface
      *
      * @return array
      */
+    #[\Override]
     public function getOptions()
     {
         return $this->options;
@@ -195,6 +206,7 @@ class Variable implements EntityParameterInterface
      *
      * @return Variable
      */
+    #[\Override]
     public function setOption($key, $value)
     {
         $this->options[$key] = $value;
@@ -209,6 +221,7 @@ class Variable implements EntityParameterInterface
      *
      * @return mixed|null
      */
+    #[\Override]
     public function getOption($key)
     {
         return $this->hasOption($key) ? $this->options[$key] : null;
@@ -221,6 +234,7 @@ class Variable implements EntityParameterInterface
      *
      * @return bool
      */
+    #[\Override]
     public function hasOption($key)
     {
         return isset($this->options[$key]);
@@ -241,6 +255,7 @@ class Variable implements EntityParameterInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getPropertyPath()
     {
         return $this->propertyPath;
@@ -251,6 +266,7 @@ class Variable implements EntityParameterInterface
      *
      * @return Variable
      */
+    #[\Override]
     public function setPropertyPath($propertyPath)
     {
         $this->propertyPath = $propertyPath;
@@ -261,6 +277,7 @@ class Variable implements EntityParameterInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getInternalType()
     {
         return self::INTERNAL_TYPE_VARIABLE;

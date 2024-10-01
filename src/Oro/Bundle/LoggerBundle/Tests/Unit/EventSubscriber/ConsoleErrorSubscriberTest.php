@@ -40,6 +40,7 @@ class ConsoleErrorSubscriberTest extends \PHPUnit\Framework\TestCase
         E_CORE_WARNING => [null, LogLevel::WARNING],
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -50,6 +51,7 @@ class ConsoleErrorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->output = $this->createMock(OutputInterface::class);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         restore_error_handler();

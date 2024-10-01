@@ -41,6 +41,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     private TranslationManager|\PHPUnit\Framework\MockObject\MockObject $translationManager;
     private EnumSynchronizer $synchronizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -65,9 +65,7 @@ abstract class AbstractOwnerValidator extends ConstraintValidator
         $this->aclGroupProvider = $aclGroupProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Owner) {

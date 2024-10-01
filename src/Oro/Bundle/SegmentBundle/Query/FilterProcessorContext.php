@@ -7,9 +7,7 @@ namespace Oro\Bundle\SegmentBundle\Query;
  */
 class FilterProcessorContext extends SegmentQueryConverterContext
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function validateDefinition(array $definition): void
     {
         // skip validation

@@ -59,9 +59,7 @@ class DictionaryController extends RestGetController
         return $this->handleGetListRequest($page, $limit);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_entity.manager.dictionary.api');

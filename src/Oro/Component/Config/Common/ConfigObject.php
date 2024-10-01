@@ -111,25 +111,19 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
         return $params;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return isset($this->params[$offset]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         return $this->params[$offset];
@@ -186,9 +180,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
         return $value !== null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         $this->params[$offset] = $value;
@@ -209,9 +201,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         unset($this->params[$offset]);

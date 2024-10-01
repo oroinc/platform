@@ -20,6 +20,7 @@ class FormTypeStub extends AbstractType
         $this->parent = $parent;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         foreach ($this->options as $option) {
@@ -27,6 +28,7 @@ class FormTypeStub extends AbstractType
         }
     }
 
+    #[\Override]
     public function getParent(): string
     {
         return $this->parent;

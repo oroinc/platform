@@ -35,9 +35,7 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -48,9 +46,7 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -378,9 +374,7 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->getNumberFormatter()->isCurrencySymbolPrepend($currency, $locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

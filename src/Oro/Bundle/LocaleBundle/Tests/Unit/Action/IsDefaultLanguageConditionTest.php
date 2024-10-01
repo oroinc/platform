@@ -22,6 +22,7 @@ class IsDefaultLanguageConditionTest extends \PHPUnit\Framework\TestCase
     private IsDefaultLanguageCondition $condition1;
     private IsDefaultLanguageCondition $condition2;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->otherCode = 'fr_FR';

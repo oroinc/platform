@@ -25,9 +25,7 @@ class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQue
      */
     private $mimeTypes;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -36,9 +34,7 @@ class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQue
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

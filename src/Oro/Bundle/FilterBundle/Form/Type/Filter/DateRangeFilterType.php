@@ -15,33 +15,24 @@ class DateRangeFilterType extends AbstractDateFilterType
 {
     const NAME = 'oro_type_date_range_filter';
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return FilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -61,6 +52,7 @@ class DateRangeFilterType extends AbstractDateFilterType
         );
     }
 
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['type_values'] = $options['type_values'];

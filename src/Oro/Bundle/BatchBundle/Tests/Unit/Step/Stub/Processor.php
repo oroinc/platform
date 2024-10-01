@@ -13,10 +13,10 @@ class Processor implements ItemProcessorInterface, ClosableInterface
     public const LOGIC_EXCEPTION_MESSAGE = 'Processor logic exception message';
 
     /**
-     * {@inheritdoc}
      *
      * @throws InvalidItemException
      */
+    #[\Override]
     public function process($item)
     {
         if ($item === self::INVALID_ITEM) {
@@ -30,9 +30,7 @@ class Processor implements ItemProcessorInterface, ClosableInterface
         return $item;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close(): void
     {
         throw new \LogicException(self::LOGIC_EXCEPTION_MESSAGE);

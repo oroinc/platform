@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class ImportexportFieldConfiguration implements FieldConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'importexport';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

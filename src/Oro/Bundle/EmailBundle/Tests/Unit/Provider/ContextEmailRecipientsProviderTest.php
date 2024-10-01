@@ -16,6 +16,7 @@ class ContextEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ContextEmailRecipientsProvider */
     private $emailRecipientsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->relatedEmailsProvider = $this->createMock(RelatedEmailsProvider::class);

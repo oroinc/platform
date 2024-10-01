@@ -21,9 +21,7 @@ class TagMergeAccessor implements AccessorInterface
         $this->taggableHelper = $helper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($entity, FieldMetadata $metadata)
     {
         return
@@ -31,25 +29,19 @@ class TagMergeAccessor implements AccessorInterface
             $metadata->getSourceClassName() === 'Oro\Bundle\TagBundle\Entity\Tag';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($entity, FieldMetadata $metadata)
     {
         return $this->tagManager->getTags($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($entity, FieldMetadata $metadata, $value)
     {
         $this->tagManager->setTags($entity, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'tag';

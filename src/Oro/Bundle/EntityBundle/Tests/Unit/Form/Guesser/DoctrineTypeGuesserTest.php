@@ -23,6 +23,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineTypeGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

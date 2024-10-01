@@ -26,6 +26,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var FieldMetadata */
     private $fieldMetadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->options = ['foo' => 'bar'];

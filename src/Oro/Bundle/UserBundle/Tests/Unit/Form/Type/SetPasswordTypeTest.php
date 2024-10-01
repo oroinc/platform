@@ -19,6 +19,7 @@ class SetPasswordTypeTest extends \PHPUnit\Framework\TestCase
     /** @var SetPasswordType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->optionsProvider = $this->createMock(PasswordFieldOptionsProvider::class);

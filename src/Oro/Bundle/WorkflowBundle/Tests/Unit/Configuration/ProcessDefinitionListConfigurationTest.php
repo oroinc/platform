@@ -10,6 +10,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessDefinitionListConfiguration */
     private $configuration;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configuration = new ProcessDefinitionListConfiguration(new ProcessDefinitionConfiguration());

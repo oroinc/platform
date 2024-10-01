@@ -51,9 +51,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         $this->blockViewCache      = $blockViewCache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function add(
         $id,
         $parentId,
@@ -67,9 +65,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($id)
     {
         $this->layoutManipulator->remove($id);
@@ -77,9 +73,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function move($id, $parentId = null, $siblingId = null, $prepend = null)
     {
         $this->layoutManipulator->move($id, $parentId, $siblingId, $prepend);
@@ -87,9 +81,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addAlias($alias, $id)
     {
         $this->layoutManipulator->addAlias($alias, $id);
@@ -97,9 +89,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeAlias($alias)
     {
         $this->layoutManipulator->removeAlias($alias);
@@ -107,9 +97,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOption($id, $optionName, $optionValue)
     {
         $this->layoutManipulator->setOption($id, $optionName, $optionValue);
@@ -117,9 +105,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function appendOption($id, $optionName, $optionValue)
     {
         $this->layoutManipulator->appendOption($id, $optionName, $optionValue);
@@ -127,9 +113,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function subtractOption($id, $optionName, $optionValue)
     {
         $this->layoutManipulator->subtractOption($id, $optionName, $optionValue);
@@ -137,9 +121,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
     {
         $this->layoutManipulator->replaceOption($id, $optionName, $oldOptionValue, $newOptionValue);
@@ -147,9 +129,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeOption($id, $optionName)
     {
         $this->layoutManipulator->removeOption($id, $optionName);
@@ -157,9 +137,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function changeBlockType($id, $blockType, $optionsCallback = null)
     {
         $this->layoutManipulator->changeBlockType($id, $blockType, $optionsCallback);
@@ -167,9 +145,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setBlockTheme($themes, $id = null)
     {
         $this->layoutManipulator->setBlockTheme($themes, $id);
@@ -177,9 +153,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFormTheme($themes)
     {
         $this->layoutManipulator->setFormTheme($themes);
@@ -187,9 +161,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear()
     {
         $this->layoutManipulator->clear();
@@ -198,9 +170,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLayout(ContextInterface $context, $rootId = null)
     {
         if (!$context->isResolved()) {
@@ -366,14 +336,13 @@ class LayoutBuilder implements LayoutBuilderInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNotAppliedActions()
     {
         return $this->layoutManipulator->getNotAppliedActions();
     }
 
+    #[\Override]
     public function getLayoutContextStack(): LayoutContextStack
     {
         return $this->layoutContextStack;

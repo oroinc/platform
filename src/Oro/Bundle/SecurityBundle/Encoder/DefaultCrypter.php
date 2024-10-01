@@ -23,17 +23,13 @@ class DefaultCrypter implements SymmetricCrypterInterface
         $this->key = $key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function encryptData($data)
     {
         return base64_encode($this->getCipher()->encryptData($data));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function decryptData($data)
     {
         return  str_replace("\x0", '', trim($this->getCipher()->decryptData(base64_decode((string) $data))));

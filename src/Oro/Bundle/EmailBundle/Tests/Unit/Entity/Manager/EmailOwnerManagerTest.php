@@ -28,6 +28,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $fixtures;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fixtures = [

@@ -12,17 +12,13 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v1_5';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         // create symfony acl tables

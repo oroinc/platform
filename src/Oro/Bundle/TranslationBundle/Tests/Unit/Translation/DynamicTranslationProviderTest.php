@@ -20,6 +20,7 @@ class DynamicTranslationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DynamicTranslationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->loader = $this->createMock(DynamicTranslationLoaderInterface::class);

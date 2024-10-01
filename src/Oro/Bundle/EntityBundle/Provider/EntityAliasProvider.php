@@ -20,9 +20,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityAlias($entityClass)
     {
         // check for the exclusion list
@@ -52,9 +50,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassNames()
     {
         return $this->config->getClassNames();

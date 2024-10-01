@@ -16,17 +16,13 @@ class UserConfigurationFormProvider extends AbstractProvider
         $this->parentCheckboxLabel = $label;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getTreeName(): string
     {
         return 'user_configuration';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getParentCheckboxLabel(): string
     {
         return $this->parentCheckboxLabel ?? 'oro.user.user_configuration.use_default';

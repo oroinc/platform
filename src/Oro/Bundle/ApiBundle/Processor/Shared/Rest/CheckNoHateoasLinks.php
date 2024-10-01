@@ -14,9 +14,7 @@ class CheckNoHateoasLinks implements ProcessorInterface
 {
     public const REQUEST_HEADER_VALUE = 'noHateoas';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

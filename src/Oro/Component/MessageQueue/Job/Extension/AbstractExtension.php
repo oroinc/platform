@@ -9,58 +9,42 @@ use Oro\Component\MessageQueue\Job\Job;
  */
 abstract class AbstractExtension implements ExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunUnique(Job $job)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunUnique(Job $job, $jobResult)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreCreateDelayed(Job $job)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostCreateDelayed(Job $job, $createResult)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunDelayed(Job $job)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunDelayed(Job $job, $jobResult)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onCancel(Job $job)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onError(Job $job)
     {
     }

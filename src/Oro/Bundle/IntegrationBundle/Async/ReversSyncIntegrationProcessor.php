@@ -74,17 +74,13 @@ class ReversSyncIntegrationProcessor implements
         $this->reverseSyncProcessor->getLoggerStrategy()->setLogger($logger);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [ReverseSyncIntegrationTopic::getName()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();

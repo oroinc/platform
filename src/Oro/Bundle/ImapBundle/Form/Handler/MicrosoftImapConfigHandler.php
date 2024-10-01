@@ -12,17 +12,13 @@ use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
  */
 class MicrosoftImapConfigHandler extends AbstractImapConfigHandler
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getManagerType(): string
     {
         return AccountTypeModel::ACCOUNT_TYPE_MICROSOFT;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isForceRefreshRequired(ConfigChangeSet $changeSet): bool
     {
         return $changeSet->isChanged('oro_microsoft_integration.client_id')

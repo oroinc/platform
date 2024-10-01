@@ -37,6 +37,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->markTestSkipped('Due to BAP-13223');

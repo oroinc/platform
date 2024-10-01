@@ -15,9 +15,7 @@ class ChangeLanguageOwnership implements Migration
 {
     use MigrationConstraintTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_language');

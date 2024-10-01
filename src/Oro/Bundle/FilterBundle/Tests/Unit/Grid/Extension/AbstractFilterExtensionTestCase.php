@@ -45,6 +45,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridParameters;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterBag = new FilterBagStub();

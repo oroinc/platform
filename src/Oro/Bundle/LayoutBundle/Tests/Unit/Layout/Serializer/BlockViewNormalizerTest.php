@@ -26,6 +26,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var BlockViewNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->typeNameConverter = $this->createMock(TypeNameConverter::class);

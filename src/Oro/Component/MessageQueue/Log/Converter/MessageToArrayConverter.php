@@ -9,9 +9,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
  */
 class MessageToArrayConverter implements MessageToArrayConverterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convert(MessageInterface $message): array
     {
         $result = [

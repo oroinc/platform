@@ -65,9 +65,6 @@ class ExtendFieldValueRenderListener
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function beforeValueRender(ValueRenderEvent $event)
     {
         $value = $event->getFieldValue();

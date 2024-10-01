@@ -20,6 +20,7 @@ class UniqueKeyTypeTest extends TypeTestCase
         'Email' => 'email',
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $validator = Validation::createValidatorBuilder()

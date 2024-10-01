@@ -18,9 +18,7 @@ abstract class AbstractRenameField extends AbstractFixture implements ContainerA
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         if (!$this->container->get(ApplicationState::class)->isInstalled()) {

@@ -12,9 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class CommentExclusionProvider extends AbstractExclusionProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         if ($metadata->name !== 'Oro\Bundle\CommentBundle\Entity\Comment') {

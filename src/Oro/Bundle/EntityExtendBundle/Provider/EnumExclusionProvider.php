@@ -18,9 +18,7 @@ class EnumExclusionProvider extends AbstractExclusionProvider
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         if ($this->isMultiEnumField($metadata->name, $fieldName)) {

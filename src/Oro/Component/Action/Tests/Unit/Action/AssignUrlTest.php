@@ -15,6 +15,7 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
     /** @var AssignUrl */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $router = $this->createMock(RouterInterface::class);

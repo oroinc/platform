@@ -19,6 +19,7 @@ class ProcessorWatcher extends AbstractExtension
         $this->bufferedProducer = $bufferedProducer;
     }
 
+    #[\Override]
     public function onPreReceived(Context $context): void
     {
         if (!$this->bufferedProducer->isBufferingEnabled()) {
@@ -26,6 +27,7 @@ class ProcessorWatcher extends AbstractExtension
         }
     }
 
+    #[\Override]
     public function onPostReceived(Context $context): void
     {
         if ($this->bufferedProducer->isBufferingEnabled() && $this->bufferedProducer->hasBufferedMessages()) {

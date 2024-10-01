@@ -9,6 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ReflectionVirtualPropertyTest extends WebTestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         $this->bootKernel();

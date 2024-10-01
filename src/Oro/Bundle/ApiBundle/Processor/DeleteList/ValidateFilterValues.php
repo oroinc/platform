@@ -12,9 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidateFilterValues implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var DeleteListContext $context */

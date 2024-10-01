@@ -17,6 +17,7 @@ class SubQueryLimitHelperTest extends WebTestCase
 {
     private SubQueryLimitHelper $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

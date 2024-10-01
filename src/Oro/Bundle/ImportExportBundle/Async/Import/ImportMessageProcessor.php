@@ -49,9 +49,7 @@ class ImportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $this->postponedRowsHandler = $postponedRowsHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();
@@ -143,6 +141,7 @@ class ImportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         return $fileName;
     }
 
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [ImportTopic::getName()];

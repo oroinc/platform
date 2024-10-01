@@ -6,14 +6,9 @@ use Doctrine\ORM\Query\Expr\Base;
 
 class Coalesce extends Base
 {
-    /**
-     * {@inheritdoc}
-     */
     protected $preSeparator = 'COALESCE(';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __toString()
     {
         return $this->preSeparator . implode($this->separator, $this->parts) . $this->postSeparator;

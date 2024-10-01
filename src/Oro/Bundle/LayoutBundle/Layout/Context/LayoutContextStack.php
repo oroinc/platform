@@ -21,6 +21,7 @@ class LayoutContextStack extends BaseLayoutContextStack
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    #[\Override]
     public function push(?ContextInterface $context): void
     {
         parent::push($context);
@@ -28,6 +29,7 @@ class LayoutContextStack extends BaseLayoutContextStack
         $this->eventDispatcher->dispatch(new LayoutContextChangedEvent($this->getParentContext(), $context));
     }
 
+    #[\Override]
     public function pop(): ?ContextInterface
     {
         $context = parent::pop();

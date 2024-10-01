@@ -19,9 +19,7 @@ class PublicEmailOwnerProviderStub extends PublicEmailOwnerProvider
         $this->publicEmailOwnerProvider = $publicEmailOwnerProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isPublicEmailOwner(string $ownerClass): bool
     {
         foreach ($this->stubPublicOwners as [$class, $isPublic]) {

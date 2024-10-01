@@ -22,6 +22,7 @@ class SegmentChoiceTypeTest extends TestCase
 
     private AclHelper|MockObject $aclHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

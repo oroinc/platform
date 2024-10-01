@@ -17,6 +17,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
     /** @var AssignValue */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

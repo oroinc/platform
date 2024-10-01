@@ -130,6 +130,7 @@ abstract class AbstractLocalizedFallbackValue
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         $fields = get_object_vars($this);

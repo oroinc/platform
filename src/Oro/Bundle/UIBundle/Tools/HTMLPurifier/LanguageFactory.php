@@ -14,9 +14,9 @@ class LanguageFactory extends \HTMLPurifier_LanguageFactory implements Translato
     use TranslatorAwareTrait;
 
     /**
-     * {@inheritDoc}
      * @return LanguageFactory
      */
+    #[\Override]
     public static function instance($prototype = null)
     {
         $instance = null;
@@ -30,9 +30,7 @@ class LanguageFactory extends \HTMLPurifier_LanguageFactory implements Translato
         return $instance;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function create($config, $context, $code = false)
     {
         $language = new Language($config, $context);
@@ -41,9 +39,7 @@ class LanguageFactory extends \HTMLPurifier_LanguageFactory implements Translato
         return $language;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function loadLanguage($code)
     {
         parent::loadLanguage($code);

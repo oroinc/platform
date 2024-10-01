@@ -21,9 +21,7 @@ class GlobalOptionsProviderRegistry implements GlobalOptionsProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addGlobalOptions(Command $command)
     {
         foreach ($this->providers as $provider) {
@@ -31,9 +29,7 @@ class GlobalOptionsProviderRegistry implements GlobalOptionsProviderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolveGlobalOptions(InputInterface $input)
     {
         foreach ($this->providers as $provider) {

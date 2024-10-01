@@ -15,9 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EmailTemplateSelectType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $choices = function (Options $options) {
@@ -68,9 +66,7 @@ class EmailTemplateSelectType extends AbstractType
         $resolver->setNormalizer('configs', $configsNormalizer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $config = $form->getConfig();
@@ -81,17 +77,13 @@ class EmailTemplateSelectType extends AbstractType
         $view->vars['includeSystemTemplates'] = (bool)$config->getOption('includeSystemTemplates');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_email_template_list';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return Select2TranslatableEntityType::class;

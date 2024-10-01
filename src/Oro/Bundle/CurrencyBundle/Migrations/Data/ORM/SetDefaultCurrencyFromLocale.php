@@ -16,9 +16,7 @@ class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerA
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var ConfigManager $configManager */

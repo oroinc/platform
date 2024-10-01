@@ -24,6 +24,7 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ResetPasswordHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailNotificationManager = $this->createMock(EmailNotificationManager::class);

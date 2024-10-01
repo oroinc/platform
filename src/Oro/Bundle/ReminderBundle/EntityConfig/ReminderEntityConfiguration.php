@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class ReminderEntityConfiguration implements EntityConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'reminder';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

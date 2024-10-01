@@ -33,25 +33,19 @@ class SoapClientSettings implements SoapClientSettingsInterface
         $this->soapOptions = $soapOptions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getWsdlFilePath()
     {
         return $this->wsdlFilePath;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMethodName(): string
     {
         return $this->methodName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSoapOptions(): array
     {
         return $this->soapOptions;

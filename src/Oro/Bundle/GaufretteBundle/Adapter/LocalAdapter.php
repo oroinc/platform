@@ -16,9 +16,7 @@ class LocalAdapter extends BaseAdapter implements ListKeysAware
         return $this->directory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function listKeys($prefix = '')
     {
         $directory = $this->getRootDirectoryForListKeys($prefix);

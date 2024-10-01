@@ -44,6 +44,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AclManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectIdentityFactory = $this->createMock(ObjectIdentityFactory::class);

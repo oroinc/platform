@@ -28,18 +28,14 @@ class Configurable implements ActionInterface
         $this->assembler = $assembler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function initialize(array $configuration)
     {
         $this->configuration = $configuration;
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute($context)
     {
         if (!$this->action) {
@@ -52,8 +48,8 @@ class Configurable implements ActionInterface
     /**
      * Configurable action is always allowed
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function setCondition(ExpressionInterface $condition)
     {
     }

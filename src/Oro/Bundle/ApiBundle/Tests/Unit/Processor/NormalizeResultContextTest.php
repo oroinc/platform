@@ -9,6 +9,7 @@ class NormalizeResultContextTest extends \PHPUnit\Framework\TestCase
 {
     private NormalizeResultContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new NormalizeResultContext();

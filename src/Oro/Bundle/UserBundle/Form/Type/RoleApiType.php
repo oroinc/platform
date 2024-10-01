@@ -18,9 +18,7 @@ class RoleApiType extends AclRoleType
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -55,17 +53,12 @@ class RoleApiType extends AclRoleType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addEntityFields(FormBuilderInterface $builder)
     {
         $builder->addEventSubscriber(new PatchSubscriber());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -73,17 +66,13 @@ class RoleApiType extends AclRoleType
         $resolver->setDefaults(['csrf_protection' => false]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'role';

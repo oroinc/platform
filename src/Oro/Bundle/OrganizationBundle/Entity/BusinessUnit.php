@@ -95,6 +95,7 @@ class BusinessUnit implements
      *
      * @return integer
      */
+    #[\Override]
     public function getId()
     {
         return $this->id;
@@ -119,6 +120,7 @@ class BusinessUnit implements
      *
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;
@@ -215,6 +217,7 @@ class BusinessUnit implements
      *
      * @return string
      */
+    #[\Override]
     public function getEmail()
     {
         return $this->email;
@@ -286,6 +289,7 @@ class BusinessUnit implements
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getName();

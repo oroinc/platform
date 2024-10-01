@@ -19,6 +19,7 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     private ErrorLogNotificationHandlerWrapper $handlerWrapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->recipientsProvider = $this->createMock(ErrorLogNotificationRecipientsProvider::class);

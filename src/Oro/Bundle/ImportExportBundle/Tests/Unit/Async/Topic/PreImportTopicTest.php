@@ -13,11 +13,13 @@ class PreImportTopicTest extends AbstractTopicTestCase
 {
     private const BATCH_SIZE = 5000;
 
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new PreImportTopic(self::BATCH_SIZE);
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         $fullOptionsSet = [
@@ -65,6 +67,7 @@ class PreImportTopicTest extends AbstractTopicTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

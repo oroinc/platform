@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ConsumptionExtensionCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('oro_ui.consumption_extension.request_context')) {

@@ -36,41 +36,31 @@ class MigrationContainer extends DependencyInjectionContainer
         $this->privateContainer = $privateContainer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile()
     {
         $this->publicContainer->compile();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isCompiled(): bool
     {
         return $this->publicContainer->isCompiled();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function set(string $id, ?object $service)
     {
         $this->publicContainer->set($id, $service);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function has(string $id): bool
     {
         return $this->publicContainer->has($id) || $this->privateContainer->has($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
     {
         return $this->privateContainer->has($id)
@@ -78,33 +68,25 @@ class MigrationContainer extends DependencyInjectionContainer
             : $this->publicContainer->get($id, $invalidBehavior);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialized(string $id): bool
     {
         return $this->publicContainer->initialized($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->publicContainer->reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getServiceIds(): array
     {
         return $this->publicContainer->getServiceIds();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRemovedIds(): array
     {
         return $this->publicContainer->getRemovedIds();

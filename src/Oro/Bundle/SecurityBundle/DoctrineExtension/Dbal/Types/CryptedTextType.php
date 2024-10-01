@@ -20,25 +20,25 @@ class CryptedTextType extends TextType
         static::$crypter = $crypter;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName(): string
     {
         return self::TYPE;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return static::$crypter->encryptData($value);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function convertToPHPValue($value, AbstractPlatform $platform): string
     {
         return static::$crypter->decryptData($value);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;

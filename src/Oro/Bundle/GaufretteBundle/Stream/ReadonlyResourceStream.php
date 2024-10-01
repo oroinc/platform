@@ -19,9 +19,7 @@ class ReadonlyResourceStream implements Stream
         $this->resource = $resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function open(StreamMode $mode)
     {
         if ($mode->allowsWrite()) {
@@ -29,81 +27,61 @@ class ReadonlyResourceStream implements Stream
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function read($count)
     {
         return fread($this->resource, $count);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write($data)
     {
         throw new \LogicException('The ReadonlyResourceStream does not allow write.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close()
     {
         fclose($this->resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flush()
     {
         throw new \LogicException('The ReadonlyResourceStream does not allow write.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function seek($offset, $whence = SEEK_SET)
     {
         return 0 === fseek($this->resource, $offset, $whence);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function tell()
     {
         return ftell($this->resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function eof()
     {
         return feof($this->resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function stat()
     {
         return fstat($this->resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function cast($castAs)
     {
         return $this->resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function unlink()
     {
         throw new \LogicException('The ReadonlyResourceStream does not allow unlink.');

@@ -16,6 +16,7 @@ class EntityDataAccessorTest extends WebTestCase
 {
     private DataAccessorInterface $entityDataAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

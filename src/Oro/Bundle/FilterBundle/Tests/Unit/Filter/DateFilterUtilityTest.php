@@ -14,6 +14,7 @@ class DateFilterUtilityTest extends \PHPUnit\Framework\TestCase
     /** @var DateFilterUtility */
     private $utility;
 
+    #[\Override]
     protected function setUp(): void
     {
         $localeSettings = $this->createMock(LocaleSettings::class);

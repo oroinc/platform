@@ -32,9 +32,7 @@ class MaintenanceLockCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -53,9 +51,7 @@ HELP
             ->setAliases(['lexik:maintenance:lock']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $driver = $this->getDriver();

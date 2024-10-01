@@ -13,9 +13,7 @@ class FlashBagChannelActionErrorHandler implements ChannelActionErrorHandlerInte
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleErrors($errors)
     {
         $flashBag = $this->requestStack->getSession()->getFlashBag();

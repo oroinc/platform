@@ -19,18 +19,16 @@ class UpdateFallbackEntityFieldConfig extends ParametrizedMigrationQuery
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription(): string
     {
         return 'Update system option config for fallback entity field config';
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Exception|\Doctrine\DBAL\Driver\Exception
      */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $this->updateEntityConfig($logger);

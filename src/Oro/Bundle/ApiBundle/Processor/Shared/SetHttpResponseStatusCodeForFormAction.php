@@ -13,9 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SetHttpResponseStatusCodeForFormAction implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

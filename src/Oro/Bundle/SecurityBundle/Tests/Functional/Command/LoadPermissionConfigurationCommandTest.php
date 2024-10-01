@@ -23,6 +23,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 {
     private PermissionConfigurationProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -31,6 +32,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
             ->get('oro_security.configuration.provider.permission_configuration');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->provider->warmUpCache();

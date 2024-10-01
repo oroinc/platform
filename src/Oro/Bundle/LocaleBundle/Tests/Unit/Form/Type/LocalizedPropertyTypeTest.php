@@ -22,6 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LocalizedPropertyTypeTest extends AbstractLocalizedType
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
@@ -29,9 +30,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $localizationCollection = new LocalizationCollectionType($this->registry);

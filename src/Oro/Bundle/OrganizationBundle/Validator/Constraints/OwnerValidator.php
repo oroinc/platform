@@ -42,9 +42,7 @@ class OwnerValidator extends AbstractOwnerValidator
         $this->businessUnitManager = $businessUnitManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isValidExistingOwner(OwnershipMetadataInterface $ownershipMetadata, $owner, $accessLevel)
     {
         $currentUser = $this->tokenAccessor->getUser();

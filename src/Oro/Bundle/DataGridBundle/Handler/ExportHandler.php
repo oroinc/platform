@@ -122,6 +122,7 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
      * @param array $reasonParameters
      * @param mixed $item
      */
+    #[\Override]
     public function handleWarning($element, $name, $reason, array $reasonParameters, $item)
     {
         $this->exportFailed = true;

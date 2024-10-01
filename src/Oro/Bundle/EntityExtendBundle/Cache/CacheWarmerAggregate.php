@@ -40,6 +40,7 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
     /**
      * @see \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate::enableOptionalWarmers
      */
+    #[\Override]
     public function enableOptionalWarmers(): void
     {
         $this->optionalsEnabled = true;
@@ -48,25 +49,24 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
     /**
      * @see \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate::enableOnlyOptionalWarmers
      */
+    #[\Override]
     public function enableOnlyOptionalWarmers(): void
     {
         $this->optionalsEnabled = true;
         $this->onlyOptionalsEnabled = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return false;
     }
 
     /**
-     * {@inheritdoc}
      * @param string $cacheDir
      * @param SymfonyStyle|null $io
      */
+    #[\Override]
     public function warmUp(string $cacheDir, string|SymfonyStyle $buildDir = null, SymfonyStyle $io = null): array
     {
         $cacheWarmerLink = $this->cacheWarmerLink;

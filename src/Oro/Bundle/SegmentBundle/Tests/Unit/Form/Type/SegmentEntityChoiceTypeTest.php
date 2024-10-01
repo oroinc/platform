@@ -14,6 +14,7 @@ class SegmentEntityChoiceTypeTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityProviderMock;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityProviderMock = $this->createMock(EntityProvider::class);

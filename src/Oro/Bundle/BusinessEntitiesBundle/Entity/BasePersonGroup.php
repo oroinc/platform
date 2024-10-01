@@ -64,6 +64,7 @@ class BasePersonGroup
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getName();

@@ -14,6 +14,7 @@ class DoctrineMappingConvertTest extends WebTestCase
     use CommandTestingTrait;
     use TempDirExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->markTestSkipped('Skipped due to BAP-21072');

@@ -13,6 +13,7 @@ class InitializeConfigExtrasTest extends ChangeRelationshipProcessorTestCase
     /** @var InitializeConfigExtras */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -26,11 +26,13 @@ class OwnershipExtension extends AbstractDuplicatorExtension
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
+    #[\Override]
     public function getFilter(): Filter
     {
         return new SetNullFilter();
     }
 
+    #[\Override]
     public function getMatcher(): Matcher
     {
         $ownerProperties = $this->getSourceOwnerShipProperties();
@@ -38,6 +40,7 @@ class OwnershipExtension extends AbstractDuplicatorExtension
         return new PropertiesNameMatcher($ownerProperties);
     }
 
+    #[\Override]
     public function isSupport(DraftableInterface $source): bool
     {
         $className = ClassUtils::getRealClass($source);

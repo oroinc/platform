@@ -28,9 +28,7 @@ class ReloadLoggedInUser implements ProcessorInterface
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

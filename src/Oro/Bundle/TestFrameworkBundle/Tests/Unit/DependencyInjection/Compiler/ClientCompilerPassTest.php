@@ -11,6 +11,7 @@ class ClientCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var ClientCompilerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ClientCompilerPass();

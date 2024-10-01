@@ -26,6 +26,7 @@ class ExtendFieldFormOptionsByFieldTypeProvider implements ExtendFieldFormOption
         $this->extendFieldFormTypeProvider = $extendFieldFormTypeProvider;
     }
 
+    #[\Override]
     public function getOptions(string $className, string $fieldName): array
     {
         $className = ClassUtils::getRealClass($className);

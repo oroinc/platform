@@ -18,6 +18,7 @@ class NumberFilterTest extends WebTestCase
 {
     private NumberFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

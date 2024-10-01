@@ -24,9 +24,7 @@ class EntityFilter extends ChoiceFilter
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'choice';
@@ -42,9 +40,7 @@ class EntityFilter extends ChoiceFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         if (isset($data['value'])) {
@@ -69,9 +65,7 @@ class EntityFilter extends ChoiceFilter
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return EntityFilterType::class;

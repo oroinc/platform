@@ -13,9 +13,7 @@ class MakeLoggerServicesPersistentPass extends RegisterPersistentServicesPass
 {
     use CompilerPassProviderTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processPersistentServices(ContainerBuilder $container, array $persistentServices)
     {
         parent::processPersistentServices($container, $persistentServices);
@@ -29,6 +27,7 @@ class MakeLoggerServicesPersistentPass extends RegisterPersistentServicesPass
      *
      * @return string[]
      */
+    #[\Override]
     protected function getPersistentServices(ContainerBuilder $container)
     {
         $result = [

@@ -42,6 +42,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var MergeMassActionHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

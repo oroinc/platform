@@ -24,9 +24,7 @@ class ImageSrcFormatter implements FormatterInterface
         $this->manager = $manager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($value, array $formatterArguments = [])
     {
         $height = AttachmentManager::DEFAULT_IMAGE_HEIGHT;
@@ -53,9 +51,7 @@ class ImageSrcFormatter implements FormatterInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultValue()
     {
         return '#';

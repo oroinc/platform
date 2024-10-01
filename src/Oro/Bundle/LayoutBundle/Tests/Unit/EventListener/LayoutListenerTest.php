@@ -34,6 +34,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->layoutManager = $this->createMock(LayoutManager::class);

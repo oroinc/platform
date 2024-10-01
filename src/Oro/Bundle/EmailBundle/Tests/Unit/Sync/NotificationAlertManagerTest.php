@@ -28,6 +28,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
     /** @var NotificationAlertManager */
     private $notificationAlertManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

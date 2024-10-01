@@ -23,9 +23,7 @@ class TranslationWriter implements ItemWriterInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items)
     {
         /** @var EntityManager $em */

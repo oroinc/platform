@@ -16,6 +16,7 @@ class UnidirectionalAssociationsTest extends RestJsonApiTestCase
     private const ENTITY_CLASS = 'Extend\Entity\TestApiE2';
     private const TARGET_ENTITY_CLASS = 'Extend\Entity\TestApiE1';
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

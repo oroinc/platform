@@ -12,9 +12,7 @@ class OroTestFrameworkExtension extends Extension implements PrependExtensionInt
 {
     private const INSTALL_DEFAULT_OPTIONS_HOLDER_SERVICE = 'oro_test.provider.install_default_options';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
@@ -32,9 +30,7 @@ class OroTestFrameworkExtension extends Extension implements PrependExtensionInt
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('profiler.enabled')) {

@@ -21,17 +21,13 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
     public const SIMPLE_USER_DISABLED = 'simple_user_disabled';
     public const SIMPLE_USER_DISABLED_PASSWORD = 'simple_user_disabled';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $userManager = $this->container->get('oro_user.manager');

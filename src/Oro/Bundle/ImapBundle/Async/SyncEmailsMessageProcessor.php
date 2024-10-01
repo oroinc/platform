@@ -23,9 +23,7 @@ class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         foreach ($message->getBody()['ids'] as $id) {
@@ -35,9 +33,7 @@ class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubs
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [SyncEmailsTopic::getName()];

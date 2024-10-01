@@ -18,6 +18,7 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
     /** @var EntityChangesetType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -27,9 +28,7 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

@@ -15,9 +15,7 @@ class SetDeletedCountHeader implements ProcessorInterface
     public const RESPONSE_HEADER_NAME = 'X-Include-Deleted-Count';
     public const REQUEST_HEADER_VALUE = 'deletedCount';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var DeleteListContext $context */

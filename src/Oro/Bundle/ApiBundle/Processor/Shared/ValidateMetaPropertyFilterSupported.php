@@ -25,9 +25,7 @@ class ValidateMetaPropertyFilterSupported implements ProcessorInterface
         $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

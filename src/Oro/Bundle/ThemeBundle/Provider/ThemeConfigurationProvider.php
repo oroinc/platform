@@ -27,9 +27,7 @@ class ThemeConfigurationProvider implements ResetInterface
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->configurationCache = [];

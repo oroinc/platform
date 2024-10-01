@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\TreeWalkerAdapter;
 
 class ReduceOrderByWalker extends TreeWalkerAdapter
 {
+    #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
         $queryComponents = $this->_getQueryComponents();

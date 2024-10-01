@@ -7,9 +7,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroBirthdayType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('years', range(date('Y') - 120, date('Y')));
@@ -17,9 +15,7 @@ class OroBirthdayType extends AbstractType
         $resolver->setDefault('maxDate', '0');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return OroDateType::class;

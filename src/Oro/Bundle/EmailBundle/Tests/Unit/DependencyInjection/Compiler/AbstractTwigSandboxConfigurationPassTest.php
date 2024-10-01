@@ -13,6 +13,7 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
     /** @var CompilerPassInterface */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new TwigSandboxConfigurationPassStub();

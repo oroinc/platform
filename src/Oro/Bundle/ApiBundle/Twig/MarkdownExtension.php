@@ -13,9 +13,7 @@ class MarkdownExtension extends BaseMarkdownExtension
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function markdown($text)
     {
         if (!$this->markdownParser) {

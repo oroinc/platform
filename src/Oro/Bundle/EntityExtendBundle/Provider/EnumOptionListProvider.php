@@ -30,17 +30,13 @@ class EnumOptionListProvider implements DictionaryValueListProviderInterface
         $this->enumOptionEntityClassProvider = $enumOptionEntityClassProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(string $className): bool
     {
         return ExtendHelper::isOutdatedEnumOptionEntity($className);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getValueListQueryBuilder(string $className): QueryBuilder
     {
         /** @var EntityManagerInterface $em */
@@ -53,9 +49,7 @@ class EnumOptionListProvider implements DictionaryValueListProviderInterface
             ->setParameter('enumCode', ExtendHelper::getEnumCode($className));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSerializationConfig(string $className): array
     {
         $fields = [];
@@ -86,9 +80,7 @@ class EnumOptionListProvider implements DictionaryValueListProviderInterface
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSupportedEntityClasses(): array
     {
         return $this->enumOptionEntityClassProvider->getClassNames();

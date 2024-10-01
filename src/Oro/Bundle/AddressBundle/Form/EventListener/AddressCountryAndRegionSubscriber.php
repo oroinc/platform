@@ -34,9 +34,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
         $this->factory = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return array(

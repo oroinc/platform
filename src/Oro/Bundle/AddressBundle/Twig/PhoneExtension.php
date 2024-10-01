@@ -31,9 +31,7 @@ class PhoneExtension extends AbstractExtension implements ServiceSubscriberInter
         return $this->container->get('oro_address.provider.phone');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -74,9 +72,7 @@ class PhoneExtension extends AbstractExtension implements ServiceSubscriberInter
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

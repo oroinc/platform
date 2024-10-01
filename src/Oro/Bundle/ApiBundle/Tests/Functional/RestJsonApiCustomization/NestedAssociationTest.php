@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class NestedAssociationTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

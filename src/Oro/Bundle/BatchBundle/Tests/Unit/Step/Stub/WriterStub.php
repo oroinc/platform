@@ -9,17 +9,17 @@ use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 class WriterStub extends AbstractConfigurableStepElement implements ItemWriterInterface, StepExecutionAwareInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items)
     {
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
     }
 
+    #[\Override]
     public function getConfigurationFields(): array
     {
         return [];

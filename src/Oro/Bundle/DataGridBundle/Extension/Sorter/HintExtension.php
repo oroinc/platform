@@ -36,25 +36,19 @@ class HintExtension extends AbstractExtension
         $this->priority = $priority;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return parent::isApplicable($config) && $config->isOrmDatasource();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return $this->priority;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $query = $config->getOrmQuery();

@@ -22,9 +22,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlDriver extends AbstractDriver
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadResourceGeneratorData($file)
     {
         $data = Yaml::parse(file_get_contents($file));
@@ -33,9 +31,7 @@ class YamlDriver extends AbstractDriver
         return new GeneratorData($data, $file);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function dumpSource($source)
     {
         return Yaml::dump($source);

@@ -12,6 +12,7 @@ class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -19,6 +20,7 @@ class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): AccessGrantedValidator
     {
         return new AccessGrantedValidator($this->authorizationChecker);

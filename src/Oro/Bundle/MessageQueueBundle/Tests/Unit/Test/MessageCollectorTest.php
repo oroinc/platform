@@ -13,9 +13,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
     /** @var MessageCollector */
     private $messageCollector;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);

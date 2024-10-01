@@ -13,6 +13,7 @@ class ConsumerHeartbeatTest extends \PHPUnit\Framework\TestCase
     /** @var ConsumerHeartbeat */
     private $consumerHeartbeat;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(StateDriverInterface::class);

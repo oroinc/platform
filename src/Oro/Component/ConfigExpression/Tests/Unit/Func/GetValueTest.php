@@ -13,6 +13,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
     /** @var Func\GetValue */
     protected $function;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->function = new Func\GetValue();

@@ -19,9 +19,7 @@ class LoadDictionaries implements ProcessorInterface
         $this->dictionaryProvider = $dictionaryProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */

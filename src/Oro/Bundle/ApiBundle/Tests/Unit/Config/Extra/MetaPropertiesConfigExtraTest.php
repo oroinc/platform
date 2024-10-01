@@ -12,6 +12,7 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var MetaPropertiesConfigExtra */
     private $extra;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extra = new MetaPropertiesConfigExtra();

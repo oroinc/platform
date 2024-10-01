@@ -32,6 +32,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $activityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $activityListManager = ActivityListManager::class;

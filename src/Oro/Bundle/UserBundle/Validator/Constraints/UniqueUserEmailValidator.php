@@ -20,9 +20,7 @@ class UniqueUserEmailValidator extends ConstraintValidator
         $this->userManager = $userManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof UniqueUserEmail) {

@@ -7,6 +7,7 @@ use Oro\Component\EntitySerializer\Tests\Unit\EntityDataAccessorTest as BaseTest
 
 class EntityDataAccessorTest extends BaseTest
 {
+    #[\Override]
     protected function createEntityDataAccessor(): EntityDataAccessor
     {
         return new EntityDataAccessor();

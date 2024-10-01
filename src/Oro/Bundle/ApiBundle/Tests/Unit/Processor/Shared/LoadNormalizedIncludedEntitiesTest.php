@@ -30,6 +30,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
     /** @var LoadNormalizedIncludedEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

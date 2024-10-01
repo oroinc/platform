@@ -14,6 +14,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 {
     private LayoutContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new LayoutContext();

@@ -19,9 +19,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class DbalTransportFactory implements TransportFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create(ContainerBuilder $container, array $config)
     {
         $container->setParameter('oro_message_queue.dbal.pid_file_dir', $config['pid_file_dir']);
@@ -62,19 +60,17 @@ class DbalTransportFactory implements TransportFactoryInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getKey()
     {
         return 'dbal';
     }
 
     /**
-     * {@inheritdoc}
      *
      * @param ArrayNodeDefinition $builder
      */
+    #[\Override]
     public function addConfiguration(NodeDefinition $builder)
     {
         $pidFileDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'oro-message-queue';

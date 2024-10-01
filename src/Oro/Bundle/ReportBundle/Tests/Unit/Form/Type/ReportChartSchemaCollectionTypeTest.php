@@ -16,6 +16,7 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
     /** @var ReportChartSchemaCollectionType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $chartConfigs = [
@@ -50,9 +51,7 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
         $this->factory->create(ReportChartSchemaCollectionType::class, null, []);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $manager = $this->createMock(QueryDesignerManager::class);

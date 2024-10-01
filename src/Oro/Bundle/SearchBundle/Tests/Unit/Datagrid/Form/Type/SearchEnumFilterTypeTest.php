@@ -10,6 +10,7 @@ class SearchEnumFilterTypeTest extends \PHPUnit\Framework\TestCase
 {
     private SearchEnumFilterType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new SearchEnumFilterType();

@@ -31,9 +31,7 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
             && !$this->getQuery()->getHint(self::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkFromClause($fromClause, string $result)
     {
         $this->saveResolvedTableAliases($fromClause);
@@ -41,9 +39,7 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSelectClause($selectClause, string $result)
     {
         $this->saveResolvedColumnAliases($selectClause);
@@ -57,8 +53,8 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
      * ASC sorting should sort NULL to top, desc in reverse order.
      *
      * @param AST\OrderByItem $orderByItem
-     * {@inheritdoc}
      */
+    #[\Override]
     public function walkOrderByItem($orderByItem, string $result)
     {
         if ($this->isOrderByModificationAllowed()) {

@@ -11,6 +11,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
 {
     private ConfigObjectType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new ConfigObjectType();

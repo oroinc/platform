@@ -11,9 +11,7 @@ class DateTimeRangeFilter extends AbstractDateFilter
 {
     public const DATE_FORMAT = 'yyyy-MM-dd HH:mm';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return DateTimeRangeFilterType::class;

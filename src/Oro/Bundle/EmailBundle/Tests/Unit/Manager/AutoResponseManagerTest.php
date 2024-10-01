@@ -53,6 +53,7 @@ class AutoResponseManagerTest extends TestCase
 
     private ?array $definitions = null;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

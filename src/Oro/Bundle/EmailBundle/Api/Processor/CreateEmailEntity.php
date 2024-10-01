@@ -13,9 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CreateEmailEntity implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext $context */

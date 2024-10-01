@@ -23,6 +23,7 @@ class AssociationAccessExclusionProviderRegistryTest extends \PHPUnit\Framework\
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultProvider = $this->getMockBuilder(AssociationAccessExclusionProviderInterface::class)

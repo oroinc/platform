@@ -17,6 +17,7 @@ class DraftSourceExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DraftSourceExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new DraftSourceExtension();

@@ -19,6 +19,7 @@ class ResetTypeTest extends FormIntegrationTestCase
     /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $optionsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -15,9 +15,7 @@ class TrimApplicationUrl extends AbstractFixture implements ContainerAwareInterf
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var ConfigManager $configManager */

@@ -20,6 +20,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationDomainProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(TranslationKeyRepository::class);

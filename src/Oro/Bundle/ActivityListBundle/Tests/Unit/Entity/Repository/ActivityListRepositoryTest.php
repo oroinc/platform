@@ -17,6 +17,7 @@ class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityListRepository */
     private $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

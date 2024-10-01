@@ -32,10 +32,10 @@ class Client extends BaseKernelBrowser
     protected $isHashNavigation = false;
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function request(
         string $method,
         string $uri,
@@ -223,9 +223,7 @@ class Client extends BaseKernelBrowser
         return $this->requestGrid($gridParameters, $filter, $isRealRequest, 'oro_frontend_datagrid_index');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function filterRequest(InternalRequest $request): Request
     {
         $httpRequest = parent::filterRequest($request);

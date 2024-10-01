@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class ExtendEntityConfiguration implements EntityConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'extend';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

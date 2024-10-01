@@ -31,9 +31,7 @@ class DurationToStringTransformer implements DataTransformerInterface
                                 (?:[\s]*|$))?(?:(?:(\d+(?:[\.,]\d{0,2})?)?)m
                                 (?:[\s]*|$))?(?:(?:(\d+(?:[\.,]\d{0,2})?)?)s)?
                                 $/ix';
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -57,9 +55,7 @@ class DurationToStringTransformer implements DataTransformerInterface
         return $this->dateIntervalToString($interval);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (null === $value || (is_string($value) && '' === trim($value))) {

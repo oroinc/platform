@@ -30,6 +30,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     private $configuration;
     private KernelInterface $kernel;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);

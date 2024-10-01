@@ -9,17 +9,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
  */
 abstract class AbstractChoiceBuilder extends AbstractConfigurationChildBuilder
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTypeClass(): string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getConfiguredOptions($option): array
     {
         $options = [

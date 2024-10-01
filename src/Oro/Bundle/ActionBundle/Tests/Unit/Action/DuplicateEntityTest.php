@@ -21,6 +21,7 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
     /** @var DuplicateEntity */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new DuplicateEntity(new ContextAccessor());

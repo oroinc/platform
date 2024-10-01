@@ -21,6 +21,7 @@ class DialogAction extends AbstractAction
         ]
     ];
 
+    #[\Override]
     public function getOptions()
     {
         $options = parent::getOptions();

@@ -345,6 +345,7 @@ class ActivityList implements
      *
      * @return self
      */
+    #[\Override]
     public function setUpdatedBy(User $updatedBy = null)
     {
         $this->updatedBySet = false;
@@ -360,6 +361,7 @@ class ActivityList implements
     /**
      * @return User
      */
+    #[\Override]
     public function getUpdatedBy()
     {
         return $this->editor;
@@ -368,6 +370,7 @@ class ActivityList implements
     /**
      * @return bool
      */
+    #[\Override]
     public function isUpdatedBySet()
     {
         return $this->updatedBySet;
@@ -408,6 +411,7 @@ class ActivityList implements
     /**
      * @return \DateTimeInterface
      */
+    #[\Override]
     public function getCreatedAt()
     {
         return $this->createdAt;
@@ -417,6 +421,7 @@ class ActivityList implements
      * @param \DateTimeInterface|null $createdAt
      * @return $this
      */
+    #[\Override]
     public function setCreatedAt(\DateTimeInterface $createdAt = null)
     {
         $this->createdAt = $createdAt;
@@ -427,6 +432,7 @@ class ActivityList implements
     /**
      * @return \DateTimeInterface
      */
+    #[\Override]
     public function getUpdatedAt()
     {
         return $this->updatedAt;
@@ -437,6 +443,7 @@ class ActivityList implements
      *
      * @return $this
      */
+    #[\Override]
     public function setUpdatedAt(\DateTimeInterface $updatedAt = null)
     {
         $this->updatedAtSet = false;
@@ -452,6 +459,7 @@ class ActivityList implements
     /**
      * @return bool
      */
+    #[\Override]
     public function isUpdatedAtSet()
     {
         return $this->updatedAtSet;
@@ -460,6 +468,7 @@ class ActivityList implements
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->subject;

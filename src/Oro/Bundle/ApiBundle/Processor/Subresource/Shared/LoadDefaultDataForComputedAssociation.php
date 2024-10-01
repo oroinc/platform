@@ -13,9 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadDefaultDataForComputedAssociation implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

@@ -21,6 +21,7 @@ class LocalizedFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     private LocalizedFallbackValueNormalizer $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $managerRegistry = $this->createMock(ManagerRegistry::class);

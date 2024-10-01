@@ -46,6 +46,7 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ImportHandler */
     private $importHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobExecutor = $this->createMock(JobExecutor::class);

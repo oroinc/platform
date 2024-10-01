@@ -23,6 +23,7 @@ class ValidateStep implements MergeStepInterface
      *
      * @throws ValidationException
      */
+    #[\Override]
     public function run(EntityData $data)
     {
         $constraintViolations = $this->validator->validate($data);

@@ -12,17 +12,13 @@ use Psr\Log\LoggerInterface;
  */
 class AddScopeUniquenessQuery extends AbstractScopeQuery
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getInfo(): string
     {
         return 'Add unique index to oro_scope row_hash';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function doExecute(LoggerInterface $logger, bool $dryRun = false): void
     {
         $this->fillScopeHashesForExistingRows($logger, $dryRun);

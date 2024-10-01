@@ -38,9 +38,7 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
         $this->subresourcesProvider = $subresourcesProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */

@@ -13,6 +13,7 @@ class DecimalFieldConfigConstraintsProviderTest extends \PHPUnit\Framework\TestC
 
     private DecimalFieldConfigConstraintsProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configId = new FieldConfigId('test', \stdClass::class, 'field');

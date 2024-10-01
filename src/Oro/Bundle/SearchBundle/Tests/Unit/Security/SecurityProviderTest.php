@@ -17,6 +17,7 @@ class SecurityProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SecurityProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

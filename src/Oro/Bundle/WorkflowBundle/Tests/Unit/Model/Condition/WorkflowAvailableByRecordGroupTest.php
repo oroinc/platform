@@ -19,6 +19,7 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAvailableByRecordGroup */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(WorkflowManager::class);

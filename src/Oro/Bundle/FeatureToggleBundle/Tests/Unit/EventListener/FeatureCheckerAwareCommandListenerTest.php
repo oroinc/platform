@@ -18,6 +18,7 @@ class FeatureCheckerAwareCommandListenerTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureCheckerAwareCommandListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

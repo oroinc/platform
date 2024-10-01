@@ -8,17 +8,13 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class TextAttributeTypeTest extends AttributeTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         return new TextAttributeType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurationMethodsDataProvider(): array
     {
         return [

@@ -25,6 +25,7 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
     /** @var JsTranslationDumpDemoDataListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jsTranslationDumper = $this->createMock(JsTranslationDumper::class);

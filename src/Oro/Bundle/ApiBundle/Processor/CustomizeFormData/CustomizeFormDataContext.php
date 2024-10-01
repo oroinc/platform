@@ -222,6 +222,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
      *
      * @return object[]
      */
+    #[\Override]
     public function getAllEntities(bool $mainOnly = false): array
     {
         $includedEntities = $this->getIncludedEntities();
@@ -328,6 +329,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     /**
      * This method is just an alias for getData.
      */
+    #[\Override]
     public function getResult(): mixed
     {
         return $this->data;
@@ -336,22 +338,19 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     /**
      * This method is just an alias for setData.
      */
+    #[\Override]
     public function setResult(mixed $data): void
     {
         $this->data = $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasResult(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeResult(): void
     {
         throw new \BadMethodCallException('Not implemented.');

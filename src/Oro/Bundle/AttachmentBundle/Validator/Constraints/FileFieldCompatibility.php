@@ -23,11 +23,13 @@ class FileFieldCompatibility extends Constraint
     public string $incompatibleForExternalFileMessage = 'oro.attachment.incompatible_field.external_file';
     public string $incompatibleForRegularFileMessage = 'oro.attachment.incompatible_field.regular_file';
 
+    #[\Override]
     public function getTargets(): array
     {
         return [self::CLASS_CONSTRAINT];
     }
 
+    #[\Override]
     public function getRequiredOptions(): array
     {
         return ['entityClass', 'fieldName'];

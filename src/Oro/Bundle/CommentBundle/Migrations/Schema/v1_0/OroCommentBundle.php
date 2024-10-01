@@ -15,9 +15,7 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
     use CommentExtensionAwareTrait;
     use AttachmentExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createCommentTable($schema);

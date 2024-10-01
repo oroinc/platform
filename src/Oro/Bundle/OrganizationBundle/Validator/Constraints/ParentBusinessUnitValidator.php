@@ -20,9 +20,7 @@ class ParentBusinessUnitValidator extends ConstraintValidator
         $this->ownerTreeProvider = $ownerTreeProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         /** @var BusinessUnit $value */

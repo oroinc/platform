@@ -12,9 +12,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class OroSanitizeExtension extends Extension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);

@@ -15,6 +15,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
     private ConfigurationPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ConfigurationPass();

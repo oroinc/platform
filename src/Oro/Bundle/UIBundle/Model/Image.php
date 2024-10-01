@@ -43,9 +43,7 @@ class Image implements \JsonSerializable
         return $this->data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return [

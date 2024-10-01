@@ -17,9 +17,7 @@ class MultiRelationGuesser extends RelationGuesser
     const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/multi-relation-editor-view';
     const DEFAULT_API_ACCESSOR_CLASS = 'oroui/js/tools/search-api-accessor';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];

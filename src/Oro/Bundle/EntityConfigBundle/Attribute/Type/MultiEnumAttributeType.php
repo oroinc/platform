@@ -14,17 +14,13 @@ class MultiEnumAttributeType extends EnumAttributeType
 {
     use ArrayOrTraversableGuardTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSortable(FieldConfigModel $attribute)
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         $this->ensureTraversable($originalValue);
@@ -37,9 +33,7 @@ class MultiEnumAttributeType extends EnumAttributeType
         return implode(' ', $values);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         $this->ensureTraversable($originalValue);
@@ -58,9 +52,7 @@ class MultiEnumAttributeType extends EnumAttributeType
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');

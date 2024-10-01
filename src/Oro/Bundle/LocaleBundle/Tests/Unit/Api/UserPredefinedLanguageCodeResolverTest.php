@@ -17,6 +17,7 @@ class UserPredefinedLanguageCodeResolverTest extends \PHPUnit\Framework\TestCase
     /** @var UserPredefinedLanguageCodeResolver */
     private $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);

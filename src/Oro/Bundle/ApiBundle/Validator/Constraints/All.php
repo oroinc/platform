@@ -27,33 +27,25 @@ class All extends Composite
     /** @var Constraint|Constraint[] */
     public $constraints = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultOption(): ?string
     {
         return 'constraints';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRequiredOptions(): array
     {
         return ['constraints'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getCompositeOption(): string
     {
         return 'constraints';

@@ -32,9 +32,7 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityAlias($entityClass)
     {
         // check for enums

@@ -8,9 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroImapBundle implements Migration
 {
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPreQuery("UPDATE oro_email_origin SET imap_ssl='tls' WHERE imap_ssl='tsl';");

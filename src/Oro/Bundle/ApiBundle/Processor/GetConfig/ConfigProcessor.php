@@ -9,9 +9,7 @@ use Oro\Component\ChainProcessor\ActionProcessor;
  */
 class ConfigProcessor extends ActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): ConfigContext
     {
         return new ConfigContext();

@@ -18,12 +18,14 @@ class GroupAttributesValidatorTest extends ConstraintValidatorTestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attributeManager = $this->createMock(AttributeManager::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): GroupAttributesValidator
     {
         return new GroupAttributesValidator($this->attributeManager);

@@ -33,9 +33,7 @@ class DataFixturesExecutor extends ORMExecutor
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager, FixtureInterface $fixture)
     {
         if ($this->logger) {

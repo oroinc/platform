@@ -17,9 +17,7 @@ class TranslationContextResolver implements TranslationContextResolverInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve($id)
     {
         return $this->translator->trans('oro.translation.context.ui_label');

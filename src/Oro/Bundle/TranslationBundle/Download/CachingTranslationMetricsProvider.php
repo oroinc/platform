@@ -36,6 +36,7 @@ class CachingTranslationMetricsProvider implements TranslationMetricsProviderInt
         $this->logger = $logger;
     }
 
+    #[\Override]
     public function getAll(): array
     {
         if (null === $this->metrics) {
@@ -45,6 +46,7 @@ class CachingTranslationMetricsProvider implements TranslationMetricsProviderInt
         return $this->metrics;
     }
 
+    #[\Override]
     public function getForLanguage(string $languageCode): ?array
     {
         $metrics = $this->getAll();

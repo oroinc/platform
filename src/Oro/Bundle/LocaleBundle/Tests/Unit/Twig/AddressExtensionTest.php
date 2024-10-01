@@ -20,6 +20,7 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AddressExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(AddressFormatter::class);

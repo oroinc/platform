@@ -30,6 +30,7 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
     /** @var AddressCountryAndRegionSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->om = $this->createMock(ObjectManager::class);

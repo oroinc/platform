@@ -27,9 +27,7 @@ class EnumFilterType extends AbstractMultiChoiceType
         $this->valueProvider = $valueProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -87,9 +85,7 @@ class EnumFilterType extends AbstractMultiChoiceType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /**
@@ -115,17 +111,13 @@ class EnumFilterType extends AbstractMultiChoiceType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_enum_filter';

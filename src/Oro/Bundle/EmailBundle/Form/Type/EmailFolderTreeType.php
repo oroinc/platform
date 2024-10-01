@@ -13,9 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailFolderTreeType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
@@ -59,9 +57,7 @@ class EmailFolderTreeType extends AbstractType
             )));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -69,17 +65,12 @@ class EmailFolderTreeType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_email_email_folder_tree';

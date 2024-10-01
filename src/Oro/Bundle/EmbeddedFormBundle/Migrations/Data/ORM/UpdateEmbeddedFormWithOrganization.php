@@ -16,17 +16,13 @@ class UpdateEmbeddedFormWithOrganization extends UpdateWithOrganization implemen
     DependentFixtureInterface,
     RenamedFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganizationAndBusinessUnitData::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPreviousClassNames(): array
     {
         return [
@@ -34,9 +30,7 @@ class UpdateEmbeddedFormWithOrganization extends UpdateWithOrganization implemen
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->update($manager, EmbeddedForm::class, 'owner');

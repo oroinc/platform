@@ -29,9 +29,7 @@ class ImageLinkFormatter implements FormatterInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($value, array $formatterArguments = [])
     {
         $height = AttachmentManager::DEFAULT_IMAGE_HEIGHT;
@@ -61,9 +59,7 @@ class ImageLinkFormatter implements FormatterInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultValue()
     {
         return $this->translator->trans('oro.attachment.formatter.image_link.default');

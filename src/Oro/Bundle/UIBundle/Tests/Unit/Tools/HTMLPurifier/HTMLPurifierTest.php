@@ -14,6 +14,7 @@ class HTMLPurifierTest extends \PHPUnit\Framework\TestCase
     /** @var HTMLPurifier */
     private $purifier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $config = \HTMLPurifier_Config::create(\HTMLPurifier_HTML5Config::createDefault());

@@ -15,9 +15,7 @@ class ScreenshotInitializer implements ContextInitializer
     {
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function initializeContext(Context $context)
     {
         if (\method_exists($context, 'setScreenshotGenerator')) {

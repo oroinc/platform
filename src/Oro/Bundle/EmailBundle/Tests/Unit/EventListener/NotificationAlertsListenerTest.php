@@ -54,6 +54,7 @@ class NotificationAlertsListenerTest extends \PHPUnit\Framework\TestCase
     /** @var NotificationAlertsListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);

@@ -22,6 +22,7 @@ class StartAsyncOperationTest extends UpdateListProcessorTestCase
     /** @var SyncProcessingLimitProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $syncProcessingLimitProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

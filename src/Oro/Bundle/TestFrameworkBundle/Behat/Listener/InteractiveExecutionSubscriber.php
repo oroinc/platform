@@ -18,9 +18,7 @@ class InteractiveExecutionSubscriber implements EventSubscriberInterface
         $this->output = $output;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -41,6 +41,7 @@ class UserWithoutCurrentHandlerTest extends TestCase
     /** @var UserWithoutCurrentHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

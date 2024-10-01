@@ -46,6 +46,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(ConfigManager::class);
@@ -55,6 +56,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): DigitalAssetSourceFileMimeTypeValidator
     {
         $validator = new DigitalAssetSourceFileMimeTypeValidator(

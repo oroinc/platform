@@ -25,9 +25,9 @@ class FormConfigGuesser extends AbstractFormGuesser
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function guessType($class, $property): ?TypeGuess
     {
         $metadata = $this->getMetadataForClass($class);

@@ -116,9 +116,7 @@ class StandaloneFilter implements FilterInterface
         $this->operators = $operators;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {
     }

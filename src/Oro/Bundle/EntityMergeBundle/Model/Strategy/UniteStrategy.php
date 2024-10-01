@@ -28,9 +28,7 @@ class UniteStrategy implements StrategyInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function merge(FieldData $fieldData)
     {
         $entityData    = $fieldData->getEntityData();
@@ -58,9 +56,7 @@ class UniteStrategy implements StrategyInterface
         $this->accessor->setValue($masterEntity, $fieldMetadata, $collection);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(FieldData $fieldData)
     {
         if ($fieldData->getMode() == MergeModes::UNITE) {
@@ -70,9 +66,7 @@ class UniteStrategy implements StrategyInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'unite';

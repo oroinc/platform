@@ -19,17 +19,13 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
     protected const CONFIG_SCOPE = 'user';
     protected const TREE_NAME = 'user_configuration';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getParentCheckboxLabel(): string
     {
         return 'oro.user.user_configuration.use_default';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getProvider(
         ConfigBag $configBag,
         TranslatorInterface $translator,
@@ -52,9 +48,7 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFilePath(string $fileName): string
     {
         return __DIR__ . '/data/' . $fileName;

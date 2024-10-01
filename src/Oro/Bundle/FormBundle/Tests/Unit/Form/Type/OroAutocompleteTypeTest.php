@@ -17,6 +17,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     /** @var OroAutocompleteType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $searchRegistry = $this->createMock(SearchRegistry::class);
@@ -28,9 +29,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

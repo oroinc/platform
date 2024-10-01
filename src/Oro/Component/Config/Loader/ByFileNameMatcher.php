@@ -18,9 +18,7 @@ class ByFileNameMatcher implements FileMatcherInterface
         $this->fileNamePatterns = $fileNamePatterns;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isMatched(\SplFileInfo $file): bool
     {
         if (!$this->fileNamePatterns) {

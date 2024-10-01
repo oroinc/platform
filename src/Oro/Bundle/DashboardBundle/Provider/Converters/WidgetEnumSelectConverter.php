@@ -14,9 +14,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
  */
 class WidgetEnumSelectConverter extends WidgetEntitySelectConverter
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         AclHelper $aclHelper,
         EntityNameResolver $entityNameResolver,

@@ -36,9 +36,7 @@ class ConsoleErrorSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [ConsoleEvents::COMMAND => ['configure', 2048]];

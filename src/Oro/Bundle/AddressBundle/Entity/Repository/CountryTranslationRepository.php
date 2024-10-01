@@ -10,19 +10,19 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\AbstractTranslationRepository
  */
 class CountryTranslationRepository extends AbstractTranslationRepository
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateTranslations(array $data, string $locale): void
     {
         $this->doUpdateTranslations(Country::class, 'name', $data, $locale);
     }
 
+    #[\Override]
     public function getAllIdentities(): array
     {
         return $this->doGetAllIdentities(Country::class, 'iso2Code');
     }
 
+    #[\Override]
     public function updateDefaultTranslations(array $data): void
     {
         $this->doUpdateDefaultTranslations(

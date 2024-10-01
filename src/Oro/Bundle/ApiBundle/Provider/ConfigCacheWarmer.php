@@ -56,9 +56,7 @@ class ConfigCacheWarmer implements WarmableConfigCacheInterface
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->warmUp();

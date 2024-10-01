@@ -50,6 +50,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TestActivityProvider */
     private $testActivityProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -11,6 +11,7 @@ class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
     /** @var OwnershipDecisionMakerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new OwnershipDecisionMakerPass();

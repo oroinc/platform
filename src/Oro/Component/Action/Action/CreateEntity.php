@@ -24,9 +24,7 @@ class CreateEntity extends CreateObject
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createObject($context)
     {
         $entityClassName = $this->getObjectClassName($context);

@@ -61,7 +61,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         $this->setLogger(new NullLogger());
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;

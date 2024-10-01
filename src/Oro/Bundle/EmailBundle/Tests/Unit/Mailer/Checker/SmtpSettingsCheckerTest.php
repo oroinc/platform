@@ -17,6 +17,7 @@ class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
 
     private SmtpSettingsChecker $smtpSettingsChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dsnFromSmtpSettingsFactory = $this->createMock(DsnFromSmtpSettingsFactory::class);

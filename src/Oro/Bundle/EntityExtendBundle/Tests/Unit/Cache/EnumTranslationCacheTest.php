@@ -31,6 +31,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleSettings */
     private $localeSettings;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheInterface::class);

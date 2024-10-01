@@ -63,17 +63,13 @@ class FilteredAttachmentMigrationService implements FilteredAttachmentMigrationS
         $this->directory = $directory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setManager(EntityManagerInterface $manager)
     {
         $this->manager = $manager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function migrate(string $fromPrefix, string $toPrefix)
     {
         $fs = $this->filesystemMap->get($this->fsName);
@@ -114,9 +110,7 @@ class FilteredAttachmentMigrationService implements FilteredAttachmentMigrationS
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clear(string $prefix, array $subfolders)
     {
         $fs = $this->filesystemMap->get($this->fsName);

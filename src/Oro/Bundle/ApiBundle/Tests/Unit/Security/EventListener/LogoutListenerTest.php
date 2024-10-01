@@ -21,6 +21,7 @@ class LogoutListenerTest extends \PHPUnit\Framework\TestCase
     /** @var LogoutListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->httpUtils = $this->createMock(HttpUtils::class);

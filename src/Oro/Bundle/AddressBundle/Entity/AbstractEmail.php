@@ -84,6 +84,7 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
      * @param bool $primary
      * @return AbstractEmail
      */
+    #[\Override]
     public function setPrimary($primary)
     {
         $this->primary = (bool)$primary;
@@ -94,6 +95,7 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
     /**
      * @return bool
      */
+    #[\Override]
     public function isPrimary()
     {
         return $this->primary;
@@ -102,6 +104,7 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getEmail();
@@ -112,6 +115,7 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
      *
      * @return bool
      */
+    #[\Override]
     public function isEmpty()
     {
         return empty($this->email);

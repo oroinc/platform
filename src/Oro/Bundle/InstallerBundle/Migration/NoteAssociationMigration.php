@@ -10,9 +10,7 @@ class NoteAssociationMigration extends UpdateNoteAssociationKindForRenamedEntiti
     /** @var array [entity class => old entity class, ...] */
     private $renamedEntitiesNames = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRenamedEntitiesNames(Schema $schema)
     {
         return $this->renamedEntitiesNames;

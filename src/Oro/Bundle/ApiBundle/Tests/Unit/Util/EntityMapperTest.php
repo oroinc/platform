@@ -19,6 +19,7 @@ class EntityMapperTest extends OrmRelatedTestCase
     /** @var EntityMapper */
     private $entityMapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

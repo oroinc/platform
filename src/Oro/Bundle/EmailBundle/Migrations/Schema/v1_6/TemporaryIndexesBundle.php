@@ -8,9 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class TemporaryIndexesBundle implements Migration
 {
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         if ($schema->hasTable('oro_activity_list')) {

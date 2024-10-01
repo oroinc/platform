@@ -19,17 +19,13 @@ class DefaultPreferredLocalizationProvider implements PreferredLocalizationProvi
         $this->localizationManager = $localizationManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($entity): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPreferredLocalization($entity): ?Localization
     {
         return $this->localizationManager->getDefaultLocalization();

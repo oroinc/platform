@@ -10,9 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class RemoveUserStatus implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         if ($schema->hasTable('oro_user_status')) {

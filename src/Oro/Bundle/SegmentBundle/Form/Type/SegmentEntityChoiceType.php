@@ -6,17 +6,13 @@ use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 
 class SegmentEntityChoiceType extends EntityChoiceType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_segment_entity_choice';

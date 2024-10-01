@@ -12,6 +12,7 @@ class OroIconTypeTest extends FormIntegrationTestCase
     /** @var OroIconType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new OroIconType($this->createMock(KernelInterface::class));

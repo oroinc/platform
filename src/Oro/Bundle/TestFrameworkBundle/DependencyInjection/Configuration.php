@@ -7,6 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    #[\Override]
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder('oro_test_framework');

@@ -26,6 +26,7 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigListener */
     private $configListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

@@ -19,6 +19,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FileLockManager */
     private $fileLockManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->itemKeyBuilder = new ItemKeyBuilder();

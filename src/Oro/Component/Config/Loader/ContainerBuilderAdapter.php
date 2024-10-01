@@ -19,17 +19,13 @@ class ContainerBuilderAdapter implements ResourcesContainerInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResources(): array
     {
         return $this->container->getResources();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addResource(ResourceInterface $resource): void
     {
         $this->container->addResource($resource);

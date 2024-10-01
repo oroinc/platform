@@ -12,6 +12,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowImportProcessorSupervisor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new WorkflowImportProcessorSupervisor();

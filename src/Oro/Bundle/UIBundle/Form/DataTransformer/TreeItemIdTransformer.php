@@ -21,9 +21,7 @@ class TreeItemIdTransformer implements DataTransformerInterface
         $this->treeItems = $treeItems;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if ($value !== null && !$value instanceof TreeItem) {
@@ -33,9 +31,7 @@ class TreeItemIdTransformer implements DataTransformerInterface
         return $value ? $value->getKey() : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if ($value !== null && !isset($this->treeItems[$value])) {

@@ -18,6 +18,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
 {
     use UserUtilityTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -33,12 +33,7 @@ use Laminas\Mail\Header\Subject as BaseSubject;
  */
 class Subject extends BaseSubject
 {
-    /**
-     * {@inheritdoc}
-     *
-     * This method is a copy of {@see \Laminas\Mail\Header\Subject::fromString}.
-     * It is needed to override static call of `GenericHeader::splitHeaderLine`.
-     */
+    #[\Override]
     public static function fromString($headerLine)
     {
         [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
@@ -55,9 +50,7 @@ class Subject extends BaseSubject
         return $header;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSubject($subject)
     {
         $subject = (string) $subject;

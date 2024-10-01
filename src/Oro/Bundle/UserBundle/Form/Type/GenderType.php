@@ -29,9 +29,7 @@ class GenderType extends AbstractType
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
@@ -40,11 +38,13 @@ class GenderType extends AbstractType
     /**
      * @return string
      */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

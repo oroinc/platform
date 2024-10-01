@@ -4,9 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider
 
 class PRAvgTimeProvider extends AbstractAvgTimeProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function calculate()
     {
         if (!$this->criteria->containsKey('branch_name') || !$this->criteria->containsKey('target_branch')) {

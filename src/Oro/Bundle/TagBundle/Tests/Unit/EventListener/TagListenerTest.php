@@ -20,6 +20,7 @@ class TagListenerTest extends \PHPUnit\Framework\TestCase
     /** @var TagListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->taggableHelper = $this->createMock(TaggableHelper::class);

@@ -29,9 +29,7 @@ class AddEnumOptionAssociations implements ProcessorInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

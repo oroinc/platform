@@ -15,9 +15,7 @@ class UpdateIntegrationChannelSettingFieldsTypes implements Migration, DatabaseP
 {
     use DatabasePlatformAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPreQuery(new UpdateIntegrationChannelSettingFieldsValue());

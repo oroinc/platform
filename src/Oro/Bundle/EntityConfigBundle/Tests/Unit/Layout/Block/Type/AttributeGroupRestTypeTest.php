@@ -18,9 +18,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
     /** @var AttributeRenderRegistry */
     private $attributeRenderRegistry;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);

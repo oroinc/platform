@@ -10,6 +10,7 @@ class FieldsTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var FieldsTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new FieldsTransformer();

@@ -4,30 +4,22 @@ namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor;
 
 abstract class AbstractEntityApiHandler implements EntityApiHandlerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preProcess($entity)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function beforeProcess($entity)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function afterProcess($entity)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function invalidateProcess($entity)
     {
     }

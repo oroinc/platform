@@ -15,6 +15,7 @@ class MaterializedViewSchemaManagerTest extends \PHPUnit\Framework\TestCase
     /** @var MaterializedViewSchemaManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

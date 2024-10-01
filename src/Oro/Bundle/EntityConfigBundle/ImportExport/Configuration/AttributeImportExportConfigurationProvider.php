@@ -16,9 +16,7 @@ class AttributeImportExportConfigurationProvider implements ImportExportConfigur
     const ATTRIBUTE_IMPORT_FROM_CSV_JOB_NAME = 'attribute_import_from_csv';
     const ATTRIBUTE_IMPORT_VALIDATION_FROM_CSV_JOB_NAME = 'attribute_import_validation_from_csv';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get(): ImportExportConfigurationInterface
     {
         return new ImportExportConfiguration([

@@ -14,9 +14,7 @@ class DataSourcesPass implements CompilerPassInterface
 {
     use PriorityTaggedLocatorTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $container->getDefinition('oro_datagrid.datagrid.builder')

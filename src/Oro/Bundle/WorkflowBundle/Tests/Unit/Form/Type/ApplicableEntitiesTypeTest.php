@@ -16,6 +16,7 @@ class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
     /** @var ApplicableEntitiesType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConnector = $this->createMock(WorkflowEntityConnector::class);

@@ -19,17 +19,13 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
 {
     use DatabasePlatformAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v1_37';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/

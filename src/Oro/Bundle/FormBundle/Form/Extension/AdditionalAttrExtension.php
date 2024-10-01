@@ -12,17 +12,13 @@ class AdditionalAttrExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array('random_id' => true));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!empty($options['random_id']) && isset($view->vars['id'])) {

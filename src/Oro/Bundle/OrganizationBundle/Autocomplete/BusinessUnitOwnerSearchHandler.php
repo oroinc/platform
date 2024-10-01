@@ -19,9 +19,7 @@ class BusinessUnitOwnerSearchHandler extends SearchHandler
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         $result = parent::convertItem($item);

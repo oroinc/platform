@@ -48,9 +48,7 @@ class FormTypeTest extends BlockTypeTestCase
         $this->assertNotNull($builder->getBlockView()->children['form_id_end']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);

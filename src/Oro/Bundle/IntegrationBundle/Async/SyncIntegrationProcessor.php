@@ -61,17 +61,13 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [SyncIntegrationTopic::getName()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();

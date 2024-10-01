@@ -31,6 +31,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureAccessListener|\PHPUnit\Framework\MockObject\MockObject */
     private $featureAccessListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

@@ -30,9 +30,7 @@ class NestedTreeFilter extends StandaloneFilter implements FieldFilterInterface
         $this->field = $field;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         $expr = $this->createExpression($value);

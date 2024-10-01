@@ -8,9 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class RemoveDictionaryGroupForUser implements Migration
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $queries->addQuery(new RemoveDictionaryGroupForUserQuery());

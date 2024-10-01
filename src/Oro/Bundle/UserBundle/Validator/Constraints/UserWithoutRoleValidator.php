@@ -13,9 +13,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class UserWithoutRoleValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof UserWithoutRole) {

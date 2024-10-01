@@ -30,9 +30,7 @@ class OAuthSubscriber implements EventSubscriberInterface
         $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -10,23 +10,20 @@ use Symfony\Component\Validator\Constraints\PositiveOrZero;
  */
 class NumberBuilder extends AbstractConfigurationChildBuilder
 {
-    #[\Override] public static function getType(): string
+    #[\Override]
+    public static function getType(): string
     {
         return 'number';
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    #[\Override] protected function getTypeClass(): string
+    #[\Override]
+    protected function getTypeClass(): string
     {
         return NumberType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    #[\Override] protected function getDefaultOptions(): array
+    #[\Override]
+    protected function getDefaultOptions(): array
     {
         return [
             'required' => false,

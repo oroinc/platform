@@ -19,9 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
  */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('oro_api');

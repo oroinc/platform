@@ -12,9 +12,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function guessFilter($class, $property, $type)
     {
         switch ($type) {

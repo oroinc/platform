@@ -28,6 +28,7 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
     /** @var LocalizationAwareEmailTemplateDataMapper */
     private $dataMapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationsForm = $this->createMock(FormInterface::class);

@@ -62,17 +62,13 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     private bool $caseInsensitive = false;
     private mixed $valueTransformer = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setField(string $field): void
     {
         $this->field = $field;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getField(): ?string
     {
         return $this->field;
@@ -86,17 +82,13 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         return $this->collection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setCollection(bool $collection): void
     {
         $this->collection = $collection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isArrayAllowed(string $operator = null): bool
     {
         return
@@ -111,9 +103,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
             );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isRangeAllowed(string $operator = null): bool
     {
         return
@@ -140,9 +130,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         $this->valueTransformer = $valueTransformer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         $expr = $this->createExpression($value);

@@ -13,6 +13,7 @@ class WidgetsDashboardTypeConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

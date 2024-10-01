@@ -15,6 +15,7 @@ class WorkflowDefinitionRepositoryCacheInvalidationListenerTest extends \PHPUnit
     /** @var WorkflowDefinitionRepositoryCacheInvalidationListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

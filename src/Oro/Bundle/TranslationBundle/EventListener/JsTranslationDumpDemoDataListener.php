@@ -34,9 +34,6 @@ class JsTranslationDumpDemoDataListener
         $this->applicationState = $applicationState;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function onPostLoad(MigrationDataFixturesEvent $event): void
     {
         if ($this->applicationState->isInstalled() && $event->isDemoFixtures()) {

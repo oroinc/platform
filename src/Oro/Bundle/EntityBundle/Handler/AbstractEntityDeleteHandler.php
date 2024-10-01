@@ -39,9 +39,7 @@ abstract class AbstractEntityDeleteHandler implements EntityDeleteHandlerInterfa
         $this->accessDeniedExceptionFactory = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isDeleteGranted($entity): bool
     {
         try {
@@ -53,9 +51,7 @@ abstract class AbstractEntityDeleteHandler implements EntityDeleteHandlerInterfa
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function delete($entity, bool $flush = true, array $options = []): ?array
     {
         $this->assertDeleteGranted($entity);
@@ -72,9 +68,7 @@ abstract class AbstractEntityDeleteHandler implements EntityDeleteHandlerInterfa
         return $flushOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flush(array $options): void
     {
         $entity = $options[self::ENTITY];
@@ -82,9 +76,7 @@ abstract class AbstractEntityDeleteHandler implements EntityDeleteHandlerInterfa
         $this->postFlush($entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flushAll(array $listOfOptions): void
     {
         $flushedEntityManagers = [];

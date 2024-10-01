@@ -24,9 +24,7 @@ class ResourceFileImportProcessorFactory implements ImportProcessorFactoryInterf
         $this->fileLocator = $fileLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable($import): bool
     {
         return (bool)$this->getPath($import);
@@ -52,9 +50,7 @@ class ResourceFileImportProcessorFactory implements ImportProcessorFactoryInterf
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create($import): ConfigImportProcessorInterface
     {
         if (!$this->isApplicable($import)) {

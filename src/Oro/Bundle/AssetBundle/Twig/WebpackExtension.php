@@ -25,9 +25,7 @@ class WebpackExtension extends AbstractExtension implements ServiceSubscriberInt
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -35,9 +33,7 @@ class WebpackExtension extends AbstractExtension implements ServiceSubscriberInt
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -55,9 +51,7 @@ class WebpackExtension extends AbstractExtension implements ServiceSubscriberInt
         return $this->getWebpackServer()->getServerUrl($url);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

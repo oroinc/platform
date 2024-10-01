@@ -10,9 +10,7 @@ class DeleteMassAction extends AjaxMassAction
     /** @var array */
     protected $requiredOptions = ['handler', 'entity_name', 'data_identifier'];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['handler'])) {
@@ -26,9 +24,7 @@ class DeleteMassAction extends AjaxMassAction
         return parent::setOptions($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAllowedRequestTypes()
     {
         return [Request::METHOD_POST, Request::METHOD_DELETE];

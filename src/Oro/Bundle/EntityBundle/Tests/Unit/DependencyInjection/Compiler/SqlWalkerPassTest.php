@@ -14,6 +14,7 @@ class SqlWalkerPassTest extends \PHPUnit\Framework\TestCase
 {
     private SqlWalkerPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new SqlWalkerPass();

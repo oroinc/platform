@@ -10,9 +10,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  */
 class NavigationItemRepository extends EntityRepository implements NavigationRepositoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNavigationItems($user, Organization $organization, $type = null, $options = array())
     {
         $qb = $this->_em->createQueryBuilder();

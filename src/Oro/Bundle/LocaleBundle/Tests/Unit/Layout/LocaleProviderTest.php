@@ -15,6 +15,7 @@ class LocaleProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);

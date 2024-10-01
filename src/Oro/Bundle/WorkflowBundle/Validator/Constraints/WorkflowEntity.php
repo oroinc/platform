@@ -12,17 +12,13 @@ class WorkflowEntity extends Constraint
 
     public $updateFieldMessage = 'oro.workflow.validator.field.message.update';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return 'oro_workflow.validator.workflow_entity';

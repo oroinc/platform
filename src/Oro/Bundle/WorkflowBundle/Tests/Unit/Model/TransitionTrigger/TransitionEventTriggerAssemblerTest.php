@@ -16,6 +16,7 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionEventTriggerAssembler */
     private $assembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->verifier = $this->createMock(TransitionEventTriggerVerifierInterface::class);

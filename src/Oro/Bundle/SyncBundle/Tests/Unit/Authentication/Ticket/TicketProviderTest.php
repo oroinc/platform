@@ -19,6 +19,7 @@ class TicketProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TicketProvider */
     private $ticketProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->ticketDigestGenerator = $this->createMock(TicketDigestGeneratorInterface::class);

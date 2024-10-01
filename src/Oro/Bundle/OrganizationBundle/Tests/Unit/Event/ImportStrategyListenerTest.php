@@ -30,6 +30,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ImportStrategyListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

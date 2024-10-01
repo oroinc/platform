@@ -14,6 +14,7 @@ class WidgetDefinitionProviderTest extends \PHPUnit\Framework\TestCase
 
     private WidgetDefinitionProvider $widgetDefinitionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $cacheFile = $this->getTempFile('WidgetDefinitionProvider');

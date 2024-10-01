@@ -9,16 +9,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateListProcessChunkTopic extends AbstractUpdateListTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.api.update_list.process_chunk';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Processes a chunk of data of API batch update request.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

@@ -14,6 +14,7 @@ class SecurityTokenProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SecurityTokenProvider */
     private $tokenProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

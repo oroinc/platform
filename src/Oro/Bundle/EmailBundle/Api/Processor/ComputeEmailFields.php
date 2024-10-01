@@ -24,9 +24,7 @@ class ComputeEmailFields implements ProcessorInterface
         $this->emailAddressHelper = $emailAddressHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

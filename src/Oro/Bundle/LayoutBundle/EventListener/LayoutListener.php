@@ -31,9 +31,7 @@ class LayoutListener implements ServiceSubscriberInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

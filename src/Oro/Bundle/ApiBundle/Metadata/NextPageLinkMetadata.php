@@ -24,9 +24,7 @@ class NextPageLinkMetadata extends LinkMetadataDecorator
         $this->queryStringAccessor = $queryStringAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {
         if (!$this->hasMoreRecords($dataAccessor)) {

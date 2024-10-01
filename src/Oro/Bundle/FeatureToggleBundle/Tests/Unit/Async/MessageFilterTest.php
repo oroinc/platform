@@ -14,6 +14,7 @@ class MessageFilterTest extends \PHPUnit\Framework\TestCase
     /** @var MessageFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

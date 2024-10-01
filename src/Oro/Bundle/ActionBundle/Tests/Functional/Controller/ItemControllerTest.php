@@ -10,6 +10,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ItemControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

@@ -15,6 +15,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityApiHandlerProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new EntityApiHandlerProcessor();

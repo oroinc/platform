@@ -9,9 +9,7 @@ namespace Oro\Bundle\IntegrationBundle\Model\Action;
  */
 class RemoveFieldsChangesAction extends AbstractFieldsChangesAction
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $entity = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_ENTITY]);

@@ -19,9 +19,7 @@ class ResetPasswordMassAction extends AbstractMassAction
         'route_parameters' => [],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['handler'])) {
@@ -43,17 +41,13 @@ class ResetPasswordMassAction extends AbstractMassAction
         return parent::setOptions($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAllowedRequestTypes()
     {
         return [Request::METHOD_POST];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequestType()
     {
         return Request::METHOD_POST;

@@ -38,6 +38,7 @@ class LoadMigrationsCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -107,6 +108,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $force = $input->getOption('force');

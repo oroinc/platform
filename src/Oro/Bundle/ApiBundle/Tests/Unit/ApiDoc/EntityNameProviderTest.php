@@ -14,6 +14,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityNameProvider */
     private $entityNameProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

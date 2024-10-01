@@ -28,9 +28,7 @@ class Configurable extends AbstractCondition implements ContextAccessorAwareInte
      */
     protected $assembler;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'configurable';
@@ -41,9 +39,7 @@ class Configurable extends AbstractCondition implements ContextAccessorAwareInte
         $this->assembler = $assembler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $this->configuration = $options;
@@ -51,9 +47,7 @@ class Configurable extends AbstractCondition implements ContextAccessorAwareInte
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isConditionAllowed($context)
     {
         return $this->getCondition()->evaluate($context, $this->errors) ? true : false;

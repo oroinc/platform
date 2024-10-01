@@ -10,6 +10,7 @@ class UuidFilterTest extends \PHPUnit\Framework\TestCase
     /** @var UuidFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filter = new UuidFilter();

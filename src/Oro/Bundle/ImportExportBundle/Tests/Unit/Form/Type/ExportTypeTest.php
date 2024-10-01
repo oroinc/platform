@@ -17,6 +17,7 @@ class ExportTypeTest extends FormIntegrationTestCase
     /** @var ExportType */
     private $exportType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistry::class);
@@ -24,9 +25,7 @@ class ExportTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

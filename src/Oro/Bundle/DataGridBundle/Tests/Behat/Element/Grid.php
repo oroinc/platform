@@ -20,9 +20,7 @@ class Grid extends Table implements GridInterface
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in grid";
     const ERROR_NO_ROW_CONTENT = 'Grid has no record with "%s" content';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRows()
     {
         /** @var Table $table */
@@ -32,9 +30,7 @@ class Grid extends Table implements GridInterface
         return $table->getRowElements($elementName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRowByContent($content, $failIfNotFound = true)
     {
         /** @var Table $table */
@@ -50,6 +46,7 @@ class Grid extends Table implements GridInterface
     /**
      * @return TableHeader
      */
+    #[\Override]
     public function getHeader()
     {
         /** @var Table $table */
@@ -58,9 +55,7 @@ class Grid extends Table implements GridInterface
         return $table->getHeaderElement(static::TABLE_HEADER_ELEMENT);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMappedChildElementName($name)
     {
         if (!isset($this->options['mapping'][$name])) {
@@ -70,18 +65,14 @@ class Grid extends Table implements GridInterface
         return $this->options['mapping'][$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMassActionLink($title)
     {
         return $this->elementFactory->createElement($this->getMappedChildElementName('GridMassActionMenu'))
             ->findLink($title);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasMassActionLink($title): bool
     {
         try {
@@ -98,9 +89,7 @@ class Grid extends Table implements GridInterface
         return $hasLink;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clickMassActionLink($title)
     {
         $massActionsButton = $this->getMassActionButton();
@@ -113,9 +102,7 @@ class Grid extends Table implements GridInterface
         $massActionLink->click();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clickSelectAllMassActionLink($title)
     {
         $massActionsButton = $this->getMassActionButton();
@@ -128,6 +115,7 @@ class Grid extends Table implements GridInterface
         $massActionLink->click();
     }
 
+    #[\Override]
     public function clickViewList()
     {
         $list = $this->getViewList();
@@ -136,9 +124,7 @@ class Grid extends Table implements GridInterface
         $list->press();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function checkFirstRecords($number, $cellNumber = 0)
     {
         $rows = $this->getRows();
@@ -154,9 +140,7 @@ class Grid extends Table implements GridInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function uncheckFirstRecords($number, $cellNumber = 0)
     {
         $rows = $this->getRows();
@@ -181,9 +165,7 @@ class Grid extends Table implements GridInterface
         return !$this->getRowByContent($content)->isMassActionChecked();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function checkRecord($content)
     {
         $this->getRowByContent($content)->checkMassActionCheckbox();
@@ -194,17 +176,13 @@ class Grid extends Table implements GridInterface
         $this->getRowByContent($content)->hasMassActionCheckbox();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function uncheckRecord($content)
     {
         $this->getRowByContent($content)->uncheckMassActionCheckbox();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMassActionButton()
     {
         $massActionsButton = $this->elementFactory->createElement(
@@ -222,9 +200,7 @@ class Grid extends Table implements GridInterface
         return $massActionsButton;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function massCheck($title)
     {
         $massActionHeadCheckboxElementName = $this->getMappedChildElementName('MassActionHeadCheckbox');
@@ -233,9 +209,7 @@ class Grid extends Table implements GridInterface
         $this->elementFactory->createElement('GridMassCheckMenu')->clickLink($title);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function selectPageSize($number)
     {
         $pageSizeElement = $this->elementFactory->createElement('PageSize');
@@ -243,9 +217,7 @@ class Grid extends Table implements GridInterface
         $pageSizeElement->clickLink($number);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clickActionLink($content, $action, $failIfNotFound = true)
     {
         /** @var GridRow $row */
@@ -258,9 +230,7 @@ class Grid extends Table implements GridInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getViewList()
     {
         return $this->getElement($this->getMappedChildElementName('GridViewList'));

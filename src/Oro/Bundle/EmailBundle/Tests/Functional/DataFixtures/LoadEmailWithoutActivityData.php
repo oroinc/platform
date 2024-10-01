@@ -17,17 +17,13 @@ class LoadEmailWithoutActivityData extends AbstractFixture implements
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserData::class, LoadUser::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->loadEmails($manager, $this->loadEmailTemplates());

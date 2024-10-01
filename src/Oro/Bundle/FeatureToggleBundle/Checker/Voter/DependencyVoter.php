@@ -26,9 +26,7 @@ class DependencyVoter implements VoterInterface
         $this->featureConfigManager = $featureConfigManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function vote($feature, $scopeIdentifier = null)
     {
         $dependOnFeatures = $this->featureConfigManager->getFeatureDependencies($feature);

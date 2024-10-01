@@ -47,9 +47,7 @@ class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterf
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockType(FieldConfigModel $attribute)
     {
         $type = $attribute->getType();

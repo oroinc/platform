@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SendImportNotificationTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.importexport.send_import_notification';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Sends different types of notifications related to import process';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

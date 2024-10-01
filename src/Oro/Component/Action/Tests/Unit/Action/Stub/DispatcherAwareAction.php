@@ -7,9 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DispatcherAwareAction implements EventDispatcherAwareActionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDispatcher(EventDispatcherInterface $eventDispatcher)
     {
     }

@@ -28,6 +28,7 @@ class AdaptivelyValidCollectionValidator extends ConstraintValidator
         $this->entityStateChecker = $entityStateChecker;
     }
 
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof AdaptivelyValidCollection) {

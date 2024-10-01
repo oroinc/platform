@@ -13,6 +13,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
     /** @var Func\Trim */
     private $function;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->function = new Func\Trim();

@@ -23,9 +23,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery implements Contain
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $sql = 'SELECT f.id, f.data, f.type
@@ -109,9 +107,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery implements Contain
         $this->logQuery($logger, $sql, $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription(): string
     {
         return 'Remove '. $this->enumField .' enum field data';

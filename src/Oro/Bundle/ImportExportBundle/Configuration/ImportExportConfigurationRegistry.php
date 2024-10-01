@@ -9,17 +9,12 @@ class ImportExportConfigurationRegistry implements ImportExportConfigurationRegi
      */
     private $configurations = [];
 
-    /**
-     * {@inheritDoc}
-     */
     public function addConfiguration(ImportExportConfigurationProviderInterface $provider, string $alias)
     {
         $this->configurations[$alias][] = $provider->get();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigurations(string $alias): array
     {
         if (!array_key_exists($alias, $this->configurations)) {

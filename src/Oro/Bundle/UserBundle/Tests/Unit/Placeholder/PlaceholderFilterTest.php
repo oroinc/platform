@@ -14,6 +14,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     /** @var PlaceholderFilter */
     private $placeholderFilter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

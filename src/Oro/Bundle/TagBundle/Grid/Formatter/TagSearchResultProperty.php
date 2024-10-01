@@ -32,9 +32,7 @@ class TagSearchResultProperty extends SearchResultProperty
         $this->defaultTemplate      = $defaultTemplate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue(ResultRecordInterface $record)
     {
         $entity      = $record->getValue('entity');

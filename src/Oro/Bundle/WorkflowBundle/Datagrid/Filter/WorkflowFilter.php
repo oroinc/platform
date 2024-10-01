@@ -26,9 +26,7 @@ class WorkflowFilter extends EntityFilter
         $this->translationHelper = $translationHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         foreach ($this->getFieldOptions() as $key => $value) {

@@ -10,9 +10,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 
 class UserProviderTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient(

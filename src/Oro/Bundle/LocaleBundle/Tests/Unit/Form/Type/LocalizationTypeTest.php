@@ -35,6 +35,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         '2' => 'en_US'
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new LocalizationType();
@@ -133,9 +134,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         return $localization;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $languages = [];

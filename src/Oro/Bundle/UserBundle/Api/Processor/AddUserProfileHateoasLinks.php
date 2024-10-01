@@ -41,9 +41,7 @@ class AddUserProfileHateoasLinks implements ProcessorInterface
         $this->subresourcesProvider = $subresourcesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */

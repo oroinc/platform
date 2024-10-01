@@ -33,6 +33,7 @@ class AbstractPinbarTab implements NavigationItemInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getId()
     {
         return $this->id;
@@ -98,6 +99,7 @@ class AbstractPinbarTab implements NavigationItemInterface
      *
      * @return AbstractUser
      */
+    #[\Override]
     public function getUser()
     {
         if ($this->getItem()) {
@@ -144,6 +146,7 @@ class AbstractPinbarTab implements NavigationItemInterface
     /**
      * Set entity properties
      */
+    #[\Override]
     public function setValues(array $values)
     {
         if (isset($values['maximized'])) {

@@ -23,9 +23,7 @@ class EntityMerger implements EntityMergerInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function merge(EntityData $data): void
     {
         if (null === $this->sortedSteps) {

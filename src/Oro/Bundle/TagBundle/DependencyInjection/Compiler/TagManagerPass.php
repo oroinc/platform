@@ -11,9 +11,7 @@ class TagManagerPass implements CompilerPassInterface
     const SERVICE_KEY = 'oro_tag.tag.manager';
     const TAG = 'oro_tag.tag_manager';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::SERVICE_KEY)) {

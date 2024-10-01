@@ -26,6 +26,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -47,9 +48,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

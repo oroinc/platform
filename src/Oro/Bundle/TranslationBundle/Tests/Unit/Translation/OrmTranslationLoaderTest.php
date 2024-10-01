@@ -15,6 +15,7 @@ class OrmTranslationLoaderTest extends TestCase
     private Registry|MockObject $registry;
     private TranslationRepository|MockObject $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(Registry::class);

@@ -37,9 +37,7 @@ class OroEntityExtendBundle extends Bundle
         ExtendClassLoadingUtils::registerClassLoader($this->cacheDir);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function boot(): void
     {
         parent::boot();
@@ -64,9 +62,7 @@ class OroEntityExtendBundle extends Bundle
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

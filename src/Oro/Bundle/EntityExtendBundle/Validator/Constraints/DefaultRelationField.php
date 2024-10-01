@@ -12,17 +12,13 @@ class DefaultRelationField extends Constraint
     /** @var string */
     public $duplicateFieldMessage = 'This relation name is duplicated a field.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return DefaultRelationFieldValidator::ALIAS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

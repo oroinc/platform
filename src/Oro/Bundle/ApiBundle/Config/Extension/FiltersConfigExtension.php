@@ -19,17 +19,13 @@ class FiltersConfigExtension extends AbstractConfigExtension
         $this->filterOperatorRegistry = $filterOperatorRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationSections(): array
     {
         return [ConfigUtil::FILTERS => new FiltersConfiguration($this->filterOperatorRegistry)];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationLoaders(): array
     {
         return [ConfigUtil::FILTERS => new FiltersConfigLoader()];

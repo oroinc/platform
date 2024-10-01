@@ -11,9 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class SetOwnerForEmailOrganizationOnDeleteCascade implements Migration
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_user');

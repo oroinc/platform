@@ -16,6 +16,7 @@ class IsCaptchaVerifiedValidator extends ConstraintValidator
     ) {
     }
 
+    #[\Override]
     public function validate(mixed $value, Constraint $constraint): void
     {
         if ($this->captchaServiceRegistry->getCaptchaService()->isVerified($value)) {

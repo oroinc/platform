@@ -50,9 +50,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         $this->fieldValidationHelper = $fieldValidationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($entity)
     {
         $this->assertEnvironment($entity);

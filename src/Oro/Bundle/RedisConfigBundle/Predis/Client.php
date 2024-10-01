@@ -12,9 +12,7 @@ use Predis\Configuration\OptionsInterface;
  */
 class Client extends BaseClient
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createOptions($options)
     {
         if (is_array($options)) {

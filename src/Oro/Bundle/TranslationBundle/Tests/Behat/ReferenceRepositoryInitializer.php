@@ -10,9 +10,7 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
 class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void
     {
         $referenceRepository->set(

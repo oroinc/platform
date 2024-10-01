@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class MigrateFileStorageCommandCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $container->getDefinition(MigrateFileStorageCommand::class)

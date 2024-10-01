@@ -9,6 +9,7 @@ class RelationGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var RelationGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->guesser = new RelationGuesser();

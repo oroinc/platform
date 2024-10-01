@@ -21,9 +21,7 @@ class StacktraceProcessor implements ProcessorInterface
         $this->projectDir = $projectDir;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function __invoke(array $record): array
     {
         if (isset($record['context']['exception']) && $record['level'] >= $this->level) {

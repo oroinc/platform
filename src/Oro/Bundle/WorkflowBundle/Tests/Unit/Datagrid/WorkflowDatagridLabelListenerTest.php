@@ -18,6 +18,7 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
 
     private WorkflowDatagridLabelListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

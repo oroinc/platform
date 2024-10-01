@@ -43,6 +43,7 @@ class FormProcessEvent extends Event implements FormAwareInterface
     /**
      * @return FormInterface
      */
+    #[\Override]
     public function getForm()
     {
         return $this->form;

@@ -11,6 +11,7 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
 {
     private SetHttpResponseStatusCode $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

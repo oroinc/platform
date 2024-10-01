@@ -45,9 +45,7 @@ class ConfigType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $configModel = $options['config_model'];
@@ -121,15 +119,14 @@ class ConfigType extends AbstractType
         );
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         // Partial submit button should not be rendered.
         $view[self::PARTIAL_SUBMIT]->setRendered();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['config_model']);
@@ -145,9 +142,7 @@ class ConfigType extends AbstractType
         $resolver->setAllowedTypes('field_name', ['string', 'null']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_config_type';

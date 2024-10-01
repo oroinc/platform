@@ -24,6 +24,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FilterHelper */
     private $filterHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterCollection = new FilterCollection();

@@ -24,6 +24,7 @@ class EnumFilterTypeTest extends TypeTestCase
     /** @var EnumFilterType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

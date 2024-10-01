@@ -22,9 +22,7 @@ abstract class AbstractConfigType extends AbstractType
         $this->typeHelper = $typeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setNormalizer(

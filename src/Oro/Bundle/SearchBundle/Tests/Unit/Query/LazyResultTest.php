@@ -28,6 +28,7 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
     /** @var LazyResult */
     private $result;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->elements = [

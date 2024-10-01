@@ -43,9 +43,7 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void
     {
         foreach ($this->data as $className => $entities) {

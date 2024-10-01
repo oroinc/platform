@@ -12,6 +12,7 @@ class DefaultFallbackMethodsNamesProviderTest extends \PHPUnit\Framework\TestCas
 
     private DefaultFallbackMethodsNamesProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->inflector = InflectorFactory::create()->build();

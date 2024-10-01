@@ -171,6 +171,7 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getLabel();
@@ -763,6 +764,7 @@ class WorkflowDefinition implements DomainObjectInterface
      *
      * @return string
      */
+    #[\Override]
     public function getObjectIdentifier()
     {
         return $this->getName();

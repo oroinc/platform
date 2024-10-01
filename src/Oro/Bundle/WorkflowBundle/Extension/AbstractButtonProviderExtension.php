@@ -49,9 +49,7 @@ abstract class AbstractButtonProviderExtension implements
         $this->originalUrlProvider = $originalUrlProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         $buttons = [];

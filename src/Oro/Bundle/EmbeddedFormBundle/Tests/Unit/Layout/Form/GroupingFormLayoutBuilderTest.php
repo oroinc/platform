@@ -33,6 +33,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var GroupingFormLayoutBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);

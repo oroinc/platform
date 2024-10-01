@@ -9,11 +9,13 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
     private SymfonyErrorHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = ErrorHandler::register();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         restore_error_handler();

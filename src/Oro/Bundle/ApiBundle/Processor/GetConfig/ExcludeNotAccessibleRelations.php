@@ -37,9 +37,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

@@ -18,6 +18,7 @@ class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
     /** @var ThemeImageType */
     private $imageType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->imageType = new ThemeImageType(

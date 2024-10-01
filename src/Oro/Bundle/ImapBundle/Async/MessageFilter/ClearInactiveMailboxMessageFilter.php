@@ -11,9 +11,7 @@ use Oro\Bundle\MessageQueueBundle\Client\MessageFilterInterface;
  */
 class ClearInactiveMailboxMessageFilter implements MessageFilterInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(MessageBuffer $buffer): void
     {
         if (!$buffer->hasMessagesForTopic(ClearInactiveMailboxTopic::getName())) {

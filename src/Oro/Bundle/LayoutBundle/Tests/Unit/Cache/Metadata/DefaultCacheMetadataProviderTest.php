@@ -15,6 +15,7 @@ class DefaultCacheMetadataProviderTest extends TestCase
      */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new DefaultCacheMetadataProvider();

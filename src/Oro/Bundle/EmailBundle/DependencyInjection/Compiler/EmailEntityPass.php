@@ -26,9 +26,7 @@ class EmailEntityPass implements CompilerPassInterface
         $this->entityCacheDir = $entityCacheDir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->setParameter('oro_email.entity.cache_dir', $this->entityCacheDir);

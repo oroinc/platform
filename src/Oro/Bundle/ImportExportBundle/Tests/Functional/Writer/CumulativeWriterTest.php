@@ -27,6 +27,7 @@ class CumulativeWriterTest extends WebTestCase
     /** @var CumulativeWriter */
     private $writer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

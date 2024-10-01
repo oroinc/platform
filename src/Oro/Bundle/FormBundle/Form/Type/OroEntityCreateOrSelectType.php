@@ -39,25 +39,18 @@ class OroEntityCreateOrSelectType extends AbstractType
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // disable validation for new entity in case of existing entity
@@ -150,8 +143,8 @@ class OroEntityCreateOrSelectType extends AbstractType
      *      - self::MODE_GRID - grid with allowed entities is rendered
      *      - self::MODE_VIEW - entity view is rendered
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
@@ -198,9 +191,7 @@ class OroEntityCreateOrSelectType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $viewWidgets = $options['view_widgets'];

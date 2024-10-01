@@ -21,9 +21,7 @@ class SimpleProcessorRegistry implements ProcessorRegistryInterface
         $this->parentRegistry = $parentRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProcessor(string $processorId): ProcessorInterface
     {
         if (!isset($this->processors[$processorId])) {

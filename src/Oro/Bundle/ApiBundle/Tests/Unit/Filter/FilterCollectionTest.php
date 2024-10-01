@@ -12,6 +12,7 @@ class FilterCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var FilterCollection */
     private $filterCollection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterCollection = new FilterCollection();

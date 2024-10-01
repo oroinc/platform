@@ -49,6 +49,7 @@ class DumpCommand extends AbstractDebugCommand
         $this->configProvider = $configProvider;
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -136,6 +137,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('accessible')) {

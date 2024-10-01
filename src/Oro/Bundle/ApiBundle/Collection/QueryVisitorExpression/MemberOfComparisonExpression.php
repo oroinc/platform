@@ -13,9 +13,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class MemberOfComparisonExpression implements ComparisonExpressionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
         string $field,

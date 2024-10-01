@@ -18,9 +18,7 @@ class AliasedEntityExclusionProvider extends AbstractExclusionProvider
         $this->entityAliasResolver = $entityAliasResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredEntity($className)
     {
         return !$this->entityAliasResolver->hasAlias($className);

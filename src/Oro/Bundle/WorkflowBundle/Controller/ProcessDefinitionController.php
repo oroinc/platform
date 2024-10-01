@@ -56,6 +56,7 @@ class ProcessDefinitionController extends AbstractController
         return $this->container->get('doctrine')->getRepository($entityName);
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

@@ -15,9 +15,9 @@ class UpdateRelationshipsToProcessedIncludedEntities implements ProcessorInterfa
     public const OPERATION_NAME = 'update_relationships_to_processed_included_entities';
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

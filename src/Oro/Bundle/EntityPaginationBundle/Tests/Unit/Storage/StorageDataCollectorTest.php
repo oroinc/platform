@@ -40,6 +40,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
     /** @var StorageDataCollector */
     private $collector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datagridManager = $this->createMock(ManagerInterface::class);

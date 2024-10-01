@@ -41,18 +41,14 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
         $this->configEntityManager = $configEntityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(DatagridInterface $grid, array $config)
     {
         $this->role = $grid->getParameters()->get('role');
         $grid->setDatasource(clone $this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResults()
     {
         $gridData = [];

@@ -12,9 +12,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
  */
 class SetInitializeGroups extends SetGroups
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setGroups(Context $targetContext, string $targetAction): void
     {
         $targetContext->setFirstGroup(null);

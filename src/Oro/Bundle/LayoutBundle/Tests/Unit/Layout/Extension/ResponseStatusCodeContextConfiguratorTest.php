@@ -11,6 +11,7 @@ class ResponseStatusCodeContextConfiguratorTest extends TestCase
 {
     private ResponseStatusCodeContextConfigurator $configurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurator = new ResponseStatusCodeContextConfigurator();

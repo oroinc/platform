@@ -10,9 +10,7 @@ abstract class AbstractComposite extends AbstractCondition
     /** @var ExpressionInterface[] */
     protected $operands = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!$options) {
@@ -36,17 +34,13 @@ abstract class AbstractComposite extends AbstractCondition
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray($this->operands);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode($this->operands, $factoryAccessor);

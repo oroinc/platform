@@ -50,6 +50,7 @@ class Attribute implements EntityParameterInterface
      * @param string $type
      * @return Attribute
      */
+    #[\Override]
     public function setType($type)
     {
         $this->type = $type;
@@ -61,11 +62,13 @@ class Attribute implements EntityParameterInterface
      *
      * @return string
      */
+    #[\Override]
     public function getType()
     {
         return $this->type;
     }
 
+    #[\Override]
     public function setEntityAcl(array $entityAcl)
     {
         $this->entityAcl = $entityAcl;
@@ -74,6 +77,7 @@ class Attribute implements EntityParameterInterface
     /**
      * @return bool
      */
+    #[\Override]
     public function isEntityUpdateAllowed()
     {
         return !array_key_exists('update', $this->entityAcl) || $this->entityAcl['update'];
@@ -82,6 +86,7 @@ class Attribute implements EntityParameterInterface
     /**
      * @return bool
      */
+    #[\Override]
     public function isEntityDeleteAllowed()
     {
         return !array_key_exists('delete', $this->entityAcl) || $this->entityAcl['delete'];
@@ -93,6 +98,7 @@ class Attribute implements EntityParameterInterface
      * @param string $label
      * @return Attribute
      */
+    #[\Override]
     public function setLabel($label)
     {
         $this->label = $label;
@@ -104,6 +110,7 @@ class Attribute implements EntityParameterInterface
      *
      * @return string
      */
+    #[\Override]
     public function getLabel()
     {
         return $this->label;
@@ -115,6 +122,7 @@ class Attribute implements EntityParameterInterface
      * @param string $name
      * @return Attribute
      */
+    #[\Override]
     public function setName($name)
     {
         $this->name = $name;
@@ -126,6 +134,7 @@ class Attribute implements EntityParameterInterface
      *
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;
@@ -137,6 +146,7 @@ class Attribute implements EntityParameterInterface
      * @param array $options
      * @return Attribute
      */
+    #[\Override]
     public function setOptions(array $options)
     {
         $this->options = $options;
@@ -148,6 +158,7 @@ class Attribute implements EntityParameterInterface
      *
      * @return array
      */
+    #[\Override]
     public function getOptions()
     {
         return $this->options;
@@ -160,6 +171,7 @@ class Attribute implements EntityParameterInterface
      * @param mixed $value
      * @return Attribute
      */
+    #[\Override]
     public function setOption($key, $value)
     {
         $this->options[$key] = $value;
@@ -172,6 +184,7 @@ class Attribute implements EntityParameterInterface
      * @param string $key
      * @return null|mixed
      */
+    #[\Override]
     public function getOption($key)
     {
         return $this->hasOption($key) ? $this->options[$key] : null;
@@ -183,6 +196,7 @@ class Attribute implements EntityParameterInterface
      * @param string $key
      * @return bool
      */
+    #[\Override]
     public function hasOption($key)
     {
         return isset($this->options[$key]);
@@ -191,6 +205,7 @@ class Attribute implements EntityParameterInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getPropertyPath()
     {
         return $this->propertyPath;
@@ -200,6 +215,7 @@ class Attribute implements EntityParameterInterface
      * @param string $propertyPath
      * @return Attribute
      */
+    #[\Override]
     public function setPropertyPath($propertyPath)
     {
         $this->propertyPath = $propertyPath;
@@ -210,6 +226,7 @@ class Attribute implements EntityParameterInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getInternalType()
     {
         return self::INTERNAL_TYPE_ATTRIBUTE;

@@ -54,110 +54,77 @@ class KernelStub extends OroKernel
         $this->bundleMap = $bundleMap;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerBundles(): iterable
     {
         return $this->registeredBundles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function serialize()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unserialize($serialized)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function boot(): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function shutdown()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function locateResource($name): string
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEnvironment(): string
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isDebug(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getStartTime(): float
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheDir(): string
     {
         return 'var/cache';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLogDir(): string
     {
         return $this->logDir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCharset(): string
     {
     }

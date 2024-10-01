@@ -17,23 +17,17 @@ abstract class AbstractTopic implements TopicInterface
         $this->topicName = $topicName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onUnSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return $this->topicName;

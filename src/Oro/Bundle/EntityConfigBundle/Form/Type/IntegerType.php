@@ -12,25 +12,18 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType as SymfonyIntegerType
  */
 class IntegerType extends AbstractConfigType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_config_integer';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return SymfonyIntegerType::class;

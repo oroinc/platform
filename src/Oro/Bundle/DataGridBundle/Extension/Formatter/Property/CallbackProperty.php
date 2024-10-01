@@ -15,9 +15,7 @@ class CallbackProperty extends AbstractProperty
     /** @var array */
     protected $excludeParams = [self::CALLABLE_KEY, self::PARAMS_KEY];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRawValue(ResultRecordInterface $record)
     {
         return call_user_func_array($this->get(self::CALLABLE_KEY), $this->getParameters($record));

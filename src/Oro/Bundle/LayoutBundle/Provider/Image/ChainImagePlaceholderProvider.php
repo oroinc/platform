@@ -17,6 +17,7 @@ class ChainImagePlaceholderProvider implements ImagePlaceholderProviderInterface
         $this->providers[] = $provider;
     }
 
+    #[\Override]
     public function getPath(
         string $filter,
         string $format = '',

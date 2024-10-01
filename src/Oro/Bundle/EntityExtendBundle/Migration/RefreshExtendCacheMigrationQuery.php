@@ -20,17 +20,13 @@ class RefreshExtendCacheMigrationQuery implements MigrationQuery, ResetContainer
         $this->commandExecutor = $commandExecutor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Refresh extend entity cache';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->commandExecutor->runCommand(

@@ -36,9 +36,7 @@ class EmailNotificationEntityProvider extends EntityProvider
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addEntities(array &$result, $applyExclusions, $translate)
     {
         $entities = $this->getEmailTemplateRepository()

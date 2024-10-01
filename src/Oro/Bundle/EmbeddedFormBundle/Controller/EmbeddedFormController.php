@@ -141,9 +141,7 @@ class EmbeddedFormController extends AbstractController
         return $this->container->get(EmbeddedFormManager::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

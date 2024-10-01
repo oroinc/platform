@@ -25,6 +25,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityInheritanceTargetsHelper */
     private $activityInheritanceTargetsHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

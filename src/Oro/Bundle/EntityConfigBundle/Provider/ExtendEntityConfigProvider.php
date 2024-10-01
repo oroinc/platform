@@ -19,9 +19,7 @@ class ExtendEntityConfigProvider implements ExtendEntityConfigProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtendEntityConfigs($filter = null)
     {
         $configsToReturn = [];

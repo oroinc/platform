@@ -7,6 +7,7 @@ use Oro\Component\MessageQueue\Topic\TopicInterface;
 
 class SendMassEmailNotificationTopicTest extends SendEmailNotificationTopicTest
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new SendMassEmailNotificationTopic();

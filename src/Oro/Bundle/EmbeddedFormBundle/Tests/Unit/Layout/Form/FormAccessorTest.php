@@ -15,6 +15,7 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $form;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);

@@ -9,6 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class CreateMaterializedView implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         if ($schema->hasTable('oro_materialized_view')) {

@@ -10,6 +10,7 @@ class DeleteListContextTest extends \PHPUnit\Framework\TestCase
 {
     private DeleteListContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new DeleteListContext(

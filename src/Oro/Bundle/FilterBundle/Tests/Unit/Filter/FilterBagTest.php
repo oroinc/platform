@@ -14,6 +14,7 @@ class FilterBagTest extends \PHPUnit\Framework\TestCase
     /** @var FilterBag */
     private $filterBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterContainer = $this->createMock(ContainerInterface::class);

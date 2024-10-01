@@ -15,18 +15,14 @@ class EmbedFormFieldType extends AbstractFormType
 
     const SHORT_NAME = 'field';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
         $resolver->setRequired(['form_name', 'field_path']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
@@ -35,9 +31,7 @@ class EmbedFormFieldType extends AbstractFormType
         BlockUtils::setViewVarsFromOptions($view, $options, ['field_path']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         // prevent the form field rendering by form_rest() method,
@@ -49,9 +43,7 @@ class EmbedFormFieldType extends AbstractFormType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

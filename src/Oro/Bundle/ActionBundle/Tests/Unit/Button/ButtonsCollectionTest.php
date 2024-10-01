@@ -16,6 +16,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonsCollection */
     private $collection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchContext = $this->createMock(ButtonSearchContext::class);

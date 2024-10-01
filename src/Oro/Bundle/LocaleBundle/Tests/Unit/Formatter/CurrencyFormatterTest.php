@@ -13,6 +13,7 @@ class CurrencyFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var CurrencyFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->numberFormatter = $this->createMock(NumberFormatter::class);

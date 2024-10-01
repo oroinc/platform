@@ -7,11 +7,13 @@ namespace Oro\Bundle\NotificationBundle\Async\Topic;
  */
 class SendMassEmailNotificationTopic extends SendEmailNotificationTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.notification.send_mass_notification_email';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Email mass notification to be sent';

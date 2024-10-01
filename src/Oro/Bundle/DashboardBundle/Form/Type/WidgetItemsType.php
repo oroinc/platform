@@ -22,9 +22,7 @@ class WidgetItemsType extends AbstractType
         $this->itemsSubscriber = $itemsSubscriber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->itemsSubscriber);
@@ -34,9 +32,7 @@ class WidgetItemsType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired([
@@ -48,25 +44,18 @@ class WidgetItemsType extends AbstractType
         $resolver->setAllowedTypes('item_label', 'string');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['item_label'] = $options['item_label'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return static::NAME;

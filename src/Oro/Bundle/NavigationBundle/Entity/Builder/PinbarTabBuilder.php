@@ -47,6 +47,7 @@ class PinbarTabBuilder extends AbstractBuilder
      * @param $params
      * @return object|null
      */
+    #[\Override]
     public function buildItem($params)
     {
         if (isset($params['url'])) {
@@ -76,6 +77,7 @@ class PinbarTabBuilder extends AbstractBuilder
      * @param  int            $itemId
      * @return PinbarTab|null
      */
+    #[\Override]
     public function findItem($itemId)
     {
         return $this->getEntityManager()->find($this->className, $itemId);

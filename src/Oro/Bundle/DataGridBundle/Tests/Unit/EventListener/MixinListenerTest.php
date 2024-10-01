@@ -18,6 +18,7 @@ class MixinListenerTest extends \PHPUnit\Framework\TestCase
     /** @var MixinListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mixinConfigurationHelper = $this->createMock(MixinConfigurationHelper::class);

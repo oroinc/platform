@@ -19,9 +19,7 @@ class ScopeProviderPass implements CompilerPassInterface
     private const PROVIDER_TAG_NAME    = 'oro_scope.provider';
     private const SCOPE_TYPE_ATTRIBUTE = 'scopeType';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $services = [];

@@ -48,9 +48,7 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
         $this->assertEquals($translationForReplace->getId(), $translation->getId());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getStrategyObject(): AbstractImportStrategy
     {
         $container = $this->getContainer();

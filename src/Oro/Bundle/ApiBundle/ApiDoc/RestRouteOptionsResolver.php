@@ -66,9 +66,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
         $this->valueNormalizer = $valueNormalizer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes): void
     {
         if ($route->getOption(self::GROUP_OPTION) !== $this->routeGroup
@@ -90,9 +88,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->resources = [];

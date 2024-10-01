@@ -27,9 +27,7 @@ class EntityType extends AbstractType
         $this->entityLoader = $entityLoader;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var AssociationMetadata $metadata */
@@ -65,9 +63,7 @@ class EntityType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver

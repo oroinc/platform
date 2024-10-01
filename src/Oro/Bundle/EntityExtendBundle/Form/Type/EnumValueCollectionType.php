@@ -27,10 +27,10 @@ class EnumValueCollectionType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -75,18 +75,14 @@ class EnumValueCollectionType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['multiple'] = $this->isMultipleSelectEnable($options['config_id']);
         $view->vars['show_form_when_empty'] = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['validation_ignore_if_not_changed'] = true;
@@ -137,9 +133,7 @@ class EnumValueCollectionType extends AbstractType
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return CollectionType::class;
@@ -150,9 +144,7 @@ class EnumValueCollectionType extends AbstractType
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_enum_value_collection';

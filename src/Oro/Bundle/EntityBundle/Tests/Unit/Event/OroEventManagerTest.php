@@ -14,6 +14,7 @@ class OroEventManagerTest extends \PHPUnit\Framework\TestCase
     /** @var OroEventManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

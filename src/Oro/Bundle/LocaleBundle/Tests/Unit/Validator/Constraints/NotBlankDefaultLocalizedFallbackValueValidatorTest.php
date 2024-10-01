@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotBlankDefaultLocalizedFallbackValueValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         return new NotBlankDefaultLocalizedFallbackValueValidator();

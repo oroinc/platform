@@ -20,9 +20,7 @@ class TestEntitiesMigration implements
     use AttachmentExtensionAwareTrait;
     use ExtendNameGeneratorAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->addAttachmentAssociationToTestDepartment($schema);

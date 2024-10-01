@@ -50,9 +50,7 @@ class AvailableSuiteSetsController implements Controller
         $this->featureStatisticManager = $featureStatisticManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -77,9 +75,7 @@ class AvailableSuiteSetsController implements Controller
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if ($path = $input->getOption('dump-suite-sets')) {

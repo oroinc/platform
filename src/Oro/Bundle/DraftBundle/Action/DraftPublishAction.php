@@ -24,6 +24,7 @@ class DraftPublishAction extends AbstractDraftAction
     /**
      * @param \ArrayAccess $context
      */
+    #[\Override]
     protected function executeAction($context): void
     {
         $source = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_SOURCE]);

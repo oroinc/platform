@@ -17,6 +17,7 @@ class NotificationSettingsTest extends \PHPUnit\Framework\TestCase
 
     private NotificationSettings $notificationSettings;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

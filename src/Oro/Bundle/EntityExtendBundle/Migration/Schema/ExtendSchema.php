@@ -42,9 +42,7 @@ class ExtendSchema extends SchemaWithNameGenerator
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createTableObject(array $args)
     {
         $args['extendOptionsManager'] = $this->extendOptionsManager;

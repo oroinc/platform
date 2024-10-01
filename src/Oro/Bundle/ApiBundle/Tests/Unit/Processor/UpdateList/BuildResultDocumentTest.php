@@ -25,6 +25,7 @@ class BuildResultDocumentTest extends UpdateListProcessorTestCase
     /** @var BuildResultDocument */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

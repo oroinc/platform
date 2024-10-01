@@ -30,6 +30,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $formConfigProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

@@ -10,6 +10,7 @@ class ExtraFieldsValidationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ExtraFieldsValidationExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new ExtraFieldsValidationExtension();

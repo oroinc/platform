@@ -11,9 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class RemoveLocationHeader implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

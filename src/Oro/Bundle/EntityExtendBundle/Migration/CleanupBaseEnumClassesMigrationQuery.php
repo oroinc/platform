@@ -11,6 +11,7 @@ class CleanupBaseEnumClassesMigrationQuery extends AbstractCleanupMarketingMigra
     {
     }
 
+    #[\Override]
     public function getClassNames(): array
     {
         return $this->classes;

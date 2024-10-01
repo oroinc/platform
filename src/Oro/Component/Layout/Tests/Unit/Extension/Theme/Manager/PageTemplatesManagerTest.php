@@ -19,6 +19,7 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
     /** @var PageTemplatesManager */
     private $pageTemplatesManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeManager = $this->createMock(ThemeManager::class);

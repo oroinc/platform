@@ -18,6 +18,7 @@ class ConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationExtension */
     private $configurationExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension1 = $this->createMock(ConfigurationExtensionInterface::class);

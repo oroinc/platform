@@ -12,9 +12,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class PageNumberFilter extends StandaloneFilterWithDefaultValue
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         $val = null !== $value

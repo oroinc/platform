@@ -16,6 +16,7 @@ class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var SerializerExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         if (!interface_exists('JMS\Serializer\SerializerInterface')) {

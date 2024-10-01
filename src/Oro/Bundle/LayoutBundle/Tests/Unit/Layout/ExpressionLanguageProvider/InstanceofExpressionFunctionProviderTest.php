@@ -11,6 +11,7 @@ class InstanceofExpressionFunctionProviderTest extends \PHPUnit\Framework\TestCa
     /** @var InstanceofExpressionFunctionProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new InstanceofExpressionFunctionProvider();

@@ -8,9 +8,7 @@ class ImageTypeStub extends AbstractType
 {
     const NAME = 'oro_image';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

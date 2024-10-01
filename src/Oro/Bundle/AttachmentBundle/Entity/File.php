@@ -259,6 +259,7 @@ class File implements FileExtensionInterface, ExtendEntityInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getExtension()
     {
         return $this->extension;
@@ -347,6 +348,7 @@ class File implements FileExtensionInterface, ExtendEntityInterface
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
+    #[\Override]
     public function __toString()
     {
         if ($this->getExternalUrl() !== null) {

@@ -30,9 +30,7 @@ class EnumFilter extends BaseMultiChoiceFilter
         $this->dictionaryEntityDataProvider = $dictionaryEntityDataProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'dictionary';
@@ -52,9 +50,7 @@ class EnumFilter extends BaseMultiChoiceFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
@@ -68,17 +64,13 @@ class EnumFilter extends BaseMultiChoiceFilter
         return $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
@@ -89,17 +81,13 @@ class EnumFilter extends BaseMultiChoiceFilter
         return $this->buildComparisonExpr($ds, $comparisonType, $fieldName, $parameterName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return EnumFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
         $comparisonType,

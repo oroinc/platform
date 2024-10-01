@@ -28,25 +28,19 @@ class FormAccessor extends AbstractFormAccessor
         $this->hash = $this->buildHash($this->form->getName(), $action, $method, $enctype);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->form;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toString()
     {
         return 'name:' . $this->getName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHash()
     {
         return $this->hash;

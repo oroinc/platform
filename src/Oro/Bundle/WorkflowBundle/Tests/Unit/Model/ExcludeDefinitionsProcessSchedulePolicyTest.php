@@ -13,6 +13,7 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
     /** @var ExcludeDefinitionsProcessSchedulePolicy */
     private $schedulePolicy;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->schedulePolicy = new ExcludeDefinitionsProcessSchedulePolicy();

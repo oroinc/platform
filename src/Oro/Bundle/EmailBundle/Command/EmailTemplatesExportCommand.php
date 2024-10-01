@@ -30,9 +30,7 @@ class EmailTemplatesExportCommand extends Command
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -40,9 +38,7 @@ class EmailTemplatesExportCommand extends Command
             ->addOption('template', null, InputOption::VALUE_OPTIONAL, "template name");
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $destination = $input->getArgument('destination');

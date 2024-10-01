@@ -12,6 +12,7 @@ class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var CommentSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = new CommentSubscriber();

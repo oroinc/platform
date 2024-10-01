@@ -32,6 +32,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTransitCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repo = $this->createMock(EntityRepository::class);

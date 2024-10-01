@@ -35,6 +35,7 @@ class CacheRendererTest extends LayoutTestCase
      */
     private $cache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

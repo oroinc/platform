@@ -24,9 +24,7 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
         $this->projectDir = $projectDir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function prepare(GeneratorData $data, VisitorCollection $collection)
     {
         $source = $data->getSource();

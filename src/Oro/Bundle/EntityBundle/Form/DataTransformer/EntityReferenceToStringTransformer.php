@@ -19,9 +19,7 @@ class EntityReferenceToStringTransformer implements DataTransformerInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($entity)
     {
         if (null === $entity) {
@@ -47,9 +45,7 @@ class EntityReferenceToStringTransformer implements DataTransformerInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (empty($value)) {

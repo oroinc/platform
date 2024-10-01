@@ -9,6 +9,7 @@ class FilesystemStatisticRepositoryTest extends \PHPUnit\Framework\TestCase
     public static string $statFile;
     public static string $appDir;
 
+    #[\Override]
     public static function setUpBeforeClass(): void
     {
         self::$statFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'feature_duration.json';
@@ -43,6 +44,7 @@ class FilesystemStatisticRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         unlink(self::$statFile);

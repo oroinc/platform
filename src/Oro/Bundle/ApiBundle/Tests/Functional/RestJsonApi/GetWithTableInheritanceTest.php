@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 class GetWithTableInheritanceTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

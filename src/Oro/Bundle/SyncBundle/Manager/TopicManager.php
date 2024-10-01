@@ -10,13 +10,7 @@ use Ratchet\ConnectionInterface;
  */
 class TopicManager extends GosTopicManager
 {
-    /**
-     * {@inheritdoc}
-     *
-     * Overrides method to correctly handle the case when no subscribers left in topic after last connection is closed.
-     * If the "onUnsubscribe()" is not called, then periodic timers would not be cleared properly and new subscribers
-     * could not receive periodic messages.
-     */
+    #[\Override]
     public function onClose(ConnectionInterface $conn): void
     {
         $this->app->onClose($conn);

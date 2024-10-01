@@ -20,6 +20,7 @@ class StartInitDataProcessor implements ProcessorInterface
     /**
      * @param ContextInterface|TransitionContext $context
      */
+    #[\Override]
     public function process(ContextInterface $context)
     {
         if ($context->getTransition()->isEmptyInitOptions()) {

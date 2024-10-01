@@ -19,9 +19,7 @@ class LoadTestMagazineModel1 implements ProcessorInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var GetContext $context */

@@ -24,9 +24,7 @@ class TranslationReader extends AbstractReader
         $this->languageRepository = $languageRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function read()
     {
         $offset = $this->getStepExecution()->getReadCount();

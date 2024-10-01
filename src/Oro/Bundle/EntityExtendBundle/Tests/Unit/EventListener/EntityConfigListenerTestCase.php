@@ -27,6 +27,7 @@ class EntityConfigListenerTestCase extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

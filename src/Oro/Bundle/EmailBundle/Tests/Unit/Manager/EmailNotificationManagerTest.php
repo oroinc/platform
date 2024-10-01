@@ -34,6 +34,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailNotificationManager */
     private $emailNotificationManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(EmailRepository::class);

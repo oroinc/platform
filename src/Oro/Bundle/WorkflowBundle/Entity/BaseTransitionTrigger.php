@@ -156,9 +156,6 @@ abstract class BaseTransitionTrigger
             && $this->isEqualAdditionalFields($trigger);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntityClass()
     {
         return $this->getWorkflowDefinition() ? $this->getWorkflowDefinition()->getRelatedEntity() : null;

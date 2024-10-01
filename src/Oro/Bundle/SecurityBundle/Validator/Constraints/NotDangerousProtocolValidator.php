@@ -23,6 +23,7 @@ class NotDangerousProtocolValidator extends ConstraintValidator
      * @param mixed $value
      * @param Constraint $constraint
      */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!is_string($value)) {

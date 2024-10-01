@@ -22,6 +22,7 @@ class EntitySystemConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntitySystemConfigListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

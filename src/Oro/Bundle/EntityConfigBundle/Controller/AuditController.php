@@ -77,9 +77,7 @@ class AuditController extends AbstractController
         return $this->container->get(ConfigManager::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

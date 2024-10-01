@@ -27,9 +27,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         $this->dqlNameFormatterLink = $dqlNameFormatterLink;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if (self::FULL !== $format || !$this->isFullFormatSupported(\get_class($entity))) {
@@ -45,9 +43,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if (self::FULL !== $format || !$this->isFullFormatSupported($className)) {

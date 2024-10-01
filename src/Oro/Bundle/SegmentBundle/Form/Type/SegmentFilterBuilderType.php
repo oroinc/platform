@@ -59,17 +59,13 @@ class SegmentFilterBuilderType extends AbstractType
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('data_class', Segment::class);
@@ -151,9 +147,7 @@ class SegmentFilterBuilderType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('definition', HiddenType::class, ['required' => false]);
@@ -260,9 +254,7 @@ class SegmentFilterBuilderType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['condition_builder_options'] = [

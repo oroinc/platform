@@ -12,9 +12,7 @@ use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
  */
 class OverlaidMultiSetDataTransformer implements TransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform(DataInterface $data, array $chartOptions)
     {
         $data = $data->toArray();

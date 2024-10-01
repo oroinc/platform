@@ -9,9 +9,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class TestVariableProcessor implements VariableProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(string $variable, array $processorArguments, TemplateData $data): void
     {
         $value = null;

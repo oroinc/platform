@@ -72,17 +72,13 @@ final class BigInteger extends BigNumber
         return $this->getTargetObject()->toBase($base);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toBigInteger()
     {
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __unserialize(array $serialized): void
     {
         if ($this->getTargetObject() !== null) {

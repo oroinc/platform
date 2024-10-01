@@ -20,9 +20,7 @@ class AddAttributesToTestActivityTargetMigration implements Migration
     public const REGULAR_ATTRIBUTE_1 = 'regular_attribute_1';
     public const REGULAR_ATTRIBUTE_2 = 'regular_attribute_2';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('test_activity_target');

@@ -13,9 +13,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFilterInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions): void
     {
         $queryFilter = $widgetOptions->get('queryFilter', []);
@@ -53,25 +51,19 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
         return $qb;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createContext(): FilterProcessorContext
     {
         return new FilterProcessorContext();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function context(): FilterProcessorContext
     {
         return parent::context();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function prepareTableAliases(): void
     {
         $this->addTableAliasForRootEntity();
@@ -81,41 +73,31 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addTableAliasForRootEntity(): void
     {
         $this->context()->setRootTableAlias($this->context()->getRootEntityAlias());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function prepareColumnAliases(): void
     {
         // nothing to do
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addSelectStatement(): void
     {
         // nothing to do
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addFromStatements(): void
     {
         // nothing to do
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addOrderByStatement(): void
     {
         // nothing to do

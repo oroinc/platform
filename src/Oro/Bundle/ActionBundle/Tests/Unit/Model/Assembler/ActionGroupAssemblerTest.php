@@ -22,6 +22,7 @@ class ActionGroupAssemblerTest extends TestCase
 
     private ActionGroupAssembler $assembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionGroupServiceLocator = $this->createMock(ServiceProviderInterface::class);

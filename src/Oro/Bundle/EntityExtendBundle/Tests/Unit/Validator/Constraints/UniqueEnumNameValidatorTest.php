@@ -18,12 +18,14 @@ class UniqueEnumNameValidatorTest extends ConstraintValidatorTestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new UniqueEnumNameValidator($this->configManager);

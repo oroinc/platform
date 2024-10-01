@@ -31,6 +31,7 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
     /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $transport;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->stepExecution = $this->createMock(StepExecution::class);

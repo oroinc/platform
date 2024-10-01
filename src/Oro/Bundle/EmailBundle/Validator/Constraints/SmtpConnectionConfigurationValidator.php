@@ -29,9 +29,7 @@ class SmtpConnectionConfigurationValidator extends ConstraintValidator
         $this->encryptor = $encryptor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof SmtpConnectionConfiguration) {

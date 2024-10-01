@@ -19,9 +19,7 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
 
     abstract public function doExecute(LoggerInterface $logger, bool $dryRun = false): void;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription(): array
     {
         $logger = new ArrayLogger();
@@ -31,9 +29,7 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $this->doExecute($logger);

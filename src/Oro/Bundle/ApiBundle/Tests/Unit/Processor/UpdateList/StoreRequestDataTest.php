@@ -13,6 +13,7 @@ class StoreRequestDataTest extends UpdateListProcessorTestCase
     /** @var StoreRequestData */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

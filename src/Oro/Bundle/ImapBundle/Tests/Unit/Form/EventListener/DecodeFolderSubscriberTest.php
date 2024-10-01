@@ -10,6 +10,7 @@ class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var DecodeFolderSubscriber */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new DecodeFolderSubscriber();

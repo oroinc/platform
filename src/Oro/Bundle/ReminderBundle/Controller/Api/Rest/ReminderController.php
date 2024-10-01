@@ -55,6 +55,7 @@ class ReminderController extends AbstractFOSRestController
         return $this->container->get('doctrine')->getRepository(Reminder::class);
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

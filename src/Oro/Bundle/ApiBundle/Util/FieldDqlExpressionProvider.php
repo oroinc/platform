@@ -20,9 +20,7 @@ class FieldDqlExpressionProvider implements FieldDqlExpressionProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFieldDqlExpression(QueryBuilder $qb, string $fieldPath): ?string
     {
         $pathDelimiterPos = strpos($fieldPath, '.');

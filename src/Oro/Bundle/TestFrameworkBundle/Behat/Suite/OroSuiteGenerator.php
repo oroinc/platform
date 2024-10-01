@@ -20,17 +20,13 @@ class OroSuiteGenerator implements SuiteGenerator
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsTypeAndSettings($type, array $settings)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generateSuite($suiteName, array $settings)
     {
         try {

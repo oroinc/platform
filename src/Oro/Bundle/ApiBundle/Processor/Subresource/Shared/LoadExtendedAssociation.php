@@ -11,17 +11,13 @@ use Oro\Bundle\ApiBundle\Request\DataType;
  */
 class LoadExtendedAssociation extends LoadCustomAssociation
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isSupportedAssociation(string $dataType): bool
     {
         return DataType::isExtendedAssociation($dataType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadAssociationData(
         SubresourceContext $context,
         string $associationName,

@@ -147,9 +147,7 @@ class GridViewController extends RestController
         return $this->isGranted('oro_datagrid_gridview_publish');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createEntity()
     {
         $entity = parent::createEntity();
@@ -158,25 +156,19 @@ class GridViewController extends RestController
         return $entity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_datagrid.form.grid_view.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_datagrid.grid_view.form.handler.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_datagrid.grid_view.manager.api');

@@ -27,25 +27,19 @@ class ChoiceLoaderStub implements ChoiceLoaderInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadChoiceList($value = null): ChoiceListInterface
     {
         return $this->choiceList;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadChoicesForValues(array $values, $value = null): array
     {
         return $this->choiceList->getChoicesForValues($values);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadValuesForChoices(array $choices, $value = null): array
     {
         return $this->choiceList->getValuesForChoices($choices);

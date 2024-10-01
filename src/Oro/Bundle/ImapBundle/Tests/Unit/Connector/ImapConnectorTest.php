@@ -22,6 +22,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
     /** @var ImapConnector */
     private $connector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->storage = $this->createMock(Imap::class);

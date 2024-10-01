@@ -18,6 +18,7 @@ class DraftLocalizedFallbackValueExtensionTest extends \PHPUnit\Framework\TestCa
     /** @var DraftHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $draftHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->draftHelper = $this->createMock(DraftHelper::class);

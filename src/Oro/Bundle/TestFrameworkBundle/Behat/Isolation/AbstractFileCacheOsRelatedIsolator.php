@@ -49,7 +49,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         $this->cacheFiles = $cacheFiles;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
@@ -59,7 +59,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         return $this->isApplicableOS();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
         $event->writeln('<info>Create temp directory</info>');
@@ -71,12 +71,12 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         $this->startCopyDumpToTempDir();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         if (!$this->copyDumpToTempDirProcess) {
@@ -90,7 +90,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         $this->startCopyDumpToTempDir();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function terminate(AfterFinishTestsEvent $event)
     {
         if (!$this->copyDumpToTempDirProcess) {
@@ -105,7 +105,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         $this->removeDumpCacheDir();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function restoreState(RestoreStateEvent $event)
     {
         $event->writeln('<info>Begin to restore the state Cache...</info>');
@@ -123,9 +123,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         $event->writeln('<info>Cache state was restored</info>');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOutdatedState()
     {
         if (is_dir($this->cacheDumpDir)) {
@@ -135,9 +133,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTag()
     {
         return 'cache';

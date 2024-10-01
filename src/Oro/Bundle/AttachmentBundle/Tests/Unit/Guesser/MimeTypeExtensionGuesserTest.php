@@ -9,6 +9,7 @@ class MimeTypeExtensionGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var MimeTypeExtensionGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->guesser = new MimeTypeExtensionGuesser();

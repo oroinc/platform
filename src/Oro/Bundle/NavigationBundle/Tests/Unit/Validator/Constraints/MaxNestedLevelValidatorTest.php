@@ -22,6 +22,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
 
     private MenuUpdateApplierInterface $menuUpdateApplier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builderChainProvider = $this->createMock(BuilderChainProvider::class);
@@ -39,6 +40,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): MaxNestedLevelValidator
     {
         return new MaxNestedLevelValidator($this->builderChainProvider, $this->menuUpdateApplier);

@@ -36,9 +36,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private const CONFIG_CACHE_WARMER_SERVICE_ID = 'oro_api.config_cache_warmer';
     private const CACHE_MANAGER_SERVICE_ID = 'oro_api.cache_manager';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
@@ -118,9 +116,9 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         // set "oro_api.rest.prefix" and "oro_api.rest.pattern" parameters

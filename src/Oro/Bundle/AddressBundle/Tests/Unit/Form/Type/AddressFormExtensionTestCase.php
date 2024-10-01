@@ -28,9 +28,7 @@ abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
     private ?Country $validCountry = null;
     private ?Country $noRegionsCountry = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

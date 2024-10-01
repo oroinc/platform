@@ -141,9 +141,6 @@ class RenderCache
         return implode('|', $keyParts);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private function getAlwaysVaryBy(): array
     {
         if (!$this->alwaysVaryBy) {

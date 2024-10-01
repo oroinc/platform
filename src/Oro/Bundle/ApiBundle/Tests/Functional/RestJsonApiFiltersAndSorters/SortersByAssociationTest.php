@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class SortersByAssociationTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

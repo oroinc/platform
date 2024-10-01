@@ -9,6 +9,7 @@ class StepTemplate extends WorkflowTemplate
 {
     const NAME = 'step';
 
+    #[\Override]
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.step.{{ step_name }}';
@@ -17,6 +18,7 @@ class StepTemplate extends WorkflowTemplate
     /**
      * @return array
      */
+    #[\Override]
     public function getRequiredKeys()
     {
         return array_merge(parent::getRequiredKeys(), ['step_name']);

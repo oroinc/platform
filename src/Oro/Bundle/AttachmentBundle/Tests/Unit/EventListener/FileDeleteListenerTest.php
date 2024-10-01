@@ -25,6 +25,7 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 
     private FileDeleteListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

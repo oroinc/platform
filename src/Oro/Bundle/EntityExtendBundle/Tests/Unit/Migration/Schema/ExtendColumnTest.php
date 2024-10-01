@@ -19,6 +19,7 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendColumn */
     private $column;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extendOptionsManager = $this->createMock(ExtendOptionsManager::class);

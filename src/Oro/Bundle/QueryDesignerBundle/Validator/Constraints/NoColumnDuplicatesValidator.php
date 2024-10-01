@@ -13,9 +13,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class NoColumnDuplicatesValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof NoColumnDuplicates) {

@@ -7,17 +7,13 @@ namespace Oro\Component\ConfigExpression\Condition;
  */
 class Orx extends AbstractComposite
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'or';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         foreach ($this->operands as $operand) {

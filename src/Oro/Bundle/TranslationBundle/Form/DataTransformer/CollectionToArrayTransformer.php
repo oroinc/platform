@@ -9,9 +9,7 @@ use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer as
  */
 class CollectionToArrayTransformer extends DoctrineCollectionToArrayTransformer
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($collection): mixed
     {
         // process any empty value (string, array)

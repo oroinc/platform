@@ -28,9 +28,7 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

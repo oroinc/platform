@@ -20,9 +20,7 @@ class Mailer implements MailerInterface
         $this->transport = $transport;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send(RawMessage $message, Envelope $envelope = null): void
     {
         $sentMessage = $this->transport->send($message, $envelope);

@@ -146,6 +146,7 @@ class BatchStatus
     /**
      * Return the string representation of the current status
      */
+    #[\Override]
     public function __toString(): string
     {
         return self::$statusLabels[$this->value];

@@ -75,17 +75,13 @@ class UserViewList extends AbstractViewsList
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getViewsList()
     {
         return $this->getSystemViewsList();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSystemViewsList()
     {
         $views = parent::getSystemViewsList();

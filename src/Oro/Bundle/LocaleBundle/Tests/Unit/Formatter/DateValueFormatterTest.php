@@ -17,6 +17,7 @@ class DateValueFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var DateValueFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datetimeFormatter = $this->createMock(DateTimeFormatterInterface::class);

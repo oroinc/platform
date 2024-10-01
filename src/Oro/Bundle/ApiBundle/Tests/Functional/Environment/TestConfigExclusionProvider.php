@@ -15,9 +15,7 @@ class TestConfigExclusionProvider implements ExclusionProviderInterface
         $this->innerExclusionProvider = $innerExclusionProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredEntity($className)
     {
         if (TestActivity::class === $className) {
@@ -27,17 +25,13 @@ class TestConfigExclusionProvider implements ExclusionProviderInterface
         return $this->innerExclusionProvider->isIgnoredEntity($className);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         return $this->innerExclusionProvider->isIgnoredField($metadata, $fieldName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         return $this->innerExclusionProvider->isIgnoredRelation($metadata, $associationName);

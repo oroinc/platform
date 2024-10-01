@@ -34,9 +34,7 @@ class SessionHttpKernelDecorator implements HttpKernelInterface, TerminableInter
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
         if (null === $this->collectedSessionOptions) {
@@ -50,9 +48,7 @@ class SessionHttpKernelDecorator implements HttpKernelInterface, TerminableInter
         return $this->kernel->handle($request, $type, $catch);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function terminate(Request $request, Response $response)
     {
         if ($this->kernel instanceof TerminableInterface) {

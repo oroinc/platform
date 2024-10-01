@@ -16,6 +16,7 @@ class RemoveEnumFieldQueryTest extends TestCase
 
     private Connection|MockObject $connector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connector = $this->createMock(Connection::class);

@@ -20,9 +20,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return array(

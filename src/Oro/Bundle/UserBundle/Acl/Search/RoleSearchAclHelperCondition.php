@@ -23,17 +23,13 @@ class RoleSearchAclHelperCondition implements SearchAclHelperConditionInterface
         $this->ownershipDataBuilder = $ownershipDataBuilder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(string $className, string $permission): bool
     {
         return is_a($className, Role::class, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addRestriction(Query $query, string $alias, ?Expression $orExpression): ?Expression
     {
         $expressionBuilder = new ExpressionBuilder();

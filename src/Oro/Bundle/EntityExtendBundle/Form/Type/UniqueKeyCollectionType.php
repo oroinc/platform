@@ -23,9 +23,7 @@ class UniqueKeyCollectionType extends AbstractType
         $this->entityProvider = $entityProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $fields         = [];
@@ -66,9 +64,7 @@ class UniqueKeyCollectionType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -76,17 +72,12 @@ class UniqueKeyCollectionType extends AbstractType
             ->setAllowedTypes('className', 'string');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_unique_key_collection_type';

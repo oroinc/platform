@@ -22,6 +22,7 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
     /** @var AuditChangedEntitiesInverseRelationsProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

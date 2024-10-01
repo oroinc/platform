@@ -28,9 +28,7 @@ class OriginController extends AbstractController
         return new JsonResponse($originProvider->getListTypeChoices(true));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

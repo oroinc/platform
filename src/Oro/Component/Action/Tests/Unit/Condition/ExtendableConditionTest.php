@@ -22,6 +22,7 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
     private ExtendableConditionEventErrorsProcessorInterface|MockObject $errorsProcessor;
     private ExtendableCondition $extendableCondition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

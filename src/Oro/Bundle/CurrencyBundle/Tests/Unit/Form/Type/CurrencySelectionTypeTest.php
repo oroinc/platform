@@ -21,6 +21,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     /** @var CurrencySelectionType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->currencyProvider = $this->createMock(CurrencyProviderInterface::class);
@@ -39,9 +40,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

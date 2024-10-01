@@ -18,6 +18,7 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
 
     private ActivityListProviderPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

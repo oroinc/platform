@@ -23,19 +23,19 @@ class ExternalFileType extends AbstractType
         $this->externalFileTransformer = $externalFileTransformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addViewTransformer($this->externalFileTransformer);
     }
 
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['attr']['data-is-external-file'] = 1;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -44,6 +44,7 @@ class ExternalFileType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function getParent(): string
     {
         return UrlType::class;

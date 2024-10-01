@@ -9,11 +9,13 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
 class SendAutoResponsesTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new SendAutoResponsesTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         return [
@@ -36,6 +38,7 @@ class SendAutoResponsesTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

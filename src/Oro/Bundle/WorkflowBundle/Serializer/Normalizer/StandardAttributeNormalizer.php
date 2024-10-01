@@ -18,9 +18,7 @@ class StandardAttributeNormalizer implements AttributeNormalizer
         'object'  => 'object',
     );
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function normalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         $normalType = $this->normalTypes[$attribute->getType()];
@@ -93,9 +91,7 @@ class StandardAttributeNormalizer implements AttributeNormalizer
         return $this->serialize($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         $normalType = $this->normalTypes[$attribute->getType()];
@@ -170,17 +166,13 @@ class StandardAttributeNormalizer implements AttributeNormalizer
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         return !empty($this->normalTypes[$attribute->getType()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         return !empty($this->normalTypes[$attribute->getType()]);

@@ -18,9 +18,7 @@ class FeatureAwareMenuFactoryExtension implements ExtensionInterface
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildOptions(array $options): array
     {
         if (!empty($options['route'])
@@ -33,9 +31,7 @@ class FeatureAwareMenuFactoryExtension implements ExtensionInterface
         return $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildItem(ItemInterface $item, array $options): void
     {
     }

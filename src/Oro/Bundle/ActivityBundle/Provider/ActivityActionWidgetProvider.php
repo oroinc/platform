@@ -26,17 +26,13 @@ class ActivityActionWidgetProvider implements WidgetProviderInterface
         $this->placeholderProvider = $placeholderProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($object)
     {
         return is_object($object) && $this->activityManager->hasActivityAssociations(ClassUtils::getClass($object));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWidgets($object)
     {
         $result = [];

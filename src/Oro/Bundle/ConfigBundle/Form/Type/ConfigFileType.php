@@ -22,9 +22,7 @@ class ConfigFileType extends AbstractType
         $this->transformer = $transformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -47,9 +45,7 @@ class ConfigFileType extends AbstractType
         $builder->addModelTransformer($this->transformer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -59,9 +55,7 @@ class ConfigFileType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return FileType::class;

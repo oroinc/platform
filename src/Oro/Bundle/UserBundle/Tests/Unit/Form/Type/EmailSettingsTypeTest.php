@@ -23,6 +23,7 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
     /** @var EmailSettingsType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = $this->createMock(UserImapConfigSubscriber::class);

@@ -8,6 +8,7 @@ class FilterOperatorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     private FilterOperatorRegistry $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = new FilterOperatorRegistry([

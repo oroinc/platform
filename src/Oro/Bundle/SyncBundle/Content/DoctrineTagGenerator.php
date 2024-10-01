@@ -28,9 +28,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
         $this->entityClassResolver = $entityClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($data)
     {
         if (null === $data) {
@@ -52,9 +50,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         if ($data instanceof FormInterface) {

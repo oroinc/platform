@@ -23,6 +23,7 @@ class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
     /** @var InvalidateCacheListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->notificationManager = $this->createMock(NotificationManager::class);

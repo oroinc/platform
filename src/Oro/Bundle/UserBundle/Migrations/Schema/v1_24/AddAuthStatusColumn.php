@@ -18,9 +18,7 @@ class AddAuthStatusColumn implements Migration, OutdatedExtendExtensionAwareInte
 {
     use OutdatedExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $enumTable = $this->outdatedExtendExtension->addOutdatedEnumField(

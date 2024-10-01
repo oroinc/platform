@@ -18,6 +18,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
     /** @var ValidateParentEntityObjectAccess */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

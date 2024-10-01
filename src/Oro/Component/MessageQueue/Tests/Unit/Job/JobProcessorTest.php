@@ -26,6 +26,7 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var JobProcessor */
     private $jobProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobManager = $this->createMock(JobManagerInterface::class);

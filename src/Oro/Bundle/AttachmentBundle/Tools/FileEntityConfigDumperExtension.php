@@ -14,9 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDum
  */
 class FileEntityConfigDumperExtension extends RelationEntityConfigDumperExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preUpdate()
     {
         $entityConfigs = $this->configManager->getConfigs('extend');

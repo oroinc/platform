@@ -9,6 +9,7 @@ class ApiDocDataTypeConverterTest extends \PHPUnit\Framework\TestCase
     /** @var ApiDocDataTypeConverter */
     private $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->converter = new ApiDocDataTypeConverter(

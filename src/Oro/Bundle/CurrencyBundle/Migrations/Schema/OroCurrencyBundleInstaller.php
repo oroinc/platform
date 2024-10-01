@@ -14,17 +14,13 @@ class OroCurrencyBundleInstaller implements Installation, ContainerAwareInterfac
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v1_0';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         if ($this->container->get(ApplicationState::class)->isInstalled()) {

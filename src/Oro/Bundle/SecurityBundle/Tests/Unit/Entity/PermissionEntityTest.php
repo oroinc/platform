@@ -10,6 +10,7 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionEntity */
     private $object;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->object = new PermissionEntity();

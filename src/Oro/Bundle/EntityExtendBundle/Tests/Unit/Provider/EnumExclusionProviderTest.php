@@ -17,6 +17,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumExclusionProvider */
     private $exclusionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -19,6 +19,7 @@ class DebugVoteListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DebugVoteListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

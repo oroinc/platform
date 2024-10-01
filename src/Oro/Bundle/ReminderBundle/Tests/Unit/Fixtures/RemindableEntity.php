@@ -21,11 +21,13 @@ class RemindableEntity implements RemindableInterface
     /**
      * @return Collection
      */
+    #[\Override]
     public function getReminders()
     {
         return $this->reminders;
     }
 
+    #[\Override]
     public function setReminders(Collection $reminders)
     {
         $this->reminders = $reminders;
@@ -34,6 +36,7 @@ class RemindableEntity implements RemindableInterface
     /**
      * @return ReminderDataInterface
      */
+    #[\Override]
     public function getReminderData()
     {
         return new ReminderData();

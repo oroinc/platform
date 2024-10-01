@@ -9,17 +9,13 @@ use Psr\Log\LoggerInterface;
 
 class RemoveDictionaryGroupForBusinessUnitQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription(): string|array
     {
         return 'Remove dictionary group for BusinessUnit entity';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $sql = 'SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1';

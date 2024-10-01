@@ -37,9 +37,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
         $this->jobRunner = $jobRunner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = $message->getBody();
@@ -63,9 +61,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [PurgeEmailAttachmentsByIdsTopic::getName()];

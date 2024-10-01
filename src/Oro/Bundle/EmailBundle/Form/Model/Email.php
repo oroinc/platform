@@ -583,6 +583,7 @@ class Email implements OrganizationAwareInterface
      *
      * @return OrganizationInterface
      */
+    #[\Override]
     public function getOrganization()
     {
         return $this->organization;
@@ -594,6 +595,7 @@ class Email implements OrganizationAwareInterface
      * @param OrganizationInterface $organization
      * @return $this
      */
+    #[\Override]
     public function setOrganization(OrganizationInterface $organization)
     {
         $this->organization = $organization;

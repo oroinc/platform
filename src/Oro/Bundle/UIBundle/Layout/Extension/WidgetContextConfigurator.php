@@ -19,9 +19,7 @@ class WidgetContextConfigurator implements ContextConfiguratorInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $request = $this->requestStack->getCurrentRequest();

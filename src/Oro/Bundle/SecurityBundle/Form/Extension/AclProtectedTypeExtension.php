@@ -31,17 +31,13 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [EntityType::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $aclHelper = $this->aclHelper;

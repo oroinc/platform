@@ -146,9 +146,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
         return $this->getDoctrine()->getRepository($entityClass);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions(): array
     {
         return [
@@ -358,9 +356,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
             ->getCandidatesNames(new EmailTemplateCriteria($templateName), $templateContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

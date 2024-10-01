@@ -56,9 +56,7 @@ class LoadFromConfigBag implements ProcessorInterface
         $this->mergeSubresourceConfigHelper = $mergeSubresourceConfigHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

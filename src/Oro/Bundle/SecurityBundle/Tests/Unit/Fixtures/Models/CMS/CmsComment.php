@@ -42,6 +42,7 @@ class CmsComment
         $this->article = $article;
     }
 
+    #[\Override]
     public function __toString()
     {
         return __CLASS__."[id=".$this->id."]";

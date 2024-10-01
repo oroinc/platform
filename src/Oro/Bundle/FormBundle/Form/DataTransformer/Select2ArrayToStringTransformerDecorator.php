@@ -19,17 +19,13 @@ class Select2ArrayToStringTransformerDecorator implements DataTransformerInterfa
         $this->transformer = $transformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return $this->transformer->transform($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (is_array($value)) {

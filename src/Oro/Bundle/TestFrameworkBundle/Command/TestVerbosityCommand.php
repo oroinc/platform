@@ -17,9 +17,7 @@ class TestVerbosityCommand extends Command
 {
     protected static $defaultName = 'oro:test:verbosity';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Test verbosity level.');

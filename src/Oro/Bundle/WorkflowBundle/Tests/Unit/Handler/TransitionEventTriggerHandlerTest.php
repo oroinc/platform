@@ -38,6 +38,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionEventTrigger */
     private $trigger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);

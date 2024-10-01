@@ -19,6 +19,7 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var CurrencyExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(NumberFormatter::class);

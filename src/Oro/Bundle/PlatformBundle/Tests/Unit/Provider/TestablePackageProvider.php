@@ -16,6 +16,7 @@ class TestablePackageProvider extends PackageProvider
         $this->installedPackages = $installedPackages;
     }
 
+    #[\Override]
     protected function getInstalledPackages(): array
     {
         return $this->installedPackages;

@@ -27,6 +27,7 @@ class ImagineUrlProvider implements ImagineUrlProviderInterface
         $this->filenameExtensionHelper = $filenameExtensionHelper;
     }
 
+    #[\Override]
     public function getFilteredImageUrl(
         string $path,
         string $filterName,

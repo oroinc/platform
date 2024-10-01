@@ -29,6 +29,7 @@ class ErrorNormalizeProcessor implements ProcessorInterface
     /**
      * @param ContextInterface|TransitionContext $context
      */
+    #[\Override]
     public function process(ContextInterface $context)
     {
         //skip if custom failure handling were performed already or no failures met

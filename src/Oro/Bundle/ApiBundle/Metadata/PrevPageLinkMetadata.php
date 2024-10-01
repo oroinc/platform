@@ -24,9 +24,7 @@ class PrevPageLinkMetadata extends LinkMetadataDecorator
         $this->queryStringAccessor = $queryStringAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {
         $pageNumber = null;

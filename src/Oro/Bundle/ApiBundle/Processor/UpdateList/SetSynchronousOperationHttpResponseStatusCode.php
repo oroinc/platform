@@ -12,9 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SetSynchronousOperationHttpResponseStatusCode implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */

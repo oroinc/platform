@@ -27,6 +27,7 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
     /** @var array */
     private static $attributesData = [];
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         if (!empty(self::$attributesData)) {

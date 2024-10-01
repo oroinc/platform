@@ -9,17 +9,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class AddTransactionIdColumn implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $auditTable = $schema->getTable('oro_audit');

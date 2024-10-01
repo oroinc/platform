@@ -8,17 +8,20 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class DateTimePicker extends Element
 {
+    #[\Override]
     public function focus()
     {
         $this->open();
     }
 
+    #[\Override]
     public function blur()
     {
         $this->close();
         parent::blur();
     }
 
+    #[\Override]
     public function getValue()
     {
         $value = $this->getDatePicker()->getValue();
@@ -32,6 +35,7 @@ class DateTimePicker extends Element
     /**
      * @param string|\DateTime $value
      */
+    #[\Override]
     public function setValue($value)
     {
         $dateTime = $this->getDateTime($value);

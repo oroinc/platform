@@ -12,17 +12,13 @@ use Oro\Bundle\NoteBundle\Entity\Note;
  */
 class AddNoteActivityLists extends AddActivityListsData implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [UpdateNotesWithOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->addActivityListsForActivityClass(

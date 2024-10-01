@@ -31,9 +31,7 @@ class AttributeFieldValidator extends ConstraintValidator
         $this->attributeConfigProvider = $attributeConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$value instanceof FieldConfigModel) {

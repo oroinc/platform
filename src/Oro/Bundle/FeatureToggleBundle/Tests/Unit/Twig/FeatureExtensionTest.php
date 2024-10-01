@@ -16,6 +16,7 @@ class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

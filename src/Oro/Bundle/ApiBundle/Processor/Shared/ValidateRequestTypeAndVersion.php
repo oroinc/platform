@@ -16,9 +16,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidateRequestTypeAndVersion implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

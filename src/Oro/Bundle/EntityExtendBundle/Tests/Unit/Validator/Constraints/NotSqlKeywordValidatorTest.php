@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotSqlKeywordValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         $connection = $this->createMock(Connection::class);

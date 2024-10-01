@@ -40,6 +40,7 @@ class OrganizationBasicAuthenticator extends AbstractAuthenticator implements Au
         $this->tokenFactory = $tokenFactory;
     }
 
+    #[\Override]
     public function supports(Request $request): ?bool
     {
         $username = $request->headers->get('PHP_AUTH_USER');
@@ -59,6 +60,7 @@ class OrganizationBasicAuthenticator extends AbstractAuthenticator implements Au
         return true;
     }
 
+    #[\Override]
     public function authenticate(Request $request): Passport
     {
         $username = $request->headers->get('PHP_AUTH_USER');
@@ -78,6 +80,7 @@ class OrganizationBasicAuthenticator extends AbstractAuthenticator implements Au
         return $passport;
     }
 
+    #[\Override]
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         if (null === $this->tokenFactory) {
@@ -105,11 +108,13 @@ class OrganizationBasicAuthenticator extends AbstractAuthenticator implements Au
         return $authToken;
     }
 
+    #[\Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
     }
 
+    #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $this->logger?->info(
@@ -120,6 +125,7 @@ class OrganizationBasicAuthenticator extends AbstractAuthenticator implements Au
         return $this->start($request, $exception);
     }
 
+    #[\Override]
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
         $response = new Response();

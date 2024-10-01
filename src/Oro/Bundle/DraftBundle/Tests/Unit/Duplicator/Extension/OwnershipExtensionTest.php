@@ -25,6 +25,7 @@ class OwnershipExtensionTest extends \PHPUnit\Framework\TestCase
      */
     private $ownershipMetadataProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);

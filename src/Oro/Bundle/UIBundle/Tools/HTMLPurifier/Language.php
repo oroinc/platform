@@ -13,9 +13,7 @@ class Language extends \HTMLPurifier_Language implements TranslatorAwareInterfac
 {
     use TranslatorAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load()
     {
         if ($this->_loaded) {

@@ -41,17 +41,13 @@ class ReEncryptMigrationQuery implements MigrationQuery, ConnectionAwareInterfac
         $this->fields = $fields;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Re-encrypt database fields using new encrypter';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $select = implode(', ', array_merge(['id'], $this->fields));

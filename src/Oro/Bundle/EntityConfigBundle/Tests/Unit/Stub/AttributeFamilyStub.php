@@ -21,17 +21,13 @@ class AttributeFamilyStub extends AttributeFamily
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function __call($name, $arguments)
     {
         return $this->localizedMethodCall($this->localizedFields, $name, $arguments);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function __get(string $name)
     {
         if (\array_key_exists($name, $this->localizedFields)) {
@@ -41,9 +37,7 @@ class AttributeFamilyStub extends AttributeFamily
         throw new \RuntimeException(sprintf('It is not expected to get non-existing property "%s".', $name));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function __set(string $name, $value): void
     {
         if (\array_key_exists($name, $this->localizedFields)) {

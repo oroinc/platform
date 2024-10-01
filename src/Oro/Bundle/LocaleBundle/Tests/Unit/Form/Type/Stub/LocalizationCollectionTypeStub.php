@@ -14,7 +14,7 @@ class LocalizationCollectionTypeStub extends LocalizationCollectionType
         $this->localizations = $localizations;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     protected function getLocalizations()
     {
         return $this->localizations;

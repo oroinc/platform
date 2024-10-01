@@ -42,9 +42,7 @@ class WebSocketSendProcessor implements SendProcessorInterface
         $this->messageParamsProvider = $messageParamsProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function push(Reminder $reminder)
     {
         $recipientId = $reminder->getRecipient()->getId();
@@ -57,6 +55,7 @@ class WebSocketSendProcessor implements SendProcessorInterface
     /**
      * Send reminders using WebSocket
      */
+    #[\Override]
     public function process()
     {
         foreach ($this->remindersByRecipient as $recipientId => $reminders) {
@@ -112,9 +111,7 @@ class WebSocketSendProcessor implements SendProcessorInterface
         return $this->websocketClient->publish(sprintf('oro/reminder_remind/%s', $recipientId), $messageData);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return 'oro.reminder.processor.web_socket.label';

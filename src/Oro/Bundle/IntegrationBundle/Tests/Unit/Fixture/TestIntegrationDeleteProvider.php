@@ -7,17 +7,13 @@ use Oro\Bundle\IntegrationBundle\Manager\DeleteProviderInterface;
 
 class TestIntegrationDeleteProvider implements DeleteProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($type)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function deleteRelatedData(Integration $integration)
     {
     }

@@ -13,6 +13,7 @@ class MaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
 
     private MaintenanceExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->maintenance = $this->createMock(MaintenanceModeState::class);

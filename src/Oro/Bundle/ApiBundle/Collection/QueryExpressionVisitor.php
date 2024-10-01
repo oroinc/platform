@@ -291,9 +291,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr): mixed
     {
         $expressionType = $expr->getType();
@@ -311,9 +309,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
             ->walkCompositeExpression($processedExpressions);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison): mixed
     {
         if (!isset($this->queryAliases[0])) {
@@ -358,9 +354,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
         return $expr;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkValue(Value $value): mixed
     {
         return $value->getValue();

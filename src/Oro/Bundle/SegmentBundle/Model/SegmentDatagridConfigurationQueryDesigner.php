@@ -29,25 +29,19 @@ class SegmentDatagridConfigurationQueryDesigner extends AbstractQueryDesigner
         $this->em = $em;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntity()
     {
         return $this->segment->getEntity();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntity($entity)
     {
         $this->segment->setEntity($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefinition()
     {
         if (null === $this->segment->getId()) {
@@ -83,9 +77,7 @@ class SegmentDatagridConfigurationQueryDesigner extends AbstractQueryDesigner
         return $this->preparedDefinition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDefinition($definition)
     {
         $this->segment->setDefinition($definition);

@@ -35,9 +35,7 @@ class ColumnOptionsGuesserChain implements ColumnOptionsGuesserInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFormatter($class, $property, $type)
     {
         return $this->guess(
@@ -47,9 +45,7 @@ class ColumnOptionsGuesserChain implements ColumnOptionsGuesserInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessSorter($class, $property, $type)
     {
         return $this->guess(
@@ -59,9 +55,7 @@ class ColumnOptionsGuesserChain implements ColumnOptionsGuesserInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFilter($class, $property, $type)
     {
         return $this->guess(

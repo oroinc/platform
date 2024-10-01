@@ -31,33 +31,25 @@ abstract class AbstractTransitionButton implements ButtonInterface
         $this->buttonContext = $buttonContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return sprintf('%s_%s', $this->workflow->getName(), $this->transition->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel(): string
     {
         return (string) $this->transition->getButtonLabel();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAriaLabel(): ?string
     {
         return null; // not implemented
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIcon()
     {
         $frontendOptions = $this->transition->getFrontendOptions();
@@ -65,25 +57,19 @@ abstract class AbstractTransitionButton implements ButtonInterface
         return isset($frontendOptions['icon']) ? $frontendOptions['icon'] : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return $this->workflow->getDefinition()->getPriority();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplate()
     {
         return static::DEFAULT_TEMPLATE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateData(array $customData = [])
     {
         $showDialog = $this->transition->getDisplayType() !== 'page';
@@ -122,33 +108,24 @@ abstract class AbstractTransitionButton implements ButtonInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDatagridData()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getButtonContext()
     {
         return $this->buttonContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroup()
     {
         return ButtonInterface::DEFAULT_GROUP;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTranslationDomain()
     {
         return 'workflows';

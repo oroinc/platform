@@ -6,6 +6,7 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 
 class DestinationNameTopicSubscriber implements TopicSubscriberInterface
 {
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [

@@ -22,6 +22,7 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
     /** @var WorkflowReplacementType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = $this->createMock(WorkflowDeactivationHelper::class);
@@ -148,9 +149,7 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
         return $workflow;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

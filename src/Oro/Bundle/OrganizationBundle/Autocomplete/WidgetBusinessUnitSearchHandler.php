@@ -29,9 +29,7 @@ class WidgetBusinessUnitSearchHandler extends SearchHandler
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         $page = (int)$page > 0 ? (int)$page : 1;
@@ -42,9 +40,7 @@ class WidgetBusinessUnitSearchHandler extends SearchHandler
         return parent::search($query, $page, $perPage, $searchById);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function convertItems(array $items)
     {
         $result = parent::convertItems($items);
@@ -67,9 +63,7 @@ class WidgetBusinessUnitSearchHandler extends SearchHandler
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         if ($this->idFieldName) {

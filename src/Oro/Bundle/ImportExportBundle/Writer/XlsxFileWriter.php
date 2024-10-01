@@ -23,18 +23,14 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
         $this->clearWriter = $clearWriter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items): void
     {
         parent::write($items);
 
         $this->clearWriter->write($items);
     }
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution): void
     {
         $this->clearWriter->setStepExecution($stepExecution);
@@ -42,9 +38,7 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
         $this->setImportExportContext($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context): void
     {
         if (!$context->hasOption('filePath')) {

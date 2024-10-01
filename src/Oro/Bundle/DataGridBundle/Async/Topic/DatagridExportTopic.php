@@ -20,16 +20,19 @@ class DatagridExportTopic extends AbstractTopic
     ) {
     }
 
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.datagrid.export';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Exports a batch of rows during the datagrid data export.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

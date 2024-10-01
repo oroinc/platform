@@ -17,9 +17,7 @@ class TestButtonProviderExtension implements ButtonProviderExtensionInterface
         $this->decoratedExtension = $decoratedExtension;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         if (null === $this->decoratedExtension) {
@@ -29,9 +27,7 @@ class TestButtonProviderExtension implements ButtonProviderExtensionInterface
         return $this->decoratedExtension->find($buttonSearchContext);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isAvailable(
         ButtonInterface $button,
         ButtonSearchContext $buttonSearchContext,
@@ -44,9 +40,7 @@ class TestButtonProviderExtension implements ButtonProviderExtensionInterface
         return $this->decoratedExtension->isAvailable($button, $buttonSearchContext, $errors);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(ButtonInterface $button)
     {
         return null !== $this->decoratedExtension && $this->decoratedExtension->supports($button);

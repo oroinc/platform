@@ -15,6 +15,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var SignalExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new Context($this->createMock(SessionInterface::class));

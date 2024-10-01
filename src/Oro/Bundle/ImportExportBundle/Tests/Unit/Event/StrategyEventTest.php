@@ -17,6 +17,7 @@ class StrategyEventTest extends \PHPUnit\Framework\TestCase
     /** @var StrategyEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->strategy = $this->createMock(StrategyInterface::class);

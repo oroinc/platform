@@ -17,6 +17,7 @@ class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
     /** @var MassDeleteLimiter */
     private $limiter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = $this->createMock(AclHelper::class);

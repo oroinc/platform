@@ -41,9 +41,7 @@ class NormalizeFilterValues implements ProcessorInterface
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

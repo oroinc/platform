@@ -51,9 +51,7 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
         $this->configManager         = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -62,9 +60,7 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->runActivityLists($logger);

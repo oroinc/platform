@@ -42,6 +42,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
 
     private ReportDatagridConfigurationBuilder $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->functionProvider = $this->createMock(FunctionProviderInterface::class);

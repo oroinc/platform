@@ -14,6 +14,7 @@ class CallbackPropertyTest extends \PHPUnit\Framework\TestCase
     /** @var CallbackProperty */
     private $property;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->callable = $this->getMockBuilder(\stdClass::class)

@@ -19,6 +19,7 @@ class EntityDataControllerTest extends WebTestCase
 {
     use ResponseExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

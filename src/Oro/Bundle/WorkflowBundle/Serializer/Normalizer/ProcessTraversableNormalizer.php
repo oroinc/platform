@@ -4,9 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
 class ProcessTraversableNormalizer extends AbstractProcessNormalizer
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = [])
     {
         $normalizedData = [];
@@ -18,9 +16,7 @@ class ProcessTraversableNormalizer extends AbstractProcessNormalizer
         return $normalizedData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $denormalizedData = [];
@@ -32,17 +28,13 @@ class ProcessTraversableNormalizer extends AbstractProcessNormalizer
         return $denormalizedData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null): bool
     {
         return is_array($data) || $data instanceof \Traversable;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return is_array($data);

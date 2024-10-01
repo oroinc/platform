@@ -16,6 +16,7 @@ class ExecuteActionEventTest extends \PHPUnit\Framework\TestCase
     /** @var ExecuteActionEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = $this->createMock(ActionInterface::class);

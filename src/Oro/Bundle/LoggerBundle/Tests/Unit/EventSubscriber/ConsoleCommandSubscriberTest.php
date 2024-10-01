@@ -19,9 +19,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private Logger|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);

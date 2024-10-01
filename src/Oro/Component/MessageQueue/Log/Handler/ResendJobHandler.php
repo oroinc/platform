@@ -30,9 +30,7 @@ class ResendJobHandler extends AbstractResendHandler
         $this->consumerState = $consumerState;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isResendRequired(array $record)
     {
         return null !== $this->consumerState->getJob();

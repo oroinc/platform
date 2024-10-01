@@ -37,18 +37,14 @@ class ActivityListAccessRule implements AccessRuleInterface
         $this->activityListProvider = $activityListProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         // This check should be deleted in BAP-17679
         return $criteria->hasOption(self::ACTIVITY_OWNER_TABLE_ALIAS);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         if (!$criteria->hasOption(self::ACTIVITY_OWNER_TABLE_ALIAS)) {

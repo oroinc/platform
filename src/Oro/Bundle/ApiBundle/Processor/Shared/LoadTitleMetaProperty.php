@@ -48,9 +48,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

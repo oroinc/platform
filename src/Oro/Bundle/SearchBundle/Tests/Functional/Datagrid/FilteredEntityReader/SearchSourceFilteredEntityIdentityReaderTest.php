@@ -22,6 +22,7 @@ class SearchSourceFilteredEntityIdentityReaderTest extends SearchBundleWebTestCa
 
     protected SearchSourceFilteredEntityIdentityReader $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

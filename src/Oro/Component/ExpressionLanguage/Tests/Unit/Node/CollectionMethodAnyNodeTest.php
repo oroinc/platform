@@ -16,6 +16,7 @@ class CollectionMethodAnyNodeTest extends AbstractNodeTest
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function getEvaluateData(): array
     {
         $variables = [
@@ -123,6 +124,7 @@ class CollectionMethodAnyNodeTest extends AbstractNodeTest
         ];
     }
 
+    #[\Override]
     public function getCompileData(): array
     {
         return [
@@ -184,6 +186,7 @@ class CollectionMethodAnyNodeTest extends AbstractNodeTest
         return $arguments;
     }
 
+    #[\Override]
     public function getDumpData(): array
     {
         return [

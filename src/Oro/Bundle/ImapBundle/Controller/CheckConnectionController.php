@@ -37,6 +37,7 @@ class CheckConnectionController extends AbstractController
         return $this->container->get(ConnectionControllerManager::class);
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

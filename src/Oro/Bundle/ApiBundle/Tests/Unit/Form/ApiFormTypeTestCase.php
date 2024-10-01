@@ -28,6 +28,7 @@ class ApiFormTypeTestCase extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $formExtensionChecker = $this->createMock(FormExtensionCheckerInterface::class);

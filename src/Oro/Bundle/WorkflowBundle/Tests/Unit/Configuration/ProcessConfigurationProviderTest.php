@@ -20,6 +20,7 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     private ProcessTriggerListConfiguration $triggerConfiguration;
     private Kernel $kernel;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(Kernel::class);

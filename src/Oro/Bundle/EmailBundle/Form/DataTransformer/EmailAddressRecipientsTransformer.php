@@ -10,9 +10,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class EmailAddressRecipientsTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (!is_array($value)) {
@@ -22,9 +20,7 @@ class EmailAddressRecipientsTransformer implements DataTransformerInterface
         return EmailRecipientsHelper::prepareFormRecipientIds($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (is_array($value)) {

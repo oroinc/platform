@@ -22,9 +22,7 @@ class RemoveTableQuery extends ParametrizedMigrationQuery
         $this->entityClass = $entityClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $sql = 'SELECT id FROM oro_entity_config WHERE class_name = ? LIMIT 1';
@@ -48,9 +46,7 @@ class RemoveTableQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql, $parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Remove config of entity' . $this->entityClass;

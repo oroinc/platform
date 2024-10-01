@@ -21,9 +21,7 @@ class ValidateEmailBodyExists implements ProcessorInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

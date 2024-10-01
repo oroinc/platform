@@ -26,9 +26,7 @@ class AddIncludeFilter implements ProcessorInterface
         $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

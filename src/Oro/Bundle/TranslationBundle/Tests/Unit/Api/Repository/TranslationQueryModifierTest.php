@@ -23,6 +23,7 @@ class TranslationQueryModifierTest extends OrmTestCase
     private EntityManagerInterface $em;
     private TranslationQueryModifier $queryModifier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

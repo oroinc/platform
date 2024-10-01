@@ -41,9 +41,7 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
         $this->emailRecipientsHelper = $emailRecipientsHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRecipients(EmailRecipientsProviderArgs $args)
     {
         $user = $this->tokenAccessor->getUser();
@@ -80,9 +78,7 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSection(): string
     {
         return 'oro.email.autocomplete.recently_used';

@@ -10,6 +10,7 @@ use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
 class GetPropertyNodeTest extends AbstractNodeTest
 {
+    #[\Override]
     public function getEvaluateData(): array
     {
         return [
@@ -43,6 +44,7 @@ class GetPropertyNodeTest extends AbstractNodeTest
         ];
     }
 
+    #[\Override]
     public function getCompileData(): array
     {
         return [
@@ -58,6 +60,7 @@ class GetPropertyNodeTest extends AbstractNodeTest
         ];
     }
 
+    #[\Override]
     public function getDumpData(): array
     {
         return [

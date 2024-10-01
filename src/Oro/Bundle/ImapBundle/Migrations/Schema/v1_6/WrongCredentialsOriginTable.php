@@ -11,9 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class WrongCredentialsOriginTable implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         if (!$schema->hasTable('oro_imap_wrong_creds_origin')) {

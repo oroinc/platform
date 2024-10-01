@@ -19,9 +19,7 @@ class EntityExtendUpdateHandler implements EntityExtendUpdateHandlerInterface
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function update(): EntityExtendUpdateResult
     {
         $this->maintenance->activate();

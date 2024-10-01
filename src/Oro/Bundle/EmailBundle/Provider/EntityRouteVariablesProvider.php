@@ -25,9 +25,7 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableDefinitions(): array
     {
         $result = [];
@@ -43,17 +41,13 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableGetters(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableProcessors(string $entityClass): array
     {
         return $this->getEntityVariableProcessors($entityClass);

@@ -27,9 +27,7 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
         $this->workflowDefinition = $workflowDefinition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         $context = new \ArrayObject([]);

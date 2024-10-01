@@ -17,6 +17,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
         'fields[testapientity2]' => 'name,computedName,computedIds,biM2OOwners,biM2MOwners,biO2MOwner'
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

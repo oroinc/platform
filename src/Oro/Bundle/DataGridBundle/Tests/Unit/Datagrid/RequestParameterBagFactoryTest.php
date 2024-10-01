@@ -15,6 +15,7 @@ class RequestParameterBagFactoryTest extends \PHPUnit\Framework\TestCase
     private RequestStack $requestStack;
     private RequestParameterBagFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();

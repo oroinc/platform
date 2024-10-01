@@ -24,18 +24,14 @@ class DatabaseConnectionsClearExtension extends AbstractExtension
         $this->connections = $connections;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context): void
     {
         $connections = $this->getAliveConnections();
         $this->close($connections);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context): void
     {
         $connections = $this->getAliveConnections();

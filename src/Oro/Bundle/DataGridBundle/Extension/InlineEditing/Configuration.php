@@ -55,9 +55,7 @@ class Configuration implements ConfigurationInterface
         $this->behaviourConfigValues = [self::BEHAVIOUR_ENABLE_SELECTED, self::BEHAVIOUR_ENABLE_ALL_VALUE];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder($this->root);

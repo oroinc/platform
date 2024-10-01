@@ -18,6 +18,7 @@ class ValidateEntityObjectsAccessTest extends DeleteListProcessorTestCase
     /** @var ValidateEntityObjectAccess */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

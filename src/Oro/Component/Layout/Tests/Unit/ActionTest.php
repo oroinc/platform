@@ -9,6 +9,7 @@ class ActionTest extends \PHPUnit\Framework\TestCase
     /** @var Action */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new Action('test_action', ['arg1']);

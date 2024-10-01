@@ -16,9 +16,7 @@ class BuildTopicMetaRegistryPass implements CompilerPassInterface
 {
     use MessageProcessorsMetadataTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $metaRegistryId = 'oro_message_queue.client.meta.topic_meta_registry';

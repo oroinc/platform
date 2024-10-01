@@ -47,9 +47,7 @@ class RegistryDelegateProcessor implements ProcessorInterface, StepExecutionAwar
         $this->contextRegistry = $contextRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($item)
     {
         return $this->getDelegateProcessor()->process($item);
@@ -90,14 +88,13 @@ class RegistryDelegateProcessor implements ProcessorInterface, StepExecutionAwar
         return $result;
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close()
     {
         $delegateProcessor = $this->getDelegateProcessor();

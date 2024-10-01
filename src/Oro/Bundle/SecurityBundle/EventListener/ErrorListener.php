@@ -13,8 +13,8 @@ class ErrorListener extends BaseErrorListener
     /**
      * Changes log levels of exceptions
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function logException(\Throwable $exception, string $message, string $logLevel = null): void
     {
         if (null !== $this->logger && $exception instanceof AccessDeniedHttpException) {

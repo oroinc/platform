@@ -10,6 +10,7 @@ class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
 {
     private LayoutRendererRegistry $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = new LayoutRendererRegistry();

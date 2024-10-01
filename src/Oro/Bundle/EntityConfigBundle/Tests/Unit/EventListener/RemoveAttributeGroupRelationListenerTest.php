@@ -23,6 +23,7 @@ class RemoveAttributeGroupRelationListenerTest extends \PHPUnit\Framework\TestCa
     /** @var RemoveAttributeGroupRelationListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

@@ -46,6 +46,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
 
     abstract protected function getExtension(): AbstractFieldsExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

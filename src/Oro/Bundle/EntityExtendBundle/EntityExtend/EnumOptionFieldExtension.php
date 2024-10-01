@@ -31,6 +31,7 @@ class EnumOptionFieldExtension extends AbstractEntityFieldExtension implements E
         return true;
     }
 
+    #[\Override]
     public function get(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport) || $transport->getName() !== self::PROPERTY_NAME) {
@@ -42,10 +43,12 @@ class EnumOptionFieldExtension extends AbstractEntityFieldExtension implements E
         );
     }
 
+    #[\Override]
     public function set(EntityFieldProcessTransport $transport): void
     {
     }
 
+    #[\Override]
     public function call(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport)) {
@@ -61,6 +64,7 @@ class EnumOptionFieldExtension extends AbstractEntityFieldExtension implements E
         }
     }
 
+    #[\Override]
     public function propertyExists(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport) || $transport->getName() !== self::PROPERTY_NAME) {
@@ -70,6 +74,7 @@ class EnumOptionFieldExtension extends AbstractEntityFieldExtension implements E
         $transport->setResult(true);
     }
 
+    #[\Override]
     public function methodExists(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport) || $transport->getName() !== self::METHOD_NAME) {

@@ -21,9 +21,7 @@ class EntityDeleteHandlerCompilerPass implements CompilerPassInterface
     private const EXTENSION_REGISTRY_SERVICE = 'oro_entity.delete_handler_extension_registry';
     private const EXTENSION_TAG_NAME         = 'oro_entity.delete_handler_extension';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->register($container, self::HANDLER_REGISTRY_SERVICE, self::HANDLER_TAG_NAME);

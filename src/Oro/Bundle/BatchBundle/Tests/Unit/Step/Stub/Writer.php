@@ -13,10 +13,10 @@ class Writer implements ItemWriterInterface, ClosableInterface
     public const LOGIC_EXCEPTION_MESSAGE = 'Writer logic exception message';
 
     /**
-     * {@inheritdoc}
      *
      * @throws InvalidItemException
      */
+    #[\Override]
     public function write(array $items): void
     {
         foreach ($items as $item) {
@@ -30,9 +30,7 @@ class Writer implements ItemWriterInterface, ClosableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close(): void
     {
         throw new \LogicException(self::LOGIC_EXCEPTION_MESSAGE);

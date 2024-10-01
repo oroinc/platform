@@ -24,6 +24,7 @@ class SpecificationCountDivider implements SpecificationDividerInterface
      *                 'AcmeSuite#1' => ['/path/to/third.feature'],
      *               ]
      */
+    #[\Override]
     public function divide($baseName, array $array, $divider)
     {
         $generatedSuites = [];

@@ -41,9 +41,7 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
         $this->auditRecordValidator = $auditRecordValidator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convert(
         string $auditEntryClass,
         string $auditFieldClass,

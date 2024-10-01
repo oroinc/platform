@@ -84,6 +84,7 @@ class MenuUpdate implements
         $this->traitConstructor();
     }
 
+    #[\Override]
     public function getLinkAttributes(): array
     {
         return [];

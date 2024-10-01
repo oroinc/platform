@@ -37,6 +37,7 @@ class DataAuditTest extends WebTestCase
     use AuditChangedEntitiesExtensionTrait;
     use JobsAwareTestTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -53,6 +54,7 @@ class DataAuditTest extends WebTestCase
         );
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $doctrine = self::getContainer()->get('doctrine');

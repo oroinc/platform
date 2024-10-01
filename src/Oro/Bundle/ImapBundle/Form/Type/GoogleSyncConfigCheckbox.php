@@ -12,17 +12,13 @@ class GoogleSyncConfigCheckbox extends ConfigCheckbox
 {
     const NAME = 'oro_config_google_imap_sync_checkbox';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return $this->getName();

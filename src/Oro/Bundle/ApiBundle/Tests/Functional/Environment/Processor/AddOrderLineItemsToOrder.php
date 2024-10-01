@@ -17,9 +17,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddOrderLineItemsToOrder implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

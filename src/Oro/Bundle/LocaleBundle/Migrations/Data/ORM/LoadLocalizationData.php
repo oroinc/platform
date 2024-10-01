@@ -23,9 +23,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $locale = $this->getLocale();
@@ -118,9 +116,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         return Locales::exists($locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadLanguageData::class];

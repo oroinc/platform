@@ -51,6 +51,7 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager */
     private $configManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);

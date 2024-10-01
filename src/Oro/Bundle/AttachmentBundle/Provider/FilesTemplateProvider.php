@@ -14,6 +14,7 @@ class FilesTemplateProvider implements FilesTemplateProviderInterface
         $this->filesTemplate = $filesTemplate;
     }
 
+    #[\Override]
     public function getTemplate(): string
     {
         return $this->filesTemplate;

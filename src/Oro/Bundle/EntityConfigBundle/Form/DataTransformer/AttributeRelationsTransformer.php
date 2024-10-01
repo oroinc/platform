@@ -23,9 +23,7 @@ class AttributeRelationsTransformer implements DataTransformerInterface
         $this->attributeGroup = $attributeGroup;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($collectionToArray)
     {
         if (null === $collectionToArray) {
@@ -41,9 +39,7 @@ class AttributeRelationsTransformer implements DataTransformerInterface
         return $selected;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($arrayToCollection)
     {
         // New group(null) passed - create empty instance

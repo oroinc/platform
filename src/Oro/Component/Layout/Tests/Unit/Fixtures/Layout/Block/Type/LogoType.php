@@ -10,9 +10,7 @@ use Oro\Component\Layout\BlockView;
 
 class LogoType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -22,17 +20,13 @@ class LogoType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $view->vars['title'] = $options['title'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'logo';

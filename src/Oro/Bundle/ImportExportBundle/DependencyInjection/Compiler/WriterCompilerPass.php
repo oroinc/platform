@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class WriterCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('oro_importexport.writer.writer_chain')) {

@@ -30,6 +30,7 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
     /** @var MaintenanceListener */
     private $maintenanceListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(AbstractDriver::class);

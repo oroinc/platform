@@ -32,6 +32,7 @@ class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
     /** @var InstallerEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();

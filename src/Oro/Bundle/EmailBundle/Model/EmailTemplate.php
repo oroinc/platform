@@ -77,6 +77,7 @@ class EmailTemplate implements EmailTemplateInterface
         ];
     }
 
+    #[\Override]
     public function getName(): ?string
     {
         return $this->name;
@@ -89,6 +90,7 @@ class EmailTemplate implements EmailTemplateInterface
         return $this;
     }
 
+    #[\Override]
     public function getType(): ?string
     {
         return $this->type;
@@ -113,6 +115,7 @@ class EmailTemplate implements EmailTemplateInterface
         return $this;
     }
 
+    #[\Override]
     public function getSubject(): ?string
     {
         return $this->subject;
@@ -125,6 +128,7 @@ class EmailTemplate implements EmailTemplateInterface
         return $this;
     }
 
+    #[\Override]
     public function getContent(): ?string
     {
         return $this->content;

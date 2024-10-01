@@ -149,9 +149,7 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
         $this->path = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function tryGetValue(string $propertyPath, mixed &$value): bool
     {
         if (self::PATH === $propertyPath) {

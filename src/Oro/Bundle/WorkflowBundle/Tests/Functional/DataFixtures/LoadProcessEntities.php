@@ -73,9 +73,7 @@ class LoadProcessEntities extends AbstractFixture
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->definitions as $name => $config) {

@@ -30,25 +30,19 @@ class TagController extends RestController
         return $this->handleDeleteRequest($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_tag.tag.manager.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_tag.form.tag.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_tag.form.handler.api');

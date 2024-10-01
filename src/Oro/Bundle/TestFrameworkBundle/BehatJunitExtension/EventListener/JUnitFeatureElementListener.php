@@ -71,9 +71,6 @@ class JUnitFeatureElementListener
         $this->setupPrinter = $setupPrinter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function listenEvent(Formatter $formatter, Event $event, $eventName)
     {
         if ($event instanceof ScenarioTested) {

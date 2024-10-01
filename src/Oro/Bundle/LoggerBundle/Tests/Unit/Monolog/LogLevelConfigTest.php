@@ -21,9 +21,7 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
 
     private ItemInterface|\PHPUnit\Framework\MockObject\MockObject  $cacheItemMock;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

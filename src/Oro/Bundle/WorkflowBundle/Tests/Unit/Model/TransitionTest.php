@@ -31,6 +31,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     private Transition $transition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);

@@ -22,6 +22,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class EntityOverrideTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

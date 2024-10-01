@@ -43,9 +43,7 @@ class UpdateExtendConfigMigration implements Migration, ResetContainerMigration,
         $this->initialEntityConfigStatePath = $initialEntityConfigStatePath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $extendOptions = $schema instanceof ExtendSchema ? $schema->getExtendOptions() : [];

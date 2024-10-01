@@ -16,6 +16,7 @@ class FinishImportListenerTest extends TestCase
     private JsTranslationDumper|MockObject $translationDumper;
     private DynamicAssetVersionManager|MockObject $dynamicAssetVersionManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationDumper = self::createMock(JsTranslationDumper::class);

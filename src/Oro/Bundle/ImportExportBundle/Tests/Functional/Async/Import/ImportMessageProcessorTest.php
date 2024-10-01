@@ -18,11 +18,13 @@ class ImportMessageProcessorTest extends WebTestCase
     use MessageQueueExtension;
     use JobsAwareTestTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->getImportExportFileManager()->deleteFile('import.csv');

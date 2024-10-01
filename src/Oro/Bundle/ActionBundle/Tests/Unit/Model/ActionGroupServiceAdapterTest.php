@@ -14,6 +14,7 @@ class ActionGroupServiceAdapterTest extends TestCase
 {
     private ParametersResolver $parametersResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->parametersResolver = new ParametersResolver();

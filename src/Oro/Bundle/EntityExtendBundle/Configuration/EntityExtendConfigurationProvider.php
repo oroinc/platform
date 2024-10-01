@@ -26,9 +26,7 @@ class EntityExtendConfigurationProvider extends PhpArrayConfigProvider
         return $config['underlying_types'] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];

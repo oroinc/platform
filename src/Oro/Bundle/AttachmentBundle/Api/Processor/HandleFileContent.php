@@ -25,9 +25,7 @@ class HandleFileContent implements ProcessorInterface
         $this->fileManager = $fileManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

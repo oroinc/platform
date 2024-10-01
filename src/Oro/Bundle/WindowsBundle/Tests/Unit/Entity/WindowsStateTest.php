@@ -9,6 +9,7 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
 {
     private WindowsState $windowState;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->windowState = new WindowsState();

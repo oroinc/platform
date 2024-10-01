@@ -17,6 +17,7 @@ class ChainMessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
     /** @var ChainMessageToArrayConverter */
     private $chainConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->converter1 = $this->createMock(MessageToArrayConverterInterface::class);

@@ -20,6 +20,7 @@ class ResourceCheckerRegistryPassTest extends \PHPUnit\Framework\TestCase
     /** @var Definition */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

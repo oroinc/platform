@@ -10,9 +10,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class BooleanToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -26,9 +24,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
         return $value ? 'true' : 'false';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!\is_string($value)) {

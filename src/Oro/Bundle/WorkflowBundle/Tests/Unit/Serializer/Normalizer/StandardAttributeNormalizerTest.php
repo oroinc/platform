@@ -17,6 +17,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var StandardAttributeNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflow = $this->createMock(Workflow::class);

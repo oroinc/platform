@@ -30,17 +30,13 @@ class SearchStringManager extends AbstractSearchStringManager
         'received:after' => 'SINCE'
     );
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getNameValueDelimiter()
     {
         return ' ';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getKeyword($itemName)
     {
         if (!isset(static::$keywords[$itemName])) {
@@ -50,9 +46,7 @@ class SearchStringManager extends AbstractSearchStringManager
         return static::$keywords[$itemName];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isAcceptableItem($name, $value, $match)
     {
         if (!isset(static::$keywords[$name])) {
@@ -64,9 +58,7 @@ class SearchStringManager extends AbstractSearchStringManager
             || ($match === SearchQueryMatch::SUBSTRING_MATCH);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildSearchString(SearchQueryExpr $searchQueryExpr)
     {
         return $this->processExpr($this->arrangeExpr($searchQueryExpr));
@@ -204,6 +196,7 @@ class SearchStringManager extends AbstractSearchStringManager
      * @param mixed $value
      * @return string
      */
+    #[\Override]
     protected function formatDate($value)
     {
         if ($value instanceof \DateTime) {

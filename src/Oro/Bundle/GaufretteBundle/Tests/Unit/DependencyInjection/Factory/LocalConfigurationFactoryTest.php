@@ -9,6 +9,7 @@ class LocalConfigurationFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var LocalConfigurationFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new LocalConfigurationFactory();

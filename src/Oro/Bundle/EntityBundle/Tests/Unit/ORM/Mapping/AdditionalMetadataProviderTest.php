@@ -24,6 +24,7 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheItem;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadataFactory = $this->createMock(ClassMetadataFactory::class);

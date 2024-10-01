@@ -16,9 +16,7 @@ class EnumSelectType extends AbstractEnumType
 {
     const NAME = 'oro_enum_select';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         parent::buildView($view, $form, $options);
@@ -27,9 +25,7 @@ class EnumSelectType extends AbstractEnumType
         $this->excludeChoices($view, $options['excluded_values']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
@@ -71,9 +67,7 @@ class EnumSelectType extends AbstractEnumType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return Select2TranslatableEntityType::class;
@@ -84,9 +78,7 @@ class EnumSelectType extends AbstractEnumType
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

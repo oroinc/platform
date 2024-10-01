@@ -15,9 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WidgetFilterType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('entity', HiddenType::class, ['data' => $options['entity']]);
@@ -44,9 +42,7 @@ class WidgetFilterType extends AbstractType
             ->addViewTransformer(new ArrayToJsonTransformer());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widgetType']  = $options['widgetType'];
@@ -55,9 +51,7 @@ class WidgetFilterType extends AbstractType
         parent::buildView($view, $form, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -71,17 +65,12 @@ class WidgetFilterType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_dashboard_query_filter';

@@ -9,11 +9,13 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 
 class AccessRule1 implements AccessRuleInterface
 {
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         $criteria->andExpression(new Comparison(new Path('owner'), Comparison::IN, [1,2,3,4,5]));
     }
 
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         return true;

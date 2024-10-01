@@ -15,9 +15,7 @@ class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
     const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -30,9 +28,7 @@ class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->splitGroups($logger);

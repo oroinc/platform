@@ -16,6 +16,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
     /** @var FallbackPropertyType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
@@ -30,9 +31,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

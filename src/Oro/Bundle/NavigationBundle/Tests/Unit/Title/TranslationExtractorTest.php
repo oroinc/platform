@@ -18,6 +18,7 @@ class TranslationExtractorTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationExtractor */
     private $translatorExtractor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->titleReaderRegistry = $this->createMock(TitleReaderRegistry::class);

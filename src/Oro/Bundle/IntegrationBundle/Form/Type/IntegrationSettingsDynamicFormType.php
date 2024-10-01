@@ -10,9 +10,7 @@ class IntegrationSettingsDynamicFormType extends AbstractType
 {
     const NAME = 'oro_integration_integration_settings_type';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['fields'] as $fieldName => $field) {
@@ -20,9 +18,7 @@ class IntegrationSettingsDynamicFormType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         /**
@@ -41,17 +37,12 @@ class IntegrationSettingsDynamicFormType extends AbstractType
         $resolver->setAllowedTypes('fields', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

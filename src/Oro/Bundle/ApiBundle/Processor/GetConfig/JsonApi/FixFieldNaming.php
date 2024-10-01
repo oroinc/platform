@@ -16,9 +16,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class FixFieldNaming implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

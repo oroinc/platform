@@ -11,6 +11,7 @@ class LocalizationSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new LocalizationSelectType();

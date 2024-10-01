@@ -11,9 +11,7 @@ use Doctrine\DBAL\Configuration;
  */
 class PersistentConnectionFactory extends ConnectionFactory
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createConnection(
         array $params,
         Configuration $config = null,

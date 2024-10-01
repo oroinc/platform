@@ -12,17 +12,13 @@ class DataStorageExtension implements DataStorageInterface
     /** @var array */
     private $data = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function has($key)
     {
         return array_key_exists($key, $this->data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($key, $default = null)
     {
         return array_key_exists($key, $this->data)
@@ -30,17 +26,13 @@ class DataStorageExtension implements DataStorageInterface
             : $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function set($key, $value)
     {
         $this->data[$key] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($key)
     {
         unset($this->data[$key]);

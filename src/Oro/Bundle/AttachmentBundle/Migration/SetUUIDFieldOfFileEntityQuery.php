@@ -23,9 +23,7 @@ class SetUUIDFieldOfFileEntityQuery extends ParametrizedMigrationQuery
         $this->databasePlatform = $databasePlatform;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription(): array
     {
         $logger = new ArrayLogger();
@@ -34,9 +32,7 @@ class SetUUIDFieldOfFileEntityQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $this->doExecute($logger);

@@ -17,6 +17,7 @@ class InsertFromSelectNoConflictQueryExecutorTest extends WebTestCase
 {
     private InsertFromSelectNoConflictQueryExecutor $queryExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

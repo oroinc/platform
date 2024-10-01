@@ -17,9 +17,7 @@ class DriverFactory implements DriverFactoryInterface
         $this->connectionToDriverMap = $connectionToDriverMap;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create(ConnectionInterface $connection, Config $config)
     {
         $connectionClass = get_class($connection);

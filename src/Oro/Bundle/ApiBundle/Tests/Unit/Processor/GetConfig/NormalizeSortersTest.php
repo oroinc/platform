@@ -14,6 +14,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
     /** @var NormalizeSorters */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -40,6 +40,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EnumEntityConfigDumperExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

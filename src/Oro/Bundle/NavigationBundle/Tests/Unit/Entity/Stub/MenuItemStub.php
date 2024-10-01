@@ -36,59 +36,43 @@ class MenuItemStub implements ItemInterface
     /** @var bool */
     protected $display = true;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFactory(FactoryInterface $factory): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setName($name): self
     {
         $this->name = $name;
@@ -96,17 +80,13 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUri(): ?string
     {
         return $this->uri;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setUri($uri): self
     {
         $this->uri = $uri;
@@ -114,17 +94,13 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel(): string
     {
         return $this->label ?: $this->getName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLabel($label): self
     {
         $this->label = $label;
@@ -132,17 +108,13 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAttributes(): array
     {
         return $this->attributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setAttributes(array $attributes): self
     {
         $this->attributes = $attributes;
@@ -150,9 +122,7 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAttribute($name, $default = null)
     {
         if (array_key_exists($name, $this->attributes)) {
@@ -162,9 +132,7 @@ class MenuItemStub implements ItemInterface
         return $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setAttribute($name, $value): self
     {
         $this->attributes[$name] = $value;
@@ -172,101 +140,73 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLinkAttributes(): array
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLinkAttributes(array $linkAttributes): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLinkAttribute($name, $default = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLinkAttribute($name, $value): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getChildrenAttributes(): array
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setChildrenAttributes(array $childrenAttributes): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getChildrenAttribute($name, $default = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setChildrenAttribute($name, $value): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabelAttributes(): array
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLabelAttributes(array $labelAttributes): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabelAttribute($name, $default = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLabelAttribute($name, $value): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtras(): array
     {
         return $this->extras;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setExtras(array $extras): self
     {
         $this->extras = $extras;
@@ -274,9 +214,7 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtra($name, $default = null)
     {
         if (array_key_exists($name, $this->extras)) {
@@ -286,9 +224,7 @@ class MenuItemStub implements ItemInterface
         return $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setExtra($name, $value): self
     {
         $this->extras[$name] = $value;
@@ -296,32 +232,24 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDisplayChildren(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDisplayChildren($bool): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isDisplayed(): bool
     {
         return $this->display;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDisplay(bool $bool): ItemInterface
     {
         $this->display = $bool;
@@ -329,9 +257,7 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addChild($child, array $options = []): self
     {
         $this->children[] = $child;
@@ -339,9 +265,7 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getChild($name): ?self
     {
         if (array_key_exists($name, $this->children)) {
@@ -351,52 +275,38 @@ class MenuItemStub implements ItemInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reorderChildren($order): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function copy(): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLevel(): int
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRoot(): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isRoot(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?self
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setParent(ItemInterface $parent = null): self
     {
         $this->parent = $parent;
@@ -404,17 +314,13 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getChildren(): array
     {
         return $this->children;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setChildren(array $children): self
     {
         $this->children = $children;
@@ -422,9 +328,7 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeChild($name): self
     {
         if (array_key_exists($name, $this->children)) {
@@ -434,73 +338,53 @@ class MenuItemStub implements ItemInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFirstChild(): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLastChild(): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasChildren(): bool
     {
         return !empty($this->children);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setCurrent($bool): self
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isCurrent(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isLast(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFirst(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function actsLikeFirst(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function actsLikeLast(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function count(): int
     {
         return count($this->children);

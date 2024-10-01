@@ -27,9 +27,7 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
         $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($actionType)
     {
         if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {
@@ -39,9 +37,7 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preUpdate()
     {
         $targetEntityConfigs = $this->configManager->getProvider('extend')->getConfigs();

@@ -23,6 +23,7 @@ class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
         return $this->securityPolicy->{$name}(...$arguments);
     }
 
+    #[\Override]
     public function checkSecurity($tags, $filters, $functions): void
     {
         $this->ensureInitialized();
@@ -30,6 +31,7 @@ class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
         $this->securityPolicy->checkSecurity($tags, $filters, $functions);
     }
 
+    #[\Override]
     public function checkMethodAllowed($obj, $method): void
     {
         if (str_contains($obj::class, '\Entity\\')
@@ -43,6 +45,7 @@ class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
         $this->securityPolicy->checkMethodAllowed($obj, $method);
     }
 
+    #[\Override]
     public function checkPropertyAllowed($obj, $property): void
     {
         $this->ensureInitialized();

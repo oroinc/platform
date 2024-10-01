@@ -85,6 +85,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListMessageProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

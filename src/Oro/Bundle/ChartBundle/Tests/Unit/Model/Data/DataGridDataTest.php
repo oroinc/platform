@@ -14,6 +14,7 @@ class DataGridDataTest extends TestCase
     private DatagridInterface|MockObject $grid;
     private DataGridData $data;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->grid = $this->createMock(DatagridInterface::class);

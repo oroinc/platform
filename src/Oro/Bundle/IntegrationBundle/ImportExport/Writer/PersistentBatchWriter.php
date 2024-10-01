@@ -54,9 +54,7 @@ class PersistentBatchWriter implements
         $this->logger          = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items)
     {
         /** @var EntityManager $em */
@@ -107,6 +105,7 @@ class PersistentBatchWriter implements
         $this->eventDispatcher->dispatch(new WriterAfterFlushEvent($em), WriterAfterFlushEvent::NAME);
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->previousStepExecution = $this->stepExecution;
@@ -114,9 +113,7 @@ class PersistentBatchWriter implements
         $this->stepExecution = $stepExecution;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function restoreStepExecution()
     {
         $this->stepExecution = $this->previousStepExecution;

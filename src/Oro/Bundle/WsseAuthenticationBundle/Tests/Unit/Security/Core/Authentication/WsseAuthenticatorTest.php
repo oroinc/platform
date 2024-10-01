@@ -41,6 +41,7 @@ class WsseAuthenticatorTest extends \PHPUnit\Framework\TestCase
     private MockObject|WsseEntryPoint $featureDependAuthenticatorChecker;
     private WsseAuthenticator $wsseAuthenticator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);

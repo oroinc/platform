@@ -15,6 +15,7 @@ class ImageFileNamesProviderTest extends \PHPUnit\Framework\TestCase
 
     private ImageFileNamesProvider $fileNamesProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterConfiguration = $this->createMock(FilterConfiguration::class);

@@ -11,6 +11,7 @@ class RemoveEmptyUnauthorizedResponseErrorTest extends UnhandledErrorProcessorTe
     /** @var RemoveEmptyUnauthorizedResponseError */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

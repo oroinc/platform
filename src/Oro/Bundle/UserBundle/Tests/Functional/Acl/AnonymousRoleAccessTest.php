@@ -14,6 +14,7 @@ class AnonymousRoleAccessTest extends RestJsonApiTestCase
 {
     use SearchExtensionTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

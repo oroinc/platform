@@ -11,6 +11,7 @@ class PushBatchLogHandlerPassTest extends \PHPUnit\Framework\TestCase
 {
     private PushBatchLogHandlerPass $pushBatchLogHandlerPass;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->pushBatchLogHandlerPass = new PushBatchLogHandlerPass();

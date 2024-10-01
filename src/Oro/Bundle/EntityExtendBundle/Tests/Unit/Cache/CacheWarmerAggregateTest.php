@@ -18,6 +18,7 @@ class CacheWarmerAggregateTest extends \PHPUnit\Framework\TestCase
     /** @var CacheWarmerAggregate */
     private $cacheWarmerAggregate;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheWarmer = $this->createMock(SymfonyCacheWarmerAggregate::class);

@@ -32,9 +32,7 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -138,9 +136,7 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->getLocaleSettings()->isFormatAddressByAddressCountry();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

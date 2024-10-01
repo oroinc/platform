@@ -29,9 +29,7 @@ class FileConstraintFromEntityFieldConfigValidator extends ConstraintValidator
         $this->fileConstraintsProvider = $mimeTypesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(ExecutionContextInterface $context): void
     {
         parent::initialize($context);
@@ -39,9 +37,7 @@ class FileConstraintFromEntityFieldConfigValidator extends ConstraintValidator
         $this->fileValidator->initialize($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof FileConstraintFromEntityFieldConfig) {

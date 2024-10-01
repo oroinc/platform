@@ -88,6 +88,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     /**
      * Gets the number of objects in the collection
      */
+    #[\Override]
     public function count(): int
     {
         return \count($this->objects);
@@ -154,6 +155,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     /**
      * Gets an iterator to get all objects from the collection.
      */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->objects);

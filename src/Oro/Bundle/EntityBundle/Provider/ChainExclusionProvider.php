@@ -30,9 +30,7 @@ class ChainExclusionProvider implements ExclusionProviderInterface
         $this->providers[] = $provider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredEntity($className)
     {
         foreach ($this->providers as $provider) {
@@ -44,9 +42,7 @@ class ChainExclusionProvider implements ExclusionProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         foreach ($this->providers as $provider) {
@@ -58,9 +54,7 @@ class ChainExclusionProvider implements ExclusionProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         foreach ($this->providers as $provider) {

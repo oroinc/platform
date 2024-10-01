@@ -10,6 +10,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
 {
     private GenderProvider $genderProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

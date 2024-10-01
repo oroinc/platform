@@ -8,6 +8,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
 {
     private Config $config;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->config = new Config(

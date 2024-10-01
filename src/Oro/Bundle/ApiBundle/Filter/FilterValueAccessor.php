@@ -17,9 +17,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     private array $groups;
     private ?string $defaultGroupName = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function has(string $key): bool
     {
         $this->ensureInitialized();
@@ -44,9 +42,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get(string $key): array
     {
         $this->ensureInitialized();
@@ -71,9 +67,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOne(string $key): ?FilterValue
     {
         $values = $this->get($key);
@@ -84,9 +78,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         return end($values);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getGroup(string $group): array
     {
         $this->ensureInitialized();
@@ -94,25 +86,19 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         return $this->groups[$group] ?? [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDefaultGroupName(): ?string
     {
         return $this->defaultGroupName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setDefaultGroupName(?string $group): void
     {
         $this->defaultGroupName = $group;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAll(): array
     {
         $this->ensureInitialized();
@@ -120,9 +106,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         return $this->parameters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function set(string $key, ?FilterValue $value): void
     {
         $this->ensureInitialized();
@@ -136,9 +120,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function remove(string $key): void
     {
         $this->ensureInitialized();
@@ -148,9 +130,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         unset($this->parameters[$key], $this->groups[$group][$key]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getQueryString(): string
     {
         $this->ensureInitialized();

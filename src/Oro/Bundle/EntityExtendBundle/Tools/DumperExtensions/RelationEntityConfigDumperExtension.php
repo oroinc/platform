@@ -28,17 +28,13 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($actionType)
     {
         return ExtendConfigDumper::ACTION_PRE_UPDATE === $actionType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preUpdate()
     {
         $entityConfigs = $this->configManager->getConfigs('extend');

@@ -39,10 +39,10 @@ class SyncProcessor extends AbstractSyncProcessor
      * Process integration synchronization
      * By default, if $connector is empty, will process all connectors of given integration
      *
-     * {@inheritdoc}
      *
      * @return boolean
      */
+    #[\Override]
     public function process(Integration $integration, $connector = null, array $parameters = [])
     {
         if (!$integration->isEnabled()) {
@@ -315,9 +315,7 @@ class SyncProcessor extends AbstractSyncProcessor
         return $status;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function formatResultMessage(ContextInterface $context = null)
     {
         return sprintf(

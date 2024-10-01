@@ -20,9 +20,7 @@ class MultiCurrencyTypeFormatter implements TypeFormatterInterface
         $this->formatter = $formatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatType($value, $type)
     {
         if ('' === $value) {

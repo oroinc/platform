@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NewAddressValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): NewAddressValidator
     {
         return new NewAddressValidator();

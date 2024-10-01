@@ -46,11 +46,11 @@ class DigitalAssetSourceFileMimeTypeValidator extends ConstraintValidator implem
     }
 
     /**
-     * {@inheritdoc}
      *
      * @param mixed|DigitalAsset $value
      * @param Constraint|DigitalAssetSourceFileMimeType $constraint
      */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         $this->assertArgumentsCorrect($value, $constraint);

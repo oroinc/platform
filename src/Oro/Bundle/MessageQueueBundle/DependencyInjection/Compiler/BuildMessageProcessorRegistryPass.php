@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class BuildMessageProcessorRegistryPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $processorRegistryId = 'oro_message_queue.client.message_processor_registry';

@@ -21,16 +21,19 @@ class PreExportTopic extends AbstractTopic implements JobAwareTopicInterface
         $this->tokenStorage = $tokenStorage;
     }
 
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.importexport.pre_export';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Generates a list of records for export which are later used in child job';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -64,6 +67,7 @@ class PreExportTopic extends AbstractTopic implements JobAwareTopicInterface
             ->addAllowedTypes('userId', 'int');
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         return sprintf('oro_importexport.pre_export.%s.user_%s', $messageBody['jobName'], $this->getUser()->getId());

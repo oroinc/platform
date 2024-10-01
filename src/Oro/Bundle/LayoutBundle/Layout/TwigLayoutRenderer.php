@@ -31,11 +31,13 @@ class TwigLayoutRenderer extends LayoutRenderer implements TwigEnvironmentAwareL
         $this->setEnvironment($environment);
     }
 
+    #[\Override]
     public function getEnvironment(): Environment
     {
         return $this->environment;
     }
 
+    #[\Override]
     public function setEnvironment(Environment $environment): void
     {
         $this->environment = $environment;
@@ -43,9 +45,7 @@ class TwigLayoutRenderer extends LayoutRenderer implements TwigEnvironmentAwareL
         $this->innerRenderer->setEnvironment($this->environment);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function renderBlock(BlockView $view)
     {
         $this->placeholderRenderer->reset();

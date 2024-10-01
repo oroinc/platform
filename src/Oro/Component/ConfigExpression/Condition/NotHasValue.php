@@ -7,17 +7,13 @@ namespace Oro\Component\ConfigExpression\Condition;
  */
 class NotHasValue extends HasValue
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'not_has';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         return !parent::isConditionAllowed($context);

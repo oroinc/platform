@@ -21,6 +21,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigureGaufretteFileManagersPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ExtendedContainerBuilder();

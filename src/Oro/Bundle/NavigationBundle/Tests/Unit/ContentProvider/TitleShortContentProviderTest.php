@@ -13,6 +13,7 @@ class TitleShortContentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TitleShortContentProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->titleService = $this->createMock(TitleServiceInterface::class);

@@ -20,9 +20,7 @@ class LoadWorkflowEmailNotifications extends AbstractFixture implements
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var WorkflowDefinition $workflowDefinition */
@@ -53,9 +51,7 @@ class LoadWorkflowEmailNotifications extends AbstractFixture implements
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadWorkflowDefinitions::class, LoadWorkflowEmailTemplates::class];

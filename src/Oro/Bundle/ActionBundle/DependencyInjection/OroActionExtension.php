@@ -10,9 +10,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroActionExtension extends Extension implements PrependExtensionInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
@@ -32,9 +30,7 @@ class OroActionExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         if ('test' === $container->getParameter('kernel.environment')) {

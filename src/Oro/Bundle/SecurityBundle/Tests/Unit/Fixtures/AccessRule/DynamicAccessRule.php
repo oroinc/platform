@@ -10,6 +10,7 @@ class DynamicAccessRule implements AccessRuleInterface
     /** @var callable */
     private $expression;
 
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         call_user_func($this->expression, $criteria);
@@ -20,6 +21,7 @@ class DynamicAccessRule implements AccessRuleInterface
         $this->expression = $expression;
     }
 
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         return true;

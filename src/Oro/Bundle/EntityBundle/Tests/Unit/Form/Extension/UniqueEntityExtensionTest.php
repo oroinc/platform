@@ -37,6 +37,7 @@ class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var UniqueEntityExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);

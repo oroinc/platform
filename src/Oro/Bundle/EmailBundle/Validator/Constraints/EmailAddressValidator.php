@@ -21,9 +21,7 @@ class EmailAddressValidator extends ConstraintValidator
         $this->emailAddressHelper = $emailAddressHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof EmailAddress) {

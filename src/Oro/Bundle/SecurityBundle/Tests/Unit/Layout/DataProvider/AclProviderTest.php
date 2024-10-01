@@ -20,6 +20,7 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AclProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

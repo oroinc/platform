@@ -9,6 +9,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
  */
 class OriginalFileNameProvider extends AbstractHumanReadableFileNameProvider
 {
+    #[\Override]
     protected function isApplicable(File $file): bool
     {
         return $file->getOriginalFilename() && $this->isFeaturesEnabled();

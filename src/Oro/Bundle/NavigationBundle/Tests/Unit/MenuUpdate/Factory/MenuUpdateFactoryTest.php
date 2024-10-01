@@ -18,6 +18,7 @@ class MenuUpdateFactoryTest extends \PHPUnit\Framework\TestCase
 
     private MenuUpdateFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new MenuUpdateFactory(new PropertyAccessor(), MenuUpdateStub::class);

@@ -49,9 +49,7 @@ abstract class PhpConfigProvider implements
         $this->debug = $debug;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isCacheFresh(?int $timestamp): bool
     {
         if (null === $timestamp) {
@@ -70,9 +68,7 @@ abstract class PhpConfigProvider implements
         return $this->cacheFresh;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheTimestamp(): ?int
     {
         if (false === $this->cacheTimestamp) {
@@ -90,9 +86,7 @@ abstract class PhpConfigProvider implements
         return $this->cacheTimestamp;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clearCache(): void
     {
         $this->config = null;
@@ -101,9 +95,7 @@ abstract class PhpConfigProvider implements
         $this->getCacheAccessor()->remove($this->getConfigCache());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->clearCache();

@@ -22,6 +22,7 @@ class RememberMeListener extends AbstractListener
     ) {
     }
 
+    #[\Override]
     public function supports(Request $request): bool
     {
         if ($this->csrfProtectedAjaxOnly && !$this->csrfProtectedRequestHelper->isCsrfProtectedRequest($request)) {
@@ -31,6 +32,7 @@ class RememberMeListener extends AbstractListener
         return $this->innerRememberMeAuthenticator->supports($request);
     }
 
+    #[\Override]
     public function authenticate(RequestEvent $event): void
     {
         $this->innerRememberMeAuthenticator->authenticate($event->getRequest());

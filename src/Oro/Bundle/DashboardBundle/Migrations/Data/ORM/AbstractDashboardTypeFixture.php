@@ -20,6 +20,7 @@ abstract class AbstractDashboardTypeFixture extends AbstractFixture implements
 {
     use ContainerAwareTrait;
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $className = EnumOption::class;
@@ -44,6 +45,7 @@ abstract class AbstractDashboardTypeFixture extends AbstractFixture implements
         $configManager->flush();
     }
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadLanguageData::class];

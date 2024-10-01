@@ -38,6 +38,7 @@ class ReportController extends RestController
      *
      * @return ApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_report.report.manager.api');
@@ -47,6 +48,7 @@ class ReportController extends RestController
      * @return FormInterface
      * @throws \RuntimeException
      */
+    #[\Override]
     public function getForm()
     {
         throw new \RuntimeException('This method is not implemented yet.');
@@ -56,6 +58,7 @@ class ReportController extends RestController
      * @return ApiFormHandler
      * @throws \RuntimeException
      */
+    #[\Override]
     public function getFormHandler()
     {
         throw new \RuntimeException('This method is not implemented yet.');

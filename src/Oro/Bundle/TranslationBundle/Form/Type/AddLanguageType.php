@@ -36,6 +36,7 @@ class AddLanguageType extends AbstractType
         $this->translator = $translator;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -46,11 +47,13 @@ class AddLanguageType extends AbstractType
         );
     }
 
+    #[\Override]
     public function getParent(): ?string
     {
         return OroChoiceType::class;
     }
 
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_translation_add_language';

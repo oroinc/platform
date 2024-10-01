@@ -36,12 +36,7 @@ use Oro\Bundle\ImapBundle\Mail\Headers;
  */
 class From extends BaseFrom
 {
-    /**
-     * {@inheritdoc}
-     *
-     * This method is a copy of {@see \Laminas\Mail\Header\From::fromString}
-     * It is needed to override static call of `GenericHeader::splitHeaderLine`
-     */
+    #[\Override]
     public static function fromString($headerLine)
     {
         [$fieldName, $fieldValue] = GenericHeader::splitHeaderLine($headerLine);
@@ -92,12 +87,7 @@ class From extends BaseFrom
         return $header;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * This method is a copy of {@see \Laminas\Mail\Header\From::getAddressList}
-     * It is needed to override `new AddressList()`
-     */
+    #[\Override]
     public function getAddressList()
     {
         if (null === $this->addressList) {

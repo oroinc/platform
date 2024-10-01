@@ -16,9 +16,7 @@ class UpdateDoctrineEventHandlersPass implements CompilerPassInterface
     private const DOCTRINE_EVENT_SUBSCRIBER_TAG = 'doctrine.event_subscriber';
     private const DOCTRINE_EVENT_LISTENER_TAG   = 'doctrine.event_listener';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $connections = $this->getAllConnections($container);

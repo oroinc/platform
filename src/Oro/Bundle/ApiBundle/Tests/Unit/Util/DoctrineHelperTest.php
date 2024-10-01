@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
  */
 class DoctrineHelperTest extends OrmRelatedTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

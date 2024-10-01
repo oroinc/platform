@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class PublicSecurityServicesPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('security.token_storage')->setPublic(true);

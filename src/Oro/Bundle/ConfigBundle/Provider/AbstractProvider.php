@@ -74,25 +74,19 @@ abstract class AbstractProvider implements ProviderInterface
      */
     abstract protected function getParentCheckboxLabel(): string;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTree(): GroupNodeDefinition
     {
         return $this->getTreeData($this->getTreeName(), self::CORRECT_FIELDS_NESTING_LEVEL);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getJsTree(): array
     {
         return $this->getJsTreeData($this->getTreeName(), self::CORRECT_MENU_NESTING_LEVEL);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getApiTree(?string $path = null): SectionDefinition
     {
         $sections = $path ? explode('/', $path) : [];
@@ -114,9 +108,7 @@ abstract class AbstractProvider implements ProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSubTree(string $subTreeName): GroupNodeDefinition
     {
         if (!isset($this->processedSubTrees[$subTreeName])) {
@@ -398,17 +390,13 @@ abstract class AbstractProvider implements ProviderInterface
         return $section;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDataTransformer(string $key): ?DataTransformerInterface
     {
         return $this->configBag->getDataTransformer($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm(string $groupName, ConfigManager $configManager): FormInterface
     {
         $toAddFields = [];
@@ -464,9 +452,7 @@ abstract class AbstractProvider implements ProviderInterface
         return $formBuilder->getForm();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function chooseActiveGroups(?string $activeGroup, ?string $activeSubGroup): array
     {
         $tree = $this->getTree();

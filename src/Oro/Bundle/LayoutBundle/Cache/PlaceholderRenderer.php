@@ -88,6 +88,7 @@ class PlaceholderRenderer implements ResetInterface
         return $this->layoutManager->getLayout($context, $blockId)->render();
     }
 
+    #[\Override]
     public function reset()
     {
         $this->renderedPlaceholders = [];

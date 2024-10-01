@@ -14,6 +14,7 @@ class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private MessageProcessorClassProvider|\PHPUnit\Framework\MockObject\MockObject $messageProcessorClassProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->messageProcessorClassProvider = $this->createMock(MessageProcessorClassProvider::class);

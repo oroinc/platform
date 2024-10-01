@@ -19,6 +19,7 @@ class DataCollectorLayoutNameProvider implements DataCollectorLayoutNameProvider
         $this->layoutNameProviders = $layoutNameProviders;
     }
 
+    #[\Override]
     public function getNameByContext(ContextInterface $context): string
     {
         foreach ($this->layoutNameProviders as $layoutNameProvider) {

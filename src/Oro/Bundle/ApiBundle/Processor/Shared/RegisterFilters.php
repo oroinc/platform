@@ -86,7 +86,6 @@ abstract class RegisterFilters implements ProcessorInterface
                         $propertyPath
                     ));
                 }
-
                 if ($filter instanceof FieldAwareFilterInterface && $metadata->hasAssociation($filter->getField())) {
                     $metadata = $metadata->getAssociation($filter->getField())?->getTargetMetadata() ?? $metadata;
                 }

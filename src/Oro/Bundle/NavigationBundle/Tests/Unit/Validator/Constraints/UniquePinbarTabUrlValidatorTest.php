@@ -27,6 +27,7 @@ class UniquePinbarTabUrlValidatorTest extends ConstraintValidatorTestCase
     /** @var PinbarTabUrlNormalizerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $pinbarTabUrlNormalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -44,6 +45,7 @@ class UniquePinbarTabUrlValidatorTest extends ConstraintValidatorTestCase
         ]);
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new UniquePinbarTabUrlValidator($this->doctrineHelper, $this->pinbarTabUrlNormalizer);

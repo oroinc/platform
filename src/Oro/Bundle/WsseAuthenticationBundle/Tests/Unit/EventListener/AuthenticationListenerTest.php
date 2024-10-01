@@ -19,6 +19,7 @@ class AuthenticationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AuthenticationListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(UserLoginAttemptLogger::class);

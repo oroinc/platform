@@ -9,9 +9,7 @@ use OpenApi\Annotations as OA;
  */
 class JsonOpenApiFormatter implements OpenApiFormatterInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function format(OA\OpenApi $api): string
     {
         return $api->toJson(JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);

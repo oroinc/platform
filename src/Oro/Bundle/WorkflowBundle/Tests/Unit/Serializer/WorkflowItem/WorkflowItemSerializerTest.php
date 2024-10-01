@@ -18,6 +18,7 @@ class WorkflowItemSerializerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowItemSerializer */
     private $serializer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

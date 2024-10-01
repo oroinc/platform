@@ -28,33 +28,25 @@ class DynamicSegmentQueryDesigner extends AbstractQueryDesigner implements Segme
         $this->em = $em;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSegmentId(): ?int
     {
         return $this->segment->getId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntity()
     {
         return $this->segment->getEntity();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntity($entity)
     {
         $this->segment->setEntity($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefinition()
     {
         if (null === $this->preparedDefinition) {
@@ -80,9 +72,7 @@ class DynamicSegmentQueryDesigner extends AbstractQueryDesigner implements Segme
         return $this->preparedDefinition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDefinition($definition)
     {
         $this->segment->setDefinition($definition);

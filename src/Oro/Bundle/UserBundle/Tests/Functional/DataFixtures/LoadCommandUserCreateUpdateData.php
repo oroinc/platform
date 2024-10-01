@@ -18,17 +18,13 @@ class LoadCommandUserCreateUpdateData extends AbstractFixture implements Contain
      */
     protected $container;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $businessUnitName = 'bu1';

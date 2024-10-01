@@ -19,9 +19,7 @@ use Symfony\Component\Mime\MimeTypes;
  */
 class OroAttachmentBundle extends Bundle
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function boot(): void
     {
         parent::boot();
@@ -31,9 +29,7 @@ class OroAttachmentBundle extends Bundle
         $mimeTypes->registerGuesser(new MimeTypeExtensionGuesser());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

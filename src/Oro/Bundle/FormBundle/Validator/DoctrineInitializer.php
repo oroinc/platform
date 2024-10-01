@@ -22,9 +22,7 @@ class DoctrineInitializer implements ObjectInitializerInterface
         $this->innerInitializer = $innerInitializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize($object)
     {
         if ($object instanceof FormInterface

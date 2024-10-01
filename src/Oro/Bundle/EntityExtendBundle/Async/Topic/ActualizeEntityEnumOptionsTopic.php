@@ -13,16 +13,19 @@ class ActualizeEntityEnumOptionsTopic extends AbstractTopic
     public const string ENUM_CODE = 'enumCode';
     public const string ENUM_OPTION_ID = 'id';
 
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.entity_extend.actualize_entity_enum_options';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Actualize entity enum options';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

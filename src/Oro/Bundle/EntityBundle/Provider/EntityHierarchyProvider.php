@@ -21,9 +21,7 @@ class EntityHierarchyProvider extends AbstractEntityHierarchyProvider
         $this->extendConfigProvider = $extendConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeHierarchy()
     {
         $entityConfigs = $this->extendConfigProvider->getConfigs();

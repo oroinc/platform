@@ -26,9 +26,7 @@ class UnauthorizedApiRequestListener implements ServiceSubscriberInterface
         $this->apiRequestHelper = $apiRequestHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

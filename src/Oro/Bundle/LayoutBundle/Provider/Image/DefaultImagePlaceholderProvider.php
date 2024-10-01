@@ -20,6 +20,7 @@ class DefaultImagePlaceholderProvider implements ImagePlaceholderProviderInterfa
         $this->defaultPath = $defaultPath;
     }
 
+    #[\Override]
     public function getPath(
         string $filter,
         string $format = '',

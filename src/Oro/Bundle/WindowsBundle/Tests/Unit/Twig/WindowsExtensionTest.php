@@ -37,6 +37,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $fragmentHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);

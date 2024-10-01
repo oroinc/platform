@@ -55,9 +55,7 @@ class TestSessionListener implements EventSubscriberInterface
         $this->isSessionStarted = $request->hasSession() && $request->getSession()->isStarted();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -14,6 +14,7 @@ class SetEntityIdTest extends CreateProcessorTestCase
     /** @var SetEntityId */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

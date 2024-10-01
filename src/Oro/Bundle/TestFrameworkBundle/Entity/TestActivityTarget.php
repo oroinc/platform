@@ -58,6 +58,7 @@ class TestActivityTarget implements
      * @param AttributeFamily $attributeFamily
      * @return $this
      */
+    #[\Override]
     public function setAttributeFamily(AttributeFamily $attributeFamily)
     {
         $this->attributeFamily = $attributeFamily;
@@ -68,6 +69,7 @@ class TestActivityTarget implements
     /**
      * @return AttributeFamily
      */
+    #[\Override]
     public function getAttributeFamily()
     {
         return $this->attributeFamily;

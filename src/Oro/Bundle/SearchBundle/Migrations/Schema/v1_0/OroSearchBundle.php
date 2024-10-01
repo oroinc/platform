@@ -13,9 +13,9 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
     use ContainerAwareTrait;
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Generate table oro_search_index_datetime **/

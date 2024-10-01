@@ -12,9 +12,7 @@ class PrivilegeCollectionType extends AbstractType
 {
     const NAME = 'oro_acl_collection';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['privileges_config'] = $options['entry_options']['privileges_config'];
@@ -22,9 +20,7 @@ class PrivilegeCollectionType extends AbstractType
         $view->vars['page_component_options'] = $options['page_component_options'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -33,25 +29,18 @@ class PrivilegeCollectionType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return CollectionType::class;

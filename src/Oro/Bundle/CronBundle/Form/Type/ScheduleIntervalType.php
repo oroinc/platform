@@ -15,9 +15,7 @@ class ScheduleIntervalType extends AbstractType
     const ACTIVE_AT_FIELD = 'activeAt';
     const DEACTIVATE_AT_FIELD = 'deactivateAt';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -29,9 +27,7 @@ class ScheduleIntervalType extends AbstractType
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setNormalizer('data_class', function (Options $options, $value) {
@@ -47,17 +43,12 @@ class ScheduleIntervalType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

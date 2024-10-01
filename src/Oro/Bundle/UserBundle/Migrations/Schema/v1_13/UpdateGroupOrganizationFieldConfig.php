@@ -9,9 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class UpdateGroupOrganizationFieldConfig implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         //Set identity to false for importexport scope in organization field of Group entity

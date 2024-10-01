@@ -34,6 +34,7 @@ class AttachmentFilterConfiguration extends FilterConfiguration
      *
      * @return array
      */
+    #[\Override]
     public function get($filter): array
     {
         $config = $this->filterConfiguration->get($filter);
@@ -55,11 +56,13 @@ class AttachmentFilterConfiguration extends FilterConfiguration
      * @param string $filter
      * @param array $config
      */
+    #[\Override]
     public function set($filter, array $config): void
     {
         $this->filterConfiguration->set($filter, $config);
     }
 
+    #[\Override]
     public function all(): array
     {
         return array_map(

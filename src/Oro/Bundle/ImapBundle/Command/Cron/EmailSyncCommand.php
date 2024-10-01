@@ -44,9 +44,7 @@ class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionI
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return '*/1 * * * *';
@@ -56,6 +54,7 @@ class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionI
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -163,6 +162,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->imapEmailSynchronizer->setLogger(new OutputLogger($output));

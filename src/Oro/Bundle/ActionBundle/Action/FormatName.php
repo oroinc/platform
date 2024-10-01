@@ -26,9 +26,7 @@ class FormatName extends AbstractAction
         $this->entityNameResolver = $entityNameResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['attribute'])) {
@@ -43,9 +41,7 @@ class FormatName extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $this->contextAccessor->setValue(

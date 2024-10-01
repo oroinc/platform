@@ -29,6 +29,7 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $testConfigProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -39,9 +40,7 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
 
     abstract protected function getFormType(): AbstractType;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $validator = new RecursiveValidator(

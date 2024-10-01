@@ -23,6 +23,7 @@ class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
 
     private CacheLayoutFactory $cacheLayoutFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->baseLayoutFactory = $this->createMock(LayoutFactoryInterface::class);

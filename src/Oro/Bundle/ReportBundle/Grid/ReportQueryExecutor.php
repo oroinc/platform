@@ -49,9 +49,7 @@ class ReportQueryExecutor implements QueryExecutorInterface
         $this->reportDatagridPrefixes[] = Report::GRID_PREFIX;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(DatagridInterface $datagrid, Query $query, $executeFunc = null)
     {
         if (!$this->isApplicable($datagrid->getName())) {

@@ -26,6 +26,7 @@ class Reader implements ItemReaderInterface, ClosableInterface
      * @return mixed|null
      * @throws InvalidItemException
      */
+    #[\Override]
     public function read()
     {
         if ($this->iterator->valid()) {
@@ -46,9 +47,7 @@ class Reader implements ItemReaderInterface, ClosableInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close(): void
     {
         throw new \LogicException(self::LOGIC_EXCEPTION_MESSAGE);

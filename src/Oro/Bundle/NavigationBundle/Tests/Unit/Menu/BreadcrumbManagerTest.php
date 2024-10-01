@@ -22,6 +22,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
     /** @var BreadcrumbManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->matcher = $this->createMock(Matcher::class);

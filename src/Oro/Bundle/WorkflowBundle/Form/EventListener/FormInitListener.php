@@ -61,9 +61,7 @@ class FormInitListener implements EventSubscriberInterface
         $this->dispatchFormInitEvents($workflowItem, $this->getTransition($formConfig));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [FormEvents::PRE_SET_DATA => 'onPreSetData'];

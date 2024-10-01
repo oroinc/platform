@@ -17,6 +17,7 @@ class EntityClassValidatorTest extends ConstraintValidatorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityClassNameHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -24,6 +25,7 @@ class EntityClassValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new EntityClassValidator($this->doctrineHelper, $this->entityClassNameHelper);

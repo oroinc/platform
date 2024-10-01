@@ -18,6 +18,7 @@ class ExtendableConditionEventErrorsProcessor implements ExtendableConditionEven
     ) {
     }
 
+    #[\Override]
     public function processErrors(
         ExtendableConditionEvent $event,
         bool $showErrors = false,

@@ -31,37 +31,37 @@ class PgsqlIsolator implements IsolatorInterface
         $this->setupDatabaseUrl();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTag()
     {
         return 'database';
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName()
     {
         return 'PostgreSQL DB';
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
         return true;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
         $event->writeln('<info>Dumping current application database</info>');
         $this->dump();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         if (!$this->dbTemp) {
@@ -72,7 +72,7 @@ class PgsqlIsolator implements IsolatorInterface
         $this->restore();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function restoreState(RestoreStateEvent $event)
     {
         if (!$this->dbTemp) {
@@ -114,8 +114,7 @@ class PgsqlIsolator implements IsolatorInterface
         $this->dbPass = $parsedUrl['pass'] ?? '';
     }
 
-
-    /** {@inheritdoc} */
+    #[\Override]
     public function terminate(AfterFinishTestsEvent $event)
     {
         if (!$this->dbTemp) {
@@ -126,7 +125,7 @@ class PgsqlIsolator implements IsolatorInterface
         $this->dropDb($this->dbTemp);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isOutdatedState()
     {
         return (bool)$this->dbTemp;
@@ -192,7 +191,6 @@ class PgsqlIsolator implements IsolatorInterface
         $pdo->exec(sprintf("CREATE DATABASE %s WITH TEMPLATE %s OWNER %s", $dbName, $template, $this->dbUser));
     }
 
-    /** {@inheritdoc} */
     private function dump(): void
     {
         $this->dbTemp = $this->dbName.TokenGenerator::generateToken('db');
@@ -200,7 +198,6 @@ class PgsqlIsolator implements IsolatorInterface
         $this->createDB($this->dbTemp, $this->dbName);
     }
 
-    /** {@inheritdoc} */
     private function restore(): void
     {
         $this->createDB($this->dbName, $this->dbTemp);

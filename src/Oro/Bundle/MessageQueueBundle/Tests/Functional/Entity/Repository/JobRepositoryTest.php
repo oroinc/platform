@@ -14,9 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class JobRepositoryTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -94,9 +92,7 @@ class JobRepositoryTest extends WebTestCase
         $this->assertSame($expectedResult, $preparedResult);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataFixturesExecutorEntityManager()
     {
         return $this->getJobEntityManager();

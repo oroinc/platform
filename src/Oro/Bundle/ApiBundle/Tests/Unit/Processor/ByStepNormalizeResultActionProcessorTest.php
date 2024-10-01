@@ -33,6 +33,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /** @var ByStepNormalizeResultActionProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);

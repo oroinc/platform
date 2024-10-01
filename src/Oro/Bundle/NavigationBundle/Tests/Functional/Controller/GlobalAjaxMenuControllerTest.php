@@ -10,6 +10,7 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
 {
     private const MENU_NAME = 'application_menu';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

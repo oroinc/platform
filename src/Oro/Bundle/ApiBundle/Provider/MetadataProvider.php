@@ -91,9 +91,7 @@ class MetadataProvider implements ResetInterface
         return clone $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->cache = [];

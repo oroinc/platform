@@ -20,9 +20,7 @@ class DBLogsHandler extends AbstractProcessingHandler
     /** @var string */
     private $dateTimeFormatString;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function write(array $record): void
     {
         $formatted = $record['formatted'];

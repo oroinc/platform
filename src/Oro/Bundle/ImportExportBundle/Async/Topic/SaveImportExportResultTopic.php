@@ -21,16 +21,19 @@ class SaveImportExportResultTopic extends AbstractTopic
         $this->userManager = $userManager;
     }
 
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.importexport.save_import_export_result';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Processes the results of import or export before they are stored';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

@@ -36,6 +36,7 @@ class WidgetDateRangeTypeTest extends TypeTestCase
 
     private EventSubscriberInterface|MockObject $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
@@ -51,6 +52,7 @@ class WidgetDateRangeTypeTest extends TypeTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         $type = new WidgetDateRangeType($this->translator);

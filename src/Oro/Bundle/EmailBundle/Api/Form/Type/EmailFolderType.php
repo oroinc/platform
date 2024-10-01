@@ -17,9 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class EmailFolderType extends AbstractType
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -45,9 +43,7 @@ class EmailFolderType extends AbstractType
             ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

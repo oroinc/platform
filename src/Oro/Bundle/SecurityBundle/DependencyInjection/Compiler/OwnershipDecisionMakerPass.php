@@ -11,9 +11,7 @@ class OwnershipDecisionMakerPass implements CompilerPassInterface
     const TAG_NAME = 'oro_security.owner.ownership_decision_maker';
     const CHAIN_SERVICE_ID = 'oro_security.owner.ownership_decision_maker.chain';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->has(self::CHAIN_SERVICE_ID)) {

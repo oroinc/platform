@@ -48,6 +48,7 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);

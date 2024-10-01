@@ -32,6 +32,7 @@ class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
     /** @var LoadEntityByDataLoader */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

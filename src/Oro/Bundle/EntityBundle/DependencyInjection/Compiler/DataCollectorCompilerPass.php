@@ -19,9 +19,7 @@ class DataCollectorCompilerPass implements CompilerPassInterface
     private const PROFILING_LOGGER_SERVICE_ID  = 'oro_entity.profiler.orm_logger';
     private const LOGGING_HYDRATORS_PARAM_NAME = 'oro_entity.orm.hydrators';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition('profiler')) {

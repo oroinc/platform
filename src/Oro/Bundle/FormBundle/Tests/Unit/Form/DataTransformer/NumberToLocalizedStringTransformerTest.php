@@ -10,6 +10,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     private $numberFormatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->numberFormatter = $this->createMock(NumberFormatter::class);

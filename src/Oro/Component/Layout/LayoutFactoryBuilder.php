@@ -98,9 +98,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addExtension(ExtensionInterface $extension)
     {
         $this->extensions[] = $extension;
@@ -108,9 +106,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addType(BlockTypeInterface $type)
     {
         $this->types[$type->getName()] = $type;
@@ -118,9 +114,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addTypeExtension(BlockTypeExtensionInterface $typeExtension)
     {
         $this->typeExtensions[$typeExtension->getExtendedType()][] = $typeExtension;
@@ -128,9 +122,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addLayoutUpdate($id, LayoutUpdateInterface $layoutUpdate)
     {
         $this->layoutUpdates[$id][] = $layoutUpdate;
@@ -138,9 +130,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addRenderer($name, LayoutRendererInterface $renderer)
     {
         $this->renderers[$name] = $renderer;
@@ -148,9 +138,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDefaultRenderer($name)
     {
         $this->defaultRenderer = $name;
@@ -158,9 +146,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLayoutFactory()
     {
         // initialize extension manager

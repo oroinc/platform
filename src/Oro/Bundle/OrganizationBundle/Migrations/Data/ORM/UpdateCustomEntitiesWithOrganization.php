@@ -20,17 +20,13 @@ class UpdateCustomEntitiesWithOrganization extends UpdateWithOrganization implem
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganizationAndBusinessUnitData::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var ConfigManager $configManager */

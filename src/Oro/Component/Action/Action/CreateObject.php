@@ -17,18 +17,14 @@ class CreateObject extends AbstractAction
      */
     protected $options;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $object = $this->createObject($context);
         $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_ATTRIBUTE], $object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options[self::OPTION_KEY_CLASS])) {

@@ -10,9 +10,7 @@ class OroMigrationBundle implements Migration
 {
     const MIGRATION_DATA_TABLE = 'oro_migrations_data';
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable(self::MIGRATION_DATA_TABLE);

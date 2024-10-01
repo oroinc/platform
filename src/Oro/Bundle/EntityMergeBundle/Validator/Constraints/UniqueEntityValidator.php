@@ -20,9 +20,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof UniqueEntity) {

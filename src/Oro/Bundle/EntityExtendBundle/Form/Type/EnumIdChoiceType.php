@@ -27,9 +27,7 @@ class EnumIdChoiceType extends AbstractType
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $className = EnumOption::class;
@@ -43,34 +41,25 @@ class EnumIdChoiceType extends AbstractType
         $builder->addModelTransformer(new ReversedTransformer($transformer));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['enum_code']);
         $resolver->setDefaults(['multiple' => true]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return EnumChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return static::NAME;

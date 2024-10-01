@@ -32,6 +32,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
     /** @var NormalizeRequestData */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

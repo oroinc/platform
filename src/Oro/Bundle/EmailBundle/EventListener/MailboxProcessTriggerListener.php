@@ -34,9 +34,7 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -46,9 +44,7 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
         ];
     }
 
-    /**
-     * {@inheritdoc} In addition it filters out emails which are part of thread
-     */
+    #[\Override]
     public function onFlush(OnFlushEventArgs $args)
     {
         parent::onFlush($args);

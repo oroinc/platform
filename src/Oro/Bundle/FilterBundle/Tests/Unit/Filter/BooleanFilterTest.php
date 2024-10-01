@@ -15,6 +15,7 @@ class BooleanFilterTest extends \PHPUnit\Framework\TestCase
     /** @var BooleanFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

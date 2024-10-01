@@ -10,79 +10,57 @@ use Behat\Testwork\Output\Printer\OutputPrinter;
  */
 class NullOutputPrinter implements OutputPrinter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOutputPath($path)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOutputPath()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOutputStyles(array $styles)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOutputStyles()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOutputDecorated($decorated)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOutputDecorated()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOutputVerbosity($level)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOutputVerbosity()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write($messages)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function writeln($messages = '')
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flush()
     {
     }

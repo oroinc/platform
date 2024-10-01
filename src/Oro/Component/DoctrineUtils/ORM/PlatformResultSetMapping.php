@@ -15,9 +15,7 @@ class PlatformResultSetMapping extends ResultSetMapping
         $this->platform = $platform;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDiscriminatorColumn($alias, $discrColumn)
     {
         return parent::setDiscriminatorColumn(
@@ -26,17 +24,13 @@ class PlatformResultSetMapping extends ResultSetMapping
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFieldResult($columnName)
     {
         return parent::isFieldResult($this->platform->getSQLResultCasing($columnName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addFieldResult($alias, $columnName, $fieldName, $declaringClass = null)
     {
         return parent::addFieldResult(
@@ -47,9 +41,7 @@ class PlatformResultSetMapping extends ResultSetMapping
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addScalarResult($columnName, $alias, $type = 'string')
     {
         return parent::addScalarResult(
@@ -59,49 +51,37 @@ class PlatformResultSetMapping extends ResultSetMapping
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isScalarResult($columnName)
     {
         return parent::isScalarResult($this->platform->getSQLResultCasing($columnName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getScalarAlias($columnName)
     {
         return parent::getScalarAlias($this->platform->getSQLResultCasing($columnName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDeclaringClass($columnName)
     {
         return parent::getDeclaringClass($this->platform->getSQLResultCasing($columnName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityAlias($columnName)
     {
         return parent::getEntityAlias($this->platform->getSQLResultCasing($columnName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFieldName($columnName)
     {
         return parent::getFieldName($this->platform->getSQLResultCasing($columnName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addMetaResult($alias, $columnName, $fieldName, $isIdentifierColumn = false, $type = null)
     {
         return parent::addMetaResult(

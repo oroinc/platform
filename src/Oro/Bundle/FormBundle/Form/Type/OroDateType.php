@@ -18,9 +18,7 @@ class OroDateType extends AbstractType
 {
     const NAME = 'oro_date';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!empty($options['placeholder'])) {
@@ -36,9 +34,7 @@ class OroDateType extends AbstractType
         $view->vars['maxDate'] = $options['maxDate'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -66,25 +62,18 @@ class OroDateType extends AbstractType
         $resolver->setAllowedTypes('maxDate', ['string', 'null']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return DateType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

@@ -20,6 +20,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     private OrmManyRelationBuilder $builder;
     private int $paramIndex;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

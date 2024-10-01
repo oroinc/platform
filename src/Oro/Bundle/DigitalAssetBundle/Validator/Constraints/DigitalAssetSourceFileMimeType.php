@@ -14,9 +14,7 @@ class DigitalAssetSourceFileMimeType extends Constraint
     public $mimeTypeCannotBeNonImageInEntity
         = 'oro.digitalasset.validator.mime_type_cannot_be_non_image_in_entity.message';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

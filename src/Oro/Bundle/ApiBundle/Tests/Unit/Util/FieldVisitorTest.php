@@ -10,6 +10,7 @@ class FieldVisitorTest extends \PHPUnit\Framework\TestCase
 {
     private FieldVisitor $visitor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->visitor = new FieldVisitor();

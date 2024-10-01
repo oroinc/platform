@@ -9,11 +9,13 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class SyncEmailTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new SyncEmailTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         return [
@@ -36,6 +38,7 @@ class SyncEmailTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

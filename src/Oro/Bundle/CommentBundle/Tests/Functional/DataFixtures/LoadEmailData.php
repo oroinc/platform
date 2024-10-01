@@ -9,9 +9,7 @@ use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 
 class LoadEmailData extends AbstractFixture
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $emailAddress = new EmailAddressProxy();

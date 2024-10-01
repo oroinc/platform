@@ -20,9 +20,7 @@ abstract class AbstractSelectedFieldsProvider implements SelectedFieldsProviderI
         $this->datagridStateProvider = $datagridStateProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSelectedFields(
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters

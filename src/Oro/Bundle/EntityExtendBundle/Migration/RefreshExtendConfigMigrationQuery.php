@@ -35,17 +35,13 @@ class RefreshExtendConfigMigrationQuery implements MigrationQuery
         $this->initialEntityConfigStatePath = $initialEntityConfigStatePath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Refresh extend entity configs';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         if (empty($this->initialEntityConfigState)) {

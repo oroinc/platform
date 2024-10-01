@@ -30,10 +30,10 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
     }
 
     /**
-     * {@inheritDoc}
      *
      * @throws BadCredentialsException
      */
+    #[\Override]
     public function authenticate(ConnectionInterface $connection): TokenInterface
     {
         $ticket = $this->getTicketFromConnection($connection);

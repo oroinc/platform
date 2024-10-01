@@ -10,9 +10,7 @@ use Oro\Bundle\EntityBundle\Handler\AbstractEntityDeleteHandlerExtension;
  */
 class EmailUserDeleteHandlerExtension extends AbstractEntityDeleteHandlerExtension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function assertDeleteGranted($entity): void
     {
         /** @var EmailUser $entity */

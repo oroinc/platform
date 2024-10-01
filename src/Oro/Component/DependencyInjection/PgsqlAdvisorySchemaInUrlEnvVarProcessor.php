@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
  */
 class PgsqlAdvisorySchemaInUrlEnvVarProcessor implements EnvVarProcessorInterface
 {
+    #[\Override]
     public static function getProvidedTypes(): array
     {
         return [
@@ -16,6 +17,7 @@ class PgsqlAdvisorySchemaInUrlEnvVarProcessor implements EnvVarProcessorInterfac
         ];
     }
 
+    #[\Override]
     public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         $url = $getEnv($name);

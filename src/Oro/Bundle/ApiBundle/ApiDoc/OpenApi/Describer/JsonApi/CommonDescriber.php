@@ -29,9 +29,7 @@ class CommonDescriber implements DescriberInterface, SchemaStorageAwareInterface
     private const ERRORS = 'errors';
     private const FAILURE = 'failure';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function describe(OA\OpenApi $api, array $options): void
     {
         $this->registerMetaObject($api);

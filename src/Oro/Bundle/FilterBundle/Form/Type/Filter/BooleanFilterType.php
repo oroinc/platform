@@ -13,9 +13,7 @@ class BooleanFilterType extends AbstractType
     public const TYPE_YES = 1;
     public const TYPE_NO = 2;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('field_options', [
@@ -26,17 +24,13 @@ class BooleanFilterType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_type_boolean_filter';

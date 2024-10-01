@@ -27,9 +27,7 @@ class DbalMessageProducer implements MessageProducerInterface
         $this->connection = $connection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send(QueueInterface $queue, MessageInterface $message): void
     {
         $dbalMessage = [

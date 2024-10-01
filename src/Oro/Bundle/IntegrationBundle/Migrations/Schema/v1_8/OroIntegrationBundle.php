@@ -12,8 +12,8 @@ class OroIntegrationBundle implements Migration
     /**
      * Set ownership type for Integration entity to Organization
      *
-     * @inheritdoc
      */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(

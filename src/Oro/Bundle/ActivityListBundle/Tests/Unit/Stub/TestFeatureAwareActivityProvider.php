@@ -7,23 +7,17 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
 class TestFeatureAwareActivityProvider extends TestActivityProvider implements FeatureToggleableInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setFeatureChecker(FeatureChecker $featureChecker)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addFeature($feature)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isFeaturesEnabled($scopeIdentifier = null)
     {
     }

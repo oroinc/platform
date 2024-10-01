@@ -13,9 +13,7 @@ class MultiEnumSnapshotFieldValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.multi_enum_snapshot';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         /** @var FieldConfigModel $value */

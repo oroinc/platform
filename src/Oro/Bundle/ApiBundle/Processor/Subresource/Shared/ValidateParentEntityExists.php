@@ -12,9 +12,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ValidateParentEntityExists implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */

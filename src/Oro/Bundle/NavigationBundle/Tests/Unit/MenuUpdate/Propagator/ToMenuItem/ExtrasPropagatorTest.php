@@ -18,6 +18,7 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
 
     private ExtrasPropagator $propagator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $localizationHelper = $this->createMock(LocalizationHelper::class);

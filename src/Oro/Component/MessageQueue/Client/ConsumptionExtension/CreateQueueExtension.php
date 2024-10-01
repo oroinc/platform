@@ -24,6 +24,7 @@ class CreateQueueExtension extends AbstractExtension
         $this->createdQueues = $createdQueues;
     }
 
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         $queueName = $context->getQueueName();

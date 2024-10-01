@@ -6,9 +6,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class LoadUserData extends AbstractLoadUserData implements DependentFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [

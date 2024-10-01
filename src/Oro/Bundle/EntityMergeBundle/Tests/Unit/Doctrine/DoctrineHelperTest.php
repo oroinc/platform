@@ -44,6 +44,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

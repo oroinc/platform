@@ -31,6 +31,7 @@ class UserImapConfigSubscriberTest extends TestCase
     /** @var UserImapConfigSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

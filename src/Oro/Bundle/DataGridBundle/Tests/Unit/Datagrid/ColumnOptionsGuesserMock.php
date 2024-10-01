@@ -10,9 +10,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
  */
 class ColumnOptionsGuesserMock implements ColumnOptionsGuesserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFormatter($class, $property, $type)
     {
         $frontendType = $type;
@@ -32,17 +30,13 @@ class ColumnOptionsGuesserMock implements ColumnOptionsGuesserInterface
         return new ColumnGuess(['frontend_type' => $frontendType], ColumnGuess::LOW_CONFIDENCE);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessSorter($class, $property, $type)
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFilter($class, $property, $type)
     {
         $filterType = $type;

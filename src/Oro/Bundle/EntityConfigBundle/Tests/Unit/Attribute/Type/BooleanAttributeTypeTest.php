@@ -7,17 +7,13 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Type\BooleanAttributeType;
 
 class BooleanAttributeTypeTest extends AttributeTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         return new BooleanAttributeType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurationMethodsDataProvider(): array
     {
         return [

@@ -42,6 +42,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var RestDocFiltersHandler */
     private $filtersHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST]);

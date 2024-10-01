@@ -24,9 +24,7 @@ class FlashBagNotificationSender implements NotificationSenderInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function sendNotification(UserEmailOrigin $emailOrigin)
     {
         if ($emailOrigin->getOwner()) {

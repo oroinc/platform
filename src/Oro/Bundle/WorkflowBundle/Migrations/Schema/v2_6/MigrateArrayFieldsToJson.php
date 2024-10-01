@@ -13,6 +13,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class MigrateArrayFieldsToJson implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(new MigrateColumnToJsonQuery(

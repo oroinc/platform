@@ -19,9 +19,7 @@ class ContentFileType extends AbstractType
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -39,9 +37,7 @@ class ContentFileType extends AbstractType
         $builder->addModelTransformer($this->dataTransformer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -52,14 +48,13 @@ class ContentFileType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): string
     {
         return FileType::class;
     }
 
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_content_file';

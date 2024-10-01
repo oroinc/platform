@@ -12,11 +12,13 @@ class IsoYearTest extends WebTestCase
 {
     private EntityManager $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = self::getContainer()->get('doctrine')->getManagerForClass(User::class);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         unset($this->entityManager);

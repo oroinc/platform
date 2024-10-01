@@ -25,6 +25,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
     /** @var JobListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

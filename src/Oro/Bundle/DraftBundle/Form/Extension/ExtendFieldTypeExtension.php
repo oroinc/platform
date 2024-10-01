@@ -26,9 +26,7 @@ class ExtendFieldTypeExtension extends AbstractTypeExtension
         $this->excludeTypes = $excludeTypes;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['class_name', 'excludeTypes']);
@@ -39,9 +37,7 @@ class ExtendFieldTypeExtension extends AbstractTypeExtension
         });
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public static function getExtendedTypes(): array
     {
         return [FieldType::class];

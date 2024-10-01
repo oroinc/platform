@@ -37,9 +37,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handle(MassActionHandlerArgs $args): MassActionResponseInterface
     {
         $limitResult = $this->limiter->getLimitResult($args);

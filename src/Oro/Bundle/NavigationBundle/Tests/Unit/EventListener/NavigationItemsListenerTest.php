@@ -13,6 +13,7 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationItemsListener */
     private $navigationListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $featureChecker = $this->createMock(FeatureChecker::class);

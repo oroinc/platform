@@ -24,53 +24,53 @@ class ImportExportIsolator implements IsolatorInterface
         $this->kernel = $kernel;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
         $this->clearStorage();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         $this->clearStorage();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function terminate(AfterFinishTestsEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
         return true;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function restoreState(RestoreStateEvent $event)
     {
         $this->clearStorage();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isOutdatedState()
     {
         return count($this->getImportExportFileManager()->getFilesByFilePattern('*')) !== 0;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName()
     {
         return 'Import and Export isolator';
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTag()
     {
         return 'import_export';

@@ -20,6 +20,7 @@ class OptionalListenerExtension extends AbstractExtension
         $this->optionalListenerManager = $optionalListenerManager;
     }
 
+    #[\Override]
     public function onPreReceived(Context $context)
     {
         $this->optionalListenerManager->enableListeners(

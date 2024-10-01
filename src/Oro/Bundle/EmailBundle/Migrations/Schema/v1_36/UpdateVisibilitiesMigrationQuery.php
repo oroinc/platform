@@ -16,17 +16,13 @@ class UpdateVisibilitiesMigrationQuery implements MigrationQuery
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Schedule the update of visibilities for emails and email addresses.';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->producer->send(UpdateVisibilitiesTopic::getName(), []);

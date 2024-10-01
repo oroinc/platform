@@ -33,6 +33,7 @@ class ClientEventListenerTest extends TestCase
 
     private ClientEventListener $clientEventListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->websocketAuthenticationProvider = $this->createMock(WebsocketAuthenticationProviderInterface::class);

@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class EnumOptionValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): EnumOptionValidator
     {
         return new EnumOptionValidator();

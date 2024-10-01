@@ -17,6 +17,7 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchStringFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $formFactory = $this->createMock(FormFactoryInterface::class);

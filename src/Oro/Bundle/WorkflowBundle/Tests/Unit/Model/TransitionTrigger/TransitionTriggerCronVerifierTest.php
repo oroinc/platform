@@ -42,6 +42,7 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionTriggerCronVerifier */
     private $verifier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowAssembler = $this->createMock(WorkflowAssembler::class);

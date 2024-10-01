@@ -20,6 +20,7 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FileApplicationsProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);

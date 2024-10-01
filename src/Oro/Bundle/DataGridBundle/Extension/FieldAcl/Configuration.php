@@ -14,9 +14,7 @@ class Configuration implements ConfigurationInterface
     const FIELDS_ACL = '[fields_acl]';
     const COLUMNS_PATH  = '[fields_acl][columns]';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('fields_acl');

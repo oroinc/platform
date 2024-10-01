@@ -24,9 +24,7 @@ class AttributeImportProcessor extends ImportProcessor implements StepExecutionA
      */
     protected $stepExecution;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($item)
     {
         $context = $this->contextRegistry->getByStepExecution($this->stepExecution);
@@ -41,6 +39,7 @@ class AttributeImportProcessor extends ImportProcessor implements StepExecutionA
         $this->contextRegistry = $contextRegistry;
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

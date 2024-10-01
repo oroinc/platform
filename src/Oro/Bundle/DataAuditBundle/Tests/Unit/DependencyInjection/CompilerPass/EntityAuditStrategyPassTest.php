@@ -11,6 +11,7 @@ class EntityAuditStrategyPassTest extends TestCase
 {
     private EntityAuditStrategyPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new EntityAuditStrategyPass();

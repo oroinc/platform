@@ -19,6 +19,7 @@ class TestEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         parent::__construct($em, $emailEntityBuilder, $knownEmailAddressChecker);
     }
 
+    #[\Override]
     public function process(EmailOrigin $origin, $syncStartTime, EmailSyncNotificationBag $notificationBag)
     {
     }

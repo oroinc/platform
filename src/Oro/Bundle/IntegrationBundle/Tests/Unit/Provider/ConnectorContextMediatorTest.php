@@ -28,6 +28,7 @@ class ConnectorContextMediatorTest extends TestCase
     /** @var TypesRegistry|MockObject */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $proxiedServiceID = 'registry';

@@ -74,9 +74,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $event = $this->dispatchDenormalize($data, $this->createObject($type), Events::BEFORE_DENORMALIZE_ENTITY);
@@ -120,9 +118,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         return $reflection->newInstance();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return is_array($data) && class_exists($type) && $this->fieldHelper->hasConfig($type);
@@ -131,8 +127,8 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = [])
     {
         $entityName = ClassUtils::getClass($object);
@@ -183,9 +179,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         return $isExcluded || $isNotIdentity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         if (is_object($data)) {
@@ -197,9 +191,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSerializer(SerializerInterface $serializer)
     {
         if (!$serializer instanceof ContextAwareNormalizerInterface ||

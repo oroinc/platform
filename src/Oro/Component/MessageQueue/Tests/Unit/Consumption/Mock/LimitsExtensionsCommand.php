@@ -13,6 +13,7 @@ class LimitsExtensionsCommand extends Command
 
     protected $extensions;
 
+    #[\Override]
     protected function configure()
     {
         parent::configure();
@@ -20,6 +21,7 @@ class LimitsExtensionsCommand extends Command
         $this->configureLimitsExtensions();
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->extensions = $this->getLimitsExtensions($input, $output);

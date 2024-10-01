@@ -11,9 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddIncludedEntitiesToResultDocument implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

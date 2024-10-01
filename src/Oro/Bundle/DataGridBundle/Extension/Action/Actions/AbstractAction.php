@@ -19,33 +19,25 @@ abstract class AbstractAction implements ActionInterface
         $this->options = ActionConfiguration::create([]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAclResource()
     {
         return $this->options->offsetGetOr(self::ACL_KEY);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->options->getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOptions()
     {
         return $this->options;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         $this->options = $options;

@@ -6,9 +6,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class RemoveManyToOneRelationQuery extends RemoveRelationQuery
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRelationType()
     {
         return RelationType::MANY_TO_ONE;

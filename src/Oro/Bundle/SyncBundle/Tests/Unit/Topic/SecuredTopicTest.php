@@ -34,6 +34,7 @@ class SecuredTopicTest extends \PHPUnit\Framework\TestCase
     /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject */
     private $request;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->clientManipulator = $this->createMock(ClientManipulatorInterface::class);

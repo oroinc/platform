@@ -18,9 +18,7 @@ class WarmerPass implements CompilerPassInterface
     private const EXTEND_CACHE_WARMER_SERVICE    = 'oro_entity_extend.cache_warmer';
     private const NEW_CACHE_WARMER_SERVICE       = 'oro_entity_extend.cache_warmer.default';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $cacheWarmerAggregateDefinition = $container->getDefinition(self::CACHE_WARMER_AGGREGATE_SERVICE);

@@ -41,6 +41,7 @@ class TranslatorCatalogueListenerTest extends TestCase
 
     private const array REGION_TRANSLATION_DATA = ["AD-02", "AD-03", "AD-04", "AD-05", "AD-06"];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

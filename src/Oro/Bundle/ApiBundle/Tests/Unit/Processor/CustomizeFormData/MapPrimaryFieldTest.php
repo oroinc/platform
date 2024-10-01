@@ -58,6 +58,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
     /** @var MapPrimaryField */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -107,9 +108,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormExtensions(): array
     {
         return [

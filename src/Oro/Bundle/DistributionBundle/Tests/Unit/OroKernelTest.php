@@ -9,11 +9,13 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
 {
     private OroKernelStub $kernel;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = new OroKernelStub('env', false);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->removeDir($this->kernel->getCacheDir());

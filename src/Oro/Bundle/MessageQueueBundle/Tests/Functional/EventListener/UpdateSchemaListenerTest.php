@@ -13,6 +13,7 @@ class UpdateSchemaListenerTest extends WebTestCase
 {
     private CacheItemPoolInterface $interruptConsumptionCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -21,6 +22,7 @@ class UpdateSchemaListenerTest extends WebTestCase
         $this->interruptConsumptionCache->clear();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->interruptConsumptionCache->clear();

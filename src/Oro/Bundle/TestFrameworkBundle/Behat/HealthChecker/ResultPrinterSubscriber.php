@@ -20,9 +20,7 @@ class ResultPrinterSubscriber implements EventSubscriberInterface, HealthChecker
         $this->output = $output;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

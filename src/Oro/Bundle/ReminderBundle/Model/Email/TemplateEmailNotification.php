@@ -59,6 +59,7 @@ class TemplateEmailNotification implements SenderAwareInterface, TemplateEmailNo
      * @return mixed
      * @throws InvalidArgumentException
      */
+    #[\Override]
     public function getEntity()
     {
         return $this->em
@@ -66,9 +67,7 @@ class TemplateEmailNotification implements SenderAwareInterface, TemplateEmailNo
             ->find($this->getReminder()->getRelatedEntityId());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSender(): ?From
     {
         $sender = $this->getReminder()->getSender();
@@ -91,9 +90,9 @@ class TemplateEmailNotification implements SenderAwareInterface, TemplateEmailNo
     }
 
     /**
-     * {@inheritdoc}
      * @throws InvalidArgumentException|RuntimeException
      */
+    #[\Override]
     public function getTemplateCriteria(): EmailTemplateCriteria
     {
         $className = $this->getReminder()->getRelatedEntityClassName();
@@ -103,9 +102,9 @@ class TemplateEmailNotification implements SenderAwareInterface, TemplateEmailNo
     }
 
     /**
-     * {@inheritdoc}
      * @throws InvalidArgumentException
      */
+    #[\Override]
     public function getRecipients(): iterable
     {
         return [$this->getReminder()->getRecipient()];

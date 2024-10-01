@@ -17,63 +17,48 @@ class LoggerClientDecorator implements RestClientInterface
      */
     protected $logger;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(RestClientInterface $client, LoggerInterface $logger)
     {
         $this->client = $client;
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($resource, array $params = array(), array $headers = array(), array $options = array())
     {
         $this->logRequest('get', $resource, $params);
         return $this->client->get($resource, $params, $headers, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array())
     {
         $this->logRequest('getJSON', $resource, $params);
         return $this->client->getJSON($resource, $params, $headers, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function post($resource, $data, array $headers = array(), array $options = array())
     {
         $this->logRequest('post', $resource);
         return $this->client->post($resource, $data, $headers, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function delete($resource, array $headers = array(), array $options = array())
     {
         $this->logRequest('delete', $resource);
         return $this->client->delete($resource, $headers, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function put($resource, $data, array $headers = array(), array $options = array())
     {
         $this->logRequest('post', $resource);
         return $this->client->put($resource, $data, $headers, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLastResponse()
     {
         return $this->client->getLastResponse();

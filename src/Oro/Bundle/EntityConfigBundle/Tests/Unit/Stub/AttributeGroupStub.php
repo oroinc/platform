@@ -24,9 +24,6 @@ class AttributeGroupStub extends AttributeGroup
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLabel(Localization $localization = null)
     {
         return $this->label;

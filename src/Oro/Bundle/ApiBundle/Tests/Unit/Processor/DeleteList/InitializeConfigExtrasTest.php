@@ -12,6 +12,7 @@ class InitializeConfigExtrasTest extends DeleteListProcessorTestCase
     /** @var InitializeConfigExtras */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

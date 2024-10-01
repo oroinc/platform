@@ -25,6 +25,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheFactory */
     private $configCacheFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configKey = 'test';

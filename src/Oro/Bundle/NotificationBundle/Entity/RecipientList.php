@@ -196,6 +196,7 @@ class RecipientList
      *
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         // get user emails

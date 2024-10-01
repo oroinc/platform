@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class TestFormExtension extends AbstractExtension
 {
+    #[\Override]
     protected function loadTypes(): array
     {
         return [

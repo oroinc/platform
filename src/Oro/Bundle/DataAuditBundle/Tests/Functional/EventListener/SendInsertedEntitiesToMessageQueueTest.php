@@ -14,6 +14,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
 {
     use SendChangedEntitiesToMessageQueueExtensionTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

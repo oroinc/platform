@@ -13,6 +13,7 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class CacheExpressionProcessorTest extends ExpressionProcessorTest
 {
+    #[\Override]
     protected function createExpressionProcessor(): ExpressionProcessor
     {
         return new CacheExpressionProcessor(

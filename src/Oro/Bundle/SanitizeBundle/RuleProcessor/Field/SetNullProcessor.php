@@ -18,11 +18,13 @@ class SetNullProcessor implements ProcessorInterface
     ) {
     }
 
+    #[\Override]
     public static function getProcessorName(): string
     {
         return 'set_null';
     }
 
+    #[\Override]
     public function getIncompatibilityMessages(
         string $fieldName,
         ClassMetadata $metadata,
@@ -31,9 +33,7 @@ class SetNullProcessor implements ProcessorInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSqls(
         string $fieldName,
         ClassMetadata $metadata,

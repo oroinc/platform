@@ -68,7 +68,7 @@ class WorkflowFileImportProcessor implements ConfigImportProcessorInterface
         $this->fileLocator = $fileLocator;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function process(array $content, \SplFileInfo $contentSource): array
     {
         $importFile = $this->getImportFile($contentSource);
@@ -88,7 +88,7 @@ class WorkflowFileImportProcessor implements ConfigImportProcessorInterface
         return $content;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function setParent(ConfigImportProcessorInterface $parentProcessor)
     {
         $this->parent = $parentProcessor;

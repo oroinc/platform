@@ -11,9 +11,7 @@ use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType;
 
 class UpdateOrganizationFormType implements Migration
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(

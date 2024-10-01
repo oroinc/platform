@@ -55,9 +55,7 @@ abstract class AbstractStep implements StepInterface
         return $this->jobRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
@@ -80,14 +78,13 @@ abstract class AbstractStep implements StepInterface
      */
     abstract protected function doExecute(StepExecution $stepExecution);
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigurableStepElements(): array
     {
         return [];
     }
 
+    #[\Override]
     final public function execute(StepExecution $stepExecution): void
     {
         $this->dispatchStepExecutionEvent(EventInterface::BEFORE_STEP_EXECUTION, $stepExecution);

@@ -14,6 +14,7 @@ class SetTargetActionTest extends BatchUpdateItemProcessorTestCase
 {
     private SetTargetAction $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

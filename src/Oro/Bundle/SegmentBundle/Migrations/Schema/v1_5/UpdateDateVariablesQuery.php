@@ -26,17 +26,13 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
         $this->segmentTable = $segmentTable;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Fixes month variables to use new format';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $steps = ceil($this->getSegmentCount() / static::LIMIT);

@@ -30,9 +30,7 @@ class EntityIdByCriteriaProvider implements ValueProviderInterface
         $this->defaultEntityCriteria = $defaultEntityCriteria;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getValue()
     {
         $entity = $this->doctrineHelper->getEntityRepositoryForClass($this->entityClass)

@@ -10,6 +10,7 @@ class TranslationKeyGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationKeyGenerator */
     private $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->generator = new TranslationKeyGenerator();

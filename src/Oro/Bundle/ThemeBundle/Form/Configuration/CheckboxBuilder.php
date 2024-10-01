@@ -13,14 +13,13 @@ use Symfony\Component\Form\FormView;
  */
 class CheckboxBuilder extends AbstractConfigurationChildBuilder
 {
-    #[\Override] public static function getType(): string
+    #[\Override]
+    public static function getType(): string
     {
         return 'checkbox';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildOption(FormBuilderInterface $builder, array $option): void
     {
         parent::buildOption($builder, $option);
@@ -41,17 +40,13 @@ class CheckboxBuilder extends AbstractConfigurationChildBuilder
             ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTypeClass(): string
     {
         return CheckboxType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDefaultOptions(): array
     {
         return [
@@ -60,9 +55,7 @@ class CheckboxBuilder extends AbstractConfigurationChildBuilder
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $formOptions, array $themeOption): void
     {
         parent::finishView($view, $form, $formOptions, $themeOption);
@@ -76,6 +69,7 @@ class CheckboxBuilder extends AbstractConfigurationChildBuilder
         }
     }
 
+    #[\Override]
     protected function getOptionPreview(array $option, mixed $value = null, bool $default = false): ?string
     {
         $value = match ($value) {

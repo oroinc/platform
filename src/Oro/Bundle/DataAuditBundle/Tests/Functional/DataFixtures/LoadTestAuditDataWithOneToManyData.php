@@ -14,9 +14,7 @@ class LoadTestAuditDataWithOneToManyData extends AbstractFixture implements Cont
     use ContainerAwareTrait;
     private const CHILD_COUNT = 4;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $owner = new TestAuditDataOwner();

@@ -15,33 +15,25 @@ use Oro\Component\Layout\Util\BlockUtils;
  */
 class TaggableDatagridExtension extends AbstractBlockTypeExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['enable_tagging' => false]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['enable_tagging']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         BlockUtils::registerPlugin($view, 'taggable_datagrid');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtendedType()
     {
         return 'datagrid';

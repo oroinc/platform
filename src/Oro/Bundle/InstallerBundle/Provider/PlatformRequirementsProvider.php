@@ -41,9 +41,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->processorHelper = $processorHelper;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getMandatoryRequirements(): ?RequirementCollection
     {
         $collection = new RequirementCollection();
@@ -73,9 +71,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         return $collection;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getPhpIniRequirements(): ?RequirementCollection
     {
         $collection = new RequirementCollection();
@@ -97,9 +93,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         return $collection;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getOroRequirements(): ?RequirementCollection
     {
         $collection = new RequirementCollection();
@@ -125,9 +119,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         return $collection;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getRecommendations(): ?RequirementCollection
     {
         $collection = new RequirementCollection();

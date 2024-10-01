@@ -24,6 +24,7 @@ class EmailTemplateCandidatesProvider implements EmailTemplateCandidatesProvider
         $this->emailTemplateCandidatesProviders = $emailTemplateCandidatesProviders;
     }
 
+    #[\Override]
     public function getCandidatesNames(EmailTemplateCriteria $emailTemplateCriteria, array $templateContext = []): array
     {
         $emailTemplateNames = [];

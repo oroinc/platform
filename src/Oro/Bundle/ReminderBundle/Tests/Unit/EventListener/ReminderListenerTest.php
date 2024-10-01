@@ -22,6 +22,7 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ReminderListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->reminderManager = $this->createMock(ReminderManager::class);

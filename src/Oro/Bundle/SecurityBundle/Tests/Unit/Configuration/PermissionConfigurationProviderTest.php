@@ -67,6 +67,7 @@ class PermissionConfigurationProviderTest extends TestCase
 
     private PermissionConfigurationProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $bundle1 = new TestBundle1();

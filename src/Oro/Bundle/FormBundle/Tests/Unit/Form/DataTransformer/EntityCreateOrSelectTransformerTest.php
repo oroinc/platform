@@ -17,6 +17,7 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityCreateOrSelectTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);

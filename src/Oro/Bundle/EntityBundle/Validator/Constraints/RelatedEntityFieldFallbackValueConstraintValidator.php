@@ -20,9 +20,7 @@ class RelatedEntityFieldFallbackValueConstraintValidator extends ConstraintValid
         $this->fallbackResolver = $resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($fallbackValue, Constraint $constraint)
     {
         /** @var RelatedEntityFieldFallbackValueConstraint $constraint */

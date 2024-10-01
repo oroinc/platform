@@ -20,6 +20,7 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlTagHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

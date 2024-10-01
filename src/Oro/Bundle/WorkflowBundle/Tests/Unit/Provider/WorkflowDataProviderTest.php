@@ -28,6 +28,7 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $systemWorkflowManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transitionDataProvider = $this->createMock(TransitionDataProvider::class);

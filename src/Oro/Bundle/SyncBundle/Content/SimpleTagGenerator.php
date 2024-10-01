@@ -8,17 +8,13 @@ class SimpleTagGenerator implements TagGeneratorInterface
     const IDENTIFIER_KEY  = 'params';
     const NESTED_DATA_KEY = 'children';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($data)
     {
         return is_array($data) && isset($data[self::STATIC_NAME_KEY]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         $params = isset($data[self::IDENTIFIER_KEY]) ? $data[self::IDENTIFIER_KEY] : [];

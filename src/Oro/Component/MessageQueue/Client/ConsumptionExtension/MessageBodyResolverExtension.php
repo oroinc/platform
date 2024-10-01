@@ -26,6 +26,7 @@ class MessageBodyResolverExtension extends AbstractExtension
         $this->messageBodyResolver = $messageBodyResolver;
     }
 
+    #[\Override]
     public function onPreReceived(Context $context): void
     {
         parent::onPreReceived($context);

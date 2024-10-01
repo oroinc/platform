@@ -6,6 +6,7 @@ use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql;
 
 class PdoPgsqlTest extends AbstractPdoTest
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

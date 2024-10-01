@@ -83,6 +83,7 @@ class LogLevelConfig implements ResetInterface
         return $this->logLevel;
     }
 
+    #[\Override]
     public function reset()
     {
         $this->logLevel = null;

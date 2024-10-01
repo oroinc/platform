@@ -20,6 +20,7 @@ final class ContentFileTypeTest extends FormIntegrationTestCase
 
     private ContentFileDataTransformerInterface&MockObject $contentFileDataTransformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contentFileDataTransformer = $this->createMock(
@@ -117,6 +118,7 @@ final class ContentFileTypeTest extends FormIntegrationTestCase
         self::assertEquals('content', $form->getData());
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

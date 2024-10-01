@@ -9,15 +9,13 @@ use Symfony\Component\Process\Process;
  */
 class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'Cache';
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     protected function getApplicableOs()
     {
         return [
@@ -25,6 +23,7 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         ];
     }
 
+    #[\Override]
     protected function replaceCache()
     {
         $commands = [];
@@ -54,6 +53,7 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         $this->runProcess(implode(' & ', $commands));
     }
 
+    #[\Override]
     protected function startCopyDumpToTempDir()
     {
         $commands = [];
@@ -80,6 +80,7 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
             ->start();
     }
 
+    #[\Override]
     protected function dumpCache()
     {
         $commands = [];
@@ -109,6 +110,7 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         $this->runProcess(implode(' & ', $commands));
     }
 
+    #[\Override]
     protected function removeDumpCacheDir()
     {
         $this->runProcess(
@@ -116,6 +118,7 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         );
     }
 
+    #[\Override]
     protected function removeTempCacheDir()
     {
         $this->runProcess(
@@ -123,6 +126,7 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         );
     }
 
+    #[\Override]
     protected function removeCacheDirs()
     {
         $commands = [];

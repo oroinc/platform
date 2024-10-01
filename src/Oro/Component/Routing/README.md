@@ -84,9 +84,7 @@ use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 
 class MyRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
         // Add your logic here
@@ -126,9 +124,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class HiddenRoutesPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $definition = $container->getDefinition('router.default');
@@ -152,9 +148,7 @@ use Acme\Bundle\AppBundle\DependencyInjection\Compiler\HiddenRoutesPass;
 
 class AcmeAppBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
@@ -187,9 +181,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     /** @var array */
     private $supportedEntities;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
         if ($route->getOption('group') !== self::ROUTE_GROUP) {

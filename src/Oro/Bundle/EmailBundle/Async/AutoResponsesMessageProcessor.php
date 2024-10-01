@@ -33,9 +33,7 @@ class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicS
         $this->jobRunner = $jobRunner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = $message->getBody();
@@ -67,9 +65,7 @@ class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicS
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [SendAutoResponsesTopic::getName()];

@@ -10,49 +10,37 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  */
 class DecimalAttributeType implements AttributeTypeInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSearchable(FieldConfigModel $attribute)
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSortable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         return ($originalValue === null) ? $originalValue : (float)$originalValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         return $this->getFilterableValue($attribute, $originalValue, $localization);

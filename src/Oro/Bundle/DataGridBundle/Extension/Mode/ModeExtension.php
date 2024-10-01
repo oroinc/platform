@@ -13,9 +13,7 @@ class ModeExtension extends AbstractExtension
     const MODE_SERVER = 'server';
     const MODE_CLIENT = 'client';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -23,9 +21,7 @@ class ModeExtension extends AbstractExtension
             && $this->getMode($config) !== self::MODE_SERVER;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $data->offsetSetByPath('mode', $this->getMode($config));

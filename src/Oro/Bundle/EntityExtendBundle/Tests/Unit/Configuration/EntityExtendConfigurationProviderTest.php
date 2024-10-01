@@ -14,6 +14,7 @@ class EntityExtendConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     private EntityExtendConfigurationProvider $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $cacheFile = $this->getTempFile('EntityExtendConfigurationProvider');

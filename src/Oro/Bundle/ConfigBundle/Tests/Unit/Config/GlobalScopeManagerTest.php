@@ -6,33 +6,25 @@ use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 
 class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createManager(): GlobalScopeManager
     {
         return new GlobalScopeManager($this->doctrine, $this->cache, $this->dispatcher, $this->configBag);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getScopedEntityName(): string
     {
         return 'app';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getScopedEntity(): object
     {
         return new \stdClass();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function testSetScopeId(): void
     {
         $this->dispatcher->expects(self::never())
@@ -43,17 +35,13 @@ class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
         self::assertSame(0, $this->manager->getScopeId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function testGetScopeIdFromEntity(): void
     {
         self::assertSame(0, $this->manager->getScopeIdFromEntity($this->getScopedEntity()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function testGetScopeIdFromUnsupportedEntity(): void
     {
         self::assertSame(0, $this->manager->getScopeIdFromEntity(new \stdClass()));

@@ -14,6 +14,7 @@ class GmailSearchStringManagerTest extends \PHPUnit\Framework\TestCase
     /** @var SearchQuery */
     private $query;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchStringManager = new GmailSearchStringManager();

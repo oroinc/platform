@@ -13,9 +13,7 @@ class CurrentUserWalker extends TreeWalkerAdapter
 {
     const HINT_SECURITY_CONTEXT = 'oro_security.current_user_walker.security_context';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
         /** @var Query $query */

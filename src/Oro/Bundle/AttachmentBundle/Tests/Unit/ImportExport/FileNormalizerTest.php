@@ -32,6 +32,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
 
     private FileNormalizer $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentManager = $this->createMock(AttachmentManager::class);

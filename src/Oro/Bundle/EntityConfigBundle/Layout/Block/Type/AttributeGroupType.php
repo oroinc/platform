@@ -49,9 +49,7 @@ class AttributeGroupType extends AbstractContainerType
         $this->notRenderableAttributeTypes = $notRenderableAttributeTypes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         /** @var AttributeFamily $attributeFamily */
@@ -120,9 +118,7 @@ class AttributeGroupType extends AbstractContainerType
         return $sorted;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['group']);
@@ -140,9 +136,7 @@ class AttributeGroupType extends AbstractContainerType
         return sprintf('%s_%s_%s', $attributeGroupBlockId, $blockType, $field_name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
@@ -160,9 +154,7 @@ class AttributeGroupType extends AbstractContainerType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

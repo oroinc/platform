@@ -116,6 +116,7 @@ class TestSanitizable implements
     /**
      * @return string
      */
+    #[\Override]
     public function getMiddleName()
     {
         return $this->middleName;
@@ -136,6 +137,7 @@ class TestSanitizable implements
     /**
      * @return string
      */
+    #[\Override]
     public function getLastName()
     {
         return $this->lastName;
@@ -173,6 +175,7 @@ class TestSanitizable implements
     /**
      * @return string
      */
+    #[\Override]
     public function getEmail()
     {
         return $this->email;

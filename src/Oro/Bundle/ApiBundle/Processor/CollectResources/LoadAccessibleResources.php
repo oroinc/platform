@@ -19,9 +19,7 @@ class LoadAccessibleResources implements ProcessorInterface
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */

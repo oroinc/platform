@@ -15,9 +15,6 @@ class GroupChoiceField extends Element
      */
     protected $choices;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(Session $session, OroElementFactory $elementFactory, $selector = ['xpath' => '//'])
     {
         parent::__construct($session, $elementFactory, $selector);
@@ -25,9 +22,7 @@ class GroupChoiceField extends Element
         $this->choices = $this->findChoices();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($values)
     {
         $values = true === is_array($values) ? $values : [$values];
@@ -54,6 +49,7 @@ class GroupChoiceField extends Element
      *
      * @return array
      */
+    #[\Override]
     public function getValue()
     {
         return array_keys(array_filter($this->findChoices(), function (NodeElement $element) {

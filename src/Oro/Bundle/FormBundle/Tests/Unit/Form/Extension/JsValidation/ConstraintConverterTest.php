@@ -18,6 +18,7 @@ class ConstraintConverterTest extends TestCase
 
     private ConstraintConverter $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->exactConverter = $this->createMock(ConstraintConverterInterface::class);

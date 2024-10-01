@@ -32,6 +32,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
     /** @var EntityIdentifierType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
@@ -50,6 +51,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

@@ -11,6 +11,7 @@ class TemplateEntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCa
     /** @var TemplateEntityRepositoryCompilerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new TemplateEntityRepositoryCompilerPass();

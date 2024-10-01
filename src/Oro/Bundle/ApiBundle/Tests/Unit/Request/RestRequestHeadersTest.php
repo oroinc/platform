@@ -16,6 +16,7 @@ class RestRequestHeadersTest extends \PHPUnit\Framework\TestCase
     /** @var RestRequestHeaders */
     private $requestHeaders;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->request = Request::create('http://test.com');

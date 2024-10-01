@@ -12,9 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 class LoadSegmentSnapshotData extends AbstractFixture implements
     DependentFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var Segment $segment */
@@ -35,9 +33,7 @@ class LoadSegmentSnapshotData extends AbstractFixture implements
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [

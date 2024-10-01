@@ -10,9 +10,7 @@ use Symfony\Component\Validator\Constraints\Length;
  */
 class StringFieldConfigConstraintsProvider implements FieldConfigConstraintsProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create(ConfigInterface $config): array
     {
         $length = $config->get('length') ?: 255;

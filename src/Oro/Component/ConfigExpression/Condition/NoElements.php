@@ -16,33 +16,25 @@ class NoElements extends AbstractCondition implements ContextAccessorAwareInterf
     /** @var mixed */
     protected $value;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'no_elements';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray($this->value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode($this->value, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (1 === count($options)) {
@@ -56,9 +48,7 @@ class NoElements extends AbstractCondition implements ContextAccessorAwareInterf
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getMessageParameters($context)
     {
         return [
@@ -66,9 +56,7 @@ class NoElements extends AbstractCondition implements ContextAccessorAwareInterf
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $value = $this->resolveValue($context, $this->value, false);

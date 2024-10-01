@@ -13,15 +13,14 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
 {
     private UserApiKeyGenType $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new UserApiKeyGenType();
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

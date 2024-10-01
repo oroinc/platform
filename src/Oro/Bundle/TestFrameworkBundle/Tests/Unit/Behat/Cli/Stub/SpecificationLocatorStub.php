@@ -19,17 +19,13 @@ class SpecificationLocatorStub implements SpecificationLocator
         $this->suiteNames = $suiteNames;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLocatorExamples()
     {
         return 'Return iterators for suites specified in constructor. For unit tests only';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function locateSpecifications(Suite $suite, $locator = null)
     {
         if (in_array($suite->getName(), $this->suiteNames)) {

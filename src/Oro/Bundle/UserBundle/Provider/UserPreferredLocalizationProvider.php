@@ -31,9 +31,7 @@ class UserPreferredLocalizationProvider extends AbstractPreferredLocalizationPro
         $this->localizationManager = $localizationManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($entity): bool
     {
         return $entity instanceof User;
@@ -43,6 +41,7 @@ class UserPreferredLocalizationProvider extends AbstractPreferredLocalizationPro
      * @param User $entity
      * @return Localization|null
      */
+    #[\Override]
     public function getPreferredLocalizationForEntity($entity): ?Localization
     {
         $originalScopeId = $this->userConfigManager->getScopeId();

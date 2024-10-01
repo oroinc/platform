@@ -21,6 +21,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $layoutManipulator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);

@@ -11,9 +11,7 @@ abstract class AbstractLocalizedProperty extends FieldProperty
     const RESOLVER_KEY     = 'context_resolver';
     const CONTEXT_KEY      = 'context';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRawValue(ResultRecordInterface $record)
     {
         $value = parent::getRawValue($record);

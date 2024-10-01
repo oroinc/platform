@@ -18,6 +18,7 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultOperationRequestHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

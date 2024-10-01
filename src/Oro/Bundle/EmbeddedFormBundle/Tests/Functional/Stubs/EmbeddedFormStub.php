@@ -8,9 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class EmbeddedFormStub extends EmbeddedFormType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);

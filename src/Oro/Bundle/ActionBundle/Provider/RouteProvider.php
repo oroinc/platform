@@ -27,21 +27,25 @@ class RouteProvider implements RouteProviderInterface
         $this->widgetRoute = $widgetRoute;
     }
 
+    #[\Override]
     public function getWidgetRoute(): string
     {
         return $this->widgetRoute;
     }
 
+    #[\Override]
     public function getFormDialogRoute(): string
     {
         return $this->formDialogRoute;
     }
 
+    #[\Override]
     public function getFormPageRoute(): string
     {
         return $this->formPageRoute;
     }
 
+    #[\Override]
     public function getExecutionRoute(): string
     {
         return $this->executionRoute;

@@ -15,9 +15,7 @@ class AclProtectedEntitySerializer extends EntitySerializer
 {
     private array $contextStack = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function serialize(
         QueryBuilder $qb,
         EntityConfig|array $config,
@@ -32,9 +30,7 @@ class AclProtectedEntitySerializer extends EntitySerializer
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function serializeEntities(
         array $entities,
         string $entityClass,
@@ -50,9 +46,7 @@ class AclProtectedEntitySerializer extends EntitySerializer
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildQuery(
         QueryBuilder $qb,
         EntityConfig|array $config,

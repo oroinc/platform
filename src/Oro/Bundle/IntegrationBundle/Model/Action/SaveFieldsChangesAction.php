@@ -12,9 +12,7 @@ use Oro\Component\Action\Exception\InvalidParameterException;
  */
 class SaveFieldsChangesAction extends AbstractFieldsChangesAction
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options[self::OPTION_KEY_CHANGESET])) {
@@ -26,9 +24,7 @@ class SaveFieldsChangesAction extends AbstractFieldsChangesAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $changeSet = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_CHANGESET]);

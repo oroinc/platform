@@ -34,6 +34,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
     private $workflow;
 
+    #[\Override]
     protected function setUp(): void
     {
         $attributeNormalizer = $this->createMock(AttributeNormalizer::class);

@@ -9,9 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class LoadDataFixtures extends AbstractFixture
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $data = $this->getFixturesData();

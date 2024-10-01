@@ -15,6 +15,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EnumFieldConfigSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = $this->createMock(EnumFieldConfigSubscriber::class);

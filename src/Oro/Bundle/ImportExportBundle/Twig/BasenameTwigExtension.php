@@ -14,6 +14,7 @@ class BasenameTwigExtension extends AbstractExtension
     /**
      * @return array
      */
+    #[\Override]
     public function getFilters()
     {
         return [

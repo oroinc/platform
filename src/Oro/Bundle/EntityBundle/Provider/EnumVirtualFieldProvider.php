@@ -20,9 +20,7 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFields($className): array
     {
         $this->ensureVirtualFieldsInitialized($className);
@@ -32,9 +30,7 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
             : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualField($className, $fieldName): bool
     {
         $this->ensureVirtualFieldsInitialized($className);
@@ -43,9 +39,7 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
             && array_key_exists($fieldName, $this->virtualFields[$className]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFieldQuery($className, $fieldName)
     {
         $this->ensureVirtualFieldQueriesInitialized($className);

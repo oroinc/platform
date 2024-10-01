@@ -10,6 +10,7 @@ class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionAssembler */
     private $expressionAssembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configExpressions = new ConfigExpressions();

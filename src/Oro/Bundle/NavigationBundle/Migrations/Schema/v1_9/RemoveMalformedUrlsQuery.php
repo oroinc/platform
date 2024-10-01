@@ -25,9 +25,7 @@ class RemoveMalformedUrlsQuery extends ParametrizedMigrationQuery
         $this->urlFieldName = $urlFieldName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Removes rows with malformed url from the table after url was truncated';
@@ -37,8 +35,8 @@ class RemoveMalformedUrlsQuery extends ParametrizedMigrationQuery
      * Ensure that truncated query (because its length could not exceed 1023 characters) is still a valid query
      * (i.e the last % (if present) is followed by 2 characters).
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $sql = <<<'SQL'

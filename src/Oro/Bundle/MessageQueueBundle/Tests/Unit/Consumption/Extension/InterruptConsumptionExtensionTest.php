@@ -13,6 +13,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private CacheState|\PHPUnit\Framework\MockObject\MockObject $cacheState;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheState = $this->createMock(CacheState::class);

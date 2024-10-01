@@ -67,6 +67,7 @@ class UserPermissionController extends RestGetController
     /**
      * @return UserPermissionApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_user.permission_manager.api');

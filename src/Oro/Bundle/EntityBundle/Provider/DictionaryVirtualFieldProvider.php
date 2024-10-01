@@ -49,9 +49,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         $this->additionalDictionaries[$entityClass] = $virtualFieldNames;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFields($className)
     {
         $this->ensureVirtualFieldsInitialized($className);
@@ -61,9 +59,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
             : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualField($className, $fieldName)
     {
         $this->ensureVirtualFieldsInitialized($className);
@@ -71,9 +67,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         return isset($this->virtualFields[$className][$fieldName]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFieldQuery($className, $fieldName)
     {
         $this->ensureVirtualFieldQueriesInitialized($className);

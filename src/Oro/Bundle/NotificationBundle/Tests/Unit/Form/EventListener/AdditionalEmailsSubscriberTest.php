@@ -20,6 +20,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var AdditionalEmailsSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->associationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);

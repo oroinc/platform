@@ -6,9 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\CronBundle\Checker\ScheduleIntervalChecker;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\ScheduleIntervalStub;
 
-/**
- * {@inheritDoc}
- */
 class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -16,9 +13,7 @@ class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
      */
     private $scheduleIntervalChecker;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->scheduleIntervalChecker = new ScheduleIntervalChecker();

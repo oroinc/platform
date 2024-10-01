@@ -37,6 +37,7 @@ class CacheMetadataProvider implements CacheMetadataProviderInterface, ResetInte
         $this->debug = $debug;
     }
 
+    #[\Override]
     public function getCacheMetadata(BlockView $blockView, ContextInterface $context): ?LayoutCacheMetadata
     {
         $blockCacheKey = $blockView->vars['cache_key'];
@@ -72,6 +73,7 @@ class CacheMetadataProvider implements CacheMetadataProviderInterface, ResetInte
         }
     }
 
+    #[\Override]
     public function reset(): void
     {
         $this->metadataByBlockCacheKey = [];

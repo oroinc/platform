@@ -25,9 +25,7 @@ class UpdateEmailOwnerAssociationMessageProcessor implements MessageProcessorInt
         $this->jobRunner = $jobRunner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = $message->getBody();
@@ -41,9 +39,7 @@ class UpdateEmailOwnerAssociationMessageProcessor implements MessageProcessorInt
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [UpdateEmailOwnerAssociationTopic::getName()];

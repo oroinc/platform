@@ -14,9 +14,7 @@ class EmailAddressParameterFilter implements ParameterFilterInterface
         $this->emailAddressHelper = $emailAddressHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter($rawValue, $operator)
     {
         if (is_array($rawValue)) {

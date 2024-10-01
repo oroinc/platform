@@ -8,9 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 
 class LoadTestSanitizableData extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $testSanitizable = new TestSanitizable();

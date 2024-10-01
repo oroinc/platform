@@ -17,6 +17,7 @@ class NumberRangeFilterTest extends WebTestCase
 {
     private NumberRangeFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

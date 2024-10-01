@@ -12,6 +12,7 @@ use Twig\TwigFunction;
  */
 class ScheduleExtension extends AbstractExtension
 {
+    #[\Override]
     public function getFunctions()
     {
         return [

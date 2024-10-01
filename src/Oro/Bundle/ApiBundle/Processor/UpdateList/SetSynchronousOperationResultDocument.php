@@ -10,9 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetSynchronousOperationResultDocument implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */

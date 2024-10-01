@@ -20,6 +20,7 @@ class DoctrineClearIdentityMapExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineClearIdentityMapExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

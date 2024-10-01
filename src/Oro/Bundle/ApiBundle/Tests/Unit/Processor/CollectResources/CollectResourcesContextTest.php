@@ -9,6 +9,7 @@ class CollectResourcesContextTest extends \PHPUnit\Framework\TestCase
 {
     private CollectResourcesContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new CollectResourcesContext();

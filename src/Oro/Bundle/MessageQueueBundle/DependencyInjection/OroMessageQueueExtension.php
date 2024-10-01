@@ -27,9 +27,7 @@ class OroMessageQueueExtension extends Extension
         $this->factories[$transportFactory->getKey()] = $transportFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
@@ -96,9 +94,7 @@ class OroMessageQueueExtension extends Extension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         return new Configuration($this->factories, $container->getParameter('kernel.environment'));

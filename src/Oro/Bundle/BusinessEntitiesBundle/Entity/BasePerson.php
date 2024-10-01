@@ -105,6 +105,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getNamePrefix()
     {
         return $this->namePrefix;
@@ -125,6 +126,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getFirstName()
     {
         return $this->firstName;
@@ -145,6 +147,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getMiddleName()
     {
         return $this->middleName;
@@ -165,6 +168,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getLastName()
     {
         return $this->lastName;
@@ -185,6 +189,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getNameSuffix()
     {
         return $this->nameSuffix;
@@ -242,6 +247,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getEmail()
     {
         return $this->email;
@@ -370,6 +376,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getLastName() . (string)$this->getFirstName();

@@ -81,9 +81,9 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function guessType(string $class, string $property): ?TypeGuess
     {
         $metadata = $this->metadataAccessor?->getMetadata($class);
@@ -120,25 +120,19 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         return $this->dataTypeGuesser->guessDefault();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function guessRequired(string $class, string $property): ?ValueGuess
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function guessPattern(string $class, string $property): ?ValueGuess
     {
         return null;

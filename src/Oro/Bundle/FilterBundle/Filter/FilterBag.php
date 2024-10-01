@@ -23,25 +23,19 @@ class FilterBag implements FilterBagInterface
         $this->filterContainer = $filterContainer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilterNames(): array
     {
         return $this->filterNames;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasFilter(string $name): bool
     {
         return $this->filterContainer->has($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilter(string $name): FilterInterface
     {
         /** @var FilterInterface $filter */

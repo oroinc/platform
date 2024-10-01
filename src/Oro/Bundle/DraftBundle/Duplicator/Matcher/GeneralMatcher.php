@@ -9,9 +9,7 @@ use DeepCopy\Matcher\Matcher;
  */
 class GeneralMatcher implements Matcher
 {
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function matches($object, $property): bool
     {
         return true;

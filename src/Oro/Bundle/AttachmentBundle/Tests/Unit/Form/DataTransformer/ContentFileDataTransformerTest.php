@@ -10,6 +10,7 @@ final class ContentFileDataTransformerTest extends TestCase
 {
     private ContentFileDataTransformer $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new ContentFileDataTransformer();

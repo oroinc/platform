@@ -12,9 +12,7 @@ class BuildDestinationMetaRegistryPass implements CompilerPassInterface
 {
     use MessageProcessorsMetadataTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $destinationMetaRegistryId = 'oro_message_queue.client.meta.destination_meta_registry';

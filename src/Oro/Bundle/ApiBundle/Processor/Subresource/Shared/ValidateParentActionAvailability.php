@@ -21,9 +21,7 @@ class ValidateParentActionAvailability implements ProcessorInterface
         $this->resourcesProvider = $resourcesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

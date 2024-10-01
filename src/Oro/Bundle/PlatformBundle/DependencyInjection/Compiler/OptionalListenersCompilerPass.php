@@ -20,9 +20,7 @@ class OptionalListenersCompilerPass implements CompilerPassInterface
     const OPTIONAL_LISTENER_MANAGER = 'oro_platform.optional_listeners.manager';
     const OPTIONAL_LISTENER_INTERFACE = 'Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $listeners = array_keys(

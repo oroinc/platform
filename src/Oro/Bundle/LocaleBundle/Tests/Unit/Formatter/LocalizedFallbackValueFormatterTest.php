@@ -29,6 +29,7 @@ class LocalizedFallbackValueFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizedFallbackValueFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

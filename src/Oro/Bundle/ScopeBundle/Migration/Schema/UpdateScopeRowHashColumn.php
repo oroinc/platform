@@ -27,6 +27,7 @@ class UpdateScopeRowHashColumn implements Migration
     /**
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_scope');

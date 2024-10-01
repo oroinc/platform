@@ -11,6 +11,7 @@ class AuditFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AuditFieldTypeProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new AuditFieldTypeProvider();

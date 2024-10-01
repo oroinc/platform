@@ -71,17 +71,13 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResource()
     {
         return $this->resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load($bundleClass, $bundleDir, $bundleAppDir = '', $folderPlaceholder = '')
     {
         $realPath = $this->getResourcePath($bundleAppDir, $bundleDir);
@@ -171,9 +167,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
         $path = $this->getBundleAppResourcePath($bundleAppDir);
@@ -187,9 +181,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
         if (CumulativeResourceManager::getInstance()->isDir($bundleAppDir)) {

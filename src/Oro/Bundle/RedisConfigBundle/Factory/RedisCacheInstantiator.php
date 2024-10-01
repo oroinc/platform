@@ -22,6 +22,7 @@ class RedisCacheInstantiator implements CacheInstantiatorInterface
         $this->adapter = $adapter;
     }
 
+    #[\Override]
     public function getCacheInstance(string $namespace): AdapterInterface
     {
         if (!\array_key_exists($namespace, $this->caches)) {

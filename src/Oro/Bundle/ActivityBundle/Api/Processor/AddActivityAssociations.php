@@ -24,9 +24,7 @@ class AddActivityAssociations implements ProcessorInterface
         $this->activityAssociationProvider = $activityAssociationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

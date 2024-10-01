@@ -33,6 +33,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurableEntityNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);

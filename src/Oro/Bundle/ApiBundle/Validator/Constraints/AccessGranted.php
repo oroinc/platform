@@ -19,17 +19,13 @@ class AccessGranted extends Constraint implements ConstraintWithStatusCodeInterf
 
     public string $permission = 'VIEW';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getStatusCode(): int
     {
         return Response::HTTP_FORBIDDEN;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;

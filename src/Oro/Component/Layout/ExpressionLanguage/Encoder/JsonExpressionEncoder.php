@@ -18,17 +18,13 @@ class JsonExpressionEncoder implements ExpressionEncoderInterface
         $this->expressionManipulator = $expressionManipulator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function encodeExpr(ParsedExpression $expr)
     {
         return json_encode($this->expressionManipulator->toArray($expr));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function encodeActions($actions)
     {
         return json_encode(

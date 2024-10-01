@@ -38,6 +38,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
     /* @var AbstractGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formRegistry = $this->createMock(FormRegistry::class);

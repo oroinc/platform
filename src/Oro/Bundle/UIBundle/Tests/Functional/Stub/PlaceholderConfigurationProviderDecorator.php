@@ -38,42 +38,50 @@ class PlaceholderConfigurationProviderDecorator extends PlaceholderConfiguration
         $this->placeholderItemConfigs[$placeholderItem] = $itemConfig;
     }
 
+    #[\Override]
     public function getPlaceholderItems(string $placeholderName): ?array
     {
         return $this->testPlaceholderItems[$placeholderName] ?? $this->decorated->getPlaceholderItems($placeholderName);
     }
 
+    #[\Override]
     public function getItemConfiguration(string $itemName): ?array
     {
         return $this->placeholderItemConfigs[$itemName] ?? $this->decorated->getItemConfiguration($itemName);
     }
 
     //region proxying all public method
+    #[\Override]
     public function isCacheFresh(?int $timestamp): bool
     {
         return $this->decorated->isCacheFresh($timestamp);
     }
 
+    #[\Override]
     public function getCacheTimestamp(): ?int
     {
         return $this->decorated->getCacheTimestamp();
     }
 
+    #[\Override]
     public function clearCache(): void
     {
         $this->decorated->clearCache();
     }
 
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->decorated->warmUpCache();
     }
 
+    #[\Override]
     public function ensureCacheWarmedUp(): void
     {
         $this->decorated->ensureCacheWarmedUp();
     }
 
+    #[\Override]
     public function getCacheResource(): ResourceInterface
     {
         return $this->decorated->getCacheResource();

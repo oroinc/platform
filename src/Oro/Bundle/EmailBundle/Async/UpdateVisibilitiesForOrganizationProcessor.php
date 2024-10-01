@@ -32,17 +32,13 @@ class UpdateVisibilitiesForOrganizationProcessor implements MessageProcessorInte
         $this->jobRunner = $jobRunner;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [UpdateVisibilitiesForOrganizationTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = $message->getBody();

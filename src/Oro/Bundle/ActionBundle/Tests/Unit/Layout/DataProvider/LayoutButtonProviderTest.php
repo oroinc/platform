@@ -19,6 +19,7 @@ class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutButtonProvider */
     private $layoutButtonProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

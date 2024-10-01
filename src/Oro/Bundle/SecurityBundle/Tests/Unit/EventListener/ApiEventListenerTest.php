@@ -27,6 +27,7 @@ class ApiEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ApiEventListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestAuthorizationChecker = $this->createMock(RequestAuthorizationChecker::class);

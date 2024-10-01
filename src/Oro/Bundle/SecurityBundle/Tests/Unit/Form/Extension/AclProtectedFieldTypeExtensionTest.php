@@ -34,6 +34,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     /** @var AclProtectedFieldTypeExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

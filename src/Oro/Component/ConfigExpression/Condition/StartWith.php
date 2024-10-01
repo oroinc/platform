@@ -4,17 +4,13 @@ namespace Oro\Component\ConfigExpression\Condition;
 
 class StartWith extends AbstractComparison
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doCompare($left, $right)
     {
         return stripos($left, $right) === 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'start_with';

@@ -27,6 +27,7 @@ class EntityValidationLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityValidationLoader */
     private $loader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

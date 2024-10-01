@@ -25,6 +25,7 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ImageTypeProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeManager = $this->createMock(ThemeManager::class);

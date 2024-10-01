@@ -12,6 +12,7 @@ class NormalizeStringTest extends \PHPUnit\Framework\TestCase
 {
     private NormalizeString $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new NormalizeString();

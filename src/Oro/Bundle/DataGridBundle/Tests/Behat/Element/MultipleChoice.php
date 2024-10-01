@@ -149,6 +149,7 @@ class MultipleChoice extends AbstractGridFilterItem
         return null;
     }
 
+    #[\Override]
     public function open()
     {
         parent::open();
@@ -156,6 +157,7 @@ class MultipleChoice extends AbstractGridFilterItem
         $this->getDriver()->waitForAjax();
     }
 
+    #[\Override]
     public function close()
     {
         $dropDownMask = $this->getPage()->find('css', '.oro-dropdown-mask');

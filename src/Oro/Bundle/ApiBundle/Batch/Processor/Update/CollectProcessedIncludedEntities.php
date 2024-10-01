@@ -35,9 +35,9 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

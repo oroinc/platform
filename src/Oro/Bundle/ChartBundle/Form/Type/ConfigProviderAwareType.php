@@ -17,17 +17,12 @@ abstract class ConfigProviderAwareType extends AbstractType
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_chart_aware';

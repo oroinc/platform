@@ -22,6 +22,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDefinitionScopeListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowScopeManager = $this->createMock(WorkflowScopeManager::class);

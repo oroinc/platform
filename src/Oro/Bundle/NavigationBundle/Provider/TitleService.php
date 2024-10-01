@@ -82,10 +82,10 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function render(
         $params = [],
         $title = null,
@@ -141,9 +141,7 @@ class TitleService implements TitleServiceInterface
         return $this->titleTranslator->trans($title, $params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setData(array $values)
     {
         if (isset($values['titleTemplate'])
@@ -266,9 +264,7 @@ class TitleService implements TitleServiceInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadByRoute($route, $menuName = null)
     {
         $title = null;
@@ -380,9 +376,7 @@ class TitleService implements TitleServiceInterface
         return $title ?? '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSerialized()
     {
         $params = [];

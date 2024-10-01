@@ -30,25 +30,19 @@ class TaxonomyController extends RestController
         return $this->handleDeleteRequest($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_tag.taxonomy.manager.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         throw new \BadMethodCallException('Form is not available.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_tag.form.handler.api');

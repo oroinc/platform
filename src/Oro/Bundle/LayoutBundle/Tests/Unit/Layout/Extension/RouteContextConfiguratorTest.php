@@ -15,6 +15,7 @@ class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var RouteContextConfigurator */
     private $configurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();

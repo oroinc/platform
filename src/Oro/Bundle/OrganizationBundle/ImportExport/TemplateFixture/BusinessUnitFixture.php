@@ -9,17 +9,13 @@ class BusinessUnitFixture extends AbstractTemplateRepository
 {
     const MAIN_BUSINESS_UNIT = 'Main';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClass()
     {
         return BusinessUnit::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createEntity($key)
     {
         return new BusinessUnit();
@@ -29,6 +25,7 @@ class BusinessUnitFixture extends AbstractTemplateRepository
      * @param string       $key
      * @param BusinessUnit $entity
      */
+    #[\Override]
     public function fillEntityData($key, $entity)
     {
         switch ($key) {

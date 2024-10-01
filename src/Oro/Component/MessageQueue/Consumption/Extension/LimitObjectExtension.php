@@ -18,26 +18,31 @@ class LimitObjectExtension extends AbstractExtension
         $this->objectLimit = $objectLimit;
     }
 
+    #[\Override]
     public function onStart(Context $context)
     {
         $this->checkObjectLimit($context);
     }
 
+    #[\Override]
     public function onIdle(Context $context)
     {
         $this->checkObjectLimit($context);
     }
 
+    #[\Override]
     public function onPreReceived(Context $context)
     {
         $this->checkObjectLimit($context);
     }
 
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         $this->checkObjectLimit($context);
     }
 
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $this->checkObjectLimit($context);

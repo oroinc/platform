@@ -17,6 +17,7 @@ class DbalMessageConsumerTest extends WebTestCase
 {
     use DbalSchemaExtensionTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -26,6 +27,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->ensureTableExists('message_queue');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         parent::tearDown();

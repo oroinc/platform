@@ -19,11 +19,13 @@ class ElementDependentVisitor implements VisitorInterface
         $this->elementId = $elementId;
     }
 
+    #[\Override]
     public function startVisit(VisitContext $visitContext): void
     {
         $visitContext->getClass()->addImplement(ElementDependentLayoutUpdateInterface::class);
     }
 
+    #[\Override]
     public function endVisit(VisitContext $visitContext): void
     {
         $visitContext->getClass()

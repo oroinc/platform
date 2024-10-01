@@ -7,9 +7,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Exception;
  */
 class LayoutChildWithInvisibleParentException extends \Exception
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
         parent::__construct(

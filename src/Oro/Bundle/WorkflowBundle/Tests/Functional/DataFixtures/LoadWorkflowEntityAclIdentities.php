@@ -10,9 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 
 class LoadWorkflowEntityAclIdentities extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->createIdentity($manager, 'test_active_flow1', 'name', 60);
@@ -39,9 +37,7 @@ class LoadWorkflowEntityAclIdentities extends AbstractFixture implements Depende
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadWorkflowEntityAcls::class];

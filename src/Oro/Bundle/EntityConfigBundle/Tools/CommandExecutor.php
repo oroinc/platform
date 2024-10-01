@@ -27,9 +27,7 @@ class CommandExecutor implements CommandExecutorInterface
         $this->dataCacheManager = $dataCacheManager;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function runCommand(string $command, array $params = [], LoggerInterface $logger = null): int
     {
         $disableCacheSync = false;
@@ -46,17 +44,13 @@ class CommandExecutor implements CommandExecutorInterface
         return $exitCode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultOption(string $name)
     {
         return $this->commandExecutor->getDefaultOption($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDefaultOption(string $name, $value = true): CommandExecutorInterface
     {
         $this->commandExecutor->setDefaultOption($name, $value);

@@ -18,25 +18,19 @@ class Localization extends BaseLocalization
         $this->id = $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __call($name, $arguments)
     {
         return $this->localizedMethodCall(['title' => 'titles'], $name, $arguments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __get($name)
     {
         return $this->localizedFieldGet(['title' => 'titles'], $name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __set($name, $value)
     {
         return $this->localizedFieldSet(['title' => 'titles'], $name, $value);

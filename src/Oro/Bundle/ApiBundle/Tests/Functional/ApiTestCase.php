@@ -369,9 +369,7 @@ abstract class ApiTestCase extends WebTestCase
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected static function assertResponseStatusCodeEquals(
         Response $response,
         int $statusCode,

@@ -9,11 +9,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class AttributeFieldConfiguration implements FieldConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'attribute';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

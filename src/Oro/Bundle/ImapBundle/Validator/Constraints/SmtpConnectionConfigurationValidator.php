@@ -23,9 +23,7 @@ class SmtpConnectionConfigurationValidator extends ConstraintValidator
         $this->smtpSettingsFactory = $smtpSettingsFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof SmtpConnectionConfiguration) {

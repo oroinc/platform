@@ -34,6 +34,7 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
     /** @var SyncFailTopic */
     private $syncFailTopic;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->conn = $this->createMock(ConnectionInterface::class);

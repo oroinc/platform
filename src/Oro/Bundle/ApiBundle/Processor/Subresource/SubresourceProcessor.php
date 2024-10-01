@@ -10,9 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
  */
 class SubresourceProcessor extends RequestActionProcessor
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getLogContext(NormalizeResultContext $context): array
     {
         /** @var SubresourceContext $context */

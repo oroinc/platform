@@ -13,6 +13,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureAwareMenuFactoryExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

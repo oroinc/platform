@@ -26,6 +26,7 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
     private LoggerInterface $logger;
     private ExternalFileFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->httpClient = $this->createMock(ClientInterface::class);

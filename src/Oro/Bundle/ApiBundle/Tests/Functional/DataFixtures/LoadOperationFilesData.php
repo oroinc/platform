@@ -14,14 +14,13 @@ class LoadOperationFilesData extends AbstractFixture implements ContainerAwareIn
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return ['@OroApiBundle/Tests/Functional/DataFixtures/async_operations.yml'];
     }
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var FileManager $fileManager */

@@ -16,6 +16,7 @@ class DQLNameFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var DQLNameFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->nameFormatter = $this->createMock(NameFormatter::class);

@@ -127,17 +127,13 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         $this->autoResponseRules = new ArrayCollection();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmail()
     {
         return $this->email;
@@ -212,9 +208,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmailFields()
     {
         return ['email'];
@@ -269,17 +263,13 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFirstName()
     {
         return $this->getLabel();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLastName()
     {
         return 'Mailbox';
@@ -372,6 +362,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getLabel();

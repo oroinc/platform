@@ -37,6 +37,7 @@ class EmailQueryFactoryTest extends OrmTestCase
     /** @var EmailQueryFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->providerStorage = new EmailOwnerProviderStorage();

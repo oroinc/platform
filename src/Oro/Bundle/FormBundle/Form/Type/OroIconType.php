@@ -26,9 +26,7 @@ class OroIconType extends AbstractType
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         parent::buildView($view, $form, $options);
@@ -47,9 +45,7 @@ class OroIconType extends AbstractType
         $view->vars = array_replace_recursive($view->vars, $vars);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $configFile = $this->kernel->locateResource('@OroFormBundle/Resources/config/config_icon.yml');
@@ -77,25 +73,18 @@ class OroIconType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return Select2ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

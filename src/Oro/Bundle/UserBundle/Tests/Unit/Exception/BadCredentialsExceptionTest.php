@@ -8,6 +8,7 @@ class BadCredentialsExceptionTest extends \PHPUnit\Framework\TestCase
 {
     private $exception;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->exception = new BadCredentialsException();

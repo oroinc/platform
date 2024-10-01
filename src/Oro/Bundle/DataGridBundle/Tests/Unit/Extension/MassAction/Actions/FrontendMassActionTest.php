@@ -12,6 +12,7 @@ class FrontendMassActionTest extends \PHPUnit\Framework\TestCase
     /** @var FrontendMassAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new FrontendMassAction();

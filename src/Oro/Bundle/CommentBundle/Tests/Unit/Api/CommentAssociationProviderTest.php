@@ -20,6 +20,7 @@ class CommentAssociationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CommentAssociationProvider */
     private $commentAssociationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

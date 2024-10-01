@@ -10,9 +10,7 @@ class WidgetMassAction extends AbstractMassAction
     /** @var array */
     protected $requiredOptions = ['route', 'frontend_type'];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['frontend_options'])) {

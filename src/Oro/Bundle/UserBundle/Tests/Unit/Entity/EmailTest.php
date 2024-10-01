@@ -11,6 +11,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     private $email;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->user = $this->createMock(User::class);

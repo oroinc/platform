@@ -31,6 +31,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
     /** @var FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldTypeHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->classMethodNameChecker = $this->createMock(ClassMethodNameChecker::class);
@@ -41,6 +42,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->setPropertyPath('');
     }
 
+    #[\Override]
     protected function createValidator(): UniqueExtendEntityMethodNameValidator
     {
         $configManager = $this->createMock(ConfigManager::class);

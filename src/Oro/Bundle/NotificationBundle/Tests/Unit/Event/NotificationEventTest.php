@@ -12,6 +12,7 @@ class NotificationEventTest extends \PHPUnit\Framework\TestCase
     /** @var NotificationEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new \stdClass();

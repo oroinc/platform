@@ -72,17 +72,13 @@ class MaintenanceExtension extends AbstractExtension
         return strstr($var, '#', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context)
     {
         $this->reactToMaintenanceMode($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         $this->reactToMaintenanceMode($context);

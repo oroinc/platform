@@ -20,9 +20,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigProvider;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): AbstractType
     {
         $config1 = new Config(new EntityConfigId('grouping', 'Test\Entity1'));

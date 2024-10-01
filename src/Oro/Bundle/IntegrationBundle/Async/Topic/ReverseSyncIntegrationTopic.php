@@ -11,16 +11,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ReverseSyncIntegrationTopic extends AbstractTopic implements JobAwareTopicInterface
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.integration.revers_sync_integration';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Synchronizes an integration in reverse order.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -41,6 +44,7 @@ class ReverseSyncIntegrationTopic extends AbstractTopic implements JobAwareTopic
             ->addAllowedTypes('connector_parameters', 'array');
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         return 'oro_integration:revers_sync_integration:' . $messageBody['integration_id'];

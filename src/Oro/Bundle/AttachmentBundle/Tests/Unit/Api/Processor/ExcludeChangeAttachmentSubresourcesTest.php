@@ -23,6 +23,7 @@ class ExcludeChangeAttachmentSubresourcesTest extends \PHPUnit\Framework\TestCas
     /** @var CollectSubresourcesContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentAssociationProvider = $this->createMock(AttachmentAssociationProvider::class);

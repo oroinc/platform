@@ -11,19 +11,19 @@ class CurrencyType extends StringType
 
     const ISO_CODE_LENGTH = 3;
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName()
     {
         return self::TYPE;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getDefaultLength(AbstractPlatform $platform)
     {
         return self::ISO_CODE_LENGTH;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function requiresSQLCommentHint(AbstractPlatform $platform)
     {
         return true;

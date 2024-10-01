@@ -20,6 +20,7 @@ class ReminderCollection extends CollectionField
     /**
      * @param TableNode $table
      */
+    #[\Override]
     public function setValue($table)
     {
         $this->removeAllRows();

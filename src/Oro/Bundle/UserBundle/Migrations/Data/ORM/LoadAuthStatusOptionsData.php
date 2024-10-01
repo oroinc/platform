@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
  */
 class LoadAuthStatusOptionsData extends AbstractEnumFixture
 {
+    #[\Override]
     protected function getData(): array
     {
         return [
@@ -18,11 +19,13 @@ class LoadAuthStatusOptionsData extends AbstractEnumFixture
         ];
     }
 
+    #[\Override]
     protected function getDefaultValue(): string
     {
         return UserManager::STATUS_ACTIVE;
     }
 
+    #[\Override]
     protected function getEnumCode(): string
     {
         return 'auth_status';

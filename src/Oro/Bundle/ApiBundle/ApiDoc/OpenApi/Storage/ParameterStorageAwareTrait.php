@@ -9,9 +9,6 @@ trait ParameterStorageAwareTrait
 {
     private ?ParameterStorage $parameterStorage = null;
 
-    /**
-     * {@inheritDoc}
-     */
     public function setParameterStorage(?ParameterStorage $parameterStorage): void
     {
         $this->parameterStorage = $parameterStorage;

@@ -56,6 +56,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailModelBuilder */
     private $emailModelBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = $this->createMock(EmailModelBuilderHelper::class);

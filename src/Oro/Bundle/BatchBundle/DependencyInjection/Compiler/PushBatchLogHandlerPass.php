@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class PushBatchLogHandlerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         if (!$container->has('monolog.logger.batch')) {

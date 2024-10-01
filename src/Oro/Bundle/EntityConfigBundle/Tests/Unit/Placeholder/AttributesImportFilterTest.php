@@ -33,6 +33,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
     /** @var AttributesImportFilter */
     private $attributesImportFilter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);

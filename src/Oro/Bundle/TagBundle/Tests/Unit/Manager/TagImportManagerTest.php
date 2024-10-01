@@ -13,6 +13,7 @@ class TagImportManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TagImportManager */
     private $tagImportManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $tagStorage = $this->createMock(TagManager::class);

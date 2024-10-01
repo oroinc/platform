@@ -31,9 +31,7 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
         $this->flushDataHandler = $flushDataHandler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function startFlushData(array $items): void
     {
         if (null !== $this->entityManager) {
@@ -44,9 +42,9 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function flushData(array $items): void
     {
         if (null === $this->entityManager) {
@@ -87,16 +85,12 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function finishFlushData(array $items): void
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clear(): void
     {
         if (null !== $this->entityManager) {

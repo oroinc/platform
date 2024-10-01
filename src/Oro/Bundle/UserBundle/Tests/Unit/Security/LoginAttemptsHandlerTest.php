@@ -38,6 +38,7 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var LoginAttemptsHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);

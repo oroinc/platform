@@ -24,6 +24,7 @@ class ExtendedAssociationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendedAssociationProvider */
     private $extendedAssociationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

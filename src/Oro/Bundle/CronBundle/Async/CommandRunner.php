@@ -22,6 +22,7 @@ class CommandRunner implements CommandRunnerInterface
      * @param string $commandName
      * @param array $commandArguments
      */
+    #[\Override]
     public function run($commandName, $commandArguments = [])
     {
         $this->producer->send(

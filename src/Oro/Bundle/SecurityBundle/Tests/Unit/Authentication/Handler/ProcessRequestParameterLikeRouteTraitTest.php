@@ -15,6 +15,7 @@ class ProcessRequestParameterLikeRouteTraitTest extends TestCase
     private MockObject|LoggerInterface $logger;
     private ProcessRequestParameterLikeRouteTraitStub $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

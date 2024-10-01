@@ -79,9 +79,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->emailErrorsLogger = $emailErrorsLogger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(EmailOrigin $origin, $syncStartTime, EmailSyncNotificationBag $notificationBag): void
     {
         // make sure that the entity builder is empty
@@ -405,9 +403,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->cleanUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function entitiesToClear(): array
     {
         return array_merge(

@@ -17,14 +17,11 @@ class ResetPasswordExtension extends AbstractExtension
     /** @var RequestStack */
     protected $requestStack;
 
-    /** {@inheritdoc} */
     protected $excludedModes = [
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -38,9 +35,7 @@ class ResetPasswordExtension extends AbstractExtension
             && $request->get('actionName', false) === 'reset_password';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if ($datasource instanceof OrmDatasource) {

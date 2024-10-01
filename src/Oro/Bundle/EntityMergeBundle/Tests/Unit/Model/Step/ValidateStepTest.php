@@ -16,6 +16,7 @@ class ValidateStepTest extends \PHPUnit\Framework\TestCase
     /** @var ValidateStep */
     private $step;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);

@@ -47,6 +47,7 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
      *
      * @return mixed
      */
+    #[\Override]
     protected function getEntities($value)
     {
         if (empty($value)) {

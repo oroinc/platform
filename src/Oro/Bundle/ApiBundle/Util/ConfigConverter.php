@@ -29,9 +29,7 @@ class ConfigConverter extends BaseConfigConverter
         $this->requestType = $requestType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildEntityConfig(EntityConfig $result, array $config): void
     {
         parent::buildEntityConfig($result, $config);
@@ -41,9 +39,7 @@ class ConfigConverter extends BaseConfigConverter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function setAssociationQuery(FieldConfig $result, array $config): void
     {
         if (isset($config[ConfigUtil::ASSOCIATION_QUERY])) {
