@@ -1,0 +1,4 @@
+<% const current = obj.currentStatus ? currentStatus : label; %>
+<% const status = (obj.map && map[current]) ? `status-label--${map[current]}` : '';%>
+<div class="status-label <%- status %>"><%- label %></div>
+
