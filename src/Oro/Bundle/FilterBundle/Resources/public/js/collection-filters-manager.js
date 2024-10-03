@@ -94,7 +94,8 @@ define(function(require) {
         _updateView: function() {
             this.trigger('update-view:before-fetch');
             this.collection.state.currentPage = 1;
-            this.collection.fetch({reset: true});
+            this.xhr && this.xhr.abort();
+            this.xhr = this.collection.fetch({reset: true});
         },
 
         _onChangeFilterSelect(filters) {
