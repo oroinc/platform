@@ -1,6 +1,6 @@
 <?php
 
-namespace Functional\Migration;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
