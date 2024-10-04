@@ -1,0 +1,18 @@
+{#
+A label to render status
+Parameters - array:
+    [
+        'label' - text to show for a satus
+        'code' - current status
+        'map' - an array of statuses
+    ]
+#}
+{% macro status(parameters) %}
+    {% apply spaceless %}
+        {% set label = parameters.label|default('') %}
+        {% set code = parameters.code|default([]) %}
+        {% set map = parameters.map|default('') %}
+        {% set classes = attribute(map, code) is defined ? ' status-label--' ~ map[code] : '' %}
+        <span class="status-label{{ classes }}">{{ label }}</span>
+    {% endapply %}
+{% endmacro %}
