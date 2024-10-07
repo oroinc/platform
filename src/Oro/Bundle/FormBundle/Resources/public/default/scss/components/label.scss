@@ -12,4 +12,14 @@
     &--full {
         width: 100%;
     }
+
+    &--button {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .label {
+            margin: 0;
+        }
+    }
 }
