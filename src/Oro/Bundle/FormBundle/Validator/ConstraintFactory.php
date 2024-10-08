@@ -57,6 +57,10 @@ class ConstraintFactory
         foreach ($constraints as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $name => $options) {
+                    if (isset($options['constraints']) && is_array($options['constraints'])) {
+                        $options['constraints'] = $this->parse($options['constraints']);
+                    }
+
                     $result[] = $this->create($name, $options);
                 }
             } elseif ($value instanceof Constraint) {
