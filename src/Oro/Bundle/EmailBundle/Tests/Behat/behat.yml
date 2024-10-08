@@ -18,10 +18,6 @@ oro_behat_extension:
         - Oro\Bundle\EmailBundle\Tests\Behat\Context\GoogleImapEnableContext
         - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
         - Oro\Bundle\QueryDesignerBundle\Tests\Behat\Context\QueryDesignerContext
-        - Oro\Bundle\ApplicationBundle\Tests\Behat\Context\CommerceMainContext
-        - Oro\Bundle\ShoppingListBundle\Tests\Behat\Context\FeatureContext
-        - Oro\Bundle\CheckoutBundle\Tests\Behat\Context\FeatureContext
-        - Oro\Bundle\FrontendLocalizationBundle\Tests\Behat\Context\LocalizationSwitcherContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:

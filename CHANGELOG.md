@@ -7,6 +7,9 @@ The current file describes significant changes in the code that may affect the u
 ### Added
 * Added public method `loadThemeResources` to `\Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface`
 
+#### FormBundle
+* Added the ability to use nested constraints (e.g. `When`) in `\Oro\Bundle\FormBundle\Validator\ConstraintFactory` that creates constraints from an array definition (e.g. fetched from `system_configuration.yml`).
+
 #### ThemeBundle
 * Added theme configuration feature that provides theme developers a way to make a storefront theme configurable by a store owner.
 * Added new `\Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration` entity that contains theme configuration options.
