@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
@@ -20,22 +21,19 @@ class TranslationRepository extends EntityRepository
      */
     public function findValues($keysPrefix, $locale, $domain)
     {
-        $queryBuilder = $this->createQueryBuilder('t');
-        $result = $queryBuilder->select('tk.key, t.value')
-            ->join('t.language', 'l')
-            ->join('t.translationKey', 'tk')
-            ->where(
-                $queryBuilder->expr()->andX(
-                    $queryBuilder->expr()->eq('tk.domain', ':domain'),
-                    $queryBuilder->expr()->eq('l.code', ':locale'),
-                    $queryBuilder->expr()->like('tk.key', ':keysPrefix')
-                )
+        $queryBuilder = $this->getTranslationQueryBuilder($locale, $domain);
+        $queryBuilder
+            ->select('tk.key, t.value')
+            ->andWhere(
+                $queryBuilder->expr()->like('tk.key', ':keysPrefix')
             )
-            ->setParameters(['locale' => $locale, 'domain' => $domain, 'keysPrefix' => $keysPrefix . '%'])
-            ->getQuery()
-            ->getArrayResult();
+            ->setParameter('keysPrefix', $keysPrefix . '%', Types::STRING);
 
-        return array_column($result, 'value', 'key');
+        return array_column(
+            $queryBuilder->getQuery()->getArrayResult(),
+            'value',
+            'key'
+        );
     }
 
     /**
@@ -46,20 +44,13 @@ class TranslationRepository extends EntityRepository
      */
     public function findTranslation($key, $locale, $domain)
     {
-        $queryBuilder = $this->createQueryBuilder('t');
+        $queryBuilder = $this->getTranslationQueryBuilder($locale, $domain);
 
-        return $queryBuilder->join('t.language', 'l')
-            ->join('t.translationKey', 'k')
-            ->where(
-                $queryBuilder->expr()->andX(
-                    $queryBuilder->expr()->eq('l.code', ':code'),
-                    $queryBuilder->expr()->eq('k.key', ':key'),
-                    $queryBuilder->expr()->eq('k.domain', ':domain')
-                )
+        return $queryBuilder
+            ->andWhere(
+                $queryBuilder->expr()->eq('tk.key', ':key')
             )
-            ->setParameter('code', $locale, Types::STRING)
             ->setParameter('key', $key, Types::STRING)
-            ->setParameter('domain', $domain, Types::STRING)
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -96,23 +87,15 @@ class TranslationRepository extends EntityRepository
         string $languageCode,
         array $scopes = []
     ) {
-        $qb = $this->createQueryBuilder('t');
-        $qb->distinct()
-            ->select('t.id, t.value, k.key, k.domain, l.code')
-            ->join('t.language', 'l')
-            ->join('t.translationKey', 'k')
-            ->setParameter('code', $languageCode);
+        $qb = $this->getTranslationQueryBuilder($languageCode);
+        $qb
+            ->distinct()
+            ->select('t.id, t.value, tk.key, tk.domain, l.code');
 
         if (count($scopes)) {
-            $qb->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('l.code', ':code'),
-                    $qb->expr()->in('t.scope', ':scopes'),
-                )
-            )
+            $qb
+                ->andWhere($qb->expr()->in('t.scope', ':scopes'))
                 ->setParameter('scopes', $scopes);
-        } else {
-            $qb->where($qb->expr()->eq('l.code', ':code'));
         }
 
         return $qb->getQuery()->getArrayResult();
@@ -144,27 +127,65 @@ class TranslationRepository extends EntityRepository
      *
      * @return array [['key' => '...', 'value' => '...'], ...]
      */
-    public function findDomainTranslations(
-        string $languageCode,
-        string $domain
-    ): array {
-        $qb = $this->_em->createQueryBuilder()
-            ->from(Translation::class, 't');
-        $qb->distinct()
-            ->select('k.key, t.value')
-            ->join('t.language', 'l')
-            ->join('t.translationKey', 'k')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('l.code', ':code'),
-                    $qb->expr()->gt('t.scope', ':scope'),
-                    $qb->expr()->eq('k.domain', ':domain')
-                )
-            )
-            ->setParameter('code', $languageCode, Types::STRING)
-            ->setParameter('domain', $domain, Types::STRING)
+    public function findDomainTranslations(string $languageCode, string $domain): array
+    {
+        $qb = $this->getTranslationQueryBuilder($languageCode, $domain);
+        $qb
+            ->distinct()
+            ->select('tk.key, t.value')
+            ->andWhere($qb->expr()->gte('t.scope', ':scope'))
             ->setParameter('scope', Translation::SCOPE_SYSTEM, Types::INTEGER);
 
         return $qb->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @param string $key
+     * @param string|null $domain
+     * @param string|null $locale
+     * @return array [['key' => '...', 'value' => '...'], ...]
+     */
+    public function findTranslations(string $key, ?string $domain = null, ?string $locale = null): array
+    {
+        $qb = $this->getTranslationQueryBuilder($locale, $domain);
+        $qb
+            ->distinct()
+            ->select('tk.key', 't.value')
+            ->andWhere(
+                $qb->expr()->andX(
+                    $qb->expr()->like('tk.key', ':key'),
+                    $qb->expr()->eq('t.scope', ':scope')
+                )
+            )
+            ->setParameter('scope', Translation::SCOPE_SYSTEM, Types::INTEGER)
+            ->setParameter('key', $key . '%', Types::STRING);
+
+        return array_column(
+            $qb->getQuery()->getArrayResult(),
+            'value',
+            'key'
+        );
+    }
+
+    private function getTranslationQueryBuilder(?string $locale, ?string $domain = null): QueryBuilder
+    {
+        $queryBuilder = $this->createQueryBuilder('t');
+        $queryBuilder
+            ->join('t.language', 'l')
+            ->join('t.translationKey', 'tk');
+
+        if ($locale) {
+            $queryBuilder
+                ->andWhere($queryBuilder->expr()->eq('l.code', ':locale'))
+                ->setParameter('locale', $locale, Types::STRING);
+        }
+
+        if ($domain) {
+            $queryBuilder
+                ->andWhere($queryBuilder->expr()->eq('tk.domain', ':domain'))
+                ->setParameter('domain', $domain, Types::STRING);
+        }
+
+        return $queryBuilder;
     }
 }

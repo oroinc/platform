@@ -3,11 +3,14 @@
 namespace Oro\Bundle\AddressBundle\EventListener;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\AddressBundle\Entity\AddressTypeTranslation;
 use Oro\Bundle\AddressBundle\Entity\CountryTranslation;
 use Oro\Bundle\AddressBundle\Entity\RegionTranslation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\AbstractTranslationRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterface;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueInitialize;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogueInterface;
@@ -37,55 +40,75 @@ class TranslatorCatalogueListener
             return;
         }
         /** @var AbstractTranslationRepository $repository */
-        $repository = $this->getRepository($className);
+        $dictionaryRepository = $this->getRepository($className);
+        $data = $this->getTranslations($catalogue, $prefix);
 
-        $ids = $repository->getAllIdentities();
-        $translations = $repository->findDomainTranslations($catalogue->getLocale(), 'entities');
-        $translations = array_combine(
-            array_column($translations, 'key'),
-            array_column($translations, 'value')
-        );
-
-        $data = array_combine(
-            $ids,
-            array_map(
-                function (string $id) use ($catalogue, $prefix, $translations) {
-                    $value = $catalogue->get($prefix.$id, 'entities');
-                    if (!$catalogue->defines($prefix.$id, 'entities')) {
-                        $value = $translations[$prefix.$id] ?? $value;
-                    }
-                    $translations[$prefix.$id] = $value;
-                    return $value;
-                },
-                $ids
-            )
-        );
-
-        if ($catalogue->getLocale() === Translator::DEFAULT_LOCALE) {
-            $repository->updateDefaultTranslations($data);
-        } else {
-            $repository->updateTranslations($data, $catalogue->getLocale());
+        foreach ($data as $locale => $translations) {
+            if ($locale === Translator::DEFAULT_LOCALE) {
+                $dictionaryRepository->updateDefaultTranslations($translations);
+            } else {
+                $dictionaryRepository->updateTranslations($translations, $locale);
+            }
         }
+    }
+
+    private function getTranslations(MessageCatalogueInterface $catalogue, string $prefix): array
+    {
+        $data = [];
+        /** @var TranslationRepository $translationsRepository */
+        $translationsRepository = $this->getRepository(Translation::class);
+        $locales = $this->getLocaleWithAllFallbacks($catalogue);
+
+        foreach ($locales as $locale) {
+            $translations = $translationsRepository->findTranslations($prefix, 'entities', $locale);
+            $catalogueTranslations = $catalogue->all('entities');
+
+            if ($catalogue->getLocale() === $locale && $catalogueTranslations) {
+                $translations = array_merge(
+                    $translations,
+                    array_filter(
+                        $catalogueTranslations,
+                        static fn (string $key): bool => str_starts_with($key, $prefix),
+                        ARRAY_FILTER_USE_KEY
+                    )
+                );
+            }
+
+            $translationKeys = array_map(
+                static fn (string $key): string => str_replace($prefix, '', $key),
+                array_keys($translations)
+            );
+
+            $data[$locale] = array_combine($translationKeys, $translations);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param MessageCatalogueInterface $catalogue
+     * @return array<string>
+     */
+    private function getLocaleWithAllFallbacks(MessageCatalogueInterface $catalogue): array
+    {
+        $locales = [Translator::DEFAULT_LOCALE, $catalogue->getLocale()];
+
+        if ($catalogue->getFallbackCatalogue()) {
+            $locales = array_merge(
+                $locales,
+                $this->getLocaleWithAllFallbacks($catalogue->getFallbackCatalogue())
+            );
+        }
+
+        return $locales;
     }
 
     /**
      * @param string $className
-     * @return TranslationRepositoryInterface
+     * @return TranslationRepositoryInterface|ObjectRepository
      */
-    private function getRepository(string $className): TranslationRepositoryInterface
+    private function getRepository(string $className): TranslationRepositoryInterface|ObjectRepository
     {
-        $repository = $this->registry->getManagerForClass($className)->getRepository($className);
-
-        if (!$repository instanceof TranslationRepositoryInterface) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expected repository of type "%s", "%s" given',
-                    TranslationRepositoryInterface::class,
-                    is_object($repository) ? get_class($repository) : gettype($repository)
-                )
-            );
-        }
-
-        return $repository;
+        return $this->registry->getManagerForClass($className)->getRepository($className);
     }
 }
