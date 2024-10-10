@@ -213,8 +213,8 @@ class OroMainContext extends MinkContext implements
             'Alert Error Flash Message',
         ];
         $errors = [
-//            'There was an error performing the requested operation. Please try again or contact us for assistance.',
-//            'Error occurred during layout update. Please contact system administrator.',
+            'There was an error performing the requested operation. Please try again or contact us for assistance.',
+            'Error occurred during layout update. Please contact system administrator.',
         ];
 
         foreach ($errorNotifyElements as $element) {
