@@ -17,12 +17,6 @@ class CountryTranslationRepository extends AbstractTranslationRepository
     }
 
     #[\Override]
-    public function getAllIdentities(): array
-    {
-        return $this->doGetAllIdentities(Country::class, 'iso2Code');
-    }
-
-    #[\Override]
     public function updateDefaultTranslations(array $data): void
     {
         $this->doUpdateDefaultTranslations(

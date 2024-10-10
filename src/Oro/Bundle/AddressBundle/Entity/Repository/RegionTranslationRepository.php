@@ -17,12 +17,6 @@ class RegionTranslationRepository extends AbstractTranslationRepository
     }
 
     #[\Override]
-    public function getAllIdentities(): array
-    {
-        return $this->doGetAllIdentities(Region::class, 'combinedCode');
-    }
-
-    #[\Override]
     public function updateDefaultTranslations(array $data): void
     {
         $this->doUpdateDefaultTranslations(
