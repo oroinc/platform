@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 
 /**
  * Provides a set of methods to manage business units.
@@ -93,6 +94,27 @@ class BusinessUnitManager
     }
 
     /**
+     * Checks if user interface can be set as owner by given user
+     *
+     * @param UserInterface              $currentUser
+     * @param UserInterface              $newUser
+     * @param string                     $accessLevel
+     * @param OwnerTreeProviderInterface $treeProvider
+     * @param Organization               $organization
+     *
+     * @return bool
+     */
+    public function canUserInterfaceBeSetAsOwner(
+        UserInterface $currentUser,
+        UserInterface $newUser,
+        $accessLevel,
+        OwnerTreeProviderInterface $treeProvider,
+        Organization $organization
+    ) {
+        return $this->canUserBeOwner($currentUser, $newUser, $accessLevel, $treeProvider, $organization);
+    }
+
+    /**
      * Checks if user can be set as owner by given user
      *
      * @param User                       $currentUser
@@ -110,6 +132,26 @@ class BusinessUnitManager
         OwnerTreeProviderInterface $treeProvider,
         Organization $organization
     ) {
+        return $this->canUserBeOwner($currentUser, $newUser, $accessLevel, $treeProvider, $organization);
+    }
+
+    /**
+     * Separate method to check if user can be set as owner and avoid BC break
+     *
+     * @param UserInterface $currentUser
+     * @param UserInterface $newUser
+     * @param $accessLevel
+     * @param OwnerTreeProviderInterface $treeProvider
+     * @param Organization $organization
+     * @return bool
+     */
+    private function canUserBeOwner(
+        UserInterface $currentUser,
+        UserInterface $newUser,
+        $accessLevel,
+        OwnerTreeProviderInterface $treeProvider,
+        Organization $organization
+    ) {
         if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
         }
@@ -122,7 +164,13 @@ class BusinessUnitManager
             return $newUser->isBelongToOrganization($organization);
         }
 
-        $allowedBuIds = $this->getAllowedBusinessUnitIds($currentUser, $accessLevel, $treeProvider, $organization);
+        $allowedBuIds = $this->getAllowedUserInterfaceBusinessUnitIds(
+            $currentUser,
+            $accessLevel,
+            $treeProvider,
+            $organization
+        );
+
         if (empty($allowedBuIds)) {
             return false;
         }
@@ -160,7 +208,7 @@ class BusinessUnitManager
 
         $allowedBuIds = AccessLevel::GLOBAL_LEVEL === $accessLevel
             ? $this->getBusinessUnitIds($this->tokenAccessor->getOrganizationId())
-            : $this->getAllowedBusinessUnitIds($currentUser, $accessLevel, $treeProvider, $organization);
+            : $this->getAllowedUserInterfaceBusinessUnitIds($currentUser, $accessLevel, $treeProvider, $organization);
 
         return in_array($entityOwner->getId(), $allowedBuIds, true);
     }
@@ -291,6 +339,41 @@ class BusinessUnitManager
      */
     private function getAllowedBusinessUnitIds(
         User $currentUser,
+        $accessLevel,
+        OwnerTreeProviderInterface $treeProvider,
+        Organization $organization
+    ) {
+        return $this->getAllowedUserBusinessUnitIds($currentUser, $accessLevel, $treeProvider, $organization);
+    }
+
+    /**
+     * @param User                       $currentUser
+     * @param int                        $accessLevel
+     * @param OwnerTreeProviderInterface $treeProvider
+     * @param Organization               $organization
+     *
+     * @return array
+     */
+    private function getAllowedUserInterfaceBusinessUnitIds(
+        UserInterface $currentUser,
+        $accessLevel,
+        OwnerTreeProviderInterface $treeProvider,
+        Organization $organization
+    ) {
+        return $this->getAllowedUserBusinessUnitIds($currentUser, $accessLevel, $treeProvider, $organization);
+    }
+
+    /**
+     * Get allowed user business unit ids as separate method to avoid BC break
+     * @param User                       $currentUser
+     * @param int                        $accessLevel
+     * @param OwnerTreeProviderInterface $treeProvider
+     * @param Organization               $organization
+     *
+     * @return array
+     */
+    private function getAllowedUserBusinessUnitIds(
+        UserInterface $currentUser,
         $accessLevel,
         OwnerTreeProviderInterface $treeProvider,
         Organization $organization
