@@ -42,6 +42,9 @@ class OwnerChecker
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var OwnerTreeProviderInterface */
+    private $treeProviderChain;
+
     public function __construct(
         DoctrineHelper $doctrineHelper,
         BusinessUnitManager $businessUnitManager,
@@ -122,11 +125,11 @@ class OwnerChecker
     protected function isValidOwner(OwnershipMetadataInterface $metadata, $owner, $accessLevel, $entity)
     {
         if ($metadata->isUserOwned()) {
-            return $this->businessUnitManager->canUserBeSetAsOwner(
+            return $this->businessUnitManager->canUserInterfaceBeSetAsOwner(
                 $this->tokenAccessor->getUser(),
                 $owner,
                 $accessLevel,
-                $this->treeProvider,
+                $this->treeProviderChain,
                 $this->getOrganization($entity)
             );
         }
@@ -136,7 +139,7 @@ class OwnerChecker
                 $this->tokenAccessor->getUser(),
                 $owner,
                 $accessLevel,
-                $this->treeProvider,
+                $this->treeProviderChain,
                 $this->getOrganization($entity)
             );
         }
@@ -144,7 +147,7 @@ class OwnerChecker
         if ($metadata->isOrganizationOwned()) {
             return in_array(
                 $owner->getId(),
-                $this->treeProvider->getTree()->getUserOrganizationIds($this->tokenAccessor->getUserId()),
+                $this->treeProviderChain->getTree()->getUserOrganizationIds($this->tokenAccessor->getUserId()),
                 true
             );
         }
@@ -179,5 +182,10 @@ class OwnerChecker
     protected function getOrganization($object)
     {
         return $this->tokenAccessor->getOrganization();
+    }
+
+    public function setTreeProviderChain(OwnerTreeProviderInterface $treeProviderChain)
+    {
+        $this->treeProviderChain = $treeProviderChain;
     }
 }
