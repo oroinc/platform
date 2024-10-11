@@ -17,6 +17,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -62,6 +63,9 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerChecker */
     private $ownerChecker;
 
+    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $treeProviderChain;
+
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -72,6 +76,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->treeProvider = $this->createMock(OwnerTreeProvider::class);
+        $this->treeProviderChain = $this->createMock(OwnerTreeProviderInterface::class);
 
         $this->testEntity = new Entity();
         $this->currentUser = new User();
@@ -89,6 +94,8 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             $this->treeProvider,
             $this->aclVoter
         );
+
+        $this->ownerChecker->setTreeProviderChain($this->treeProviderChain);
     }
 
     public function testValidateOnNonSupportedEntity()
@@ -144,8 +151,8 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('ASSIGN', $this->testEntity)
             ->willReturn(true);
         $this->businessUnitManager->expects($this->once())
-            ->method('canUserBeSetAsOwner')
-            ->with($this->currentUser, $owner, $accessLevel, $this->treeProvider, $this->currentOrg)
+            ->method('canUserInterfaceBeSetAsOwner')
+            ->with($this->currentUser, $owner, $accessLevel, $this->treeProviderChain, $this->currentOrg)
             ->willReturn(true);
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
@@ -179,7 +186,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->businessUnitManager->expects($this->once())
             ->method('canBusinessUnitBeSetAsOwner')
-            ->with($this->currentUser, $owner, $accessLevel, $this->treeProvider, $this->currentOrg)
+            ->with($this->currentUser, $owner, $accessLevel, $this->treeProviderChain, $this->currentOrg)
             ->willReturn(true);
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
@@ -243,8 +250,8 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('ASSIGN', $this->testEntity)
             ->willReturn(true);
         $this->businessUnitManager->expects($this->once())
-            ->method('canUserBeSetAsOwner')
-            ->with($this->currentUser, $owner, $accessLevel, $this->treeProvider, $this->currentOrg)
+            ->method('canUserInterfaceBeSetAsOwner')
+            ->with($this->currentUser, $owner, $accessLevel, $this->treeProviderChain, $this->currentOrg)
             ->willReturn(false);
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
@@ -278,7 +285,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->businessUnitManager->expects($this->once())
             ->method('canBusinessUnitBeSetAsOwner')
-            ->with($this->currentUser, $owner, $accessLevel, $this->treeProvider, $this->currentOrg)
+            ->with($this->currentUser, $owner, $accessLevel, $this->treeProviderChain, $this->currentOrg)
             ->willReturn(false);
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
@@ -341,8 +348,8 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
         $this->businessUnitManager->expects($this->once())
-            ->method('canUserBeSetAsOwner')
-            ->with($this->currentUser, $owner, $accessLevel, $this->treeProvider, $this->currentOrg)
+            ->method('canUserInterfaceBeSetAsOwner')
+            ->with($this->currentUser, $owner, $accessLevel, $this->treeProviderChain, $this->currentOrg)
             ->willReturn(true);
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
@@ -375,7 +382,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->businessUnitManager->expects($this->once())
             ->method('canBusinessUnitBeSetAsOwner')
-            ->with($this->currentUser, $owner, $accessLevel, $this->treeProvider, $this->currentOrg)
+            ->with($this->currentUser, $owner, $accessLevel, $this->treeProviderChain, $this->currentOrg)
             ->willReturn(true);
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
@@ -437,8 +444,8 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
         $this->businessUnitManager->expects($this->once())
-            ->method('canUserBeSetAsOwner')
-            ->with($this->currentUser, $owner, $accessLevel, $this->treeProvider, $this->currentOrg)
+            ->method('canUserInterfaceBeSetAsOwner')
+            ->with($this->currentUser, $owner, $accessLevel, $this->treeProviderChain, $this->currentOrg)
             ->willReturn(false);
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
@@ -471,7 +478,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->businessUnitManager->expects($this->once())
             ->method('canBusinessUnitBeSetAsOwner')
-            ->with($this->currentUser, $owner, $accessLevel, $this->treeProvider, $this->currentOrg)
+            ->with($this->currentUser, $owner, $accessLevel, $this->treeProviderChain, $this->currentOrg)
             ->willReturn(false);
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
@@ -534,7 +541,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
         $this->businessUnitManager->expects($this->never())
-            ->method('canUserBeSetAsOwner');
+            ->method('canUserInterfaceBeSetAsOwner');
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
             ->with($this->testEntity)
@@ -614,7 +621,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
         $this->businessUnitManager->expects($this->never())
-            ->method('canUserBeSetAsOwner');
+            ->method('canUserInterfaceBeSetAsOwner');
         $this->entityOwnerAccessor->expects($this->once())
             ->method('getOwner')
             ->with($this->testEntity)
@@ -697,7 +704,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $ownerTree->expects($this->once())
             ->method('getUserOrganizationIds')
             ->willReturn($organizationIds);
-        $this->treeProvider->expects($this->once())
+        $this->treeProviderChain->expects($this->once())
             ->method('getTree')
             ->willReturn($ownerTree);
     }
