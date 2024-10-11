@@ -79,6 +79,13 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
      */
     public const EVENT_POST_SAVE_DATA = 'post_save_data';
 
+    /**
+     * This event is dispatched before the database transaction is rolled back for
+     * API requests with the "validate" meta flag.
+     * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler
+     */
+    public const EVENT_ROLLBACK_VALIDATED_REQUEST = 'rollback_validated_request';
+
     /** the form event name */
     private const EVENT = 'event';
 

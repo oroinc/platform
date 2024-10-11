@@ -9,6 +9,7 @@ use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetOperationFlags;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Psr\Log\LoggerInterface;
@@ -42,13 +43,20 @@ class FlushDataHandler implements FlushDataHandlerInterface
     #[\Override]
     public function flushData(EntityManagerInterface $entityManager, FlushDataHandlerContext $context): void
     {
+        $validate = $this->isValidateResource($context);
+
         $successfullyFlushed = false;
         $connection = $entityManager->getConnection();
         $connection->beginTransaction();
         try {
-            if ($this->doFlush($context, $entityManager, $connection)) {
-                $connection->commit();
-                $successfullyFlushed = true;
+            if ($this->doFlush($context, $entityManager, $connection, $validate)) {
+                if ($validate) {
+                    $this->dispatchEvent(CustomizeFormDataContext::EVENT_ROLLBACK_VALIDATED_REQUEST, $context);
+                    $this->safeRollbackTransaction($connection, $context);
+                } else {
+                    $connection->commit();
+                    $successfullyFlushed = true;
+                }
             }
         } catch (\Throwable $e) {
             $this->safeRollbackTransaction($connection, $context);
@@ -64,7 +72,8 @@ class FlushDataHandler implements FlushDataHandlerInterface
     private function doFlush(
         FlushDataHandlerContext $context,
         EntityManagerInterface $entityManager,
-        Connection $connection
+        Connection $connection,
+        bool $validate
     ): bool {
         if (!$this->dispatchFlushEvent(CustomizeFormDataContext::EVENT_PRE_FLUSH_DATA, $context, $connection)) {
             return false;
@@ -77,7 +86,9 @@ class FlushDataHandler implements FlushDataHandlerInterface
 
         $entityManager->flush();
 
-        if (!$this->dispatchFlushEvent(CustomizeFormDataContext::EVENT_POST_FLUSH_DATA, $context, $connection)) {
+        if (!$validate &&
+            !$this->dispatchFlushEvent(CustomizeFormDataContext::EVENT_POST_FLUSH_DATA, $context, $connection)
+        ) {
             return false;
         }
 
@@ -302,6 +313,18 @@ class FlushDataHandler implements FlushDataHandlerInterface
         }
 
         $entityManager->remove($entity);
+    }
+
+    private function isValidateResource(FlushDataHandlerContext $context): bool
+    {
+        // The batch API operation doesn't support the validate operation.
+        if ($context->isBatchOperation()) {
+            return false;
+        }
+
+        $entityContext = current($context->getEntityContexts());
+
+        return $entityContext->get(SetOperationFlags::VALIDATE_FLAG) ?? false;
     }
 
     public function isManageableEntity(EntityManagerInterface $entityManager, object $entity): bool

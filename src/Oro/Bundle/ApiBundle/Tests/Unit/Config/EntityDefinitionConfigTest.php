@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\UpsertConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -13,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
+class EntityDefinitionConfigTest extends TestCase
 {
     public function testKey()
     {
@@ -849,5 +850,22 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
 
         $config->getUpsertConfig()->setEnabled(false);
         self::assertSame([], $config->toArray());
+    }
+
+    public function testValidateFlag(): void
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertFalse($config->hasEnableValidation());
+        self::assertFalse($config->isValidationEnabled());
+
+        $config->enableValidation();
+        self::assertTrue($config->hasEnableValidation());
+        self::assertTrue($config->isValidationEnabled());
+        self::assertEquals(['enable_validation' => true], $config->toArray());
+
+        $config->disableValidation();
+        self::assertTrue($config->hasEnableValidation());
+        self::assertFalse($config->isValidationEnabled());
+        self::assertEquals([], $config->toArray());
     }
 }

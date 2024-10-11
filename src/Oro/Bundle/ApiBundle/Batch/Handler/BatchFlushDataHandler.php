@@ -81,7 +81,7 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
 
         $this->flushDataHandler->flushData(
             $this->entityManager,
-            new FlushDataHandlerContext($itemTargetContexts, $sharedData ?? new ParameterBag())
+            new FlushDataHandlerContext($itemTargetContexts, $sharedData ?? new ParameterBag(), true)
         );
     }
 

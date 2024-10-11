@@ -487,6 +487,12 @@ services:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!batch, priority: 47 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api&!batch, priority: 47 }
 
+    oro_api.json_api.disable_validate_operation:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\DisableValidateOperation
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!batch, priority: 47 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api&!batch, priority: 47 }
+
     oro_api.json_api.validate_included_data_dependencies:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateIncludedDataDependencies
         tags:

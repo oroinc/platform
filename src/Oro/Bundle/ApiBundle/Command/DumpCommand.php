@@ -88,6 +88,12 @@ class DumpCommand extends AbstractDebugCommand
                 InputOption::VALUE_NONE,
                 'Show resources that support the upsert operation'
             )
+            ->addOption(
+                'validate',
+                null,
+                InputOption::VALUE_NONE,
+                'Show resources that support the validate operation'
+            )
             ->setDescription('Dumps all resources accessible through API.')
             ->setHelp(
                 <<<'HELP'
@@ -122,6 +128,10 @@ The <info>--action</info> option can be used to displays a list of entity classe
 The <info>--upsert</info> option can be used to displays a list of entity classes that support the upsert operation:
 
   <info>php %command.full_name% --upsert</info>
+  
+The <info>--validate</info> option can be used to display a list of entity classes that support the validate operation:
+
+  <info>php %command.full_name% --validate</info>
 
 HELP
             )
@@ -131,6 +141,7 @@ HELP
             ->addUsage('--not-accessible')
             ->addUsage('--action=<action>')
             ->addUsage('--upsert')
+            ->addUsage('--validate')
         ;
 
         parent::configure();
@@ -210,6 +221,7 @@ HELP
         $isSubresourcesRequested = $input->getOption('sub-resources');
         $actions = $input->getOption('action');
         $upsert = $input->getOption('upsert');
+        $validate = $input->getOption('validate');
 
         $resources = $this->resourcesProvider->getResources($version, $requestType);
         /** @var ApiResource[] $sortedResources */
@@ -226,18 +238,23 @@ HELP
             if ($actions && !$this->isResourceHasAnyOfActions($resource, $actions)) {
                 continue;
             }
-            $upsertAttribute = null;
-            if ($upsert) {
-                $upsertAttribute = $this->getUpsertAttribute($resource, $version, $requestType);
-                if (!$upsertAttribute) {
-                    continue;
-                }
+
+            $isValidatedResource = $validate && $this->isValidatedResource($resource, $version, $requestType);
+            $upsertAttribute = $upsert ? $this->getUpsertAttribute($resource, $version, $requestType) : null;
+            if (($validate || $upsert) && (!$upsertAttribute && !$isValidatedResource)) {
+                continue;
             }
+
             $output->writeln(sprintf('<info>%s</info>', $resource->getEntityClass()));
             $attributes = $this->getResourceAttributes($resource, $requestType);
             if ($upsertAttribute) {
                 $attributes['Upsert Allowed By'] = $upsertAttribute;
             }
+
+            if ($isValidatedResource) {
+                $attributes['Allowed Validation'] = 'Yes';
+            }
+
             $output->writeln($this->convertResourceAttributesToString($attributes));
             if ($isSubresourcesRequested) {
                 $subresourcesText = $this->getEntitySubresourcesText(
@@ -375,5 +392,25 @@ HELP
         }
 
         return $upsertAttribute;
+    }
+
+    private function isValidatedResource(ApiResource $resource, string $version, RequestType $requestType): bool
+    {
+        if ($resource->isExcludedAction(ApiAction::CREATE) && $resource->isExcludedAction(ApiAction::UPDATE)) {
+            return false;
+        }
+
+        $config = $this->configProvider->getConfig(
+            $resource->getEntityClass(),
+            $version,
+            $requestType,
+            [new EntityDefinitionConfigExtra()]
+        )->getDefinition();
+
+        if (null === $config) {
+            return false;
+        }
+
+        return $config->isValidationEnabled();
     }
 }

@@ -323,6 +323,7 @@ class NormalizeIncludedData implements ProcessorInterface
             $meta,
             JsonApiDoc::META_UPDATE,
             JsonApiDoc::META_UPSERT,
+            JsonApiDoc::META_VALIDATE,
             $this->buildPointer($pointer, JsonApiDoc::META),
             $this->context
         );

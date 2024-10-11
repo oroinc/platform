@@ -1,0 +1,3 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget:
+    test_target:
+        name: TestTarget

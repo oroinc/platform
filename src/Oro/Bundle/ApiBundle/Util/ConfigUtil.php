@@ -80,6 +80,9 @@ class ConfigUtil extends BaseConfigUtil
     /** the names of additional meta properties a requesting of that are disabled */
     public const DISABLED_META_PROPERTIES = 'disabled_meta_properties';
 
+    /** a flag indicates whether possibility using validate operation */
+    public const ENABLE_VALIDATION = 'enable_validation';
+
     /** the form type that should be used for the entity */
     public const FORM_TYPE = 'form_type';
 

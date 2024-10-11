@@ -14,9 +14,12 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataEventDispa
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetOperationFlags;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
@@ -27,22 +30,14 @@ use Symfony\Component\Form\FormInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
+class FlushDataHandlerTest extends TestCase
 {
-    /** @var CustomizeFormDataEventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
-    private $customizeFormDataEventDispatcher;
+    private CustomizeFormDataEventDispatcher|MockObject $customizeFormDataEventDispatcher;
+    private ProcessorInterface|MockObject $formErrorsCollector;
+    private ProcessorInterface|MockObject $formErrorsCollectorForSubresource;
+    private LoggerInterface|MockObject $logger;
 
-    /** @var ProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formErrorsCollector;
-
-    /** @var ProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formErrorsCollectorForSubresource;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var FlushDataHandler */
-    private $handler;
+    private FlushDataHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -133,7 +128,7 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
 
     private function expectsFlush(
         array &$calls,
-        EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em,
+        EntityManagerInterface|MockObject $em,
         \Throwable $exception = null
     ): void {
         $connection = $this->createMock(Connection::class);
@@ -666,10 +661,10 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
     public function testFlushDataWhenFormErrorsAddedInPreFlushDataHandlers(): void
     {
         $form1 = $this->getForm();
-        /** @var FormContext|\PHPUnit\Framework\MockObject\MockObject $entityContext1 */
+        /** @var FormContext|MockObject $entityContext1 */
         $entityContext1 = $this->getFormContext($form1, null, true);
         $form2 = $this->getForm();
-        /** @var FormContext|\PHPUnit\Framework\MockObject\MockObject $entityContext2 */
+        /** @var FormContext|MockObject $entityContext2 */
         $entityContext2 = $this->getFormContext($form2, null, true);
 
         $entityContext1->expects(self::once())
@@ -732,10 +727,10 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
     public function testFlushDataWhenFormErrorsAddedInPostFlushDataHandlers(): void
     {
         $form1 = $this->getForm();
-        /** @var FormContext|\PHPUnit\Framework\MockObject\MockObject $entityContext1 */
+        /** @var FormContext|MockObject $entityContext1 */
         $entityContext1 = $this->getFormContext($form1, null, true);
         $form2 = $this->getForm();
-        /** @var FormContext|\PHPUnit\Framework\MockObject\MockObject $entityContext2 */
+        /** @var FormContext|MockObject $entityContext2 */
         $entityContext2 = $this->getFormContext($form2, null, true);
 
         $entityContext1->expects(self::exactly(2))
@@ -804,10 +799,10 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
     public function testFlushDataWhenFormErrorsAddedInPostSaveDataHandlers(): void
     {
         $form1 = $this->getForm();
-        /** @var FormContext|\PHPUnit\Framework\MockObject\MockObject $entityContext1 */
+        /** @var FormContext|MockObject $entityContext1 */
         $entityContext1 = $this->getFormContext($form1, null, true);
         $form2 = $this->getForm();
-        /** @var FormContext|\PHPUnit\Framework\MockObject\MockObject $entityContext2 */
+        /** @var FormContext|MockObject $entityContext2 */
         $entityContext2 = $this->getFormContext($form2, null, true);
 
         $entityContext1->expects(self::exactly(2))
@@ -1182,6 +1177,132 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
                 'collectFormErrors - entity 1',
                 'post_save_data - entity 2',
                 'collectFormErrors - entity 2'
+            ],
+            $calls
+        );
+    }
+
+    public function testFlushDataWhenBatchOperation(): void
+    {
+        $form1 = $this->getForm();
+        $entityContext1 = $this->getFormContext($form1);
+        $form2 = $this->getForm();
+        $entityContext2 = $this->getFormContext($form2);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+
+        $calls = [];
+        $this->expectsFlush($calls, $em);
+
+        $this->customizeFormDataEventDispatcher->expects(self::any())
+            ->method('dispatch')
+            ->willReturnCallback(function (string $eventName, FormInterface $form) use (&$calls, $form1, $form2) {
+                $description = 'unknown entity';
+                if ($form1 === $form) {
+                    $description = 'entity 1';
+                } elseif ($form2 === $form) {
+                    $description = 'entity 2';
+                }
+                $calls[] = $eventName . ' - ' . $description;
+            });
+
+        $this->formErrorsCollector->expects(self::any())
+            ->method('process')
+            ->willReturnCallback(function (FormContext $formContext) use (&$calls, $entityContext1, $entityContext2) {
+                $description = 'unknown entity';
+                if ($entityContext1 === $formContext) {
+                    $description = 'entity 1';
+                } elseif ($entityContext2 === $formContext) {
+                    $description = 'entity 2';
+                }
+                $calls[] = 'collectFormErrors - ' . $description;
+            });
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
+
+        $this->handler->flushData(
+            $em,
+            new FlushDataHandlerContext([$entityContext1, $entityContext2], new ParameterBag(), true)
+        );
+
+        self::assertEquals(
+            [
+                'getConnection',
+                'beginTransaction',
+                'pre_flush_data - entity 1',
+                'collectFormErrors - entity 1',
+                'pre_flush_data - entity 2',
+                'collectFormErrors - entity 2',
+                'flushData',
+                'post_flush_data - entity 1',
+                'collectFormErrors - entity 1',
+                'post_flush_data - entity 2',
+                'collectFormErrors - entity 2',
+                'commitTransaction',
+                'post_save_data - entity 1',
+                'collectFormErrors - entity 1',
+                'post_save_data - entity 2',
+                'collectFormErrors - entity 2'
+            ],
+            $calls
+        );
+    }
+
+    public function testFlushDataWhenValidateFlag(): void
+    {
+        $form1 = $this->getForm();
+
+        /** @var FormContext|MockObject $entityContext1 */
+        $entityContext1 = $this->getFormContext($form1);
+        $entityContext1->expects(self::once())
+            ->method('get')
+            ->with(SetOperationFlags::VALIDATE_FLAG)
+            ->willReturn(true);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+
+        $calls = [];
+        $this->expectsFlush($calls, $em);
+
+        $this->customizeFormDataEventDispatcher->expects(self::any())
+            ->method('dispatch')
+            ->willReturnCallback(function (string $eventName, FormInterface $form) use (&$calls, $form1) {
+                $description = 'unknown entity';
+                if ($form1 === $form) {
+                    $description = 'entity 1';
+                }
+                $calls[] = $eventName . ' - ' . $description;
+            });
+
+        $this->formErrorsCollector->expects(self::any())
+            ->method('process')
+            ->willReturnCallback(function (FormContext $formContext) use (&$calls, $entityContext1) {
+                $description = 'unknown entity';
+                if ($entityContext1 === $formContext) {
+                    $description = 'entity 1';
+                }
+                $calls[] = 'collectFormErrors - ' . $description;
+            });
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
+
+        $this->handler->flushData(
+            $em,
+            new FlushDataHandlerContext([$entityContext1], new ParameterBag())
+        );
+
+        self::assertEquals(
+            [
+                'getConnection',
+                'beginTransaction',
+                'pre_flush_data - entity 1',
+                'collectFormErrors - entity 1',
+                'flushData',
+                'rollback_validated_request - entity 1',
+                'collectFormErrors - entity 1',
+                'rollbackTransaction'
             ],
             $calls
         );
