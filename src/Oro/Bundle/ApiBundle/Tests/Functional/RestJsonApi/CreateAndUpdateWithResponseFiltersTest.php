@@ -239,7 +239,6 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
             ]
         );
 
-        $this->dumpYmlTemplate(null, $response);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
