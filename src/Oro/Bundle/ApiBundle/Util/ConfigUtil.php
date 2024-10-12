@@ -65,6 +65,9 @@ class ConfigUtil extends BaseConfigUtil
     /** the default page size */
     public const PAGE_SIZE = 'page_size';
 
+    /** a flag indicates whether a paging is disabled */
+    public const DISABLE_PAGING = 'disable_paging';
+
     /** a flag indicates whether a sorting is disabled */
     public const DISABLE_SORTING = 'disable_sorting';
 
