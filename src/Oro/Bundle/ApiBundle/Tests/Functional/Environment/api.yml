@@ -355,6 +355,10 @@ api:
                     fieldDuration: ~
                     fieldMoneyValue: ~
                     fieldCurrency: ~
+        Extend\Entity\EV_Api_Enum2:
+            actions:
+                get_list:
+                    disable_paging: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier:
             fields:
