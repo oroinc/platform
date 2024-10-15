@@ -178,7 +178,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions', targetAction: update|create|update_subresource|add_subresource|delete_subresource, priority: -40 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', targetAction: update|create|update_subresource|add_subresource|delete_subresource, priority: -40 }
 
     oro_api.get_config.exclude_not_accessible_relations:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\ExcludeNotAccessibleRelations
