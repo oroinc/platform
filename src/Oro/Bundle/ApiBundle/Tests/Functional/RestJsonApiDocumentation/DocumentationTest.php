@@ -63,6 +63,19 @@ class DocumentationTest extends RestJsonApiTestCase
     /**
      * @depends testWarmUpCache
      */
+    public function testReadonlyTimestampableFieldsInRequestAndResponse()
+    {
+        $entityType = $this->getEntityType(User::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        $expectedData = $this->loadYamlData('readonly_timestampable_fields.yml', 'documentation');
+        self::assertArrayContains($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
     public function testSubresourceWithEntityIdentifierTargetTypeShouldBeInRightCategory()
     {
         $entityType = $this->getEntityType(TestProduct::class);
