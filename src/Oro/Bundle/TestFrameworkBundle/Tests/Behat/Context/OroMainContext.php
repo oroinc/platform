@@ -77,6 +77,14 @@ class OroMainContext extends MinkContext implements
     private bool $debug = false;
     private string $rememberedURL = '';
 
+    const POSITION_MAP = [
+        'first' => 0,
+        'second' => 1,
+        'third' => 2,
+        'fourth' => 3,
+        'fifth' => 4,
+    ];
+
     /**
      * @BeforeScenario
      */
@@ -859,6 +867,27 @@ class OroMainContext extends MinkContext implements
     public function iClickOn($element)
     {
         $this->createElement($element)->click();
+    }
+
+    /**
+     * Example: When I click on first "Help Icon"
+     *
+     * @When /^(?:|I )click on (?P<rowNumber>[^"]*) "(?P<element>(?:[^"]|\\")*)"$/
+     */
+    public function iClickOnPositionElement(string $elementName, string $rowNumber)
+    {
+        $elements = $this->findAllElements($elementName);
+
+        $position = $this->getPosition($rowNumber);
+        if ($position === null) {
+            self::fail(sprintf('Invalid line number search key %s', $rowNumber));
+        }
+
+        if (!array_key_exists($position, $elements)) {
+            self::fail(sprintf('"%s" not available at position %s', $elementName, $rowNumber));
+        }
+
+        $elements[$position]->click();
     }
 
     /**
@@ -3380,5 +3409,10 @@ JS;
 
         self::assertArrayHasKey($parameterName, $routeAttributes);
         VariableStorage::storeData($alias, $routeAttributes[$parameterName]);
+    }
+
+    public function getPosition(string $rowNumber): ?int
+    {
+        return self::POSITION_MAP[$rowNumber] ?? null;
     }
 }
