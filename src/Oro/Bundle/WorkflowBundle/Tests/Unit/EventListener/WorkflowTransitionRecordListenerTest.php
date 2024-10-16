@@ -27,6 +27,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTransitionRecordListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

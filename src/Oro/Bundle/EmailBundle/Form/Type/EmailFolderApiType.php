@@ -16,9 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class EmailFolderApiType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -73,17 +71,12 @@ class EmailFolderApiType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_email_email_folder_api';

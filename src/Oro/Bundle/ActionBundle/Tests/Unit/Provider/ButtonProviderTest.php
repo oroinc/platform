@@ -26,6 +26,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonSearchContext */
     private $searchContext;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

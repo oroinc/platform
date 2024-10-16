@@ -16,6 +16,7 @@ class EntityFormatExtensionFactoryTest extends TestCase
 
     private EntityFormatExtensionFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->templateRendererConfigProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);

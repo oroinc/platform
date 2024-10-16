@@ -9,9 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class InitializeSharedDataForBatchUpdate implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

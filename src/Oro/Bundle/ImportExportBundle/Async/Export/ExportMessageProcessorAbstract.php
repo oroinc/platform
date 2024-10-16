@@ -41,9 +41,7 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         if (! ($body = $this->getMessageBody($message))) {

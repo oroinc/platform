@@ -15,7 +15,7 @@ class StubWorkflowImportCallbackProcessor extends WorkflowImportProcessor
         $this->processCb = $processCb;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function process(array $content, \SplFileInfo $contentSource): array
     {
         $this->inProgress = $contentSource;

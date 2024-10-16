@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ *  The form type which can be used as a text filter.
+ */
 class FilterType extends AbstractType
 {
     const NAME = 'oro_type_filter';
@@ -25,25 +28,18 @@ class FilterType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('type', $options['operator_type'], $this->createOperatorOptions($options));
@@ -61,9 +57,8 @@ class FilterType extends AbstractType
         if ($options['operator_choices']) {
             $result['choices'] = $options['operator_choices'];
         }
-        $result = array_merge($result, $options['operator_options']);
 
-        return $result;
+        return array_merge($result, $options['operator_options']);
     }
 
     /**
@@ -76,9 +71,7 @@ class FilterType extends AbstractType
         return array_merge(array('required' => false), $options['field_options']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $children                     = $form->all();
@@ -89,9 +82,7 @@ class FilterType extends AbstractType
         $view->vars['show_filter']    = $options['show_filter'];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

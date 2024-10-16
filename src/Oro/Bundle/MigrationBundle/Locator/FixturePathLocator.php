@@ -12,9 +12,7 @@ class FixturePathLocator implements FixturePathLocatorInterface
     protected const MAIN_FIXTURES_PATH = 'Migrations/Data/ORM';
     protected const DEMO_FIXTURES_PATH = 'Migrations/Data/Demo/ORM';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPath(string $fixtureType): string
     {
         if ($fixtureType === DataFixturesExecutorInterface::DEMO_FIXTURES) {

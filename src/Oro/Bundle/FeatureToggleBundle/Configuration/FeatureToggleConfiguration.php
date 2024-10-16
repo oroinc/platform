@@ -20,9 +20,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
         $this->extension = $extension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder(self::ROOT_NODE);

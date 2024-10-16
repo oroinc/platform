@@ -30,6 +30,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAttachmentTransformer */
     private $emailAttachmentTransformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

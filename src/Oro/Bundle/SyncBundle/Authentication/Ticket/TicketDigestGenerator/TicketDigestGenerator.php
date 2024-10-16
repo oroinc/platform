@@ -25,9 +25,7 @@ class TicketDigestGenerator implements TicketDigestGeneratorInterface
         $this->secret = $secret;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generateDigest(string $nonce, string $created, string $password): string
     {
         return $this->passwordHasher->hash(sprintf('%s|%s|%s', $nonce, $created, $password), $this->secret);

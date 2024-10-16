@@ -35,6 +35,7 @@ class ContextsSelectTypeTest extends TypeTestCase
     /* @var ContextsSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

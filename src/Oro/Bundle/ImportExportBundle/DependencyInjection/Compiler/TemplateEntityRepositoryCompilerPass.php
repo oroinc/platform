@@ -11,9 +11,7 @@ class TemplateEntityRepositoryCompilerPass implements CompilerPassInterface
     const TEMPLATE_MANAGER_KEY = 'oro_importexport.template_fixture.manager';
     const TEMPLATE_FIXTURE_TAG = 'oro_importexport.template_fixture';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::TEMPLATE_MANAGER_KEY)) {

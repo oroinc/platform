@@ -12,6 +12,7 @@ class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorInterface */
     private $translator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

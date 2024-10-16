@@ -13,9 +13,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class BuildResultDocument extends BaseBuildResultDocument
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */
@@ -27,9 +25,7 @@ class BuildResultDocument extends BaseBuildResultDocument
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context): void
     {
         /** @var UpdateListContext $context */

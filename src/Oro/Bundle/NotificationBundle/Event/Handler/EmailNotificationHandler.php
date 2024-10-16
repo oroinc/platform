@@ -45,9 +45,7 @@ class EmailNotificationHandler implements EventHandlerInterface
         $this->additionalEmailAssociationProvider = $additionalEmailAssociationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(NotificationEvent $event, array $matchedNotifications)
     {
         // convert notification rules to a list of EmailNotificationInterface

@@ -18,9 +18,7 @@ class ConstraintConverter implements ConstraintConverterInterface
         $this->processors = $processors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(Constraint $constraint, ?FormInterface $form = null): bool
     {
         foreach ($this->processors as $processor) {
@@ -32,9 +30,7 @@ class ConstraintConverter implements ConstraintConverterInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertConstraint(Constraint $constraint, ?FormInterface $form = null): ?Constraint
     {
         foreach ($this->processors as $processor) {

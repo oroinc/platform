@@ -25,6 +25,7 @@ class AssociationManagerTest extends WebTestCase
     private array $dispatched = [];
     private AssociationManager $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -40,6 +41,7 @@ class AssociationManagerTest extends WebTestCase
         $this->manager = $this->getContainer()->get('oro_email.async.manager.association_manager');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->dispatched = [];

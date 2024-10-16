@@ -15,22 +15,19 @@ class TestActivityScopeProvider implements ScopeCriteriaProviderInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getCriteriaField()
     {
         return self::TEST_ACTIVITY;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValue()
     {
         return $this->currentTestActivity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValueType()
     {
         return TestActivity::class;

@@ -28,9 +28,7 @@ class AvailableSuitesController implements Controller
         $this->specificationFinder = $specificationFinder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -43,9 +41,7 @@ class AvailableSuitesController implements Controller
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('available-suites')) {

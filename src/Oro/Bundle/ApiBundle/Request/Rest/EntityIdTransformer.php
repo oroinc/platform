@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Transforms entity identifier value to and from a string representation used in REST API.
@@ -18,39 +19,41 @@ class EntityIdTransformer implements EntityIdTransformerInterface
 
     private ValueNormalizer $valueNormalizer;
     private RequestType $requestType;
+    private bool $alwaysString;
 
-    public function __construct(ValueNormalizer $valueNormalizer)
+    public function __construct(ValueNormalizer $valueNormalizer, array $requestType, bool $alwaysString = false)
     {
         $this->valueNormalizer = $valueNormalizer;
-        $this->requestType = new RequestType([RequestType::REST]);
+        $this->requestType = new RequestType($requestType);
+        $this->alwaysString = $alwaysString;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform(mixed $id, EntityMetadata $metadata): mixed
     {
-        return \is_array($id)
-            ? http_build_query($id, '', self::COMPOSITE_ID_SEPARATOR)
-            : (string)$id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed
-    {
-        $idFieldNames = $metadata->getIdentifierFieldNames();
-        if (\count($idFieldNames) === 1) {
-            $value = $this->reverseTransformSingleId(
-                $value,
-                $this->getSingleIdDataType($metadata)
-            );
-        } else {
-            $value = $this->reverseTransformCompositeEntityId($value, $metadata);
+        if (ExtendHelper::isOutdatedEnumOptionEntity($metadata->getClassName())) {
+            return ExtendHelper::getEnumInternalId($id);
         }
 
-        return $value;
+        if (\is_array($id)) {
+            return http_build_query($id, '', self::COMPOSITE_ID_SEPARATOR);
+        }
+
+        return $this->alwaysString ? (string)$id : $id;
+    }
+
+    #[\Override]
+    public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed
+    {
+        if (ExtendHelper::isOutdatedEnumOptionEntity($metadata->getClassName())) {
+            return ExtendHelper::buildEnumOptionId($this->getEnumCode($metadata), $value);
+        }
+
+        if (\count($metadata->getIdentifierFieldNames()) !== 1) {
+            return $this->reverseTransformCompositeEntityId($value, $metadata);
+        }
+
+        return $this->reverseTransformSingleId($value, $this->getSingleIdDataType($metadata));
     }
 
     private function getSingleIdDataType(EntityMetadata $metadata): string
@@ -66,7 +69,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     private function reverseTransformSingleId(mixed $value, string $dataType): mixed
     {
         if (DataType::STRING === $dataType) {
-            return $value;
+            return (string)$value;
         }
 
         return $this->valueNormalizer->normalizeValue($value, $dataType, $this->requestType);
@@ -122,5 +125,17 @@ class EntityIdTransformer implements EntityIdTransformerInterface
         }
 
         return $normalized;
+    }
+
+    private function getEnumCode(EntityMetadata $metadata): string
+    {
+        $hints = $metadata->getHints();
+        foreach ($hints as $hint) {
+            if (\is_array($hint) && 'HINT_ENUM_OPTION' === $hint['name']) {
+                return $hint['value'];
+            }
+        }
+
+        return ExtendHelper::getEnumCode($metadata->getClassName());
     }
 }

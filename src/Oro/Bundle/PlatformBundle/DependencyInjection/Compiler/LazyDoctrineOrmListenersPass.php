@@ -10,6 +10,7 @@ class LazyDoctrineOrmListenersPass extends LazyDoctrineListenersPass
     /**
      * @return string
      */
+    #[\Override]
     protected function getListenerTagName()
     {
         return 'doctrine.orm.entity_listener';

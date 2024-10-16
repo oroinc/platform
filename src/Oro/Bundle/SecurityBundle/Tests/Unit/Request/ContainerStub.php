@@ -20,6 +20,7 @@ class ContainerStub extends Container
      *
      * @return mixed
      */
+    #[\Override]
     public function getParameter($name)
     {
         if (!array_key_exists($name, $this->parameters)) {

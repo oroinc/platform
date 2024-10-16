@@ -13,6 +13,7 @@ class SegmentQueryConverterTest extends WebTestCase
     /** @var SegmentQueryConverter */
     private $segmentQueryConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

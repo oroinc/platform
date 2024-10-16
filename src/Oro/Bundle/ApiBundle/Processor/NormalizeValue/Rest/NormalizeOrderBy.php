@@ -18,9 +18,7 @@ class NormalizeOrderBy implements ProcessorInterface
 {
     public const REQUIREMENT = '-?[\w\.]+(,-?[\w\.]+)*';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */

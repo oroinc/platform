@@ -66,6 +66,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

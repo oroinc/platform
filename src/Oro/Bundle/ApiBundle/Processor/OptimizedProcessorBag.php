@@ -36,9 +36,7 @@ class OptimizedProcessorBag extends ProcessorBag
         $this->ungroupedProcessorIteratorFactory = $ungroupedProcessorIteratorFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createProcessorIterator(ComponentContextInterface $context): ProcessorIterator
     {
         $action = $context->getAction();

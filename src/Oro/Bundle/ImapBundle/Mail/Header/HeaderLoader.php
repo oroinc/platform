@@ -32,9 +32,6 @@ use Laminas\Mail\Header\HeaderLoader as BaseHeaderLoader;
  */
 class HeaderLoader extends BaseHeaderLoader
 {
-    /**
-     * {@inheritdoc}
-     */
     protected $plugins = [
         'bcc' => 'Oro\Bundle\ImapBundle\Mail\Header\Bcc',
         'cc' => 'Oro\Bundle\ImapBundle\Mail\Header\Cc',

@@ -37,6 +37,7 @@ class SetOwnershipTypeQuery extends UpdateOwnershipTypeQuery
      * @param array $data
      * @return array
      */
+    #[\Override]
     protected function getNewData($data)
     {
         $data['ownership'] = $this->ownershipData;

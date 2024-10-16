@@ -22,6 +22,7 @@ class ReminderSender implements ReminderSenderInterface
     /**
      * Push reminder to processor
      */
+    #[\Override]
     public function push(Reminder $reminder)
     {
         $processor = $this->registry->getProcessor($reminder->getMethod());
@@ -31,6 +32,7 @@ class ReminderSender implements ReminderSenderInterface
     /**
      * Handle all reminders sending
      */
+    #[\Override]
     public function send()
     {
         foreach ($this->registry->getProcessors() as $processor) {

@@ -10,6 +10,7 @@ class UpdateFieldExclusionsTest extends ConfigProcessorTestCase
     /** @var UpdateFieldExclusions */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -14,9 +14,7 @@ class MimeTypeConfigTypeTest extends FormIntegrationTestCase
         'image/png'
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

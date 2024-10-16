@@ -12,6 +12,7 @@ class PrivilegeCollectionTypeTest extends \PHPUnit\Framework\TestCase
     /** @var PrivilegeCollectionType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new PrivilegeCollectionType();

@@ -19,6 +19,7 @@ class FileTest extends RestJsonApiTestCase
 
     private string $externalFileAllowedUrlsRegExp;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -26,6 +27,7 @@ class FileTest extends RestJsonApiTestCase
         $this->externalFileAllowedUrlsRegExp = $this->getExternalFileAllowedUrlsRegExp();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         parent::tearDown();

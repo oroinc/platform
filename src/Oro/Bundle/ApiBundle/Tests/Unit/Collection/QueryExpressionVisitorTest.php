@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExpressionValue;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\FieldDqlExpressionProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
@@ -24,9 +25,20 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class QueryExpressionVisitorTest extends OrmRelatedTestCase
 {
+    /** @var FieldDqlExpressionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldDqlExpressionProvider;
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fieldDqlExpressionProvider = $this->createMock(FieldDqlExpressionProviderInterface::class);
+    }
+
     private function buildExistsSql(QueryBuilder $query, QueryBuilder $subquery): string
     {
         return $query
@@ -40,6 +52,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -51,6 +64,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -65,6 +79,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -82,6 +97,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -93,6 +109,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -106,6 +123,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -119,6 +137,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -132,6 +151,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -148,6 +168,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -162,6 +183,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -173,6 +195,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -187,6 +210,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -201,6 +225,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -212,6 +237,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -226,6 +252,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
         $value = 'test';
@@ -241,6 +268,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             ['AND' => new AndCompositeExpression()],
             ['IN' => new InComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -254,9 +282,18 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             ['AND' => new AndCompositeExpression()],
             ['=' => new EqComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
+        $qb = new QueryBuilder($this->em);
+
+        $this->fieldDqlExpressionProvider->expects(self::exactly(3))
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb))
+            ->willReturn(null);
+
+        $expressionVisitor->setQuery($qb);
         $expressionVisitor->setQueryAliases(['e']);
         $expr = new CompositeExpression(
             'AND',
@@ -292,6 +329,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -304,9 +342,18 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['IN' => new InComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
+        $qb = new QueryBuilder($this->em);
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb), 'e.test')
+            ->willReturn(null);
+
+        $expressionVisitor->setQuery($qb);
         $expressionVisitor->setQueryAliases(['e']);
         $comparison = new Comparison('e.test', 'IN', [1, 2, 3]);
         $result = $expressionVisitor->walkComparison($comparison);
@@ -323,18 +370,56 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testWalkComparisonWithFieldDqlExpression(): void
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['IN' => new InComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $qb = new QueryBuilder($this->em);
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb), 'e.test')
+            ->willReturn('UPPER(e.test)');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryAliases(['e']);
+        $comparison = new Comparison('e.test', 'IN', [1, 2, 3]);
+        $result = $expressionVisitor->walkComparison($comparison);
+
+        self::assertEquals(
+            new QueryExpr\Func('UPPER(e.test) IN', [':e_test']),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('e_test', [1, 2, 3])
+            ],
+            $expressionVisitor->getParameters()
+        );
+    }
+
     public function testWalkComparisonWithEmptyFieldName(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['IN' => new InComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
-        $expressionVisitor->setQueryAliases(['e']);
+        $this->fieldDqlExpressionProvider->expects(self::never())
+            ->method('getFieldDqlExpression');
 
+        $expressionVisitor->setQuery(new QueryBuilder($this->em));
+        $expressionVisitor->setQueryAliases(['e']);
         $comparison = new Comparison('', 'IN', [1, 2, 3]);
         $result = $expressionVisitor->walkComparison($comparison);
+
         self::assertEquals(
             new QueryExpr\Func(' IN', [':e']),
             $result
@@ -369,6 +454,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             ['AND' => new AndCompositeExpression()],
             ['IN' => new InComparisonExpression(), '=' => new EqComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -385,9 +471,18 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['=' => new EqComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
+        $qb = new QueryBuilder($this->em);
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb), 'e.test')
+            ->willReturn(null);
+
+        $expressionVisitor->setQuery($qb);
         $expressionVisitor->setQueryAliases(['e']);
         $comparison = new Comparison('e.test', '=/a', 21);
         $expressionVisitor->walkComparison($comparison);
@@ -398,9 +493,18 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['=' => new EqComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
+        $qb = new QueryBuilder($this->em);
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb), 'e.test')
+            ->willReturn(null);
+
+        $expressionVisitor->setQuery($qb);
         $expressionVisitor->setQueryAliases(['e']);
         $comparison = new Comparison('e.test', '=/i', 'Test Value');
         $result = $expressionVisitor->walkComparison($comparison);
@@ -420,9 +524,18 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['empty' => new EmptyValueComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
+        $qb = new QueryBuilder($this->em);
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb), 'e.test')
+            ->willReturn(null);
+
+        $expressionVisitor->setQuery($qb);
         $expressionVisitor->setQueryAliases(['e']);
         $comparison = new Comparison('e.test', 'empty/:string', true);
         $result = $expressionVisitor->walkComparison($comparison);
@@ -449,6 +562,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['=' => new EqComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
@@ -462,9 +576,18 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['IN' => new InComparisonExpression()],
+            $this->fieldDqlExpressionProvider,
             $this->createMock(EntityClassResolver::class)
         );
 
+        $qb = new QueryBuilder($this->em);
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb), 'test')
+            ->willReturn(null);
+
+        $expressionVisitor->setQuery($qb);
         $expressionVisitor->setQueryAliases(['e']);
         $comparison = new Comparison('{test}', 'IN', [1, 2, 3]);
         $result = $expressionVisitor->walkComparison($comparison);
@@ -489,6 +612,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -503,12 +627,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
-        $qb = new QueryBuilder($this->em);
-
-        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQuery(new QueryBuilder($this->em));
         $expressionVisitor->createSubquery('e.test');
     }
 
@@ -520,12 +643,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
-        $qb = new QueryBuilder($this->em);
-
-        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQuery(new QueryBuilder($this->em));
         $expressionVisitor->setQueryJoinMap([]);
         $expressionVisitor->createSubquery('e.test');
     }
@@ -535,6 +657,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -572,6 +695,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -609,6 +733,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -646,6 +771,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -679,6 +805,89 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
+    public function testCreateSubqueryForAssociationWithCustomExpression(): void
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->fieldDqlExpressionProvider,
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\Origin::class, 'e')
+            ->leftJoin('e.user', 'user')
+            ->leftJoin('user.groups', 'user_groups');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryJoinMap(['user' => 'user', 'user.groups' => 'user_groups']);
+        $expressionVisitor->setQueryAliases(['e', 'user', 'user_groups']);
+        $subquery = $expressionVisitor->createSubquery(
+            'user',
+            true,
+            sprintf('user.id = {entity:%s}.id', Entity\User::class)
+        );
+
+        $expectedSubquery = 'SELECT user_subquery1'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User user_subquery1'
+            . ' WHERE user.id = user_subquery1.id';
+        self::assertEquals($expectedSubquery, $subquery->getDQL());
+
+        // test that the subquery has valid SQL
+        $expectedSql = 'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.user_id AS user_id_2'
+            . ' FROM origin_table o0_'
+            . ' LEFT JOIN user_table u1_ ON o0_.user_id = u1_.id'
+            . ' LEFT JOIN user_to_group_table u3_ ON u1_.id = u3_.user_id'
+            . ' LEFT JOIN group_table g2_ ON g2_.id = u3_.user_group_id'
+            . ' WHERE EXISTS ('
+            . 'SELECT u4_.id'
+            . ' FROM user_table u4_'
+            . ' WHERE u1_.id = u4_.id)';
+        self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
+    }
+
+    public function testCreateSubqueryForAssociationWithCustomExpressionWithoutEntityPlaceholder(): void
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('The subquery expression must contain an entity placeholder.');
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->fieldDqlExpressionProvider,
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\Origin::class, 'e');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryJoinMap(['user' => 'user', 'user.groups' => 'user_groups']);
+        $expressionVisitor->setQueryAliases(['e', 'user', 'user_groups']);
+        $expressionVisitor->createSubquery('user', true, 'user.id = e.id');
+    }
+
+    public function testCreateSubqueryForAssociationWithCustomExpressionWithUnclosedEntityPlaceholder(): void
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('The subquery expression must contain an entity placeholder.');
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->fieldDqlExpressionProvider,
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\Origin::class, 'e');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryJoinMap(['user' => 'user', 'user.groups' => 'user_groups']);
+        $expressionVisitor->setQueryAliases(['e', 'user', 'user_groups']);
+        $expressionVisitor->createSubquery('user', true, 'user.id = {entity:SomeEntity.id');
+    }
+
     public function testCreateSubqueryWhenJoinExistsInJoinMapButDoesNotExistInQuery(): void
     {
         $this->expectException(QueryException::class);
@@ -690,6 +899,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -715,6 +925,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -740,6 +951,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -766,6 +978,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -787,6 +1000,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -822,6 +1036,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -860,6 +1075,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -896,6 +1112,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -934,6 +1151,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -970,6 +1188,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -1014,6 +1233,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -1058,6 +1278,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -1106,6 +1327,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -1154,6 +1376,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 
@@ -1202,6 +1425,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            $this->fieldDqlExpressionProvider,
             new EntityClassResolver($this->doctrine)
         );
 

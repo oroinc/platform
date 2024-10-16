@@ -10,9 +10,7 @@ class ConfigExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         // config_is_new is true if a new entity or field is created

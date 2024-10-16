@@ -28,6 +28,7 @@ class ConstraintsProviderDecorator implements ConstraintsProviderInterface
      * @param FormInterface $form
      * @return Constraint[]
      */
+    #[\Override]
     public function getFormConstraints(FormInterface $form)
     {
         $constraints = $this->constraintsProvider->getFormConstraints($form);

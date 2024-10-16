@@ -36,6 +36,7 @@ final class OperationButtonProviderExtensionTest extends TestCase
     private OperationRegistry&MockObject $operationRegistry;
     private OperationButtonProviderExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->operationRegistry = $this->createMock(OperationRegistry::class);

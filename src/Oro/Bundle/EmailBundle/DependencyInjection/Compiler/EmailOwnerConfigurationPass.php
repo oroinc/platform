@@ -14,9 +14,7 @@ class EmailOwnerConfigurationPass implements CompilerPassInterface
     private const SERVICE_KEY = 'oro_email.email.owner.provider.storage';
     private const TAG         = 'oro_email.owner.provider';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $storageDefinition = $container->getDefinition(self::SERVICE_KEY);

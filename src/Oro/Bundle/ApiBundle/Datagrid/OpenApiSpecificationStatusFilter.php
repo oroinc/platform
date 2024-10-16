@@ -15,9 +15,7 @@ class OpenApiSpecificationStatusFilter extends ChoiceFilter
     private const STATUS_PUBLISHED = 'published';
     private const VALUE = 'value';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         if (!\is_array($data) || empty($data[self::VALUE])) {

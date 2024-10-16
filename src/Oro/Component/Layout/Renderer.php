@@ -29,33 +29,25 @@ class Renderer implements FormRendererInterface
         $this->engine = $engine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEngine(): SymfonyFormRendererEngineInterface
     {
         return $this->engine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
     {
         $this->engine->setTheme($view, $themes, $useDefaultThemes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function renderCsrfToken($tokenId): string
     {
         throw new \LogicException('Method must not be called during layout rendering.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function renderBlock(FormView $view, $blockName, array $variables = []): string
     {
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
@@ -117,8 +109,8 @@ class Renderer implements FormRendererInterface
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function searchAndRenderBlock(
         FormView $view,
         $blockNameSuffix,
@@ -229,9 +221,7 @@ class Renderer implements FormRendererInterface
         return $html;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function humanize($text): string
     {
         return ucfirst(trim(strtolower(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));

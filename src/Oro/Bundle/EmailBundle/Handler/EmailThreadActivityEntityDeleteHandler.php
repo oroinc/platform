@@ -26,9 +26,7 @@ class EmailThreadActivityEntityDeleteHandler extends DeleteHandler
         $this->activityEntityDeleteHandler = $activityEntityDeleteHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleDelete($id, ApiEntityManager $manager, array $options = []): void
     {
         /** @var RelationIdentifier $id */

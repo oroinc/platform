@@ -41,6 +41,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var KnownEmailAddressChecker */
     private $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

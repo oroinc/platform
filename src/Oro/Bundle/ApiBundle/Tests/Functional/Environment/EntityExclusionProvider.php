@@ -13,9 +13,7 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  */
 class EntityExclusionProvider implements ExclusionProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredEntity($className)
     {
         return
@@ -23,17 +21,13 @@ class EntityExclusionProvider implements ExclusionProviderInterface
             || $className === TestEmployee::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         return false;

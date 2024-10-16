@@ -20,9 +20,7 @@ class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
         $this->extractors = $extractors;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConstraintStatusCode(Validator\Constraint $constraint): ?int
     {
         $result = null;
@@ -36,9 +34,7 @@ class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConstraintCode(Validator\Constraint $constraint): ?string
     {
         $result = null;
@@ -52,9 +48,7 @@ class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConstraintType(Validator\Constraint $constraint): ?string
     {
         $result = null;

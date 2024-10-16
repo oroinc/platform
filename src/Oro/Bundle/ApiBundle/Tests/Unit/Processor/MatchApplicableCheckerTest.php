@@ -4,6 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
+use Oro\Bundle\FormBundle\Entity\PrimaryItem;
+use Oro\Bundle\FormBundle\Entity\PriorityItem;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorIterator;
@@ -32,6 +36,16 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         return $processorRegistry;
     }
 
+    private function getProcessorIterator(array $processors, Context $context): ProcessorIterator
+    {
+        return new ProcessorIterator(
+            $processors,
+            $context,
+            $this->getApplicableChecker(),
+            $this->getProcessorRegistry()
+        );
+    }
+
     private function assertProcessors(array $expectedProcessorIds, \Iterator $processors): void
     {
         $processorIds = [];
@@ -43,7 +57,41 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedProcessorIds, $processorIds);
     }
 
-    public function testMatchByInstanceOf()
+    public function testMatchByEqualTo(): void
+    {
+        $context = new Context();
+        $context->setAction('action1');
+        $context->set('attr', Entity\User::class);
+
+        $processors = [
+            [
+                'processor1',
+                []
+            ],
+            [
+                'processor2',
+                ['attr' => Entity\User::class]
+            ],
+            [
+                'processor3',
+                ['attr' => Entity\UserInterface::class]
+            ],
+            [
+                'processor3',
+                ['attr' => Entity\Role::class]
+            ]
+        ];
+
+        $this->assertProcessors(
+            [
+                'processor1',
+                'processor2'
+            ],
+            $this->getProcessorIterator($processors, $context)
+        );
+    }
+
+    public function testMatchByInstanceOf(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -68,20 +116,115 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $iterator = new ProcessorIterator(
-            $processors,
-            $context,
-            $this->getApplicableChecker(),
-            $this->getProcessorRegistry()
-        );
-
         $this->assertProcessors(
             [
                 'processor1',
                 'processor2',
                 'processor3'
             ],
-            $iterator
+            $this->getProcessorIterator($processors, $context)
+        );
+    }
+
+    public function testMatchConcreteEnumOptionInContext(): void
+    {
+        $context = new Context();
+        $context->setAction('action1');
+        $context->set('class', 'Extend\Entity\EV_Test_Enum');
+
+        $processors = [
+            [
+                'processor1',
+                []
+            ],
+            [
+                'processor2',
+                ['class' => Entity\User::class]
+            ],
+            [
+                'processor3',
+                ['class' => 'Extend\Entity\EV_Test_Enum']
+            ],
+            [
+                'processor4',
+                ['class' => 'Extend\Entity\EV_Another_Enum']
+            ],
+            [
+                'processor5',
+                ['class' => EnumOption::class]
+            ],
+            [
+                'processor6',
+                ['class' => EnumOptionInterface::class]
+            ],
+            [
+                'processor7',
+                ['class' => PriorityItem::class]
+            ],
+            [
+                'processor8',
+                ['class' => PrimaryItem::class]
+            ]
+        ];
+
+        $this->assertProcessors(
+            [
+                'processor1',
+                'processor3',
+                'processor5',
+                'processor6',
+                'processor7'
+            ],
+            $this->getProcessorIterator($processors, $context)
+        );
+    }
+
+    public function testMatchBaseEnumOptionInContext(): void
+    {
+        $context = new Context();
+        $context->setAction('action1');
+        $context->set('class', EnumOption::class);
+
+        $processors = [
+            [
+                'processor1',
+                []
+            ],
+            [
+                'processor2',
+                ['class' => Entity\User::class]
+            ],
+            [
+                'processor3',
+                ['class' => 'Extend\Entity\EV_Test_Enum']
+            ],
+            [
+                'processor4',
+                ['class' => 'Extend\Entity\EV_Another_Enum']
+            ],
+            [
+                'processor5',
+                ['class' => EnumOption::class]
+            ],
+            [
+                'processor6',
+                ['class' => EnumOptionInterface::class]
+            ],
+            [
+                'processor7',
+                ['class' => PriorityItem::class]
+            ],
+            [
+                'processor8',
+                ['class' => PrimaryItem::class]
+            ]
+        ];
+
+        $this->assertProcessors(
+            [
+                'processor1'
+            ],
+            $this->getProcessorIterator($processors, $context)
         );
     }
 }

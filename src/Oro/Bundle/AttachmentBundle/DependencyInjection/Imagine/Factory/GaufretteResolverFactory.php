@@ -14,9 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class GaufretteResolverFactory implements ResolverFactoryInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function create(ContainerBuilder $container, $resolverName, array $config)
     {
         $resolverDefinition = new ChildDefinition(
@@ -33,17 +31,13 @@ class GaufretteResolverFactory implements ResolverFactoryInterface
         return $resolverId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'oro_gaufrette';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addConfiguration(ArrayNodeDefinition $builder)
     {
         $builder

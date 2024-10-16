@@ -25,11 +25,13 @@ class DriverMessageCollector implements DriverInterface
         $this->driver = $driver;
     }
 
+    #[\Override]
     public function createTransportMessage(): MessageInterface
     {
         return $this->driver->createTransportMessage();
     }
 
+    #[\Override]
     public function send(QueueInterface $queue, Message $message): void
     {
         $this->sentMessages[$queue->getQueueName()][$message->getMessageId()] = [
@@ -40,11 +42,13 @@ class DriverMessageCollector implements DriverInterface
         $this->driver->send($queue, $message);
     }
 
+    #[\Override]
     public function createQueue(string $queueName): QueueInterface
     {
         return $this->driver->createQueue($queueName);
     }
 
+    #[\Override]
     public function getConfig(): Config
     {
         return $this->driver->getConfig();

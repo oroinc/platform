@@ -18,9 +18,7 @@ class ChainEntityOverrideProvider implements EntityOverrideProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSubstituteEntityClass(string $entityClass): ?string
     {
         foreach ($this->providers as $provider) {
@@ -33,9 +31,7 @@ class ChainEntityOverrideProvider implements EntityOverrideProviderInterface
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClass(string $substituteClass): ?string
     {
         foreach ($this->providers as $provider) {

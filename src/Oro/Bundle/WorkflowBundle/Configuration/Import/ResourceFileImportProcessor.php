@@ -51,9 +51,7 @@ class ResourceFileImportProcessor implements ConfigImportProcessorInterface
         $this->ignoreErrors = $ignoreErrors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(array $content, \SplFileInfo $contentSource): array
     {
         $importFile = $this->getImportFile($contentSource);
@@ -70,9 +68,7 @@ class ResourceFileImportProcessor implements ConfigImportProcessorInterface
         return ArrayUtil::arrayMergeRecursiveDistinct($content, $importContent);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setParent(ConfigImportProcessorInterface $parentProcessor)
     {
         $this->parent = $parentProcessor;

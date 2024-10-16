@@ -40,6 +40,7 @@ class CurrentLocalizationProvider implements LocalizationProviderInterface
         $this->translatableListener = $translatableListener;
     }
 
+    #[\Override]
     public function getCurrentLocalization(): ?Localization
     {
         if (null !== $this->currentLocalization) {
@@ -60,6 +61,7 @@ class CurrentLocalizationProvider implements LocalizationProviderInterface
      * Makes the given localization as the current one.
      * When the given localization is NULL then reverts the current localization to a default localization.
      */
+    #[\Override]
     public function setCurrentLocalization(?Localization $localization): void
     {
         $this->currentLocalization = $localization;

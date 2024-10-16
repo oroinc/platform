@@ -35,9 +35,7 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
         $this->associationBuilder = $associationBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($actionType)
     {
         if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {
@@ -50,9 +48,7 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preUpdate()
     {
         $targetEntityConfigs = $this->getTargetEntityConfigs();

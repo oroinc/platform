@@ -1,0 +1,26 @@
+<?php
+
+namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
+
+use Attribute;
+use Symfony\Component\Validator\Constraint;
+
+/**
+ * EnumValue constraint
+ *
+ * @Annotation
+ */
+#[Attribute]
+class EnumOption extends Constraint
+{
+    /**
+     * @var string
+     */
+    public $message = 'This value should contain only alphabetic symbols, underscore, hyphen, spaces and numbers.';
+
+    #[\Override]
+    public function getTargets(): string|array
+    {
+        return [self::CLASS_CONSTRAINT];
+    }
+}

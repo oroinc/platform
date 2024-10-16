@@ -45,6 +45,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         $this->extensions[] = $extension;
     }
 
+    #[\Override]
     protected function doGenerateBody(GeneratorData $data): string
     {
         $body   = [];
@@ -83,6 +84,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function validate(GeneratorData $data): void
     {
         $source = $data->getSource();
@@ -134,6 +136,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         $this->processExpressionsRecursive($source);
     }
 
+    #[\Override]
     protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection): void
     {
         foreach ($this->extensions as $extension) {

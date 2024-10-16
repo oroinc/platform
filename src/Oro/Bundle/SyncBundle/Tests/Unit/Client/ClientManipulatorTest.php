@@ -47,6 +47,7 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
     /** @var ClientManipulator */
     private $clientManipulator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->decoratedClientManipulator = $this->createMock(ClientManipulatorInterface::class);

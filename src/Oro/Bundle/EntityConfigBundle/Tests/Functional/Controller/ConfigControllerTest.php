@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ConfigControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

@@ -14,9 +14,7 @@ final class FeatureAvgTimeRegistry implements AvgTimeProviderInterface
      */
     private $averageTime = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAverageTimeById($id)
     {
         foreach ($this->providers as $provider) {
@@ -28,9 +26,7 @@ final class FeatureAvgTimeRegistry implements AvgTimeProviderInterface
         return $this->getAverageTime();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAverageTime()
     {
         if (!is_null($this->averageTime)) {

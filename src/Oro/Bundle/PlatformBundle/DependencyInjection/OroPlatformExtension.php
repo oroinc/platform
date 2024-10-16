@@ -16,9 +16,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroPlatformExtension extends Extension implements PrependExtensionInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('web_backend_prefix')) {
@@ -178,9 +176,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $container->setExtensionConfig($name, $originalConfig);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));

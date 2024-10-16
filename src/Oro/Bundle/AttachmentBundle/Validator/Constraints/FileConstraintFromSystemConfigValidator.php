@@ -28,9 +28,7 @@ class FileConstraintFromSystemConfigValidator extends ConstraintValidator
         $this->fileConstraintsProvider = $mimeTypesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(ExecutionContextInterface $context): void
     {
         parent::initialize($context);
@@ -40,8 +38,8 @@ class FileConstraintFromSystemConfigValidator extends ConstraintValidator
 
     /**
      * @param FileConstraintFromSystemConfig $constraint
-     * {@inheritdoc}
      */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (empty($constraint->mimeTypes)) {

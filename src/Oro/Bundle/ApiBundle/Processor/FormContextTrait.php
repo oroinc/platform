@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -24,7 +27,10 @@ trait FormContextTrait
     private ?FormBuilderInterface $formBuilder = null;
     private ?FormInterface $form = null;
     private bool $skipFormValidation = false;
+    /** @var ConfigExtraInterface[]|null $normalizedEntityConfigExtras */
     private ?array $normalizedEntityConfigExtras = null;
+    /** @var ConfigExtraInterface[]|null $responseConfigExtras [name => extra, ...] */
+    private ?array $responseConfigExtras = null;
 
     /**
      * Gets an identifier of an entity that was sent in the request.
@@ -237,6 +243,52 @@ trait FormContextTrait
     }
 
     /**
+     * Sets a list of requests for configuration data.
+     *
+     * @param ConfigExtraInterface[] $extras
+     *
+     * @throws \InvalidArgumentException if $extras has invalid elements
+     */
+    public function setConfigExtras(array $extras): void
+    {
+        $processedExtras = [];
+        foreach ($extras as $extra) {
+            $processedExtra = $this->processConfigExtra($extra);
+            if (null !== $processedExtra) {
+                $processedExtras[] = $processedExtra;
+            }
+        }
+        parent::setConfigExtras($processedExtras);
+    }
+
+    /**
+     * Adds a request for some configuration data.
+     *
+     * @throws \InvalidArgumentException if a config extra with the same name already exists
+     */
+    public function addConfigExtra(ConfigExtraInterface $extra): void
+    {
+        $processedExtra = $this->processConfigExtra($extra);
+        if (null !== $processedExtra) {
+            parent::addConfigExtra($processedExtra);
+        }
+    }
+
+    /**
+     * Removes a request for some configuration data.
+     */
+    public function removeConfigExtra(string $extraName): void
+    {
+        if (ExpandRelatedEntitiesConfigExtra::NAME === $extraName
+            || FilterFieldsConfigExtra::NAME === $extraName
+            || MetaPropertiesConfigExtra::NAME === $extraName
+        ) {
+            unset($this->responseConfigExtras[$extraName]);
+        }
+        parent::removeConfigExtra($extraName);
+    }
+
+    /**
      * Gets config extras that should be used by {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity}
      * and {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities} processors.
      *
@@ -244,7 +296,16 @@ trait FormContextTrait
      */
     public function getNormalizedEntityConfigExtras(): array
     {
-        return $this->normalizedEntityConfigExtras ?? [];
+        $configExtras = $this->responseConfigExtras ?? [];
+        if ($this->normalizedEntityConfigExtras) {
+            foreach ($this->normalizedEntityConfigExtras as $configExtra) {
+                if (!isset($configExtras[$configExtra->getName()])) {
+                    $configExtras[$configExtra->getName()] = $configExtra;
+                }
+            }
+        }
+
+        return array_values($configExtras);
     }
 
     /**
@@ -278,5 +339,28 @@ trait FormContextTrait
         }
 
         return $entities;
+    }
+
+    private function processConfigExtra(ConfigExtraInterface $extra): ?ConfigExtraInterface
+    {
+        if ($extra instanceof ExpandRelatedEntitiesConfigExtra) {
+            $this->responseConfigExtras[$extra->getName()] = $extra;
+
+            return new ExpandRelatedEntitiesConfigExtra([]);
+        }
+
+        if ($extra instanceof FilterFieldsConfigExtra) {
+            $this->responseConfigExtras[$extra->getName()] = $extra;
+
+            return new FilterFieldsConfigExtra(array_fill_keys(array_keys($extra->getFieldFilters()), null));
+        }
+
+        if ($extra instanceof MetaPropertiesConfigExtra) {
+            $this->responseConfigExtras[$extra->getName()] = $extra;
+
+            return null;
+        }
+
+        return $extra;
     }
 }

@@ -30,9 +30,7 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationManager;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

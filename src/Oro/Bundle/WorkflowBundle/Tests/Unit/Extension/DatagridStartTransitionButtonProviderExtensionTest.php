@@ -40,6 +40,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
     /** @var DatagridStartTransitionButtonProviderExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

@@ -18,6 +18,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
     /** @var Attachment */
     private $attachment;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->part = $this->createMock(Part::class);

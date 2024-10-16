@@ -21,6 +21,7 @@ class LocaleConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->nameFormatConfigProvider = $this->createMock(NameFormatConfigurationProvider::class);

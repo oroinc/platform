@@ -27,9 +27,7 @@ class OroEntityManager extends EntityManager
     /** @var int|null */
     private $defaultQueryCacheLifetime = false;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function create($conn, Configuration $config, EventManager $eventManager = null)
     {
         if (!$config->getMetadataDriverImpl()) {
@@ -88,9 +86,7 @@ class OroEntityManager extends EntityManager
         $this->getMetadataFactory()->setReflectionService($reflectionService);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close()
     {
         $evm = $this->getEventManager();
@@ -101,9 +97,7 @@ class OroEntityManager extends EntityManager
         parent::close();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createQuery($dql = '')
     {
         $query = parent::createQuery($dql);
@@ -144,11 +138,7 @@ class OroEntityManager extends EntityManager
         $property->setValue($object, $metadataFactory);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Throws additional event "preClear".
-     */
+    #[\Override]
     public function clear($entityName = null): void
     {
         $this->getEventManager()->dispatchEvent(Events::preClear, new PreClearEventArgs($this, $entityName));

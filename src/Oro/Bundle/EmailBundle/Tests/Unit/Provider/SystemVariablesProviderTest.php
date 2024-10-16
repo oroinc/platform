@@ -18,6 +18,7 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SystemVariablesProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

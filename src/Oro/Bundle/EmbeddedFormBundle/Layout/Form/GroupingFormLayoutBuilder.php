@@ -16,9 +16,7 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
     /** @var array */
     protected $defaultGroupName;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeState(
         FormAccessorInterface $formAccessor,
         BlockBuilderInterface $builder,
@@ -41,9 +39,7 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function clearState()
     {
         parent::clearState();
@@ -52,18 +48,14 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
         $this->defaultGroupName = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doBuild()
     {
         parent::doBuild();
         $this->addGroups();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addField($fieldPath, $id, $parentId = null)
     {
         $groupName = $this->findGroupName($fieldPath);

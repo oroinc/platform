@@ -74,6 +74,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     }
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -184,6 +185,7 @@ HELP
         parent::configure();
     }
 
+    #[\Override]
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $event = new ConsoleEvent($this, $input, $output);
@@ -191,6 +193,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;

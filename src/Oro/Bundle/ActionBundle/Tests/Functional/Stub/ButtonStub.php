@@ -31,25 +31,19 @@ class ButtonStub implements ButtonInterface
         $this->datagridOptions = array_replace(['aria_label' => 'Label'], $datagridOptions);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplate()
     {
         return '@OroActionStub/button.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateData(array $customData = [])
     {
         return [
@@ -58,17 +52,13 @@ class ButtonStub implements ButtonInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getButtonContext()
     {
         return new ButtonContext();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroup()
     {
         return null;
@@ -77,17 +67,19 @@ class ButtonStub implements ButtonInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->buttonOptions['name'];
     }
 
+    #[\Override]
     public function getLabel(): string
     {
         return (string) $this->buttonOptions['label'];
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getAriaLabel(): ?string
     {
         return $this->datagridOptions['aria_label'];
@@ -96,6 +88,7 @@ class ButtonStub implements ButtonInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getIcon()
     {
         return $this->buttonOptions['icon'];
@@ -104,6 +97,7 @@ class ButtonStub implements ButtonInterface
     /**
      * @return string|null
      */
+    #[\Override]
     public function getTranslationDomain()
     {
         return $this->buttonOptions['translationDomain'];

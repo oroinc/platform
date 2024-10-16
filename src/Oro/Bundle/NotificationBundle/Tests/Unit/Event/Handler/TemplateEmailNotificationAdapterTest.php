@@ -35,6 +35,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateEmailNotificationAdapter */
     private $adapter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new EmailHolderStub();

@@ -25,6 +25,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
     private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $pictureSourcesProvider;
     private AttachmentProvider $attachmentProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

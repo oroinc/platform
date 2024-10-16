@@ -18,9 +18,7 @@ class ChainTransactionWatcher implements TransactionWatcherInterface
         $this->watchers = $watchers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onTransactionStarted()
     {
         foreach ($this->watchers as $watcher) {
@@ -28,9 +26,7 @@ class ChainTransactionWatcher implements TransactionWatcherInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onTransactionCommitted()
     {
         foreach ($this->watchers as $watcher) {
@@ -38,9 +34,7 @@ class ChainTransactionWatcher implements TransactionWatcherInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onTransactionRolledback()
     {
         foreach ($this->watchers as $watcher) {

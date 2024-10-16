@@ -12,9 +12,7 @@ class GroupRangeApplicableChecker implements ApplicableCheckerInterface, Process
     private ?string $action = null;
     private ?array $groups = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setProcessorBag(ProcessorBagInterface $processorBag): void
     {
         $this->processorBag = $processorBag;
@@ -23,9 +21,9 @@ class GroupRangeApplicableChecker implements ApplicableCheckerInterface, Process
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         if (null === $this->processorBag

@@ -7,8 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumNameValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -18,12 +18,14 @@ class UniqueEnumNameValidatorTest extends ConstraintValidatorTestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new UniqueEnumNameValidator($this->configManager);
@@ -100,7 +102,7 @@ class UniqueEnumNameValidatorTest extends ConstraintValidatorTestCase
         $fieldConfigs2 = [$fieldConfig21];
 
         $enumValueConfig = new Config(new EntityConfigId('extend', 'Test\EnumValue'));
-        $enumValueConfig->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
+        $enumValueConfig->set('inherit', EnumOptionInterface::class);
         $enumValueEnumConfig = new Config(new EntityConfigId('enum', 'Test\EnumValue'));
         $enumValueEnumConfig->set('code', 'existing_enum');
 

@@ -27,9 +27,7 @@ class ReminderExtension extends AbstractTypeExtension implements ServiceSubscrib
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -37,9 +35,7 @@ class ReminderExtension extends AbstractTypeExtension implements ServiceSubscrib
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit'], -128);

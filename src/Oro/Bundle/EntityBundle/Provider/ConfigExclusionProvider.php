@@ -23,17 +23,13 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredEntity($className)
     {
         return $this->getMatcher()->isEntityMatched($className);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         return $this->getMatcher()->isFieldMatched(
@@ -43,9 +39,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         return $this->getMatcher()->isFieldMatched($metadata->name, $associationName);

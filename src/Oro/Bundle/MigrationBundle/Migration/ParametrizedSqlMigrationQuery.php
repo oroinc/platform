@@ -37,9 +37,7 @@ class ParametrizedSqlMigrationQuery extends ParametrizedMigrationQuery
         $this->queries[] = [$query, $params, $types];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -48,9 +46,7 @@ class ParametrizedSqlMigrationQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->processQueries($logger);

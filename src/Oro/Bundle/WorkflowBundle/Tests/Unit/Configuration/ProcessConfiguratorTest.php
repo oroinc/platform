@@ -29,6 +29,7 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessConfigurator */
     private $processConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

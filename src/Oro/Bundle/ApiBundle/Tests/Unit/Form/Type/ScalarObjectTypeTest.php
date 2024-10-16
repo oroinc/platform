@@ -19,9 +19,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class ScalarObjectTypeTest extends ApiFormTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

@@ -156,9 +156,7 @@ class Pager extends AbstractPager
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResults($hydrationMode = Query::HYDRATE_OBJECT)
     {
         return $this->executeQuery(
@@ -169,6 +167,7 @@ class Pager extends AbstractPager
         );
     }
 
+    #[\Override]
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
@@ -177,9 +176,6 @@ class Pager extends AbstractPager
         return $vars;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function init()
     {
         $this->resetIterator();
@@ -295,9 +291,7 @@ class Pager extends AbstractPager
         $this->aclPermission = $permission;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function retrieveObject($offset)
     {
         $queryForRetrieve = clone $this->getQueryBuilder();

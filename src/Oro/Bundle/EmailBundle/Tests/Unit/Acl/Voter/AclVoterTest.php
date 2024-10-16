@@ -17,6 +17,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
     /** @var AclVoter */
     private $voter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerVoter = $this->createMock(AclVoterInterface::class);

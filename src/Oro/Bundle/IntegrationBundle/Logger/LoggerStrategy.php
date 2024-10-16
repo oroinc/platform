@@ -25,73 +25,55 @@ class LoggerStrategy implements LoggerInterface
         $this->setLogger($logger ?: new NullLogger());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function emergency($message, array $context = [])
     {
         $this->logger->emergency($this->buildMessage($message), $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function alert($message, array $context = [])
     {
         $this->logger->alert($this->buildMessage($message), $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function critical($message, array $context = [])
     {
         $this->logger->critical($this->buildMessage($message), $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function error($message, array $context = [])
     {
         $this->logger->error($this->buildMessage($message), $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warning($message, array $context = [])
     {
         $this->logger->warning($this->buildMessage($message), $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function notice($message, array $context = [])
     {
         $this->logger->notice($this->buildMessage($message), $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function info($message, array $context = [])
     {
         $this->logger->info($this->buildMessage($message), $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function debug($message, array $context = [])
     {
         $this->logger->debug($this->buildMessage($message), $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function log($level, $message, array $context = [])
     {
         $this->logger->log($level, $this->buildMessage($message), $context);

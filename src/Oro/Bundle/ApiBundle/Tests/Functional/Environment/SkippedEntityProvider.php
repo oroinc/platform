@@ -15,9 +15,7 @@ class SkippedEntityProvider implements SkippedEntityProviderInterface
         $this->innerProvider = $innerProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSkippedEntity(string $entityClass, string $action): bool
     {
         if (isset($this->skippedEntities[$entityClass])) {

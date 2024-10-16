@@ -39,17 +39,13 @@ class ConditionalReverseTransformer implements DataTransformerInterface
         $this->condition       = $condition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return $this->baseTransformer->transform($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!call_user_func($this->condition, $value)) {

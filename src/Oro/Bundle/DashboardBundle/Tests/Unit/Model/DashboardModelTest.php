@@ -30,6 +30,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
     /** @var DashboardModel */
     private $dashboardModel;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dashboardEntity = $this->createMock(Dashboard::class);

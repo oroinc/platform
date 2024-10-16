@@ -20,6 +20,7 @@ class ApiResolvedFormTypeFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ApiResolvedFormTypeFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultFactory = $this->createMock(ResolvedFormTypeFactoryInterface::class);

@@ -24,6 +24,7 @@ class FormTypeTest extends TypeTestCase
     /** @var FormType */
     private $form;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->subscriber = $this->getMockBuilder(ConfigSubscriber::class)
@@ -40,9 +41,7 @@ class FormTypeTest extends TypeTestCase
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

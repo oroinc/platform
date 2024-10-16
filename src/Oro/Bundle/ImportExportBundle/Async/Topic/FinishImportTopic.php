@@ -12,16 +12,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class FinishImportTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.importexport.finish_import_topic';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Sends an event that signals the completion of the import.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

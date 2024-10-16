@@ -17,6 +17,7 @@ class DeleteMaterializedViewMessageProcessorTest extends \PHPUnit\Framework\Test
     /** @var DeleteMaterializedViewMessageProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->materializedViewManager = $this->createMock(MaterializedViewManager::class);

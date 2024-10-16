@@ -10,9 +10,7 @@ use Oro\Component\Duplicator\Filter\Filter;
  */
 class DateTimeFilter implements Filter
 {
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function apply($object, $property, $objectCopier): void
     {
         $reflectionProperty = ReflectionHelper::getProperty($object, $property);

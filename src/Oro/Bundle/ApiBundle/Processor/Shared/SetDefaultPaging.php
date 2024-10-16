@@ -25,9 +25,7 @@ class SetDefaultPaging implements ProcessorInterface
         $this->defaultPageSize = $defaultPageSize;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

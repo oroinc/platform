@@ -36,6 +36,7 @@ class EmailModelSenderTest extends TestCase
 
     private EmailModelSender $emailModelSender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mailer = $this->createMock(MailerInterface::class);

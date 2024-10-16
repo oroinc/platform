@@ -76,6 +76,7 @@ final class WebsocketServerCommand extends Command
         $this->serverRegistry = $serverRegistry;
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -90,6 +91,7 @@ final class WebsocketServerCommand extends Command
             ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port of the websocket server');
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var string $name */
@@ -113,6 +115,7 @@ final class WebsocketServerCommand extends Command
         return 0;
     }
 
+    #[\Override]
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestArgumentValuesFor('name') && null !== $this->serverRegistry) {

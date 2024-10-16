@@ -21,9 +21,7 @@ class WebpStrategyExtension extends AbstractExtension implements ServiceSubscrib
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions(): array
     {
         return [
@@ -39,6 +37,7 @@ class WebpStrategyExtension extends AbstractExtension implements ServiceSubscrib
         return $this->container->get(WebpConfiguration::class)->isEnabledIfSupported();
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

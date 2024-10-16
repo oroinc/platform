@@ -11,6 +11,7 @@ class UserSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var UserSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new UserSelectType();

@@ -19,6 +19,7 @@ class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
     /** @var ValueRenderEvent */
     private $target;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadata = $this->createMock(MetadataInterface::class);

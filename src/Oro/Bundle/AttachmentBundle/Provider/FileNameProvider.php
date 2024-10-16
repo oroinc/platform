@@ -24,9 +24,7 @@ class FileNameProvider implements FileNameProviderInterface
         $this->filenameExtensionHelper = $filenameExtensionHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFileName(File $file): string
     {
         return (string) $file->getFilename();
@@ -35,8 +33,8 @@ class FileNameProvider implements FileNameProviderInterface
     /**
      * Uses format taken from LiipImagine filter config if it is not specified explicitly.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getFilteredImageName(File $file, string $filterName, string $format = ''): string
     {
         if (!$format) {
@@ -49,6 +47,7 @@ class FileNameProvider implements FileNameProviderInterface
         return $this->getNameWithFormat($file, $format);
     }
 
+    #[\Override]
     public function getResizedImageName(File $file, int $width, int $height, string $format = ''): string
     {
         return $this->getNameWithFormat($file, $format);

@@ -14,9 +14,7 @@ class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
 {
     const NAME = 'oro_type_widget_user_select';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -41,6 +39,7 @@ class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
      *
      * @return array
      */
+    #[\Override]
     protected function getEntitiesByIdentifiers($entityClass, array $ids)
     {
         $ids = array_filter($ids);
@@ -68,17 +67,13 @@ class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

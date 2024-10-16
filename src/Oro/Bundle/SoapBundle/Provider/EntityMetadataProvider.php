@@ -24,9 +24,7 @@ class EntityMetadataProvider implements MetadataProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadataFor($object)
     {
         $metadata = [];

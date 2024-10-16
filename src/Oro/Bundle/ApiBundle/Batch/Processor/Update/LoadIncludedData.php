@@ -26,9 +26,7 @@ class LoadIncludedData implements ProcessorInterface
         $this->includeMapManager = $includeMapManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

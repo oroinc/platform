@@ -18,9 +18,7 @@ abstract class AssociationFilter extends ComparisonFilter implements
     private RequestType $requestType;
     private ValueNormalizer $valueNormalizer;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setRequestType(RequestType $requestType): void
     {
         $this->requestType = $requestType;
@@ -31,9 +29,7 @@ abstract class AssociationFilter extends ComparisonFilter implements
         $this->valueNormalizer = $valueNormalizer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFilterValueName(): string
     {
         return 'type';
@@ -44,9 +40,7 @@ abstract class AssociationFilter extends ComparisonFilter implements
         return $this->requestType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function searchFilterKeys(array $filterValues): array
     {
         $result = [];

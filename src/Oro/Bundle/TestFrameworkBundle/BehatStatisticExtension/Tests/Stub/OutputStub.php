@@ -16,9 +16,7 @@ class OutputStub extends Output
      */
     private $output = '';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doWrite($message, $newline)
     {
         $this->messages[] = $message;

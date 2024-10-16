@@ -26,6 +26,7 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var AclRoleHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $queryCacheProvider = $this->createMock(DoctrineAclCacheProvider::class);

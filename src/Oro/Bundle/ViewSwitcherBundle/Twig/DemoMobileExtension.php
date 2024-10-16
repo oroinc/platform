@@ -25,9 +25,7 @@ class DemoMobileExtension extends AbstractExtension implements ServiceSubscriber
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -60,9 +58,7 @@ class DemoMobileExtension extends AbstractExtension implements ServiceSubscriber
         return !$this->isMobile();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

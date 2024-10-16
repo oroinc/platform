@@ -7,11 +7,7 @@ namespace Oro\Bundle\CacheBundle\Provider;
  */
 class NullMemoryCacheProvider implements MemoryCacheProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * Calls given callback and returns value without caching.
-     */
+    #[\Override]
     public function get($cacheKeyArguments, ?callable $callback = null)
     {
         if (is_callable($callback)) {
@@ -21,9 +17,7 @@ class NullMemoryCacheProvider implements MemoryCacheProviderInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reset(): void
     {
     }

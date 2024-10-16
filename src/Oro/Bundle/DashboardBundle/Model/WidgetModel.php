@@ -43,6 +43,7 @@ class WidgetModel implements EntityModelInterface
     /**
      * @return Widget
      */
+    #[\Override]
     public function getEntity()
     {
         return $this->entity;

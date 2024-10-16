@@ -14,6 +14,7 @@ class ExtendedRelationsCascadeTest extends WebTestCase
     private const ENTITY1 = 'Extend\Entity\TestEntity3';
     private const ENTITY2 = 'Extend\Entity\TestEntity4';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

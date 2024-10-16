@@ -11,9 +11,7 @@ class AttributeFamilyGroupsValidator extends ConstraintValidator
 {
     const ALIAS = 'oro_entity_config.validator.attribute_family_groups';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$value instanceof AttributeFamily) {

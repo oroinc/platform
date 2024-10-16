@@ -11,6 +11,7 @@ class GetContextTest extends \PHPUnit\Framework\TestCase
 {
     private GetContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new GetContext(

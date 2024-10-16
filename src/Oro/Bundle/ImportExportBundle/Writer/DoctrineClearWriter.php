@@ -26,6 +26,7 @@ class DoctrineClearWriter implements ItemWriterInterface, StepExecutionAwareInte
         $this->context = $contextRegistry;
     }
 
+    #[\Override]
     public function write(array $items): void
     {
         if (!$this->getContext()?->getValue(self::SKIP_CLEAR)) {
@@ -33,6 +34,7 @@ class DoctrineClearWriter implements ItemWriterInterface, StepExecutionAwareInte
         }
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution): void
     {
         $this->stepExecution = $stepExecution;

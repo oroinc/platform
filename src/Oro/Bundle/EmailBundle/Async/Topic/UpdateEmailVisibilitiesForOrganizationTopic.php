@@ -11,16 +11,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateEmailVisibilitiesForOrganizationTopic extends AbstractTopic implements JobAwareTopicInterface
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.update_email_visibilities_for_organization';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Update visibilities for emails for organization';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -28,6 +31,7 @@ class UpdateEmailVisibilitiesForOrganizationTopic extends AbstractTopic implemen
             ->addAllowedTypes('organizationId', 'int');
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         $organizationId = $messageBody['organizationId'];

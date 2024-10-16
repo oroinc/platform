@@ -19,17 +19,13 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
     public const TRANSLATOR_USERNAME = 'translator';
     public const TRANSLATOR_EMAIL = 'translator@example.com';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadTranslationRoles::class, LoadBusinessUnit::class, LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $userManager = $this->container->get('oro_user.manager');

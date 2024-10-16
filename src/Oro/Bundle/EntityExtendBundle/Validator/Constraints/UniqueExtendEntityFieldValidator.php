@@ -12,9 +12,7 @@ class UniqueExtendEntityFieldValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_field';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         $this->assertValidatingValue($value);

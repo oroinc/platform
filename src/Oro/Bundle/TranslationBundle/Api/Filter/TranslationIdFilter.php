@@ -14,9 +14,7 @@ use Oro\Bundle\TranslationBundle\Api\TranslationIdUtil;
  */
 class TranslationIdFilter extends AbstractCompositeIdentifierFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildEqualExpression(array $value): Expression
     {
         [$translationKeyId, $languageCode] = $value;
@@ -27,9 +25,7 @@ class TranslationIdFilter extends AbstractCompositeIdentifierFilter
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildNotEqualExpression(array $value): Expression
     {
         [$translationKeyId, $languageCode] = $value;
@@ -40,9 +36,7 @@ class TranslationIdFilter extends AbstractCompositeIdentifierFilter
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function parseIdentifier(mixed $value): mixed
     {
         $translationKeyId = TranslationIdUtil::extractTranslationKeyId($value);

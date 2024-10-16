@@ -18,9 +18,7 @@ class CleanupSubscriber implements EventSubscriberInterface
         'folders',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

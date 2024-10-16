@@ -10,9 +10,7 @@ class FormatterProviderPass implements CompilerPassInterface
     const SERVICE_ID = 'oro_importexport.formatter.formatter_provider';
     const TAG_NAME   = 'oro_importexport.formatter.formatter';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::SERVICE_ID)) {

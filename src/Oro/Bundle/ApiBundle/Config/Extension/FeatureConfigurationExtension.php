@@ -32,9 +32,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
         $this->resourceDescription = $resourceDescription;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function extendConfigurationTree(NodeBuilder $node): void
     {
         $node
@@ -54,9 +52,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
             ->end();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfiguration(array $configuration): array
     {
         $this->configProvider->startBuild();
@@ -68,9 +64,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
         return $configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function completeConfiguration(array $configuration): array
     {
         foreach ($configuration as $feature => $featureConfig) {
@@ -86,9 +80,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
         return $configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clearConfigurationCache(): void
     {
         $this->configProvider->clear();

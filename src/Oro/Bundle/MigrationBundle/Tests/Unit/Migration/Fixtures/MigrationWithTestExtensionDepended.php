@@ -14,6 +14,7 @@ class MigrationWithTestExtensionDepended implements
 {
     protected $testExtensionDepended;
 
+    #[\Override]
     public function setTestExtensionDepended(
         TestExtensionDepended $testExtensionDepended
     ) {
@@ -25,6 +26,7 @@ class MigrationWithTestExtensionDepended implements
         return $this->testExtensionDepended;
     }
 
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
     }

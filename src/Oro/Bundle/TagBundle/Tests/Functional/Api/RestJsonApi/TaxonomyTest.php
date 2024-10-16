@@ -11,6 +11,7 @@ use Oro\Bundle\TagBundle\Entity\Taxonomy;
  */
 class TaxonomyTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

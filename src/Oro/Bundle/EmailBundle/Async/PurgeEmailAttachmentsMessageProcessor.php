@@ -58,9 +58,7 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $size = $this->getSize($message->getBody());
@@ -98,9 +96,7 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [PurgeEmailAttachmentsTopic::getName()];

@@ -13,6 +13,7 @@ class ProcessorsPassTest extends \PHPUnit\Framework\TestCase
     /** @var CompilerPassInterface */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ProcessorsPass();

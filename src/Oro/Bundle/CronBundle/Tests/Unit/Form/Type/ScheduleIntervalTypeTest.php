@@ -11,9 +11,7 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class ScheduleIntervalTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

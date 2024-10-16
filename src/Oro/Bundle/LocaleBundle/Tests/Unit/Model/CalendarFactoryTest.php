@@ -14,6 +14,7 @@ class CalendarFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var CalendarFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

@@ -20,63 +20,47 @@ class EntityFieldTestExtension implements EntityFieldExtensionInterface
         $this->expectations[$objectClass][$name][] = $expectation;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get(EntityFieldProcessTransport $transport): void
     {
         $this->processExpectations($transport);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function set(EntityFieldProcessTransport $transport): void
     {
         $this->processExpectations($transport);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function call(EntityFieldProcessTransport $transport): void
     {
         $this->processExpectations($transport);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isset(EntityFieldProcessTransport $transport): void
     {
         $this->processExpectations($transport);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function propertyExists(EntityFieldProcessTransport $transport): void
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function methodExists(EntityFieldProcessTransport $transport): void
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMethods(EntityFieldProcessTransport $transport): array
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMethodInfo(EntityFieldProcessTransport $transport): void
     {
     }

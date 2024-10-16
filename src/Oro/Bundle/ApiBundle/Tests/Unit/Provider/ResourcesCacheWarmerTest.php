@@ -20,6 +20,7 @@ class ResourcesCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /** @var ResourcesCacheWarmer */
     private $cacheWarmer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resourcesProvider = $this->createMock(ResourcesProvider::class);

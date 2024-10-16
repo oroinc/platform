@@ -18,9 +18,7 @@ class UpdateSummaryErrorCounter implements ProcessorInterface
         $this->retryHelper = $retryHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

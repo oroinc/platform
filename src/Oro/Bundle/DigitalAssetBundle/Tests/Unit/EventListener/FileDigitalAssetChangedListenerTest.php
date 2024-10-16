@@ -30,6 +30,7 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
     /** @var File|\PHPUnit\Framework\MockObject\MockObject */
     private $file;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileReflector = $this->createMock(FileReflector::class);

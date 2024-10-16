@@ -24,6 +24,7 @@ class RenameEntityConfigFieldQuery extends ParametrizedMigrationQuery
         $this->newFieldName = $newFieldName;
     }
 
+    #[\Override]
     public function getDescription(): array
     {
         $logger = new ArrayLogger();
@@ -32,6 +33,7 @@ class RenameEntityConfigFieldQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $this->doExecute($logger);

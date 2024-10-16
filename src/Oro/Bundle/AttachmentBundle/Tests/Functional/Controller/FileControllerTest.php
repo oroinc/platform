@@ -13,6 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class FileControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
@@ -20,6 +21,7 @@ class FileControllerTest extends WebTestCase
         $this->loadFixtures([LoadFileData::class, LoadImageData::class]);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->client->enableReboot();

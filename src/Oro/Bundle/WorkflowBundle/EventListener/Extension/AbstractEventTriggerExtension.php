@@ -22,25 +22,19 @@ abstract class AbstractEventTriggerExtension implements EventTriggerExtensionInt
     /** @var array */
     protected $triggers;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setForceQueued($forceQueued = false)
     {
         $this->forceQueued = (bool)$forceQueued;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasTriggers($entity, $event)
     {
         return $this->triggerCache->hasTrigger(ClassUtils::getClass($entity), $event);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear($entityClass = null)
     {
         $this->triggers = null;

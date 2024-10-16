@@ -18,6 +18,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var RouteCollectionAccessor */
     protected $accessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->collection = new EnhancedRouteCollection();

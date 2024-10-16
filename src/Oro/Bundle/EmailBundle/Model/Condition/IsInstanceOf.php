@@ -27,9 +27,7 @@ class IsInstanceOf extends AbstractCondition implements ContextAccessorAwareInte
     /** @var string */
     protected $class;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $object = $this->resolveValue($context, $this->object);
@@ -43,14 +41,13 @@ class IsInstanceOf extends AbstractCondition implements ContextAccessorAwareInte
      *
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return 'instanceof';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (2 !== count($options)) {

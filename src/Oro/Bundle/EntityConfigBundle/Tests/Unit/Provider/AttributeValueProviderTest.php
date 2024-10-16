@@ -26,6 +26,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeValueProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

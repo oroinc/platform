@@ -16,6 +16,7 @@ class JsTranslationGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     private $twig;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);

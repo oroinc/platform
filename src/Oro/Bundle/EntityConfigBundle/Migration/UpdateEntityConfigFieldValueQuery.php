@@ -63,9 +63,7 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
         $this->replaceValue = $replaceValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -84,9 +82,7 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->updateFieldConfig($logger);

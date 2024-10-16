@@ -15,6 +15,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionWidgetHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

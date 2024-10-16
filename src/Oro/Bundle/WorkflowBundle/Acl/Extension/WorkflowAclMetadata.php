@@ -52,49 +52,37 @@ class WorkflowAclMetadata implements ClassSecurityMetadata
         $this->category = $category;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassName()
     {
         return $this->workflowName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return $this->label;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return $this->description;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroup()
     {
         return $this->group;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCategory()
     {
         return $this->category;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFields()
     {
         return $this->transitions;

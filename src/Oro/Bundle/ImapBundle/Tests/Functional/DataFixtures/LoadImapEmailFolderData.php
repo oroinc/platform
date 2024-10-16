@@ -20,9 +20,7 @@ class LoadImapEmailFolderData extends AbstractFixture implements DependentFixtur
     const SENT_IMAP_EMAIL_FOLDER = 'imap_email_folder.sent';
     const OTHER_IMAP_EMAIL_FOLDER = 'imap_email_folder.other';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->loadEmailFolders($manager);
@@ -115,9 +113,7 @@ class LoadImapEmailFolderData extends AbstractFixture implements DependentFixtur
         $this->addReference($referenceName, $emailFolder);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadUserEmailOriginData::class];

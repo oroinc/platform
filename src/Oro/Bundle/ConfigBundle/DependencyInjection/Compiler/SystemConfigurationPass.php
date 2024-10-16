@@ -33,9 +33,7 @@ class SystemConfigurationPass implements CompilerPassInterface
     private const RESOLVED_KEY = 'resolved';
     private const VALUE_KEY = 'value';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $settings = $this->loadSettings($container);

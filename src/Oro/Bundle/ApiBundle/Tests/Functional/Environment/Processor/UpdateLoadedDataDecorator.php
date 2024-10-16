@@ -19,9 +19,7 @@ class UpdateLoadedDataDecorator implements ProcessorInterface
         $this->innerProcessor = $innerProcessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

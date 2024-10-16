@@ -13,6 +13,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TaggableDatagridExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new TaggableDatagridExtension();

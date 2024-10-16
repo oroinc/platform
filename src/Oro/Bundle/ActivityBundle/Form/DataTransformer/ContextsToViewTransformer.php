@@ -48,9 +48,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
         $this->separator = $separator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (!$value) {
@@ -76,9 +74,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

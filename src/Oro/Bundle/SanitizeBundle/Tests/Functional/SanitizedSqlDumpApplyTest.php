@@ -18,6 +18,7 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
 
     private ?Connection $connection = null;
 
+    #[\Override]
     protected function setup(): void
     {
         $this->initClient();

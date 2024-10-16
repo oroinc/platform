@@ -31,9 +31,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $data = $this->parseData($data);

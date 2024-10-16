@@ -10,6 +10,7 @@ class ParameterBagNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ParameterBagNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->normalizer = new ParameterBagNormalizer();

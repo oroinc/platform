@@ -37,9 +37,7 @@ class LoadErrors implements ProcessorInterface
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var GetSubresourceContext $context */

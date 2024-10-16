@@ -8,13 +8,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class UpdatedColumnIndexMigration implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('index_table2');
-        $table->getColumn('key')->setLength(500);
+        $table->getColumn('key')->setLength(1000);
         $table->addIndex(['key'], 'index2');
     }
 }

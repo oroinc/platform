@@ -81,9 +81,7 @@ abstract class AbstractEntityVoter implements VoterInterface
         return $supportsAttributes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function vote(TokenInterface $token, $object, array $attributes): int
     {
         if (!\is_object($object)) {

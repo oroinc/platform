@@ -13,9 +13,7 @@ class GoogleResourceOwnerConfigurationPass implements CompilerPassInterface
 {
     public const FACTORY = 'oro_google_integration.resource_owner.factory';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getExtensionConfig('hwi_oauth') as $config) {

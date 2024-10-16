@@ -32,11 +32,13 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         $this->prefixCacheKey = $prefixCacheKey;
     }
 
+    #[\Override]
     public function isApplicable(string $gridName): bool
     {
         return $this->builder->isApplicable($gridName);
     }
 
+    #[\Override]
     public function getConfiguration(string $gridName): DatagridConfiguration
     {
         return $this->cache->get($this->prefixCacheKey . '.' . $gridName, function () use ($gridName) {
@@ -52,6 +54,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         return $this->isValidConfiguration($gridName);
     }
 
+    #[\Override]
     public function getBuilder(): DatagridConfigurationBuilder
     {
         return $this->builder;
@@ -72,6 +75,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         return $this->builder->getConfiguration();
     }
 
+    #[\Override]
     public function isValidConfiguration(string $gridName): bool
     {
         try {

@@ -13,31 +13,26 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     protected const JSON_MEDIA_TYPE = 'application/json';
     protected const JSON_CONTENT_TYPE = 'application/json';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequestType(): RequestType
     {
         return new RequestType([RequestType::REST]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getResponseContentType(): string
     {
         return self::JSON_CONTENT_TYPE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function request(
         string $method,
         string $uri,

@@ -31,9 +31,7 @@ class FallbackEntityNameProvider implements EntityNameProviderInterface
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         $fieldName = $this->getFieldName(ClassUtils::getClass($entity));
@@ -54,9 +52,7 @@ class FallbackEntityNameProvider implements EntityNameProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         $fieldName = $this->getFieldName($className);

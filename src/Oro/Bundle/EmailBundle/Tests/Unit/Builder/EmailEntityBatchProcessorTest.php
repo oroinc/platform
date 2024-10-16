@@ -35,6 +35,7 @@ class EmailEntityBatchProcessorTest extends TestCase
     /** @var EmailEntityBatchProcessor */
     private $batch;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->ownerProvider = $this->createMock(EmailOwnerProvider::class);

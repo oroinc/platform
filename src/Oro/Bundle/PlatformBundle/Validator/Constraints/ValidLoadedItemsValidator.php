@@ -21,9 +21,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ValidLoadedItemsValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof ValidLoadedItems) {

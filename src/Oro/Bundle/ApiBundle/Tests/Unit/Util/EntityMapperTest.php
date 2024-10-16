@@ -9,15 +9,17 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 class EntityMapperTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
+    /** @var EntityOverrideProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityOverrideProvider;
 
     /** @var EntityMapper */
     private $entityMapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,6 +33,21 @@ class EntityMapperTest extends OrmRelatedTestCase
         );
 
         $this->notManageableClassNames = [UserProfile::class];
+    }
+
+    public function testGetModelForEnumOption()
+    {
+        $entity = new EnumOption('test.1', 'test', 'Item 1', '1');
+        $modelClass = 'Extend\Entity\EV_Test_Enum';
+
+        $this->entityOverrideProvider->expects(self::never())
+            ->method('getSubstituteEntityClass');
+
+        /** @var UserProfile $model */
+        $model = $this->entityMapper->getModel($entity, $modelClass);
+
+        self::assertInstanceOf(EnumOption::class, $model);
+        self::assertEquals($entity->getId(), $model->getId());
     }
 
     public function testGetModelWithEmptyAssociations()

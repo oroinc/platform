@@ -9,11 +9,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TestEntityType extends AbstractType
 {
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('id', TextType::class);
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -26,6 +28,7 @@ class TestEntityType extends AbstractType
     /**
      * @return string
      */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'test_entity';

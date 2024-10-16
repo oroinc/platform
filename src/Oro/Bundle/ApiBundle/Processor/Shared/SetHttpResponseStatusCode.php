@@ -23,9 +23,7 @@ class SetHttpResponseStatusCode implements ProcessorInterface
         $this->defaultSuccessStatusCode = $defaultSuccessStatusCode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

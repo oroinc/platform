@@ -17,6 +17,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MutableAclInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $acl;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->acl = $this->createMock(MutableAclInterface::class);

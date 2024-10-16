@@ -21,7 +21,7 @@ api:
                     max_results: -1 # no limit for the number of configuration options
             actions:
                 get_list:
-                    page_size: -1 # disable paging
+                    disable_paging: true
                     disable_sorting: true
                 create: false
                 update: false

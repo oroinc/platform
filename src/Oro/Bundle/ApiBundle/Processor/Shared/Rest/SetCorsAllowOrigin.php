@@ -20,9 +20,7 @@ class SetCorsAllowOrigin implements ProcessorInterface
         $this->corsSettings = $corsSettings;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

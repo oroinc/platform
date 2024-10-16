@@ -41,9 +41,7 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [UpdateListCreateChunkJobsTopic::getName()];
@@ -57,9 +55,7 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
         $this->batchSize = $batchSize;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);

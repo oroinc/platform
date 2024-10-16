@@ -30,9 +30,7 @@ class FileRemovalManager implements FileRemovalManagerInterface
         $this->mediaCacheManagerRegistry = $mediaCacheManagerRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeFiles(File $file): void
     {
         if ($file->getExternalUrl()) {

@@ -30,9 +30,7 @@ class PasswordComplexityExtension extends AbstractTypeExtension
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $constraints = $this->constraintsProvider->getFormConstraints($form);
@@ -59,8 +57,8 @@ class PasswordComplexityExtension extends AbstractTypeExtension
     /**
      * Returns the name of the type being extended.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [RepeatedType::class];

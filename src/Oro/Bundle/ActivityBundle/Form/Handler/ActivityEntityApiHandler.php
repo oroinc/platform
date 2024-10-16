@@ -32,9 +32,7 @@ class ActivityEntityApiHandler extends ApiFormHandler
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function prepareFormData($entity)
     {
         $relations = new ArrayCollection();
@@ -50,6 +48,7 @@ class ActivityEntityApiHandler extends ApiFormHandler
      *
      * @return mixed|null The instance of saved entity on successful processing; otherwise, null
      */
+    #[\Override]
     public function process($entity)
     {
         $this->checkPermissions($entity);
@@ -57,9 +56,7 @@ class ActivityEntityApiHandler extends ApiFormHandler
         return parent::process($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function onSuccess($entity)
     {
         /** @var ActivityInterface $activity */

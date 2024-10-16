@@ -30,17 +30,13 @@ class Email implements EmailInterface
     #[ConfigField(defaultValues: ['importexport' => ['identity' => true], 'dataaudit' => ['auditable' => true]])]
     protected ?string $email = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmailField()
     {
         return 'email';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmailOwner()
     {
         return $this->getUser();
@@ -51,6 +47,7 @@ class Email implements EmailInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getId()
     {
         return $this->id;
@@ -74,6 +71,7 @@ class Email implements EmailInterface
      *
      * @return string
      */
+    #[\Override]
     public function getEmail()
     {
         return $this->email;
@@ -105,6 +103,7 @@ class Email implements EmailInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string) $this->getEmail();

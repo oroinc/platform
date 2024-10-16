@@ -19,9 +19,7 @@ class HandleTagEntitiesAssociation implements ProcessorInterface
         $this->handler = $handler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

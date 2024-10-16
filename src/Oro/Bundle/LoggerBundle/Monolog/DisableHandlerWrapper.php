@@ -13,26 +13,19 @@ class DisableHandlerWrapper extends HandlerWrapper
 {
     private LogLevelConfig $logLevelConfig;
 
-    /**
-     * {@inheritDoc}
-     */
     public function __construct(LogLevelConfig $config, HandlerInterface $handler)
     {
         parent::__construct($handler);
         $this->logLevelConfig = $config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isHandling(array $record): bool
     {
         return !$this->logLevelConfig->isActive();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleBatch(array $records): void
     {
         if ($this->logLevelConfig->isActive()) {

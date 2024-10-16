@@ -16,9 +16,7 @@ class BlockViewSerializerNormalizersPass implements CompilerPassInterface
     private const TYPE_NAME_CONVERTER_SERVICE_ID = 'oro_layout.block_view_serializer.type_name_converter';
     private const TAG_NAME = 'layout.block_view_serializer.normalizer';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $normalizers = [];

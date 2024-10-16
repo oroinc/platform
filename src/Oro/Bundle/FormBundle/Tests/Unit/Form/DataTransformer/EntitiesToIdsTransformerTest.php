@@ -29,6 +29,7 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

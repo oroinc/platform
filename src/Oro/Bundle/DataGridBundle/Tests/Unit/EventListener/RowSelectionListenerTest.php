@@ -29,6 +29,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
     /** @var RowSelectionListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->event = $this->createMock(BuildAfter::class);

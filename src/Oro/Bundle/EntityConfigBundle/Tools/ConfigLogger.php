@@ -20,9 +20,7 @@ class ConfigLogger extends AbstractLogger
         $this->baseLogger = $baseLogger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function log($level, $message, array $context = [])
     {
         $this->baseLogger->log($level, $message, $context);

@@ -29,6 +29,7 @@ class CopyTaggingTest extends \PHPUnit\Framework\TestCase
     /** @var CopyTaggingToNewEntity */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tagManager = $this->createMock(TagManager::class);

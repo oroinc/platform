@@ -39,9 +39,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
     /** @var JobRunner */
     private $jobRunner;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobProcessor = $this->createMock(JobProcessor::class);

@@ -12,6 +12,7 @@ class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
     /** @var CollectionElementValueExists */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new CollectionElementValueExists();

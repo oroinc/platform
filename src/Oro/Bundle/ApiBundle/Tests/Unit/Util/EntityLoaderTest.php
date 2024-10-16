@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -18,16 +19,21 @@ use Oro\Bundle\ApiBundle\Util\EntityLoader;
 class EntityLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    protected $doctrineHelper;
+
+    /** @var QueryHintResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $queryHintResolver;
 
     /** @var EntityLoader */
     private $entityLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->queryHintResolver = $this->createMock(QueryHintResolverInterface::class);
 
-        $this->entityLoader = new EntityLoader($this->doctrineHelper);
+        $this->entityLoader = new EntityLoader($this->doctrineHelper, $this->queryHintResolver);
     }
 
     public function testFindEntityWithoutMetadata(): void
@@ -46,6 +52,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with($entityClass, $entityId)
             ->willReturn($entity);
+
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
 
         self::assertSame(
             $entity,
@@ -68,6 +77,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with($entityClass, $entityId)
             ->willReturn(null);
+
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
 
         self::assertNull(
             $this->entityLoader->findEntity($entityClass, $entityId, null)
@@ -104,6 +116,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass, $entityId)
             ->willReturn($entity);
 
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
+
         self::assertSame(
             $entity,
             $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
@@ -139,6 +154,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with($entityClass, $entityId)
             ->willReturn($entity);
+
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
 
         self::assertSame(
             $entity,
@@ -192,6 +210,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getOneOrNullResult')
             ->willReturn($entity);
 
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
+
         self::assertSame(
             $entity,
             $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
@@ -242,6 +263,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $query->expects(self::once())
             ->method('getOneOrNullResult')
             ->willReturn(null);
+
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
 
         self::assertNull(
             $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
@@ -295,6 +319,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getOneOrNullResult')
             ->willThrowException(new NonUniqueResultException());
 
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
+
         $this->entityLoader->findEntity($entityClass, $entityId, $metadata);
     }
 
@@ -344,6 +371,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getOneOrNullResult')
             ->willReturn($entity);
 
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
+
         self::assertSame(
             $entity,
             $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
@@ -381,6 +411,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass, $entityId)
             ->willReturn($entity);
 
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
+
         self::assertSame(
             $entity,
             $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
@@ -417,6 +450,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with($entityClass, ['id1' => 1, 'id2' => 2])
             ->willReturn($entity);
+
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
 
         self::assertSame(
             $entity,
@@ -471,6 +507,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getOneOrNullResult')
             ->willReturn($entity);
 
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
+
         self::assertSame(
             $entity,
             $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
@@ -523,6 +562,9 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $query->expects(self::once())
             ->method('getOneOrNullResult')
             ->willReturn($entity);
+
+        $this->queryHintResolver->expects(self::never())
+            ->method('resolveHints');
 
         self::assertSame(
             $entity,

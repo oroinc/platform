@@ -9,12 +9,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class PermissionRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadPermissionData::class]);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->getContainer()->get('oro_security.cache.provider.permission')->clear();

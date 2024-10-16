@@ -13,6 +13,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonSearchContextProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextHelper = $this->createMock(ContextHelper::class);

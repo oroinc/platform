@@ -13,9 +13,7 @@ class DbalTransactionWatcherTest extends \PHPUnit\Framework\TestCase
     /** @var DbalTransactionWatcher */
     private $transactionWatcher;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->bufferedProducer = $this->createMock(BufferedMessageProducer::class);

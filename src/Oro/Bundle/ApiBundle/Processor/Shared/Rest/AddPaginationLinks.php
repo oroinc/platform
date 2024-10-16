@@ -11,9 +11,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class AddPaginationLinks extends AbstractAddPaginationLinks
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

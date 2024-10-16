@@ -11,6 +11,7 @@ class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
     /** @var CollectionCalculator */
     private $collectionCalculator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->collectionCalculator = new CollectionCalculator();

@@ -128,9 +128,7 @@ class EntityPaginationController extends AbstractController
         return new JsonResponse(['url' => $url, 'message' => $message]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

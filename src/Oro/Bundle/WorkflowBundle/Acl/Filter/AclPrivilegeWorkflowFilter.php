@@ -9,9 +9,7 @@ use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
 class AclPrivilegeWorkflowFilter implements AclPrivilegeConfigurableFilterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(AclPrivilege $aclPrivilege, ConfigurablePermission $configurablePermission)
     {
         $workflowName = ObjectIdentityHelper::getClassFromIdentityString($aclPrivilege->getIdentity()->getId());
@@ -25,9 +23,7 @@ class AclPrivilegeWorkflowFilter implements AclPrivilegeConfigurableFilterInterf
         return $aclPrivilege->hasPermissions();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSupported(AclPrivilege $aclPrivileges)
     {
         $identity = $aclPrivileges->getIdentity();

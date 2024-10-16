@@ -30,6 +30,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var MergeListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(TagManager::class);

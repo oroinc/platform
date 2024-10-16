@@ -16,6 +16,7 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
     /** @var RefreshGrid */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new RefreshGrid(new ContextAccessor());

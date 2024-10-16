@@ -13,6 +13,7 @@ class LocalizedValueExtractorTest extends TestCase
 {
     private LocalizedValueExtractor $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = new LocalizedValueExtractor();

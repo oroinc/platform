@@ -15,9 +15,7 @@ class ChainExtension implements ExtensionInterface
         $this->extensions = $extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -25,9 +23,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -35,9 +31,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreReceived(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -45,9 +39,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -55,9 +47,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onIdle(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -65,9 +55,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onInterrupted(Context $context)
     {
         foreach ($this->extensions as $extension) {

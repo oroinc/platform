@@ -20,9 +20,7 @@ class EntityAliasCompilerPass implements CompilerPassInterface
     private const ALIAS_PROVIDER_TAG_NAME = 'oro_entity.alias_provider';
     private const CLASS_PROVIDER_TAG_NAME = 'oro_entity.class_provider';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $classProviders = $this->getProviders($container, self::CLASS_PROVIDER_TAG_NAME);

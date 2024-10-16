@@ -55,9 +55,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->container->get('oro_ui.provider.url_without_front_controller');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -67,9 +65,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -188,9 +184,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
         return $date->diff(new \DateTime('now'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

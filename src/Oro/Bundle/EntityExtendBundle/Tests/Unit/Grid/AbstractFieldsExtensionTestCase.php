@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -45,6 +46,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
 
     abstract protected function getExtension(): AbstractFieldsExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -302,8 +304,10 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'join' => [
                                 'left' => [
                                     [
-                                        'join' => 'c.testField',
+                                        'join' => EnumOption::class,
                                         'alias' => 'auto_rel_1',
+                                        'conditionType' => 'WITH',
+                                        'condition' => "JSON_EXTRACT(order1.serialized_data, 'testField') = auto_rel_1"
                                     ],
                                 ],
                             ],
@@ -380,12 +384,12 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                     'source' => [
                         'query' => [
                             'from' => $from,
-                            'select' => ['c.testFieldSnapshot'],
+                            'select' => ["JSON_EXTRACT(order1.serialized_data, 'testField') = c"],
                         ],
                     ],
                     'columns' => [
                         self::FIELD_NAME => [
-                            'data_name' => 'testFieldSnapshot',
+                            'data_name' => 'testField',
                             'frontend_type' => 'multiEnum',
                             'label' => 'label',
                             'renderable' => true,
@@ -395,14 +399,14 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                     'sorters' => [
                         'columns' => [
                             self::FIELD_NAME => [
-                                'data_name' => 'c.testFieldSnapshot',
+                                'data_name' => "JSON_EXTRACT(order1.serialized_data, 'testField') = c",
                             ],
                         ],
                     ],
                     'filters' => [
                         'columns' => [
                             self::FIELD_NAME => [
-                                'data_name' => 'c.testField',
+                                'data_name' => "JSON_EXTRACT(order1.serialized_data, 'testField') = c",
                                 'type' => 'multiEnum',
                                 'renderable' => true,
                             ],
@@ -410,7 +414,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                     ],
                     'fields_acl' => [
                         'columns' => [
-                            'testFieldSnapshot' => [
+                            'testField' => [
                                 'data_name' => 'c.testField',
                             ],
                         ],

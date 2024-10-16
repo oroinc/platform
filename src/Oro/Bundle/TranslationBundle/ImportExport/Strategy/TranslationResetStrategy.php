@@ -12,8 +12,8 @@ class TranslationResetStrategy extends TranslationImportStrategy
     /**
      * @param Translation $entity
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function beforeProcessEntity($entity)
     {
         if ($entity instanceof Translation) {
@@ -31,9 +31,7 @@ class TranslationResetStrategy extends TranslationImportStrategy
         return parent::beforeProcessEntity($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function findExistingEntity($entity, array $searchContext = [])
     {
         // no need to search entity
@@ -47,8 +45,8 @@ class TranslationResetStrategy extends TranslationImportStrategy
     /**
      * There is no replaced entities during reset
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function updateContextCounters($entity)
     {
         $this->context->incrementAddCount();

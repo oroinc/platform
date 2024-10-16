@@ -5,8 +5,8 @@ namespace Oro\Bundle\UserBundle\Tests\Behat;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitializerInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -18,9 +18,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
 class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void
     {
         /** @var EntityManagerInterface $em */
@@ -63,15 +61,12 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
                 'domain' => 'messages'
             ])
         );
-
-        $className = ExtendHelper::buildEnumValueClassName('auth_status');
-
         /** @var EntityRepository $repository */
-        $repository = $doctrine->getManager()->getRepository($className);
+        $repository = $doctrine->getManager()->getRepository(EnumOption::class);
 
-        /** @var AbstractEnumValue $status */
-        foreach ($repository->findAll() as $status) {
-            $referenceRepository->set('user_auth_status_' . $status->getId(), $status);
+        /** @var EnumOptionInterface $status */
+        foreach ($repository->findBy(['enumCode' => 'auth_status']) as $status) {
+            $referenceRepository->set($status->getId(), $status);
         }
     }
 }

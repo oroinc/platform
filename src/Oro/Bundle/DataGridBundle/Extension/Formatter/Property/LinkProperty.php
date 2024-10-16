@@ -25,9 +25,7 @@ class LinkProperty extends UrlProperty
         $this->twig = $twig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRawValue(ResultRecordInterface $record)
     {
         $label = null;

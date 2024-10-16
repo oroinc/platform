@@ -10,9 +10,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class InitializeTarget extends ExecuteTargetProcessor
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function assertTargetContext(ContextInterface $targetContext): void
     {
         if (!$targetContext->getLastGroup()) {

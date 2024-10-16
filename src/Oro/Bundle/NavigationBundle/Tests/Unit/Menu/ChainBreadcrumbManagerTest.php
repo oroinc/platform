@@ -16,6 +16,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = $this->createMock(MenuFactory::class);

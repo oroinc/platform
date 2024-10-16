@@ -21,6 +21,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
     /** @var CreateAsyncOperation */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -13,9 +13,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class MemberOfComparisonExpression implements ComparisonExpressionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
         string $field,
@@ -28,7 +26,7 @@ class MemberOfComparisonExpression implements ComparisonExpressionInterface
             throw new QueryException(sprintf('The value for "%s" must not be NULL.', $field));
         }
 
-        $subquery = $visitor->createSubquery($field, true);
+        $subquery = $visitor->createSubquery($field, true, $expression !== $field ? $expression : null);
 
         if ($value instanceof Range) {
             $fromParameterName = $parameterName . '_from';

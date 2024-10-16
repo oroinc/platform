@@ -64,9 +64,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
         return $processor->processConfiguration($this, array($configs));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('configuration');

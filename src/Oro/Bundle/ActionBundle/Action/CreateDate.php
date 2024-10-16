@@ -29,6 +29,7 @@ class CreateDate extends AbstractDateAction
      *
      * @return \DateTime
      */
+    #[\Override]
     protected function createDateTime($context)
     {
         $fullDate = new \DateTime($this->getOption($this->options, 'date'), new \DateTimeZone('UTC'));
@@ -36,9 +37,7 @@ class CreateDate extends AbstractDateAction
         return new \DateTime($fullDate->format('Y-m-d'), new \DateTimeZone('UTC'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['date'])) {

@@ -20,9 +20,7 @@ class FeatureResourceDecisionManager implements FeatureResourceDecisionManagerIn
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function decide(string $resource, string $resourceType, object|int|null $scopeIdentifier): bool
     {
         $features = $this->configManager->getFeaturesByResource($resourceType, $resource);

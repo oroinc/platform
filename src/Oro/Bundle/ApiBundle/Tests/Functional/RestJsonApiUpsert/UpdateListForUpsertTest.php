@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiUpdateListTestCase;
  */
 class UpdateListForUpsertTest extends RestJsonApiUpdateListTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

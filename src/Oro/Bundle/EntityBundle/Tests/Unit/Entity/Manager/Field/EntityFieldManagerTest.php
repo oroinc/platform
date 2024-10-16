@@ -40,6 +40,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

@@ -17,9 +17,7 @@ class LoadOptionSetsQuery extends ParametrizedMigrationQuery
         $this->storage = $storage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -29,9 +27,7 @@ class LoadOptionSetsQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $optionSets      = $this->loadOptionSets($logger);

@@ -82,10 +82,10 @@ class ApiDocDescriber implements
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function describe(OA\OpenApi $api, array $options): void
     {
         $groupedItems = [];

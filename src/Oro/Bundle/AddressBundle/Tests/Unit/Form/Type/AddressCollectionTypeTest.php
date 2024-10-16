@@ -10,6 +10,7 @@ class AddressCollectionTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AddressCollectionType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new AddressCollectionType();

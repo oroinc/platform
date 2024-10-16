@@ -24,27 +24,28 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
  */
 class EntityMetadataLoaderTest extends LoaderTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataFactory */
+    /** @var MetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $metadataFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
+    /** @var ObjectMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $objectMetadataFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadataFactory */
+    /** @var EntityMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $entityMetadataFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNestedObjectMetadataFactory */
+    /** @var EntityNestedObjectMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $nestedObjectMetadataFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNestedAssociationMetadataFactory */
+    /** @var EntityNestedAssociationMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $nestedAssociationMetadataFactory;
 
     /** @var EntityMetadataLoader */
     private $entityMetadataLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -1965,5 +1966,58 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
         self::assertFalse($associationMetadata->isInput());
         self::assertTrue($associationMetadata->isOutput());
+    }
+
+    public function testForEntityWithHints()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $config->addHint('HINT_TEST');
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $fieldName = 'testField';
+        $field = $config->addField($fieldName);
+
+        $entityMetadata = new EntityMetadata($entityClass);
+        $entityMetadata->setIdentifierFieldNames([$fieldName]);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([$fieldName]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::once())
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                $fieldName,
+                self::identicalTo($field),
+                $targetAction
+            );
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertEquals([$fieldName], $entityMetadata->getIdentifierFieldNames());
+        self::assertEquals(['HINT_TEST'], $entityMetadata->getHints());
     }
 }

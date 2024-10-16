@@ -13,9 +13,7 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
 {
     use ConnectionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->resolveDuplicates();

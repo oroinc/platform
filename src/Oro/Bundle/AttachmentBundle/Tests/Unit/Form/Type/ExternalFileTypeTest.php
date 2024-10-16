@@ -32,6 +32,7 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
 
     private ExternalFileType $type;
 
+    #[\Override]
     protected function getExtensions(): array
     {
         $this->configFileValidator = $this->createMock(ConfigFileValidator::class);

@@ -16,9 +16,7 @@ class ReportDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
      */
     protected $dateGroupingBuilder;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration()
     {
         $config = parent::getConfiguration();

@@ -162,10 +162,10 @@ class CommandExecutor extends AbstractCommandExecutor
     }
 
     /**
-     * {@inheritDoc}
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function prepareParameters(string $command, array $params): array
     {
         $params = parent::prepareParameters($command, $params);

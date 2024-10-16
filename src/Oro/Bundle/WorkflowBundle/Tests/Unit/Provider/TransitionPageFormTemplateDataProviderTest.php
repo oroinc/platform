@@ -13,6 +13,7 @@ class TransitionPageFormTemplateDataProviderTest extends \PHPUnit\Framework\Test
     /** @var TransitionPageFormTemplateDataProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new TransitionPageFormTemplateDataProvider();

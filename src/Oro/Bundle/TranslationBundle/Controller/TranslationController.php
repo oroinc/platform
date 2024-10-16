@@ -64,9 +64,7 @@ class TranslationController extends BaseController
         return new JsonResponse($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

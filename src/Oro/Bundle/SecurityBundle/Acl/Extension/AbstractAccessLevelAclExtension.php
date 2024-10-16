@@ -48,9 +48,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
         $this->decisionMaker = $decisionMaker;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessLevelNames($object, $permissionName = null)
     {
         return $this->getMetadata($object)->getAccessLevelNames();

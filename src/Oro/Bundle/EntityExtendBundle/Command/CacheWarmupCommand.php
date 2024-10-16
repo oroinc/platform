@@ -18,6 +18,7 @@ class CacheWarmupCommand extends CacheCommand
     protected static $defaultName = 'oro:entity-extend:cache:warmup';
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure()
     {
         $this
@@ -42,6 +43,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Warm up extended entity cache.');

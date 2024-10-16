@@ -16,6 +16,7 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDefinitionValidateListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowAssembler = $this->createMock(WorkflowAssembler::class);

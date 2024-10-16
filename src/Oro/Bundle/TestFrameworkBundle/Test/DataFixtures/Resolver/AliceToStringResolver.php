@@ -24,9 +24,7 @@ class AliceToStringResolver implements ResolverInterface, ReferencesAwareInterfa
         $this->resolver = $resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setReferences(Collection $references): void
     {
         if ($this->resolver instanceof ReferencesAwareInterface) {
@@ -34,9 +32,7 @@ class AliceToStringResolver implements ResolverInterface, ReferencesAwareInterfa
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve($value)
     {
         if (\is_string($value) && \preg_match(self::$regex, $value, $matches)) {

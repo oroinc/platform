@@ -16,6 +16,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);

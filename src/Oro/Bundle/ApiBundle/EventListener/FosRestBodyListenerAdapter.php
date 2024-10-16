@@ -20,9 +20,7 @@ class FosRestBodyListenerAdapter implements BodyListenerInterface
         $this->listener = $listener;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();

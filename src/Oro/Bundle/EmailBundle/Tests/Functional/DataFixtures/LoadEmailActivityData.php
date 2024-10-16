@@ -21,17 +21,13 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserData::class, LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $emailEntityBuilder = $this->getEmailEntityBuilder();

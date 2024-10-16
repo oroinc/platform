@@ -20,6 +20,7 @@ class UpdateBrokenInheritedUris extends AbstractFixture implements ContainerAwar
 {
     use ContainerAwareTrait;
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $repo = $this->getRepository($manager);

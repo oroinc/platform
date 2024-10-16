@@ -18,6 +18,7 @@ class FieldConfigGridListener extends AbstractConfigGridListener
      */
     protected $parameters;
 
+    #[\Override]
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();
@@ -29,15 +30,14 @@ class FieldConfigGridListener extends AbstractConfigGridListener
         }
     }
 
+    #[\Override]
     public function onBuildBefore(BuildBefore $event)
     {
         // false flag used to place dynamic columns to the end of grid
         $this->doBuildBefore($event, 'cfv_', PropertyConfigContainer::TYPE_FIELD, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function prepareQuery(QueryBuilder $query, $rootAlias, $alias, $itemsType)
     {
         $query->setParameter('entity_id', $this->parameters->get(self::ENTITY_PARAM, 0));

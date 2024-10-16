@@ -16,9 +16,7 @@ abstract class AbstractDuplicatorExtension implements DuplicatorExtensionInterfa
      */
     private $context;
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function setContext(\ArrayAccess $context): DuplicatorExtensionInterface
     {
         $this->context = $context;
@@ -26,26 +24,21 @@ abstract class AbstractDuplicatorExtension implements DuplicatorExtensionInterfa
         return $this;
     }
 
+    #[\Override]
     public function getContext(): \ArrayAccess
     {
         return $this->context;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function isSupport(DraftableInterface $source): bool
     {
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     abstract public function getFilter(): Filter;
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     abstract public function getMatcher(): Matcher;
 }

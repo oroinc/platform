@@ -15,9 +15,7 @@ class NotSqlKeyword extends Constraint
 {
     public $message = 'This value should not be the reserved SQL word.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return NotSqlKeywordValidator::ALIAS;

@@ -7,6 +7,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class LoadTest1BundleData extends AbstractFixture
 {
+    #[\Override]
     public function load(ObjectManager $manager)
     {
     }

@@ -16,11 +16,13 @@ class CronCommandTest extends WebTestCase
 {
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->getCronHelperStub()->setCron(null);

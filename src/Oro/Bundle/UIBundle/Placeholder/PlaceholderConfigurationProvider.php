@@ -40,9 +40,7 @@ class PlaceholderConfigurationProvider extends PhpArrayConfigProvider
         return $config[Config::ITEMS_NODE][$itemName] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $placeholders = [];

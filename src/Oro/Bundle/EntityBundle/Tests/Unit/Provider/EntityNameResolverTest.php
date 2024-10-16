@@ -21,6 +21,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
     /** @var EntityNameResolver */
     private $entityNameResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider1 = $this->createMock(EntityNameProviderInterface::class);

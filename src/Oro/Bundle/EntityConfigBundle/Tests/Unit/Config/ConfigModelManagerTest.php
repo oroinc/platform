@@ -44,6 +44,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigModelManager */
     private $configModelManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

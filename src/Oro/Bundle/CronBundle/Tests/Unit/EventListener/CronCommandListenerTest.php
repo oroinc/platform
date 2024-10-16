@@ -19,6 +19,7 @@ class CronCommandListenerTest extends \PHPUnit\Framework\TestCase
     /** @var CronCommandListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->commandFeatureChecker = $this->createMock(CronCommandFeatureCheckerInterface::class);

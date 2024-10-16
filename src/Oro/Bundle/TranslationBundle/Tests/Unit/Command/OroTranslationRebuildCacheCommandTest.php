@@ -21,6 +21,7 @@ class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
     /** @var OroTranslationRebuildCacheCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->rebuildTranslationCacheProcessor = $this->createMock(RebuildTranslationCacheProcessor::class);

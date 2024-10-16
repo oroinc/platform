@@ -20,9 +20,7 @@ class BaseContextInitProcessor implements ProcessorInterface
         $this->workflowManager = $workflowManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var TransitionContext $context */

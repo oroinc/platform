@@ -27,6 +27,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAclMetadataProvider */
     private $workflowAclMetadataProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

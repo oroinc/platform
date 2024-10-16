@@ -18,6 +18,7 @@ class ModeTest extends \PHPUnit\Framework\TestCase
 
     private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(AbstractDriver::class);

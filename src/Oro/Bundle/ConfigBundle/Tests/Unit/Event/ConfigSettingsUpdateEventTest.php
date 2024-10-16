@@ -15,6 +15,7 @@ class ConfigSettingsUpdateEventTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigSettingsUpdateEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

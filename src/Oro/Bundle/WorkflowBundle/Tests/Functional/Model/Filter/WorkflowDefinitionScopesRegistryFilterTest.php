@@ -19,6 +19,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
     /** @var TestActivityScopeProvider */
     private $activityScopeProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -27,6 +28,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
         $this->activityScopeProvider = self::getContainer()->get('oro_workflow.test_activity_scope_provider');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->activityScopeProvider->setCurrentTestActivity(null);

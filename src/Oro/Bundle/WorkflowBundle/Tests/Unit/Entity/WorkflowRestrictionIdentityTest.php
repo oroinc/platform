@@ -13,6 +13,7 @@ class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowRestrictionIdentity */
     private $identity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->identity = new WorkflowRestrictionIdentity();

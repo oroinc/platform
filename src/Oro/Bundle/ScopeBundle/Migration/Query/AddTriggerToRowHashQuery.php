@@ -10,17 +10,13 @@ use Psr\Log\LoggerInterface;
  */
 class AddTriggerToRowHashQuery extends AbstractScopeQuery
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getInfo(): string
     {
         return 'Add row_hash fill trigger to oro_scope';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function doExecute(LoggerInterface $logger, bool $dryRun = false): void
     {
         $this->addTriggers($logger, $dryRun);

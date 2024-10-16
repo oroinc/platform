@@ -35,9 +35,7 @@ class UpdateDataFixturesFixture extends AbstractFixture
         return $this->fixtures;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         if (!$this->fixtures) {

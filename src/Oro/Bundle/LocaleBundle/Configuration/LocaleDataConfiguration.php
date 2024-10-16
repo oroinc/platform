@@ -12,9 +12,7 @@ class LocaleDataConfiguration implements ConfigurationInterface
 {
     public const ROOT_NODE = 'locale_data';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

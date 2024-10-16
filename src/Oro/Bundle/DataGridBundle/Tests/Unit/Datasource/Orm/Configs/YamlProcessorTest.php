@@ -21,6 +21,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var YamlProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

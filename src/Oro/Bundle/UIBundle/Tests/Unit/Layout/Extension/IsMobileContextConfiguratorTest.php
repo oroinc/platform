@@ -19,6 +19,7 @@ class IsMobileContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var IsMobileContextConfigurator */
     private $isMobileContextConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userAgentProvider = $this->createMock(UserAgentProvider::class);

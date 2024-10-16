@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
@@ -32,6 +33,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurableEntityNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
@@ -44,7 +46,13 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
-            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper, $propertyAccessor])
+            ->setConstructorArgs([
+                $fieldProvider,
+                $configProvider,
+                $fieldTypeHelper,
+                $propertyAccessor,
+                $this->createMock(EnumOptionsProvider::class)
+            ])
             ->onlyMethods(['hasConfig', 'getConfigValue', 'getEntityFields', 'getObjectValue'])
             ->getMock();
 
@@ -396,46 +404,69 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testDenormalize(array $data, string $class, array $fields, object $expected): void
     {
-        $context = [];
+        $serializer = $this->createMock(Serializer::class);
+        $this->normalizer->setSerializer($serializer);
+
+        $this->fieldHelper->expects(self::once())
+            ->method('getEntityFields')
+            ->with($class, EntityFieldProvider::OPTION_WITH_RELATIONS)
+            ->willReturn($fields);
+
+        $this->eventDispatcher
+            ->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [self::isInstanceOf(DenormalizeEntityEvent::class), Events::BEFORE_DENORMALIZE_ENTITY],
+                [self::isInstanceOf(DenormalizeEntityEvent::class), Events::AFTER_DENORMALIZE_ENTITY]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new DenormalizeEntityEvent(new $class(), $data),
+                new DenormalizeEntityEvent($expected, $data)
+            );
 
         $denormalizedMap = [];
 
         foreach ($fields as $field) {
-            $fieldName = $field['name'];
-
             if (isset($field['denormalizedValue'])) {
-                $fieldValue = $data[$fieldName];
-                $entityClass = $field['expectedEntityClass'];
-                $context = array_merge($context, ['fieldName' => $fieldName]);
-                if (array_key_exists('type', $field) && in_array($field['type'], ['date', 'datetime', 'time'], true)) {
-                    $context = array_merge($context, ['type' => $field['type']]);
-                }
-                $context['originalFieldName'] = 'collection';
-                $denormalizedMap[] = [$fieldValue, $entityClass, null, $context, $field['denormalizedValue']];
+                $fieldContext = $this->normalizer->prepareFieldContextForDenormalization(
+                    [],
+                    $field['name'],
+                    $class,
+                    $field
+                );
+
+                $denormalizedMap[] = [
+                    $data[$field['name']],
+                    $field['expectedEntityClass'],
+                    null,
+                    $fieldContext,
+                    $field['denormalizedValue']
+                ];
             }
         }
 
-        $serializer = $this->createMock(Serializer::class);
         if ($denormalizedMap) {
             $serializer->expects(self::atLeastOnce())
                 ->method('denormalize')
                 ->willReturnMap($denormalizedMap);
         }
-        $this->normalizer->setSerializer($serializer);
 
-        $this->fieldHelper->expects(self::atLeastOnce())
-            ->method('getEntityFields')
-            ->willReturn($fields);
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            if (isset($data[$fieldName]) && $field['type'] == 'boolean') {
+                if ($data[$fieldName] === 'false') {
+                    $this->fieldHelper->setObjectValue($expected, $fieldName, false);
+                } elseif ($data[$fieldName] === 'true') {
+                    $this->fieldHelper->setObjectValue($expected, $fieldName, true);
+                } else {
+                    $this->fieldHelper->setObjectValue($expected, $fieldName, (bool)$data[$fieldName]);
+                }
+            }
+        }
 
-        $this->eventDispatcher
-            ->expects(self::any())
-            ->method('dispatch')
-            ->withConsecutive(
-                [new DenormalizeEntityEvent(new $class(), $data), Events::BEFORE_DENORMALIZE_ENTITY],
-                [new DenormalizeEntityEvent($expected, $data), Events::AFTER_DENORMALIZE_ENTITY]
-            );
+        $result = $this->normalizer->denormalize($data, $class, null, []);
 
-        self::assertEquals($expected, $this->normalizer->denormalize($data, $class, null, $context));
+        self::assertEquals($expected, $result);
     }
 
     public function denormalizeDataProvider(): array

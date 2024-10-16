@@ -32,6 +32,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ErrorManager */
     private $errorManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

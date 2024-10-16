@@ -17,6 +17,7 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractComparison */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);

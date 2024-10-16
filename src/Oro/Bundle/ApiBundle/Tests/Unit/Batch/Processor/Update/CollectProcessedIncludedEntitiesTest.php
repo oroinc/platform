@@ -39,6 +39,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
     /** @var CollectProcessedIncludedEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

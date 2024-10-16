@@ -24,9 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ServiceContainerRealRefPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('oro_migration.service_container')) {

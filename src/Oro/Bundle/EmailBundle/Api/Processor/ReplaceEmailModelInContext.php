@@ -14,9 +14,7 @@ class ReplaceEmailModelInContext implements ProcessorInterface
 {
     public const EMAIL_MODEL = '_email_model';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

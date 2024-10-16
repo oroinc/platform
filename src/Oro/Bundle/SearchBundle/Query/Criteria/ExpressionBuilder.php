@@ -24,6 +24,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *
      * @return Comparison
      */
+    #[\Override]
     public function startsWith($field, $value)
     {
         return new Comparison($field, Comparison::STARTS_WITH, new Value($value));

@@ -19,6 +19,7 @@ class ThemeExtensionTest extends TestCase
 
     private ThemeExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeRegistry = $this->createMock(ThemeRegistry::class);

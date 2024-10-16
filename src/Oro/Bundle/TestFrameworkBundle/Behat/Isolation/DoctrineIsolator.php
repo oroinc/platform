@@ -72,16 +72,12 @@ class DoctrineIsolator implements IsolatorInterface
         $em->getEventManager()->removeEventListener([Events::preFlush], $restrictListener);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
         $manager = $this->kernel->getContainer()->get('oro_platform.optional_listeners.manager');
@@ -108,9 +104,7 @@ class DoctrineIsolator implements IsolatorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         $this->kernel->getContainer()->get('doctrine')->getManager()->clear();
@@ -118,47 +112,35 @@ class DoctrineIsolator implements IsolatorInterface
         $this->clearAliceIncompleteObjectsState();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function terminate(AfterFinishTestsEvent $event)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function restoreState(RestoreStateEvent $event)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOutdatedState()
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'Doctrine';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTag()
     {
         return 'doctrine';

@@ -15,16 +15,19 @@ class TraversableArrayObject implements \ArrayAccess, \IteratorAggregate, \Count
         $this->array = $array ?: array();
     }
 
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->array);
     }
 
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         return $this->array[$offset];
     }
 
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         if (null === $offset) {
@@ -34,16 +37,19 @@ class TraversableArrayObject implements \ArrayAccess, \IteratorAggregate, \Count
         }
     }
 
+    #[\Override]
     public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
     }
 
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->array);
     }
 
+    #[\Override]
     public function count(): int
     {
         return count($this->array);

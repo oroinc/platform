@@ -36,6 +36,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
     /** @var AuditChangedEntitiesInverseCollectionsChunkProcessor */
     private $chunkProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

@@ -25,6 +25,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
     /** @var AclAccessRule */
     private $accessRule;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);

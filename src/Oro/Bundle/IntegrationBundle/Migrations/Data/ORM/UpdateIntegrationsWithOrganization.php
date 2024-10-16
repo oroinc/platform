@@ -13,17 +13,13 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
  */
 class UpdateIntegrationsWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadAdminUserData::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->update($manager, Channel::class);

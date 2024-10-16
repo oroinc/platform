@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
@@ -24,6 +25,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
 
     private ConfigurationProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->getDoctrine(
@@ -39,7 +41,8 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
             $this->getVirtualRelationProvider(),
             new DoctrineHelper($this->doctrine),
             new DatagridGuesser([]),
-            $this->getEntityNameResolver()
+            $this->getEntityNameResolver(),
+            $this->createMock(EnumTypeHelper::class)
         );
 
         $builder->setConfigManager($this->configManager);

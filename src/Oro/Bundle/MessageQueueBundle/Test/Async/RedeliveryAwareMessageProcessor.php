@@ -16,6 +16,7 @@ class RedeliveryAwareMessageProcessor implements MessageProcessorInterface, Topi
 {
     private static array $processedMessages = [];
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         if ((int)$message->getProperty(RedeliveryMessageExtension::PROPERTY_REDELIVER_COUNT, '0') < 1) {
@@ -35,6 +36,7 @@ class RedeliveryAwareMessageProcessor implements MessageProcessorInterface, Topi
         return MessageProcessorInterface::ACK;
     }
 
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [SampleNormalizableBodyTopic::getName()];

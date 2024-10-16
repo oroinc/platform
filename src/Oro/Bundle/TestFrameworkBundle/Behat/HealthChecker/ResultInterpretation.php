@@ -9,9 +9,7 @@ class ResultInterpretation implements ResultInterpretationInterface, HealthCheck
 {
     use HealthCheckerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFailure(TestResult $result)
     {
         foreach ($this->healthCheckers as $healthChecker) {

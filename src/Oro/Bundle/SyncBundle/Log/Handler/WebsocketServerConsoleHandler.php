@@ -50,6 +50,7 @@ class WebsocketServerConsoleHandler extends HandlerWrapper implements EventSubsc
         return $command && $command->getName() === WebsocketServerCommand::getDefaultName();
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return SymfonyConsoleHandler::getSubscribedEvents();

@@ -40,6 +40,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     /** @var SegmentFilterBuilderType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -52,9 +53,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

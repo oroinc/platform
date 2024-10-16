@@ -9,17 +9,17 @@ use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 class ReaderStub extends AbstractConfigurableStepElement implements ItemReaderInterface, StepExecutionAwareInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function read()
     {
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
     }
 
+    #[\Override]
     public function getConfigurationFields(): array
     {
         return [];

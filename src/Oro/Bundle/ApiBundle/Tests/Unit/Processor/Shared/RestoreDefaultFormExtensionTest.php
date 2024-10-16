@@ -21,6 +21,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
     /** @var RestoreDefaultFormExtension */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

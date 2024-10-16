@@ -9,6 +9,7 @@ class DoctrineTypeMappingExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineTypeMappingExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new DoctrineTypeMappingExtension();

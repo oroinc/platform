@@ -25,6 +25,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var UserProvider */
     private $userProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userLoader = $this->createMock(UserLoaderInterface::class);

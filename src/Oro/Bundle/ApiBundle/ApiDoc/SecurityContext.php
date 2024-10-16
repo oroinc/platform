@@ -25,17 +25,13 @@ class SecurityContext implements SecurityContextInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasSecurityToken(): bool
     {
         return null !== $this->tokenStorage->getToken();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrganizations(): array
     {
         $token = $this->tokenStorage->getToken();
@@ -57,9 +53,7 @@ class SecurityContext implements SecurityContextInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrganization(): ?string
     {
         $token = $this->tokenStorage->getToken();
@@ -75,9 +69,7 @@ class SecurityContext implements SecurityContextInterface
         return (string)$organization->getId();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getUserName(): ?string
     {
         $token = $this->tokenStorage->getToken();
@@ -93,9 +85,7 @@ class SecurityContext implements SecurityContextInterface
         return $user->getUserIdentifier();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getApiKey(): ?string
     {
         $token = $this->tokenStorage->getToken();
@@ -125,9 +115,7 @@ class SecurityContext implements SecurityContextInterface
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getApiKeyGenerationHint(): ?string
     {
         return
@@ -136,9 +124,7 @@ class SecurityContext implements SecurityContextInterface
             . ' After that reload this page.';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCsrfCookieName(): ?string
     {
         if (null === $this->requestStack) {
@@ -155,25 +141,19 @@ class SecurityContext implements SecurityContextInterface
             : CsrfRequestManager::CSRF_TOKEN_ID;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSwitchOrganizationRoute(): ?string
     {
         return 'oro_security_switch_organization';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLoginRoute(): ?string
     {
         return 'oro_user_security_login';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLogoutRoute(): ?string
     {
         return 'oro_user_security_logout';

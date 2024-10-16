@@ -24,9 +24,7 @@ class NormalizeEntityId implements ProcessorInterface
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext $context */

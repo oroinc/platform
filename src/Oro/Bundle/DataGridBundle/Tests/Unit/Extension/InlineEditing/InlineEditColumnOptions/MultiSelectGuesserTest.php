@@ -19,6 +19,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var MultiSelectGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

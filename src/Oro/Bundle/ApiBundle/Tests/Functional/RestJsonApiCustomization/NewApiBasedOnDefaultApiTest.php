@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiCustomization;
 
-use Extend\Entity\EV_Api_Enum1 as TestEnum;
 use Extend\Entity\TestApiE1 as TestCustomEntity;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
@@ -13,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class NewApiBasedOnDefaultApiTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -24,9 +24,7 @@ class NewApiBasedOnDefaultApiTest extends RestJsonApiTestCase
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequestType(): RequestType
     {
         $requestType = parent::getRequestType();
@@ -35,9 +33,7 @@ class NewApiBasedOnDefaultApiTest extends RestJsonApiTestCase
         return $requestType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function request(
         string $method,
         string $uri,
@@ -73,16 +69,16 @@ class NewApiBasedOnDefaultApiTest extends RestJsonApiTestCase
 
     public function testEnum()
     {
-        $entityType = $this->getEntityType(TestEnum::class);
+        $entityType = $this->getEntityType('Extend\Entity\EV_Api_Enum1');
         $response = $this->get(
-            ['entity' => $entityType, 'id' => '<toString(@enum1_1->id)>']
+            ['entity' => $entityType, 'id' => '<toString(@enum1_1->internalId)>']
         );
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type' => $entityType,
-                    'id'   => '<toString(@enum1_1->id)>'
+                    'id'   => '<toString(@enum1_1->internalId)>'
                 ]
             ],
             $response

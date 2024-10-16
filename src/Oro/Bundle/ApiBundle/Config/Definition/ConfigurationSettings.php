@@ -16,33 +16,25 @@ class ConfigurationSettings implements ConfigurationSettingsInterface
     /** @var array [section path => callback[], ...] */
     private array $postProcessCallbacks = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtraSections(): array
     {
         return $this->extraSections;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigureCallbacks(string $section): array
     {
         return $this->configureCallbacks[$section] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPreProcessCallbacks(string $section): array
     {
         return $this->preProcessCallbacks[$section] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPostProcessCallbacks(string $section): array
     {
         return $this->postProcessCallbacks[$section] ?? [];

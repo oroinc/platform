@@ -13,9 +13,7 @@ use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
  */
 class SelectedFieldsFromColumnsProvider extends AbstractSelectedFieldsProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getState(DatagridConfiguration $datagridConfiguration, ParameterBag $datagridParameters): array
     {
         $state = parent::getState($datagridConfiguration, $datagridParameters);
@@ -28,9 +26,7 @@ class SelectedFieldsFromColumnsProvider extends AbstractSelectedFieldsProvider
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getConfiguration(DatagridConfiguration $datagridConfiguration): array
     {
         return (array)$datagridConfiguration->offsetGet(Configuration::COLUMNS_KEY);

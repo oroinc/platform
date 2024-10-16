@@ -19,6 +19,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessConfigurationBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = new ProcessConfigurationBuilder();

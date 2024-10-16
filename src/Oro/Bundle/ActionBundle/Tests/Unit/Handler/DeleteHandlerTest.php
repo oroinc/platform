@@ -15,6 +15,7 @@ class DeleteHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var DeleteHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->deleteHandlerRegistry = $this->createMock(EntityDeleteHandlerRegistry::class);

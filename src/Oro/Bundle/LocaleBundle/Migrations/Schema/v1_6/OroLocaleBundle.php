@@ -12,6 +12,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class OroLocaleBundle implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $queries->addPostQuery(new UpdateFallbackExcludedQuery());

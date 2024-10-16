@@ -11,9 +11,7 @@ class ConnectionWithTransactionWatcher extends Connection implements Transaction
     /** @var TransactionWatcherInterface|null */
     private $transactionWatcher;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setTransactionWatcher(TransactionWatcherInterface $transactionWatcher = null)
     {
         $this->transactionWatcher = $transactionWatcher;

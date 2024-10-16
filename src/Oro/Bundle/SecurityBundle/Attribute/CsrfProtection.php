@@ -20,11 +20,13 @@ class CsrfProtection implements ConfigurationInterface
     ) {
     }
 
+    #[\Override]
     public function getAliasName()
     {
         return self::ALIAS_NAME;
     }
 
+    #[\Override]
     public function allowArray()
     {
         return false;

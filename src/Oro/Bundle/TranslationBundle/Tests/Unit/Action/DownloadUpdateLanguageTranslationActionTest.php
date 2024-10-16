@@ -24,6 +24,7 @@ class DownloadUpdateLanguageTranslationActionTest extends \PHPUnit\Framework\Tes
     /** @var DownloadUpdateLanguageTranslationAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationDownloader = $this->createMock(TranslationDownloader::class);

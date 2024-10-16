@@ -42,9 +42,7 @@ class AvailableReferencesController implements Controller
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -56,9 +54,7 @@ class AvailableReferencesController implements Controller
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('available-references')) {

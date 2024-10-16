@@ -6,9 +6,7 @@ class ContainerType extends AbstractType
 {
     const NAME = 'container';
 
-    /**
-    * {@inheritdoc}
-    */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

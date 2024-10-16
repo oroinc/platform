@@ -9,6 +9,7 @@ class GridCacheUtilsTest extends TestCase
 {
     private GridCacheUtils $gridCacheUtils;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->gridCacheUtils = new GridCacheUtils('/tmp');

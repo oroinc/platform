@@ -14,6 +14,7 @@ class CurrentThemeProviderTest extends TestCase
     private Request|MockObject $requestStack;
     private CurrentThemeProvider $currentThemeProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

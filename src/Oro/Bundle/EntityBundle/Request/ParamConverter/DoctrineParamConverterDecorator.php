@@ -23,9 +23,7 @@ class DoctrineParamConverterDecorator implements ParamConverterInterface
         $this->paramConverter = $paramConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function apply(Request $request, ParamConverter $configuration)
     {
         try {
@@ -35,9 +33,7 @@ class DoctrineParamConverterDecorator implements ParamConverterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(ParamConverter $configuration)
     {
         return $this->paramConverter->supports($configuration);

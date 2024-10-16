@@ -55,9 +55,7 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
         return $this->container->get(TranslatorInterface::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -68,9 +66,7 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -148,9 +144,7 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
         return $this->getFieldValueRenderer()->renderEntityLabel($entity, $metadata);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

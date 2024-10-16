@@ -39,9 +39,7 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
         throw new UnexpectedTypeException($value, 'array', 'value');
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function add($value)
     {
         if ($prepared = $this->prepareValueType($value)) {
@@ -49,9 +47,7 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
         }
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function remove($value)
     {
         if (!($prepared = $this->prepareValueType($value))) {
@@ -64,9 +60,7 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
         }));
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function replace($oldValues, $newValue)
     {
         if (!$this->prepareValueType($oldValues) || !$this->prepareValueType($newValue)) {
@@ -85,9 +79,7 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
         }
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function get()
     {
         return $this->values;

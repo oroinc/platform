@@ -32,17 +32,13 @@ class AliceReferenceResolver implements ResolverInterface, ReferencesAwareInterf
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setReferences(Collection $references)
     {
         $this->references = $references;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve($value)
     {
         if (!\is_string($value) || !\preg_match(self::$regex, $value, $matches)) {

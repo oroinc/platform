@@ -25,6 +25,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /** @var RestDocumentBuilder */
     private $documentBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST]);
@@ -162,7 +163,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                 'id'         => 123,
                 'name'       => 'Name',
                 'meta1'      => 'Meta1',
-                'category'   => 456,
+                'category'   => 'Test\Category::456',
                 'group'      => null,
                 'role'       => 789,
                 'categories' => [456, 457],
@@ -218,9 +219,9 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                     'id'         => 123,
                     'name'       => 'Name',
                     'meta1'      => 'Meta1',
-                    'category'   => 456,
+                    'category'   => 'Test\Category::456',
                     'group'      => null,
-                    'role'       => 789,
+                    'role'       => 'Test\Role::789',
                     'categories' => [456, 457],
                     'groups'     => [],
                     'products'   => [],
@@ -942,7 +943,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'name'       => 'Name',
                 'meta1'      => 'Meta1',
-                'category'   => 456,
+                'category'   => 'Test\Category::456',
                 'categories' => [456, 457]
             ],
             $this->documentBuilder->getDocument()
@@ -1093,10 +1094,10 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 [
                     'id'    => 1,
-                    'role'  => ['name' => 'Role1', 'users' => [211, 212]],
+                    'role'  => ['name' => 'Role1', 'users' => ['Test\User::211', 'Test\User::212']],
                     'roles' => [
-                        ['name' => 'Role1', 'users' => [211, 212]],
-                        ['name' => 'Role2', 'users' => [213, 214]]
+                        ['name' => 'Role1', 'users' => ['Test\User::211', 'Test\User::212']],
+                        ['name' => 'Role2', 'users' => ['Test\User::213', 'Test\User::214']]
                     ]
                 ]
             ],
@@ -1133,10 +1134,10 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         self::assertEquals(
             [
                 'id'    => 1,
-                'role'  => ['name' => 'Role1', 'users' => [211, 212]],
+                'role'  => ['name' => 'Role1', 'users' => ['Test\User::211', 'Test\User::212']],
                 'roles' => [
-                    ['name' => 'Role1', 'users' => [211, 212]],
-                    ['name' => 'Role2', 'users' => [213, 214]]
+                    ['name' => 'Role1', 'users' => ['Test\User::211', 'Test\User::212']],
+                    ['name' => 'Role2', 'users' => ['Test\User::213', 'Test\User::214']]
                 ]
             ],
             $this->documentBuilder->getDocument()

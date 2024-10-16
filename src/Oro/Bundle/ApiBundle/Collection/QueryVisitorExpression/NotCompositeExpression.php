@@ -9,9 +9,7 @@ use Doctrine\ORM\Query\Expr;
  */
 class NotCompositeExpression implements CompositeExpressionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(array $expressions): mixed
     {
         return new Expr\Func('NOT', $expressions);

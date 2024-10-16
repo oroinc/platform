@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -55,9 +56,7 @@ class LoadFromConfigBag implements ProcessorInterface
         $this->mergeSubresourceConfigHelper = $mergeSubresourceConfigHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
@@ -98,9 +97,9 @@ class LoadFromConfigBag implements ProcessorInterface
         }
         if ($isInherit) {
             $configs = [$config];
-            $parentClass = (new \ReflectionClass($entityClass))->getParentClass();
+            $parentClass = ExtendHelper::getParentClassName($entityClass);
             while ($parentClass) {
-                $config = $this->getConfig($parentClass->getName(), $version, $requestType);
+                $config = $this->getConfig($parentClass, $version, $requestType);
                 if (false === $config) {
                     break;
                 }
@@ -111,7 +110,7 @@ class LoadFromConfigBag implements ProcessorInterface
                         break;
                     }
                 }
-                $parentClass = $parentClass->getParentClass();
+                $parentClass = ExtendHelper::getParentClassName($parentClass);
             }
             if (\count($configs) === 1) {
                 $config = $configs[0];

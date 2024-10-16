@@ -41,9 +41,7 @@ class EmailCaseInsensitiveOptionValidator extends ConstraintValidator
         $this->datagridRouteHelper = $datagridRouteHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof EmailCaseInsensitiveOption) {

@@ -17,6 +17,7 @@ class MenuUpdateTreeHandlerTest extends TestCase
 
     private MenuUpdateTreeHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new MenuFactory();

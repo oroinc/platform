@@ -15,6 +15,7 @@ class ErrorLogNotificationRecipientsProviderTest extends \PHPUnit\Framework\Test
 
     private ErrorLogNotificationRecipientsProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

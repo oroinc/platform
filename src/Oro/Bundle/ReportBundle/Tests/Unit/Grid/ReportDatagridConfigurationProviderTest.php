@@ -15,6 +15,7 @@ use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
@@ -41,6 +42,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
 
     private ReportDatagridConfigurationBuilder $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->functionProvider = $this->createMock(FunctionProviderInterface::class);
@@ -57,7 +59,8 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             $virtualRelationProvider,
             new DoctrineHelper($this->doctrine),
             new DatagridGuesser([]),
-            $entityNameResolver
+            $entityNameResolver,
+            $this->createMock(EnumTypeHelper::class)
         );
 
         $dateGroupingBuilder = $this->createMock(DatagridDateGroupingBuilder::class);

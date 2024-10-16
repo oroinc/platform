@@ -1,0 +1,3 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder:
+    test_order:
+        po_number: TestPONumber

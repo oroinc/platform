@@ -54,25 +54,19 @@ class EmailThreadActivityContextController extends RestController
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getManager(): EmailThreadActivityContextApiEntityManager
     {
         return $this->container->get('oro_email.manager.email_thread_activity_context.api');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFormHandler(): ApiFormHandler
     {
         throw new \BadMethodCallException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDeleteHandler(): DeleteHandler
     {
         return $this->container->get('oro_email.delete_handler.email_thread');

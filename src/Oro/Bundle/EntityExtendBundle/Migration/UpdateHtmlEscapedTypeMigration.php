@@ -31,9 +31,7 @@ class UpdateHtmlEscapedTypeMigration implements Migration
         $this->htmlEscapedFields = $htmlEscapedFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         foreach ($this->htmlEscapedFields as $htmlEscapedField) {

@@ -11,9 +11,7 @@ class ImportAction extends AbstractImportExportAction
         'importProcessor',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getType()
     {
         return self::TYPE_IMPORT;

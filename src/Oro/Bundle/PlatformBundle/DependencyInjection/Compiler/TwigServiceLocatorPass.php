@@ -15,9 +15,7 @@ use Twig\Extension\ExtensionInterface;
  */
 class TwigServiceLocatorPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('oro_platform.twig.service_locator')) {

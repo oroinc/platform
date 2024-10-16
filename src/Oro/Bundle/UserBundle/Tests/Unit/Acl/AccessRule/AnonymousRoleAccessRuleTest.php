@@ -13,6 +13,7 @@ class AnonymousRoleAccessRuleTest extends \PHPUnit\Framework\TestCase
 {
     private AnonymousRoleAccessRule $accessRule;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->accessRule = new AnonymousRoleAccessRule();

@@ -20,6 +20,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
 
     private const TABLE_NAME = 'message_queue';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -27,6 +28,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         $this->ensureTableExists(self::TABLE_NAME);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->dropTable(self::TABLE_NAME);

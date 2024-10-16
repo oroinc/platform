@@ -17,10 +17,10 @@ abstract class AbstractAclManager implements AclSidInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws InvalidAclManagerException
      */
+    #[\Override]
     public function getSid($identity)
     {
         if ($this->baseAclManager instanceof AclSidInterface) {

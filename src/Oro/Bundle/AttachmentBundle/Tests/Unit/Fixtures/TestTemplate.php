@@ -7,33 +7,25 @@ use Twig\Template;
 
 class TestTemplate extends Template
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateName()
     {
         return 'test';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doDisplay(array $context, array $blocks = array())
     {
         echo 'test';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDebugInfo()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSourceContext()
     {
         return new Source('test', 'test');

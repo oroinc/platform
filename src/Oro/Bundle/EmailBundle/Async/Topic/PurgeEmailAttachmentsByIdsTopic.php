@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PurgeEmailAttachmentsByIdsTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.purge_email_attachments_by_ids';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Purge email attachments by ids';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

@@ -16,6 +16,7 @@ class SearchEngineFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ServiceLocator|\PHPUnit\Framework\MockObject\MockObject */
     private $locator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->engineParametersBag = $this->createMock(EngineParameters::class);

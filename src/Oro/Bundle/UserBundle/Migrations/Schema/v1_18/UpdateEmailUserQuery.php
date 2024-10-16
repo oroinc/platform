@@ -14,9 +14,7 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateEmailUserQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -28,9 +26,7 @@ class UpdateEmailUserQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->updateOrigin($logger);

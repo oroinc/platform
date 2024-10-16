@@ -25,9 +25,7 @@ class UpdateEmailAssociationsMessageProcessor implements MessageProcessorInterfa
         $this->jobRunner = $jobRunner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $result = $this->jobRunner->runUniqueByMessage(
@@ -42,9 +40,7 @@ class UpdateEmailAssociationsMessageProcessor implements MessageProcessorInterfa
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [UpdateEmailAssociationsTopic::getName()];

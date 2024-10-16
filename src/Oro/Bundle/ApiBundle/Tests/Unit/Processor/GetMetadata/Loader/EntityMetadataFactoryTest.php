@@ -19,6 +19,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
     /** @var EntityMetadataFactory */
     private $entityMetadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadataFactory = $this->createMock(MetadataFactory::class);

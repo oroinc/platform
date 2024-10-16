@@ -16,6 +16,7 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
     private $applicationState;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

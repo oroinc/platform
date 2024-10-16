@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
  */
 class LoadTitleMetaPropertyForCollection extends LoadTitleMetaProperty
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function updateData(array $data, string $entityClass, EntityDefinitionConfig $config): array
     {
         return $this->addTitles($data, $entityClass, $config);

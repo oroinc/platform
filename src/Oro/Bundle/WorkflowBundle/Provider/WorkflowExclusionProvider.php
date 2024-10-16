@@ -10,9 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\AbstractExclusionProvider;
  */
 class WorkflowExclusionProvider extends AbstractExclusionProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         return in_array(

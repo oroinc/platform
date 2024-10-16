@@ -9,6 +9,7 @@ use Knp\Menu\ItemInterface;
  */
 class DividerBuilder implements BuilderInterface
 {
+    #[\Override]
     public function build(ItemInterface $menu, array $options = [], $alias = null): void
     {
         $this->applyRecursively($menu);

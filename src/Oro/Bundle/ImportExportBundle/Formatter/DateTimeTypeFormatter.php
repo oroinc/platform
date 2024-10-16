@@ -11,9 +11,7 @@ class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterIn
     const TYPE_DATE     = 'date';
     const TYPE_TIME     = 'time';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatType($value, $type)
     {
         switch ($type) {

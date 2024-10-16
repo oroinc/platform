@@ -34,9 +34,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         $this->normalizers = $normalizers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function normalize(
         $data,
         string $format = null,
@@ -74,9 +72,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = []): mixed
     {
         if (!$this->normalizers) {
@@ -105,9 +101,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         try {
@@ -119,9 +113,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         try {

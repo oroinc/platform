@@ -48,9 +48,7 @@ class DateGroupingFilter extends ChoiceFilter
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'select';
@@ -58,9 +56,7 @@ class DateGroupingFilter extends ChoiceFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $data = $this->parseData($data);
@@ -216,9 +212,7 @@ class DateGroupingFilter extends ChoiceFilter
         $qb->addSelect(sprintf('CONCAT(%s) as %s', $select, $columnName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseValue(array $data)
     {
         if (!isset($data['value']) || !$data['value']) {

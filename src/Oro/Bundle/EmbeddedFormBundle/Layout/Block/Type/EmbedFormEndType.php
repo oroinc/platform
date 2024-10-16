@@ -17,27 +17,21 @@ class EmbedFormEndType extends AbstractFormType
 
     const SHORT_NAME = 'end';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
         $resolver->setDefaults(['render_rest' => false]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['render_rest']);
         parent::buildView($view, $block, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
@@ -45,9 +39,7 @@ class EmbedFormEndType extends AbstractFormType
         $view->vars['form'] = $formAccessor->getView();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

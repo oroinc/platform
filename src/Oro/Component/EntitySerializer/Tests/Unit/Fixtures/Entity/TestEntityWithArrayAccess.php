@@ -18,17 +18,13 @@ class TestEntityWithArrayAccess implements \ArrayAccess
         $this->typedAttribute = $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return \array_key_exists($offset, $this->attributes);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         if (!\array_key_exists($offset, $this->attributes)) {
@@ -38,17 +34,13 @@ class TestEntityWithArrayAccess implements \ArrayAccess
         return $this->attributes[$offset];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         $this->attributes[$offset] = $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         unset($this->attributes[$offset]);

@@ -19,6 +19,7 @@ class Executor extends JobExecutor
      * @param JobInstance $jobInstance
      * @return JobResult
      */
+    #[\Override]
     protected function doJob(JobInstance $jobInstance, JobExecution $jobExecution)
     {
         $jobResult = new JobResult();

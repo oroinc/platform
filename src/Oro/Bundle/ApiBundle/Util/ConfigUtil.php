@@ -65,6 +65,9 @@ class ConfigUtil extends BaseConfigUtil
     /** the default page size */
     public const PAGE_SIZE = 'page_size';
 
+    /** a flag indicates whether a paging is disabled */
+    public const DISABLE_PAGING = 'disable_paging';
+
     /** a flag indicates whether a sorting is disabled */
     public const DISABLE_SORTING = 'disable_sorting';
 
@@ -79,6 +82,9 @@ class ConfigUtil extends BaseConfigUtil
 
     /** the names of additional meta properties a requesting of that are disabled */
     public const DISABLED_META_PROPERTIES = 'disabled_meta_properties';
+
+    /** a flag indicates whether possibility using validate operation */
+    public const ENABLE_VALIDATION = 'enable_validation';
 
     /** the form type that should be used for the entity */
     public const FORM_TYPE = 'form_type';

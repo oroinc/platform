@@ -14,9 +14,7 @@ class MySqlUseIndexOutputResultModifier extends AbstractOutputResultModifier
      */
     public const HINT_USE_INDEX = 'oro.use_index';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkFromClause($fromClause, string $result)
     {
         if ($this->getConnection()->getDatabasePlatform() instanceof MySqlPlatform) {

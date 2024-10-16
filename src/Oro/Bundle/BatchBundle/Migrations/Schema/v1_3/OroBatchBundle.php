@@ -10,9 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
 class OroBatchBundle implements Migration
 {
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->deleteJobExecutions($queries);

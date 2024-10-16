@@ -26,6 +26,7 @@ class AddHateoasLinksTest extends GetProcessorTestCase
     /** @var AddHateoasLinks */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -12,16 +12,19 @@ use Symfony\Component\Validator\Validation;
  */
 class SendEmailNotificationTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.notification.send_notification_email';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Email notification to be sent';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $emailIsValidCallable = Validation::createIsValidCallable(new EmailConstraint());

@@ -34,6 +34,7 @@ class EmailTemplateEntityProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailTemplateEntityProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);

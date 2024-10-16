@@ -23,6 +23,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 
     private EmailHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

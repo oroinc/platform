@@ -23,6 +23,7 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
     /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldProvider;
 
+    #[\Override]
     protected function createValidator(): QueryDefinitionValidator
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);

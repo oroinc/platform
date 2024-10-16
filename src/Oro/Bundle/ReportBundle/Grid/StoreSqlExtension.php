@@ -30,9 +30,7 @@ class StoreSqlExtension extends AbstractExtension
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -43,29 +41,19 @@ class StoreSqlExtension extends AbstractExtension
             && $this->authorizationChecker->isGranted('oro_report_view_sql');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $data->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['ororeport/js/view-sql-query-builder']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $config->offsetAddToArray(MetadataObject::OPTIONS_KEY, [self::STORE_SQL => true]);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Gets stored SQL and parameters prepared by
-     * Oro\Bundle\DataGridBundle\EventListener\StoreSqlListener
-     * and puts them into metadata of ResultsObject
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $value = $config->offsetGetByPath(self::STORED_SQL_PATH);

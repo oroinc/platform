@@ -11,9 +11,7 @@ class UserAuthenticationFields extends Constraint
 {
     public string $message = 'oro.user.message.invalid_username';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

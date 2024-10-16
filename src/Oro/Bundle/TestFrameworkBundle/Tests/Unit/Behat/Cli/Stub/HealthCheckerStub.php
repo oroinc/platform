@@ -23,9 +23,7 @@ class HealthCheckerStub implements HealthCheckerInterface
         $this->errors = $errors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [
@@ -37,25 +35,19 @@ class HealthCheckerStub implements HealthCheckerInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFailure()
     {
         return !empty($this->errors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getErrors()
     {
         return $this->errors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->name;

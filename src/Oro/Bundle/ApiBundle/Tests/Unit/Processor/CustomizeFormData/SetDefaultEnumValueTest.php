@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\SetDefaultEnumValue;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEntityWithEnum;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -16,8 +16,8 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
 {
     private const ENUM_CODE = 'test_enum';
 
-    /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $enumValueProvider;
+    /** @var EnumOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $enumOptionsProvider;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
@@ -28,15 +28,16 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
     /** @var SetDefaultEnumValue */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->enumValueProvider = $this->createMock(EnumValueProvider::class);
+        $this->enumOptionsProvider = $this->createMock(EnumOptionsProvider::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new SetDefaultEnumValue(
-            $this->enumValueProvider,
+            $this->enumOptionsProvider,
             $this->doctrineHelper,
             PropertyAccess::createPropertyAccessor(),
             'singleEnumField',
@@ -66,8 +67,8 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
     {
         $this->doctrineHelper->expects(self::never())
             ->method('isNewEntity');
-        $this->enumValueProvider->expects(self::never())
-            ->method('getDefaultEnumValueByCode');
+        $this->enumOptionsProvider->expects(self::never())
+            ->method('getDefaultEnumOptionByCode');
 
         $this->context->setForm($this->getForm(false));
         $this->processor->process($this->context);
@@ -81,8 +82,8 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
 
         $this->doctrineHelper->expects(self::never())
             ->method('isNewEntity');
-        $this->enumValueProvider->expects(self::never())
-            ->method('getDefaultEnumValueByCode');
+        $this->enumOptionsProvider->expects(self::never())
+            ->method('getDefaultEnumOptionByCode');
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
@@ -94,8 +95,8 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
             ->method('isNewEntity')
             ->with(self::identicalTo($this->entity))
             ->willReturn(false);
-        $this->enumValueProvider->expects(self::never())
-            ->method('getDefaultEnumValueByCode');
+        $this->enumOptionsProvider->expects(self::never())
+            ->method('getDefaultEnumOptionByCode');
 
         $this->context->setForm($this->getForm());
         $this->processor->process($this->context);
@@ -105,15 +106,15 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
 
     public function testProcessForNewEntityWithValueForEnumField()
     {
-        $value = new TestEnumValue('val1', 'Value 1');
+        $value = new TestEnumValue('test', 'Value 1', 'val1');
         $this->entity->setSingleEnumField($value);
 
         $this->doctrineHelper->expects(self::once())
             ->method('isNewEntity')
             ->with(self::identicalTo($this->entity))
             ->willReturn(true);
-        $this->enumValueProvider->expects(self::never())
-            ->method('getDefaultEnumValueByCode');
+        $this->enumOptionsProvider->expects(self::never())
+            ->method('getDefaultEnumOptionByCode');
 
         $this->context->setForm($this->getForm());
         $this->processor->process($this->context);
@@ -127,8 +128,8 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
             ->method('isNewEntity')
             ->with(self::identicalTo($this->entity))
             ->willReturn(true);
-        $this->enumValueProvider->expects(self::once())
-            ->method('getDefaultEnumValueByCode')
+        $this->enumOptionsProvider->expects(self::once())
+            ->method('getDefaultEnumOptionByCode')
             ->with(self::ENUM_CODE)
             ->willReturn(null);
 
@@ -140,14 +141,14 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
 
     public function testProcessForNewEntityWithoutValueForEnumFieldAndEnumHasDefaultValue()
     {
-        $defaultValue = new TestEnumValue('val1', 'Value 1');
+        $defaultValue = new TestEnumValue('test', 'Value 1', 'val1');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isNewEntity')
             ->with(self::identicalTo($this->entity))
             ->willReturn(true);
-        $this->enumValueProvider->expects(self::once())
-            ->method('getDefaultEnumValueByCode')
+        $this->enumOptionsProvider->expects(self::once())
+            ->method('getDefaultEnumOptionByCode')
             ->with(self::ENUM_CODE)
             ->willReturn($defaultValue);
 

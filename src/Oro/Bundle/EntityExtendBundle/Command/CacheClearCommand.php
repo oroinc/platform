@@ -18,6 +18,7 @@ class CacheClearCommand extends CacheCommand
     protected static $defaultName = 'oro:entity-extend:cache:clear';
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure()
     {
         $this
@@ -40,6 +41,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Clear extended entity cache');

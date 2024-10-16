@@ -11,17 +11,13 @@ class NoTags extends Constraint
      */
     public $message = 'Value should not contain HTML tags.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return get_class($this).'Validator';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;

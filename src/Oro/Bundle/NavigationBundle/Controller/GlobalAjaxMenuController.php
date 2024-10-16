@@ -13,9 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[CsrfProtection()]
 class GlobalAjaxMenuController extends AbstractAjaxMenuController
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function checkAcl(array $context)
     {
         if (!$this->isGranted('oro_config_system')) {
@@ -24,55 +22,43 @@ class GlobalAjaxMenuController extends AbstractAjaxMenuController
         parent::checkAcl($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[Route(path: '/reset/{menuName}', name: 'oro_navigation_global_menu_ajax_reset', methods: ['DELETE'])]
+    #[\Override]
     public function resetAction($menuName, Request $request)
     {
         return parent::resetAction($menuName, $request);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[Route(path: '/create/{menuName}/{parentKey}', name: 'oro_navigation_global_menu_ajax_create', methods: ['POST'])]
+    #[\Override]
     public function createAction(Request $request, $menuName, $parentKey)
     {
         return parent::createAction($request, $menuName, $parentKey);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[Route(path: '/delete/{menuName}/{key}', name: 'oro_navigation_global_menu_ajax_delete', methods: ['DELETE'])]
+    #[\Override]
     public function deleteAction($menuName, $key, Request $request)
     {
         return parent::deleteAction($menuName, $key, $request);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[Route(path: '/show/{menuName}/{key}', name: 'oro_navigation_global_menu_ajax_show', methods: ['PUT'])]
+    #[\Override]
     public function showAction($menuName, $key, Request $request)
     {
         return parent::showAction($menuName, $key, $request);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[Route(path: '/hide/{menuName}/{key}', name: 'oro_navigation_global_menu_ajax_hide', methods: ['PUT'])]
+    #[\Override]
     public function hideAction($menuName, $key, Request $request)
     {
         return parent::hideAction($menuName, $key, $request);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[Route(path: '/move/{menuName}', name: 'oro_navigation_global_menu_ajax_move', methods: ['PUT'])]
+    #[\Override]
     public function moveAction(Request $request, $menuName)
     {
         return parent::moveAction($request, $menuName);

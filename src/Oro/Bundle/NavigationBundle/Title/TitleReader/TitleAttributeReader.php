@@ -23,9 +23,7 @@ class TitleAttributeReader extends PhpArrayConfigProvider implements ReaderInter
         parent::__construct($cacheFile, $debug);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTitle($route)
     {
         $config = $this->doGetConfig();
@@ -33,9 +31,7 @@ class TitleAttributeReader extends PhpArrayConfigProvider implements ReaderInter
         return $config[$route] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $config = [];

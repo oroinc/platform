@@ -16,17 +16,13 @@ class UnsetValue extends AbstractAction
         $this->assignValueAction = $assignValueAction;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function executeAction($context)
     {
         $this->assignValueAction->execute($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!isset($options['attribute']) && isset($options[0])) {
@@ -39,9 +35,7 @@ class UnsetValue extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setCondition(ExpressionInterface $condition)
     {
         $this->assignValueAction->setCondition($condition);

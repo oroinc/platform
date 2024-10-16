@@ -20,9 +20,7 @@ class RenameExtension extends BaseRenameExtension
         $this->extendOptionsManager = $extendOptionsManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function renameTable(Schema $schema, QueryBag $queries, string $oldTableName, string $newTableName): void
     {
         $extendOptions = $this->extendOptionsManager->getExtendOptions();
@@ -55,9 +53,7 @@ class RenameExtension extends BaseRenameExtension
         parent::renameTable($schema, $queries, $oldTableName, $newTableName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function renameColumn(
         Schema $schema,
         QueryBag $queries,

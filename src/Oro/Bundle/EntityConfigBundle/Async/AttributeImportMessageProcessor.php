@@ -21,11 +21,13 @@ class AttributeImportMessageProcessor extends ImportMessageProcessor implements 
         $this->producer = $producer;
     }
 
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [AttributeImportTopic::getName()];
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();

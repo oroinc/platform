@@ -13,6 +13,7 @@ class Organization extends ParentOrganization
         $this->id = $id;
     }
 
+    #[\Override]
     public function getId()
     {
         return $this->id;

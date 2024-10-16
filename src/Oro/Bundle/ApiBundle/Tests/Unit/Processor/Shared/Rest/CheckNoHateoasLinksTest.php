@@ -10,6 +10,7 @@ class CheckNoHateoasLinksTest extends GetListProcessorTestCase
     /** @var CheckNoHateoasLinks */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

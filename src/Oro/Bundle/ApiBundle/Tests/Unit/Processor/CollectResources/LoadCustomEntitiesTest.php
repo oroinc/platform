@@ -18,6 +18,7 @@ class LoadCustomEntitiesTest extends \PHPUnit\Framework\TestCase
     /** @var LoadCustomEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

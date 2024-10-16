@@ -18,26 +18,22 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
         $this->itemKeyBuilder = $itemKeyBuilder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPrimaryItemData(array $item): array
     {
         return $item[JsonApiDoc::DATA];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPrimaryItemData(array &$item, array $data): void
     {
         $item[JsonApiDoc::DATA] = $data;
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function getItemIdentifier(array $item): array
     {
         if (!\array_key_exists(JsonApiDoc::TYPE, $item)) {
@@ -73,9 +69,9 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function getRelationships(array $item): array
     {
         $result = [];
@@ -125,9 +121,9 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function updateRelationships(array &$item, callable $callback): void
     {
         if (empty($item[JsonApiDoc::RELATIONSHIPS])) {

@@ -3,49 +3,57 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Fixture;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\TranslationBundle\Migrations\Data\ORM\LoadLanguageData;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-abstract class AbstractEnumFixture extends AbstractFixture
+/**
+ * Base enum option fixture.
+ */
+abstract class AbstractEnumFixture extends AbstractFixture implements DependentFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    #[\Override]
+    public function load(ObjectManager $manager): void
     {
-        $className = ExtendHelper::buildEnumValueClassName($this->getEnumCode());
-        /** @var EnumValueRepository $enumRepo */
-        $enumRepo = $manager->getRepository($className);
+        /** @var EnumOptionRepository $enumRepo */
+        $enumRepo = $manager->getRepository(EnumOption::class);
 
-        $priority = 1;
+        $priority = $this->getStartPriority();
         foreach ($this->getData() as $id => $name) {
+            if (null !== $enumRepo->getValue(ExtendHelper::buildEnumOptionId($this->getEnumCode(), $id))) {
+                continue;
+            }
             $isDefault = $id === $this->getDefaultValue();
-            $enumOption = $enumRepo->createEnumValue($name, $priority++, $isDefault, $id);
+            $enumOption = $enumRepo->createEnumOption($this->getEnumCode(), $id, $name, $priority++, $isDefault);
+            $enumOption->setLocale(Translator::DEFAULT_LOCALE);
+
             $manager->persist($enumOption);
         }
 
         $manager->flush();
     }
 
-    /**
-     * Returns an id of a default enum value
-     *
-     * @return string|null
-     */
-    protected function getDefaultValue()
+    protected function getDefaultValue(): ?string
     {
         return null;
     }
 
-    /**
-     * Returns an array of possible enum values, where array key is an id and array value is an English translation
-     *
-     * @return array
-     */
-    abstract protected function getData();
+    protected function getStartPriority(): int
+    {
+        return 1;
+    }
 
-    /**
-     * Returns an enum code of an extend entity
-     *
-     * @return string
-     */
-    abstract protected function getEnumCode();
+    abstract protected function getData(): array;
+
+    abstract protected function getEnumCode(): string;
+
+    #[\Override]
+    public function getDependencies(): array
+    {
+        return [LoadLanguageData::class];
+    }
 }

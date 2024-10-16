@@ -12,9 +12,7 @@ use Symfony\Component\Form\FormEvents;
  */
 class AddressIdentifierSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

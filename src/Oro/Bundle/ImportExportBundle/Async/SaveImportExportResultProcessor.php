@@ -35,9 +35,7 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();
@@ -81,6 +79,7 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
         );
     }
 
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [SaveImportExportResultTopic::getName()];

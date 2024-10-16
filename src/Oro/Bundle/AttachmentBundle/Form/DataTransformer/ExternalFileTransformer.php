@@ -30,12 +30,12 @@ class ExternalFileTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @param ExternalFile|null $externalFile
      *
      * @return ExternalFile|null
      */
+    #[\Override]
     public function transform($externalFile): ?ExternalFile
     {
         $this->originalExternalFile = $externalFile;
@@ -50,6 +50,7 @@ class ExternalFileTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException When there are constraint violations.
      */
+    #[\Override]
     public function reverseTransform($externalUrl): ?ExternalFile
     {
         if (!$externalUrl) {

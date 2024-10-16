@@ -16,6 +16,7 @@ class CallMethodTest extends \PHPUnit\Framework\TestCase
     /** @var CallMethod */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new CallMethod(new ContextAccessor());

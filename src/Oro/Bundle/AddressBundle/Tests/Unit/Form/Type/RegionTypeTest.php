@@ -15,6 +15,7 @@ class RegionTypeTest extends \PHPUnit\Framework\TestCase
     /** @var RegionType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new RegionType();

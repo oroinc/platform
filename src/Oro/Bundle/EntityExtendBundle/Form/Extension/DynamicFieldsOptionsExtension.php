@@ -13,9 +13,7 @@ class DynamicFieldsOptionsExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

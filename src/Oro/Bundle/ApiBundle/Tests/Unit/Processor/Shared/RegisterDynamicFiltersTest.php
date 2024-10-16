@@ -41,6 +41,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     /** @var RegisterDynamicFilters */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

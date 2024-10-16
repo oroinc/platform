@@ -11,6 +11,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
      */
     private $query;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->query = new Query();

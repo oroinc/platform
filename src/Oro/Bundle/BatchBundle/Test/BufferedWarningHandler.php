@@ -11,9 +11,7 @@ class BufferedWarningHandler implements StepExecutionWarningHandlerInterface
 {
     private array $warnings = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleWarning($element, $name, $reason, array $reasonParameters, $item): void
     {
         $this->warnings[] = [$element, $name, $reason, $reasonParameters, $item];

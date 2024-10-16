@@ -24,9 +24,7 @@ class ExtendMigrationExtensionManager extends MigrationExtensionManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function configureExtension(object $obj): void
     {
         parent::configureExtension($obj);

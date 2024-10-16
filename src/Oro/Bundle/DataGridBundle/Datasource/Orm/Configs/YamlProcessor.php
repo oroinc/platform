@@ -21,9 +21,9 @@ class YamlProcessor implements ConfigProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function processQuery(array $config)
     {
         if (array_key_exists('query', $config)) {
@@ -72,8 +72,8 @@ class YamlProcessor implements ConfigProcessorInterface
     /**
      * Creates QueryBuilder for count query if configs for count query exist in configs array.
      * Merges
-     * {@inheritdoc}
      */
+    #[\Override]
     public function processCountQuery(array $config)
     {
         if (array_key_exists('count_query', $config) && is_array($config['count_query'])) {

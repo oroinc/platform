@@ -42,12 +42,14 @@ class AttachmentImageContext extends AttachmentContext implements OroPageObjectA
         return $this->getAttachmentManager()->getFilteredImageUrl($attachment, 'avatar_xsmall');
     }
 
+    #[\Override]
     protected function assertResponseSuccess(ResponseInterface $response): void
     {
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         self::assertTrue($this->getAttachmentManager()->isImageType($response->getHeader('Content-Type')[0]));
     }
 
+    #[\Override]
     protected function assertResponseFail(ResponseInterface $response): void
     {
         self::assertContains($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_FORBIDDEN]);

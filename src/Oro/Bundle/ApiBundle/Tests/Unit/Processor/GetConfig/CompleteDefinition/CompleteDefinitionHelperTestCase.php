@@ -18,6 +18,7 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
 
     protected ConfigLoaderFactory $configLoaderFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configLoaderFactory = new ConfigLoaderFactory(new ConfigExtensionRegistry());
@@ -69,6 +70,7 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function () use ($classMetadata) {
                 return ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType;
             });
+        $classMetadata->expects(self::any())->method('getName')->willReturn($className);
 
         return $classMetadata;
     }

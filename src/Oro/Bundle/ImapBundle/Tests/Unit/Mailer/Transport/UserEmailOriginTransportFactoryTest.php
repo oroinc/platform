@@ -22,6 +22,7 @@ class UserEmailOriginTransportFactoryTest extends \PHPUnit\Framework\TestCase
 
     private UserEmailOriginTransportFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transportFactory = new Transport([]);

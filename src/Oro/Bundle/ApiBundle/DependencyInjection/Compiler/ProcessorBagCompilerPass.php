@@ -60,9 +60,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     private const COLLECTION_ATTRIBUTE = 'collection';
     private const EVENT_ATTRIBUTE = 'event';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $groups = [];
@@ -202,18 +200,19 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
                     $item[1] = [self::IDENTIFIER_ONLY_ATTRIBUTE => false] + $item[1];
                 } elseif (null === $item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]) {
                     unset($item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]);
+                    $identifierOnlyProcessors[] = $item;
                 } else {
                     $isIdentifierOnly = $item[1][self::IDENTIFIER_ONLY_ATTRIBUTE];
                     unset($item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]);
-                    $item[1] = [self::IDENTIFIER_ONLY_ATTRIBUTE => $isIdentifierOnly] + $item[1];
+                    if ($isIdentifierOnly) {
+                        $identifierOnlyProcessors[] = $item;
+                    } else {
+                        // add "identifier_only" attribute to the beginning of an attributes array,
+                        // it will give a small performance gain at the runtime
+                        $item[1] = [self::IDENTIFIER_ONLY_ATTRIBUTE => false] + $item[1];
+                    }
                 }
                 $itemProcessors[] = $item;
-                if (\array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])
-                    && $item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]
-                ) {
-                    unset($item[1][self::IDENTIFIER_ONLY_ATTRIBUTE]);
-                    $identifierOnlyProcessors[] = $item;
-                }
             }
         }
 
@@ -238,6 +237,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             CustomizeFormDataContext::EVENT_POST_VALIDATE,
             CustomizeFormDataContext::EVENT_PRE_FLUSH_DATA,
             CustomizeFormDataContext::EVENT_POST_FLUSH_DATA,
+            CustomizeFormDataContext::EVENT_ROLLBACK_VALIDATED_REQUEST,
             CustomizeFormDataContext::EVENT_POST_SAVE_DATA
         ];
         $groupedProcessors = [];

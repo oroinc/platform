@@ -31,8 +31,8 @@ class BehatBundleConfiguration implements ConfigurationInterface
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('oro_behat_extension');

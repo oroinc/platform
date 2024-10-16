@@ -24,9 +24,7 @@ class EmptyDataExtension extends AbstractTypeExtension
         $this->entityInstantiator = $entityInstantiator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $dataClass = $options['data_class'];
@@ -37,9 +35,7 @@ class EmptyDataExtension extends AbstractTypeExtension
         $builder->setEmptyData($emptyData);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];

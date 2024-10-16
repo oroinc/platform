@@ -12,9 +12,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
  */
 class RemoveInfoRecordsForCollection extends RemoveInfoRecords
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processData(array &$data, EntityMetadata $metadata): array
     {
         return $this->processEntities($data, $metadata, '');

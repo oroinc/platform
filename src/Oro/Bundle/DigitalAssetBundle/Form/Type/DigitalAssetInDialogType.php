@@ -18,9 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class DigitalAssetInDialogType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -65,9 +63,7 @@ class DigitalAssetInDialogType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -81,9 +77,7 @@ class DigitalAssetInDialogType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_digital_asset_in_dialog';

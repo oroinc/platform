@@ -30,6 +30,7 @@ class PdoMysql extends BaseDriver
     /**
      * Init additional doctrine functions
      */
+    #[\Override]
     public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
         $ormConfig = $em->getConfiguration();
@@ -64,6 +65,7 @@ class PdoMysql extends BaseDriver
      *
      * @return string
      */
+    #[\Override]
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
         $fieldValue = $searchCondition['fieldValue'];
@@ -391,9 +393,7 @@ class PdoMysql extends BaseDriver
         return $fieldName === Indexer::TEXT_ALL_DATA_FIELD;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
         $connection->executeQuery('SET FOREIGN_KEY_CHECKS=0');
@@ -403,9 +403,7 @@ class PdoMysql extends BaseDriver
         $connection->executeQuery('SET FOREIGN_KEY_CHECKS=1');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
     {
         if ($this->entityManager->getConnection()->isTransactionActive()) {

@@ -4,17 +4,13 @@ namespace Oro\Component\ConfigExpression\Condition;
 
 class Contains extends AbstractComparison
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doCompare($left, $right)
     {
         return stripos($left, $right) !== false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'contains';

@@ -17,6 +17,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMetadataHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

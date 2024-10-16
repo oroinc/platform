@@ -67,6 +67,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     /** @var DigitalAssetManagerExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
@@ -87,9 +88,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $fileType = new FileType($this->createMock(ExternalFileFactory::class));

@@ -11,9 +11,7 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
     /** @var EmailFolderTreeType */
     private $emailFolderTreeType;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailFolderTreeType = new EmailFolderTreeType();

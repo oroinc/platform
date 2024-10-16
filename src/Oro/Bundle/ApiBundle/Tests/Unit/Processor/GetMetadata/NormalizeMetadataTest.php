@@ -32,6 +32,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /** @var NormalizeMetadata */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

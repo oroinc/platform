@@ -32,9 +32,7 @@ class ProgressArtifactsSubscriber implements EventSubscriberInterface
         $this->screenshotGenerator = $screenshotGenerator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

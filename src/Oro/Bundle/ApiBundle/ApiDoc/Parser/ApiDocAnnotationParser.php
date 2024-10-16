@@ -19,9 +19,7 @@ use Nelmio\ApiDocBundle\Parser\ParserInterface;
  */
 class ApiDocAnnotationParser implements ParserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(array $item)
     {
         return
@@ -29,9 +27,7 @@ class ApiDocAnnotationParser implements ParserInterface
             && \is_array($item['fields']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function parse(array $item)
     {
         $result = [];

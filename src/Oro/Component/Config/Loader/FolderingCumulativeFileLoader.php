@@ -60,17 +60,13 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
         $this->initialize();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResource()
     {
         return $this->resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
         $result = [];
@@ -114,9 +110,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
         foreach ($this->fileResourceLoaders as $loader) {
@@ -152,9 +146,9 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Exception
      */
+    #[\Override]
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
         if ($this->fileResourceLoaders === null) {

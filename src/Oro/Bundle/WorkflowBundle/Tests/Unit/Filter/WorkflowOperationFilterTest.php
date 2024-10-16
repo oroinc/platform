@@ -20,6 +20,7 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowOperationFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(WorkflowDefinitionRepository::class);

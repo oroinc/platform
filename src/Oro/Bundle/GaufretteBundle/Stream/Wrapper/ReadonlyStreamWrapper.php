@@ -9,9 +9,7 @@ use Gaufrette\StreamWrapper;
  */
 class ReadonlyStreamWrapper extends StreamWrapper
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function register($scheme = 'gaufrette-readonly')
     {
         static::streamWrapperUnregister($scheme);
@@ -26,9 +24,7 @@ class ReadonlyStreamWrapper extends StreamWrapper
     }
 
     // @codingStandardsIgnoreStart
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function url_stat($path, $flags)
     {
         $stream = $this->createStream($path);
@@ -43,9 +39,7 @@ class ReadonlyStreamWrapper extends StreamWrapper
     // @codingStandardsIgnoreEnd
 
     // @codingStandardsIgnoreStart
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function stream_write($data)
     {
         throw new \LogicException('The Read-only stream does not allow write.');
@@ -53,18 +47,14 @@ class ReadonlyStreamWrapper extends StreamWrapper
     // @codingStandardsIgnoreEnd
 
     // @codingStandardsIgnoreStart
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function stream_flush()
     {
         throw new \LogicException('The Read-only stream does not allow flush.');
     }
     // @codingStandardsIgnoreEnd
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function unlink($path)
     {
         throw new \LogicException('The Read-only stream does not allow unlink.');

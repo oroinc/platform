@@ -26,34 +26,25 @@ class DateRangeType extends AbstractType
         $this->localeSettings = $localeSettings;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->addDateField($builder, 'start', $options);
         $this->addDateField($builder, 'end', $options);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $children = $form->all();
@@ -61,9 +52,7 @@ class DateRangeType extends AbstractType
         $view->vars['value']['end'] = $children['end']->getViewData();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

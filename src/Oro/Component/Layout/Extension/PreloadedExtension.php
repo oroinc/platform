@@ -98,17 +98,13 @@ class PreloadedExtension implements ExtensionInterface
         $this->dataProviders        = $dataProviders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeNames(): array
     {
         return array_keys($this->types);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType($name)
     {
         if (!isset($this->types[$name])) {
@@ -120,17 +116,13 @@ class PreloadedExtension implements ExtensionInterface
         return $this->types[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasType($name)
     {
         return isset($this->types[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeExtensions($name)
     {
         return isset($this->typeExtensions[$name])
@@ -138,17 +130,13 @@ class PreloadedExtension implements ExtensionInterface
             : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasTypeExtensions($name)
     {
         return !empty($this->typeExtensions[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLayoutUpdates(LayoutItemInterface $item)
     {
         $idOrAlias = $item->getAlias() ?: $item->getId();
@@ -158,9 +146,7 @@ class PreloadedExtension implements ExtensionInterface
             : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasLayoutUpdates(LayoutItemInterface $item)
     {
         $idOrAlias = $item->getAlias() ?: $item->getId();
@@ -168,25 +154,19 @@ class PreloadedExtension implements ExtensionInterface
         return !empty($this->layoutUpdates[$idOrAlias]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContextConfigurators()
     {
         return $this->contextConfigurators;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasContextConfigurators()
     {
         return !empty($this->contextConfigurators);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDataProvider($name)
     {
         if (!isset($this->dataProviders[$name])) {
@@ -198,9 +178,7 @@ class PreloadedExtension implements ExtensionInterface
         return $this->dataProviders[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasDataProvider($name)
     {
         return isset($this->dataProviders[$name]);

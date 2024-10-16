@@ -249,10 +249,10 @@ class UserController extends RestController
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function transformEntityField($field, &$value)
     {
         switch ($field) {
@@ -309,9 +309,7 @@ class UserController extends RestController
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getPreparedItem($entity, $resultFields = [])
     {
         $result = parent::getPreparedItem($entity);
@@ -331,6 +329,7 @@ class UserController extends RestController
     /**
      * @return ApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_user.manager.api');
@@ -339,6 +338,7 @@ class UserController extends RestController
     /**
      * @return FormInterface
      */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_user.form.user.api');
@@ -347,6 +347,7 @@ class UserController extends RestController
     /**
      * @return ApiFormHandler
      */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_user.form.handler.user.api');

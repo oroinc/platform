@@ -61,9 +61,7 @@ class JsonFileSplitterListener implements ListenerInterface
         $this->sectionNamesToSplit = $sectionNamesToSplit;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function startDocument(): void
     {
         $this->stack = [];
@@ -73,17 +71,13 @@ class JsonFileSplitterListener implements ListenerInterface
         $this->objectKeys = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function endDocument(): void
     {
         // nothing to do here
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function startObject(): void
     {
         $this->objectLevel++;
@@ -91,9 +85,9 @@ class JsonFileSplitterListener implements ListenerInterface
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function endObject(): void
     {
         $this->endCommon();
@@ -139,25 +133,19 @@ class JsonFileSplitterListener implements ListenerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function startArray(): void
     {
         $this->startCommon();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function endArray(): void
     {
         $this->endCommon();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(string $key): void
     {
         $this->key = $key;
@@ -166,9 +154,7 @@ class JsonFileSplitterListener implements ListenerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function value($value)
     {
         // Retrieve the item that we're currently parsing from the stack.
@@ -183,6 +169,7 @@ class JsonFileSplitterListener implements ListenerInterface
         $this->stack[] = $obj;
     }
 
+    #[\Override]
     public function whitespace(string $whitespace): void
     {
         // nothing to do here

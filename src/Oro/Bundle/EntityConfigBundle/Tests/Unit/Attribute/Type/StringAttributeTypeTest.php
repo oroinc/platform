@@ -8,17 +8,13 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class StringAttributeTypeTest extends AttributeTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         return new StringAttributeType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurationMethodsDataProvider(): array
     {
         return [
@@ -33,7 +29,11 @@ class StringAttributeTypeTest extends AttributeTypeTestCase
         $this->assertSame(
             $string,
             $this->getAttributeType()
-                ->getSearchableValue($this->attribute, new TestEnumValue('id', $string), $this->localization)
+                ->getSearchableValue(
+                    $this->attribute,
+                    new TestEnumValue('test_enum_code', $string, 'id', 1),
+                    $this->localization
+                )
         );
     }
 
@@ -44,7 +44,11 @@ class StringAttributeTypeTest extends AttributeTypeTestCase
         $this->assertSame(
             $string,
             $this->getAttributeType()
-                ->getFilterableValue($this->attribute, new TestEnumValue('id', $string), $this->localization)
+                ->getFilterableValue(
+                    $this->attribute,
+                    new TestEnumValue('test_enum_code', 'test', $string, 1),
+                    $this->localization
+                )
         );
     }
 
@@ -55,7 +59,11 @@ class StringAttributeTypeTest extends AttributeTypeTestCase
         $this->assertSame(
             $string,
             $this->getAttributeType()
-                ->getSortableValue($this->attribute, new TestEnumValue('id', $string), $this->localization)
+                ->getSortableValue(
+                    $this->attribute,
+                    new TestEnumValue('test_enum_code', 'test', $string, 1),
+                    $this->localization
+                )
         );
     }
 }

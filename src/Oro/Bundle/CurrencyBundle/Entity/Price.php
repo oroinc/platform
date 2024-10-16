@@ -53,9 +53,7 @@ class Price implements CurrencyAwareInterface, \JsonSerializable
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return [

@@ -13,13 +13,16 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntitySerializedFieldsBundle\Entity\EntitySerializedFieldsHolder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides detailed information about fields for a specific entity.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class EntityFieldProvider
 {
@@ -66,6 +69,9 @@ class EntityFieldProvider
 
     /** @var VirtualRelationProviderInterface */
     protected $virtualRelationProvider;
+
+    /** @var VirtualFieldProviderInterface */
+    protected $enumVirtualFieldProvider;
 
     /** @var ExclusionProviderInterface */
     protected $exclusionProvider;
@@ -152,6 +158,11 @@ class EntityFieldProvider
     public function setVirtualRelationProvider($virtualRelationProvider)
     {
         $this->virtualRelationProvider = $virtualRelationProvider;
+    }
+
+    public function setEnumVirtualFieldProvider(VirtualFieldProviderInterface $enumVirtualFieldProvider)
+    {
+        $this->enumVirtualFieldProvider = $enumVirtualFieldProvider;
     }
 
     /**
@@ -276,11 +287,32 @@ class EntityFieldProvider
                 );
             }
         }
+
+        $this->addEnumFields($result, $className, $translate);
         $this->sortFields($result);
 
         return $result;
     }
 
+    private function addEnumFields(array &$result, string $className, bool $translate): void
+    {
+        $enumFields = $this->enumVirtualFieldProvider?->getVirtualFields($className) ?? [];
+
+        foreach ($enumFields as $enumField) {
+            $this->addField(
+                $result,
+                $enumField,
+                EntitySerializedFieldsHolder::getFieldType($className, $enumField),
+                $this->getFieldLabel($this->getMetadataFor($className), $enumField),
+                false,
+                $translate,
+            );
+            $enumCode = $this->enumVirtualFieldProvider->getEnumCode($className, $enumField);
+            if (null !== $enumCode) {
+                $result[$enumField]['options']['enum_code'] = $enumCode;
+            }
+        }
+    }
     /**
      * Adds entity fields to $result
      *
@@ -341,7 +373,10 @@ class EntityFieldProvider
                 $fieldConfigId = $fieldConfig->getId();
                 $fieldName = $fieldConfigId->getFieldName();
 
-                $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
+                $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType(
+                    $fieldConfigId->getFieldType(),
+                    $fieldConfig
+                );
                 if ($this->fieldTypeHelper->isRelation($underlyingFieldType)) {
                     // skip because this field is relation
                     return false;
@@ -410,7 +445,10 @@ class EntityFieldProvider
             if (isset($query['select']['related_entity_name']) && $query['select']['related_entity_name']) {
                 $result[$fieldName]['related_entity_name'] = $query['select']['related_entity_name'];
             } elseif (isset($query['select']['filter_by_id']) && $query['select']['filter_by_id']) {
-                $result[$fieldName]['related_entity_name'] = $metadata->getAssociationTargetClass($fieldName);
+                $result[$fieldName]['related_entity_name'] = isset($result[$fieldName]['type'])
+                && ExtendHelper::isEnumerableType($result[$fieldName]['type'])
+                    ? EnumOption::class
+                    : $metadata->getAssociationTargetClass($fieldName);
             }
         }
     }

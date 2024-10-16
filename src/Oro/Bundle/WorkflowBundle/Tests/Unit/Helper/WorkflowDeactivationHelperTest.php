@@ -20,6 +20,7 @@ class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDeactivationHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

@@ -42,9 +42,7 @@ class PopulateIntegrationOwner extends AbstractAction
         $this->defaultOwnerHelper = $defaultOwnerHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $entity = $this->contextAccessor->getValue($context, $this->attribute);
@@ -73,9 +71,7 @@ class PopulateIntegrationOwner extends AbstractAction
         $this->defaultOwnerHelper->populateChannelOwner($entity, $integration);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['attribute'])) {

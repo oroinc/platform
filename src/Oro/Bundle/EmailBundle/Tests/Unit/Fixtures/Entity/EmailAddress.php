@@ -13,6 +13,7 @@ class EmailAddress extends BaseEmailAddress
     /**
      * @return EmailOwnerInterface
      */
+    #[\Override]
     public function getOwner()
     {
         return $this->owner;
@@ -23,6 +24,7 @@ class EmailAddress extends BaseEmailAddress
      *
      * @return $this
      */
+    #[\Override]
     public function setOwner(EmailOwnerInterface $owner = null)
     {
         $this->owner = $owner;

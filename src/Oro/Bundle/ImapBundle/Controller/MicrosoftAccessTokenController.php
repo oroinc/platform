@@ -18,9 +18,7 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
 {
     private const ACCESS_TOKEN_DATA_SESSION_KEY = '_microsoft_access_token_data';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function accessTokenAction(Request $request): Response
     {
         if ($request->isXmlHttpRequest()) {
@@ -30,17 +28,13 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
         return $this->storeResponse($request->getSession(), parent::accessTokenAction($request));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getOAuthProvider(): OAuthProviderInterface
     {
         return $this->container->get(MicrosoftOAuthProvider::class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getAccessTokenScopes(string $state): ?array
     {
         return $this->getOAuthScopeProvider()->getAccessTokenScopes($this->getTokenType($state));
@@ -110,6 +104,7 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
         return new JsonResponse($response);
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

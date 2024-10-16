@@ -19,9 +19,7 @@ class NormalizeEntities implements ProcessorInterface
         $this->objectNormalizer = $objectNormalizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

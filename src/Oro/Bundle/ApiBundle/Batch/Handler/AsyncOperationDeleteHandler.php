@@ -25,17 +25,13 @@ class AsyncOperationDeleteHandler extends AbstractEntityDeleteHandler
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isDeleteGranted($entity): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function deleteWithoutFlush($entity, array $options): void
     {
         /** @var AsyncOperation $entity */

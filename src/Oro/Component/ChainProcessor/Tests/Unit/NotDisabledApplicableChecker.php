@@ -7,9 +7,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 
 class NotDisabledApplicableChecker implements ApplicableCheckerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         $result = self::ABSTAIN;

@@ -15,41 +15,31 @@ class MysqlDatabaseRequirementsProvider extends AbstractDatabaseRequirementsProv
 {
     public const REQUIRED_VERSION = '8.0';
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     protected function getTargetPlatformName(): string
     {
         return DatabasePlatform::MYSQL;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     protected function getTargetPlatformLabel(): string
     {
         return 'MySQL';
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     protected function getRequiredPlatformVersion(): string
     {
         return self::REQUIRED_VERSION;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     protected function getRequiredPrivileges(): array
     {
         return ['INSERT', 'SELECT', 'UPDATE', 'DELETE', 'REFERENCES', 'TRIGGER', 'CREATE', 'DROP'];
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     protected function getGrantedPrivileges(Connection $connection): array
     {
         return DbPrivilegesProvider::getMySqlGrantedPrivileges(

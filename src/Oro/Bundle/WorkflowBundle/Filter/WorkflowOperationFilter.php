@@ -27,9 +27,7 @@ class WorkflowOperationFilter implements OperationRegistryFilterInterface
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(array $operations, OperationFindCriteria $findCriteria)
     {
         $this->loadOperationsToDisable();

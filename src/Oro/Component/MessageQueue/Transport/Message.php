@@ -19,83 +19,67 @@ class Message implements MessageInterface
     /** @var bool */
     private $redelivered = false;
 
+    #[\Override]
     public function setBody(mixed $body): void
     {
         $this->body = $body;
     }
 
+    #[\Override]
     public function getBody(): mixed
     {
         return $this->body;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setProperties(array $properties): void
     {
         $this->properties = $properties;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProperties(): array
     {
         return $this->properties;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProperty(string $name, string $default = ''): string
     {
         return array_key_exists($name, $this->properties) ? $this->properties[$name] : $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setHeaders(array $headers): void
     {
         $this->headers = $headers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHeader(string $name, string $default = ''): string
     {
         return array_key_exists($name, $this->headers) ? $this->headers[$name] : $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isRedelivered(): bool
     {
         return $this->redelivered;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setRedelivered(bool $redelivered): void
     {
         $this->redelivered = $redelivered;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setCorrelationId(string $correlationId): void
     {
         $headers = $this->getHeaders();
@@ -104,17 +88,13 @@ class Message implements MessageInterface
         $this->setHeaders($headers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCorrelationId(): string
     {
         return $this->getHeader('correlation_id');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setMessageId(string $messageId): void
     {
         $headers = $this->getHeaders();
@@ -123,25 +103,19 @@ class Message implements MessageInterface
         $this->setHeaders($headers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMessageId(): string
     {
         return $this->getHeader('message_id');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTimestamp(): int
     {
         return (int)$this->getHeader('timestamp');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setTimestamp(int $timestamp): void
     {
         $headers = $this->getHeaders();
@@ -150,17 +124,13 @@ class Message implements MessageInterface
         $this->setHeaders($headers);
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getPriority(): int
     {
         return (int)$this->getHeader('priority');
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function setPriority(int $priority): void
     {
         $headers = $this->getHeaders();
@@ -169,17 +139,13 @@ class Message implements MessageInterface
         $this->setHeaders($headers);
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getDelay(): int
     {
         return (int)$this->getProperty('delay');
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function setDelay(int $delay): void
     {
         $properties = $this->getProperties();

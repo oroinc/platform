@@ -169,18 +169,14 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
         return $this->storage->getAll();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->clearCache();
         $this->ensureAllAliasesLoaded();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clearCache(): void
     {
         $this->cache->deleteItem(self::CACHE_KEY);

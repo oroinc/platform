@@ -33,9 +33,7 @@ class OrganizationFormExtension extends AbstractTypeExtension
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         //PRE_SUBMIT needed to set correct organization before other form extensions executes their logic

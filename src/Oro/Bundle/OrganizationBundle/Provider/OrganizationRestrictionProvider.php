@@ -21,9 +21,7 @@ class OrganizationRestrictionProvider implements OrganizationRestrictionProvider
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function applyOrganizationRestrictions(
         QueryBuilder $qb,
         ?Organization $organization = null,
@@ -40,9 +38,7 @@ class OrganizationRestrictionProvider implements OrganizationRestrictionProvider
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function applyOrganizationRestrictionsToAccessRuleCriteria(
         Criteria $criteria,
         ?Organization $organization = null,
@@ -61,9 +57,7 @@ class OrganizationRestrictionProvider implements OrganizationRestrictionProvider
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEnabledOrganizationIds(?Organization $organization = null): array|null
     {
         if (null === $organization) {
@@ -77,9 +71,7 @@ class OrganizationRestrictionProvider implements OrganizationRestrictionProvider
         return [$organization->getId()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isEnabledOrganization(Organization $organizationToCheck, ?Organization $organization = null): bool
     {
         if (null === $organization) {

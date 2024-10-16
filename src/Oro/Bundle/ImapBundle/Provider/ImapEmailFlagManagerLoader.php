@@ -37,17 +37,13 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
         $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(EmailOrigin $origin)
     {
         return $origin instanceof UserEmailOrigin;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function select(EmailFolder $folder, OroEntityManager $em)
     {
         /** @var UserEmailOrigin $origin */

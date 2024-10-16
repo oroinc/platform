@@ -21,9 +21,7 @@ class SelectedFieldsProvider implements SelectedFieldsProviderInterface
         $this->selectedFieldsProviders = $selectedFieldsProviders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSelectedFields(
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters

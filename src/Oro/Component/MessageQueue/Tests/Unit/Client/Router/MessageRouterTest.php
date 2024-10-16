@@ -27,6 +27,7 @@ class MessageRouterTest extends \PHPUnit\Framework\TestCase
 
     private TopicInterface|\PHPUnit\Framework\MockObject\MockObject $topic;
 
+    #[\Override]
     protected function setUp(): void
     {
         $driver = $this->createMock(DriverInterface::class);

@@ -24,6 +24,7 @@ class NormalizeSortingTest extends GetListProcessorOrmRelatedTestCase
 {
     private NormalizeSorting $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

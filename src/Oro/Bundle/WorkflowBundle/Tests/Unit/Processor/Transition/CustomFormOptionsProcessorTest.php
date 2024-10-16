@@ -18,6 +18,7 @@ class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var CustomFormOptionsProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formInitListener = $this->createMock(FormInitListener::class);

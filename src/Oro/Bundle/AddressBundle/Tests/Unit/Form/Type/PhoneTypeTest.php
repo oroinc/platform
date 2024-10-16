@@ -13,6 +13,7 @@ class PhoneTypeTest extends \PHPUnit\Framework\TestCase
     /** @var PhoneType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new PhoneType();

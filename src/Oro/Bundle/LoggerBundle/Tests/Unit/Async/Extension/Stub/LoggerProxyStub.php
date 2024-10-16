@@ -10,30 +10,22 @@ use ProxyManager\Proxy\LazyLoadingInterface;
  */
 class LoggerProxyStub extends BufferingLogger implements LazyLoadingInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setProxyInitializer(\Closure $initializer = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProxyInitializer(): ?\Closure
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initializeProxy(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isProxyInitialized(): bool
     {
     }

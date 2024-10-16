@@ -31,17 +31,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(string $gridName): bool
     {
         return $this->builder->isApplicable($gridName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration(string $gridName): DatagridConfiguration
     {
         $id = (int)substr($gridName, \strlen(Segment::GRID_PREFIX));
@@ -69,14 +65,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
         return $this->isValidConfiguration($gridName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBuilder(): DatagridConfigurationBuilder
     {
         return $this->builder;
     }
 
+    #[\Override]
     public function isValidConfiguration(string $gridName): bool
     {
         try {

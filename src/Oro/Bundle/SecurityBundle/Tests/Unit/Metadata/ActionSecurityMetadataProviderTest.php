@@ -16,6 +16,7 @@ class ActionSecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ActionSecurityMetadataProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attributeProvider = $this->createMock(AclAttributeProvider::class);

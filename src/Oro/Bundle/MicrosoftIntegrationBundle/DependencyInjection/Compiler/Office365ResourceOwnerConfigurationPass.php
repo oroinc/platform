@@ -13,6 +13,7 @@ class Office365ResourceOwnerConfigurationPass implements CompilerPassInterface
 {
     public const FACTORY = 'oro_microsoft_integration.resource_owner.factory';
 
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getExtensionConfig('hwi_oauth') as $config) {

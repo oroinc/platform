@@ -16,6 +16,7 @@ class MatcherFactory extends AbstractFactory
     /**
      * @return string
      */
+    #[\Override]
     protected function getSupportedClassName()
     {
         return '\DeepCopy\Matcher\Matcher';

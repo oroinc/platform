@@ -25,6 +25,7 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MenuUpdateProvider */
     private $menuUpdateProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->menuItem = $this->createMock(ItemInterface::class);

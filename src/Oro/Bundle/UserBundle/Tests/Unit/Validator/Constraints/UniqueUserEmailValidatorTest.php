@@ -16,6 +16,7 @@ class UniqueUserEmailValidatorTest extends ConstraintValidatorTestCase
     /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);
@@ -23,6 +24,7 @@ class UniqueUserEmailValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new UniqueUserEmailValidator($this->userManager);

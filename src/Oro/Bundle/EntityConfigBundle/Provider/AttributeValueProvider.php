@@ -30,6 +30,7 @@ class AttributeValueProvider implements AttributeValueProviderInterface
      * @param AttributeFamily $attributeFamily
      * @param string[] $names
      */
+    #[\Override]
     public function removeAttributeValues(AttributeFamily $attributeFamily, array $names): void
     {
         $entityClass = $attributeFamily->getEntityClass();

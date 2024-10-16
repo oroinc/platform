@@ -11,9 +11,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
  */
 class NotificationAlertViewList extends AbstractViewsList
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getViewsList()
     {
         $unresolvedAlertsView = new View(

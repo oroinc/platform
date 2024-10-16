@@ -14,9 +14,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class DropEventTable implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->dropEventTable($schema, $queries);
@@ -50,9 +48,7 @@ class DropEventTable implements Migration, OrderedMigrationInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 2;

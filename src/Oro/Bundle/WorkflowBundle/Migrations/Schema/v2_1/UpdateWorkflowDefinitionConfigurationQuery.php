@@ -159,9 +159,7 @@ class UpdateWorkflowDefinitionConfigurationQuery extends ParametrizedMigrationQu
         'zoom-out' => 'search-minus',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -170,9 +168,7 @@ class UpdateWorkflowDefinitionConfigurationQuery extends ParametrizedMigrationQu
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->migrateConfigs($logger);

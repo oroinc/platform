@@ -10,9 +10,7 @@ use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
  */
 class EmailTemplateEntityChoiceType extends EntityChoiceType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_email_template_entity_choice';

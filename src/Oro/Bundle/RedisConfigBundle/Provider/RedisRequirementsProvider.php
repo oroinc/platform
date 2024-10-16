@@ -27,9 +27,7 @@ class RedisRequirementsProvider extends AbstractRequirementsProvider
         $this->clients = $clients;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getOroRequirements(): ?RequirementCollection
     {
         $collection = new RequirementCollection();

@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteAssociationHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CustomAssociationCompleter;
@@ -10,6 +12,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -28,6 +31,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
     /** @var CustomAssociationCompleter */
     private $customAssociationCompleter;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -612,6 +616,164 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
                         'collapse'               => true,
                         'fields'                 => [
                             'id' => ['data_type' => 'integer']
+                        ]
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteEnumAssociation()
+    {
+        $dataType = 'enum';
+        $associationName = 'enumAssociation';
+        $fieldName = 'menumField';
+        $config = $this->createConfigObject([
+            'fields' => [
+                $associationName => [
+                    'data_type'     => 'string',
+                    'target_class'  => 'Extend\Entity\EV_Test_Enum',
+                    'target_type'   => 'to-one',
+                    'property_path' => $fieldName
+                ]
+            ]
+        ]);
+        $version = self::TEST_VERSION;
+        $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with('Extend\Entity\EV_Test_Enum', $version, $requestType)
+            ->willReturn($this->createRelationConfigObject([
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => ['data_type' => 'string']
+                ]
+            ]));
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with(EnumOption::class, 'r')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('innerJoin')
+            ->with(
+                self::TEST_CLASS_NAME,
+                'e',
+                Join::WITH,
+                sprintf(
+                    "JSON_EXTRACT(e.serialized_data, '%s') = r.id",
+                    $fieldName
+                )
+            )
+            ->willReturnSelf();
+
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
+            $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
+            $version,
+            $requestType
+        );
+        self::assertTrue($result);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    $associationName => [
+                        'data_type'              => 'string',
+                        'target_class'           => 'Extend\Entity\EV_Test_Enum',
+                        'target_type'            => 'to-one',
+                        'property_path'          => $fieldName,
+                        'association_query'      => $qb,
+                        'exclusion_policy'       => 'all',
+                        'identifier_field_names' => ['id'],
+                        'collapse'               => true,
+                        'fields'                 => [
+                            'id' => ['data_type' => 'string']
+                        ]
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteMultiEnumAssociation()
+    {
+        $dataType = 'multiEnum';
+        $associationName = 'multiEnumAssociation';
+        $fieldName = 'multiEnumField';
+        $config = $this->createConfigObject([
+            'fields' => [
+                $associationName => [
+                    'data_type'     => 'string',
+                    'target_class'  => 'Extend\Entity\EV_Test_Enum',
+                    'target_type'   => 'to-many',
+                    'property_path' => $fieldName
+                ]
+            ]
+        ]);
+        $version = self::TEST_VERSION;
+        $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with('Extend\Entity\EV_Test_Enum', $version, $requestType)
+            ->willReturn($this->createRelationConfigObject([
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => ['data_type' => 'string']
+                ]
+            ]));
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with(EnumOption::class, 'r')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('innerJoin')
+            ->with(
+                self::TEST_CLASS_NAME,
+                'e',
+                Join::WITH,
+                sprintf(
+                    "JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, '%s', CONCAT('\"', r.id, '\"')) = true",
+                    $fieldName
+                )
+            )
+            ->willReturnSelf();
+
+        $result = $this->customAssociationCompleter->completeCustomDataType(
+            $this->getClassMetadataMock(self::TEST_CLASS_NAME),
+            $config,
+            $associationName,
+            $config->getField($associationName),
+            $dataType,
+            $version,
+            $requestType
+        );
+        self::assertTrue($result);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    $associationName => [
+                        'data_type'              => 'string',
+                        'target_class'           => 'Extend\Entity\EV_Test_Enum',
+                        'target_type'            => 'to-many',
+                        'property_path'          => $fieldName,
+                        'association_query'      => $qb,
+                        'exclusion_policy'       => 'all',
+                        'identifier_field_names' => ['id'],
+                        'collapse'               => true,
+                        'fields'                 => [
+                            'id' => ['data_type' => 'string']
                         ]
                     ]
                 ]

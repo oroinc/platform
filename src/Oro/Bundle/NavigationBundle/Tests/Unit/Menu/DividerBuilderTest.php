@@ -11,6 +11,7 @@ class DividerBuilderTest extends \PHPUnit\Framework\TestCase
 {
     private DividerBuilder $dividerBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dividerBuilder = new DividerBuilder();

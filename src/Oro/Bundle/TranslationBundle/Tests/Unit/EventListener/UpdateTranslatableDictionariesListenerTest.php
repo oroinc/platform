@@ -22,6 +22,7 @@ class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
     private EntityManagerInterface $em;
     private UpdateTranslatableDictionariesListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

@@ -16,6 +16,7 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationFallbackStrategy */
     private $fallbackStrategy;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->applicationState = $this->createMock(ApplicationState::class);

@@ -215,9 +215,7 @@ class WorkflowAssembler extends BaseAbstractAssembler implements ServiceSubscrib
         return $this->container->get(Workflow::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

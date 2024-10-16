@@ -36,9 +36,7 @@ class PopulateLocalizedFallbackCollectionMigrationQuery extends ParametrizedMigr
         $this->insertQuery = $insertQuery;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -47,9 +45,7 @@ class PopulateLocalizedFallbackCollectionMigrationQuery extends ParametrizedMigr
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

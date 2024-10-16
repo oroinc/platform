@@ -23,6 +23,7 @@ class CollectionNormalizer implements
     /**
      * @throws InvalidArgumentException
      */
+    #[\Override]
     public function setSerializer(SerializerInterface $serializer)
     {
         if (!$serializer instanceof ContextAwareNormalizerInterface
@@ -47,6 +48,7 @@ class CollectionNormalizer implements
      *
      * @return array
      */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = [])
     {
         $result = [];
@@ -69,6 +71,7 @@ class CollectionNormalizer implements
      *
      * @return ArrayCollection
      */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!is_array($data)) {
@@ -102,17 +105,13 @@ class CollectionNormalizer implements
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof Collection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return (bool)preg_match(

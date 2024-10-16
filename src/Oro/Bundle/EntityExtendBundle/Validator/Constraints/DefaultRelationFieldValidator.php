@@ -14,9 +14,7 @@ class DefaultRelationFieldValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.default_relation_field';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         /** @var FieldConfigModel $value */

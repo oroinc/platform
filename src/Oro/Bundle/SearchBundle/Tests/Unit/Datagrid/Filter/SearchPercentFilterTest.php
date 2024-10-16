@@ -23,6 +23,7 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchPercentFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $formFactory = $this->createMock(FormFactoryInterface::class);

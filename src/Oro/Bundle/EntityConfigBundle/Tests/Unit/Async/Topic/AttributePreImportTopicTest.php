@@ -10,6 +10,7 @@ class AttributePreImportTopicTest extends AbstractTopicTestCase
 {
     private const BATCH_SIZE = 5000;
 
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new AttributePreImportTopic(self::BATCH_SIZE);

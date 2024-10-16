@@ -10,9 +10,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
  */
 class SearchPercentFilter extends SearchNumberRangeFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'number-range';
@@ -21,17 +19,13 @@ class SearchPercentFilter extends SearchNumberRangeFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         throw new \BadMethodCallException('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         $data = parent::parseData($data);

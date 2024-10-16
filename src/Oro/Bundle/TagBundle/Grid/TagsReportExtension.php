@@ -40,17 +40,13 @@ class TagsReportExtension extends AbstractTagsExtension
         $this->entityRoutingHelper = $entityRoutingHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return 10;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -59,9 +55,7 @@ class TagsReportExtension extends AbstractTagsExtension
             $this->isUnsupportedGridPrefix($config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $filters = $config->offsetGetByPath(self::GRID_FILTERS_PATH, []);
@@ -201,9 +195,7 @@ class TagsReportExtension extends AbstractTagsExtension
         return $entityIdsFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $identifiers = $this->getTagsColumns($config);

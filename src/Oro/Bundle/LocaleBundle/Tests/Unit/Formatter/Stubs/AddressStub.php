@@ -38,6 +38,7 @@ class AddressStub implements AddressInterface, FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getFirstName()
     {
         return 'Formatted';
@@ -46,6 +47,7 @@ class AddressStub implements AddressInterface, FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getLastName()
     {
         return 'User';
@@ -54,6 +56,7 @@ class AddressStub implements AddressInterface, FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getMiddleName()
     {
         return 'Name';
@@ -62,6 +65,7 @@ class AddressStub implements AddressInterface, FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getNamePrefix()
     {
         return '';
@@ -70,6 +74,7 @@ class AddressStub implements AddressInterface, FullNameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getNameSuffix()
     {
         return '';
@@ -80,6 +85,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getStreet()
     {
         return '1 Tests str.';
@@ -90,6 +96,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getStreet2()
     {
         return $this->street2;
@@ -100,6 +107,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getCity()
     {
         return 'New York';
@@ -110,6 +118,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getRegionName()
     {
         return 'New York';
@@ -120,6 +129,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getRegionCode()
     {
         return $this->regionCode;
@@ -130,6 +140,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getPostalCode()
     {
         return '12345';
@@ -140,6 +151,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getCountryName()
     {
         return 'United States';
@@ -150,6 +162,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getCountryIso3()
     {
         return 'USA';
@@ -160,6 +173,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getCountryIso2()
     {
         return 'US';
@@ -170,6 +184,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      *
      * @return string
      */
+    #[\Override]
     public function getOrganization()
     {
         return 'Company Ltd.';

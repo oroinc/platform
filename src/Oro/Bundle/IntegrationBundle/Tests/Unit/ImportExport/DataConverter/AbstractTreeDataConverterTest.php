@@ -12,6 +12,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractTreeDataConverter|\PHPUnit\Framework\MockObject\MockObject */
     private $dataConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dataConverter = $this->getMockForAbstractClass(AbstractTreeDataConverter::class);

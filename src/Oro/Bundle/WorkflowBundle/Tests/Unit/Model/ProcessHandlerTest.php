@@ -29,6 +29,7 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = $this->createMock(ProcessFactory::class);

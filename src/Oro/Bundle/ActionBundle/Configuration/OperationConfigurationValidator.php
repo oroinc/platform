@@ -53,6 +53,7 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
         $this->debug = $debug;
     }
 
+    #[\Override]
     public function validate(array $configuration, Collection $errors = null)
     {
         $this->errors = $errors;

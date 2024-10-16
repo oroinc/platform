@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DisabledResourceTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

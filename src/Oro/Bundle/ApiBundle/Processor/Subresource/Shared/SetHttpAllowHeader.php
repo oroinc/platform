@@ -22,17 +22,13 @@ abstract class SetHttpAllowHeader extends BaseSetHttpAllowHeader
         $this->subresourcesProvider = $subresourcesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getHttpMethodToActionsMapForResourceWithoutIdentifier(): array
     {
         return $this->getHttpMethodToActionsMap();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExcludeActions(Context $context): array
     {
         /** @var SubresourceContext $context */

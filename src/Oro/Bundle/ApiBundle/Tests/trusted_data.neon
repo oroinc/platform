@@ -14,6 +14,10 @@ trusted_data:
             createQueryBuilder:
                 entityClass: true
                 alias: true
+            walkComparison:
+                expression: true
+            createSubqueryByRootAssociation:
+                subqueryExpression: true
             createInnerSubquery:
                 entityClass: true
                 alias: true
@@ -23,6 +27,9 @@ trusted_data:
         Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer:
             tryGetValueByAssociationQuery:
                 fieldName: true
+        Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandAssociatedEntities:
+            loadAssociationData:
+                idPropertyName: true
         Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter:
             createAssociationQuery:
                 targetEntityClass: true
@@ -36,6 +43,9 @@ trusted_data:
         Oro\Bundle\ApiBundle\Datagrid\OpenApiSpecificationStatusFilter:
             buildExpr:
                 parentExpr: true
+        Oro\Bundle\ApiBundle\Util\CriteriaConnector:
+            processOrderings:
+                sort: true
 
     safe_methods:
         Oro\Bundle\ApiBundle\Util\DoctrineHelper:

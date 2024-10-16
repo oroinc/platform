@@ -30,6 +30,7 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 
     private FormWithAjaxReloadHandler $formWithAjaxReloadHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);

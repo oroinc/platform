@@ -26,6 +26,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
 
     private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
@@ -40,6 +41,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): ConstraintValidator
     {
         return new FileFieldCompatibilityValidator($this->attachmentEntityConfigProvider, $this->fieldHelper);

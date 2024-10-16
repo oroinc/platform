@@ -10,9 +10,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtil;
  */
 class IdentifierIterationStrategy implements IdentityIterationStrategyInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initializeIdentityQuery(Query $query)
     {
         $identifierHydrationMode = 'IdentifierHydrator';
@@ -26,9 +24,7 @@ class IdentifierIterationStrategy implements IdentityIterationStrategyInterface
         QueryUtil::addTreeWalker($query, SelectIdentifierWalker::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initializeDataQuery(Query $query)
     {
         QueryUtil::addTreeWalker($query, LimitIdentifierWalker::class);
@@ -38,9 +34,7 @@ class IdentifierIterationStrategy implements IdentityIterationStrategyInterface
         $query->setMaxResults(null);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDataQueryIdentifiers(Query $query, array $identifiers)
     {
         $query->setParameter(LimitIdentifierWalker::PARAMETER_IDS, $identifiers);

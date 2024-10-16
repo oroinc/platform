@@ -23,7 +23,7 @@ class WorkflowFileImportProcessorFactory implements ImportProcessorFactoryInterf
         $this->fileLocator = $fileLocator;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable($import): bool
     {
         $import = (array)$import;
@@ -35,7 +35,7 @@ class WorkflowFileImportProcessorFactory implements ImportProcessorFactoryInterf
         return isset($import['workflow'], $import['as'], $import['resource'], $import['replace']);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function create($import): ConfigImportProcessorInterface
     {
         if (!$this->isApplicable($import)) {

@@ -25,6 +25,7 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ImportExportResultManager */
     private $importExportResultManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

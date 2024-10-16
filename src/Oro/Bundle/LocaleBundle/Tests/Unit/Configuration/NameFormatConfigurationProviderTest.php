@@ -14,6 +14,7 @@ class NameFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     private NameFormatConfigurationProvider $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $cacheFile = $this->getTempFile('NameFormatConfigurationProvider');

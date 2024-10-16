@@ -26,9 +26,7 @@ class IncludeProcessor implements IncludeProcessorInterface
         $this->kernel = $kernel;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function process(ParserInterface $parser, string $file, array $data): array
     {
         $includes = $data['include'] ?? [];

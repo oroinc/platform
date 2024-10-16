@@ -22,6 +22,7 @@ class ImagineTest extends WebTestCase
     /** @var ImagineInterface */
     private $imagine;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->imagine = self::getContainer()->get('oro_attachment.liip_imagine');

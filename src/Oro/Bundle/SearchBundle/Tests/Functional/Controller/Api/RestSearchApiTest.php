@@ -14,6 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Product;
  */
 class RestSearchApiTest extends SearchBundleWebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -14,6 +14,7 @@ class RemoveProcessQueryTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connector = $this->createMock(Connection::class);

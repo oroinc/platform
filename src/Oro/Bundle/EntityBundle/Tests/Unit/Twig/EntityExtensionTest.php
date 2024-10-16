@@ -41,6 +41,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EntityExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityIdAccessor = $this->createMock(EntityIdAccessor::class);

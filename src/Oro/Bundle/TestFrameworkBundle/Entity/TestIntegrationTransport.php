@@ -16,9 +16,7 @@ class TestIntegrationTransport extends Transport
     /** @var ParameterBag|null */
     protected $settingsBag;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSettingsBag()
     {
         if (null === $this->settingsBag) {

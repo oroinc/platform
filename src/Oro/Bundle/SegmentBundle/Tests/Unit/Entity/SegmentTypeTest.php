@@ -11,6 +11,7 @@ class SegmentTypeTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentType */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new SegmentType(self::TEST_NAME);

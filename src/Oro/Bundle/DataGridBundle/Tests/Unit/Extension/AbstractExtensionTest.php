@@ -17,6 +17,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = $this->getMockForAbstractClass(AbstractExtension::class);

@@ -13,6 +13,7 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractRestIterator|\PHPUnit\Framework\MockObject\MockObject */
     private $iterator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->client = $this->createMock(RestClientInterface::class);

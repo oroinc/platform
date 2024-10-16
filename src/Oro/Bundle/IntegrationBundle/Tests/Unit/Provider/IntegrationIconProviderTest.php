@@ -20,6 +20,7 @@ class IntegrationIconProviderTest extends \PHPUnit\Framework\TestCase
     /** @var IntegrationIconProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->typesRegistry = $this->createMock(TypesRegistry::class);

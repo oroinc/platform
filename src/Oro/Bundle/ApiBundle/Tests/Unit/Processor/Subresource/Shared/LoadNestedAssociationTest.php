@@ -21,6 +21,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
     /** @var LoadNestedAssociation */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

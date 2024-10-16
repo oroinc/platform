@@ -9,9 +9,7 @@ class Configuration implements ConfigurationInterface
 {
     public const DEFAULT_ENGINE_DSN = 'orm:';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('oro_search');

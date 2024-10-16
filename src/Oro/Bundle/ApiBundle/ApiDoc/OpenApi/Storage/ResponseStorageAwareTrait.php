@@ -9,9 +9,6 @@ trait ResponseStorageAwareTrait
 {
     private ?ResponseStorage $responseStorage = null;
 
-    /**
-     * {@inheritDoc}
-     */
     public function setResponseStorage(?ResponseStorage $responseStorage): void
     {
         $this->responseStorage = $responseStorage;

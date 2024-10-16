@@ -22,6 +22,7 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
     /** @var FulltextIndexListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->event = $this->createMock(LoadClassMetadataEventArgs::class);

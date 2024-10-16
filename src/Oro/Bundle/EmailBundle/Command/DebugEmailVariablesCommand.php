@@ -40,9 +40,7 @@ class DebugEmailVariablesCommand extends Command
         $this->emailVariablesProvider = $emailVariablesProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -60,9 +58,7 @@ class DebugEmailVariablesCommand extends Command
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('System Variables');

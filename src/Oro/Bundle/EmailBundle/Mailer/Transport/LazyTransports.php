@@ -41,14 +41,13 @@ class LazyTransports implements TransportInterface
         $this->transportsDsns = $transportsDsns;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         return $this->getTransports()->send($message, $envelope);
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return '[' . implode(',', array_keys($this->transportsDsns)) . ']';

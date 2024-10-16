@@ -24,6 +24,7 @@ class CascadeRemoveAssociationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var CascadeRemoveAssociationListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->accessor = $this->createMock(AccessorInterface::class);

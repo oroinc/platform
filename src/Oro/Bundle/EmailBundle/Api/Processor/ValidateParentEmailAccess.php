@@ -38,9 +38,7 @@ class ValidateParentEmailAccess implements ProcessorInterface
         $this->queryAclHelper = $queryAclHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

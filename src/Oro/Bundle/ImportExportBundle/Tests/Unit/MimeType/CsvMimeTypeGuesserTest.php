@@ -9,6 +9,7 @@ class CsvMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var CsvMimeTypeGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->guesser = new CsvMimeTypeGuesser();

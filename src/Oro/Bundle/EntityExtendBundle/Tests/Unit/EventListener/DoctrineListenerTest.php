@@ -21,6 +21,7 @@ class DoctrineListenerTest extends OrmTestCase
     private ConfigProvider|MockObject $extendConfigProvider;
     private DoctrineListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->reader = new AttributeReader();

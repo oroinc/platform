@@ -21,6 +21,7 @@ class ActivityGridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityRoutingHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailGridHelper = $this->createMock(EmailGridHelper::class);

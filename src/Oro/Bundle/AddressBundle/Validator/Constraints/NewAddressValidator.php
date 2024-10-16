@@ -12,9 +12,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class NewAddressValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof NewAddress) {

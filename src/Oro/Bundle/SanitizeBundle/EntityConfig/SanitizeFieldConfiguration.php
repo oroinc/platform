@@ -15,11 +15,13 @@ class SanitizeFieldConfiguration implements FieldConfigInterface
     {
     }
 
+    #[\Override]
     public function getSectionName(): string
     {
         return 'sanitize';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

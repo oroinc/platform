@@ -23,6 +23,7 @@ class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
     /** @var MenuUpdateDatasource */
     private $datasource;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->chainProvider = $this->createMock(BuilderChainProvider::class);

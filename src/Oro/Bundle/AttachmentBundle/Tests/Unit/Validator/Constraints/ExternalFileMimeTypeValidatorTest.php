@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ExternalFileMimeTypeValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): ConstraintValidator
     {
         return new ExternalFileMimeTypeValidator();

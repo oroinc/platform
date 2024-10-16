@@ -9,6 +9,7 @@ namespace Oro\Component\Layout\Loader\Generator;
  */
 class PhpLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
+    #[\Override]
     protected function doGenerateBody(GeneratorData $data): string
     {
         return \str_replace(['<?php', '<?', '?>'], '', $data->getSource());

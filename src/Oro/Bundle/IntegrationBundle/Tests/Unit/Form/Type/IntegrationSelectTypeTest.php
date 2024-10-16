@@ -31,6 +31,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
     /** @var IntegrationSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

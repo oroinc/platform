@@ -25,9 +25,7 @@ class ImpersonationSearchHandler implements SearchHandlerInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         if (!$item instanceof Impersonation) {
@@ -65,9 +63,7 @@ class ImpersonationSearchHandler implements SearchHandlerInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         $impersonationQB = $this->doctrineHelper->getEntityRepository($this->getEntityName())->createQueryBuilder('i');
@@ -112,17 +108,13 @@ class ImpersonationSearchHandler implements SearchHandlerInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProperties()
     {
         return ['ipAddress', 'token', 'ipAddressToken'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityName()
     {
         return Impersonation::class;

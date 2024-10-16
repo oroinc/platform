@@ -19,6 +19,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
 
     private WebpAwarePictureSourcesProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerProvider = $this->createMock(PictureSourcesProviderInterface::class);

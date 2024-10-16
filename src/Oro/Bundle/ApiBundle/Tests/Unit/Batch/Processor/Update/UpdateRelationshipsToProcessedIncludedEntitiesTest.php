@@ -14,6 +14,7 @@ class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProc
     /** @var UpdateRelationshipsToProcessedIncludedEntities */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

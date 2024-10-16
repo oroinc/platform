@@ -46,9 +46,7 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         $this->aclOptions = $aclOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadChoiceList($value = null): ChoiceListInterface
     {
         if (null !== $this->choiceList) {
@@ -93,19 +91,20 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         return $this->choiceList;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadChoicesForValues(array $values, $value = null): array
     {
         return $this->loadChoiceList($value)->getChoicesForValues($values);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadValuesForChoices(array $choices, $value = null): array
     {
+        // check for multi-enum choices
+        if (array_key_exists(0, $choices) && is_array($choices[0]) && array_is_list($choices[0])) {
+            $choices = $choices[0];
+        }
+
         return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
 

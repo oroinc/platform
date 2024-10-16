@@ -25,6 +25,7 @@ abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
     /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $entity = new EntityConfigModel(self::CLASS_NAME);

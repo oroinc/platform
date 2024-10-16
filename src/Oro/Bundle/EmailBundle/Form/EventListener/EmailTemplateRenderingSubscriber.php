@@ -41,6 +41,7 @@ class EmailTemplateRenderingSubscriber implements EventSubscriberInterface
         $this->emailRenderer = $emailRenderer;
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

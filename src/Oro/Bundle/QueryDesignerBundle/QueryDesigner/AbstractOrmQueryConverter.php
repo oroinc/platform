@@ -25,9 +25,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getJoinType(string $joinId): ?string
     {
         $joinType = parent::getJoinType($joinId);
@@ -52,9 +50,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
         return $joinType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFieldType(string $entityClass, string $fieldName): ?string
     {
         $result = parent::getFieldType($entityClass, $fieldName);
@@ -65,9 +61,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getUnidirectionalJoinCondition(
         string $joinTableAlias,
         string $joinFieldName,

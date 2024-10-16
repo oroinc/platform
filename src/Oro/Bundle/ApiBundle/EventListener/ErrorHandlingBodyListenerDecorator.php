@@ -21,9 +21,7 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
         $this->listener = $listener;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function onKernelRequest(RequestEvent $event): void
     {
         try {

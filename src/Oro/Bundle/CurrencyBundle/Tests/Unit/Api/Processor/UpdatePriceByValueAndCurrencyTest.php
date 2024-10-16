@@ -17,6 +17,7 @@ class UpdatePriceByValueAndCurrencyTest extends CustomizeFormDataProcessorTestCa
     /** @var UpdatePriceByValueAndCurrency */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

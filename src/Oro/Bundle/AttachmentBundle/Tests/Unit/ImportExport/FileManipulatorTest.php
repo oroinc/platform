@@ -32,6 +32,7 @@ class FileManipulatorTest extends \PHPUnit\Framework\TestCase
     private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
     private FileManipulator $manipulator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

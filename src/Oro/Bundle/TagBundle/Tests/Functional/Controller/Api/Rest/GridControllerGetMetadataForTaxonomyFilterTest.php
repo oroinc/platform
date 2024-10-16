@@ -12,6 +12,7 @@ class GridControllerGetMetadataForTaxonomyFilterTest extends WebTestCase
     private const GRID_NAME = 'tag-grid';
     private const FILTER_NAME = 'taxonomyName';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

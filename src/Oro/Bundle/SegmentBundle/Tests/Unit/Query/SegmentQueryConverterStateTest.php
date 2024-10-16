@@ -29,6 +29,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentQueryConverterState */
     private $state;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheItemPoolInterface::class);

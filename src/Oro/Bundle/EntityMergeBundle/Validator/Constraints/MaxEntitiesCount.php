@@ -12,9 +12,7 @@ class MaxEntitiesCount extends Constraint
 {
     public string $message = 'You can merge only {{ limit }} entities at once.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

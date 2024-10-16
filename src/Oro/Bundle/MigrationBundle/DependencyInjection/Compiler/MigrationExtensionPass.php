@@ -14,9 +14,7 @@ class MigrationExtensionPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $storageDefinition = $container->getDefinition('oro_migration.migrations.extension_manager');

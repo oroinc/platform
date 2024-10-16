@@ -12,6 +12,7 @@ class ImageRemovalManagerTest extends WebTestCase
 {
     use ImageRemovalManagerTestingTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

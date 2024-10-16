@@ -46,33 +46,25 @@ class Collection extends ArrayCollection
         $this->instances = $elements;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->instances;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function containsKey($name)
     {
         return isset($this->instances[$name]) || array_key_exists($name, $this->instances);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function contains($element)
     {
         return in_array($element, $this->instances, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get($name)
     {
         if (isset($this->instances[$name])) {
@@ -82,17 +74,13 @@ class Collection extends ArrayCollection
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function set($name, $instance)
     {
         $this->instances[$name] = $instance;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function remove($name)
     {
         if (isset($this->instances[$name]) || array_key_exists($name, $this->instances)) {
@@ -173,6 +161,7 @@ class Collection extends ArrayCollection
     /**
      * Clears the collection, removing all elements.
      */
+    #[\Override]
     public function clear()
     {
         $this->instances = [];

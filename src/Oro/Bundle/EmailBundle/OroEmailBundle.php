@@ -26,9 +26,7 @@ class OroEmailBundle extends Bundle
         $loader->register();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

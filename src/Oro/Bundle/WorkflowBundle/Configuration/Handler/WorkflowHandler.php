@@ -14,9 +14,7 @@ class WorkflowHandler extends AbstractHandler
         $this->handlers[] = $handler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handle(array $configuration)
     {
         $configuration = $this->handleWorkflowConfiguration($configuration);

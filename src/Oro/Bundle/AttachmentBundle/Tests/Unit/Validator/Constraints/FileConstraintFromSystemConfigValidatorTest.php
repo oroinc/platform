@@ -24,6 +24,7 @@ class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\Tes
     /** @var FileConstraintFromSystemConfigValidator */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileValidator = $this->createMock(FileValidator::class);

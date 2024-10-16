@@ -22,6 +22,7 @@ class EntityVariablesTemplateProcessorTest extends TestCase
 
     private EntityVariablesTemplateProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->twigEnvironment = $this->createMock(TwigEnvironment::class);

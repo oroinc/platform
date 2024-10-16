@@ -14,6 +14,7 @@ class DefaultAuthenticationSuccessHandler extends Authentication\DefaultAuthenti
 {
     use ProcessRequestParameterLikeRouteTrait;
 
+    #[\Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
         $this->processRequestParameter($request, $this->options['target_path_parameter']);

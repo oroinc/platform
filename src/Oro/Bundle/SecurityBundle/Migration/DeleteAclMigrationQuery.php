@@ -32,9 +32,7 @@ class DeleteAclMigrationQuery implements MigrationQuery
         $this->oid         = $oid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return $this->aclProvider
@@ -42,9 +40,7 @@ class DeleteAclMigrationQuery implements MigrationQuery
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         if ($this->aclProvider) {

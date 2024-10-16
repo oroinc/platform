@@ -24,9 +24,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     protected $fixtureLoader;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFixtureLoader(FixtureLoader $fixtureLoader)
     {
         $this->fixtureLoader = $fixtureLoader;

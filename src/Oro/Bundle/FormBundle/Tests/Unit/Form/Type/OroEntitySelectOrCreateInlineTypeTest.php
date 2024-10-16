@@ -38,6 +38,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
     /** @var OroEntitySelectOrCreateInlineType|\PHPUnit\Framework\MockObject\MockObject */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -91,9 +92,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $config = $this->createMock(ConfigInterface::class);

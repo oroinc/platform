@@ -16,6 +16,7 @@ class BooleanFilterTest extends WebTestCase
 {
     private BooleanFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

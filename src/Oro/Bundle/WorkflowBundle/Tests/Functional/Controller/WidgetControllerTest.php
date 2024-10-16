@@ -23,6 +23,7 @@ class WidgetControllerTest extends WebTestCase
     /** @var WorkflowAwareEntity */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

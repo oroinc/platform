@@ -20,6 +20,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
     /** @var TitleNode */
     private $titleNode;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->node = $this->createMock(Node::class);

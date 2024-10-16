@@ -80,18 +80,6 @@ abstract class AbstractTranslationRepository extends TranslationRepository imple
         }
     }
 
-    protected function doGetAllIdentities(string $className, string $identityField): array
-    {
-        $alias = 'entity';
-        $result = $this->_em->createQueryBuilder()
-            ->select(QueryBuilderUtil::getField($alias, $identityField))
-            ->from($className, $alias)
-            ->getQuery()
-            ->getScalarResult();
-
-        return array_column($result, $identityField);
-    }
-
     protected function doUpdateDefaultTranslations(
         string $className,
         string $valueFieldName,

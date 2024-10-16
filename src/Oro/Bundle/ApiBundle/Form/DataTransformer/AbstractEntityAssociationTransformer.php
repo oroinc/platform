@@ -28,9 +28,7 @@ abstract class AbstractEntityAssociationTransformer extends AbstractAssociationT
         $this->metadata = $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getAcceptableEntityClassNames(): ?array
     {
         $acceptableClassNames = $this->metadata->getAcceptableTargetClassNames();

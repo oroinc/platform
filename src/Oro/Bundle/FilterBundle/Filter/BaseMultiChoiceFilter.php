@@ -10,9 +10,6 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
  */
 abstract class BaseMultiChoiceFilter extends AbstractFilter
 {
-    /**
-     * {@inheritdoc}
-     */
     protected $joinOperators = [
         FilterUtility::TYPE_NOT_EMPTY => FilterUtility::TYPE_EMPTY,
         DictionaryFilterType::NOT_EQUAL => DictionaryFilterType::EQUAL,
@@ -22,6 +19,7 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
     /**
      * @return array
      */
+    #[\Override]
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
@@ -40,9 +38,7 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
         return $metadata;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         $data = parent::parseData($data);

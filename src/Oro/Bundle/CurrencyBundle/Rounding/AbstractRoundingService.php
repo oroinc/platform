@@ -29,6 +29,7 @@ abstract class AbstractRoundingService implements RoundingServiceInterface
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function round($value, $precision = null, $roundType = null)
     {
         if (null === $roundType) {
@@ -79,10 +80,12 @@ abstract class AbstractRoundingService implements RoundingServiceInterface
     /**
      * @return int
      */
+    #[\Override]
     abstract public function getRoundType();
 
     /**
      * @return int
      */
+    #[\Override]
     abstract public function getPrecision();
 }

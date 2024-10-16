@@ -6,11 +6,11 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
-use Oro\Bundle\EntityExtendBundle\Migration\Query\EnumDataValue;
-use Oro\Bundle\EntityExtendBundle\Migration\Query\InsertEnumValuesQuery;
+use Oro\Bundle\EntityExtendBundle\Migration\Query\OutdatedEnumDataValue;
+use Oro\Bundle\EntityExtendBundle\Migration\Query\OutdatedInsertEnumValuesQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -18,16 +18,14 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 /**
  * Add dashboard_type enum field to the oro_dashboard table and adds widgets default dashboard type.
  */
-class AddDashboardType implements Migration, ExtendExtensionAwareInterface
+class AddDashboardType implements Migration, OutdatedExtendExtensionAwareInterface
 {
-    use ExtendExtensionAwareTrait;
+    use OutdatedExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
-        $enumTable = $this->extendExtension->addEnumField(
+        $enumTable = $this->outdatedExtendExtension->addOutdatedEnumField(
             $schema,
             $schema->getTable('oro_dashboard'),
             'dashboard_type',
@@ -48,8 +46,8 @@ class AddDashboardType implements Migration, ExtendExtensionAwareInterface
         $options->set('enum', 'immutable_codes', ['widgets']);
         $enumTable->addOption(OroOptions::KEY, $options);
 
-        $queries->addPostQuery(new InsertEnumValuesQuery($this->extendExtension, 'dashboard_type', [
-            new EnumDataValue('widgets', 'Widgets', 1, true)
+        $queries->addPostQuery(new OutdatedInsertEnumValuesQuery($this->outdatedExtendExtension, 'dashboard_type', [
+            new OutdatedEnumDataValue('widgets', 'Widgets', 1, true)
         ]));
         $queries->addPostQuery(new ParametrizedSqlMigrationQuery(
             'UPDATE oro_dashboard SET dashboard_type_id = :default_type',

@@ -124,9 +124,7 @@ class ValueNormalizer implements ResetInterface
         return $this->requirements[$cacheKey];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->requirements = [];

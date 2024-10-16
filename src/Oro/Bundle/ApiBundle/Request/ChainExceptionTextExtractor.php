@@ -18,9 +18,7 @@ class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
         $this->extractors = $extractors;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExceptionStatusCode(\Exception $exception): ?int
     {
         $result = null;
@@ -34,9 +32,7 @@ class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExceptionCode(\Exception $exception): ?string
     {
         $result = null;
@@ -50,9 +46,7 @@ class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExceptionType(\Exception $exception): ?string
     {
         $result = null;
@@ -66,9 +60,7 @@ class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExceptionText(\Exception $exception): ?string
     {
         $result = null;

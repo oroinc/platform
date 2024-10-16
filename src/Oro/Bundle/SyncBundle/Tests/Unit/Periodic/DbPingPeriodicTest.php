@@ -19,6 +19,7 @@ class DbPingPeriodicTest extends TestCase
 
     private DbPingPeriodic $dbPing;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

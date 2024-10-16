@@ -16,9 +16,7 @@ class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
     public const USER_EMAIL_ORIGIN_MICROSOFT_2 = 'user_email_origin.microsoft.2';
     public const USER_EMAIL_ORIGIN_MICROSOFT_3 = 'user_email_origin.microsoft.3';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $token = $this->generateToken();

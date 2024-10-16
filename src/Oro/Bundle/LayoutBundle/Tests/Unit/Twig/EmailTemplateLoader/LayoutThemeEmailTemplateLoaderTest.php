@@ -15,6 +15,7 @@ class LayoutThemeEmailTemplateLoaderTest extends TestCase
 {
     private LayoutThemeEmailTemplateLoader $loader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filesystemLoader = $this->createMock(FilesystemLoader::class);

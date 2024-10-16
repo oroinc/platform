@@ -23,7 +23,7 @@ class RepetitiveCrypter implements SymmetricCrypterInterface
         $this->cryptMethod = $cryptMethod;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function encryptData($data)
     {
         return base64_encode(
@@ -37,7 +37,7 @@ class RepetitiveCrypter implements SymmetricCrypterInterface
         );
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function decryptData($data)
     {
         return openssl_decrypt(

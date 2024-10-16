@@ -28,9 +28,7 @@ class ConfigurableEntityNameProvider implements EntityNameProviderInterface
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         $className = ClassUtils::getClass($entity);
@@ -57,9 +55,7 @@ class ConfigurableEntityNameProvider implements EntityNameProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if (!isset($this->fields[$className][$format])) {

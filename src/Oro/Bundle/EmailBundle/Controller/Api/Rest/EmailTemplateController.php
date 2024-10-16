@@ -193,25 +193,19 @@ class EmailTemplateController extends RestController
         return $this->handleView($view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_email.manager.emailtemplate.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         throw new \BadMethodCallException('Form is not available.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         throw new \BadMethodCallException('FormHandler is not available.');
@@ -222,6 +216,7 @@ class EmailTemplateController extends RestController
         return $this->container->get(EmailTemplateSerializer::class)->serialize($template);
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

@@ -17,6 +17,7 @@ class StripTagsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var StripTagsExtension */
     private $formExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);

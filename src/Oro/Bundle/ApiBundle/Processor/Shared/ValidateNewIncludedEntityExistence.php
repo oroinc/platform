@@ -36,9 +36,7 @@ class ValidateNewIncludedEntityExistence implements ProcessorInterface
         $this->associations = $associations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

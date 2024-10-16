@@ -9,6 +9,7 @@ class GridPaginator extends Element implements GridPaginatorInterface
     /**
      * @return int
      */
+    #[\Override]
     public function getTotalRecordsCount()
     {
         preg_match('/(total of)\s+(?P<count>\d+)/i', $this->getText(), $matches);
@@ -19,6 +20,7 @@ class GridPaginator extends Element implements GridPaginatorInterface
     /**
      * @return int
      */
+    #[\Override]
     public function getTotalPageCount()
     {
         preg_match('/(page:).+(?P<count>\d+).+total/i', $this->getText(), $matches);

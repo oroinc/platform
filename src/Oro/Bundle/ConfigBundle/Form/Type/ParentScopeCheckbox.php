@@ -10,25 +10,19 @@ class ParentScopeCheckbox extends AbstractType
 {
     const NAME = 'oro_config_parent_scope_checkbox_type';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return CheckboxType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['required' => false, 'label' => 'oro.config.system_configuration.use_default']);

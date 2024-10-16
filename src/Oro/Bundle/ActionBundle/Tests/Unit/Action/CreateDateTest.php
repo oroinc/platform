@@ -17,6 +17,7 @@ class CreateDateTest extends \PHPUnit\Framework\TestCase
     /** @var CreateDate */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $localeSettings = $this->createMock(LocaleSettings::class);

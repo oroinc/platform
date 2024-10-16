@@ -12,9 +12,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class UpdateLocalizedFallbackValueAuditable implements Migration
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.ShortMethodName)
      */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $queries->addPostQuery(

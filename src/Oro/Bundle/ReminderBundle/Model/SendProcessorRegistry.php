@@ -61,9 +61,7 @@ class SendProcessorRegistry implements ResetInterface
         return $this->processorContainer->get($method);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->processors = null;

@@ -23,9 +23,7 @@ class UpdateEntityConfigMigration implements Migration, ResetContainerMigration
         $this->commandExecutor = $commandExecutor;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(

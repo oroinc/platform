@@ -10,9 +10,7 @@ class LoadNoteTargets extends AbstractFixture
 {
     const TARGET_ONE = 'note_target_1';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $noteTarget = new TestActivityTarget();

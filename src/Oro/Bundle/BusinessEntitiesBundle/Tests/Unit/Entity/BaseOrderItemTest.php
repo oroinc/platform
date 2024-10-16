@@ -13,6 +13,7 @@ class BaseOrderItemTest extends \PHPUnit\Framework\TestCase
 
     private BaseOrderItem $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new BaseOrderItem();

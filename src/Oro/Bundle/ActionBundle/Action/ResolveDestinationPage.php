@@ -41,9 +41,7 @@ class ResolveDestinationPage extends AbstractAction
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $this->destination = $this->getDestinationOption($options);
@@ -53,9 +51,7 @@ class ResolveDestinationPage extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         if (null === ($request = $this->requestStack->getMainRequest())) {

@@ -151,49 +151,37 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
         return $this->filters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetGet($offset): ?FilterInterface
     {
         return $this->get($offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         $this->set($offset, $value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         $this->remove($offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function count(): int
     {
         return \count($this->filters);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->filters);

@@ -31,6 +31,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
     private array $fields = [];
     /** @var AssociationMetadata[] */
     private array $associations = [];
+    private array $hints = [];
     private ?ParameterBag $attributes = null;
     private ?TargetMetadataAccessorInterface $targetMetadataAccessor = null;
 
@@ -61,15 +62,18 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function toArray(): array
     {
         $result = [];
         if (null !== $this->attributes) {
             $result = $this->attributes->toArray();
+        }
+        if ($this->hints) {
+            $result['hints'] = $this->hints;
         }
         $result['class'] = $this->className;
         if ($this->inherited) {
@@ -115,6 +119,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
     /**
      * Gets FQCN of an entity.
      */
+    #[\Override]
     public function getClassName(): string
     {
         return $this->className;
@@ -133,6 +138,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
      *
      * @return string[]
      */
+    #[\Override]
     public function getIdentifierFieldNames(): array
     {
         return $this->identifiers;
@@ -198,6 +204,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
      * Gets the name of the given property in the source entity.
      * Returns NULL if the property does not exist.
      */
+    #[\Override]
     public function getPropertyPath(string $propertyName): ?string
     {
         return $this->getProperty($propertyName)?->getPropertyPath();
@@ -501,6 +508,25 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
             $metadata->setName($newName);
             $this->addAssociation($metadata);
         }
+    }
+
+    /**
+     * Gets Doctrine query hints.
+     * Each hint can be a string or an associative array with "name" and "value" keys.
+     */
+    #[\Override]
+    public function getHints(): array
+    {
+        return $this->hints;
+    }
+
+    /**
+     * Sets Doctrine query hints.
+     * Each hint can be a string or an associative array with "name" and "value" keys.
+     */
+    public function setHints(array $hints): array
+    {
+        return $this->hints = $hints;
     }
 
     /**

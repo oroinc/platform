@@ -38,6 +38,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tree = new OwnerTree();

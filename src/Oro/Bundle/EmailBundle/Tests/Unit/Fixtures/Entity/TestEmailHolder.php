@@ -13,6 +13,7 @@ class TestEmailHolder implements EmailHolderInterface
         $this->email = $email;
     }
 
+    #[\Override]
     public function getEmail()
     {
         return $this->email;

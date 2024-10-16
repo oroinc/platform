@@ -18,9 +18,7 @@ class CurrentApplicationProvider implements CurrentApplicationProviderInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicationsValid(array $applications): bool
     {
         if (empty($applications)) {
@@ -32,9 +30,7 @@ class CurrentApplicationProvider implements CurrentApplicationProviderInterface
         return $currentApplication && in_array($currentApplication, $applications, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCurrentApplication(): ?string
     {
         $token = $this->tokenStorage->getToken();

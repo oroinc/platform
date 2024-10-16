@@ -22,34 +22,42 @@ class ProxyStub implements Proxy
         return $this->id;
     }
 
+    #[\Override]
     public function __setInitialized($initialized)
     {
     }
 
+    #[\Override]
     public function __setInitializer(?Closure $initializer = null)
     {
     }
 
+    #[\Override]
     public function __getInitializer()
     {
     }
 
+    #[\Override]
     public function __setCloner(?Closure $cloner = null)
     {
     }
 
+    #[\Override]
     public function __getCloner()
     {
     }
 
+    #[\Override]
     public function __getLazyProperties()
     {
     }
 
+    #[\Override]
     public function __load()
     {
     }
 
+    #[\Override]
     public function __isInitialized()
     {
     }

@@ -19,9 +19,7 @@ class FixtureLoaderInitializer implements ContextInitializer
         $this->fixtureLoader = $fixtureLoader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initializeContext(Context $context)
     {
         if ($context instanceof FixtureLoaderAwareInterface) {

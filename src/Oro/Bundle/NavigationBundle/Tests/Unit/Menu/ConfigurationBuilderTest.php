@@ -22,6 +22,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     private ConfigurationProvider|MockObject $configurationProvider;
     private ConfigurationBuilder $configurationBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new MenuFactory();

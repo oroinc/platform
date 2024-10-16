@@ -29,6 +29,7 @@ class UserEmailConfigHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var UserEmailConfigHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

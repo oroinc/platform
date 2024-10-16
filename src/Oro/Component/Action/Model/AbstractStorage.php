@@ -226,41 +226,31 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         return $this->get($offset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         $this->set($offset, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         $this->remove($offset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function count(): int
     {
         return count($this->data);
@@ -274,9 +264,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
         return $this->data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->data);

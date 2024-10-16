@@ -43,9 +43,7 @@ class RestrictionsExtension extends AbstractTypeExtension
         $this->restrictionsManager = $restrictionManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['disable_workflow_restrictions'] ||
@@ -77,9 +75,7 @@ class RestrictionsExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['disable_workflow_restrictions' => false]);

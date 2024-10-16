@@ -6,9 +6,7 @@ use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterfa
 
 class IntegrationTypeWithoutIcon implements IntegrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return 'oro.type2.label';

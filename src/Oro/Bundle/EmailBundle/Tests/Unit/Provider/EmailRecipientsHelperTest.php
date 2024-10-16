@@ -72,6 +72,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
     private $indexer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclHelper = $this->createMock(AclHelper::class);

@@ -18,6 +18,7 @@ class ResendJobHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ResendJobHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobLogger = $this->createMock(LoggerInterface::class);

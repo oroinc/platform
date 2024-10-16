@@ -42,9 +42,7 @@ final class FeatureStatisticSubscriber implements EventListener
         $this->statisticManager = $statisticManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function listenEvent(Formatter $formatter, Event $event, $eventName)
     {
         if ($this->skip) {

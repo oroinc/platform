@@ -11,6 +11,7 @@ class AssertNotHasResultTest extends GetProcessorTestCase
     /** @var AssertNotHasResult */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

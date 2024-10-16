@@ -25,6 +25,7 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
     private DataBlockBuilder $builder;
     private $twig;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = Forms::createFormFactoryBuilder()

@@ -19,6 +19,7 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var CachingTranslationLoader */
     private $cachingLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerLoader = $this->createMock(LoaderInterface::class);

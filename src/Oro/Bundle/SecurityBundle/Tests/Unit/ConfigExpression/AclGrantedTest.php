@@ -31,6 +31,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
     /** @var AclGranted */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

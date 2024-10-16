@@ -92,17 +92,13 @@ class DependencyInjectionExtension implements ExtensionInterface
         $this->dataProviderServiceIds        = $dataProviderServiceIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeNames(): array
     {
         return array_keys($this->typeServiceIds);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getType($name)
     {
         if (!isset($this->typeServiceIds[$name])) {
@@ -128,17 +124,13 @@ class DependencyInjectionExtension implements ExtensionInterface
         return $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasType($name)
     {
         return isset($this->typeServiceIds[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeExtensions($name)
     {
         $extensions = [];
@@ -152,17 +144,13 @@ class DependencyInjectionExtension implements ExtensionInterface
         return $extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasTypeExtensions($name)
     {
         return isset($this->typeExtensionServiceIds[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLayoutUpdates(LayoutItemInterface $item)
     {
         $idOrAlias     = $item->getAlias() ?: $item->getId();
@@ -177,9 +165,7 @@ class DependencyInjectionExtension implements ExtensionInterface
         return $layoutUpdates;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasLayoutUpdates(LayoutItemInterface $item)
     {
         $idOrAlias = $item->getAlias() ?: $item->getId();
@@ -187,9 +173,7 @@ class DependencyInjectionExtension implements ExtensionInterface
         return isset($this->layoutUpdateServiceIds[$idOrAlias]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContextConfigurators()
     {
         $configurators = [];
@@ -201,17 +185,13 @@ class DependencyInjectionExtension implements ExtensionInterface
         return $configurators;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasContextConfigurators()
     {
         return !empty($this->contextConfiguratorServiceIds);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDataProvider($name)
     {
         if (!isset($this->dataProviderServiceIds[$name])) {
@@ -223,9 +203,7 @@ class DependencyInjectionExtension implements ExtensionInterface
         return $this->container->get($this->dataProviderServiceIds[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasDataProvider($name)
     {
         return isset($this->dataProviderServiceIds[$name]);

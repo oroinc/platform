@@ -46,17 +46,13 @@ class InterruptConsumptionExtension extends AbstractExtension
         $this->cacheState = $cacheState;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context): void
     {
         self::$startTime = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context): void
     {
         $interruptConsumptionCache = $this->interruptConsumptionCache->getItem(self::CACHE_KEY);

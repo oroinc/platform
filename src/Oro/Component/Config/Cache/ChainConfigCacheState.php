@@ -23,9 +23,7 @@ class ChainConfigCacheState implements ConfigCacheStateInterface
         $this->states[] = $state;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isCacheFresh(?int $timestamp): bool
     {
         foreach ($this->states as $state) {
@@ -37,9 +35,7 @@ class ChainConfigCacheState implements ConfigCacheStateInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheTimestamp(): ?int
     {
         $result = null;

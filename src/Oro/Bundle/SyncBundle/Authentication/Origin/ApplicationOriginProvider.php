@@ -23,9 +23,7 @@ class ApplicationOriginProvider implements OriginProviderInterface
         $this->originExtractor = $originExtractor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrigins(): array
     {
         $origin = $this->originExtractor->fromUrl($this->configManager->get('oro_ui.application_url'));

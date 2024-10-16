@@ -8,6 +8,7 @@ class DisabledAssociationsConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     private DisabledAssociationsConfigExtra $extra;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extra = new DisabledAssociationsConfigExtra();

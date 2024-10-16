@@ -35,6 +35,7 @@ class WorkflowEntityVoterTest extends TestCase
     /** @var WorkflowEntityVoter */
     private $voter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

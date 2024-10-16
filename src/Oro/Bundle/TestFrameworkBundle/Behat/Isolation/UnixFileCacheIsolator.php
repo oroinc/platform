@@ -9,15 +9,13 @@ use Symfony\Component\Process\Process;
  */
 class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'Cache';
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     protected function getApplicableOs()
     {
         return [
@@ -26,6 +24,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         ];
     }
 
+    #[\Override]
     protected function replaceCache()
     {
         $commands = [];
@@ -55,6 +54,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         $this->runProcess(implode(' && ', $commands));
     }
 
+    #[\Override]
     protected function startCopyDumpToTempDir()
     {
         // remove old cache dirs
@@ -72,6 +72,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
             ->start();
     }
 
+    #[\Override]
     protected function dumpCache()
     {
         $commands = [];
@@ -101,6 +102,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         $this->runProcess(implode(' && ', $commands));
     }
 
+    #[\Override]
     protected function removeDumpCacheDir()
     {
         $this->runProcess(
@@ -108,6 +110,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         );
     }
 
+    #[\Override]
     protected function removeTempCacheDir()
     {
         $this->runProcess(
@@ -115,6 +118,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
         );
     }
 
+    #[\Override]
     protected function removeCacheDirs()
     {
         $commands = [

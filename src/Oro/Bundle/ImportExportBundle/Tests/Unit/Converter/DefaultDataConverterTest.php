@@ -10,6 +10,7 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultDataConverter */
     private $dataConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dataConverter = new DefaultDataConverter();

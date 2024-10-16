@@ -12,9 +12,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class DuplicateFilter extends BooleanFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
         $comparisonType,

@@ -12,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class AttachmentsAssociationTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

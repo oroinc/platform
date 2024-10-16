@@ -12,6 +12,7 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var ExpandRelatedEntitiesConfigExtra */
     private $extra;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extra = new ExpandRelatedEntitiesConfigExtra(self::EXPANDED_ENTITIES);

@@ -30,9 +30,7 @@ class TestEntitiesMigration implements
     use SerializedFieldsExtensionAwareTrait;
     use ActivityExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createTestDepartmentTable($schema);

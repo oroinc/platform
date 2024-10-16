@@ -28,9 +28,7 @@ class ItemIdentifierCollectionTypeSubscriber implements EventSubscriberInterface
         $this->idFieldName = $idFieldName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         // this subscriber should be executed after CollectionTypeSubscriber

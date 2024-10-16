@@ -28,9 +28,7 @@ class DraftLocalizedFallbackValueExtension extends AbstractTypeExtension
         $this->draftHelper = $draftHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
@@ -56,9 +54,7 @@ class DraftLocalizedFallbackValueExtension extends AbstractTypeExtension
         return $form->getData() instanceof DraftableInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [LocalizedFallbackValueCollectionType::class];

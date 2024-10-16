@@ -10,9 +10,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class TwigPostProcessorConfigExtension extends AbstractConfigExtension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigureCallbacks(): array
     {
         return [

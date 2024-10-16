@@ -11,6 +11,7 @@ class PriceTransformer implements DataTransformerInterface
      * @param Price|null $price
      * @return Price|null
      */
+    #[\Override]
     public function transform($price)
     {
         return $price;
@@ -20,6 +21,7 @@ class PriceTransformer implements DataTransformerInterface
      * @param Price|null $price
      * @return Price|null
      */
+    #[\Override]
     public function reverseTransform($price)
     {
         if (!$price || !$price instanceof Price || filter_var($price->getValue(), FILTER_VALIDATE_FLOAT) === false) {

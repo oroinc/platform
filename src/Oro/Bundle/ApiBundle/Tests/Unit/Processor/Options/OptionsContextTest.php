@@ -10,6 +10,7 @@ class OptionsContextTest extends \PHPUnit\Framework\TestCase
 {
     private OptionsContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new OptionsContext(

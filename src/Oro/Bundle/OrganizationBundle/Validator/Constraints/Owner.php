@@ -16,17 +16,13 @@ class Owner extends Constraint
 {
     public $message = 'You have no access to set this value as {{ owner }}.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return 'owner_validator';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

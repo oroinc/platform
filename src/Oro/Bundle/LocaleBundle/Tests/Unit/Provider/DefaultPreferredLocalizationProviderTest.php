@@ -15,6 +15,7 @@ class DefaultPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCa
     /** @var DefaultPreferredLocalizationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);

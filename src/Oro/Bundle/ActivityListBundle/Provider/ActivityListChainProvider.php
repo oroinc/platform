@@ -60,9 +60,7 @@ class ActivityListChainProvider implements ResetInterface
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->ownerActivityClasses = null;

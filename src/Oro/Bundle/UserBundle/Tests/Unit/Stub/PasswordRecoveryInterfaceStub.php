@@ -26,9 +26,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     /** @var string */
     protected $passwordChangedAt;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setUsername($username): self
     {
         $this->username = $username;
@@ -36,9 +34,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPassword(?string $password): self
     {
         $this->password = $password;
@@ -46,17 +42,13 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSalt(): ?string
     {
         return 'salt';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPlainPassword(?string $password): self
     {
         $this->plainPassword = $password;
@@ -64,81 +56,60 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRoles(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getUserRoles(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getUsername()
     {
         return $this->username;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function eraseCredentials()
     {
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addUserRole(Role $role): self
     {
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isPasswordRequestNonExpired($ttl)
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfirmationToken()
     {
         return $this->confirmationToken;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setConfirmationToken($token)
     {
         $this->confirmationToken = $token;
@@ -146,25 +117,19 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function generateToken()
     {
         return '';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPasswordRequestedAt()
     {
         return $this->passwordRequestedAt;
     }
 
-    /**
-     *{@inheritDoc}
-     */
+    #[\Override]
     public function setPasswordRequestedAt(\DateTime $time = null)
     {
         $this->passwordRequestedAt = $time;
@@ -172,17 +137,13 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
         return $this;
     }
 
-    /**
-     *{@inheritDoc}
-     */
+    #[\Override]
     public function getPasswordChangedAt()
     {
         return $this->passwordChangedAt;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPasswordChangedAt(\DateTime $time = null)
     {
         $this->passwordChangedAt = $time;
@@ -190,6 +151,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
         return $this;
     }
 
+    #[\Override]
     public function getUserIdentifier(): string
     {
         return $this->getUsername();

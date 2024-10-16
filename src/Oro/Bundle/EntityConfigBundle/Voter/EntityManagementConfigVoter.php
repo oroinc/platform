@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 class EntityManagementConfigVoter implements VoterInterface
 {
+    #[\Override]
     public function vote(TokenInterface $token, mixed $subject, array $attributes)
     {
         if (!($subject instanceof ConfigModel)) {

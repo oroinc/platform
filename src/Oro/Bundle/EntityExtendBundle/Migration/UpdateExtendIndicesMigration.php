@@ -46,9 +46,7 @@ class UpdateExtendIndicesMigration implements
         $this->fieldTypeHelper      = $fieldTypeHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         if ($schema instanceof ExtendSchema) {

@@ -23,18 +23,16 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
         $this->themeManager = $themeManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContext(ContextInterface $context)
     {
         $this->context = $context;
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function getPaths(array $existingPaths)
     {
         $themeName = $this->context->getOr('theme');

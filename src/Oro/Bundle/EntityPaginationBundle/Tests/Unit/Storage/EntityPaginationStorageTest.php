@@ -32,6 +32,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /** @var EntityPaginationStorage */
     private $storage;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -8,6 +8,7 @@ class MemoryCacheTest extends \PHPUnit\Framework\TestCase
 {
     private MemoryCache $memoryCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->memoryCache = new MemoryCache();

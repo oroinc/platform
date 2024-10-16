@@ -25,14 +25,13 @@ class UrlInfoType extends AbstractType
         $this->router = $router;
     }
 
+    #[\Override]
     public function getParent(): ?string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
@@ -41,9 +40,7 @@ class UrlInfoType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('route', self::DEFAULT_DISPLAY_ROUTE);

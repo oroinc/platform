@@ -11,6 +11,7 @@ class TagTypeTest extends \PHPUnit\Framework\TestCase
     /** @var TagType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new TagType();

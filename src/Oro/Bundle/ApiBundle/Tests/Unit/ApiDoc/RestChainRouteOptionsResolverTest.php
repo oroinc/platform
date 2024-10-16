@@ -14,6 +14,7 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|RestDocViewDetector */
     private $docViewDetector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->docViewDetector = $this->createMock(RestDocViewDetector::class);

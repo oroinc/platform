@@ -51,9 +51,7 @@ class ContentProviderListener implements ServiceSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [ContentProviderManager::class];

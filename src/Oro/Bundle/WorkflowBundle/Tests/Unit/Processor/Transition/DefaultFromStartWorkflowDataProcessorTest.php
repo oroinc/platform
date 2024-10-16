@@ -14,6 +14,7 @@ class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestC
     /** @var DefaultFormStartHandleProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new DefaultFromStartWorkflowDataProcessor();

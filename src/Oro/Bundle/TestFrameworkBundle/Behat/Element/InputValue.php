@@ -31,6 +31,7 @@ class InputValue implements ElementValueInterface
      * @param string $xpath
      * @param OroSelenium2Driver $driver
      */
+    #[\Override]
     public function set($xpath, DriverInterface $driver)
     {
         if (InputMethod::SET === $this->inputMethod) {
@@ -46,9 +47,7 @@ JS;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->value;

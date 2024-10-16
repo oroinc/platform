@@ -20,6 +20,7 @@ class FinishImportProcessorTest extends TestCase
     private EventDispatcher|MockObject $eventDispatcher;
 
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);

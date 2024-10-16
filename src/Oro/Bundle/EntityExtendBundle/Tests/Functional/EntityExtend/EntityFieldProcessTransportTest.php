@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityFieldProcessTransportTest extends WebTestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         $this->bootKernel();

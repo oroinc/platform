@@ -21,6 +21,7 @@ class ExpressionLanguageCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionLanguageCacheWarmer */
     private $warmer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fs = $this->createMock(Filesystem::class);

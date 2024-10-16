@@ -76,6 +76,7 @@ class FormConfig implements FormConfigInterface
     /**
      * @return array
      */
+    #[\Override]
     public function toArray()
     {
         $result = [];

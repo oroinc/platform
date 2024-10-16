@@ -7,6 +7,7 @@ namespace Oro\Bundle\SegmentBundle\Placeholder;
  */
 class SegmentConditionFilter implements SegmentConditionFilterInterface
 {
+    #[\Override]
     public function isSegmentFilterShouldBeAdded(): bool
     {
         return true;

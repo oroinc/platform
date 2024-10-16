@@ -23,6 +23,7 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
     private ConsumerState $consumerState;
     private AddConsumerStateProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();

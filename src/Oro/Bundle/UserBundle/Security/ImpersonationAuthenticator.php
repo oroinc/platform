@@ -41,11 +41,13 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
     ) {
     }
 
+    #[\Override]
     public function supports(Request $request): bool
     {
         return $request->query->has(static::TOKEN_PARAMETER);
     }
 
+    #[\Override]
     public function authenticate(Request $request): Passport
     {
         $impersonationToken = $this->getImpersonationToken($request);
@@ -57,6 +59,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
         );
     }
 
+    #[\Override]
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         /** @var User $user */
@@ -66,6 +69,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
         return $this->tokenFactory->create($user, $firewallName, $organization, $user->getUserRoles());
     }
 
+    #[\Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $firewallName): ?Response
     {
         $impersonation = $this->getImpersonation($this->getImpersonationToken($request));
@@ -89,6 +93,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
         return $impersonation->getUser();
     }
 
+    #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
@@ -96,6 +101,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
         return new RedirectResponse($this->router->generate('oro_user_security_login'));
     }
 
+    #[\Override]
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
         if ($authException) {

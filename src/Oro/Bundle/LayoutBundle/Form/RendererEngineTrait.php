@@ -43,9 +43,6 @@ trait RendererEngineTrait
      */
     protected $resourcesHierarchy = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function addDefaultThemes($themes)
     {
         $themes = is_array($themes) ? $themes : [$themes];
@@ -53,9 +50,6 @@ trait RendererEngineTrait
         $this->defaultThemes = array_merge($this->defaultThemes, $themes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function switchToNextParentResource(FormView $view, array $blockNameHierarchy, $hierarchyLevel)
     {
         $cacheKey = $view->vars[AbstractRendererEngine::CACHE_KEY_VAR];
@@ -98,9 +92,6 @@ trait RendererEngineTrait
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResourceForBlockName(FormView $view, string $blockName): mixed
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
@@ -112,9 +103,6 @@ trait RendererEngineTrait
         return parent::getResourceForBlockName($view, $blockName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|false
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];

@@ -9,9 +9,6 @@ trait HeaderStorageAwareTrait
 {
     private ?HeaderStorage $headerStorage = null;
 
-    /**
-     * {@inheritDoc}
-     */
     public function setHeaderStorage(?HeaderStorage $headerStorage): void
     {
         $this->headerStorage = $headerStorage;

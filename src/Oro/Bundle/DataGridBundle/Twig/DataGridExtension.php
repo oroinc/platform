@@ -96,9 +96,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         return $this->container->get(LoggerInterface::class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -313,9 +311,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

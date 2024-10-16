@@ -38,9 +38,7 @@ class AttributeConfigExtension extends AbstractTypeExtension
         $this->attributeTypeRegistry = $attributeTypeRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $configModel = $options['config_model'];
@@ -103,9 +101,7 @@ class AttributeConfigExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [ConfigType::class];

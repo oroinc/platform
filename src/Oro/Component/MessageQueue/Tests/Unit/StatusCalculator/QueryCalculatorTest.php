@@ -16,6 +16,7 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
     /** @var QueryCalculator */
     private $queryCalculator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRepository = $this->createMock(JobRepositoryInterface::class);

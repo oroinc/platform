@@ -19,6 +19,7 @@ class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
 
     private PhoneProviderPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

@@ -19,6 +19,7 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);

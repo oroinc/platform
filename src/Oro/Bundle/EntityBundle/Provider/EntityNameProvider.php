@@ -8,6 +8,7 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -38,9 +39,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if (!$this->isFormatSupported($format)) {
@@ -76,9 +75,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if (!$this->isFormatSupported($format)) {
@@ -196,6 +193,14 @@ class EntityNameProvider implements EntityNameProviderInterface
                 $result[] = $fieldName;
             }
         }
+        $configs = $this->configProvider->getConfigs($metadata->getName(), true);
+        foreach ($configs as $config) {
+            if (ExtendHelper::isMultiEnumType($config->getId()->getFieldType())
+                && ExtendHelper::isFieldAccessible($config)
+            ) {
+                $result[] = $config->getId()->getFieldName();
+            }
+        }
 
         return $result;
     }
@@ -204,7 +209,12 @@ class EntityNameProvider implements EntityNameProviderInterface
     {
         $values = [];
         foreach ($fieldNames as $field) {
-            $values[] = $this->getFieldValue($entity, $field);
+            $fieldValue = $this->getFieldValue($entity, $field);
+            if (is_array($fieldValue) && !empty($fieldValue[0]) && $fieldValue[0] instanceof EnumOptionInterface) {
+                $values = array_merge($values, array_map(fn ($item) => $item->getInternalId(), $fieldValue));
+            } else {
+                $values[] = $fieldValue;
+            }
         }
 
         $values = array_filter($values);

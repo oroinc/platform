@@ -20,17 +20,13 @@ class TestSearchAclHelperCondition implements SearchAclHelperConditionInterface
         $this->addRestrictionCallback = $addRestrictionCallback;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(string $className, string $permission): bool
     {
         return \call_user_func($this->isApplicableCallback, $className, $permission);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addRestriction(Query $query, string $alias, ?Expression $orExpression): ?Expression
     {
         return \call_user_func($this->addRestrictionCallback, $query, $alias, $orExpression);

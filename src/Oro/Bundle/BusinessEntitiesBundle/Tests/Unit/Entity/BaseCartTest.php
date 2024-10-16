@@ -11,6 +11,7 @@ class BaseCartTest extends \PHPUnit\Framework\TestCase
 
     private BaseCart $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new BaseCart();

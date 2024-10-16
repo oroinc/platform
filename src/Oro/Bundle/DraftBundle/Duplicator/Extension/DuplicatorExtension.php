@@ -26,11 +26,13 @@ class DuplicatorExtension extends AbstractDuplicatorExtension
         $this->filter = $filter;
     }
 
+    #[\Override]
     public function getFilter(): Filter
     {
         return $this->filter;
     }
 
+    #[\Override]
     public function getMatcher(): Matcher
     {
         return $this->matcher;

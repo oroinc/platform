@@ -27,9 +27,7 @@ class GroupingWidgetProviderPass implements CompilerPassInterface
         $this->pageType = $pageType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $services = [];

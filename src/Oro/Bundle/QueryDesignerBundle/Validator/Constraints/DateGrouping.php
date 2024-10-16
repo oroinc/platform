@@ -16,9 +16,7 @@ class DateGrouping extends Constraint
     /** @var string */
     public $dateFieldMandatoryMessage = 'oro.query_designer.date_grouping.date_field.not_blank';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

@@ -13,9 +13,7 @@ class TwigTemplateCacheWarmerPass implements CompilerPassInterface
 {
     private const TWIG_TEMPLATE_CACHE_WARMER = 'twig.template_cache_warmer';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::TWIG_TEMPLATE_CACHE_WARMER)) {

@@ -74,9 +74,7 @@ class ConfigCache implements ConfigCacheStateInterface
         return $this->getSection(ConfigCacheWarmer::INCLUSIONS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isCacheFresh(?int $timestamp): bool
     {
         if (null === $timestamp) {
@@ -95,9 +93,7 @@ class ConfigCache implements ConfigCacheStateInterface
         return $this->cacheFresh;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCacheTimestamp(): ?int
     {
         if (false === $this->cacheTimestamp) {

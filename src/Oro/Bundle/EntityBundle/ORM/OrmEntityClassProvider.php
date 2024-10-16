@@ -18,9 +18,7 @@ class OrmEntityClassProvider implements EntityClassProviderInterface
         $this->managerBag = $managerBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassNames()
     {
         $result = [];

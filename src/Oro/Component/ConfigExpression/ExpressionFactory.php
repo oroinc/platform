@@ -18,9 +18,7 @@ class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesI
         $this->contextAccessor = $contextAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function create($name, array $options = [])
     {
         foreach ($this->extensions as $extension) {
@@ -58,6 +56,7 @@ class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesI
     /**
      * @return string[]
      */
+    #[\Override]
     public function getTypes()
     {
         $services = [];
@@ -70,9 +69,7 @@ class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesI
         return call_user_func_array('array_merge', $services);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isTypeExists($name)
     {
         foreach ($this->extensions as $extension) {

@@ -104,9 +104,7 @@ class OutputLogger extends AbstractLogger
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function log($level, $message, array $context = array())
     {
         if (empty($this->verbositySettings[$this->getVerbosity()][$level])) {

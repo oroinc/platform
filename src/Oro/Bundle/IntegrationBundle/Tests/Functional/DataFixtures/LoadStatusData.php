@@ -62,17 +62,13 @@ class LoadStatusData extends AbstractFixture implements ContainerAwareInterface,
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->data as $data) {
@@ -91,9 +87,7 @@ class LoadStatusData extends AbstractFixture implements ContainerAwareInterface,
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadChannelData::class];

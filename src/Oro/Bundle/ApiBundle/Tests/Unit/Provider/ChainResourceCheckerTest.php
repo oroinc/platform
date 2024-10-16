@@ -15,6 +15,7 @@ class ChainResourceCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ChainResourceChecker */
     private $chainResourceChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resourceCheckerRegistry = $this->createMock(ResourceCheckerRegistry::class);

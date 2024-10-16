@@ -5,8 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EmptyValueComparisonExpression;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class EmptyValueComparisonExpressionTest extends \PHPUnit\Framework\TestCase
@@ -16,8 +18,10 @@ class EmptyValueComparisonExpressionTest extends \PHPUnit\Framework\TestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['empty' => new EmptyValueComparisonExpression()],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
+        $expressionVisitor->setQuery($this->createMock(QueryBuilder::class));
         $expressionVisitor->setQueryAliases(['e']);
 
         return $expressionVisitor;

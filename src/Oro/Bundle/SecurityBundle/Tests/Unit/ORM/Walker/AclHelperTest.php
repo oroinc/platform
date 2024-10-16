@@ -37,6 +37,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AdapterInterface  */
     private $cache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(AdapterInterface::class);

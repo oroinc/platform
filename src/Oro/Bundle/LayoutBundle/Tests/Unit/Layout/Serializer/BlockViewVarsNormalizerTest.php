@@ -9,6 +9,7 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var BlockViewVarsNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->normalizer = new BlockViewVarsNormalizer();

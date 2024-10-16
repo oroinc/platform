@@ -19,22 +19,19 @@ class AbstractTransitionTriggerAssemblerStub extends AbstractTransitionTriggerAs
         $this->canAssemble = $canAssemble;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function canAssemble(array $options)
     {
         return $this->canAssemble;
     }
 
+    #[\Override]
     protected function verifyTrigger(BaseTransitionTrigger $trigger)
     {
         //void
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition)
     {
         return new TriggerStub();

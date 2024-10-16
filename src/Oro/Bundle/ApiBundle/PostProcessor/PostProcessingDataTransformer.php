@@ -18,9 +18,7 @@ class PostProcessingDataTransformer implements DataTransformerInterface
         $this->postProcessorOptions = $postProcessorOptions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform(mixed $value, array $config, array $context): mixed
     {
         return $this->postProcessor->process($value, $this->postProcessorOptions);

@@ -14,9 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\YamlDriver;
  */
 class ExtendClassMetadataFactory extends OroClassMetadataFactory
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setMetadataFor($className, $class)
     {
         $cacheDriver = $this->getCache();

@@ -13,6 +13,7 @@ class SingleObjectIterableResultDecoratorTest extends \PHPUnit\Framework\TestCas
     /** @var SingleObjectIterableResultDecorator */
     private $iterableResultDecorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->iterableResult = $this->createMock(IterableResult::class);

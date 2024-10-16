@@ -12,6 +12,7 @@ class UserCreateUpdateTest extends WebTestCase
     /** @var UserManager */
     private $userManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

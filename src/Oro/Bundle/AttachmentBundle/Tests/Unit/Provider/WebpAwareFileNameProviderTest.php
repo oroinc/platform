@@ -16,6 +16,7 @@ class WebpAwareFileNameProviderTest extends \PHPUnit\Framework\TestCase
 
     private WebpAwareFileNameProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerFileNameProvider = $this->createMock(FileNameProviderInterface::class);

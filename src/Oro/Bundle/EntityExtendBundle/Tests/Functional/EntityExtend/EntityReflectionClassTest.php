@@ -12,6 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityReflectionClassTest extends WebTestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         $this->bootKernel();
@@ -278,13 +279,6 @@ class EntityReflectionClassTest extends WebTestCase
     public function getMethodsDataProvider(): array
     {
         return [
-            'get extend enum attribute method exist' => [
-                'class' => TestExtendedEntity::class,
-                'expectedMethod' => VirtualReflectionMethod::create(
-                    TestExtendedEntity::class,
-                    'getTestExtendedEntityEnumAttribute'
-                ),
-            ],
             'remove extend method exist' => [
                 'class' => TestExtendedEntity::class,
                 'expectedMethod' => VirtualReflectionMethod::create(

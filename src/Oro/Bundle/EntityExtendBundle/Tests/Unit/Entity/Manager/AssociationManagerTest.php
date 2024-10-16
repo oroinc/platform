@@ -43,6 +43,7 @@ class AssociationManagerTest extends OrmTestCase
     /** @var AssociationManager */
     private $associationManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

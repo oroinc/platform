@@ -36,9 +36,7 @@ class ProcessIncludedEntities implements ProcessorInterface
         $this->exceptionTextExtractor = $exceptionTextExtractor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

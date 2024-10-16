@@ -13,6 +13,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
     private BuildQuery $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

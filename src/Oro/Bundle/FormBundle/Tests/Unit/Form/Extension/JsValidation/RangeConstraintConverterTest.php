@@ -19,6 +19,7 @@ class RangeConstraintConverterTest extends TestCase
 
     private RangeConstraintConverter $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);

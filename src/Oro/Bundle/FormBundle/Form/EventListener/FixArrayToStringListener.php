@@ -26,6 +26,7 @@ class FixArrayToStringListener implements EventSubscriberInterface
         }
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return array(FormEvents::PRE_SUBMIT => 'preSubmit');

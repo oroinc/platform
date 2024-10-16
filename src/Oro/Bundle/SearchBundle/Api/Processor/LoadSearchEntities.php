@@ -19,9 +19,7 @@ class LoadSearchEntities implements ProcessorInterface
         $this->searchEntityRepository = $searchEntityRepository;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */

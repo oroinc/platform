@@ -18,6 +18,7 @@ class EntitiesToJsonTransformerTest extends TestCase
     /** @var EntitiesToJsonTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

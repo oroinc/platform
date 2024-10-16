@@ -7,9 +7,7 @@ namespace Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter;
  */
 class AttributeTemplateDataConverter extends AbstractFieldTemplateDataConverter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getMainHeaders(): array
     {
         return ['fieldName', 'type'];

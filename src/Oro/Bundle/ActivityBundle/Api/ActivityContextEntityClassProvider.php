@@ -31,9 +31,7 @@ class ActivityContextEntityClassProvider implements SearchEntityClassProviderInt
         $this->activityEntityClass = $activityEntityClass;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessibleEntityClasses(string $version, RequestType $requestType): array
     {
         $activityTargets = $this->activityManager->getActivityTargets($this->activityEntityClass);
@@ -55,9 +53,7 @@ class ActivityContextEntityClassProvider implements SearchEntityClassProviderInt
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAllowedEntityClasses(string $version, RequestType $requestType): array
     {
         $entityClasses = $this->getAccessibleEntityClasses($version, $requestType);

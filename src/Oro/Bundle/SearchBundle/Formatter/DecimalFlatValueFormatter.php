@@ -7,9 +7,7 @@ namespace Oro\Bundle\SearchBundle\Formatter;
  */
 class DecimalFlatValueFormatter implements ValueFormatterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($value): string
     {
         // the standard implementation stores price values as is

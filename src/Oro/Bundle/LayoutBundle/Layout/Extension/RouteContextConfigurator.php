@@ -19,8 +19,8 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
     /**
      * Sets current request route name into layout context
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()

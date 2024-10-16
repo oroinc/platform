@@ -9,17 +9,12 @@ class TextTypeStub extends TextType
 {
     private const NAME = 'text_stub';
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);

@@ -10,17 +10,13 @@ use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
  */
 class Pgsql92CommandArgsNormalizer extends CommandArgsNormalizer
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(AbstractPlatform $platform)
     {
         return $platform instanceof PostgreSQL92Platform;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function quoteArg($value)
     {
         return '"' . $value . '"';

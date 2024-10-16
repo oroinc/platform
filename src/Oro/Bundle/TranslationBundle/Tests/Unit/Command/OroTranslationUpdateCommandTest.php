@@ -32,6 +32,7 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
     /** @var OroTranslationUpdateCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationDownloader = $this->createMock(TranslationDownloader::class);

@@ -25,6 +25,7 @@ class BeforeSearchEvent extends Event implements SearchQueryAwareEventInterface
     /**
      * @return Query
      */
+    #[\Override]
     public function getQuery()
     {
         return $this->query;

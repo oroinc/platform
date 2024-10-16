@@ -14,6 +14,7 @@ class AttributeFamilyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     private AttributeFamilyEntityNameProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new AttributeFamilyEntityNameProvider();

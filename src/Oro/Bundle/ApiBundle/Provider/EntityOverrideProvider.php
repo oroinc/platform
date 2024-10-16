@@ -17,9 +17,7 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
         $this->configCache = $configCache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSubstituteEntityClass(string $entityClass): ?string
     {
         if (null === $this->substitutions) {
@@ -29,9 +27,7 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
         return $this->substitutions[$entityClass] ?? null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClass(string $substituteClass): ?string
     {
         if (null === $this->substitutions) {

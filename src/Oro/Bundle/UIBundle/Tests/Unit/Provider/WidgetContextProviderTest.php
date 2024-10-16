@@ -14,6 +14,7 @@ class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetContextProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();

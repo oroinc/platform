@@ -10,6 +10,7 @@ class EmailCollectionTypeTest extends \PHPUnit\Framework\TestCase
     /** @var EmailCollectionType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new EmailCollectionType();

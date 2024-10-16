@@ -24,9 +24,7 @@ class FormContextConfigurator implements ContextConfiguratorInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()

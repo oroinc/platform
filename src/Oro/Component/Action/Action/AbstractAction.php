@@ -30,14 +30,13 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
         $this->contextAccessor = $contextAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setCondition(ExpressionInterface $condition)
     {
         $this->condition = $condition;
     }
 
+    #[\Override]
     public function setDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -46,6 +45,7 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
     /**
      * @param mixed $context
      */
+    #[\Override]
     public function execute($context)
     {
         if ($this->isAllowed($context)) {

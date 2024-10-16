@@ -36,9 +36,7 @@ class FeatureDecisionManager implements FeatureDecisionManagerInterface
         $this->allowIfEqualGrantedDeniedDecisions = $allowIfEqualGrantedDeniedDecisions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function decide(string $feature, object|int|null $scopeIdentifier): bool
     {
         $cacheKey = $this->getCacheKey($feature, $scopeIdentifier);
@@ -60,9 +58,7 @@ class FeatureDecisionManager implements FeatureDecisionManagerInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->cache = [];

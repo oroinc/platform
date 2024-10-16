@@ -11,6 +11,7 @@ class WidgetStateTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetState */
     private $state;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->state = new WidgetState();

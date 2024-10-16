@@ -14,9 +14,7 @@ class AddIncludedData implements ProcessorInterface
 {
     public const OPERATION_NAME = 'append_included_data';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

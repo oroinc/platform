@@ -22,6 +22,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ScheduleManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

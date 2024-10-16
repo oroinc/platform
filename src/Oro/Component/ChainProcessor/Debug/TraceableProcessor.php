@@ -26,9 +26,7 @@ class TraceableProcessor implements ProcessorInterface
         return $this->processor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         $this->logger->startProcessor($this->processorId);

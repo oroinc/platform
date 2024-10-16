@@ -179,6 +179,7 @@ class EmailAttachment implements FileExtensionInterface
      *
      * @return string
      */
+    #[\Override]
     public function getExtension()
     {
         return pathinfo($this->fileName, PATHINFO_EXTENSION);
@@ -231,6 +232,7 @@ class EmailAttachment implements FileExtensionInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getFileName();

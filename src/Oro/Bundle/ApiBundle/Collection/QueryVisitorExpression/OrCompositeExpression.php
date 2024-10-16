@@ -9,9 +9,7 @@ use Doctrine\ORM\Query\Expr;
  */
 class OrCompositeExpression implements CompositeExpressionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(array $expressions): mixed
     {
         return new Expr\Orx($expressions);

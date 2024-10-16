@@ -24,9 +24,7 @@ class DataFixtureEntityManager extends EntityManagerDecorator
         $this->validator = $validator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flush($entity = null)
     {
         $this->validateBeforeFlush

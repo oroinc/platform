@@ -11,6 +11,7 @@ class ImagineControllerTest extends WebTestCase
 
     private string $publicDir;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -26,6 +27,7 @@ class ImagineControllerTest extends WebTestCase
         );
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->client->enableReboot();

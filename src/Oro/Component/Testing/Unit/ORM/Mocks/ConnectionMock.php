@@ -20,33 +20,25 @@ class ConnectionMock extends Connection
         parent::__construct($params, $driver, $config, $eventManager);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDatabasePlatform()
     {
         return $this->platformMock;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function lastInsertId($seqName = null)
     {
         return $this->lastInsertId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function fetchColumn($statement, array $params = [], $colnum = 0, array $types = [])
     {
         return $this->fetchOneResult;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function quote($input, $type = null)
     {
         if (is_string($input)) {

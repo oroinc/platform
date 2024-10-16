@@ -19,9 +19,7 @@ class BatchFlushDataHandlerFactory implements BatchFlushDataHandlerFactoryInterf
         $this->flushDataHandler = $flushDataHandler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createHandler(string $entityClass): ?BatchFlushDataHandlerInterface
     {
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {

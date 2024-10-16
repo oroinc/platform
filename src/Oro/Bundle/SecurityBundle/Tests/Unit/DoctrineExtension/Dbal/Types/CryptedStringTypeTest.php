@@ -10,6 +10,7 @@ class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
 {
     private CryptedStringType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $crypter = $this->createMock(SymmetricCrypterInterface::class);

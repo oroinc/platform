@@ -8,6 +8,7 @@ class ItemKeyBuilderTest extends \PHPUnit\Framework\TestCase
 {
     private ItemKeyBuilder $itemKeyBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->itemKeyBuilder = new ItemKeyBuilder();

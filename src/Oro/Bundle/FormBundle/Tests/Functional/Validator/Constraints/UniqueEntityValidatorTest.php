@@ -26,6 +26,7 @@ class UniqueEntityValidatorTest extends WebTestCase
     /** @var ObjectManager */
     private ObjectManager $em;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

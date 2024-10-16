@@ -51,9 +51,7 @@ class UserHandler extends AbstractUserHandler
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(User $user)
     {
         $isUpdated = false;
@@ -80,9 +78,7 @@ class UserHandler extends AbstractUserHandler
         return $isUpdated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function onSuccess(User $user)
     {
         if (null === $user->getAuthStatus()) {

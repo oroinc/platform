@@ -14,16 +14,19 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  */
 class CommentEntityFieldExtension extends AbstractAssociationEntityFieldExtension
 {
+    #[\Override]
     public function isApplicable(EntityFieldProcessTransport $transport): bool
     {
         return $transport->getClass() === Comment::class;
     }
 
+    #[\Override]
     public function getRelationKind(): ?string
     {
         return null;
     }
 
+    #[\Override]
     public function getRelationType(): string
     {
         return RelationType::MANY_TO_ONE;

@@ -7,9 +7,7 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
-use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
-use Oro\Bundle\EntityExtendBundle\Migration\Query\EnumDataValue;
-use Oro\Bundle\EntityExtendBundle\Migration\Query\InsertEnumValuesQuery;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -21,17 +19,13 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
 {
     use ExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v1_8';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
@@ -46,7 +40,7 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
         $this->addOroDashboardWidgetForeignKeys($schema);
         $this->addOroDashboardWidgetStateForeignKeys($schema);
 
-        $this->addDashboardTypeEnumField($schema, $queries);
+        $this->addDashboardTypeEnumField($schema);
     }
 
     /**
@@ -198,11 +192,12 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
     /**
      * Add dashboard_type enum field to the oro_dashboard table and adds widgets default dashboard type.
      */
-    private function addDashboardTypeEnumField(Schema $schema, QueryBag $queries): void
+    private function addDashboardTypeEnumField(Schema $schema): void
     {
-        $enumTable = $this->extendExtension->addEnumField(
+        $dashboardTable = $schema->getTable('oro_dashboard');
+        $this->extendExtension->addEnumField(
             $schema,
-            $schema->getTable('oro_dashboard'),
+            $dashboardTable,
             'dashboard_type',
             'dashboard_type',
             false,
@@ -216,13 +211,12 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
                 'dataaudit' => ['auditable' => false]
             ]
         );
-
-        $options = new OroOptions();
-        $options->set('enum', 'immutable_codes', ['widgets']);
-        $enumTable->addOption(OroOptions::KEY, $options);
-
-        $queries->addPostQuery(new InsertEnumValuesQuery($this->extendExtension, 'dashboard_type', [
-            new EnumDataValue('widgets', 'Widgets', 1, true)
-        ]));
+        $enumOptionIds = [ExtendHelper::buildEnumOptionId('dashboard_type', 'widgets')];
+        $dashboardTable->addExtendColumnOption(
+            'dashboard_type',
+            'enum',
+            'immutable_codes',
+            $enumOptionIds
+        );
     }
 }

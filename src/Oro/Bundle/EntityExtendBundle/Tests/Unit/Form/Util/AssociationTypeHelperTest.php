@@ -16,6 +16,7 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var AssociationTypeHelper */
     private $typeHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

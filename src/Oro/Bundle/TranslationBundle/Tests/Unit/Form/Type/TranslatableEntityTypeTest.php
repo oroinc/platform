@@ -50,6 +50,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $aclHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
@@ -106,9 +107,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

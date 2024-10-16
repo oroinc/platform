@@ -9,6 +9,7 @@ class UserMenu extends Element
 {
     private $links = [];
 
+    #[\Override]
     protected function init()
     {
         $this->links = $this->findAll('css', 'ul.dropdown-menu li a');
@@ -22,6 +23,7 @@ class UserMenu extends Element
     /**
      * @param string $locator
      */
+    #[\Override]
     public function clickLink($locator)
     {
         self::assertTrue(
@@ -32,9 +34,7 @@ class UserMenu extends Element
         $this->getLinkByTitle($locator)->click();
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function hasLink($title)
     {
         return (bool) $this->getLinkByTitle($title);

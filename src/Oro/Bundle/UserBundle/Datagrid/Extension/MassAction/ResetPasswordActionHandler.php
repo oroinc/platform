@@ -39,9 +39,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handle(MassActionHandlerArgs $args): MassActionResponseInterface
     {
         $currentUser = $this->tokenAccessor->getUser();

@@ -27,9 +27,7 @@ class HandleEmailFolders implements ProcessorInterface
         $this->emailOriginRepository = $emailOriginRepository;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

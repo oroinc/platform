@@ -16,6 +16,7 @@ class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var TicketDigestGenerator */
     private $ticketDigestGenerator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->passwordHasher = $this->createMock(PasswordHasherInterface::class);

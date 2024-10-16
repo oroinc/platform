@@ -19,6 +19,7 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
     /** @var AbstractType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
@@ -60,9 +61,7 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $choiceType = $this->createMock(OroChoiceType::class);

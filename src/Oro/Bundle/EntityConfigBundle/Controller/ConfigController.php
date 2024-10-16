@@ -404,9 +404,7 @@ class ConfigController extends AbstractController
         return $this->container->get(TranslatorInterface::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

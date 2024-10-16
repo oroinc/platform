@@ -7,6 +7,7 @@ class CleanupMarketingListMigrationQuery extends AbstractCleanupMarketingMigrati
     /**
      * @return array
      */
+    #[\Override]
     public function getClassNames()
     {
         return [

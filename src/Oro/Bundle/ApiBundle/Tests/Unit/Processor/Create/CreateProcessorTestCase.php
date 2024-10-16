@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class CreateProcessorTestCase extends FormProcessorTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createContext(): FormContext
     {
         $context = new CreateContext($this->configProvider, $this->metadataProvider);

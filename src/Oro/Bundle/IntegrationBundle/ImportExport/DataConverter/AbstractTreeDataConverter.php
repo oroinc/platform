@@ -29,9 +29,7 @@ abstract class AbstractTreeDataConverter extends IntegrationAwareDataConverter
         $this->toManyDataConverters[$nodeKey] = $isToMany;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context)
     {
         parent::setImportExportContext($context);
@@ -43,9 +41,7 @@ abstract class AbstractTreeDataConverter extends IntegrationAwareDataConverter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
         foreach ($this->nodeDataConverters as $nodeKey => $dataConverter) {
@@ -66,9 +62,7 @@ abstract class AbstractTreeDataConverter extends IntegrationAwareDataConverter
         return parent::convertToImportFormat($importedRecord, $skipNullValues);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
         $rules = $this->getHeaderConversionRules();

@@ -15,6 +15,7 @@ class RemoveAuditDuplicatesQuery extends ParametrizedMigrationQuery
     /**
      * @return string|string[]
      */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -23,6 +24,7 @@ class RemoveAuditDuplicatesQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

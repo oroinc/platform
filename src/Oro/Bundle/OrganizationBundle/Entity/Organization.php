@@ -85,6 +85,7 @@ class Organization implements OrganizationInterface, ExtendEntityInterface
      *
      * @return int
      */
+    #[\Override]
     public function getId()
     {
         return $this->id;
@@ -121,6 +122,7 @@ class Organization implements OrganizationInterface, ExtendEntityInterface
      *
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;
@@ -189,6 +191,7 @@ class Organization implements OrganizationInterface, ExtendEntityInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getName();

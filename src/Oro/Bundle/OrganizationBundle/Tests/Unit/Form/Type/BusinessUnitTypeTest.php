@@ -29,6 +29,7 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     /** @var BusinessUnitType */
     private $form;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -45,9 +46,7 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
         $this->form = new BusinessUnitType($businessUnitManager, $this->createMock(TokenAccessorInterface::class));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $registry = $this->createMock(ManagerRegistry::class);
@@ -95,9 +94,7 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getValidators(): array
     {
         return [

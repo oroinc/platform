@@ -12,6 +12,7 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowStep */
     private $step;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->step = new WorkflowStep();

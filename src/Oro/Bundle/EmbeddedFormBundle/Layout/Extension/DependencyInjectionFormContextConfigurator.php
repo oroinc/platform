@@ -26,9 +26,7 @@ class DependencyInjectionFormContextConfigurator implements ContextConfiguratorI
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         if (!$this->formServiceId) {

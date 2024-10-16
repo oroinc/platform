@@ -33,6 +33,7 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(Form::class);

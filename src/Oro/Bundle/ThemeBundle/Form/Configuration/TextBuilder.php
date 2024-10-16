@@ -9,23 +9,20 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
  */
 class TextBuilder extends AbstractConfigurationChildBuilder
 {
-    #[\Override] public static function getType(): string
+    #[\Override]
+    public static function getType(): string
     {
         return 'text';
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    #[\Override] protected function getTypeClass(): string
+    #[\Override]
+    protected function getTypeClass(): string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    #[\Override] protected function getDefaultOptions(): array
+    #[\Override]
+    protected function getDefaultOptions(): array
     {
         return [
             'required' => false,

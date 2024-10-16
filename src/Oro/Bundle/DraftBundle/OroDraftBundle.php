@@ -8,9 +8,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroDraftBundle extends Bundle
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new RouterPass());

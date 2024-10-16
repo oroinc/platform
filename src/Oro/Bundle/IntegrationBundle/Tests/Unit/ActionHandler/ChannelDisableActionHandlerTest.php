@@ -14,6 +14,7 @@ class ChannelDisableActionHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ChannelDisableActionHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

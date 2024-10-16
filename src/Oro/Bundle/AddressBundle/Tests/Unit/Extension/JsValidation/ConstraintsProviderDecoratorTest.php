@@ -20,6 +20,7 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
      */
     private $providerDecorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = $this->createMock(ConstraintsProviderInterface::class);

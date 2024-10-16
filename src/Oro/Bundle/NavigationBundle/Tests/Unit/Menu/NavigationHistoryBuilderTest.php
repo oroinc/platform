@@ -31,6 +31,7 @@ class NavigationHistoryBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationHistoryBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

@@ -22,25 +22,19 @@ class EntityFieldFixture implements TemplateFixtureInterface
         $this->typeRegistry = $typeRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClass()
     {
         return FieldConfigModel::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntity($key)
     {
         return new FieldConfigModel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getData()
     {
         $types = $this->fieldTypeProvider->getSupportedFieldTypes();
@@ -56,9 +50,7 @@ class EntityFieldFixture implements TemplateFixtureInterface
         return new \ArrayIterator($objects);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function fillEntityData($key, $entity)
     {
         if (!$entity instanceof FieldConfigModel) {

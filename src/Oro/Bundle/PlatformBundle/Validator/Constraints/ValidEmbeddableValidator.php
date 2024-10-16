@@ -19,6 +19,7 @@ class ValidEmbeddableValidator extends ConstraintValidator
      * @param mixed $value
      * @param ValidEmbeddable $constraint
      */
+    #[\Override]
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof ValidEmbeddable) {

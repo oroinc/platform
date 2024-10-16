@@ -20,9 +20,7 @@ class ExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensi
         $this->expressionLanguage = $expressionLanguage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
     {
         $source = $data->getSource();

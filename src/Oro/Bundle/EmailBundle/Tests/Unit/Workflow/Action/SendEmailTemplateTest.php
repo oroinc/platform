@@ -37,6 +37,7 @@ class SendEmailTemplateTest extends TestCase
 
     private SendEmailTemplate $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

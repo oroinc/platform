@@ -20,6 +20,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
 
     private FileRemovalManager $fileRemovalManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configuration = $this->createMock(FileRemovalManagerConfigInterface::class);

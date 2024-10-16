@@ -16,9 +16,7 @@ class AddFiltersToResourceWithoutIdentifier implements ProcessorInterface
     public const FILTER1_KEY = 'filter1';
     public const FILTER2_KEY = 'filter2';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

@@ -26,6 +26,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DictionaryEntityNameProvider */
     private $entityNameProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

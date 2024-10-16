@@ -17,6 +17,7 @@ class JobExecutionTest extends \PHPUnit\Framework\TestCase
 {
     private JobExecution $jobExecution;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobExecution = new JobExecution();

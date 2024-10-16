@@ -22,6 +22,7 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
     /** @var \PHPUnit\Framework\MockObject\MockObject|NumberFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(NumberFormatter::class);
@@ -102,9 +103,7 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
         $this->assertEquals(['$' => 'USD', '€' => 'EUR'], $currencyNameHelper->getCurrencyChoices());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getViewType(): string
     {
         return $this->viewType;

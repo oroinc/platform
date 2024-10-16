@@ -36,6 +36,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formRegistry = $this->createMock(FormRegistryInterface::class);

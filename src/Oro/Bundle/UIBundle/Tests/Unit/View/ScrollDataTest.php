@@ -12,6 +12,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 {
     private ScrollData $scrollData;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->scrollData = new ScrollData();

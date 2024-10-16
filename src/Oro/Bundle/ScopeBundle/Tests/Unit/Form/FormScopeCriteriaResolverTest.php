@@ -18,6 +18,7 @@ class FormScopeCriteriaResolverTest extends \PHPUnit\Framework\TestCase
     /** @var FormScopeCriteriaResolver */
     private $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(ScopeManager::class);

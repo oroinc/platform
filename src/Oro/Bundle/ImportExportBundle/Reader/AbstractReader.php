@@ -27,6 +27,7 @@ abstract class AbstractReader implements ReaderInterface
         $this->contextRegistry = $contextRegistry;
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

@@ -11,6 +11,7 @@ class DefaultAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultAccessor */
     private $accessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->accessor = new DefaultAccessor();

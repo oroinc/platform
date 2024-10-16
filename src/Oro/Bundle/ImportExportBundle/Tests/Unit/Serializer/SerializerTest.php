@@ -11,6 +11,7 @@ class SerializerTest extends \PHPUnit\Framework\TestCase
 {
     private Serializer $serializer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serializer = new Serializer();

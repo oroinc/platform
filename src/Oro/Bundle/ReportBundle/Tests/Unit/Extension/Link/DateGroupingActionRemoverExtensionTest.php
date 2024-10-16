@@ -12,6 +12,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
     private $config;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->config = $this->createMock(DatagridConfiguration::class);

@@ -10,9 +10,7 @@ class DataChangesetTransformer implements DataTransformerInterface
 {
     const DATA_KEY = 'data';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         $result = [];
@@ -27,9 +25,7 @@ class DataChangesetTransformer implements DataTransformerInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         $result = new ArrayCollection();

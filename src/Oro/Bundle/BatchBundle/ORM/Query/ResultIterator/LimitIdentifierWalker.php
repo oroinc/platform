@@ -12,9 +12,7 @@ class LimitIdentifierWalker extends TreeWalkerAdapter
 {
     const PARAMETER_IDS = 'buffered_result_iterator_keys';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
         $this->_getQuery();

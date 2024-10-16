@@ -26,6 +26,7 @@ class PreExportMessageProcessorTest extends WebTestCase
     use MessageQueueExtension;
     use JobsAwareTestTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

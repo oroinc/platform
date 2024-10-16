@@ -7,17 +7,13 @@ use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 
 class IntegrationTypeWithIcon implements IntegrationInterface, IconAwareIntegrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return 'oro.type1.label';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIcon()
     {
         return 'bundles/acmedemo/img/logo.png';

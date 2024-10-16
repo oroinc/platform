@@ -22,9 +22,7 @@ class ValidateParentEntityTypeFeature implements ProcessorInterface
         $this->resourcesProvider = $resourcesProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

@@ -54,9 +54,7 @@ class UpdateTableFieldQuery extends ParametrizedMigrationQuery
         $this->columnId = $columnId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -65,9 +63,7 @@ class UpdateTableFieldQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->processQueries($logger);

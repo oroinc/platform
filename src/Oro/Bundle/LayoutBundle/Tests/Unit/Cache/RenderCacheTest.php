@@ -24,6 +24,7 @@ class RenderCacheTest extends TestCase
 
     private RenderCache $renderCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(TagAwareAdapterInterface::class);

@@ -6,9 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Loader\AbstractConfigLoader;
 
 class TestConfigLoader extends AbstractConfigLoader
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(array $config): mixed
     {
         $result = new TestConfig();

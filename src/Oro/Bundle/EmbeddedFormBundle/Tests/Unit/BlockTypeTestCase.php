@@ -19,9 +19,7 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
     /** @var GroupingFormLayoutBuilder */
     protected $formLayoutBuilder;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);

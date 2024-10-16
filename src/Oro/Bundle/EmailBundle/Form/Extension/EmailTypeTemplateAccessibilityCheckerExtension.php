@@ -22,17 +22,13 @@ class EmailTypeTemplateAccessibilityCheckerExtension extends AbstractTypeExtensi
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /***
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [EmailType::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$this->authorizationChecker->isGranted('VIEW', 'entity:' . EmailTemplate::class)) {

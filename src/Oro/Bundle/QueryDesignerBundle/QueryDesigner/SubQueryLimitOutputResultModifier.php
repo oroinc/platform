@@ -11,9 +11,7 @@ class SubQueryLimitOutputResultModifier extends AbstractOutputResultModifier
 {
     public const WALKER_HOOK_LIMIT_KEY = 'walker_hook_for_limit';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkSubselect($subselect, string $result)
     {
         $hooks = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_KEY);

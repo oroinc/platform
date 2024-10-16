@@ -10,23 +10,20 @@ use Symfony\Component\Validator\Constraints\PositiveOrZero;
  */
 class IntegerBuilder extends AbstractConfigurationChildBuilder
 {
-    #[\Override] public static function getType(): string
+    #[\Override]
+    public static function getType(): string
     {
         return 'integer';
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    #[\Override] protected function getTypeClass(): string
+    #[\Override]
+    protected function getTypeClass(): string
     {
         return IntegerType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    #[\Override] protected function getDefaultOptions(): array
+    #[\Override]
+    protected function getDefaultOptions(): array
     {
         return [
             'required' => false,

@@ -29,9 +29,7 @@ class OrmDatasourceExtension extends AbstractExtension
         $this->parameters = new ParameterBag();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -40,9 +38,7 @@ class OrmDatasourceExtension extends AbstractExtension
             && $config->offsetGetByPath(QueryDesignerQueryConfiguration::FILTERS);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $gridName = $config->getName();

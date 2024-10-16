@@ -52,6 +52,7 @@ class JobExecutorRedeliveryTest extends \PHPUnit\Framework\TestCase
     /** @var JobExecutor */
     private $executor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

@@ -15,6 +15,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     private Configuration $configuration;
     private Processor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configuration = new Configuration(['string', 'number']);

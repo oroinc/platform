@@ -32,10 +32,10 @@ class ExtendColumn extends Column
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return ExtendColumn
      */
+    #[\Override]
     public function setOptions(array $options)
     {
         if (isset($options[OroOptions::KEY])) {
@@ -61,10 +61,10 @@ class ExtendColumn extends Column
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return ExtendColumn
      */
+    #[\Override]
     public function setNotnull($notnull)
     {
         if ($this->constructed) {
@@ -75,10 +75,10 @@ class ExtendColumn extends Column
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return ExtendColumn
      */
+    #[\Override]
     public function setType(Type $type)
     {
         if ($this->constructed) {
@@ -89,10 +89,10 @@ class ExtendColumn extends Column
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return ExtendColumn
      */
+    #[\Override]
     public function setLength($length)
     {
         if ($this->constructed) {
@@ -103,10 +103,10 @@ class ExtendColumn extends Column
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return ExtendColumn
      */
+    #[\Override]
     public function setPrecision($precision)
     {
         if ($this->constructed) {
@@ -117,10 +117,10 @@ class ExtendColumn extends Column
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return ExtendColumn
      */
+    #[\Override]
     public function setScale($scale)
     {
         if ($this->constructed) {
@@ -131,10 +131,10 @@ class ExtendColumn extends Column
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return ExtendColumn
      */
+    #[\Override]
     public function setDefault($default)
     {
         if ($this->constructed) {

@@ -45,57 +45,43 @@ class CacheLayoutFactory implements LayoutFactoryInterface
         $this->blockViewCache = $blockViewCache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRegistry()
     {
         return $this->baseLayoutFactory->getRegistry();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRendererRegistry()
     {
         return $this->baseLayoutFactory->getRendererRegistry();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getType($name)
     {
         return $this->baseLayoutFactory->getType($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createRawLayoutBuilder()
     {
         return $this->baseLayoutFactory->createRawLayoutBuilder();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createLayoutManipulator(RawLayoutBuilderInterface $rawLayoutBuilder)
     {
         return $this->baseLayoutFactory->createLayoutManipulator($rawLayoutBuilder);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createBlockFactory(DeferredLayoutManipulatorInterface $layoutManipulator)
     {
         return $this->baseLayoutFactory->createBlockFactory($layoutManipulator);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createLayoutBuilder()
     {
         $rawLayoutBuilder = $this->createRawLayoutBuilder();

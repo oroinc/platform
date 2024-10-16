@@ -7,41 +7,31 @@ namespace Oro\Component\ChainProcessor;
  */
 abstract class AbstractParameterBag implements ParameterBagInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->toArray());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         return $this->get($offset);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         $this->set($offset, $value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         $this->remove($offset);

@@ -21,6 +21,7 @@ class ActionsPassTest extends \PHPUnit\Framework\TestCase
 
     private Definition $actionFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionsPass = new ActionsPass(self::FACTORY_SERVICE_ID, self::TAG_NAME);

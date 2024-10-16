@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 
 class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

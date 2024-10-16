@@ -23,6 +23,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
     /** @var ResourcesCache */
     private $resourcesCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheItemPoolInterface::class);

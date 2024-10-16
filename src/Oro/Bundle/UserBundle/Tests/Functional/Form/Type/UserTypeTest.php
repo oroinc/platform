@@ -22,6 +22,7 @@ class UserTypeTest extends WebTestCase
     private const FIRST_NAME = 'John';
     private const LAST_NAME = 'Doe';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient(

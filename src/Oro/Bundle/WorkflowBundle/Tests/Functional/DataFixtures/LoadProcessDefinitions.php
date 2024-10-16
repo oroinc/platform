@@ -13,17 +13,13 @@ class LoadProcessDefinitions extends AbstractFixture implements ContainerAwareIn
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $processConfiguration = $this->getProcessConfiguration();

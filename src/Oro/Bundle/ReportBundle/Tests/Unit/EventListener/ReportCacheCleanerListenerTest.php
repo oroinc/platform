@@ -20,6 +20,7 @@ class ReportCacheCleanerListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ReportCacheCleanerListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheInterface::class);

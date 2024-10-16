@@ -19,6 +19,7 @@ class LinkPropertyTest extends \PHPUnit\Framework\TestCase
     /** @var LinkProperty */
     private $property;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);

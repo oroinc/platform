@@ -14,14 +14,13 @@ use Oro\Bundle\UserBundle\Entity\Group;
  */
 class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganizationAndBusinessUnitData::class];
     }
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $defaultBusinessUnit = $manager->getRepository(BusinessUnit::class)

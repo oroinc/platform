@@ -42,9 +42,7 @@ class RefreshExtendCacheMigration implements Migration, DataStorageExtensionAwar
         $this->initialEntityConfigStatePath = $initialEntityConfigStatePath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->configManager->flushAllCaches();

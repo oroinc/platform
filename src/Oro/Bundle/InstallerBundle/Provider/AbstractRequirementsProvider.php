@@ -11,33 +11,25 @@ use Symfony\Requirements\RequirementCollection;
  */
 abstract class AbstractRequirementsProvider implements RequirementsProviderInterface
 {
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getOroRequirements(): ?RequirementCollection
     {
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getPhpIniRequirements(): ?RequirementCollection
     {
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getMandatoryRequirements(): ?RequirementCollection
     {
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getRecommendations(): ?RequirementCollection
     {
         return null;

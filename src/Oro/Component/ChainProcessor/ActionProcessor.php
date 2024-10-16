@@ -15,17 +15,13 @@ class ActionProcessor extends ChainProcessor implements ActionProcessorInterface
         $this->action = $action;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAction(): string
     {
         return $this->action;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     final public function createContext(): Context
     {
         $context = $this->createContextObject();

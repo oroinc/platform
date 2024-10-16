@@ -147,6 +147,7 @@ final class JUnitOutputPrinter extends StreamOutputPrinter
     /**
      * Generate XML from the DOMDocument and parse to the writing stream
      */
+    #[\Override]
     public function flush()
     {
         if ($this->isCallstackCallable()) {

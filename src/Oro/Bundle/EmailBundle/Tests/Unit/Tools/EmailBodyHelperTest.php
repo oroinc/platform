@@ -9,6 +9,7 @@ class EmailBodyHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBodyHelper */
     private $bodyHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->bodyHelper = new EmailBodyHelper();

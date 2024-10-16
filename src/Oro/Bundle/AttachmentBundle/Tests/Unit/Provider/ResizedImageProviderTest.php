@@ -27,6 +27,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
     private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
     private ResizedImageProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

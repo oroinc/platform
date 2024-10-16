@@ -34,6 +34,7 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var BusinessUnitHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->request = new Request();

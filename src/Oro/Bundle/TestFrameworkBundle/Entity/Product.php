@@ -27,6 +27,7 @@ class Product implements TestFrameworkEntityInterface, DenormalizedPropertyAware
 
     protected $nameLowercase;
 
+    #[\Override]
     public function updateDenormalizedProperties(): void
     {
         $this->denormalizedName = mb_strtoupper($this->name);

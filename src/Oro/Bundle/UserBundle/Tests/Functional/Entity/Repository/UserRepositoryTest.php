@@ -15,6 +15,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithSameEmailIn
  */
 class UserRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

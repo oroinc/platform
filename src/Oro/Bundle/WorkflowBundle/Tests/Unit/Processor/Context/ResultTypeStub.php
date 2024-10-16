@@ -18,17 +18,13 @@ class ResultTypeStub implements TransitActionResultTypeInterface
         $this->supportsCustom = $supportsCustom;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsCustomForm(): bool
     {
         return $this->supportsCustom;

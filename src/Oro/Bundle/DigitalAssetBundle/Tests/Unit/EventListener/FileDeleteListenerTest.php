@@ -24,6 +24,7 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerFileDeleteListener = $this->createMock(BaseFileDeleteListener::class);

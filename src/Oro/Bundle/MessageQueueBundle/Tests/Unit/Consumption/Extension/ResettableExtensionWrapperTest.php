@@ -22,6 +22,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
     /** @var ResettableExtensionWrapper */
     private $resettableExtensionWrapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

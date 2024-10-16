@@ -19,6 +19,7 @@ class SelectiveContextAggregatorTest extends \PHPUnit\Framework\TestCase
     /** @var SelectiveContextAggregator */
     private $aggregator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);

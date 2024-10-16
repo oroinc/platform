@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ValidLoadedItemsValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         return new ValidLoadedItemsValidator();

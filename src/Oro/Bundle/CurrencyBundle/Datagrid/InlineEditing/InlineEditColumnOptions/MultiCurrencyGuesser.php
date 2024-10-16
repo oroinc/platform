@@ -47,6 +47,7 @@ class MultiCurrencyGuesser implements GuesserInterface
      * @param bool $isEnabledInline
      * @return array
      */
+    #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];

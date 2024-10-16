@@ -26,8 +26,8 @@ class EmailAddressTransformer implements DataTransformerInterface
      * Transforms a list of email addresses (if $this->multiple == true) or
      * an email address (if $this->multiple == false) to a string
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function transform($value)
     {
         if (!$value) {
@@ -53,8 +53,8 @@ class EmailAddressTransformer implements DataTransformerInterface
      * Transforms a string to a list of email addresses (if $this->multiple == true) or
      * an email address (if $this->multiple == false)
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

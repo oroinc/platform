@@ -19,9 +19,7 @@ class SetEntityId implements ProcessorInterface
         $this->entityIdHelper = $entityIdHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext $context */

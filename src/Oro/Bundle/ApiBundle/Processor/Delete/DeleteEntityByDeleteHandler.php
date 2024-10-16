@@ -25,9 +25,7 @@ class DeleteEntityByDeleteHandler implements ProcessorInterface
         $this->deleteHandlerRegistry = $deleteHandlerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

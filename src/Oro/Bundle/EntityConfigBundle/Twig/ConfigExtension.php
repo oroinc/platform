@@ -40,9 +40,7 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -57,6 +55,7 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
         ];
     }
 
+    #[\Override]
     public function getFilters()
     {
         return [new TwigFilter('render_oro_entity_config_value', [$this, 'renderValue'])];
@@ -272,9 +271,7 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->getViewLink($className, $id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

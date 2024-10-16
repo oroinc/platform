@@ -17,17 +17,13 @@ class BlockViewCollection implements \ArrayAccess
         $this->elements = $elements;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return isset($this->elements[$offset]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetGet($offset): mixed
     {
         if (isset($this->elements[$offset])) {
@@ -37,17 +33,13 @@ class BlockViewCollection implements \ArrayAccess
         throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $offset));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         throw new \BadMethodCallException('Not supported');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         throw new \BadMethodCallException('Not supported');

@@ -14,6 +14,7 @@ class ValidateRequestDataTest extends ChangeSubresourceProcessorTestCase
     /** @var ValidateRequestData */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

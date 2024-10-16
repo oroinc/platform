@@ -43,17 +43,13 @@ class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextA
         $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof FieldConfigModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = [])
     {
         $result = [
@@ -73,17 +69,13 @@ class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextA
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return is_array($data) && is_a($type, FieldConfigModel::class, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!isset($data['entity']['id'])) {

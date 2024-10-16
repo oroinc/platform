@@ -17,6 +17,7 @@ class UserImpersonationTest extends WebTestCase
 {
     use CommandTestingTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

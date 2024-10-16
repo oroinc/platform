@@ -44,18 +44,14 @@ class SegmentFilter extends EntityFilter
         $this->extendConfigProvider = $extendConfigProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'segment';
         AbstractFilter::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata(): array
     {
         $metadata = parent::getMetadata();
@@ -79,9 +75,7 @@ class SegmentFilter extends EntityFilter
         return $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter
@@ -107,9 +101,7 @@ class SegmentFilter extends EntityFilter
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         if (isset($data['value'])) {
@@ -119,9 +111,7 @@ class SegmentFilter extends EntityFilter
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createForm(): FormInterface
     {
         $entityName = $this->entityNameProvider->getEntityName();

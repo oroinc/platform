@@ -11,9 +11,7 @@ use Oro\Component\Duplicator\Filter\Filter;
  */
 class UuidFilter implements Filter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function apply($object, $property, $objectCopier): void
     {
         $reflectionProperty = ReflectionHelper::getProperty($object, $property);

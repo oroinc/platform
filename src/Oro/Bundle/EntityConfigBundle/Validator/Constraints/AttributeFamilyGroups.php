@@ -26,17 +26,13 @@ class AttributeFamilyGroups extends Constraint
      */
     public $sameLabelsMessage = 'oro.entity_config.validator.attribute_family.same_labels';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return AttributeFamilyGroupsValidator::ALIAS;

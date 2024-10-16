@@ -4,26 +4,24 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_24;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
-use Oro\Bundle\EntityExtendBundle\Migration\Query\EnumDataValue;
-use Oro\Bundle\EntityExtendBundle\Migration\Query\InsertEnumValuesQuery;
+use Oro\Bundle\EntityExtendBundle\Migration\Query\OutdatedEnumDataValue;
+use Oro\Bundle\EntityExtendBundle\Migration\Query\OutdatedInsertEnumValuesQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
-class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
+class AddAuthStatusColumn implements Migration, OutdatedExtendExtensionAwareInterface
 {
-    use ExtendExtensionAwareTrait;
+    use OutdatedExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
-        $enumTable = $this->extendExtension->addEnumField(
+        $enumTable = $this->outdatedExtendExtension->addOutdatedEnumField(
             $schema,
             'oro_user',
             'auth_status',
@@ -34,9 +32,9 @@ class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
         $options->set('enum', 'immutable_codes', [UserManager::STATUS_ACTIVE, UserManager::STATUS_RESET]);
         $enumTable->addOption(OroOptions::KEY, $options);
 
-        $queries->addPostQuery(new InsertEnumValuesQuery($this->extendExtension, 'auth_status', [
-            new EnumDataValue(UserManager::STATUS_ACTIVE, 'Active', 1, true),
-            new EnumDataValue(UserManager::STATUS_RESET, 'Reset', 2)
+        $queries->addPostQuery(new OutdatedInsertEnumValuesQuery($this->outdatedExtendExtension, 'auth_status', [
+            new OutdatedEnumDataValue(UserManager::STATUS_ACTIVE, 'Active', 1, true),
+            new OutdatedEnumDataValue(UserManager::STATUS_RESET, 'Reset', 2)
         ]));
 
         $queries->addPostQuery(new ParametrizedSqlMigrationQuery(

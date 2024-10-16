@@ -11,9 +11,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
  */
 class EmailUserEntityNameProvider implements EntityNameProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if (!$entity instanceof EmailUser) {
@@ -23,9 +21,7 @@ class EmailUserEntityNameProvider implements EntityNameProviderInterface
         return $entity->getEmail()->getSubject();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if (!is_a($className, EmailUser::class, true)) {

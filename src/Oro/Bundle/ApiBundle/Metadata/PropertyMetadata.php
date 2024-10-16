@@ -26,9 +26,7 @@ abstract class PropertyMetadata extends ParameterBag implements ToArrayInterface
         $this->flags = self::MASK_DIRECTION_BIDIRECTIONAL;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $result = ['name' => $this->name];

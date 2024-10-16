@@ -14,6 +14,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ManyRelationBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->childBuilder1 = $this->createMock(ManyRelationBuilderInterface::class);

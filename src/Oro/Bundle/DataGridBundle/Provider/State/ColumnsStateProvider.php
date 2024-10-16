@@ -35,9 +35,7 @@ class ColumnsStateProvider extends AbstractStateProvider
         $this->datagridParametersHelper = $datagridParametersHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getState(DatagridConfiguration $datagridConfiguration, ParameterBag $datagridParameters): array
     {
         // Fetch state from datagrid parameters.
@@ -54,9 +52,7 @@ class ColumnsStateProvider extends AbstractStateProvider
         return $this->sanitizeState($state, $this->getColumnsConfig($datagridConfiguration));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getStateFromParameters(
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters
@@ -67,9 +63,7 @@ class ColumnsStateProvider extends AbstractStateProvider
         return $this->sanitizeState($state, $this->getColumnsConfig($datagridConfiguration));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultState(DatagridConfiguration $datagridConfiguration): array
     {
         return $this->sanitizeState([], $this->getColumnsConfig($datagridConfiguration));
@@ -84,9 +78,6 @@ class ColumnsStateProvider extends AbstractStateProvider
         return $this->fillRenderableAndWeight($columnsData);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function getFromParameters(ParameterBag $datagridParameters): array
     {
         $rawColumnsState = $this->getRawColumnsState($datagridParameters);

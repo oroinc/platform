@@ -37,6 +37,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);

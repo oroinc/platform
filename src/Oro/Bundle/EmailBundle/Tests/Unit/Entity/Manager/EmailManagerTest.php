@@ -36,6 +36,7 @@ class EmailManagerTest extends TestCase
     /** @var EmailManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

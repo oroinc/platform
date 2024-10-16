@@ -50,9 +50,7 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         $this->initialize();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setMemoryCacheProvider(?MemoryCacheProviderInterface $memoryCacheProvider): void
     {
         $this->memoryCacheProvider = $memoryCacheProvider;
@@ -67,17 +65,13 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setScope($scope)
     {
         $this->scope = $scope;
@@ -85,17 +79,13 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getScope()
     {
         return $this->scope;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getData()
     {
         if (null === $this->memoryCacheProvider) {
@@ -110,9 +100,7 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         if (null === $this->metadata) {
@@ -123,9 +111,7 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         return $this->metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getResolvedMetadata()
     {
         $data = MetadataObject::createNamed($this->getName(), [MetadataObject::LAZY_KEY => false]);
@@ -134,9 +120,7 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setDatasource(DatasourceInterface $source)
     {
         $this->memoryCacheProvider?->reset();
@@ -145,17 +129,13 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDatasource()
     {
         return $this->datasource;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAcceptedDatasource()
     {
         $this->acceptDatasource();
@@ -163,9 +143,7 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         return $this->getDatasource();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function acceptDatasource()
     {
         $this->acceptor->acceptDatasource($this->getDatasource());
@@ -173,17 +151,13 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAcceptor()
     {
         return $this->acceptor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setAcceptor(Acceptor $acceptor)
     {
         $this->acceptor = $acceptor;
@@ -191,17 +165,13 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParameters()
     {
         return $this->parameters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfig()
     {
         return $this->config;

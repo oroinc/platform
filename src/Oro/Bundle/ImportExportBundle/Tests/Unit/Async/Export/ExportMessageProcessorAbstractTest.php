@@ -28,6 +28,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     /** @var ExportMessageProcessorAbstract|\PHPUnit\Framework\MockObject\MockObject */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

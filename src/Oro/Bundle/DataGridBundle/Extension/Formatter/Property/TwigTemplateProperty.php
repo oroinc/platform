@@ -28,9 +28,7 @@ class TwigTemplateProperty extends AbstractProperty
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize()
     {
         $checkInvalidArgument = array_intersect(array_keys($this->getOr(self::CONTEXT_KEY, [])), $this->reservedKeys);
@@ -45,9 +43,7 @@ class TwigTemplateProperty extends AbstractProperty
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRawValue(ResultRecordInterface $record)
     {
         return $this->render(

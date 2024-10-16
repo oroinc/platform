@@ -14,15 +14,14 @@ class StubType extends AbstractType
     public const REQUIRED_OPTION = 'required_option';
     public const NAME = 'stub_form_type';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(self::FIELD_1, TextType::class)
             ->add(self::FIELD_2, TextType::class);
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -34,9 +33,7 @@ class StubType extends AbstractType
         $resolver->setRequired(self::REQUIRED_OPTION);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

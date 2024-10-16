@@ -15,6 +15,7 @@ class LayoutContextStackTest extends \PHPUnit\Framework\TestCase
 
     private LayoutContextStack $layoutContextStack;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

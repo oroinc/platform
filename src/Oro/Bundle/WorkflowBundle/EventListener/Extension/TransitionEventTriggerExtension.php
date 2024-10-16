@@ -47,9 +47,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         $this->handler = $handler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function schedule($entity, $event, array $changeSet = null)
     {
         $entityClass = ClassUtils::getClass($entity);
@@ -93,9 +91,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         $this->scheduled[$entityClass][] = ['trigger' => $trigger, 'entity' => $entity];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ObjectManager $manager)
     {
         foreach ($this->scheduled as &$messages) {
@@ -129,9 +125,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear($entityClass = null)
     {
         parent::clear($entityClass);
@@ -146,6 +140,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
     /**
      * @return TransitionEventTriggerRepository
      */
+    #[\Override]
     protected function getRepository()
     {
         return $this->doctrineHelper->getEntityRepositoryForClass(TransitionEventTrigger::class);

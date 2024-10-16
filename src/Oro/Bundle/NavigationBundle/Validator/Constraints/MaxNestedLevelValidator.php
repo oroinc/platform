@@ -31,10 +31,10 @@ class MaxNestedLevelValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
      *
      * @param MenuUpdateInterface $value
      */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$value instanceof MenuUpdateInterface) {

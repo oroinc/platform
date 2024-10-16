@@ -24,9 +24,7 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualRelation($className, $fieldName)
     {
         return
@@ -34,9 +32,7 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
             && $this->taggableHelper->isTaggable($className);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualRelationQuery($className, $fieldName)
     {
         $relations = $this->getVirtualRelations($className);
@@ -46,9 +42,7 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
             : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualRelations($className)
     {
         return $this->taggableHelper->isTaggable($className)
@@ -56,9 +50,7 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
             : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null)
     {
         return self::TARGET_ALIAS;

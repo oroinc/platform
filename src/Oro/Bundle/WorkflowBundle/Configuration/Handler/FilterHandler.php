@@ -96,6 +96,7 @@ class FilterHandler implements ConfigurationHandlerInterface
      * @param array $configuration
      * @return array
      */
+    #[\Override]
     public function handle(array $configuration)
     {
         $this->filterConfigNode(WorkflowConfiguration::NODE_ATTRIBUTES, self::$attributeKeys, $configuration);

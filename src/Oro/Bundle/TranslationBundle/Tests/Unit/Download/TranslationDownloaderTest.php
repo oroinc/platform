@@ -80,6 +80,7 @@ YAML
     /** @var EventDispatcherInterface|MockObject */
     private $eventDispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationServiceAdapter = $this->createMock(TranslationServiceAdapterInterface::class);
@@ -103,6 +104,7 @@ YAML
         );
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro_translations';

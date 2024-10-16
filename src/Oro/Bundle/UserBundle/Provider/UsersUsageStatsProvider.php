@@ -24,11 +24,13 @@ class UsersUsageStatsProvider extends AbstractUsageStatsProvider
         $this->organizationRestrictionProvider = $organizationRestrictionProvider;
     }
 
+    #[\Override]
     public function getTitle(): string
     {
         return 'oro.user.usage_stats.users.label';
     }
 
+    #[\Override]
     public function getValue(): ?string
     {
         /** @var UserRepository $userRepository */

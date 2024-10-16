@@ -47,41 +47,31 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
         $this->currentExtensionName = $extensionName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasType(string $name): bool
     {
         return $this->getExtension()->hasType($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getType(string $name): FormTypeInterface
     {
         return $this->getExtension()->getType($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasTypeExtensions(string $name): bool
     {
         return $this->getExtension()->hasTypeExtensions($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTypeExtensions(string $name): array
     {
         return $this->getExtension()->getTypeExtensions($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         return $this->getExtension()->getTypeGuesser();

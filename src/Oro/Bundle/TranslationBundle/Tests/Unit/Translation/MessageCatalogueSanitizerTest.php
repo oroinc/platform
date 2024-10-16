@@ -19,6 +19,7 @@ class MessageCatalogueSanitizerTest extends \PHPUnit\Framework\TestCase
     /** @var MessageCatalogueSanitizer */
     private $sanitizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationsSanitizer = $this->createMock(TranslationsSanitizer::class);

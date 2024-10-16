@@ -22,6 +22,7 @@ class AclAttributeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AclAttributeProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);

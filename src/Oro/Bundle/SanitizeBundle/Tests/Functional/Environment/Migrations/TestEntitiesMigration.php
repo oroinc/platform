@@ -19,9 +19,7 @@ class TestEntitiesMigration implements
     use ExtendExtensionAwareTrait;
     use SerializedFieldsExtensionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         if ($schema->hasTable('test_sanitizable_entity')) {

@@ -19,6 +19,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
     /** @var PasswordFieldOptionsProvider */
     private $optionsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

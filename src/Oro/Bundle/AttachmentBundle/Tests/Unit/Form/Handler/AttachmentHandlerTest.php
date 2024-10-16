@@ -26,6 +26,7 @@ class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);

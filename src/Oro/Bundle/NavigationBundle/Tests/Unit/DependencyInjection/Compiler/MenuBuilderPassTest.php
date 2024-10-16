@@ -19,6 +19,7 @@ class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
 
     private MenuBuilderPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

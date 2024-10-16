@@ -25,9 +25,7 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
         $this->translator    = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

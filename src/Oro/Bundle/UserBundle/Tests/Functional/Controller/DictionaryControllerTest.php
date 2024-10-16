@@ -6,6 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class DictionaryControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
@@ -34,6 +35,36 @@ class DictionaryControllerTest extends WebTestCase
             'POST',
             $this->getUrl('oro_dictionary_value', ['dictionary' => 'Oro_Bundle_UserBundle_Entity_User']),
             ['keys' => [1]]
+        );
+        $result = $this->client->getResponse();
+
+        self::assertJsonResponseStatusCodeEquals($result, 200);
+        $this->assertJsonStringEqualsJsonString($expectedJson, $result->getContent());
+    }
+
+    public function testGetValuesForUserAuthStatusBySearchQuery(): void
+    {
+        $expectedJson = '{"results":[{"id":"auth_status.active","value":"auth_status.active","text":"Active"}]}';
+
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_dictionary_search', ['dictionary' => 'Extend_Entity_EV_Auth_Status']),
+            ['q' => 'active']
+        );
+        $result = $this->client->getResponse();
+
+        self::assertJsonResponseStatusCodeEquals($result, 200);
+        $this->assertJsonStringEqualsJsonString($expectedJson, $result->getContent());
+    }
+
+    public function testGetValuesForUserAuthStatusByIds(): void
+    {
+        $expectedJson = '{"results":[{"id":"auth_status.active","value":"auth_status.active","text":"Active"}]}';
+
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_dictionary_value', ['dictionary' => 'Extend_Entity_EV_Auth_Status']),
+            ['keys' => ['active']]
         );
         $result = $this->client->getResponse();
 

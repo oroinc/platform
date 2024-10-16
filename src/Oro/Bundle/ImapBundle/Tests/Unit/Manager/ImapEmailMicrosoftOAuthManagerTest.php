@@ -26,6 +26,7 @@ class ImapEmailMicrosoftOAuthManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ImapEmailMicrosoftOAuthManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

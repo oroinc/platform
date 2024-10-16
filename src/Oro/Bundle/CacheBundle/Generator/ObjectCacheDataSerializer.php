@@ -20,9 +20,7 @@ class ObjectCacheDataSerializer implements ObjectCacheDataConverterInterface
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToString($object, string $scope): string
     {
         return $this->serializer->serialize(

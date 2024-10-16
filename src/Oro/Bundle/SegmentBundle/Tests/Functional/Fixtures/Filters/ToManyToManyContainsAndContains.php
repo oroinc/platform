@@ -20,18 +20,14 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ToManyToManyContainsAndContains implements FixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function assert(\PHPUnit\Framework\Assert $assertions, array $actualData): void
     {
         $assertions->assertCount(1, $actualData);
         $assertions->assertEquals('a', $actualData[0]['c1']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createData(EntityManagerInterface $em): void
     {
         $organization = $em
@@ -85,9 +81,7 @@ class ToManyToManyContainsAndContains implements FixtureInterface
         $em->persist($user2);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createSegment(EntityManagerInterface $em): Segment
     {
         $organization = $em

@@ -11,6 +11,7 @@ class TestIntegrationType implements IntegrationInterface
      *
      * @return string
      */
+    #[\Override]
     public function getLabel()
     {
         return 'testLabel';

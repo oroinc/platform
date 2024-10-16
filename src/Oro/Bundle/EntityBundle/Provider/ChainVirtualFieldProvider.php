@@ -26,9 +26,7 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualField($className, $fieldName)
     {
         foreach ($this->providers as $provider) {
@@ -40,9 +38,7 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFieldQuery($className, $fieldName)
     {
         foreach ($this->providers as $provider) {
@@ -58,9 +54,7 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFields($className)
     {
         if (!$this->isEntityAccessible($className)) {

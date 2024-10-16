@@ -13,11 +13,13 @@ class Test2BundleMigration11 implements Migration, ContainerAwareInterface, Orde
 {
     use ContainerAwareTrait;
 
+    #[\Override]
     public function getOrder()
     {
         return 2;
     }
 
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $sqls = $this->container->get('test_service')->getQueries();

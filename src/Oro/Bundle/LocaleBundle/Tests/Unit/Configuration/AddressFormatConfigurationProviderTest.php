@@ -14,6 +14,7 @@ class AddressFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     private AddressFormatConfigurationProvider $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $cacheFile = $this->getTempFile('AddressFormatConfigurationProvider');

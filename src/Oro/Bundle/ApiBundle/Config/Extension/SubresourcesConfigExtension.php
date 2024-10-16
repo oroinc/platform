@@ -24,9 +24,7 @@ class SubresourcesConfigExtension extends AbstractConfigExtension
         $this->filterOperatorRegistry = $filterOperatorRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationSections(): array
     {
         return [
@@ -37,9 +35,7 @@ class SubresourcesConfigExtension extends AbstractConfigExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationLoaders(): array
     {
         return [ConfigUtil::SUBRESOURCES => new SubresourcesConfigLoader()];

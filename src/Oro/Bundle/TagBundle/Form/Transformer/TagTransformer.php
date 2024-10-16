@@ -24,9 +24,7 @@ class TagTransformer implements DataTransformerInterface
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {
@@ -49,9 +47,7 @@ class TagTransformer implements DataTransformerInterface
         return new ArrayCollection();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         $result = [];

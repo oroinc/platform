@@ -9,26 +9,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RenamedNameContainerType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('renamedName', TextType::class, array_merge(['property_path' => 'name'], $options['name_options']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['name_options' => []]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'test_renamed_name_container';

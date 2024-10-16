@@ -18,6 +18,7 @@ class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var RuntimeCacheParser */
     private $parser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);

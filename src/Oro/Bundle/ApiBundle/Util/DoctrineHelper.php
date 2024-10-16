@@ -5,13 +5,39 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Provides utility methods to work with manageable entities.
  */
 class DoctrineHelper extends BaseHelper
 {
+    #[\Override]
+    public function isManageableEntityClass($entityClass)
+    {
+        if (ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {
+            return false;
+        }
+
+        return parent::isManageableEntityClass($entityClass);
+    }
+
+    #[\Override]
+    public function getEntityManagerForClass($entityClass, $throwException = true)
+    {
+        if (ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {
+            if ($throwException) {
+                throw new NotManageableEntityException($entityClass);
+            }
+
+            return null;
+        }
+
+        return parent::getEntityManagerForClass($entityClass, $throwException);
+    }
+
     /**
      * Returns the given API resource class if it is a manageable entity;
      * otherwise, checks if the API resource is based on a manageable entity, and if so,
@@ -57,13 +83,13 @@ class DoctrineHelper extends BaseHelper
         }
 
         $entityClass = null;
-        $parentClass = (new \ReflectionClass($resourceClass))->getParentClass();
+        $parentClass = ExtendHelper::getParentClassName($resourceClass);
         while ($parentClass) {
-            if ($this->isManageableEntityClass($parentClass->getName())) {
-                $entityClass = $parentClass->getName();
+            if ($this->isManageableEntityClass($parentClass)) {
+                $entityClass = $parentClass;
                 break;
             }
-            $parentClass = $parentClass->getParentClass();
+            $parentClass = ExtendHelper::getParentClassName($parentClass);
         }
 
         return $entityClass;
@@ -79,7 +105,7 @@ class DoctrineHelper extends BaseHelper
      */
     public function findEntityMetadataByPath(string $entityClass, array|string $associationPath): ?ClassMetadata
     {
-        $manager = $this->registry->getManagerForClass($entityClass);
+        $manager = $this->getEntityManagerForClass($entityClass, false);
         if (null === $manager) {
             return null;
         }

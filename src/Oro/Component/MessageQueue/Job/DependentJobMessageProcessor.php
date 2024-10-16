@@ -43,9 +43,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $data = $message->getBody();
@@ -77,9 +75,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [RootJobStoppedTopic::getName()];

@@ -26,6 +26,7 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTranslationFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);

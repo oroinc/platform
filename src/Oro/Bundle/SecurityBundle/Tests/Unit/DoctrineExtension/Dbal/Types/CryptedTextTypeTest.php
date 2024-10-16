@@ -11,6 +11,7 @@ final class CryptedTextTypeTest extends TestCase
 {
     private CryptedTextType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $crypter = $this->createMock(SymmetricCrypterInterface::class);

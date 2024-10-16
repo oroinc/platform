@@ -17,9 +17,7 @@ abstract class AbstractCleanupMarketingMigrationQuery extends ParametrizedMigrat
      */
     abstract public function getClassNames();
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -28,9 +26,7 @@ abstract class AbstractCleanupMarketingMigrationQuery extends ParametrizedMigrat
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->processQueries($logger);

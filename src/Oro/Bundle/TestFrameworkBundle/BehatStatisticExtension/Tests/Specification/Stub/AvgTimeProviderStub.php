@@ -17,6 +17,7 @@ class AvgTimeProviderStub implements AvgTimeProviderInterface
      * @param string|int $id
      * @return int|null
      */
+    #[\Override]
     public function getAverageTimeById($id)
     {
         if (isset($this->timeTable[$id])) {
@@ -29,6 +30,7 @@ class AvgTimeProviderStub implements AvgTimeProviderInterface
     /**
      * @return int
      */
+    #[\Override]
     public function getAverageTime()
     {
         return round(array_sum($this->timeTable) / count($this->timeTable));

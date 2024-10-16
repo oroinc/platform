@@ -11,6 +11,7 @@ class GreaterThanTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\GreaterThan */
     protected $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\GreaterThan();

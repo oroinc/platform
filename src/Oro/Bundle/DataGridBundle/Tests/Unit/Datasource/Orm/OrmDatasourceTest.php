@@ -34,6 +34,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
 
     private OrmDatasource $datasource;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = $this->createMock(YamlProcessor::class);

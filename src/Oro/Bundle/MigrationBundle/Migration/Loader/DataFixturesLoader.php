@@ -37,9 +37,7 @@ class DataFixturesLoader extends ContainerAwareLoader
         parent::__construct($container);
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getFixtures()
     {
         $sorter   = new DataFixturesSorter();

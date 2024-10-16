@@ -78,3 +78,16 @@ services:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\ActualizeEntityEnumOptionsCommand:
+        arguments:
+            - '@oro_entity_extend.enum.entity_options_actualizer'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\ActualizeEnumOptionTranslationsCommand:
+        arguments:
+            - '@oro_entity_extend.manager.enum_option_translation_manager'
+            - '@oro_translation.provider.language'
+        tags:
+            - { name: console.command }

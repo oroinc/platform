@@ -12,9 +12,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class InitializeSubresources extends LoadSubresources
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectSubresourcesContext $context */

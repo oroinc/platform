@@ -14,9 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class MigrationConfigPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $container->getDefinition('oro_migration.db_id_name_generator')

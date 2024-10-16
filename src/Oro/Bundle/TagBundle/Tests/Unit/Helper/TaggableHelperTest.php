@@ -21,6 +21,7 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TaggableHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

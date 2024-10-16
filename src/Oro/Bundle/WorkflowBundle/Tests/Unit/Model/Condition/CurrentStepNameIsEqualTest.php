@@ -25,6 +25,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
     /** @var CurrentStepNameIsEqual */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);

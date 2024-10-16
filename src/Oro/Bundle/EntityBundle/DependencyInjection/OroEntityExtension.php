@@ -13,9 +13,7 @@ class OroEntityExtension extends Extension
 {
     public const DEFAULT_QUERY_CACHE_LIFETIME_PARAM_NAME = 'oro_entity.default_query_cache_lifetime';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $this->loadHiddenFieldConfigs($container);

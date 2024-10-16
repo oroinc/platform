@@ -12,6 +12,7 @@ class ValidateIsCollectionTest extends GetSubresourceProcessorTestCase
     /** @var ValidateIsCollection */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

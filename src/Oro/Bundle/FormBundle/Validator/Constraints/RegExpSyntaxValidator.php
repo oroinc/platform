@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class RegExpSyntaxValidator extends ConstraintValidator
 {
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof RegExpSyntax) {

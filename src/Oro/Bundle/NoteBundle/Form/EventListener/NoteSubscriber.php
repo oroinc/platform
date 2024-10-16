@@ -25,9 +25,7 @@ class NoteSubscriber implements EventSubscriberInterface
         $this->extendConfigProvider = $configManager->getProvider('extend');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return array(

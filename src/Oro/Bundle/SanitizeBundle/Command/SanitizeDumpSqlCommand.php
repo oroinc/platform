@@ -28,6 +28,7 @@ class SanitizeDumpSqlCommand extends Command
         parent::__construct();
     }
 
+    #[\Override]
     public function configure()
     {
         $this
@@ -57,6 +58,7 @@ HELP
             ->addUsage('--no-guessing --skip-validate-sql <file>');
     }
 
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $filename = $input->getArgument('file');

@@ -9,6 +9,7 @@ class RestJsonApiSyncUpdateListTestCase extends RestJsonApiUpdateListTestCase
 {
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -16,6 +17,7 @@ class RestJsonApiSyncUpdateListTestCase extends RestJsonApiUpdateListTestCase
         self::clearMessageCollector();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         WaitForSynchronousModeMessagesProcessed::setContainer(null);

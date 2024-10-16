@@ -21,9 +21,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
         $this->removeGroupNames = $removeGroupNames;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -32,9 +30,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

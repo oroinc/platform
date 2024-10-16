@@ -15,9 +15,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
 {
     const FILTER_TYPE_NAME = 'dictionary';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'dictionary';
@@ -33,17 +31,13 @@ class DictionaryFilter extends BaseMultiChoiceFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
@@ -59,9 +53,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return DictionaryFilterType::class;
@@ -118,9 +110,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
         return $field;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
         $comparisonType,

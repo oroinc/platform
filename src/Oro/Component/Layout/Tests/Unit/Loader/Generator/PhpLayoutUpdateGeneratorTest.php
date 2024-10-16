@@ -13,6 +13,7 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     private PhpLayoutUpdateGenerator $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->generator = new PhpLayoutUpdateGenerator();

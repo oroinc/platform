@@ -30,9 +30,7 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $data = $this->parseData($data);
@@ -64,9 +62,7 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $metadata = parent::getMetadata();

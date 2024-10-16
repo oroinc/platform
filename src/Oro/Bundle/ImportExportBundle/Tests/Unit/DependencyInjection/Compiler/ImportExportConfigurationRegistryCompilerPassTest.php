@@ -12,6 +12,7 @@ class ImportExportConfigurationRegistryCompilerPassTest extends TestCase
     /** @var ImportExportConfigurationRegistryCompilerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ImportExportConfigurationRegistryCompilerPass();

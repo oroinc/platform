@@ -18,6 +18,7 @@ class ImportConditionFilter implements ImportFilterInterface
     ) {
     }
 
+    #[\Override]
     public function filter(array $imports): array
     {
         return array_filter($imports, $this->filterImportDirective(...));

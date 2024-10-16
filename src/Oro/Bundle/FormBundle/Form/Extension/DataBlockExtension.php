@@ -12,9 +12,7 @@ class DataBlockExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(
@@ -27,6 +25,7 @@ class DataBlockExtension extends AbstractTypeExtension
         );
     }
 
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if (isset($options['block'])) {

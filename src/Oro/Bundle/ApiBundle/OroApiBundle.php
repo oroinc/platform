@@ -18,9 +18,9 @@ class OroApiBundle extends Bundle
     use Compiler\ApiTaggedServiceTrait;
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

@@ -17,17 +17,13 @@ class DateEarlierThan extends Constraint
 
     public $message = "This date should be earlier than {{ field }} date";
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultOption(): ?string
     {
         return 'field';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRequiredOptions(): array
     {
         return ['field'];

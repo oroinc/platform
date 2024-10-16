@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type\Stub;
 
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,16 +13,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class EnumSelectTypeStub extends EntityTypeStub
 {
     /**
-     * @param AbstractEnumValue[] $choices
+     * @param EnumOptionInterface[] $choices
      */
     public function __construct(array $choices)
     {
         parent::__construct($this->getEnumChoices($choices));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

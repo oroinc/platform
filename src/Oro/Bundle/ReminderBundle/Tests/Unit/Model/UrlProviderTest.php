@@ -18,6 +18,7 @@ class UrlProviderTest extends \PHPUnit\Framework\TestCase
     /** @var UrlProvider */
     private $urlProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

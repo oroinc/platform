@@ -20,6 +20,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var OroSyncExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);

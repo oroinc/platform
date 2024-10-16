@@ -22,17 +22,13 @@ class Taggable implements OROTag
         $this->data = $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTags()
     {
         return $this->tags;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setTags($tags)
     {
         $this->tags = $tags;
@@ -40,9 +36,7 @@ class Taggable implements OROTag
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTaggableId()
     {
         return $this->data['id'];

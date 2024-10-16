@@ -13,9 +13,7 @@ use Predis\Configuration\ReplicationOption as BaseReplicationOption;
  */
 class ReplicationOption extends BaseReplicationOption
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(OptionsInterface $options, $value)
     {
         if ('sentinel' === $value) {

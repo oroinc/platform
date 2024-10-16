@@ -7,10 +7,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -43,33 +44,31 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
         ExtendDbIdentifierNameGenerator $nameGenerator,
         ExtendEntityConfigProviderInterface $extendEntityConfigProvider
     ) {
-        $this->configManager   = $configManager;
+        $this->configManager = $configManager;
         $this->relationBuilder = $relationBuilder;
         $this->fieldTypeHelper = $fieldTypeHelper;
-        $this->nameGenerator   = $nameGenerator;
+        $this->nameGenerator = $nameGenerator;
         $this->extendEntityConfigProvider = $extendEntityConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($actionType)
     {
         return $actionType === ExtendConfigDumper::ACTION_PRE_UPDATE
-        || $actionType === ExtendConfigDumper::ACTION_POST_UPDATE;
+            || $actionType === ExtendConfigDumper::ACTION_POST_UPDATE;
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function preUpdate()
     {
-        $enumConfigProvider   = $this->configManager->getProvider('enum');
+        $enumConfigProvider = $this->configManager->getProvider('enum');
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        $entityConfigs        = $this->extendEntityConfigProvider->getExtendEntityConfigs();
+        $entityConfigs = $this->extendEntityConfigProvider->getExtendEntityConfigs();
         foreach ($entityConfigs as $entityConfig) {
             $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
@@ -79,20 +78,19 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
-                $fieldType     = $fieldConfigId->getFieldType();
-                if (!in_array($fieldType, ['enum', 'multiEnum'])) {
+                $fieldType = $fieldConfigId->getFieldType();
+                if (!ExtendHelper::isEnumerableType($fieldType) || $fieldConfig->is('is_serialized')) {
                     continue;
                 }
-
                 // prepare input parameters
-                $fieldOptions    = [];
+                $fieldOptions = [];
                 $enumFieldConfig = $enumConfigProvider->getConfig(
                     $fieldConfigId->getClassName(),
                     $fieldConfigId->getFieldName()
                 );
-                $enumCode        = $enumFieldConfig->get('enum_code');
-                $enumName        = $enumFieldConfig->get('enum_name');
-                $isPublic        = $enumFieldConfig->get('enum_public');
+                $enumCode = $enumFieldConfig->get('enum_code');
+                $enumName = $enumFieldConfig->get('enum_name');
+                $isPublic = $enumFieldConfig->get('enum_public');
                 if (empty($enumCode) && $isPublic && empty($enumName)) {
                     throw new \LogicException(
                         sprintf(
@@ -113,8 +111,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
                     $fieldOptions['enum']['enum_code'] = $enumCode;
                 }
-                $isMultiple = $this->fieldTypeHelper->getUnderlyingType($fieldType) === RelationType::MANY_TO_MANY;
-                $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+                $isMultiple = ExtendHelper::isMultiEnumType($fieldType);
+                $enumValueClassName = EnumOption::class;
 
                 // create an entity is used to store enum values
                 $this->createEnumValueConfigEntityModel($enumValueClassName, $enumCode, $isMultiple, $isPublic);
@@ -147,26 +145,23 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     }
 
     /**
-     * {@inheritdoc}
      * @throws \ReflectionException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function postUpdate()
     {
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        $entityConfigs        = $this->extendEntityConfigProvider->getExtendEntityConfigs();
+        $entityConfigs = $this->extendEntityConfigProvider->getExtendEntityConfigs();
         foreach ($entityConfigs as $entityConfig) {
             $entityClassName = $entityConfig->getId()->getClassName();
-            if ($entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
-                $schema          = $entityConfig->get('schema', false, []);
+            if ($entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                $schema = $entityConfig->get('schema', false, []);
                 if (!empty($schema['doctrine'][$entityClassName]['repositoryClass'])) {
                     continue;
                 }
-
-                $schema['doctrine'][$entityClassName]['repositoryClass']                =
-                    'Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository';
-                $schema['doctrine'][$entityClassName]['gedmo']['translation']['entity'] =
-                    'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation';
+                $schema['doctrine'][$entityClassName]['repositoryClass'] =
+                    'Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository';
                 $entityConfig->set('schema', $schema);
                 $this->configManager->persist($entityConfig);
             } elseif ($entityConfig->is('is_extend')) {
@@ -177,18 +172,19 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 foreach ($fieldConfigs as $fieldConfig) {
                     /** @var FieldConfigId $fieldConfigId */
                     $fieldConfigId = $fieldConfig->getId();
-                    if ($fieldConfigId->getFieldType() !== 'multiEnum') {
+                    if (!ExtendHelper::isMultiEnumType($fieldConfigId->getFieldType()) ||
+                        $fieldConfig->is('is_serialized')
+                    ) {
                         continue;
                     }
-
                     if ($fieldConfig->get('state') === ExtendScope::STATE_DELETE
                         && $reflectionEntityClass
                         && !$reflectionEntityClass->hasProperty($fieldConfigId->getFieldName())) {
                         continue;
                     }
 
-                    $mappingClassName  = $entityConfig->getId()->getClassName();
-                    $fieldName         = $fieldConfigId->getFieldName();
+                    $mappingClassName = $entityConfig->getId()->getClassName();
+                    $fieldName = $fieldConfigId->getFieldName();
                     $snapshotFieldName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
 
                     $schema = $entityConfig->get('schema', false, []);
@@ -196,17 +192,16 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     if (!empty($schema['doctrine'][$mappingClassName]['fields'][$snapshotFieldName])) {
                         continue;
                     }
-
                     $schema['property'][$snapshotFieldName] = [];
                     if ($fieldConfig->is('is_deleted')) {
                         $schema['property'][$snapshotFieldName]['private'] = true;
                     }
 
                     $schema['doctrine'][$mappingClassName]['fields'][$snapshotFieldName] = [
-                        'column'   => $this->nameGenerator->generateMultiEnumSnapshotColumnName($fieldName),
-                        'type'     => 'string',
+                        'column' => $this->nameGenerator->generateMultiEnumSnapshotColumnName($fieldName),
+                        'type' => 'string',
                         'nullable' => true,
-                        'length'   => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH
+                        'length' => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH
                     ];
 
                     $entityConfig->set('schema', $schema);
@@ -218,9 +213,9 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     }
 
     /**
-     * @param string    $enumValueClassName The full class name of an entity is used to store enum values
-     * @param string    $enumCode           The unique identifier of an enum
-     * @param bool      $isMultiple         Indicates whether several options can be selected for this enum
+     * @param string $enumValueClassName The full class name of an entity is used to store enum values
+     * @param string $enumCode The unique identifier of an enum
+     * @param bool $isMultiple Indicates whether several options can be selected for this enum
      *                                      or it supports only one selected option
      * @param bool|null $isPublic Indicates whether this enum can be used by any entity or
      *                                      it is designed to use in one entity only
@@ -255,19 +250,19 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
             $enumValueClassName,
             [
                 'entity' => [
-                    'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                    'label' => ExtendHelper::getEnumTranslationKey('label', $enumCode),
                     'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
-                    'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode)
+                    'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode)
                 ],
                 'extend' => [
-                    'owner'     => ExtendScope::OWNER_SYSTEM,
+                    'owner' => ExtendScope::OWNER_SYSTEM,
                     'is_extend' => true,
-                    'table'     => $this->nameGenerator->generateEnumTableName($enumCode, true),
-                    'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
+                    'table' => OutdatedExtendExtension::generateEnumTableName($enumCode, true),
+                    'inherit' => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
                 ],
-                'enum'   => [
-                    'code'     => $enumCode,
-                    'public'   => $isPublic,
+                'enum' => [
+                    'code' => $enumCode,
+                    'public' => $isPublic,
                     'multiple' => $isMultiple
                 ],
             ]
@@ -279,7 +274,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
             'id',
             [
                 'entity' => [
-                    'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
+                    'label' => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                 ],
                 'importexport' => ['identity' => false]
@@ -291,10 +286,10 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
             'name',
             [
                 'entity' => [
-                    'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
+                    'label' => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
                 ],
-                'datagrid'     => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
                 'importexport' => ['identity' => true],
             ]
         );
@@ -304,7 +299,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
             'priority',
             [
                 'entity' => [
-                    'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
+                    'label' => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
                 ],
                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
@@ -316,7 +311,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
             'default',
             [
                 'entity' => [
-                    'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
+                    'label' => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
                 ],
                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]

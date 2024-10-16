@@ -21,9 +21,7 @@ class CommandWatcher implements EventSubscriberInterface
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

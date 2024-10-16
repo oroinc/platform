@@ -65,9 +65,7 @@ class EntityDescriptionHelper implements ResetInterface
         $this->maxDeleteEntitiesLimit = $maxDeleteEntitiesLimit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->singularEntityDescriptions = [];
@@ -180,9 +178,9 @@ class EntityDescriptionHelper implements ResetInterface
                 $documentation .= $maxResultNote;
             }
 
-            $upsertNote = $this->getUpsertNoteForEntityDocumentation($definition, $targetAction);
-            if ($upsertNote) {
-                $documentation .= $upsertNote;
+            $additionalNote = $this->getUpsertAndValidateNoteForEntityDocumentation($definition, $targetAction);
+            if ($additionalNote) {
+                $documentation .= $additionalNote;
             }
 
             $definition->setDocumentation($documentation);
@@ -228,8 +226,9 @@ class EntityDescriptionHelper implements ResetInterface
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    private function getUpsertNoteForEntityDocumentation(
+    private function getUpsertAndValidateNoteForEntityDocumentation(
         EntityDefinitionConfig $definition,
         string $targetAction
     ): ?string {
@@ -237,37 +236,47 @@ class EntityDescriptionHelper implements ResetInterface
             return null;
         }
 
+        $upsertDetails = '';
         $upsertConfig = $definition->getUpsertConfig();
-        if (!$upsertConfig->isEnabled()) {
-            return null;
-        }
-
-        $details = '';
-        if ($upsertConfig->isAllowedById()) {
-            $details .= ' by the resource identifier';
-        }
-        if (ApiAction::CREATE === $targetAction) {
-            $fields = $upsertConfig->getFields();
-            if ($fields) {
-                if ($details) {
-                    $details .= ' and';
-                }
-                $details .= $this->formatUpsertFields($fields);
-            } elseif ($details) {
-                $details .= '.</p>';
+        if ($upsertConfig->isEnabled()) {
+            if ($upsertConfig->isAllowedById()) {
+                $upsertDetails .= ' by the resource identifier';
             }
-        } elseif ($details) {
-            $details .= '.</p>';
+            if (ApiAction::CREATE === $targetAction) {
+                $fields = $upsertConfig->getFields();
+                if ($fields) {
+                    if ($upsertDetails) {
+                        $upsertDetails .= ' and';
+                    }
+                    $upsertDetails .= $this->formatUpsertFields($fields);
+                } elseif ($upsertDetails) {
+                    $upsertDetails .= '.</p>';
+                }
+            } elseif ($upsertDetails) {
+                $upsertDetails .= '.</p>';
+            }
         }
 
-        if (!$details) {
+        $upsertOperation = '';
+        if ($upsertDetails) {
+            $upsertOperation .= '<a href="https://doc.oroinc.com/api/upsert-operation/" target="_blank">'
+                . 'the upsert operation</a>'
+                . $upsertDetails;
+        }
+
+        $validateOperation = '';
+        if ($definition->isValidationEnabled()) {
+            $validateOperation .= '<a href="https://doc.oroinc.com/api/validate-operation/" target="_blank">'
+                . 'validate operation</a>';
+
+            $validateOperation .= $upsertOperation ? ', and ' : '.</p>';
+        }
+
+        if (!$validateOperation && !$upsertOperation) {
             return null;
         }
 
-        return
-            '<p><strong>Note:</strong> This resource supports '
-            . '<a href="https://doc.oroinc.com/api/upsert-operation/" target="_blank">the upsert operation</a>'
-            . $details;
+        return '<p><strong>Note:</strong> This resource supports ' . $validateOperation . $upsertOperation;
     }
 
     private function formatUpsertFields(array $fields): string

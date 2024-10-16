@@ -11,6 +11,7 @@ class IdentityTranslatorTest extends \PHPUnit\Framework\TestCase
 
     private IdentityTranslator $identityTranslator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->identityTranslator = new IdentityTranslator();

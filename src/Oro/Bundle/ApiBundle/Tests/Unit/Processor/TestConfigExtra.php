@@ -16,17 +16,13 @@ class TestConfigExtra implements ConfigExtraInterface
         $this->contextAttributes = $contextAttributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ConfigContext $context): void
     {
         foreach ($this->contextAttributes as $name => $value) {
@@ -34,17 +30,13 @@ class TestConfigExtra implements ConfigExtraInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPropagable(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         return null;

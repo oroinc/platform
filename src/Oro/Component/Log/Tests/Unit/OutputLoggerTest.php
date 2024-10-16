@@ -11,6 +11,7 @@ class OutputLoggerTest extends \PHPUnit\Framework\TestCase
     /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $output;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);

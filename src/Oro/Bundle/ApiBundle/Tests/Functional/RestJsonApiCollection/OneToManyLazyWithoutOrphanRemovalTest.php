@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
  */
 class OneToManyLazyWithoutOrphanRemovalTest extends AbstractOneToManyCollectionTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -18,25 +19,19 @@ class OneToManyLazyWithoutOrphanRemovalTest extends AbstractOneToManyCollectionT
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isOrphanRemoval(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getAssociationName(): string
     {
         return 'lazyWithoutOrphanRemovalItems';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getItems($entity): Collection
     {
         return $entity->getLazyWithoutOrphanRemovalItems();

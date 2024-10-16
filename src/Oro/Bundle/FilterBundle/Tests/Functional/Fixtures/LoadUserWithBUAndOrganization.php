@@ -41,17 +41,13 @@ class LoadUserWithBUAndOrganization extends AbstractFixture implements Dependent
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganization::class, LoadBusinessUnit::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var BusinessUnit $businessUnit */

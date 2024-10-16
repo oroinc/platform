@@ -10,9 +10,7 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
  */
 class ByStepActionProcessor extends ActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ComponentContextInterface $context): void
     {
         /** @var ApiContext $context */

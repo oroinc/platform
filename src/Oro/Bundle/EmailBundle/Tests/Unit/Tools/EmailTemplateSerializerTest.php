@@ -12,6 +12,7 @@ class EmailTemplateSerializerTest extends TestCase
 {
     private EmailTemplateSerializer $serializer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serializer = new EmailTemplateSerializer();

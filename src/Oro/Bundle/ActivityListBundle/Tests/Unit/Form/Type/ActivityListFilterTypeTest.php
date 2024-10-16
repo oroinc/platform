@@ -18,6 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActivityListFilterTypeTest extends TypeTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -57,9 +58,7 @@ class ActivityListFilterTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

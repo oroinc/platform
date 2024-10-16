@@ -25,6 +25,7 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dateForm;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dateGroupingFormSubscriber = new DateGroupingFormSubscriber();

@@ -137,9 +137,7 @@ class BusinessUnitController extends AbstractController
             ->isDeleteGranted($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

@@ -17,6 +17,7 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
     /** @var ActionInterface */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new AssignConstantValue(new ContextAccessor());

@@ -26,6 +26,7 @@ class MigrationWithTestExtension implements
     private ?DbIdentifierNameGenerator $nameGenerator = null;
     private ?LoggerInterface $logger = null;
 
+    #[\Override]
     public function setTestExtension(TestExtension $testExtension): void
     {
         $this->testExtension = $testExtension;
@@ -36,6 +37,7 @@ class MigrationWithTestExtension implements
         return $this->testExtension;
     }
 
+    #[\Override]
     public function setDatabasePlatform(AbstractPlatform $platform): void
     {
         $this->platform = $platform;
@@ -46,6 +48,7 @@ class MigrationWithTestExtension implements
         return $this->platform;
     }
 
+    #[\Override]
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator): void
     {
         $this->nameGenerator = $nameGenerator;
@@ -56,6 +59,7 @@ class MigrationWithTestExtension implements
         return $this->nameGenerator;
     }
 
+    #[\Override]
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
@@ -66,6 +70,7 @@ class MigrationWithTestExtension implements
         return $this->logger;
     }
 
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
     }

@@ -20,6 +20,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
     /** @var CreateEntity */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

@@ -19,17 +19,13 @@ class CollectionToArrayTransformer implements DataTransformerInterface
         $this->useCollection = $useCollection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         $value = '' === $value || null === $value

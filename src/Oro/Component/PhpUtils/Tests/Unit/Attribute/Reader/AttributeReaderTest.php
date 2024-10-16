@@ -11,6 +11,7 @@ use Oro\Component\PhpUtils\Tests\Unit\Fixtures\PhpUtilsAttribute\PropertyTestAtt
 
 class AttributeReaderTest extends \PHPUnit\Framework\TestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->reader = new AttributeReader();

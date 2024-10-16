@@ -19,18 +19,13 @@ class GmailImap extends Imap
     const X_GM_THRID = 'X-GM-THRID';
     const X_GM_LABELS = 'X-GM-LABELS';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
         array_push($this->getMessageItems, self::X_GM_MSGID, self::X_GM_THRID, self::X_GM_LABELS);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function search(array $criteria)
     {
         if (!empty($criteria)) {
@@ -43,9 +38,7 @@ class GmailImap extends Imap
         return parent::search($criteria);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getCapability()
     {
         $capability   = parent::getCapability();
@@ -54,9 +47,7 @@ class GmailImap extends Imap
         return $capability;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setExtHeaders(&$headers, array $data)
     {
         parent::setExtHeaders($headers, $data);

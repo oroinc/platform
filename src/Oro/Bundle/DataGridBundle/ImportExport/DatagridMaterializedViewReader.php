@@ -37,6 +37,7 @@ class DatagridMaterializedViewReader implements
         $this->datagridManager = $datagridManager;
     }
 
+    #[\Override]
     public function setImportExportContext(ContextInterface $context): void
     {
         $this->close();
@@ -48,6 +49,7 @@ class DatagridMaterializedViewReader implements
         }
     }
 
+    #[\Override]
     public function read(): mixed
     {
         $context = $this->getContext();
@@ -127,6 +129,7 @@ class DatagridMaterializedViewReader implements
         return $this->context;
     }
 
+    #[\Override]
     public function close(): void
     {
         $this->offset = 0;

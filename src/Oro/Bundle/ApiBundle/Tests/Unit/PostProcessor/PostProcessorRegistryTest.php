@@ -22,6 +22,7 @@ class PostProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var PostProcessorRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->postProcessor1 = $this->createMock(PostProcessorInterface::class);

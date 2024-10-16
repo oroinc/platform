@@ -28,6 +28,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDataSerializeListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serializer = $this->createMock(WorkflowAwareSerializer::class);

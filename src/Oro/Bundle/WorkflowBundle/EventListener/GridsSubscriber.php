@@ -16,9 +16,7 @@ class GridsSubscriber implements EventSubscriberInterface
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

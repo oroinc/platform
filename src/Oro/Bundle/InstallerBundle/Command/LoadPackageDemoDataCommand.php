@@ -20,6 +20,7 @@ class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
     protected static $defaultName = 'oro:package:demo:load';
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -35,6 +36,7 @@ class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function getFixtures(InputInterface $input, OutputInterface $output): array
     {
         $suppliedPackagePaths = $input->getArgument('package');
@@ -85,6 +87,7 @@ class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     protected function getTypeOfFixtures(InputInterface $input): string
     {
         return LoadDataFixturesCommand::DEMO_FIXTURES_TYPE;

@@ -19,9 +19,7 @@ class AccessGrantedValidator extends ConstraintValidator
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof AccessGranted) {

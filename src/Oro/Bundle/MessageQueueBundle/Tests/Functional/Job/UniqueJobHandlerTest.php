@@ -17,6 +17,7 @@ class UniqueJobHandlerTest extends WebTestCase
     /** @var UniqueJobHandler */
     private $uniqueJobHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -179,9 +180,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->delete($this->getConnection(), $existingJob);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataFixturesExecutorEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);

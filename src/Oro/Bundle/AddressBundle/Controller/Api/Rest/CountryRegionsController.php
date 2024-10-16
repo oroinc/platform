@@ -42,14 +42,13 @@ class CountryRegionsController extends RestGetController
         return new JsonResponse($serializedRegions, Response::HTTP_OK);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_address.api.manager.region');
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

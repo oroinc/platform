@@ -25,9 +25,7 @@ class UserChecker implements UserCheckerInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function checkPostAuth(SymfonyUserInterface $user): void
     {
         if (!$user instanceof User) {
@@ -54,9 +52,7 @@ class UserChecker implements UserCheckerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function checkPreAuth(SymfonyUserInterface $user): void
     {
         if (!$user instanceof User) {
@@ -74,7 +70,7 @@ class UserChecker implements UserCheckerInterface
             throw $exception;
         }
 
-        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE) {
+        if ($user->getAuthStatus() && $user->getAuthStatus()->getInternalId() !== UserManager::STATUS_ACTIVE) {
             $exception = new CredentialsResetException('Password reset.');
             $exception->setUser($user);
 

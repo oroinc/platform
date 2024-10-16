@@ -24,6 +24,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var WebSocketSendProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);

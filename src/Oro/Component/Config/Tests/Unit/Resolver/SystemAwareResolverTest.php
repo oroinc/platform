@@ -19,6 +19,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
     /** @var SystemAwareResolver */
     private $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $container = $this->createMock(ContainerInterface::class);

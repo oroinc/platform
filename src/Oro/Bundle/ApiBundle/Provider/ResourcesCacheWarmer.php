@@ -25,18 +25,14 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
         $this->requestTypes = $requestTypes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUp(string $cacheDir): array
     {
         $this->warmUpCache();
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return true;

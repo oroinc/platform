@@ -17,9 +17,7 @@ class AddEmailVisibilities implements Migration, DatabasePlatformAwareInterface,
     use DatabasePlatformAwareTrait;
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $visibilityTableCreated = $this->addEmailAddressVisibilityTable($schema);

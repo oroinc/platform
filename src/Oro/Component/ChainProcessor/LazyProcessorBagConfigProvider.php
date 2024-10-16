@@ -26,17 +26,13 @@ class LazyProcessorBagConfigProvider implements ProcessorBagConfigProviderInterf
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActions(): array
     {
         return $this->actions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroups(string $action): array
     {
         if (!$this->container->has($action)) {
@@ -49,9 +45,7 @@ class LazyProcessorBagConfigProvider implements ProcessorBagConfigProviderInterf
         return $configProvider->getGroups();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProcessors(string $action): array
     {
         if (!$this->container->has($action)) {

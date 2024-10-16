@@ -14,6 +14,7 @@ class FixedIntegerTypeTest extends TypeTestCase
     /** @var FixedIntegerType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new FixedIntegerType();
@@ -101,6 +102,7 @@ class FixedIntegerTypeTest extends TypeTestCase
         ];
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

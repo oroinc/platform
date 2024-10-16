@@ -51,17 +51,13 @@ class TagsExtension extends AbstractTagsExtension
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority(): int
     {
         return 10;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -89,9 +85,7 @@ class TagsExtension extends AbstractTagsExtension
         return $className && $this->taggableHelper->isTaggable($className);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config): void
     {
         $columns = $config->offsetGetByPath('[columns]', []);
@@ -108,6 +102,7 @@ class TagsExtension extends AbstractTagsExtension
         $this->enableInlineEditing($config);
     }
 
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data): void
     {
         if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)) {
@@ -164,9 +159,7 @@ class TagsExtension extends AbstractTagsExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result): void
     {
         $rows = $result->getData();

@@ -14,6 +14,7 @@ class SchemaDumperTest extends \PHPUnit\Framework\TestCase
 
     protected Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);

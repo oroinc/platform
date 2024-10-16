@@ -10,6 +10,7 @@ class QueryBuilderGroupingOrmQueryConverterContextTest extends \PHPUnit\Framewor
     /** @var QueryBuilderGroupingOrmQueryConverterContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new QueryBuilderGroupingOrmQueryConverterContext();

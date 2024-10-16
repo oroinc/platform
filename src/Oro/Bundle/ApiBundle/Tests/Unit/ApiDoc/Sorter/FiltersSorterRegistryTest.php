@@ -22,6 +22,7 @@ class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultSorter = $this->createMock(FiltersSorterInterface::class);

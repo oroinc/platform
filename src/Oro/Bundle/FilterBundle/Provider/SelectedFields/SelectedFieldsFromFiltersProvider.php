@@ -11,9 +11,7 @@ use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
  */
 class SelectedFieldsFromFiltersProvider extends AbstractSelectedFieldsProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getConfiguration(DatagridConfiguration $datagridConfiguration): array
     {
         return $datagridConfiguration->offsetGetByPath(FilterConfiguration::COLUMNS_PATH, []);

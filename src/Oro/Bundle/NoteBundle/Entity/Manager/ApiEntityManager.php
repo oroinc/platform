@@ -8,9 +8,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager as BaseApiEntityManage
 
 class ApiEntityManager extends BaseApiEntityManager
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function find($id)
     {
         /** @var Note $result */

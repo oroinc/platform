@@ -21,9 +21,7 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
         $this->searchQuery = $query;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addRestriction($restriction, $condition, $isComputed = false)
     {
         if ($restriction instanceof Expression) {
@@ -61,57 +59,43 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
         return $this->searchQuery->getQuery();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generateParameterName($filterName)
     {
         return $filterName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDatabasePlatform()
     {
         throw new \BadMethodCallException('Method currently not supported.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function groupBy($_)
     {
         throw new \BadMethodCallException('Method currently not supported.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addGroupBy($_)
     {
         throw new \BadMethodCallException('Method currently not supported.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function expr()
     {
         throw new \BadMethodCallException('Use Criteria::expr() instead.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setParameter($key, $value, $type = null)
     {
         throw new \BadMethodCallException('Method currently not supported.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFieldByAlias($fieldName)
     {
         throw new \BadMethodCallException('Method currently not supported.');

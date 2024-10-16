@@ -36,6 +36,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Adapter|\PHPUnit\Framework\MockObject\MockObject */
     private $filesystemAdapter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filesystem = $this->createMock(Filesystem::class);

@@ -25,9 +25,7 @@ class RootBasedAclWrapper implements AclInterface
         $this->rootAcl = $rootAcl;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassAces(): array
     {
         if (null !== $this->classAces) {
@@ -40,9 +38,7 @@ class RootBasedAclWrapper implements AclInterface
         return $aces;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassFieldAces($field): array
     {
         if (isset($this->classFieldAces[$field])) {
@@ -55,25 +51,19 @@ class RootBasedAclWrapper implements AclInterface
         return $aces;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getObjectAces(): array
     {
         return $this->acl->getObjectAces();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getObjectFieldAces($field): array
     {
         return $this->acl->getObjectFieldAces($field);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getObjectIdentity(): ObjectIdentityInterface
     {
         if (!$this->acl->getClassAces() && !$this->acl->getObjectAces()) {
@@ -92,59 +82,45 @@ class RootBasedAclWrapper implements AclInterface
         return $this->getObjectIdentity();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParentAcl(): ?AclInterface
     {
         return $this->acl->getParentAcl();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isEntriesInheriting(): bool
     {
         return $this->acl->isEntriesInheriting();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isFieldGranted($field, array $masks, array $securityIdentities, $administrativeMode = false): bool
     {
         return $this->getPermissionGrantingStrategy()
             ->isFieldGranted($this, $field, $masks, $securityIdentities, $administrativeMode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isGranted(array $masks, array $securityIdentities, $administrativeMode = false): bool
     {
         return $this->getPermissionGrantingStrategy()
             ->isGranted($this, $masks, $securityIdentities, $administrativeMode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isSidLoaded($securityIdentities): bool
     {
         return $this->acl->isSidLoaded($securityIdentities);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function serialize()
     {
         throw new \LogicException('Not supported.');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function unserialize($serialized)
     {
         throw new \LogicException('Not supported.');

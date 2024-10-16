@@ -21,17 +21,13 @@ class FakeRestClient implements RestClientInterface
     /** @var RestResponseInterface */
     protected $lastResponse;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($resource, array $params = [], array $headers = [], array $options = [])
     {
         return $this->createFakeResponse($resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getJSON($resource, array $params = [], array $headers = [], array $options = [])
     {
         $response = $this->get($resource, $params, $headers, $options);
@@ -39,9 +35,7 @@ class FakeRestClient implements RestClientInterface
         return Utils::jsonDecode($response->getBodyAsString(), true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function post(
         $resource,
         $data,
@@ -51,25 +45,19 @@ class FakeRestClient implements RestClientInterface
         return $this->createFakeResponse($resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function delete($resource, array $headers = [], array $options = [])
     {
         return $this->createFakeResponse($resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function put($resource, $data, array $headers = [], array $options = [])
     {
         return $this->createFakeResponse($resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLastResponse()
     {
         return $this->lastResponse;

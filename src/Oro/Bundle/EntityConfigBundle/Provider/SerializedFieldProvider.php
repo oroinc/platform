@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Responsible for specifying the types that can be represented as a serialized field
@@ -25,6 +26,8 @@ class SerializedFieldProvider
         'float',
         'money',
         'percent',
+        'enum',
+        'multiEnum',
         'wysiwyg'
     ];
 
@@ -70,6 +73,10 @@ class SerializedFieldProvider
      */
     private function checkIsSerialiazed(FieldConfigModel $fieldConfigModel, callable $getFieldValueCallback)
     {
+        if (ExtendHelper::isEnumerableType($fieldConfigModel->getType())) {
+            return true;
+        }
+
         if (!$this->isSerializableType($fieldConfigModel)) {
             return false;
         }

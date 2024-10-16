@@ -18,6 +18,7 @@ class HashNavExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var HashNavExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

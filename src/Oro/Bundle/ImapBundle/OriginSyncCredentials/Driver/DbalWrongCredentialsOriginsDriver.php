@@ -26,9 +26,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addOrigin($emailOriginId, $ownerId = null)
     {
         $this->logger->notice('Email origin with wrong credentials was detected.', ['origin_id' => $emailOriginId]);
@@ -57,9 +55,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllOrigins()
     {
         $origins = [];
@@ -77,9 +73,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
         return $origins;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllOriginsByOwnerId($ownerId = null)
     {
         $origins = [];
@@ -104,9 +98,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
         return $origins;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function deleteOrigin($emailOriginId)
     {
         $this->logger->debug(
@@ -116,9 +108,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
         $this->getConnection()->delete('oro_imap_wrong_creds_origin', ['origin_id' => $emailOriginId]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function deleteAllOrigins()
     {
         $this->logger->debug('Delete email origins with wrong credentials from the storage.');

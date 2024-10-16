@@ -19,6 +19,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataProvider */
     private $metadataProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = $this->createMock(ActionProcessorInterface::class);

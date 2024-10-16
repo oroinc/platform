@@ -19,6 +19,7 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityAssociationHelper */
     private $activityAssociationHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

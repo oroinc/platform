@@ -42,6 +42,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
     /** @var AbstractScopeManager */
     protected $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

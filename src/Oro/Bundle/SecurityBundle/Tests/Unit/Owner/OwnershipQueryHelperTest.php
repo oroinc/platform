@@ -25,6 +25,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
     /** @var OwnershipQueryHelper */
     private $ownershipQueryHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

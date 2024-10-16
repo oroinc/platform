@@ -13,6 +13,7 @@ class LocalizationQueryTraitTest extends \PHPUnit\Framework\TestCase
     /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $queryBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->queryBuilder = $this->createMock(QueryBuilder::class);

@@ -15,9 +15,7 @@ class CallbackMessageBuilder implements MessageBuilderInterface
         $this->callback = $callback;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMessage()
     {
         return \call_user_func($this->callback);

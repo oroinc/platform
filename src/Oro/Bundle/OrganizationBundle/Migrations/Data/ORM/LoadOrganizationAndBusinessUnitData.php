@@ -17,9 +17,7 @@ class LoadOrganizationAndBusinessUnitData extends AbstractFixture implements Ord
     const MAIN_BUSINESS_UNIT = 'Main';
     const REFERENCE_DEFAULT_ORGANIZATION = 'default_organization';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         /*
@@ -29,9 +27,7 @@ class LoadOrganizationAndBusinessUnitData extends AbstractFixture implements Ord
         return -240;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         // load default organization

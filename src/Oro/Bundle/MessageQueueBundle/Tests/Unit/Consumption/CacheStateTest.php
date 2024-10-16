@@ -13,6 +13,7 @@ class CacheStateTest extends \PHPUnit\Framework\TestCase
     /** @var CacheState */
     private $cacheState;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(StateDriverInterface::class);

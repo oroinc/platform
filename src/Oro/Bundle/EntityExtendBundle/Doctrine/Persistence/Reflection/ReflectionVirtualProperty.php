@@ -35,6 +35,7 @@ class ReflectionVirtualProperty extends \ReflectionProperty
      * @return mixed
      */
     #[ReturnTypeWillChange]
+    #[\Override]
     public function getValue(?object $object = null): mixed
     {
         if ($object instanceof Proxy && !$object->__isInitialized()) {
@@ -55,6 +56,7 @@ class ReflectionVirtualProperty extends \ReflectionProperty
      * @return void
      */
     #[ReturnTypeWillChange]
+    #[\Override]
     public function setValue(mixed $object, mixed $value = null): void
     {
         if (!($object instanceof Proxy && !$object->__isInitialized())) {

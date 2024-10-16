@@ -37,9 +37,7 @@ class SendEmail extends AbstractSendEmail
         $this->emailOriginHelper = $emailOriginHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options): self
     {
         $this->assertFrom($options);
@@ -62,9 +60,7 @@ class SendEmail extends AbstractSendEmail
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context): void
     {
         $from = $this->getEmailAddress($context, $this->options['from']);

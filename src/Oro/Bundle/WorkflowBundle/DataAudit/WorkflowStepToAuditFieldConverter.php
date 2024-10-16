@@ -30,9 +30,7 @@ class WorkflowStepToAuditFieldConverter implements ChangeSetToAuditFieldsConvert
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convert(
         string $auditEntryClass,
         string $auditFieldClass,

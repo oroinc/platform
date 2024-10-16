@@ -26,6 +26,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     /** @var OwnerTreeListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

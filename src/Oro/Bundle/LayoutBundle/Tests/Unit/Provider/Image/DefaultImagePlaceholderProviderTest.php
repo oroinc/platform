@@ -14,6 +14,7 @@ class DefaultImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     private DefaultImagePlaceholderProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->imagineUrlProvider = $this->createMock(ImagineUrlProviderInterface::class);

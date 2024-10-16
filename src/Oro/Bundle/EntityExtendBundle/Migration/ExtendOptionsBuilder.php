@@ -39,9 +39,9 @@ class ExtendOptionsBuilder
         bool $isDryRunMode = false
     ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
-        $this->fieldTypeHelper      = $fieldTypeHelper;
-        $this->configManager        = $configManager;
-        $this->isDryRunMode         = $isDryRunMode;
+        $this->fieldTypeHelper = $fieldTypeHelper;
+        $this->configManager = $configManager;
+        $this->isDryRunMode = $isDryRunMode;
     }
 
     /**
@@ -54,12 +54,12 @@ class ExtendOptionsBuilder
 
     /**
      * @param string $tableName
-     * @param array  $options
+     * @param array $options
      */
     public function addTableOptions($tableName, array $options)
     {
         $customEntityClassName = $this->getAndRemoveOption($options, ExtendOptionsManager::ENTITY_CLASS_OPTION);
-        $entityClassNames      = $this->getEntityClassNames($tableName, $customEntityClassName, false);
+        $entityClassNames = $this->getEntityClassNames($tableName, $customEntityClassName, false);
         if (!$entityClassNames) {
             return;
         }
@@ -81,15 +81,16 @@ class ExtendOptionsBuilder
     /**
      * @param string $tableName
      * @param string $columnName
-     * @param array  $options
+     * @param array $options
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * /
      */
     public function addColumnOptions($tableName, $columnName, $options)
     {
         $entityClassNames = $this->getEntityClassNames($tableName, null, false);
-
         // Filtering entities by contains only the required column
         if (!isset($options['extend']['is_extend'])) {
             $entityClassNames = array_filter($entityClassNames, function ($className) use ($columnName) {
@@ -114,9 +115,11 @@ class ExtendOptionsBuilder
         if (!$fieldName) {
             $fieldName = $this->getFieldName($tableName, $columnName);
         }
-        $columnType           = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
-        $columnMode           = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
-        $columnUnderlyingType = $this->fieldTypeHelper->getUnderlyingType($columnType);
+        $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
+        $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
+        $columnUnderlyingType = null !== $columnType
+            ? $this->getUnderlyingType($columnType, $options)
+            : $columnType;
 
         if (in_array($columnUnderlyingType, RelationType::$anyToAnyRelations, true)) {
             if (!isset($options['extend'])) {
@@ -189,7 +192,7 @@ class ExtendOptionsBuilder
     /**
      * @param string $configType
      * @param string $tableName
-     * @param array  $options
+     * @param array $options
      */
     public function addTableAuxiliaryOptions($configType, $tableName, $options)
     {
@@ -207,7 +210,7 @@ class ExtendOptionsBuilder
      * @param string $configType
      * @param string $tableName
      * @param string $columnName
-     * @param array  $options
+     * @param array $options
      */
     public function addColumnAuxiliaryOptions($configType, $tableName, $columnName, $options)
     {
@@ -245,7 +248,7 @@ class ExtendOptionsBuilder
      *
      * @param string $tableName
      * @param string $customEntityClassName The name of a custom entity
-     * @param bool   $throwExceptionIfNotFound
+     * @param bool $throwExceptionIfNotFound
      *
      * @return string[]
      *
@@ -253,6 +256,7 @@ class ExtendOptionsBuilder
      */
     protected function getEntityClassNames($tableName, $customEntityClassName = null, $throwExceptionIfNotFound = true)
     {
+        $this->configManager->clearConfigurableCache();
         if (!isset($this->tableToEntitiesMap[$tableName])) {
             $entityClassNames = !empty($customEntityClassName)
                 ? [$customEntityClassName]
@@ -292,7 +296,7 @@ class ExtendOptionsBuilder
     /**
      * Gets a value of an option with the given name and then remove the option from $options array
      *
-     * @param array  $options
+     * @param array $options
      * @param string $name
      *
      * @return mixed
@@ -306,5 +310,17 @@ class ExtendOptionsBuilder
         }
 
         return $value;
+    }
+
+    protected function getUnderlyingType(string $columnType, array $options): string
+    {
+        if (ExtendHelper::isEnumerableType($columnType)
+            && isset($options[ExtendOptionsManager::TARGET_OPTION]['table_name'])
+            && str_starts_with($options[ExtendOptionsManager::TARGET_OPTION]['table_name'], 'oro_enum_')
+        ) {
+            return FieldTypeHelper::matchEnumUnderlyingType($columnType);
+        }
+
+        return $this->fieldTypeHelper->getUnderlyingType($columnType);
     }
 }

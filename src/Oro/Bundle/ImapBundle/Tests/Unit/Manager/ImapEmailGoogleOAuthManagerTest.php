@@ -26,6 +26,7 @@ class ImapEmailGoogleOAuthManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ImapEmailGoogleOAuthManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

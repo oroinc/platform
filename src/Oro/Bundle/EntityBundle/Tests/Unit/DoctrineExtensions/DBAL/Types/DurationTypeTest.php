@@ -9,6 +9,7 @@ class DurationTypeTest extends \PHPUnit\Framework\TestCase
 {
     private DurationType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new DurationType();

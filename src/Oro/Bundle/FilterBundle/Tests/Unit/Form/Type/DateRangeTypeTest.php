@@ -16,6 +16,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
     /** @var string */
     protected $defaultTimezone = 'Pacific/Honolulu';
 
+    #[\Override]
     protected function setUp(): void
     {
         $localeSettings = $this->getMockBuilder(LocaleSettings::class)
@@ -32,17 +33,13 @@ class DateRangeTypeTest extends AbstractTypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptionsDataProvider(): array
     {
         return [
@@ -61,9 +58,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function bindDataProvider(): array
     {
         return [

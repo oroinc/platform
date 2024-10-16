@@ -37,9 +37,7 @@ class FeatureDependedFirewallMap extends FirewallMap
         $this->featureDependedFirewalls = $featureDependedFirewalls;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getListeners(Request $request): array
     {
         $context = $this->getContext($request);
@@ -64,6 +62,7 @@ class FeatureDependedFirewallMap extends FirewallMap
         return [$listeners, $exceptionListener, $logoutListener];
     }
 
+    #[\Override]
     public function getFirewallConfig(Request $request): ?FirewallConfig
     {
         $context = $this->getContext($request);

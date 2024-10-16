@@ -8,6 +8,7 @@ use Oro\Bundle\FilterBundle\Provider\SelectedFields\SelectedFieldsFromFiltersPro
 
 class SelectedFieldsFromFiltersProviderTest extends AbstractSelectedFieldsProviderTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -15,9 +16,7 @@ class SelectedFieldsFromFiltersProviderTest extends AbstractSelectedFieldsProvid
         $this->provider = new SelectedFieldsFromFiltersProvider($this->datagridStateProvider);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function mockGetConfiguration(array $configuration): void
     {
         $this->datagridConfiguration->expects(self::once())

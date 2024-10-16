@@ -17,9 +17,7 @@ class LoggerClientDecoratorListener extends AbstractClientDecoratorListener impl
         'enabled' => true,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function attachDecorator(ClientCreatedAfterEvent $event, array $configuration)
     {
         $client = new LoggerClientDecorator(
@@ -29,33 +27,25 @@ class LoggerClientDecoratorListener extends AbstractClientDecoratorListener impl
         $event->setClient($client);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDefaultConfigurationParameters()
     {
         return $this->defaultConfigurationParameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getConfigurationKey()
     {
         return self::CONFIG_KEY;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isEnabled(array $configuration)
     {
         return (bool) $configuration['enabled'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isApplicable(ClientCreatedAfterEvent $event)
     {
         return true;

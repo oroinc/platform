@@ -689,7 +689,7 @@ paths:
       tags:
         - testapiorders
       summary: 'Create Test Order'
-      description: 'Create an entity'
+      description: 'Create an entity<p><strong>Note:</strong> This resource supports <a href="https://doc.oroinc.com/api/validate-operation/" target="_blank">validate operation</a>.</p>'
       operationId: testapiorders-post
       parameters:
         -
@@ -868,7 +868,7 @@ paths:
       tags:
         - testapiorders
       summary: 'Update Test Order'
-      description: 'Update an entity'
+      description: 'Update an entity<p><strong>Note:</strong> This resource supports <a href="https://doc.oroinc.com/api/validate-operation/" target="_blank">validate operation</a>.</p>'
       operationId: testapiorders-id-patch
       parameters:
         -

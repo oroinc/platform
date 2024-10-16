@@ -40,9 +40,7 @@ class SetAllowedMimeTypesForImageFieldQuery extends ParametrizedMigrationQuery
         $this->mimeTypes = $mimeTypes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -51,9 +49,7 @@ class SetAllowedMimeTypesForImageFieldQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

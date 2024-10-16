@@ -56,9 +56,7 @@ class UserAclHandler implements SearchHandlerInterface
         $this->aclVoter = $aclVoter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         [$search, $entityClass, $permission, $entityId, $excludeCurrentUser] = explode(';', $query);
@@ -115,25 +113,19 @@ class UserAclHandler implements SearchHandlerInterface
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getProperties()
     {
         return ['id', 'username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email'];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityName()
     {
         return User::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         /** @var User $item */

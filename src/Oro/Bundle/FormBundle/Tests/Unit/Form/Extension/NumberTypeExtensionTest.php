@@ -15,6 +15,7 @@ class NumberTypeExtensionTest extends FormIntegrationTestCase
     /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     private $numberFormatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,6 +37,7 @@ class NumberTypeExtensionTest extends FormIntegrationTestCase
         self::assertTrue($form->getConfig()->getOption('limit_decimals'));
     }
 
+    #[\Override]
     protected function getTypeExtensions(): array
     {
         return array_merge(

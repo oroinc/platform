@@ -22,6 +22,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
     /** @var LoadEntitiesByEntitySerializer */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

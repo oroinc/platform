@@ -49,32 +49,26 @@ class OperationButton implements ButtonInterface
 
     /**
      * Gets origin operation name
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel(): string
     {
         return (string) $this->operation->getDefinition()->getLabel();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAriaLabel(): ?string
     {
         return $this->operation->getDefinition()->getDatagridOptions()['aria_label'] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIcon()
     {
         $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
@@ -82,17 +76,13 @@ class OperationButton implements ButtonInterface
         return isset($buttonOptions['icon']) ? $buttonOptions['icon'] : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return $this->operation->getDefinition()->getOrder();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplate()
     {
         $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
@@ -102,9 +92,7 @@ class OperationButton implements ButtonInterface
             : static::DEFAULT_TEMPLATE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateData(array $customData = [])
     {
         $defaultData = [
@@ -138,9 +126,6 @@ class OperationButton implements ButtonInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function getDatagridData()
     {
         $datagridOptions = $this->operation->getDefinition()->getDatagridOptions();
@@ -148,17 +133,13 @@ class OperationButton implements ButtonInterface
         return isset($datagridOptions['data']) ? $datagridOptions['data'] : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getButtonContext()
     {
         return $this->buttonContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroup()
     {
         $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
@@ -166,9 +147,7 @@ class OperationButton implements ButtonInterface
         return isset($buttonOptions['group']) ? $buttonOptions['group'] : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTranslationDomain()
     {
         return null;

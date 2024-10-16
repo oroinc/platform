@@ -42,16 +42,12 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildItem(ItemInterface $item, array $options): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildOptions(array $options): array
     {
         if (isset($options['extras']['isAllowed'])) {

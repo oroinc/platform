@@ -15,6 +15,7 @@ class ApiFeatureTest extends RestJsonApiTestCase
 {
     use ApiFeatureTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

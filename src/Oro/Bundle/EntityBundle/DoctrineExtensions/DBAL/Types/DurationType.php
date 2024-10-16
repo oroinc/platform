@@ -9,13 +9,13 @@ class DurationType extends IntegerType
 {
     const TYPE = 'duration';
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getName()
     {
         return self::TYPE;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function requiresSQLCommentHint(AbstractPlatform $platform)
     {
         return true;

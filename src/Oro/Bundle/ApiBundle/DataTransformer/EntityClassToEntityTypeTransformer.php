@@ -19,9 +19,7 @@ class EntityClassToEntityTypeTransformer implements DataTransformerInterface
         $this->valueNormalizer = $valueNormalizer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform(mixed $value, array $config, array $context): mixed
     {
         if (empty($value)) {

@@ -16,6 +16,7 @@ class EmailAddressFromTypeTest extends TypeTestCase
     private $relatedEmailsProvider;
     private $mailboxManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -56,9 +57,7 @@ class EmailAddressFromTypeTest extends TypeTestCase
         $this->assertEquals($formData, $form->getData());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

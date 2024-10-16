@@ -23,6 +23,7 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
     /** @var \SoapClient|\PHPUnit\Framework\MockObject\MockObject */
     private $soapClient;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transport = $this->getMockForAbstractClass(

@@ -22,17 +22,13 @@ class NavigationHistoryItemData extends AbstractFixture implements DependentFixt
     const NAVIGATION_HISTORY_ITEM_4 = 'Fourth navigation history item';
     const NAVIGATION_HISTORY_ITEM_5 = 'Fifth navigation history item';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadUserData::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var User $user */

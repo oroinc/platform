@@ -25,9 +25,7 @@ class PropertyGetterReturnsDefaultValue extends \PHPUnit\Framework\Constraint\Co
         $this->propertyName = $propertyName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toString(): string
     {
         return sprintf(
@@ -36,9 +34,7 @@ class PropertyGetterReturnsDefaultValue extends \PHPUnit\Framework\Constraint\Co
             $this->propertyName
         );
     }
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function failureDescription($other): string
     {
         return sprintf(
@@ -49,9 +45,7 @@ class PropertyGetterReturnsDefaultValue extends \PHPUnit\Framework\Constraint\Co
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function matches($other): bool
     {
         $this->getterName = 'get' . ucfirst($this->propertyName);

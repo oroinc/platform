@@ -12,7 +12,7 @@ use Oro\Bundle\DashboardBundle\Model\StateManager;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\DashboardType\DashboardTestType;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\DashboardWithType;
-use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
+use Oro\Bundle\EntityExtendBundle\Model\EnumOption;
 
 class FactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,6 +28,7 @@ class FactoryTest extends \PHPUnit\Framework\TestCase
     /** @var Factory */
     private $dashboardFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
@@ -87,7 +88,7 @@ class FactoryTest extends \PHPUnit\Framework\TestCase
     {
         $expectedConfig = ['template' => 'test'];
 
-        $dashboardType = new EnumValue();
+        $dashboardType = new EnumOption();
         $dashboardType->setId('test');
 
         $dashboard = new DashboardWithType();
@@ -106,7 +107,7 @@ class FactoryTest extends \PHPUnit\Framework\TestCase
         $expectedConfig = ['label' => 'test label'];
 
         $name = 'test';
-        $dashboardType = new EnumValue();
+        $dashboardType = new EnumOption();
         $dashboardType->setId('widgets');
         $dashboard = new DashboardWithType();
         $dashboard->setDashboardType($dashboardType);

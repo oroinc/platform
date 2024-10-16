@@ -15,6 +15,7 @@ class ConfigReaderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigReader */
     private $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProvider::class);

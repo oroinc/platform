@@ -46,9 +46,7 @@ class ComputeTreeNodePathField implements ProcessorInterface
         $this->sourceEntityClass = $sourceEntityClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

@@ -92,41 +92,31 @@ class ProcessorIterator implements \Iterator
         return $this->processors[$this->index][1];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function current(): ProcessorInterface
     {
         return $this->processorRegistry->getProcessor($this->processors[$this->index][0]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->nextApplicable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function key(): int
     {
         return $this->index;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         return $this->index <= $this->maxIndex;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         $this->index = -1;

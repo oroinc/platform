@@ -47,9 +47,7 @@ class Manager implements ManagerInterface
         $this->nameStrategy          = $nameStrategy;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDatagrid($name, $parameters = null, array $additionalParameters = [])
     {
         if (null === $parameters) {
@@ -79,9 +77,7 @@ class Manager implements ManagerInterface
         return $this->nameStrategy->getGridUniqueName($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDatagridByRequestParams($name, array $additionalParameters = [])
     {
         $gridScope = $this->nameStrategy->parseGridScope($name);
@@ -118,9 +114,7 @@ class Manager implements ManagerInterface
         return $this->getDatagrid($name, $parameters, $additionalParameters);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigurationForGrid($name)
     {
         $gridName = $this->nameStrategy->parseGridName($name);

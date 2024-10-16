@@ -15,9 +15,7 @@ class LoadSearchProductData extends AbstractFixture
         ['name' => 'Basic Women’s 4-Pocket Black Scrub Set'],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach (self::PRODUCTS as $key => $productData) {

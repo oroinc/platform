@@ -14,9 +14,7 @@ class ResourcePathProvidersPass implements CompilerPassInterface
     private const PROVIDER_SERVICE_ID = 'oro_layout.loader.path_provider';
     private const TAG_NAME = 'layout.resource.path_provider';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $chainProviderDef = $container->getDefinition(self::PROVIDER_SERVICE_ID);

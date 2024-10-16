@@ -25,6 +25,7 @@ class CollectListManagerTest extends \PHPUnit\Framework\TestCase
     /** @var CollectListManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->chainProvider = $this->createMock(ActivityListChainProvider::class);

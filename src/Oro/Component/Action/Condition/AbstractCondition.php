@@ -6,17 +6,13 @@ use Oro\Component\ConfigExpression\Condition\AbstractCondition as BaseAbstractCo
 
 abstract class AbstractCondition extends BaseAbstractCondition
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         throw new \BadMethodCallException('Not implemented');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         throw new \BadMethodCallException('Not implemented');

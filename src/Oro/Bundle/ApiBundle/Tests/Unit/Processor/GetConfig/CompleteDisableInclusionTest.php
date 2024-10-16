@@ -10,6 +10,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
     /** @var CompleteDisableInclusion */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

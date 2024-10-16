@@ -10,9 +10,7 @@ class LoadScopeData extends AbstractFixture
 {
     const DEFAULT_SCOPE = 'default_scope';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $manager->getRepository(Scope::class)

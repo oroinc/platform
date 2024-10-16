@@ -27,6 +27,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DeletedAttributeRelationListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);

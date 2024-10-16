@@ -21,6 +21,7 @@ class EntityIdByCriteriaProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdByCriteriaProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

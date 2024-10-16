@@ -18,6 +18,7 @@ class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
     private ConsumptionExtension $extension;
     private Context $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestContext = new RequestContext();

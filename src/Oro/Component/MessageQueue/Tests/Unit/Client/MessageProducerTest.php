@@ -29,9 +29,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
 
     private TopicInterface $topic;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(DriverInterface::class);

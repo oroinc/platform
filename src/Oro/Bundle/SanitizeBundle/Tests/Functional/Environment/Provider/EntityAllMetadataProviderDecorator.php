@@ -15,6 +15,7 @@ class EntityAllMetadataProviderDecorator extends EntityAllMetadataProvider
         $this->entitiesToFilter = $entitiesToFilter;
     }
 
+    #[\Override]
     public function getAllMetadata(): array
     {
         if (null === $this->metadataList) {

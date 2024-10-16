@@ -20,6 +20,7 @@ class FileReflectorTest extends \PHPUnit\Framework\TestCase
     /** @var FileReflector */
     private $reflector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

@@ -33,6 +33,7 @@ class TransitionIsAllowedValidator extends ConstraintValidator
      * @param WorkflowData $value
      * @param TransitionIsAllowed $constraint
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         /** @var WorkflowItem $workflowItem */

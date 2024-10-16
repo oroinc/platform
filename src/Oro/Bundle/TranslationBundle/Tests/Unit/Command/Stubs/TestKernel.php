@@ -19,9 +19,7 @@ class TestKernel extends Kernel
         parent::__construct('test_stub_env', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProjectDir(): string
     {
         return $this->projectDir;
@@ -31,11 +29,13 @@ class TestKernel extends Kernel
     {
     }
 
+    #[\Override]
     public function registerBundles(): iterable
     {
         return [];
     }
 
+    #[\Override]
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
     }

@@ -27,6 +27,7 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ByStepActionProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);

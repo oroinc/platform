@@ -22,10 +22,10 @@ class ResponseHeaderProvider implements ResponseHeaderProviderInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function getResponseHeaders(
         string $action,
         ?string $entityType,

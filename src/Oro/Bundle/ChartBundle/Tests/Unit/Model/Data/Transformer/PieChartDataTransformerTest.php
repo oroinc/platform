@@ -11,6 +11,7 @@ class PieChartDataTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var PieChartDataTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new PieChartDataTransformer();

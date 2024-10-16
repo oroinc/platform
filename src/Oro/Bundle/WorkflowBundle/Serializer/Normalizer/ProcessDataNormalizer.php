@@ -21,9 +21,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = [])
     {
         /** @var ProcessData $object */
@@ -40,9 +38,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
         return $this->serializer->normalize($object->getValues(), $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $denormalizedData = $this->serializer->denormalize($data, '', $format, $context);
@@ -51,17 +47,13 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
         return new ProcessData($denormalizedData);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, $format = null): bool
     {
         return is_object($data) && $this->supportsClass($this->getClass($data));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return $this->supportsClass($type);

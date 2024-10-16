@@ -29,6 +29,7 @@ class SearchBundleWebTestCase extends WebTestCase
      * override parent method so no DB transaction is started
      * @param bool $nestTransactionsWithSavePoints
      */
+    #[\Override]
     protected function startTransaction($nestTransactionsWithSavePoints = false)
     {
     }
@@ -36,10 +37,12 @@ class SearchBundleWebTestCase extends WebTestCase
     /**
      * override parent method so no DB transaction is rolled back
      */
+    #[\Override]
     protected static function rollbackTransaction()
     {
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         if (static::isDbIsolationPerTest()) {
@@ -49,6 +52,7 @@ class SearchBundleWebTestCase extends WebTestCase
         parent::tearDown();
     }
 
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         if (!static::isDbIsolationPerTest()) {

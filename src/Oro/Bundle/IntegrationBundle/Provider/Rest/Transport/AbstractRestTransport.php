@@ -34,9 +34,7 @@ abstract class AbstractRestTransport implements TransportInterface
         $this->clientFactory = $clientFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(Transport $transportEntity)
     {
         $this->settings = $transportEntity->getSettingsBag();

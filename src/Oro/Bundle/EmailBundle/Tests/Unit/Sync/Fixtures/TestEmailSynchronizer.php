@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationBag;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
@@ -15,11 +16,9 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
 {
     public const EMAIL_ORIGIN_ENTITY = 'AcmeBundle:EmailOrigin';
 
-    /** @var EmailEntityBuilder */
-    private $emailEntityBuilder;
+    private EmailEntityBuilder $emailEntityBuilder;
 
-    /** @var \DateTime|null */
-    private $now;
+    private ?\DateTime $now = null;
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -32,17 +31,20 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         $this->emailEntityBuilder = $emailEntityBuilder;
     }
 
-    public function supports(EmailOrigin $origin)
+    #[\Override]
+    public function supports(EmailOrigin $origin): bool
     {
         return true;
     }
 
-    protected function getEmailOriginClass()
+    #[\Override]
+    protected function getEmailOriginClass(): string
     {
         return self::EMAIL_ORIGIN_ENTITY;
     }
 
-    protected function createSynchronizationProcessor($origin)
+    #[\Override]
+    protected function createSynchronizationProcessor($origin): AbstractEmailSynchronizationProcessor
     {
         return new TestEmailSynchronizationProcessor(
             $this->getEntityManager(),
@@ -51,7 +53,8 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         );
     }
 
-    protected function getCurrentUtcDateTime()
+    #[\Override]
+    protected function getCurrentUtcDateTime(): \DateTime
     {
         return $this->now;
     }
@@ -74,6 +77,11 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
     public function callFindOriginToSync($maxConcurrentTasks, $minExecPeriodInMin)
     {
         return $this->findOriginToSync($maxConcurrentTasks, $minExecPeriodInMin);
+    }
+
+    public function callFindOrigin($originId)
+    {
+        return $this->findOrigin($originId);
     }
 
     public function callResetHangedOrigins()

@@ -19,9 +19,7 @@ class LoadEmailContextEntities implements ProcessorInterface
         $this->repository = $repository;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */

@@ -12,6 +12,7 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridCallbackActionProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new DatagridCallbackActionProvider();

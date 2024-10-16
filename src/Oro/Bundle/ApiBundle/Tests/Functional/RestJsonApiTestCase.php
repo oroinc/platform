@@ -20,33 +20,30 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     protected const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
     protected const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequestType(): RequestType
     {
         return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getResponseContentType(): string
     {
         return self::JSON_API_CONTENT_TYPE;
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     protected function request(
         string $method,
         string $uri,
@@ -88,13 +85,32 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         if (array_key_exists('filters', $parameters)) {
             $filters = $parameters['filters'];
             if ($filters) {
-                $separator = '?';
-                if (str_contains($uri, '?')) {
-                    $separator = '&';
-                }
-                $uri .= $separator . $filters;
+                $uri .= (str_contains($uri, '?') ? '&' : '?') . $filters;
             }
             unset($parameters['filters']);
+        }
+        if ('GET' !== $method) {
+            if (array_key_exists('meta', $parameters) && is_string($parameters['meta'])) {
+                $meta = $parameters['meta'];
+                if ($meta) {
+                    $uri .= (str_contains($uri, '?') ? '&' : '?') . $meta;
+                }
+                unset($parameters['meta']);
+            }
+            if (array_key_exists('fields', $parameters)) {
+                $fields = $parameters['fields'];
+                if ($fields) {
+                    $uri .= (str_contains($uri, '?') ? '&' : '?') . $fields;
+                }
+                unset($parameters['fields']);
+            }
+            if (array_key_exists('include', $parameters)) {
+                $include = $parameters['include'];
+                if ($include) {
+                    $uri .= (str_contains($uri, '?') ? '&' : '?') . $include;
+                }
+                unset($parameters['include']);
+            }
         }
 
         if (!\array_key_exists('HTTP_ACCEPT', $server)) {
@@ -376,9 +392,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected static function isApplicableContentType(ResponseHeaderBag $headers): bool
     {
         return $headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE);

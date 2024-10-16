@@ -26,6 +26,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
     /** @var Block */
     private $block;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->rawLayout = new RawLayout();

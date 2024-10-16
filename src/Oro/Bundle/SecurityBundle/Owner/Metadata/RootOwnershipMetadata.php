@@ -9,9 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
  */
 class RootOwnershipMetadata extends OwnershipMetadata
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessLevelNames(): array
     {
         // in community version the "root" ACL entry should not have GLOBAL(Organization) access level

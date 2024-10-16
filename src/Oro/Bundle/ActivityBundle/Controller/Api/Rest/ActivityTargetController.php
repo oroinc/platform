@@ -97,6 +97,7 @@ class ActivityTargetController extends RestGetController
      *
      * @return ActivityTargetApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_activity.manager.activity_target.api');

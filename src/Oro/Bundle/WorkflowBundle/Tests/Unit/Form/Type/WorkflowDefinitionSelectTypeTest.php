@@ -37,6 +37,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     /** @var WorkflowDefinitionSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
@@ -152,9 +153,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

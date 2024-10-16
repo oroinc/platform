@@ -76,6 +76,7 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
      * @param StepExecution $stepExecution
      * @return PostProcessStepExecutor
      */
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
@@ -101,9 +102,9 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function execute(StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         $itemsToWrite = [];

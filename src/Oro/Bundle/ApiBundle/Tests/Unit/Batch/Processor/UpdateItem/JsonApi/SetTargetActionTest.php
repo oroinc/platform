@@ -14,6 +14,7 @@ class SetTargetActionTest extends BatchUpdateItemProcessorTestCase
 {
     private SetTargetAction $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -216,6 +217,56 @@ class SetTargetActionTest extends BatchUpdateItemProcessorTestCase
         ];
     }
 
+    public function testProcessWithValidateMetaOptionEqualsToTrue(): void
+    {
+        $requestData = [
+            'data' => [
+                'meta' => [
+                    'validate' => true
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(ApiAction::CREATE, $this->context->getTargetAction());
+    }
+
+    public function testProcessWithValidateMetaOptionEqualsToFalse(): void
+    {
+        $requestData = [
+            'data' => [
+                'meta' => [
+                    'validate' => false
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(ApiAction::CREATE, $this->context->getTargetAction());
+    }
+
+    /**
+     * @dataProvider invalidUpdateOptionDataProvider
+     */
+    public function testProcessWithInvalidValidateMetaOption(mixed $validateOptionValue): void
+    {
+        $requestData = [
+            'data' => [
+                'meta' => [
+                    'validate' => $validateOptionValue
+                ]
+            ]
+        ];
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(ApiAction::CREATE, $this->context->getTargetAction());
+    }
+
     public function testProcessWithBothUpdateAndUpsertMetaOptionsEqualsToTrue(): void
     {
         $requestData = [
@@ -240,6 +291,60 @@ class SetTargetActionTest extends BatchUpdateItemProcessorTestCase
                 'meta' => [
                     'update' => false,
                     'upsert' => false
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(ApiAction::CREATE, $this->context->getTargetAction());
+    }
+
+    public function testAllMetaOptionsEqualsToTrue(): void
+    {
+        $requestData = [
+            'data' => [
+                'meta' => [
+                    'update' => true,
+                    'upsert' => true,
+                    'validate' => true
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(ApiAction::CREATE, $this->context->getTargetAction());
+    }
+
+    public function testAllMetaOptionsEqualsToFalse(): void
+    {
+        $requestData = [
+            'data' => [
+                'meta' => [
+                    'update' => false,
+                    'upsert' => false,
+                    'validate' => false
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals(ApiAction::CREATE, $this->context->getTargetAction());
+    }
+
+    public function testValidateMetaOptionsEqualsToTrueWithFalseOptions(): void
+    {
+        $requestData = [
+            'data' => [
+                'meta' => [
+                    'update' => false,
+                    'upsert' => false,
+                    'validate' => true
                 ]
             ]
         ];

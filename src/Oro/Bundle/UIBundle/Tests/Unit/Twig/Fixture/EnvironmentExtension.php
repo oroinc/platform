@@ -13,6 +13,7 @@ use Twig\TwigTest;
  */
 class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
 {
+    #[\Override]
     public function getTokenParsers()
     {
         return [
@@ -20,6 +21,7 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    #[\Override]
     public function getNodeVisitors()
     {
         return [
@@ -27,6 +29,7 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -34,6 +37,7 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    #[\Override]
     public function getTests()
     {
         return [
@@ -41,6 +45,7 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -48,6 +53,7 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    #[\Override]
     public function getOperators()
     {
         return [
@@ -56,6 +62,7 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    #[\Override]
     public function getGlobals(): array
     {
         return [

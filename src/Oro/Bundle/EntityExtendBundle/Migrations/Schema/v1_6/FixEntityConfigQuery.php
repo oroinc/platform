@@ -16,17 +16,13 @@ class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 
     const LIMIT = 100;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Fix config for new entities.';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $steps = ceil($this->getEntityConfigCount() / static::LIMIT);

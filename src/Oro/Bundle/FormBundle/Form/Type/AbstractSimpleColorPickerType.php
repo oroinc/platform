@@ -68,9 +68,7 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -104,9 +102,7 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $config = ['theme' => 'fontawesome'];

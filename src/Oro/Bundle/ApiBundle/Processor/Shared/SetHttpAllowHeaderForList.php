@@ -11,9 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SetHttpAllowHeaderForList extends SetHttpAllowHeader
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getHttpMethodToActionsMap(): array
     {
         return [

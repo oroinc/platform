@@ -15,9 +15,7 @@ class LoadDoctrineJobRepositoryData extends AbstractFixture implements Container
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $manager = $this->container->get('oro_batch.job.repository')->getJobManager();

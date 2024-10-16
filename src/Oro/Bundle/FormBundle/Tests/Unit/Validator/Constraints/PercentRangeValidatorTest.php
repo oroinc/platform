@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class PercentRangeValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): PercentRangeValidator
     {
         return new PercentRangeValidator();

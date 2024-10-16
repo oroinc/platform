@@ -11,6 +11,7 @@ class ConfigCheckboxTest extends FormIntegrationTestCase
     /** @var ConfigCheckbox */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

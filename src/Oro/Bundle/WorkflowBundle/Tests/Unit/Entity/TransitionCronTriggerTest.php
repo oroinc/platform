@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
 {
+    #[\Override]
     public function testAccessors()
     {
         parent::testAccessors();
@@ -163,9 +164,7 @@ class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
         return $trigger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getEntity()
     {
         return new TransitionCronTrigger();

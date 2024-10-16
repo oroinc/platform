@@ -12,6 +12,7 @@ class EmailEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailEntityAliasProvider */
     private $entityAliasProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $emailAddressManager = $this->createMock(EmailAddressManager::class);

@@ -15,6 +15,7 @@ class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
 
     private DependentJobService $dependentJobService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobManager = $this->createMock(JobManagerInterface::class);

@@ -26,6 +26,7 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SubresourcesProvider */
     private $subresourcesProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = $this->getMockBuilder(CollectSubresourcesProcessor::class)

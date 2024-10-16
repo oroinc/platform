@@ -13,6 +13,7 @@ class ScopeManagerTest extends WebTestCase
 
     private ?ConfigManager $configManager = null;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

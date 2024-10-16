@@ -29,6 +29,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
     /** @var ValidateEntityFallback */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

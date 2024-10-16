@@ -27,11 +27,13 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
  */
 class FormTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->switchToDefaultFormExtension();

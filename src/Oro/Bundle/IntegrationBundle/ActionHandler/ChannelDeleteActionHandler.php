@@ -17,9 +17,7 @@ class ChannelDeleteActionHandler implements ChannelActionHandlerInterface
         $this->deleteManager = $deleteManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleAction(Channel $channel)
     {
         return $this->deleteManager->delete($channel);

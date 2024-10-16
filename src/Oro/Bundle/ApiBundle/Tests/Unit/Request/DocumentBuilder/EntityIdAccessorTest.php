@@ -12,15 +12,16 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
+    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdTransformerRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
+    /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdTransformer;
 
     /** @var EntityIdAccessor */
     private $entityIdAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
@@ -72,6 +73,28 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             '0',
+            $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType)
+        );
+    }
+
+    public function testGetEntityIdForEntityWithSingleIdWhenTransformedValueIsNotString()
+    {
+        $entity = ['id' => 123, 'name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->setIdentifierFieldNames(['id']);
+        $requestType = new RequestType([RequestType::REST]);
+
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->with($requestType)
+            ->willReturn($this->entityIdTransformer);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('transform')
+            ->with(123, self::identicalTo($metadata))
+            ->willReturn(12345);
+
+        self::assertSame(
+            12345,
             $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType)
         );
     }

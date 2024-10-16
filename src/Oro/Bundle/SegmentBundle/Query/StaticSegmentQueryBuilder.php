@@ -21,17 +21,13 @@ class StaticSegmentQueryBuilder implements QueryBuilderInterface
         $this->em = $em;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(Segment $segment): Query
     {
         return $this->getQueryBuilder($segment)->getQuery();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getQueryBuilder(Segment $segment): QueryBuilder
     {
         return $this->em->getRepository(SegmentSnapshot::class)

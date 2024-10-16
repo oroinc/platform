@@ -21,6 +21,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 {
     private WorkflowConfigFinderBuilder $configFinderBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

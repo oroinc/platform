@@ -13,9 +13,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
  */
 class EmptyValueComparisonExpression implements ComparisonExpressionInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
         string $field,

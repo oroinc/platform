@@ -15,6 +15,7 @@ class FormTemplateDataProviderCompositeTest extends \PHPUnit\Framework\TestCase
 
     private FormTemplateDataProviderComposite $providerComposite;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formTemplateDataProviderResolver = $this->createMock(FormTemplateDataProviderResolver::class);

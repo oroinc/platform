@@ -20,9 +20,7 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
 
     private const BATCH_SIZE = 500;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->updateEmailActivityDescription($manager);

@@ -24,9 +24,7 @@ class DependencyInjectionExtension implements ExtensionInterface
         $this->serviceIds = $serviceIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExpression($name)
     {
         if (!isset($this->serviceIds[$name])) {
@@ -38,9 +36,7 @@ class DependencyInjectionExtension implements ExtensionInterface
         return $this->container->get($this->serviceIds[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasExpression($name)
     {
         return isset($this->serviceIds[$name]);

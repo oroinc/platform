@@ -21,11 +21,13 @@ class ReCaptchaService implements CaptchaServiceInterface
     ) {
     }
 
+    #[\Override]
     public function isConfigured(): bool
     {
         return $this->getPrivateKey() && $this->getPublicKey();
     }
 
+    #[\Override]
     public function isVerified($value): bool
     {
         $privateKey = $this->getPrivateKey();
@@ -39,11 +41,13 @@ class ReCaptchaService implements CaptchaServiceInterface
         return $response->isSuccess();
     }
 
+    #[\Override]
     public function getFormType(): string
     {
         return ReCaptchaType::class;
     }
 
+    #[\Override]
     public function getPublicKey(): ?string
     {
         return $this->configManager->get(Configuration::getConfigKey(Configuration::RECAPTCHA_PUBLIC_KEY));

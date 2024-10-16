@@ -23,6 +23,7 @@ class WidgetControllerTest extends WebTestCase
     /** @var Manager */
     private $dashboardManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

@@ -22,9 +22,7 @@ class CacheConfigurationPass implements CompilerPassInterface
     public const DATA_CACHE_POOL = 'oro.data.cache';
     public const DATA_CACHE_POOL_WITHOUT_MEMORY_CACHE = 'oro.data.cache.without_memory_cache';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->configureDataCacheManagerAndStaticConfigCache($container);

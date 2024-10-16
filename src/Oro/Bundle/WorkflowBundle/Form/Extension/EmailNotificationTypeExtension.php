@@ -23,26 +23,20 @@ class EmailNotificationTypeExtension extends AbstractTypeExtension
         $this->listener = $listener;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [EmailNotificationType::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this->listener, 'onPostSetData']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this->listener, 'onPreSubmit']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $elements = array_filter(

@@ -24,6 +24,7 @@ class WebpAwarePreviewMetadataProvider implements PreviewMetadataProviderInterfa
         $this->attachmentManager = $attachmentManager;
     }
 
+    #[\Override]
     public function getMetadata(File $file): array
     {
         $metadata = $this->innerPreviewMetadataProvider->getMetadata($file);

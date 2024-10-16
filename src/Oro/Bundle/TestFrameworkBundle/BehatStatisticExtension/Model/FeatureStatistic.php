@@ -58,6 +58,7 @@ class FeatureStatistic implements StatisticModelInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getPath()
     {
         return $this->path;
@@ -74,9 +75,7 @@ class FeatureStatistic implements StatisticModelInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDuration()
     {
         return $this->time;
@@ -156,9 +155,7 @@ class FeatureStatistic implements StatisticModelInterface
         return $this->createdAt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         $createdAt = $this->createdAt ?: new \DateTime('now', new \DateTimeZone('UTC'));
@@ -175,9 +172,7 @@ class FeatureStatistic implements StatisticModelInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function fromArray(array $data)
     {
         $model = new self();
@@ -194,17 +189,13 @@ class FeatureStatistic implements StatisticModelInterface
         return $model;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isNew()
     {
         return null === $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function declareSchema(Schema $schema)
     {
         $table = $schema->createTable(self::getName());
@@ -230,17 +221,13 @@ class FeatureStatistic implements StatisticModelInterface
         $table->addIndex(['created_at']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getName()
     {
         return 'feature_stat';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getIdField()
     {
         return 'path';

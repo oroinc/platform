@@ -9,9 +9,7 @@ class TagsTypeFormatter implements TypeFormatterInterface
 {
     const TYPE_TAGS = 'tags';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatType($value, $type)
     {
         if ($type === self::TYPE_TAGS) {

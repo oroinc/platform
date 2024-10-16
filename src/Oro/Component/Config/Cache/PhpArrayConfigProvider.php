@@ -7,9 +7,7 @@ namespace Oro\Component\Config\Cache;
  */
 abstract class PhpArrayConfigProvider extends PhpConfigProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function assertLoaderConfig($config): void
     {
         if (!\is_array($config)) {

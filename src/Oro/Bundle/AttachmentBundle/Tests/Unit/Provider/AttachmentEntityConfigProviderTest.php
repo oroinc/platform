@@ -18,6 +18,7 @@ class AttachmentEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentEntityConfigProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(EntityConfigManager::class);

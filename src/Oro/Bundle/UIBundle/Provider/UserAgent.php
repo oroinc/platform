@@ -27,25 +27,19 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
         $this->data[self::USER_AGENT] = $userAgent ?: '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserAgent()
     {
         return $this[self::USER_AGENT];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isMobile()
     {
         return $this[self::MOBILE];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isDesktop()
     {
         return $this[self::DESKTOP];
@@ -59,9 +53,7 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
         return $this->data[self::USER_AGENT];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($name): bool
     {
         return
@@ -71,10 +63,10 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws \OutOfBoundsException if it is requested unknown property
      */
+    #[\Override]
     public function offsetGet($name): mixed
     {
         if (isset($this->data[$name])) {
@@ -96,6 +88,7 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
      *
      * @throws \BadMethodCallException always as changing data is not allowed
      */
+    #[\Override]
     public function offsetSet($name, $value): void
     {
         throw new \BadMethodCallException('Not supported');
@@ -106,6 +99,7 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
      *
      * @throws \BadMethodCallException always as changing data is not allowed
      */
+    #[\Override]
     public function offsetUnset($name): void
     {
         throw new \BadMethodCallException('Not supported');

@@ -17,6 +17,7 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
     /** @var MultiAttemptsClientDecoratorListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

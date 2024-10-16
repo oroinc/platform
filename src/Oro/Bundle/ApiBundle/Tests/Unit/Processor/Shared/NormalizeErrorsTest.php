@@ -16,6 +16,7 @@ class NormalizeErrorsTest extends GetProcessorTestCase
     /** @var NormalizeErrors */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

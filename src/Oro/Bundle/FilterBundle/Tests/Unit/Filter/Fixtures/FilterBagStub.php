@@ -15,25 +15,19 @@ class FilterBagStub implements FilterBagInterface
         $this->filters[$name] = $filter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilterNames(): array
     {
         return array_keys($this->filters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasFilter(string $name): bool
     {
         return isset($this->filters[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilter(string $name): FilterInterface
     {
         return $this->filters[$name];

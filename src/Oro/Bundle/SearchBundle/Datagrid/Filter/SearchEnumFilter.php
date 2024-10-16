@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Filter;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\EnumFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -15,9 +16,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class SearchEnumFilter extends EnumFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         parent::init($name, $params);
@@ -25,21 +24,20 @@ class SearchEnumFilter extends EnumFilter
         $this->params[FilterUtility::FRONTEND_TYPE_KEY] = 'multiselect';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
             throw new UnexpectedTypeException($ds, SearchFilterDatasourceAdapter::class);
         }
+        if (isset($data['value']) && is_array($data['value'])) {
+            $data['value'] = ExtendHelper::mapToEnumInternalIds($data['value']);
+        }
 
         return $this->applyRestrictions($ds, $data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         throw new \BadMethodCallException('Not implemented');
@@ -54,9 +52,7 @@ class SearchEnumFilter extends EnumFilter
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return SearchEnumFilterType::class;

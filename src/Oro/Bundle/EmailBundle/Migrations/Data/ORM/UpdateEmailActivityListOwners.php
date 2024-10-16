@@ -28,17 +28,13 @@ class UpdateEmailActivityListOwners extends AbstractFixture implements Container
      */
     protected $container;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->updateActivityListOwner($manager);

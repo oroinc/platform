@@ -11,13 +11,11 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The helper that is used to set descriptions of fields,
  * including special fields such as "createdAt", "updatedAt", "owner", "organizations"
- * and fields for entities based on AbstractEnumValue.
  */
 class FieldsDescriptionHelper
 {
@@ -26,10 +24,6 @@ class FieldsDescriptionHelper
     private const OWNER_DESCRIPTION = 'An owner record represents the ownership capabilities of the record.';
     private const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm,'
         . ' company or another organization to which the users belong.';
-    private const ENUM_NAME_DESCRIPTION = 'The human readable name of the option.';
-    private const ENUM_DEFAULT_DESCRIPTION = 'Determines if this option is selected by default for new records.';
-    private const ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked.'
-        . ' First appears the option with the higher number of the priority.';
 
     private EntityDescriptionProvider $entityDescriptionProvider;
     private TranslatorInterface $translator;
@@ -134,9 +128,6 @@ class FieldsDescriptionHelper
         );
         $this->setDescriptionForCreatedAtField($definition, $targetAction);
         $this->setDescriptionForUpdatedAtField($definition, $targetAction);
-        if (is_a($entityClass, AbstractEnumValue::class, true)) {
-            $this->setDescriptionsForEnumFields($definition);
-        }
     }
 
     private function getIdentifierFieldName(EntityDefinitionConfig $definition): ?string
@@ -177,25 +168,6 @@ class FieldsDescriptionHelper
             self::UPDATED_AT_DESCRIPTION
         );
         FieldDescriptionUtil::updateReadOnlyFieldDescription($definition, 'updatedAt', $targetAction);
-    }
-
-    private function setDescriptionsForEnumFields(EntityDefinitionConfig $definition): void
-    {
-        FieldDescriptionUtil::updateFieldDescription(
-            $definition,
-            'name',
-            self::ENUM_NAME_DESCRIPTION
-        );
-        FieldDescriptionUtil::updateFieldDescription(
-            $definition,
-            'default',
-            self::ENUM_DEFAULT_DESCRIPTION
-        );
-        FieldDescriptionUtil::updateFieldDescription(
-            $definition,
-            'priority',
-            self::ENUM_PRIORITY_DESCRIPTION
-        );
     }
 
     /**

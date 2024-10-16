@@ -389,6 +389,8 @@ oro_api:
             supported_operators: ['=', '!=']
         association:
             factory: ['@oro_api.filter_factory.extended_association', 'createFilter']
+        nestedAssociation:
+            factory: [ '@oro_api.filter_factory.nested_association', 'createFilter' ]
         primaryField:
             class: Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter
         nestedTree:

@@ -27,9 +27,7 @@ class MigrateNoteAssociations implements
     use ActivityExtensionAwareTrait;
     use ExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $helper = new MigrateNoteAssociations20(

@@ -13,9 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class LinkType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -27,9 +25,7 @@ class LinkType extends AbstractType
             ->setAllowedTypes('title', 'string');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['title'] = $options['title'];
@@ -38,25 +34,18 @@ class LinkType extends AbstractType
         $view->vars['acl'] = $options['acl'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_link_type';

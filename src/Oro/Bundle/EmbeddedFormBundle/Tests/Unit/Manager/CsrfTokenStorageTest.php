@@ -25,6 +25,7 @@ class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
     /** @var CsrfTokenStorage */
     private $csrfTokenStorage;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenCache = new ArrayAdapter();

@@ -21,6 +21,7 @@ class ScopeExtensionTest extends TestCase
 
     private ScopeExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);

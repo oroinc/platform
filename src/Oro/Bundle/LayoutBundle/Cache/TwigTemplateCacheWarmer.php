@@ -27,9 +27,7 @@ class TwigTemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
         $this->iterator = $iterator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         if (null === $this->twig) {
@@ -50,17 +48,13 @@ class TwigTemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

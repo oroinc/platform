@@ -15,6 +15,7 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
     /** @var DestinationsCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(DestinationMetaRegistry::class);

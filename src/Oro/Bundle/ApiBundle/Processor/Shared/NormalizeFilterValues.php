@@ -41,9 +41,7 @@ class NormalizeFilterValues implements ProcessorInterface
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */
@@ -66,8 +64,8 @@ class NormalizeFilterValues implements ProcessorInterface
         $requestType = $this->context->getRequestType();
         $metadata = $this->context->getMetadata();
         $filters = $this->context->getFilters();
-        $filterValues = $this->context->getFilterValues()->getAll();
-        foreach ($filterValues as $filterKey => $filterValues) {
+        $allFilterValues = $this->context->getFilterValues()->getAll();
+        foreach ($allFilterValues as $filterKey => $filterValues) {
             if ($filters->has($filterKey)) {
                 $filter = $filters->get($filterKey);
                 if ($filter instanceof StandaloneFilter && !$filter instanceof SpecialHandlingFilterInterface) {
@@ -116,8 +114,10 @@ class NormalizeFilterValues implements ProcessorInterface
             $isArrayAllowed = false;
             $isRangeAllowed = false;
         } elseif (null !== $metadata && $filter instanceof ComparisonFilter) {
-            $fieldName = $filter->getField();
-            if ($fieldName) {
+            $propertyPath = $filter->getField();
+            if ($propertyPath) {
+                $property = $metadata->getPropertyByPropertyPath($propertyPath);
+                $fieldName = $property?->getName() ?? $propertyPath;
                 if ($metadata->hasAssociation($fieldName)) {
                     return $this->normalizeIdentifierValue(
                         $path,
@@ -128,10 +128,9 @@ class NormalizeFilterValues implements ProcessorInterface
                         $metadata->getAssociation($fieldName)->getTargetMetadata()
                     );
                 }
-                $idFieldNames = $metadata->getIdentifierFieldNames();
-                if (\count($idFieldNames) === 1) {
-                    $property = $metadata->getPropertyByPropertyPath($fieldName);
-                    if (null !== $property && $property->getName() === $idFieldNames[0]) {
+                if (null !== $property) {
+                    $idFieldNames = $metadata->getIdentifierFieldNames();
+                    if (\count($idFieldNames) === 1 && $property->getName() === $idFieldNames[0]) {
                         return $this->normalizeIdentifierValue(
                             $path,
                             $value,

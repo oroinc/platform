@@ -24,6 +24,7 @@ class Role
         return $this->role;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->role;

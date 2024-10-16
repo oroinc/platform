@@ -23,6 +23,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     /** @var FormatString */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new FormatString(new ContextAccessor());

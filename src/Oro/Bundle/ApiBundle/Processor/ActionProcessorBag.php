@@ -15,18 +15,14 @@ class ActionProcessorBag implements ActionProcessorBagInterface
     /** @var string[]|null */
     private ?array $publicActions = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addProcessor(ActionProcessorInterface $processor): void
     {
         $this->processors[$processor->getAction()] = $processor;
         $this->publicActions = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProcessor(string $action): ActionProcessorInterface
     {
         if (!isset($this->processors[$action])) {
@@ -36,9 +32,7 @@ class ActionProcessorBag implements ActionProcessorBagInterface
         return $this->processors[$action];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActions(): array
     {
         if (null === $this->publicActions) {

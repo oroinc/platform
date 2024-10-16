@@ -26,17 +26,13 @@ class ConfigurationProvider extends PhpArrayConfigProvider implements Configurat
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration(): array
     {
         return $this->doGetConfig();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $mergedConfig = [];

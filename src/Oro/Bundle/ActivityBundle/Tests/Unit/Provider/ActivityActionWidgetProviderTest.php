@@ -17,6 +17,7 @@ class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $placeholderProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->activityManager = $this->createMock(ActivityManager::class);

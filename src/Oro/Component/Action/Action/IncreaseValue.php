@@ -34,9 +34,7 @@ class IncreaseValue extends AbstractAction
      */
     protected $options = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $count = count($options);
@@ -90,9 +88,7 @@ class IncreaseValue extends AbstractAction
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $attribute = $this->getAttribute($this->options);

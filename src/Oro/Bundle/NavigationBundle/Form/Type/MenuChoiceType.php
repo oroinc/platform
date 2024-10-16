@@ -20,6 +20,7 @@ class MenuChoiceType extends AbstractType
         $this->menuNamesProvider = $menuNamesProvider;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined('scope_type');
@@ -44,6 +45,7 @@ class MenuChoiceType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function getParent(): string
     {
         return Select2ChoiceType::class;

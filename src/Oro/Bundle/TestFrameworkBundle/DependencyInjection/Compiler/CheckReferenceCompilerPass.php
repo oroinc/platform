@@ -14,9 +14,7 @@ use Symfony\Component\Mime\MimeTypes;
  */
 class CheckReferenceCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $definition) {

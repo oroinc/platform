@@ -38,6 +38,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var PostponedRowsHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $fileManagerMock = $this->createMock(FileManager::class);

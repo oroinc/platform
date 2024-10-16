@@ -48,9 +48,7 @@ class EmailOriginRepository implements ResetInterface
         return $emailOrigin;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->emailOrigins = [];

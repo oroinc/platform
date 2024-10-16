@@ -20,6 +20,7 @@ class HCaptchaType extends AbstractType
     ) {
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars = array_replace_recursive($view->vars, [
@@ -32,6 +33,7 @@ class HCaptchaType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function getParent(): ?string
     {
         return HiddenType::class;
@@ -42,6 +44,7 @@ class HCaptchaType extends AbstractType
         return $this->getBlockPrefix();
     }
 
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return static::NAME;

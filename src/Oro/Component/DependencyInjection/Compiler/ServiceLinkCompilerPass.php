@@ -32,9 +32,7 @@ class ServiceLinkCompilerPass implements CompilerPassInterface
         $this->decoratorClass = $decoratorClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $locator = $container->getDefinition('oro_platform.service_link.service_locator');

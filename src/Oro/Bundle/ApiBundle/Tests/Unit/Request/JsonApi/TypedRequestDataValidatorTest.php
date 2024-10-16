@@ -26,6 +26,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var TypedRequestDataValidator */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

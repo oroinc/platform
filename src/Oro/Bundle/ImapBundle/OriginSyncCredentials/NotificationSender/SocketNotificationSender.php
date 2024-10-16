@@ -30,9 +30,7 @@ class SocketNotificationSender implements NotificationSenderInterface
         $this->connectionChecker = $connectionChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function sendNotification(UserEmailOrigin $emailOrigin)
     {
         if (!$this->connectionChecker->checkConnection()) {

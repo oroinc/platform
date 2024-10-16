@@ -36,9 +36,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -53,9 +51,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -187,9 +183,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->getDoctrineHelper()->getEntityReference($entityClass, $entityId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

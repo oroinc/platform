@@ -65,9 +65,7 @@ class MemoryCache implements ResetInterface
         $this->data = [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->data = [];

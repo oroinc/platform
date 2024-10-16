@@ -45,9 +45,7 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
         $this->contextRegistry = $contextRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items)
     {
         try {
@@ -69,6 +67,7 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
         }
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

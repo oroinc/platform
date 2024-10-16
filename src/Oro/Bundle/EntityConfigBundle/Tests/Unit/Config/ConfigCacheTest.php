@@ -44,6 +44,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigCache */
     private $configCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheItemPoolInterface::class);

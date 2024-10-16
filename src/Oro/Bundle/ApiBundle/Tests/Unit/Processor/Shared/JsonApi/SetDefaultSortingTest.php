@@ -20,6 +20,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     /** @var SetDefaultSorting */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

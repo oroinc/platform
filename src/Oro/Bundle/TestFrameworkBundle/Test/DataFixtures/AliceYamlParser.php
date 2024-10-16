@@ -22,17 +22,13 @@ class AliceYamlParser implements ChainableParserInterface
         $this->yamlParser = $yamlParser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function canParse(string $file): bool
     {
         return $this->yamlParser->canParse($file);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function parse(string $file): array
     {
         $data = $this->yamlParser->parse($file);

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\UserBundle\Command;
 
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -30,6 +32,7 @@ class ListUserCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -73,6 +76,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit = (int) $input->getOption('limit');
@@ -103,7 +107,12 @@ HELP
         if (!empty($input->getOption('roles'))) {
             $builder
                 ->leftJoin('u.userRoles', 'r')
-                ->leftJoin('u.auth_status', 'au')
+                ->leftJoin(
+                    EnumOption::class,
+                    'au',
+                    Join::WITH,
+                    "JSON_EXTRACT(u.serialized_data, 'auth_status') = au"
+                )
                 ->andWhere('r.label IN (:roles)')
                 ->setParameter('roles', $input->getOption('roles'));
         }
@@ -112,8 +121,7 @@ HELP
         $table
             ->setHeaders(['ID', 'Username', 'Enabled (Auth Status)', 'First Name', 'Last Name', 'Roles'])
             ->setRows(array_map([$this, 'getUserRow'], $builder->getQuery()->getResult()))
-            ->render()
-        ;
+            ->render();
 
         return Command::SUCCESS;
     }

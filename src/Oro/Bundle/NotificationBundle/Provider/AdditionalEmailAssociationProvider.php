@@ -34,9 +34,7 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAssociations(string $entityClass): array
     {
         $associations = [];
@@ -53,17 +51,13 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
         return $associations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isAssociationSupported($entity, string $associationName): bool
     {
         return null !== $this->getEntityMetadata(ClassUtils::getClass($entity));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAssociationValue($entity, string $associationName)
     {
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {

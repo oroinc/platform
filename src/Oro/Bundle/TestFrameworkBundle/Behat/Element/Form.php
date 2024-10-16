@@ -189,6 +189,7 @@ class Form extends Element
         $this->findElementInParents($field, '.entity-select-btn')->click();
     }
 
+    #[\Override]
     public function findField($locator)
     {
         $selector = is_array($locator)
@@ -662,6 +663,7 @@ class Form extends Element
         }
     }
 
+    #[\Override]
     public function setOptions(array $options)
     {
         // Convert all mappings to lowercase

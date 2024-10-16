@@ -72,17 +72,13 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
         return $this->associationName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ConfigContext $context): void
     {
         $context->setTargetAction($this->action ?? '');
@@ -91,17 +87,13 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
         $context->setAssociationName($this->associationName ?? '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPropagable(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         $result = self::NAME;

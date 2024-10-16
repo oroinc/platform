@@ -18,9 +18,7 @@ class TraceableMessageProducer implements MessageProducerInterface
         $this->messageProducer = $messageProducer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send($topic, $message)
     {
         $this->messageProducer->send($topic, $message);

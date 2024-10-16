@@ -31,9 +31,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     /** @var array */
     protected $processedFields;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(FormAccessorInterface $formAccessor, BlockBuilderInterface $builder, Options $options)
     {
         $this->initializeState($formAccessor, $builder, $options);

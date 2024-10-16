@@ -30,6 +30,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
     /** @var SecurityAwareDriver */
     private $securityAwareDriver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(DriverInterface::class);

@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class NotificationAlertCleanupCommandTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -38,7 +39,7 @@ class NotificationAlertCleanupCommandTest extends WebTestCase
                 '$rowsCount'       => 4
             ],
             'should warn if given user is not found'       => [
-                '$expectedContent' => "In ConsoleContextGlobalOptionsProvider.php line 82: Can't find user with "
+                '$expectedContent' => "In ConsoleContextGlobalOptionsProvider.php line 84: Can't find user with "
                     . 'identifier 999 oro:notification:alerts:cleanup',
                 '$params'          => [
                     '--current-user'         => '999',

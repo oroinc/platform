@@ -345,6 +345,7 @@ class EmailTemplate extends EmailTemplateModel implements ExtendEntityInterface
      *
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getName();

@@ -14,9 +14,6 @@ class ConsoleFormatter extends BaseConsoleFormatter
         "%datetime% %start_tag%%channel%.%level_name%%end_tag%: %message%%context%%extra%\n";
     const SIMPLE_DATE = 'Y-m-d H:i:s';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(array $options = [])
     {
         $options = array_replace([
@@ -29,9 +26,7 @@ class ConsoleFormatter extends BaseConsoleFormatter
         parent::__construct($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format(array $record): mixed
     {
         $formatted = parent::format($record);

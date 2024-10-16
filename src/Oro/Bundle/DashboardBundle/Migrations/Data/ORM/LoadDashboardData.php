@@ -12,9 +12,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateUserEntitiesWithOrganization
  */
 class LoadDashboardData extends AbstractDashboardFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -23,9 +21,7 @@ class LoadDashboardData extends AbstractDashboardFixture implements DependentFix
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $mainDashboard = $this->createAdminDashboardModel($manager, 'main');

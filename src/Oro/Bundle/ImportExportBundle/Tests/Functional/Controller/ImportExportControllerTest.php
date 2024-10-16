@@ -35,6 +35,7 @@ class ImportExportControllerTest extends WebTestCase
      */
     private $existingFiles = [];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
@@ -47,6 +48,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->existingFiles = $this->getImportExportFileManager()->getFilesByFilePattern('*.csv');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $fileManager = $this->getImportExportFileManager();
@@ -340,9 +342,6 @@ class ImportExportControllerTest extends WebTestCase
         $registry = self::getContainer()->get('oro_importexport.configuration.registry');
         $registry->addConfiguration(
             new class() implements ImportExportConfigurationProviderInterface {
-                /**
-                 * {@inheritdoc}
-                 */
                 public function get(): ImportExportConfigurationInterface
                 {
                     return new ImportExportConfiguration([
@@ -370,9 +369,6 @@ class ImportExportControllerTest extends WebTestCase
 
         $registry->addConfiguration(
             new class() implements ImportExportConfigurationProviderInterface {
-                /**
-                 * {@inheritdoc}
-                 */
                 public function get(): ImportExportConfigurationInterface
                 {
                     return new ImportExportConfiguration([

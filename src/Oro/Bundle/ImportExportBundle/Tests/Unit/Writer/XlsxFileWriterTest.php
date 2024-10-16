@@ -28,6 +28,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     /** @var XlsxFileWriter */
     private $writer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->getTempDir('XlsxFileWriterTest');
@@ -37,6 +38,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer = new XlsxFileWriter($this->contextRegistry, $this->clearWriter);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->writer->close();

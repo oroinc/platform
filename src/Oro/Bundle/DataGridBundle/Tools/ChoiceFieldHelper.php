@@ -28,7 +28,7 @@ class ChoiceFieldHelper
 
     /**
      * @param ClassMetadata $metadata
-     * @param string        $columnName
+     * @param string $columnName
      *
      * @return string
      *
@@ -64,16 +64,19 @@ class ChoiceFieldHelper
     }
 
     /**
-     * @param string $entity
-     * @param string $keyField
-     * @param string $labelField
      * @param null|array $orderBy [field => direction]
-     * @param boolean $translatable
+     * @param array $whereOptions [field => value]
      *
      * @return array
      */
-    public function getChoices($entity, $keyField, $labelField, $orderBy = null, $translatable = false)
-    {
+    public function getChoices(
+        string $entity,
+        string $keyField,
+        string $labelField,
+        ?array $orderBy = null,
+        bool $translatable = false,
+        array $whereOptions = []
+    ) {
         $entityManager = $this->doctrineHelper->getEntityManager($entity);
         $queryBuilder = $entityManager
             ->getRepository($entity)
@@ -83,6 +86,10 @@ class ChoiceFieldHelper
             QueryBuilderUtil::getField('e', $keyField),
             QueryBuilderUtil::getField('e', $labelField)
         );
+        foreach ($whereOptions as $key => $value) {
+            $queryBuilder->andWhere(QueryBuilderUtil::sprintf('e.%s = :value_%s', $key, $key));
+            $queryBuilder->setParameter(sprintf('value_%s', $key), $value);
+        }
         if (!empty($orderBy)) {
             $field = array_keys($orderBy)[0];
             $queryBuilder->orderBy(

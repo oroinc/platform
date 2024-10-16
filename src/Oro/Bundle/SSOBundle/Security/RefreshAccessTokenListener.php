@@ -37,6 +37,7 @@ class RefreshAccessTokenListener extends AbstractRefreshAccessTokenListener
      *
      * @return T
      */
+    #[\Override]
     protected function refreshToken(OAuthToken $token): OAuthToken
     {
         return $this->oAuthAuthenticator->refreshToken($token);

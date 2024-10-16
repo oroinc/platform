@@ -25,6 +25,7 @@ class CreateEntityTest extends CreateProcessorTestCase
     /** @var CreateEntity */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

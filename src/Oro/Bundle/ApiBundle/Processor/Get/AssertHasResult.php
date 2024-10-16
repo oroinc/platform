@@ -11,9 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class AssertHasResult implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         if (!$context->hasResult()) {

@@ -14,6 +14,7 @@ class LostItemsBuilderTest extends \PHPUnit\Framework\TestCase
 
     private LostItemsBuilder $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = new LostItemsBuilder();

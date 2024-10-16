@@ -21,9 +21,7 @@ class SetOwnershipAssociations implements ProcessorInterface
         $this->entityOwnershipAssociationsSetter = $entityOwnershipAssociationsSetter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

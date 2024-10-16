@@ -20,6 +20,7 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ClearLoggerExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(Container::class);

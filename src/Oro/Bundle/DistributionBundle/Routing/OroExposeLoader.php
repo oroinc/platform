@@ -22,9 +22,7 @@ class OroExposeLoader extends AbstractLoader
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load($file, $type = null)
     {
         $routes = parent::load($file, $type);
@@ -32,9 +30,7 @@ class OroExposeLoader extends AbstractLoader
         return $this->dispatchEvent(RouteCollectionEvent::EXPOSE, $routes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadRoutes(RouteCollection $routes)
     {
         parent::loadRoutes($routes);

@@ -45,9 +45,7 @@ class ContextAggregatorRegistry implements ResetInterface
         return $this->initializedAggregators[$type];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->initializedAggregators = null;

@@ -19,17 +19,13 @@ use Oro\Component\Layout\Loader\Generator\GeneratorData;
  */
 class PhpDriver extends AbstractDriver
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUpdateFilenamePattern($fileExtension)
     {
         return sprintf('/^(?!.*html\.%s$).*\.%s$/', $fileExtension, $fileExtension);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadResourceGeneratorData($file)
     {
         return new GeneratorData(file_get_contents($file), $file);

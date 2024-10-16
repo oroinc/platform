@@ -10,9 +10,7 @@ use Doctrine\Common\Collections\Expr\Comparison;
  */
 class OptimizeJoinsDecisionMaker implements OptimizeJoinsDecisionMakerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOptimizationSupported(Comparison $comparison, $resolvedValue): bool
     {
         switch ($comparison->getOperator()) {

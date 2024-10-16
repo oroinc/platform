@@ -26,6 +26,7 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutFactory */
     private $layoutFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(LayoutRegistryInterface::class);

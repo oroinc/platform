@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FeatureToggleablePass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $services = [];

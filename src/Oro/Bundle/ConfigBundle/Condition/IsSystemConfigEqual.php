@@ -33,9 +33,7 @@ class IsSystemConfigEqual extends AbstractCondition implements ContextAccessorAw
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (2 !== count($options)) {
@@ -63,33 +61,25 @@ class IsSystemConfigEqual extends AbstractCondition implements ContextAccessorAw
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         return $this->configManager->get($this->key) === $this->value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray([$this->key, $this->value]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode([$this->key, $this->value], $factoryAccessor);

@@ -31,6 +31,7 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeFamily */
     private $attributeFamily;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

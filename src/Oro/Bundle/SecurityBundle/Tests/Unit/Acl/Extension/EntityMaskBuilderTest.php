@@ -18,6 +18,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMaskBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->identity = $this->getIdentity(rand(0, 20));

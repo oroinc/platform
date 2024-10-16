@@ -21,17 +21,13 @@ class WorkflowAvailableByRecordGroup extends AbstractCondition
         $this->manager = $manager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['group_name'])) {
@@ -47,9 +43,7 @@ class WorkflowAvailableByRecordGroup extends AbstractCondition
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $workflows = $this->manager->getApplicableWorkflows($this->options['entity_class']);

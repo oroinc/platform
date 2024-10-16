@@ -17,9 +17,7 @@ class TwigRendererEngine extends BaseTwigRendererEngine
     /** @var bool */
     private $profilerEnabled;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function renderBlock(FormView $view, $resource, $blockName, array $variables = []): string
     {
         $twigTemplate = current($resource);

@@ -41,9 +41,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $this->strategyProcessor = $strategyProcessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = $message->getBody();
@@ -423,9 +421,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         return $change;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [AuditChangedEntitiesInverseRelationsTopic::getName()];

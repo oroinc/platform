@@ -4,9 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 class FrontendGrid extends Grid
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMappedChildElementName($name)
     {
         return $name;

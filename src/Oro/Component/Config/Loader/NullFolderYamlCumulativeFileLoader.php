@@ -22,9 +22,7 @@ class NullFolderYamlCumulativeFileLoader implements CumulativeResourceLoader
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load($bundleClass, $bundleDir, $bundleAppDir = ''): ?array
     {
         $resources = [];
@@ -41,17 +39,13 @@ class NullFolderYamlCumulativeFileLoader implements CumulativeResourceLoader
         return $resources;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResource(): string
     {
         return $this->relativeFolderPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource): void
     {
         $bundleDirPath = $this->getBundleResourceDirPath($bundleAppDir, $bundleDir);
@@ -65,9 +59,7 @@ class NullFolderYamlCumulativeFileLoader implements CumulativeResourceLoader
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isResourceFresh(
         $bundleClass,
         $bundleDir,

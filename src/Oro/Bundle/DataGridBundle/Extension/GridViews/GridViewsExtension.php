@@ -73,17 +73,13 @@ class GridViewsExtension extends AbstractExtension
         $this->managerLink = $managerLink;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return parent::isApplicable($config) && !$this->isDisabled();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return 10;
@@ -99,9 +95,7 @@ class GridViewsExtension extends AbstractExtension
         return !empty($parameters[self::DISABLED_PARAM]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $gridName = $config->getName();
@@ -238,6 +232,7 @@ class GridViewsExtension extends AbstractExtension
         ];
     }
 
+    #[\Override]
     public function setParameters(ParameterBag $parameters)
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {

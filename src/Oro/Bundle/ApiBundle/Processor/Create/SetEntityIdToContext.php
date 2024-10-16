@@ -12,9 +12,7 @@ class SetEntityIdToContext implements ProcessorInterface
 {
     public const OPERATION_NAME = 'set_entity_id_to_context';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext $context */

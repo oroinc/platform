@@ -24,6 +24,7 @@ class FormSubmitLayoutRedirectProcessor implements ProcessorInterface
     /**
      * @param ContextInterface|TransitionContext $context
      */
+    #[\Override]
     public function process(ContextInterface $context)
     {
         if (!$context->isSaved() || !$context->getResultType() instanceof LayoutResultTypeInterface) {

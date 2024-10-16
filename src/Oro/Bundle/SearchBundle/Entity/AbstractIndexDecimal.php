@@ -36,9 +36,7 @@ abstract class AbstractIndexDecimal implements ItemFieldInterface
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setItem(AbstractItem $item)
     {
         $this->item = $item;
@@ -46,17 +44,13 @@ abstract class AbstractIndexDecimal implements ItemFieldInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getItem()
     {
         return $this->item;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setField($field)
     {
         $this->field = $field;
@@ -64,17 +58,13 @@ abstract class AbstractIndexDecimal implements ItemFieldInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getField()
     {
         return $this->field;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($value)
     {
         if (!is_numeric($value)) {
@@ -86,9 +76,7 @@ abstract class AbstractIndexDecimal implements ItemFieldInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue()
     {
         return $this->value;

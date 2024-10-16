@@ -22,9 +22,7 @@ abstract class AbstractAssociationType extends AbstractConfigType
         $this->associationTypeHelper = $associationTypeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -40,9 +38,7 @@ abstract class AbstractAssociationType extends AbstractConfigType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isReadOnly(Options $options)
     {
         /** @var EntityConfigId $configId */

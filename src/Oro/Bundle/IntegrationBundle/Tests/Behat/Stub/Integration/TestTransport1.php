@@ -9,29 +9,24 @@ use Oro\Bundle\IntegrationBundle\Tests\Behat\Stub\Form\Type\TestTransport1Settin
 
 class TestTransport1 implements TransportInterface
 {
+    #[\Override]
     public function init(Transport $transportEntity)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSettingsFormType()
     {
         return TestTransport1SettingsType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSettingsEntityFQCN()
     {
         return TestTransport1Settings::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return 'Test Transport 1';

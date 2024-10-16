@@ -178,9 +178,7 @@ class NoteController extends AbstractController
         return $this->container->get(EntityRoutingHelper::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

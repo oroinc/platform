@@ -11,6 +11,7 @@ class ConfigSettingsListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigSettingsListener */
     private $configSettingsListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configSettingsListener = new ConfigSettingsListener();

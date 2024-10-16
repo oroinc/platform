@@ -18,6 +18,7 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailNotificationDatagridListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

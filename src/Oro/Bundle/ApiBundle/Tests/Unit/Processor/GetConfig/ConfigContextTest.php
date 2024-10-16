@@ -18,6 +18,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
 {
     private ConfigContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new ConfigContext();

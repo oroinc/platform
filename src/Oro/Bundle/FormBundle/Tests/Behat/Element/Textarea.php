@@ -6,6 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class Textarea extends Element
 {
+    #[\Override]
     public function setValue($value)
     {
         $formattedValue = str_replace('\n', PHP_EOL, $value);

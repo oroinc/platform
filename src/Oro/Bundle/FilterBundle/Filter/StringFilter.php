@@ -11,18 +11,13 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
  */
 class StringFilter extends AbstractFilter
 {
-    /**
-     * {@inheritdoc}
-     */
     protected $joinOperators = [
         FilterUtility::TYPE_NOT_EMPTY => FilterUtility::TYPE_EMPTY,
         TextFilterType::TYPE_NOT_CONTAINS => TextFilterType::TYPE_CONTAINS,
         TextFilterType::TYPE_NOT_IN => TextFilterType::TYPE_IN,
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
@@ -64,25 +59,19 @@ class StringFilter extends AbstractFilter
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return TextFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         $data = parent::parseData($data);

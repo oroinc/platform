@@ -16,6 +16,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TabExtension|\PHPUnit\Framework\MockObject\MockObject */
     private $widgetProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessorInterface::class);

@@ -15,6 +15,7 @@ class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit\Framewor
     /** @var WorkflowDefinitionApplicationsRegistryFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->currentApplicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);

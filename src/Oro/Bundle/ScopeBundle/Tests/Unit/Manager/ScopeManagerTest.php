@@ -46,6 +46,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeClassMetadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->scopeDataAccessor = $this->createMock(ScopeDataAccessor::class);

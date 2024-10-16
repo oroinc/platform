@@ -42,9 +42,9 @@ class AttributeConfigurationValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$value instanceof FieldConfigModel) {

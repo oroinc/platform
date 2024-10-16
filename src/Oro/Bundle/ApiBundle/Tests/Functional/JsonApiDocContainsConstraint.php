@@ -24,9 +24,9 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function matches($other): bool
     {
         if (parent::matches($other)
@@ -72,9 +72,7 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
         return empty($this->errors);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function matchAssocArray(array $expected, array $actual, array $path): void
     {
         parent::matchAssocArray($expected, $actual, $path);
@@ -96,9 +94,7 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function matchIndexedArray(array $expected, array $actual, array $path): void
     {
         parent::matchIndexedArray($expected, $actual, $path);

@@ -11,6 +11,7 @@ class AttachmentProviderStub extends AttachmentProvider
      *
      * @return array
      */
+    #[\Override]
     public function getAttachmentInfo($entity)
     {
         return [];

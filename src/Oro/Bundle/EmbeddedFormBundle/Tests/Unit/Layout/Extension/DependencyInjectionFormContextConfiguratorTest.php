@@ -15,6 +15,7 @@ class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\
     /** @var DependencyInjectionFormContextConfigurator */
     private $contextConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

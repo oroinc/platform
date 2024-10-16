@@ -12,6 +12,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     private FilterValueAccessor $accessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->accessor = new FilterValueAccessor();

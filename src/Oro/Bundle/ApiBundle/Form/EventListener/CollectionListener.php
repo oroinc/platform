@@ -20,9 +20,7 @@ class CollectionListener implements EventSubscriberInterface
         $this->entryFactory = $entryFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -24,6 +24,7 @@ class DatagridMaterializedViewReaderTest extends \PHPUnit\Framework\TestCase
 
     private DatagridMaterializedViewReader $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->datagridManager = $this->createMock(DatagridManager::class);

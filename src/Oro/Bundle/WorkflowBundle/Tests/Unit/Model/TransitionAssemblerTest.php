@@ -79,6 +79,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);

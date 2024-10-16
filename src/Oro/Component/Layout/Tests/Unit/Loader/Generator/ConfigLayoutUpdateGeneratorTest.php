@@ -26,6 +26,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigLayoutUpdateGenerator */
     private $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->expressionValidator = $this->createMock(ValidatorInterface::class);

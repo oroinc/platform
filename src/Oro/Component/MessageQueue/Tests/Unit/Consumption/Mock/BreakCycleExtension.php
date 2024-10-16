@@ -16,11 +16,13 @@ class BreakCycleExtension extends AbstractExtension
         $this->limit = $limit;
     }
 
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $this->onIdle($context);
     }
 
+    #[\Override]
     public function onIdle(Context $context)
     {
         if ($this->cycles >= $this->limit) {

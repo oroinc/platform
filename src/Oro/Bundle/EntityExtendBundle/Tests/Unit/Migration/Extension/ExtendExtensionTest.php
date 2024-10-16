@@ -17,7 +17,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -40,6 +40,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendOptionsParser */
     private $extendOptionsParser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
@@ -48,7 +49,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturnMap([
                 ['table1', ['Acme\AcmeBundle\Entity\Entity1']],
                 ['table2', ['Acme\AcmeBundle\Entity\Entity2']],
-                ['oro_enum_test_enum', [ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum']],
+                ['oro_enum_test_enum', ['Extend\Entity\EV_Test_Enum']],
             ]);
         $this->entityMetadataHelper->expects($this->any())
             ->method('getFieldNameByColumnName')
@@ -78,9 +79,9 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         return new ExtendSchema($this->extendOptionsManager, new ExtendDbIdentifierNameGenerator());
     }
 
-    private function getExtendExtension(array $config = []): ExtendExtension
+    private function getExtendExtension(array $config = []): OutdatedExtendExtension
     {
-        $result = new ExtendExtension(
+        $result = new OutdatedExtendExtension(
             $this->extendOptionsManager,
             $this->entityMetadataHelper,
             new PropertyConfigBag($config)
@@ -309,8 +310,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
-        $expectedTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . 'test_status';
-        $expectedClassName = ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Status';
+        $expectedTableName = 'oro_enum_test_status';
+        $expectedClassName = 'Extend\Entity\EV_Test_Status';
 
         $this->entityMetadataHelper->expects($this->once())
             ->method('registerEntityClass')
@@ -325,7 +326,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                 [$expectedClassName, 'is_default', true],
             ]);
 
-        $extension->createEnum($schema, 'test_status', false, false, false, [], $identityFields);
+        $extension->createOutdatedEnum($schema, 'test_status', false, false, false, [], $identityFields);
 
         $this->assertSchemaSql(
             $schema,
@@ -352,7 +353,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                             'owner' => ExtendScope::OWNER_SYSTEM,
                             'is_extend' => true,
                             'table' => 'oro_enum_test_status',
-                            'inherit' => ExtendHelper::BASE_ENUM_VALUE_CLASS
+                            'inherit' => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
                         ],
                         'enum' => [
                             'code' => 'test_status',
@@ -442,7 +443,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);
-        $extension->createEnum($schema, 'test_status', false, false, false, [], $identityFields);
+        $extension->createOutdatedEnum($schema, 'test_status', false, false, false, [], $identityFields);
     }
 
     public function createEnumWithInvalidIdentityFieldDataProvider(): array
@@ -471,8 +472,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
-        $expectedTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . 'test_status';
-        $expectedClassName = ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Status';
+        $expectedTableName = 'oro_enum_test_status';
+        $expectedClassName = 'Extend\Entity\EV_Test_Status';
 
         $this->entityMetadataHelper->expects($this->once())
             ->method('registerEntityClass')
@@ -487,7 +488,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                 [$expectedClassName, 'is_default', true],
             ]);
 
-        $extension->createEnum(
+        $extension->createOutdatedEnum(
             $schema,
             'test_status',
             true,
@@ -525,7 +526,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                             'owner' => ExtendScope::OWNER_SYSTEM,
                             'is_extend' => true,
                             'table' => 'oro_enum_test_status',
-                            'inherit' => ExtendHelper::BASE_ENUM_VALUE_CLASS
+                            'inherit' => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
                         ],
                         'enum' => [
                             'code' => 'test_status',
@@ -609,8 +610,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = $this->getExtendExtension();
 
         $enumCode = 'test_enum';
-        $enumTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . $enumCode;
-        $enumClassName = ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum';
+        $enumTableName = 'oro_enum_test_enum';
+        $enumClassName = 'Extend\Entity\EV_Test_Enum';
 
         $enumTable = $schema->createTable($enumTableName);
         $enumTable->addColumn('id', 'string', ['length' => 32]);
@@ -621,7 +622,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $table1->addColumn('id', 'integer');
         $table1->setPrimaryKey(['id']);
 
-        $extension->addEnumField(
+        $extension->addOutdatedEnumField(
             $schema,
             $table1,
             'enum1',
@@ -675,8 +676,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = $this->getExtendExtension();
 
         $enumCode = 'test_enum';
-        $enumTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . $enumCode;
-        $enumClassName = ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum';
+        $enumTableName = 'oro_enum_test_enum';
+        $enumClassName = 'Extend\Entity\EV_Test_Enum';
 
         $enumTable = $schema->createTable($enumTableName);
         $enumTable->addColumn('id', 'string', ['length' => 32]);
@@ -687,7 +688,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $table1->addColumn('id', 'integer');
         $table1->setPrimaryKey(['id']);
 
-        $extension->addEnumField(
+        $extension->addOutdatedEnumField(
             $schema,
             $table1,
             'enum1',

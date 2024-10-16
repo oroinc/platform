@@ -15,6 +15,7 @@ class CountryProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CountryProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

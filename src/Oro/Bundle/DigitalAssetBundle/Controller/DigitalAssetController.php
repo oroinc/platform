@@ -187,9 +187,7 @@ class DigitalAssetController extends AbstractController
         return $this->handleChooseForm(false, $mimeTypes, $maxFileSize);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

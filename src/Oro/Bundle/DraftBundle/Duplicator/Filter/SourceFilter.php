@@ -10,9 +10,7 @@ use Oro\Component\Duplicator\Filter\ReplaceValueFilter;
  */
 class SourceFilter extends ReplaceValueFilter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function apply($object, $property, $objectCopier): void
     {
         $reflectionProperty = ReflectionHelper::getProperty($object, $property);

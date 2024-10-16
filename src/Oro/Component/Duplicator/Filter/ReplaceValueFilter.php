@@ -14,9 +14,7 @@ class ReplaceValueFilter implements Filter
         $this->value = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function apply($object, $property, $objectCopier)
     {
         $reflectionProperty = new \ReflectionProperty($object, $property);

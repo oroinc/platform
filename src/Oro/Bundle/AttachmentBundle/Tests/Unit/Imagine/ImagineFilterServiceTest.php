@@ -20,6 +20,7 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
 
     private ImagineFilterService $imagineFilterService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dataManager = $this->createMock(DataManager::class);

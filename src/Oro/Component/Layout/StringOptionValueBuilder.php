@@ -35,6 +35,7 @@ class StringOptionValueBuilder implements OptionValueBuilderInterface
      *
      * @param string $value
      */
+    #[\Override]
     public function add($value)
     {
         if (!is_string($value)) {
@@ -56,6 +57,7 @@ class StringOptionValueBuilder implements OptionValueBuilderInterface
      *
      * @param string $value
      */
+    #[\Override]
     public function remove($value)
     {
         if (!is_string($value)) {
@@ -78,6 +80,7 @@ class StringOptionValueBuilder implements OptionValueBuilderInterface
      * @param string      $oldValue
      * @param string|null $newValue
      */
+    #[\Override]
     public function replace($oldValue, $newValue)
     {
         if (!is_string($oldValue)) {
@@ -105,6 +108,7 @@ class StringOptionValueBuilder implements OptionValueBuilderInterface
      *
      * @return string
      */
+    #[\Override]
     public function get()
     {
         return implode($this->delimiter, $this->values);

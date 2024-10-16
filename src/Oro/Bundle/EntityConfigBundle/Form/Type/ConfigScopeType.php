@@ -30,9 +30,7 @@ class ConfigScopeType extends AbstractType
         $this->entityConfigManager = $entityConfigManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['items', 'config', 'config_model']);
@@ -41,9 +39,7 @@ class ConfigScopeType extends AbstractType
         $resolver->setAllowedTypes('config_model', ConfigModel::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var ConfigIdInterface $scopeConfigId */
@@ -104,6 +100,7 @@ class ConfigScopeType extends AbstractType
         return $itemOptions;
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         /** @var ConfigIdInterface $scopeConfigId */
@@ -204,9 +201,7 @@ class ConfigScopeType extends AbstractType
         return $form->getData()[$name] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_config_scope_type';

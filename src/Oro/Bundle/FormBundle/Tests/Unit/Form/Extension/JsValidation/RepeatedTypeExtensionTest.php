@@ -11,6 +11,7 @@ class RepeatedTypeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var RepeatedTypeExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new RepeatedTypeExtension();

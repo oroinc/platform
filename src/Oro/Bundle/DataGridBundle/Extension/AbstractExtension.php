@@ -25,45 +25,33 @@ abstract class AbstractExtension implements ExtensionVisitorInterface
      */
     protected $excludedModes = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return $this->isExtensionSupportedDatagridModes();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         // default priority if not overridden by child
@@ -100,6 +88,7 @@ abstract class AbstractExtension implements ExtensionVisitorInterface
     /**
      * Set instance of parameters used for current grid
      */
+    #[\Override]
     public function setParameters(ParameterBag $parameters)
     {
         $this->parameters = $parameters;

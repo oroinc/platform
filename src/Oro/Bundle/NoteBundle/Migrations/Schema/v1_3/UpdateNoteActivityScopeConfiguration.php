@@ -16,6 +16,7 @@ class UpdateNoteActivityScopeConfiguration implements Migration
      *
      * @return void
      */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $query = new MassUpdateEntityConfigQuery(

@@ -4,17 +4,13 @@ namespace Oro\Component\ConfigExpression\Condition;
 
 class NotIn extends In
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         return !parent::isConditionAllowed($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'not_in';

@@ -66,18 +66,14 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $this->getInternalConfiguration(self::TOGGLES);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clearCache(): void
     {
         parent::clearCache();
         $this->configurationExtension->clearConfigurationCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];

@@ -33,11 +33,6 @@ use Laminas\Mail\Header\Exception;
  */
 class Address extends BaseAddress
 {
-    /**
-     * {@inheritdoc}
-     *
-     * Simplify validation - avoid validation exception in case of invalid email address
-     */
     public function __construct($email, $name = null, $comment = null)
     {
         if (!is_string($email)) {

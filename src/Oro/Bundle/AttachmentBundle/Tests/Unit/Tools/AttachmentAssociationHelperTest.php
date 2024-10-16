@@ -19,6 +19,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentAssociationHelper */
     private $attachmentAssociationHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

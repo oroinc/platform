@@ -9,6 +9,7 @@ class OptionsTest extends \PHPUnit\Framework\TestCase
     /** @var Options */
     private $options;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->options = new Options(['value' => 'test']);

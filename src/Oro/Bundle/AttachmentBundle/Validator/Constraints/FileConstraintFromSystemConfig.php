@@ -13,9 +13,7 @@ class FileConstraintFromSystemConfig extends SymfonyFileConstraint
 
     public $mimeTypesMessage = 'oro.attachment.mimetypes.invalid_mime_type';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;

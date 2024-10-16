@@ -21,6 +21,7 @@ class FormatNameTest extends \PHPUnit\Framework\TestCase
     /** @var FormatName */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

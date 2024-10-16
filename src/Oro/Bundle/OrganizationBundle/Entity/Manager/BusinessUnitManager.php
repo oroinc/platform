@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 
 /**
  * Provides a set of methods to manage business units.
@@ -104,8 +105,8 @@ class BusinessUnitManager
      * @return bool
      */
     public function canUserBeSetAsOwner(
-        User $currentUser,
-        User $newUser,
+        UserInterface $currentUser,
+        UserInterface $newUser,
         $accessLevel,
         OwnerTreeProviderInterface $treeProvider,
         Organization $organization
@@ -290,7 +291,7 @@ class BusinessUnitManager
      * @return array
      */
     private function getAllowedBusinessUnitIds(
-        User $currentUser,
+        UserInterface $currentUser,
         $accessLevel,
         OwnerTreeProviderInterface $treeProvider,
         Organization $organization

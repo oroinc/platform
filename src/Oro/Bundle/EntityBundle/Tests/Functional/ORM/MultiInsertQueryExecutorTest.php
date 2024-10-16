@@ -25,6 +25,7 @@ class MultiInsertQueryExecutorTest extends WebTestCase
     /** @var MultiInsertQueryExecutor */
     private $queryExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

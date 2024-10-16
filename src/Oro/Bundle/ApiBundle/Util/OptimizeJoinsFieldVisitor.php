@@ -38,9 +38,7 @@ class OptimizeJoinsFieldVisitor extends ExpressionVisitor
         return $fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison)
     {
         $field = $comparison->getField();
@@ -51,17 +49,13 @@ class OptimizeJoinsFieldVisitor extends ExpressionVisitor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkValue(Value $value)
     {
         return $value->getValue();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr)
     {
         $expressionList = $expr->getExpressionList();

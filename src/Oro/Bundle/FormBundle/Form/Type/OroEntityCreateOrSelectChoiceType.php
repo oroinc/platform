@@ -36,9 +36,7 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(
@@ -83,9 +81,7 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired([
@@ -121,17 +117,12 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return static::NAME;
@@ -157,9 +148,7 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
         FormUtils::replaceField($form, 'new_entity', ['validation_groups' => false]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['editable'] = $options['editable'];

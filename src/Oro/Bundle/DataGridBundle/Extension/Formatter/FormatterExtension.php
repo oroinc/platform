@@ -37,9 +37,7 @@ class FormatterExtension extends AbstractExtension
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config): bool
     {
         if (!parent::isApplicable($config)) {
@@ -57,6 +55,7 @@ class FormatterExtension extends AbstractExtension
     /**
      * Validate configs nad fill default values
      */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config): void
     {
         $columns = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
@@ -71,9 +70,7 @@ class FormatterExtension extends AbstractExtension
         $config->offsetSet(Configuration::PROPERTIES_KEY, array_replace_recursive($properties, $propertiesNormalized));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result): void
     {
         $rows = $result->getData();
@@ -93,9 +90,7 @@ class FormatterExtension extends AbstractExtension
         $result->setData($rows);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data): void
     {
         // get only columns here because columns will be represented on frontend

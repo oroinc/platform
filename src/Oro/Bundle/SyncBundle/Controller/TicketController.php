@@ -25,6 +25,7 @@ class TicketController extends AbstractController
         );
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

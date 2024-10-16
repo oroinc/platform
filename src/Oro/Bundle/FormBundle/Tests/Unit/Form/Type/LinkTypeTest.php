@@ -12,6 +12,7 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
     /** @var LinkType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new LinkType();

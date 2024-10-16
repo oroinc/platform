@@ -29,9 +29,7 @@ final class JUnitFeaturePrinter implements FeaturePrinter
         $this->durationListener = $durationListener;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function printHeader(Formatter $formatter, FeatureNode $feature)
     {
         $stats = $this->statistics->getScenarioStatCounts();
@@ -56,9 +54,7 @@ final class JUnitFeaturePrinter implements FeaturePrinter
         $this->statistics->reset();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function printFooter(Formatter $formatter, TestResult $result)
     {
     }

@@ -16,6 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class CreateWithIncludedTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -13,6 +13,7 @@ class ModeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ModeExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new ModeExtension();

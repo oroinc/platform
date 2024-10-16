@@ -22,6 +22,7 @@ class CommandProducedError extends Constraint
         $this->expectedErrorMessage = $expectedErrorMessage;
     }
 
+    #[\Override]
     protected function matches($commandTester): bool
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $commandTester */
@@ -41,6 +42,7 @@ class CommandProducedError extends Constraint
         return 0 === count($this->errors);
     }
 
+    #[\Override]
     protected function failureDescription($commandTester): string
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $commandTester */
@@ -52,6 +54,7 @@ class CommandProducedError extends Constraint
         );
     }
 
+    #[\Override]
     public function toString(): string
     {
         return 'command produced an error';

@@ -15,10 +15,10 @@ use Symfony\Component\ExpressionLanguage\SyntaxError;
 class TransitionEventTriggerExpressionVerifier implements TransitionEventTriggerVerifierInterface
 {
     /**
-     * {@inheritdoc}
      *
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     public function verifyTrigger(TransitionEventTrigger $trigger)
     {
         $expression = $trigger->getRequire();

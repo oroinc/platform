@@ -14,6 +14,7 @@ class FormTemplateDataProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var FormTemplateDataProviderRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider1 = $this->createMock(FormTemplateDataProviderInterface::class);

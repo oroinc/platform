@@ -45,6 +45,7 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
     /** @var FileVoter */
     private $voter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

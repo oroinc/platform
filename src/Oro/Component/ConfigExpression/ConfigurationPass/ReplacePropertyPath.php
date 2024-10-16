@@ -27,9 +27,7 @@ class ReplacePropertyPath implements ConfigurationPassInterface
         $this->prefix = $prefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function passConfiguration(array $data)
     {
         foreach ($data as &$value) {

@@ -12,9 +12,7 @@ use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
  */
 class LanguageFilter extends EntityFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FORM_OPTIONS_KEY][self::FIELD_OPTIONS_KEY]['class'] = Language::class;
@@ -23,9 +21,7 @@ class LanguageFilter extends EntityFilter
         parent::init($name, $params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return LanguageFilterType::class;

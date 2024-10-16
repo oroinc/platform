@@ -21,9 +21,7 @@ class LastModifiedDateContextConfigurator implements ContextConfiguratorInterfac
         $this->lastModificationDateProvider = $lastModificationDateProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));

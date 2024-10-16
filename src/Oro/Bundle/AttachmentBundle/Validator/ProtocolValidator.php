@@ -7,9 +7,7 @@ namespace Oro\Bundle\AttachmentBundle\Validator;
  */
 class ProtocolValidator implements ProtocolValidatorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSupportedProtocol(string $protocol): bool
     {
         return

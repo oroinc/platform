@@ -44,17 +44,13 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
         $this->additionalEmailAssociationProvider = $additionalEmailAssociationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntity()
     {
         return $this->entity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplateCriteria(): EmailTemplateCriteria
     {
         return new EmailTemplateCriteria(
@@ -63,9 +59,7 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRecipients(): iterable
     {
         $recipientList = $this->notification->getRecipientList();

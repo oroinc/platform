@@ -24,9 +24,7 @@ class FiltersConfigLoader extends AbstractConfigLoader
         ConfigUtil::ALLOW_RANGE      => 'setRangeAllowed'
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(array $config): mixed
     {
         $filters = new FiltersConfig();

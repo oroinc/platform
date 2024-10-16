@@ -18,9 +18,7 @@ class IntegrationIconProvider implements IntegrationIconProviderInterface
         $this->typesRegistryLink = $typesRegistryLink;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getIcon(Channel $channel)
     {
         $types = $this->getTypesRegistry()->getRegisteredChannelTypes();

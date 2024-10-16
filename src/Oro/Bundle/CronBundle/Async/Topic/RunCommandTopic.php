@@ -11,16 +11,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RunCommandTopic extends AbstractTopic implements JobAwareTopicInterface
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.cron.run_command';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Run a console command';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -38,6 +41,7 @@ class RunCommandTopic extends AbstractTopic implements JobAwareTopicInterface
             ->addAllowedTypes('jobId', 'int');
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         $commandArguments = $messageBody['arguments'];

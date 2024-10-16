@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NestedTreeComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
@@ -17,6 +18,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
     /** @var TreeListener|\PHPUnit\Framework\MockObject\MockObject */
     private $treeListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -45,6 +47,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             new EntityClassResolver($this->doctrine)
         );
         $field = '';
@@ -107,6 +110,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             new EntityClassResolver($this->doctrine)
         );
         $field = 'e.category';
@@ -165,6 +169,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             new EntityClassResolver($this->doctrine)
         );
         $field = '';
@@ -224,6 +229,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             new EntityClassResolver($this->doctrine)
         );
         $field = '';

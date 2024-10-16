@@ -20,6 +20,7 @@ class ClassFactory extends BaseClassFactory
         $this->protocol = $protocol;
     }
 
+    #[\Override]
     public function createFileLoader($path): object
     {
         return $this->finalize(new Loader($path, $this->protocol));

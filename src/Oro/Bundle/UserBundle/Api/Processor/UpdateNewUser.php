@@ -21,9 +21,7 @@ class UpdateNewUser implements ProcessorInterface
         $this->userManager = $userManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

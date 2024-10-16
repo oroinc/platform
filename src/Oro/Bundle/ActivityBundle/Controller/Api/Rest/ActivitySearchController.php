@@ -73,9 +73,7 @@ class ActivitySearchController extends RestGetController
         return $this->handleGetListRequest($page, $limit, $filters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_activity.manager.activity_search.api');

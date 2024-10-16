@@ -14,6 +14,7 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var RelationHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->relationProvider = $this->createMock(VirtualRelationProviderInterface::class);

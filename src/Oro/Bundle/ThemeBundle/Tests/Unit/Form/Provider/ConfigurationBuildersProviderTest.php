@@ -13,6 +13,7 @@ final class ConfigurationBuildersProviderTest extends TestCase
 
     private ConfigurationChildBuilderStub $childBuilderStub;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->childBuilderStub = new ConfigurationChildBuilderStub();

@@ -23,6 +23,7 @@ class ThemeConfigurationType extends AbstractType
     ) {
     }
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber($this->themeConfigurationSubscriber);
@@ -74,6 +75,7 @@ class ThemeConfigurationType extends AbstractType
             );
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

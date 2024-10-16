@@ -17,6 +17,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
     /** @var EntityInstantiator */
     private $entityInstantiator;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

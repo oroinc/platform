@@ -9,9 +9,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class EmailTemplateTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         $value = $this->decodeTemplateVariables((string)$value);
@@ -19,9 +17,7 @@ class EmailTemplateTransformer implements DataTransformerInterface
         return $this->decodeHtmlSpecialCharsFromTwigTags($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         $value = $this->decodeTemplateVariables((string)$value);

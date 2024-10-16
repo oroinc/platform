@@ -23,9 +23,7 @@ class AddAcceptableEntityClassesToTagEntitiesAssociation implements ProcessorInt
         $this->resourcesProvider = $resourcesProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */

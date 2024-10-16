@@ -25,6 +25,7 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $classMetadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->queryBuilder = $this->createMock(QueryBuilder::class);

@@ -12,6 +12,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumEntityNameProvider */
     private $enumEntityNameProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->enumEntityNameProvider = new EnumEntityNameProvider();
@@ -35,17 +36,17 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
                 [
                     EntityNameProviderInterface::FULL,
                     null,
-                    new TestEnumValue('idValue', 'nameValue'),
+                    new TestEnumValue('test_enum_code', 'Test', 'idValue'),
                 ],
-                'nameValue',
+                'Test',
             ],
             'short version of enum' => [
                 [
                     EntityNameProviderInterface::SHORT,
                     null,
-                    new TestEnumValue('idValue', 'nameValue'),
+                    new TestEnumValue('test_enum_code', 'Test', 'idValue', 1),
                 ],
-                'nameValue',
+                'Test',
             ],
             'ful version of unsupported class' => [
                 [

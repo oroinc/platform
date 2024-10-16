@@ -17,9 +17,7 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
     const ACTION_ADD_TREE_KEY = '@addTree';
     const ACTION_ADD_KEY = '@add';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function prepare(GeneratorData $data, VisitorCollection $collection)
     {
         $source = $data->getSource();

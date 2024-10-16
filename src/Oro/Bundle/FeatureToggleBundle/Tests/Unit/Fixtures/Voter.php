@@ -15,9 +15,7 @@ class Voter implements VoterInterface
         $this->defaultStrategy   = $defaultStrategy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function vote($feature, $scopeIdentifier = null)
     {
         return \array_key_exists($feature, $this->strategyByFeature)

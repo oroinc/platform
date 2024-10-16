@@ -32,6 +32,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailTemplate */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(Form::class);

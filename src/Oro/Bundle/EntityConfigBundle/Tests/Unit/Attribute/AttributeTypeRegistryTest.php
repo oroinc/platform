@@ -28,6 +28,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $attributeTypes;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadata = $this->createMock(ClassMetadata::class);

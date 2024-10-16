@@ -33,17 +33,13 @@ class ConfigCacheWarmer implements CacheWarmerInterface
         $this->optional = $optional;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return $this->optional;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         $this->configCache->warmUpCache();

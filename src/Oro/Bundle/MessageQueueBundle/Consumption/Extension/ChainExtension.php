@@ -28,9 +28,7 @@ class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwar
         $this->setChainExtension($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -40,9 +38,7 @@ class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwar
         $this->consumerState->setExtension();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -52,9 +48,7 @@ class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwar
         $this->consumerState->setExtension();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreReceived(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -64,9 +58,7 @@ class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwar
         $this->consumerState->setExtension();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -76,9 +68,7 @@ class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwar
         $this->consumerState->setExtension();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onIdle(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -88,9 +78,7 @@ class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwar
         $this->consumerState->setExtension();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onInterrupted(Context $context)
     {
         foreach ($this->extensions as $extension) {
@@ -100,9 +88,7 @@ class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwar
         $this->consumerState->setExtension();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reset()
     {
         foreach ($this->extensions as $extension) {
@@ -112,9 +98,7 @@ class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwar
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setChainExtension(ExtensionInterface $chainExtension)
     {
         foreach ($this->extensions as $extension) {

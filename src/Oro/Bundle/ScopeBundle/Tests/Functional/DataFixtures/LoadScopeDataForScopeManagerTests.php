@@ -22,9 +22,7 @@ class LoadScopeDataForScopeManagerTests extends AbstractFixture implements Depen
     public const USER1_SCOPE             = 'user1_scope';
     public const USER_ORGANIZATION_SCOPE = 'user_organization_scope';
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [
@@ -34,9 +32,7 @@ class LoadScopeDataForScopeManagerTests extends AbstractFixture implements Depen
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $defaultScope = $manager->getRepository(Scope::class)

@@ -43,6 +43,7 @@ class GridViewsLoadListenerTest extends TestCase
     /** @var GridViewsLoadListener */
     private $gridViewsLoadListener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->gridViewRepository = $this->createMock(GridViewRepository::class);

@@ -70,9 +70,7 @@ class OperationExtension extends AbstractExtension implements ServiceSubscriberI
         return $this->container->get('oro_action.provider.button_search_context');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -129,9 +127,7 @@ class OperationExtension extends AbstractExtension implements ServiceSubscriberI
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

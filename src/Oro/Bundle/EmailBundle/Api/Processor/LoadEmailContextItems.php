@@ -13,9 +13,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class LoadEmailContextItems extends AbstractLoadEmailContextItems
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */
@@ -68,9 +66,7 @@ class LoadEmailContextItems extends AbstractLoadEmailContextItems
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createResultItem(
         string $id,
         string $entityClass,

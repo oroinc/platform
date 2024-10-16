@@ -23,9 +23,7 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
         $this->excludedActions = $excludedActions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */

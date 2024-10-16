@@ -41,9 +41,7 @@ class TranslationResetStrategyTest extends AbstractTranslationImportStrategyTest
         $this->assertEquals(2, $this->getTranslationsByLocaleCount(LoadLanguages::LANGUAGE1));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getStrategyObject(): AbstractImportStrategy
     {
         $container = $this->getContainer();

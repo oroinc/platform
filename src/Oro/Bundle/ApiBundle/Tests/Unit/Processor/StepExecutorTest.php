@@ -15,6 +15,7 @@ class StepExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var StepExecutor */
     private $stepExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = $this->createMock(ByStepNormalizeResultActionProcessor::class);

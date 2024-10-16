@@ -17,6 +17,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumExclusionProvider */
     private $exclusionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -59,7 +60,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->assertFalse(
-            $this->exclusionProvider->isIgnoredField($metadata, 'testSnapshot')
+            $this->exclusionProvider->isIgnoredField($metadata, 'test')
         );
     }
 
@@ -77,7 +78,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new FieldConfigId('extend', self::ENTITY_CLASS, 'test', 'string'));
 
         $this->assertFalse(
-            $this->exclusionProvider->isIgnoredField($metadata, 'testSnapshot')
+            $this->exclusionProvider->isIgnoredField($metadata, 'test')
         );
     }
 
@@ -95,7 +96,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new FieldConfigId('extend', self::ENTITY_CLASS, 'test', 'multiEnum'));
 
         $this->assertTrue(
-            $this->exclusionProvider->isIgnoredField($metadata, 'testSnapshot')
+            $this->exclusionProvider->isIgnoredField($metadata, 'test')
         );
     }
 

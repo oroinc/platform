@@ -73,9 +73,7 @@ class WidgetController extends AbstractController
         return $template;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

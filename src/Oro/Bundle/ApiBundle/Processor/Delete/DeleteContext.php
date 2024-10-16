@@ -10,9 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
  */
 class DeleteContext extends SingleItemContext implements ChangeContextInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAllEntities(bool $mainOnly = false): array
     {
         $entity = $this->getResult();

@@ -28,6 +28,7 @@ class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit\Framework\Tes
     /** @var ChannelActionHandlerDispatcherDecorator */
     private $decorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);

@@ -45,7 +45,6 @@ class ActionExtension extends AbstractExtension
     /** @var bool */
     protected $isMetadataVisited = false;
 
-    /** {@inheritdoc} */
     protected $excludedModes = [
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
@@ -86,9 +85,7 @@ class ActionExtension extends AbstractExtension
         $this->ownershipQueryHelper = $ownershipQueryHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         foreach ($this->actionProviders as $provider) {
@@ -98,9 +95,7 @@ class ActionExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         // should  be applied before formatter extension
@@ -108,18 +103,14 @@ class ActionExtension extends AbstractExtension
         return 200;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $this->isMetadataVisited = true;
         $data->offsetAddToArray(self::METADATA_ACTION_KEY, $this->getActionsMetadata($config));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if ($datasource instanceof OrmDatasource && $this->hasAclProtectedActions($config)) {
@@ -129,9 +120,7 @@ class ActionExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         if (!$this->isMetadataVisited) {

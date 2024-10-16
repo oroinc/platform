@@ -16,6 +16,7 @@ class AclPrivilegeEntityByConfigurableNameFilterTest extends \PHPUnit\Framework\
     /** @var AclPrivilegeEntityByConfigurableNameFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filter = new AclPrivilegeEntityByConfigurableNameFilter(self::CONFIGURABLE_NAME, [self::ENTITY_CLASS]);

@@ -17,26 +17,20 @@ class TranslationServiceAdapterStub implements TranslationServiceAdapterInterfac
         $this->archivePath = $archivePath;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function fetchTranslationMetrics(): array
     {
         throw new \RuntimeException('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function downloadLanguageTranslationsArchive(string $languageCode, string $pathToSaveDownloadedArchive): void
     {
         $filesystem = new Filesystem();
         $filesystem->copy($this->archivePath, $pathToSaveDownloadedArchive);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function extractTranslationsFromArchive(
         string $pathToArchive,
         string $directoryPathToExtractTo,

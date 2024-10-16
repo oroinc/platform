@@ -40,6 +40,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendFieldTypeGuesser|\PHPUnit\Framework\MockObject\MockObject */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $entityConfigProvider = $this->createMock(ConfigProvider::class);

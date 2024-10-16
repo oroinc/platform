@@ -14,6 +14,7 @@ class FragmentTest extends WebTestCase
 
     private UriSigner $signer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -47,6 +47,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TagManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

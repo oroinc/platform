@@ -19,6 +19,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var MigrationQueryExecutor */
     private $executor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

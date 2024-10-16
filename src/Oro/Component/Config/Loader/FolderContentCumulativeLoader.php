@@ -112,17 +112,13 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         ] = $serialized;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResource()
     {
         return 'Folder content: ' . $this->relativeFolderPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
         $bundleAppData = [];
@@ -251,9 +247,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
         $bundleAppData = [];
@@ -275,9 +269,9 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
         $registeredFiles = array_fill_keys($resource->getFound($bundleClass), false);

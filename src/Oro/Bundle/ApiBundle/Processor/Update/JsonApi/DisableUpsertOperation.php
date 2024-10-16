@@ -16,9 +16,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class DisableUpsertOperation implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateContext $context */

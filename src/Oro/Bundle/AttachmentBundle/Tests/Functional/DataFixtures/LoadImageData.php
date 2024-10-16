@@ -17,9 +17,7 @@ class LoadImageData extends AbstractFixture
     public const IMAGE_WEBP = 'image_webp';
     public const IMAGE_EXTERNAL = 'image_external';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $file = new File();

@@ -93,17 +93,13 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->set(self::HATEOAS, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassName(): ?string
     {
         return $this->get(self::CLASS_NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setClassName(?string $className): void
     {
         if (null === $className) {
@@ -113,9 +109,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getManageableEntityClass(DoctrineHelper $doctrineHelper): ?string
     {
         return $doctrineHelper->getManageableEntityClass(
@@ -124,9 +118,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasIdentifierFields(): bool
     {
         $metadata = $this->getMetadata();
@@ -134,9 +126,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return null !== $metadata && $metadata->hasIdentifierFields();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRequestHeaders(): ParameterBagInterface
     {
         if (null === $this->requestHeaders) {
@@ -146,17 +136,13 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->requestHeaders;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setRequestHeaders(ParameterBagInterface $parameterBag): void
     {
         $this->requestHeaders = $parameterBag;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getResponseHeaders(): ParameterBagInterface
     {
         if (null === $this->responseHeaders) {
@@ -166,33 +152,25 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->responseHeaders;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setResponseHeaders(ParameterBagInterface $parameterBag): void
     {
         $this->responseHeaders = $parameterBag;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getResponseStatusCode(): ?int
     {
         return $this->get(self::RESPONSE_STATUS_CODE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setResponseStatusCode(int $statusCode): void
     {
         $this->set(self::RESPONSE_STATUS_CODE, $statusCode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isSuccessResponse(): bool
     {
         $statusCode = $this->getResponseStatusCode();
@@ -200,25 +178,19 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $statusCode >= 200 && $statusCode < 300;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getResponseDocumentBuilder(): ?DocumentBuilderInterface
     {
         return $this->responseDocumentBuilder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setResponseDocumentBuilder(?DocumentBuilderInterface $documentBuilder): void
     {
         $this->responseDocumentBuilder = $documentBuilder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFilters(): FilterCollection
     {
         if (null === $this->filterCollection) {
@@ -228,9 +200,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->filterCollection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFilterValues(): FilterValueAccessorInterface
     {
         if (null === $this->filterValueAccessor) {
@@ -240,57 +210,43 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->filterValueAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setFilterValues(FilterValueAccessorInterface $accessor): void
     {
         $this->filterValueAccessor = $accessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isMainRequest(): bool
     {
         return $this->get(self::MAIN_REQUEST);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setMasterRequest(bool $master): void
     {
         $this->set(self::MAIN_REQUEST, $master);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isCorsRequest(): bool
     {
         return $this->get(self::CORS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setCorsRequest(bool $cors): void
     {
         $this->set(self::CORS, $cors);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isHateoasEnabled(): bool
     {
         return (bool)$this->get(self::HATEOAS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setHateoas(bool $flag): void
     {
         $this->set(self::HATEOAS, $flag);
@@ -308,9 +264,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSharedData(): ParameterBagInterface
     {
         if (null === $this->sharedData) {
@@ -320,17 +274,13 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->sharedData;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setSharedData(ParameterBagInterface $sharedData): void
     {
         $this->sharedData = $sharedData;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNormalizationContext(): array
     {
         return [
@@ -341,33 +291,25 @@ class Context extends NormalizeResultContext implements ContextInterface
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getInfoRecords(): ?array
     {
         return $this->infoRecords;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setInfoRecords(?array $infoRecords): void
     {
         $this->infoRecords = $infoRecords;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addInfoRecord(string $key, mixed $value): void
     {
         $this->infoRecords[$key] = $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addAssociationInfoRecords(string $propertyPath, array $infoRecords): void
     {
         foreach ($infoRecords as $key => $val) {
@@ -381,17 +323,13 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNotResolvedIdentifiers(): array
     {
         return $this->get(self::NOT_RESOLVED_IDENTIFIERS) ?? [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addNotResolvedIdentifier(string $path, NotResolvedIdentifier $identifier): void
     {
         $notResolvedIdentifiers = $this->get(self::NOT_RESOLVED_IDENTIFIERS) ?? [];
@@ -399,9 +337,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->set(self::NOT_RESOLVED_IDENTIFIERS, $notResolvedIdentifiers);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeNotResolvedIdentifier(string $path): void
     {
         $notResolvedIdentifiers = $this->get(self::NOT_RESOLVED_IDENTIFIERS);
@@ -415,57 +351,43 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasQuery(): bool
     {
         return null !== $this->query;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getQuery(): mixed
     {
         return $this->query;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setQuery(mixed $query): void
     {
         $this->query = $query;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCriteria(): ?Criteria
     {
         return $this->criteria;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setCriteria(?Criteria $criteria): void
     {
         $this->criteria = $criteria;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigExtras(): array
     {
         return $this->configExtras->getConfigExtras();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setConfigExtras(array $extras): void
     {
         $this->configExtras->setConfigExtras($extras);
@@ -474,57 +396,43 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasConfigExtra(string $extraName): bool
     {
         return $this->configExtras->hasConfigExtra($extraName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigExtra(string $extraName): ?ConfigExtraInterface
     {
         return $this->configExtras->getConfigExtra($extraName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addConfigExtra(ConfigExtraInterface $extra): void
     {
         $this->configExtras->addConfigExtra($extra);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeConfigExtra(string $extraName): void
     {
         $this->configExtras->removeConfigExtra($extraName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigSections(): array
     {
         return $this->configExtras->getConfigSections();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasConfig(): bool
     {
         return false !== $this->config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfig(): ?EntityDefinitionConfig
     {
         if (false === $this->config) {
@@ -534,9 +442,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setConfig(?EntityDefinitionConfig $definition): void
     {
         $this->config = $definition;
@@ -546,57 +452,43 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->ensureAllConfigSectionsSet();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasConfigOfFilters(): bool
     {
         return $this->hasConfigOf(FiltersConfigExtra::NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigOfFilters(): ?FiltersConfig
     {
         return $this->getConfigOf(FiltersConfigExtra::NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setConfigOfFilters(?FiltersConfig $config): void
     {
         $this->setConfigOf(FiltersConfigExtra::NAME, $config);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasConfigOfSorters(): bool
     {
         return $this->hasConfigOf(SortersConfigExtra::NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigOfSorters(): ?SortersConfig
     {
         return $this->getConfigOf(SortersConfigExtra::NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setConfigOfSorters(?SortersConfig $config): void
     {
         $this->setConfigOf(SortersConfigExtra::NAME, $config);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasConfigOf(string $configSection): bool
     {
         if (!$this->isKnownConfigSection($configSection)) {
@@ -606,9 +498,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return \array_key_exists($configSection, $this->configSections);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigOf(string $configSection): mixed
     {
         if (!$this->isKnownConfigSection($configSection)) {
@@ -626,9 +516,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->configSections[$configSection];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setConfigOf(string $configSection, mixed $config): void
     {
         if (!$this->isKnownConfigSection($configSection)) {
@@ -728,9 +616,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->configExtras->hasConfigSection($configSection);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadataExtras(): array
     {
         $this->ensureMetadataExtrasInitialized();
@@ -738,9 +624,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->metadataExtras->getMetadataExtras();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setMetadataExtras(array $extras): void
     {
         if (empty($extras)) {
@@ -756,9 +640,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasMetadataExtra(string $extraName): bool
     {
         $this->ensureMetadataExtrasInitialized();
@@ -766,9 +648,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->metadataExtras->hasMetadataExtra($extraName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadataExtra(string $extraName): ?MetadataExtraInterface
     {
         $this->ensureMetadataExtrasInitialized();
@@ -776,35 +656,27 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->metadataExtras->getMetadataExtra($extraName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addMetadataExtra(MetadataExtraInterface $extra): void
     {
         $this->ensureMetadataExtrasInitialized();
         $this->metadataExtras->addMetadataExtra($extra);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeMetadataExtra(string $extraName): void
     {
         $this->ensureMetadataExtrasInitialized();
         $this->metadataExtras->removeMetadataExtra($extraName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasMetadata(): bool
     {
         return false !== $this->metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata(): ?EntityMetadata
     {
         if (false === $this->metadata) {
@@ -814,9 +686,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         return $this->metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setMetadata(?EntityMetadata $metadata): void
     {
         if ($metadata) {

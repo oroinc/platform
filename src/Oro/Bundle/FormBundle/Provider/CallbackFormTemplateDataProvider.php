@@ -17,9 +17,7 @@ class CallbackFormTemplateDataProvider implements FormTemplateDataProviderInterf
         $this->callable = $callable;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData($entity, FormInterface $form, Request $request)
     {
         return call_user_func($this->callable, $entity, $form, $request);

@@ -30,11 +30,11 @@ class SendEmailTemplate extends AbstractSendEmailTemplate
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws \Doctrine\ORM\EntityNotFoundException if the specified email template cannot be found
      * @throws \Twig\Error\Error When an error occurred in Twig during email template loading, compilation or rendering
      */
+    #[\Override]
     protected function executeAction($context): void
     {
         $from = $this->getEmailAddress($context, $this->options['from']);

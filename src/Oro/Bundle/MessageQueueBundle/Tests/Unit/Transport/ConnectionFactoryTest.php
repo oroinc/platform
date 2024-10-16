@@ -15,6 +15,7 @@ class ConnectionFactoryTest extends TestCase
 
     private ServiceLocator $locatorMock;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transportParametersBagMock = self::createMock(DsnBasedParameters::class);

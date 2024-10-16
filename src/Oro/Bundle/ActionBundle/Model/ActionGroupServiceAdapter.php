@@ -27,6 +27,7 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
     ) {
     }
 
+    #[\Override]
     public function execute(ActionData $data, Collection $errors = null): ActionData
     {
         try {
@@ -54,6 +55,7 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
         return $data;
     }
 
+    #[\Override]
     public function getDefinition(): ActionGroupDefinition
     {
         if (!$this->definition) {
@@ -64,11 +66,13 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
         return $this->definition;
     }
 
+    #[\Override]
     public function isAllowed(ActionData $data, Collection $errors = null): bool
     {
         return true;
     }
 
+    #[\Override]
     public function getParameters(): array
     {
         if ($this->parameters === null) {

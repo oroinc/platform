@@ -8,9 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Type\OneToManyAttributeType;
 
 class OneToManyAttributeTypeTest extends ManyToManyAttributeTypeTest
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);

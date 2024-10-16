@@ -19,6 +19,7 @@ class ExternalFileMimeType extends Constraint
 
     public string $message = 'oro.attachment.external_file.invalid_mime_type';
 
+    #[\Override]
     public function getTargets(): array
     {
         return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];

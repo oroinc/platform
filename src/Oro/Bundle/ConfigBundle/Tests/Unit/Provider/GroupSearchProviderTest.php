@@ -18,9 +18,7 @@ class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
     /** @var GroupSearchProvider */
     private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->configBag = $this->createMock(ConfigBag::class);

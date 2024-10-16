@@ -11,6 +11,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     private OptionValueBagNormalizer $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->normalizer = new OptionValueBagNormalizer();

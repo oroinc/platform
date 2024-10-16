@@ -5,7 +5,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Migration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveEnumFieldQuery;
-use Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\LoadExtendedRelationsData;
+use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadEnumOptionsData;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -14,11 +15,13 @@ class RemoveEnumFieldQueryTest extends WebTestCase
     private Connection $connection;
     private ArrayLogger $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([LoadExtendedRelationsData::class]);
-
+        $this->loadFixtures([
+            LoadEnumOptionsData::class
+        ]);
         $this->logger = new ArrayLogger();
         $this->connection = self::getContainer()->get('doctrine')->getConnection();
     }
@@ -32,14 +35,15 @@ class RemoveEnumFieldQueryTest extends WebTestCase
             $entityClass,
             $entityField
         );
+        $migrationQuery->setContainer(self::getContainer());
 
         self::assertEquals(
-            'Remove outdated testEnumField enum field data',
+            'Remove testEnumField enum field data',
             $migrationQuery->getDescription()
         );
     }
 
-    public function testExecuteEntityNotFound(): void
+    public function testEntityNotFound(): void
     {
         $entityClass = \Extend\Entity\UnknownEntity::class;
         $entityField = 'testEnumField';
@@ -49,6 +53,7 @@ class RemoveEnumFieldQueryTest extends WebTestCase
             $entityField
         );
         $migrationQuery->setConnection($this->connection);
+        $migrationQuery->setContainer(self::getContainer());
         $migrationQuery->execute($this->logger);
 
         self::assertSame(
@@ -59,7 +64,7 @@ class RemoveEnumFieldQueryTest extends WebTestCase
         );
     }
 
-    public function testExecuteFieldNotFound(): void
+    public function testFieldNotFound(): void
     {
         $entityClass = \Extend\Entity\TestEntity1::class;
         $entityField = 'unknownEnumField';
@@ -68,6 +73,7 @@ class RemoveEnumFieldQueryTest extends WebTestCase
             $entityClass,
             $entityField
         );
+        $migrationQuery->setContainer(self::getContainer());
         $migrationQuery->setConnection($this->connection);
         $migrationQuery->execute($this->logger);
 
@@ -82,48 +88,35 @@ class RemoveEnumFieldQueryTest extends WebTestCase
     /**
      * @dataProvider enumFieldData
      */
-    public function testExecute(string $entityClass, string $entityField, string $extendKeyPrefix): void
+    public function testExecute(string $entityClass, string $entityField): void
     {
         $fieldRow = $this->getFieldRow($entityClass, $entityField);
-        $fieldData = $this->connection->convertToPHPValue($fieldRow['data'], Types::ARRAY);
-        $enumClass = $fieldData['extend']['target_entity'];
+        $data = $this->connection->convertToPHPValue($fieldRow['data'], Types::ARRAY);
+        $enumCode = $data['enum']['enum_code'];
+        $enumOptions = $this->getEnumOptions($enumCode);
 
-        $entityRow = $this->getEntityRow($entityClass);
-        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Types::ARRAY);
-        $extendKey = sprintf('%s|%s|%s|%s', $extendKeyPrefix, $entityClass, $enumClass, $entityField);
-        unset(
-            $entityData['extend']['relation'][$extendKey],
-            $entityData['extend']['schema']['relation'][$entityField]
-        );
-
-        $enumEntityRow = $this->getEntityRow($enumClass);
-        $enumClassId = $enumEntityRow['id'];
         $migrationQuery = new RemoveEnumFieldQuery(
             $entityClass,
             $entityField
         );
 
+        $migrationQuery->setContainer(self::getContainer());
         $migrationQuery->setConnection($this->connection);
         $migrationQuery->execute($this->logger);
 
-        self::assertArrayIntersectEquals(
-            [
-                'DELETE FROM oro_entity_config_field WHERE id = ?',
-                'Parameters:',
-                '[1] = ' . $fieldRow['id'],
-                'DELETE FROM oro_entity_config_field WHERE entity_id = ?',
-                'Parameters:',
-                '[1] = ' . $enumClassId,
-                'DELETE FROM oro_entity_config WHERE class_name = ?',
-                'Parameters:',
-                '[1] = ' . $enumClass,
-                'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
-                'Parameters:',
-                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Types::ARRAY),
-                '[2] = ' . $entityClass,
-            ],
-            $this->logger->getMessages()
-        );
+        self::assertFalse($this->getEnumOptions($enumCode));
+        self::assertFalse($this->getFieldRow($entityClass, $entityField));
+
+        if ($enumOptions) {
+            if (!array_is_list($enumOptions)) {
+                $enumOptions = [$enumOptions];
+            }
+            foreach ($enumOptions as $enumOption) {
+                $translationKey = ExtendHelper::buildEnumOptionTranslationKey($enumOption['id']);
+                self::assertFalse($this->getEnumOptionTranslation($enumOption['id']));
+                self::assertFalse($this->getOroTranslationKey($translationKey));
+            }
+        }
     }
 
     public function enumFieldData(): array
@@ -132,17 +125,15 @@ class RemoveEnumFieldQueryTest extends WebTestCase
             'common enum field' => [
                 'entityClass' => \Extend\Entity\TestEntity1::class,
                 'entityField' => 'testEnumField',
-                'extendKeyPrefix' => 'manyToOne'
             ],
             'multi-enum field' => [
                 'entityClass' => \Extend\Entity\TestEntity1::class,
                 'entityField' => 'testMultienumField',
-                'extendKeyPrefix' => 'manyToMany'
             ]
         ];
     }
 
-    private function getEntityRow(string $entityClass): array
+    private function getEntityRow(string $entityClass): array|bool
     {
         $getEntitySql = 'SELECT e.id, e.data 
                 FROM oro_entity_config as e 
@@ -155,7 +146,37 @@ class RemoveEnumFieldQueryTest extends WebTestCase
         );
     }
 
-    private function getFieldRow(string $entityClass, string $entityField): array
+    private function getEnumOptionTranslation(string $enumOptionId): array|bool
+    {
+        $getEntitySql = 'SELECT * FROM oro_enum_option_trans WHERE foreign_key = ?';
+
+        return $this->connection->fetchAssociative(
+            $getEntitySql,
+            [$enumOptionId]
+        );
+    }
+
+    private function getOroTranslationKey(string $translationKey): array|bool
+    {
+        $getEntitySql = 'SELECT *  FROM oro_translation_key WHERE key = ?';
+
+        return $this->connection->fetchAssociative(
+            $getEntitySql,
+            [$translationKey]
+        );
+    }
+
+    private function getEnumOptions(string $enumCode): array|bool
+    {
+        $getEntitySql = 'SELECT id FROM oro_enum_option WHERE enum_code = ?';
+
+        return $this->connection->fetchAssociative(
+            $getEntitySql,
+            [$enumCode]
+        );
+    }
+
+    private function getFieldRow(string $entityClass, string $entityField): array|bool
     {
         $getFieldSql = 'SELECT f.id, f.data
             FROM oro_entity_config_field as f

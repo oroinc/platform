@@ -12,25 +12,18 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType as SymfonyNumberType;
  */
 class NumberType extends AbstractConfigType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_config_number';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return SymfonyNumberType::class;

@@ -69,10 +69,10 @@ final class SubPatternsLexer implements LexerInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws LexException
      */
+    #[\Override]
     public function lex(string $value): array
     {
         $offset = 0;

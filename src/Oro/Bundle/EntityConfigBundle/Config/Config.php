@@ -23,17 +23,13 @@ class Config implements ConfigInterface
         $this->values = $values;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($code, $strict = false, $default = null)
     {
         if (\array_key_exists($code, $this->values)) {
@@ -47,9 +43,7 @@ class Config implements ConfigInterface
         return $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function set($code, $value)
     {
         $this->values[$code] = $value;
@@ -57,9 +51,7 @@ class Config implements ConfigInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($code)
     {
         unset($this->values[$code]);
@@ -67,17 +59,13 @@ class Config implements ConfigInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function has($code)
     {
         return \array_key_exists($code, $this->values);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function is($code, $value = true)
     {
         if (!\array_key_exists($code, $this->values)) {
@@ -92,17 +80,13 @@ class Config implements ConfigInterface
         return $existingValue == $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function in($code, array $values, $strict = false)
     {
         return \in_array($this->get($code), $values, $strict);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function all(\Closure $filter = null)
     {
         if (null === $filter) {
@@ -112,17 +96,13 @@ class Config implements ConfigInterface
         return \array_filter($this->values, $filter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValues()
     {
         return $this->values;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValues($values)
     {
         $this->values = $values;

@@ -17,9 +17,7 @@ class LoadImapEmailData extends AbstractFixture implements DependentFixtureInter
     const IMAP_EMAIL_4 = 'imap_email.4';
     const IMAP_EMAIL_5 = 'imap_email.5';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $data = [
@@ -64,9 +62,7 @@ class LoadImapEmailData extends AbstractFixture implements DependentFixtureInter
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadImapEmailFolderData::class];

@@ -38,9 +38,7 @@ class TestEntityNameResolverClassesProvider implements TestEntityNameResolverCla
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClasses(): array
     {
         $entityClasses = $this->innerProvider->getEntityClasses();

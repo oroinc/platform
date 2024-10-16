@@ -30,15 +30,14 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     private static ?MessageCollector $messageCollector = null;
     private static BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject|null $bufferedProducer = null;
 
+    #[\Override]
     protected function setUp(): void
     {
         self::tearDownAfterClass();
         $this->initClient();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         if (self::$container) {

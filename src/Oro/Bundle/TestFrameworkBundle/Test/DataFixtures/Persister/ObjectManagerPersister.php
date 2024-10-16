@@ -39,9 +39,7 @@ class ObjectManagerPersister implements PersisterInterface
         $this->objectManager = $manager;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function persist($object): void
     {
         if (null === $this->persistableClasses) {
@@ -80,9 +78,7 @@ class ObjectManagerPersister implements PersisterInterface
         }
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function flush(): void
     {
         $this->objectManager->flush();

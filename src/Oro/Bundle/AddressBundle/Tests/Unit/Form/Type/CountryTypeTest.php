@@ -11,6 +11,7 @@ class CountryTypeTest extends \PHPUnit\Framework\TestCase
     /** @var CountryType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new CountryType();

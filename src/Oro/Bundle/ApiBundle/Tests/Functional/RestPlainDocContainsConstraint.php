@@ -10,9 +10,7 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
  */
 class RestPlainDocContainsConstraint extends ArrayContainsConstraint
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function matches($other): bool
     {
         if (parent::matches($other)
@@ -38,9 +36,7 @@ class RestPlainDocContainsConstraint extends ArrayContainsConstraint
         return empty($this->errors);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function matchAssocArray(array $expected, array $actual, array $path): void
     {
         parent::matchAssocArray($expected, $actual, $path);

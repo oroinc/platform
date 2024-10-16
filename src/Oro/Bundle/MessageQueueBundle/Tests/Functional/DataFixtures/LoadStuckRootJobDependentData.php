@@ -17,17 +17,13 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $jobName = DependentMessageProcessor::TEST_JOB_NAME;

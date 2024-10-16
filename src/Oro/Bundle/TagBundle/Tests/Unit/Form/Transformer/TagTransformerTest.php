@@ -13,6 +13,7 @@ class TagTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var TagTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(TagManager::class);

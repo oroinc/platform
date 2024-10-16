@@ -12,6 +12,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
 {
     use SearchMappingTypeCastingHandlersTestTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,6 +32,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
     /**
      * Overwritten due to ORM limitations
      */
+    #[\Override]
     public function testAllTextLimitation()
     {
         // create a product name exceeding the 256 length limitation
@@ -78,9 +80,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function clearTextData(array $fields): array
     {
         foreach ($fields as &$value) {

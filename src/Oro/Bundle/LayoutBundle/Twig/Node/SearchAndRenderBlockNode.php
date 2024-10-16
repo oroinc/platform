@@ -14,11 +14,11 @@ use Twig\Node\Expression\FunctionExpression;
 class SearchAndRenderBlockNode extends FunctionExpression
 {
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function compile(Compiler $compiler)
     {
         $compiler->addDebugInfo($this);

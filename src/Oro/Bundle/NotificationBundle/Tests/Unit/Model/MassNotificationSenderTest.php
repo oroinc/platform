@@ -40,6 +40,7 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
     /** @var MassNotificationSender */
     private $sender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

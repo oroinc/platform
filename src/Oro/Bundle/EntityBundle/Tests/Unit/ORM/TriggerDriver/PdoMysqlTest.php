@@ -25,6 +25,7 @@ class PdoMysqlTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $tableName = 'oro_test_entity';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

@@ -21,9 +21,7 @@ class ImageValidator extends BaseImageValidator
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Image) {

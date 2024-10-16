@@ -17,9 +17,7 @@ class DoctrineTokenProviderDecorator extends DoctrineTokenProvider
         parent::__construct($connection);
     }
 
-    /**
-     * @inheridoc
-     */
+    #[\Override]
     public function configureSchema(Schema $schema, Connection $forConnection): void
     {
         if ($forConnection !== $this->connection) {

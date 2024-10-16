@@ -23,17 +23,13 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable($gridName)
     {
         return str_starts_with($gridName, Report::GRID_PREFIX);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration()
     {
         $configuration = parent::getConfiguration();

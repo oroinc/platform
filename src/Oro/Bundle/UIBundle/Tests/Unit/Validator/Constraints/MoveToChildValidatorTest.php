@@ -14,12 +14,14 @@ class MoveToChildValidatorTest extends ConstraintValidatorTestCase
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new MoveToChildValidator($this->translator);

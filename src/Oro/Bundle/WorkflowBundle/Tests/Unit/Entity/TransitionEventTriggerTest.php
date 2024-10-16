@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
 {
+    #[\Override]
     public function testAccessors()
     {
         parent::testAccessors();
@@ -230,9 +231,7 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
         return $trigger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getEntity()
     {
         return new TransitionEventTrigger();

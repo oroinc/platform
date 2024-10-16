@@ -19,9 +19,7 @@ class RequestHeaderProvider implements RequestHeaderProviderInterface
         $this->docViewDetector = $docViewDetector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRequestHeaders(string $action, ?string $entityType, ?string $associationName): array
     {
         $view = $this->docViewDetector->getView();

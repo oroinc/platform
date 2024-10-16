@@ -10,6 +10,7 @@ class TriggerStub extends BaseTransitionTrigger
      * @param BaseTransitionTrigger $trigger
      * @return bool
      */
+    #[\Override]
     protected function isEqualAdditionalFields(BaseTransitionTrigger $trigger)
     {
         return true;

@@ -11,6 +11,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var FieldMetadata */
     private $fieldMetadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldMetadata = new FieldMetadata(DemoEntity::class, 'name');

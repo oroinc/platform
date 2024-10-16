@@ -103,6 +103,7 @@ class LocalizedFallbackValueNormalizer implements ResetInterface
         return $this->classMetadataCache[$className];
     }
 
+    #[\Override]
     public function reset(): void
     {
         $this->classMetadataCache = [];

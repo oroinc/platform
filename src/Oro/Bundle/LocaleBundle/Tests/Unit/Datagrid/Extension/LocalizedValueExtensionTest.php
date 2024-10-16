@@ -41,6 +41,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizedValueExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

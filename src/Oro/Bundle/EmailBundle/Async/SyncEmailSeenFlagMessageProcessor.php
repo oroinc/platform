@@ -32,9 +32,7 @@ class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, To
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $data = $message->getBody();
@@ -60,9 +58,7 @@ class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, To
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [SyncEmailSeenFlagTopic::getName()];

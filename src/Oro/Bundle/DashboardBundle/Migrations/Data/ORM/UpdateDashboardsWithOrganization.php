@@ -17,9 +17,7 @@ class UpdateDashboardsWithOrganization extends UpdateWithOrganization implements
     DependentFixtureInterface,
     RenamedFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -28,9 +26,7 @@ class UpdateDashboardsWithOrganization extends UpdateWithOrganization implements
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPreviousClassNames(): array
     {
         return [
@@ -38,9 +34,7 @@ class UpdateDashboardsWithOrganization extends UpdateWithOrganization implements
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->update($manager, Dashboard::class);

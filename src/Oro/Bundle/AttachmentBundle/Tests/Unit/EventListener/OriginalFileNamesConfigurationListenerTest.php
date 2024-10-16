@@ -21,6 +21,7 @@ class OriginalFileNamesConfigurationListenerTest extends \PHPUnit\Framework\Test
     /** @var OriginalFileNamesConfigurationListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

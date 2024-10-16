@@ -15,6 +15,7 @@ use Oro\Component\Testing\ReflectionUtil;
 
 class DatabasePersisterTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -62,9 +62,7 @@ class NavigationItemData extends AbstractFixture implements DependentFixtureInte
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [
@@ -72,9 +70,7 @@ class NavigationItemData extends AbstractFixture implements DependentFixtureInte
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $user = $this->getReference(LoadUserData::USER_NAME_2);

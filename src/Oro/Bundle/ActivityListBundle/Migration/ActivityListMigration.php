@@ -43,9 +43,7 @@ class ActivityListMigration implements Migration
         $this->configManager         = $configManager;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         if ($schema instanceof ExtendSchema) {

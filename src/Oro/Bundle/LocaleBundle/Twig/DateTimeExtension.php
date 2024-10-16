@@ -39,9 +39,7 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
         return $date;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -168,9 +166,7 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
         );
     }
 
-    /**
-     * {@inheritdoc]
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

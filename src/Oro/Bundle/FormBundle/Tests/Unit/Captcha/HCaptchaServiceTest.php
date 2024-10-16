@@ -25,6 +25,7 @@ class HCaptchaServiceTest extends TestCase
 
     private HCaptchaService $captchaService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->httpClient = $this->createMock(HTTPClientInterface::class);

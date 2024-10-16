@@ -38,8 +38,8 @@ class ErrorLogNotificationHandlerWrapper extends HandlerWrapper implements Logge
     /**
      * Prevents record handling if there are no recipients configured for an error log notification.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function handle(array $record): bool
     {
         if (!$this->getRecipientsEmailAddresses()) {
@@ -64,8 +64,8 @@ class ErrorLogNotificationHandlerWrapper extends HandlerWrapper implements Logge
     /**
      * Prevents records handling if there are no recipients configured for an error log notification.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function handleBatch(array $records): void
     {
         if (!$this->getRecipientsEmailAddresses()) {
@@ -95,8 +95,8 @@ class ErrorLogNotificationHandlerWrapper extends HandlerWrapper implements Logge
     /**
      * Prevents record handling if there are no recipients configured for an error log notification.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function isHandling(array $record): bool
     {
         return !$this->preventHandling && parent::isHandling($record) && $this->getRecipientsEmailAddresses();

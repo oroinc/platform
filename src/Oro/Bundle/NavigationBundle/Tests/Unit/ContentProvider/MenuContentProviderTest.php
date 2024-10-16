@@ -15,6 +15,7 @@ class MenuContentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MenuContentProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->menuExtension = $this->createMock(MenuExtension::class);

@@ -26,9 +26,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private FileSubscriber $subscriber;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->validator = $this->createMock(ConfigFileValidator::class);

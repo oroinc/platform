@@ -6,9 +6,7 @@ use Behat\MinkExtension\ServiceContainer\Driver\Selenium2Factory;
 
 class OroSelenium2Factory extends Selenium2Factory
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildDriver(array $config)
     {
         $definition = parent::buildDriver($config);
@@ -17,9 +15,7 @@ class OroSelenium2Factory extends Selenium2Factory
         return $definition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDriverName()
     {
         return 'oroSelenium2';

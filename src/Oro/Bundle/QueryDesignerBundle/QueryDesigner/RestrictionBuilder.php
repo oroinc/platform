@@ -38,9 +38,7 @@ class RestrictionBuilder implements RestrictionBuilderInterface
         $this->filterExecutionContext = $filterExecutionContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildRestrictions(array $filters, GroupingOrmFilterDatasourceAdapter $ds): void
     {
         $this->doBuildRestrictions($filters, $ds);

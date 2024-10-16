@@ -28,27 +28,21 @@ class HasProperty extends AbstractCondition implements ContextAccessorAwareInter
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         $params = [$this->object, $this->property];
         return $this->convertToArray($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         $params = [$this->object, $this->property];
         return $this->convertToPhpCode($params, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $object = $this->resolveValue($context, $this->object);
@@ -65,14 +59,13 @@ class HasProperty extends AbstractCondition implements ContextAccessorAwareInter
      *
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return 'has_property';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (2 !== count($options)) {

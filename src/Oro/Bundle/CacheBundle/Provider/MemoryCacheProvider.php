@@ -31,6 +31,7 @@ class MemoryCacheProvider implements MemoryCacheProviderInterface
      *
      * @return mixed
      */
+    #[\Override]
     public function get($cacheKeyArguments, ?callable $callback = null)
     {
         $cacheKey = $this->getCacheKey($cacheKeyArguments);
@@ -54,9 +55,7 @@ class MemoryCacheProvider implements MemoryCacheProviderInterface
         return $this->universalCacheKeyGenerator->generate($cacheKeyArguments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->cache->reset();

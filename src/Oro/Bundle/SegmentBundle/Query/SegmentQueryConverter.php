@@ -83,41 +83,31 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         $this->doConvert($source);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createContext(): SegmentQueryConverterContext
     {
         return new SegmentQueryConverterContext();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function context(): SegmentQueryConverterContext
     {
         return parent::context();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function saveTableAliases(array $tableAliases): void
     {
         // nothing to do
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function saveColumnAliases(array $columnAliases): void
     {
         // nothing to do
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addSelectColumn(
         string $entityClass,
         string $tableAlias,
@@ -143,9 +133,7 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         $this->context()->getQueryBuilder()->addSelect($functionExpr ?? $columnExpr);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addWhereStatement(): void
     {
         parent::addWhereStatement();
@@ -158,25 +146,19 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addGroupByStatement(): void
     {
         // do nothing, grouping is not allowed
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addGroupByColumn(string $columnAlias): void
     {
         // do nothing, grouping is not allowed
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addOrderByColumn(string $columnAlias, string $columnSorting): void
     {
         $this->context()->getQueryBuilder()->addOrderBy(

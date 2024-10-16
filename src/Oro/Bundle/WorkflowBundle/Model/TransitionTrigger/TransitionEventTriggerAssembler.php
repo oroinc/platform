@@ -17,18 +17,16 @@ class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
         $this->triggerVerifier = $triggerVerifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function canAssemble(array $options)
     {
         return !empty($options['event']);
     }
 
     /**
-     * {@inheritdoc}
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     protected function verifyTrigger(BaseTransitionTrigger $trigger)
     {
         if (!$trigger instanceof TransitionEventTrigger) {
@@ -41,9 +39,9 @@ class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException
      */
+    #[\Override]
     protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition)
     {
         $trigger = new TransitionEventTrigger();

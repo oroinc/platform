@@ -37,17 +37,13 @@ class RecalculateEmailVisibilityChunkProcessor implements MessageProcessorInterf
         $this->jobRunner = $jobRunner;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [RecalculateEmailVisibilityChunkTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = $message->getBody();

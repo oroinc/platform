@@ -22,6 +22,7 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SmtpSettingsProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

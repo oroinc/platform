@@ -12,9 +12,7 @@ abstract class AbstractDateAction extends AbstractAction
      */
     protected $options;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $this->contextAccessor->setValue($context, $this->options['attribute'], $this->createDateTime($context));
@@ -27,9 +25,7 @@ abstract class AbstractDateAction extends AbstractAction
      */
     abstract protected function createDateTime($context);
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['attribute'])) {

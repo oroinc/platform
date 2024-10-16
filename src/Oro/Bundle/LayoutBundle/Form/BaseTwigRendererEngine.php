@@ -24,26 +24,19 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
      */
     private $template;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(array $defaultThemes, Environment $environment)
     {
         $this->environment = $environment;
         parent::__construct($defaultThemes, $environment);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEnvironment(Environment $environment)
     {
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function renderBlock(FormView $view, $resource, $blockName, array $variables = []): string
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
@@ -76,9 +69,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
         return ob_get_clean();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadResourcesFromTheme($cacheKey, &$theme)
     {
         parent::loadResourcesFromTheme($cacheKey, $theme);

@@ -12,6 +12,7 @@ class LimitGarbageCollectionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private $gcEnabled;
 
+    #[\Override]
     protected function setUp(): void
     {
         if (!function_exists('gc_status')) {
@@ -23,6 +24,7 @@ class LimitGarbageCollectionExtensionTest extends \PHPUnit\Framework\TestCase
         gc_enable();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->gcEnabled ? gc_enable() : gc_disable();

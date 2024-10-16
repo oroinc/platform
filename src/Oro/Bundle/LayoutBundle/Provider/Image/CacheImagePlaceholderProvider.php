@@ -20,6 +20,7 @@ class CacheImagePlaceholderProvider implements ImagePlaceholderProviderInterface
         $this->cache = $cache;
     }
 
+    #[\Override]
     public function getPath(
         string $filter,
         string $format = '',

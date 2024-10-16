@@ -11,6 +11,7 @@ class TwigTemplateCacheWarmerPassTest extends \PHPUnit\Framework\TestCase
 {
     private TwigTemplateCacheWarmerPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new TwigTemplateCacheWarmerPass();

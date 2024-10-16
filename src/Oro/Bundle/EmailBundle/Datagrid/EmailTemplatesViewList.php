@@ -7,9 +7,7 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 
 class EmailTemplatesViewList extends AbstractViewsList
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getViewsList()
     {
         return [

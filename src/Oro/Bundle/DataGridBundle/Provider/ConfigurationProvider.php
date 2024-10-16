@@ -29,17 +29,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         $this->resolver = $resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(string $gridName): bool
     {
         return null !== $this->rawConfigurationProvider->getRawConfiguration($gridName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration(string $gridName): DatagridConfiguration
     {
         if (!isset($this->processedConfiguration[$gridName])) {
@@ -60,6 +56,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         );
     }
 
+    #[\Override]
     public function isValidConfiguration(string $gridName): bool
     {
         try {

@@ -29,6 +29,7 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
 
     private ThemeExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->pathProvider = $this->createMock(StubContextAwarePathProvider::class);

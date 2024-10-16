@@ -25,33 +25,24 @@ class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTyp
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return NumberFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('value_end', $options['field_type'], $this->createFieldOptions($options));
@@ -62,9 +53,7 @@ class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTyp
         return array_merge(array('required' => false), $options['field_options']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $operatorChoices = [

@@ -10,6 +10,7 @@ class GridFilterManager extends FrontendGridFilterManager
      * @param string $title
      * @return NodeElement|mixed|null
      */
+    #[\Override]
     protected function getFilterCheckbox($title)
     {
         $filterCheckbox = $this->find(
@@ -22,6 +23,7 @@ class GridFilterManager extends FrontendGridFilterManager
         return $filterCheckbox;
     }
 
+    #[\Override]
     public function close()
     {
         if (!$this->isVisible()) {

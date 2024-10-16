@@ -13,6 +13,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var ContextDataCollection */
     private $collection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new LayoutContext();

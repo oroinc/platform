@@ -31,12 +31,7 @@ use Laminas\Mail\AddressList as BaseAddressList;
  */
 class AddressList extends BaseAddressList
 {
-    /**
-     * {@inheritdoc}
-     *
-     * This method is a copy of {@see \Laminas\Mail\AddressList::createAddress}
-     * It is needed to override `new Address($email, $name)`
-     */
+    #[\Override]
     protected function createAddress($email, $name)
     {
         return new Address($email, $name);

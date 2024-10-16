@@ -12,6 +12,7 @@ class ModifyExpressionVisitorTest extends \PHPUnit\Framework\TestCase
 {
     private ModifyExpressionVisitorStub $visitor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->visitor = new ModifyExpressionVisitorStub();

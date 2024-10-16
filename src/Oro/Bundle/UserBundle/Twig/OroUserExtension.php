@@ -30,9 +30,7 @@ class OroUserExtension extends AbstractExtension implements ServiceSubscriberInt
         return $this->container->get('oro_user.gender_provider');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -54,9 +52,7 @@ class OroUserExtension extends AbstractExtension implements ServiceSubscriberInt
         return $this->getGenderProvider()->getLabelByName($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

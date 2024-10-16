@@ -20,6 +20,7 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
 {
     private ValidateMetaPropertyFilterSupported $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

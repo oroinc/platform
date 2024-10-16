@@ -18,6 +18,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityClassNameHelper */
     private $entityClassNameHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $entityAliasResolver = $this->createMock(EntityAliasResolver::class);

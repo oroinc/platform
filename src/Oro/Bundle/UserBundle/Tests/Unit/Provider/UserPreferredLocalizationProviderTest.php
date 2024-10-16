@@ -19,6 +19,7 @@ class UserPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var UserPreferredLocalizationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userConfigManager = $this->createMock(ConfigManager::class);

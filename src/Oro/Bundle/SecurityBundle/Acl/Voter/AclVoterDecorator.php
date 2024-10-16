@@ -18,49 +18,37 @@ abstract class AclVoterDecorator implements AclVoterInterface
         $this->wrapped = $wrapped;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         return $this->wrapped->vote($token, $subject, $attributes);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer): void
     {
         $this->wrapped->addOneShotIsGrantedObserver($observer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSecurityToken(): TokenInterface
     {
         return $this->wrapped->getSecurityToken();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAclExtension(): AclExtensionInterface
     {
         return $this->wrapped->getAclExtension();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getObject()
     {
         return $this->wrapped->getObject();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setTriggeredMask($mask, $accessLevel): void
     {
         $this->wrapped->setTriggeredMask($mask, $accessLevel);

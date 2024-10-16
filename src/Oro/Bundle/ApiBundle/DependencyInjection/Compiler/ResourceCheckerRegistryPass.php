@@ -17,9 +17,7 @@ class ResourceCheckerRegistryPass implements CompilerPassInterface
 
     private const TAG_NAME = 'oro.api.resource_checker';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $config = [];

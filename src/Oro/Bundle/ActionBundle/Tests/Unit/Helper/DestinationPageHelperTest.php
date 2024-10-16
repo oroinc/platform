@@ -23,6 +23,7 @@ class DestinationPageHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DestinationPageHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

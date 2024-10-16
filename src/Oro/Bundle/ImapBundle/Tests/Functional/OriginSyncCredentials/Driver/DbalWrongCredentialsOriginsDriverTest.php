@@ -20,6 +20,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

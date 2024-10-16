@@ -9,6 +9,7 @@ class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractPhone */
     private $phone;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->phone = $this->createPhone();

@@ -10,9 +10,7 @@ use Oro\Bundle\ApiBundle\Form\DataTransformer\Percent100ToLocalizedStringTransfo
  */
 class NormalizePercent100 extends NormalizeNumber
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeValue(mixed $value): mixed
     {
         return round(parent::normalizeValue($value) * 100.0, Percent100ToLocalizedStringTransformer::PERCENT_SCALE);

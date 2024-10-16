@@ -23,6 +23,7 @@ class EmailRecipientsListValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->validator = new EmailRecipientsListValidator();

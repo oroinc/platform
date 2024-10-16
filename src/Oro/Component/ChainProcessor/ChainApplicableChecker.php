@@ -17,9 +17,7 @@ class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAgg
     private array $checkers = [];
     private int $numberOfCheckers = 0;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->checkers);
@@ -42,9 +40,7 @@ class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAgg
         return empty($this->checkers);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         // by performance reasons we do not need a loop if only one checker is registered

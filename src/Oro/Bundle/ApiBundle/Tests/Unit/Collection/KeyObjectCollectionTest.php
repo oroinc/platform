@@ -12,6 +12,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
     private KeyObjectCollection $collection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->collection = new KeyObjectCollection();

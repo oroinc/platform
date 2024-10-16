@@ -13,6 +13,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlTagProvider */
     private $htmlTagProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->htmlTagProvider = new HtmlTagProvider(

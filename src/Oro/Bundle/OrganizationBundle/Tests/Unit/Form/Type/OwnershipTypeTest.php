@@ -11,6 +11,7 @@ class OwnershipTypeTest extends \PHPUnit\Framework\TestCase
     /** @var OwnershipType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new OwnershipType();

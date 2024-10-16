@@ -31,6 +31,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var NumberFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);

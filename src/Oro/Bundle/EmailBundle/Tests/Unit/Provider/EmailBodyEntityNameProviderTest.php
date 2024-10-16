@@ -11,6 +11,7 @@ class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBodyEntityNameProvider */
     private $emailBodyEntityNameProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailBodyEntityNameProvider = new EmailBodyEntityNameProvider();

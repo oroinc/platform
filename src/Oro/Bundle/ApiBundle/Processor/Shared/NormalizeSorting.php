@@ -26,9 +26,7 @@ class NormalizeSorting implements ProcessorInterface
         $this->associationSortersProvider = $associationSortersProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

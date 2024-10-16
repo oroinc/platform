@@ -21,6 +21,7 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
     /** @var ActionInterface */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

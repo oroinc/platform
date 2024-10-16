@@ -20,6 +20,7 @@ class TimezoneType extends AbstractType
         $this->cache = $cache;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         if ($this->cache) {
@@ -35,6 +36,7 @@ class TimezoneType extends AbstractType
         );
     }
 
+    #[\Override]
     public function getParent(): string
     {
         return ChoiceType::class;
@@ -45,6 +47,7 @@ class TimezoneType extends AbstractType
         return $this->getBlockPrefix();
     }
 
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_locale_timezone';

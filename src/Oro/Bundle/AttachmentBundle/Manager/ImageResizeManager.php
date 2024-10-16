@@ -33,6 +33,7 @@ class ImageResizeManager implements ImageResizeManagerInterface
         $this->imagineBinaryByFileContentFactory = $imagineBinaryByFileContentFactory;
     }
 
+    #[\Override]
     public function resize(
         File $file,
         int $width,
@@ -62,6 +63,7 @@ class ImageResizeManager implements ImageResizeManagerInterface
         return $resizedImageBinary;
     }
 
+    #[\Override]
     public function applyFilter(
         File $file,
         string $filterName,

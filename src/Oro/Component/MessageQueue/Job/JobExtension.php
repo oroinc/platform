@@ -20,6 +20,7 @@ class JobExtension extends AbstractExtension
         $this->jobRunner = $jobRunner;
     }
 
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         if ($context->getStatus() === MessageProcessorInterface::REQUEUE) {
@@ -29,6 +30,7 @@ class JobExtension extends AbstractExtension
         $this->cancelJobIfStatusNew($context->getMessage());
     }
 
+    #[\Override]
     public function onInterrupted(Context $context)
     {
         if ($context->getStatus() !== MessageProcessorInterface::REJECT) {

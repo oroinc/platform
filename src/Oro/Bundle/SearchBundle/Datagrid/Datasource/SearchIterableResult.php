@@ -60,17 +60,13 @@ class SearchIterableResult implements IterableResultInterface
         $this->query = $query;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSource()
     {
         return $this->query;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setBufferSize($size)
     {
         if ($size <= 0) {
@@ -80,9 +76,7 @@ class SearchIterableResult implements IterableResultInterface
         $this->pageSize = (int)$size;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         $this->offset = -1;
@@ -93,25 +87,19 @@ class SearchIterableResult implements IterableResultInterface
         $this->next();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function current(): mixed
     {
         return $this->current;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(): int
     {
         return $this->position;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->offset++;
@@ -142,17 +130,12 @@ class SearchIterableResult implements IterableResultInterface
         $this->rows = array_values($query->execute());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         return null !== $this->current;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         if (null === $this->totalCount) {

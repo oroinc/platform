@@ -13,9 +13,7 @@ class CopyValues extends AbstractAction
     /** @var array */
     protected $options = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $attribute = $this->contextAccessor->getValue($context, $this->attribute) ?: [];
@@ -41,9 +39,7 @@ class CopyValues extends AbstractAction
         $this->contextAccessor->setValue($context, $this->attribute, $attribute);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (count($options) < 2) {

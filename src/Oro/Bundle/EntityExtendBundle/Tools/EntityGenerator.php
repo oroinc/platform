@@ -125,6 +125,10 @@ class EntityGenerator
         if (!str_starts_with($schema['class'], ExtendClassLoadingUtils::getEntityNamespace())) {
             return '';
         }
+        // Skip all enumerable classes.
+        //        if (str_starts_with($schema['doctrine'][$schema['entity']]['table'], 'oro_enum_')) {
+        //            return '';
+        //        }
         $class = new ClassGenerator($schema['entity']);
         if ('mappedSuperclass' === $schema['doctrine'][$schema['entity']]['type']) {
             $class->setAbstract();

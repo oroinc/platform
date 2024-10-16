@@ -23,6 +23,7 @@ class UpdateFallbackExcludedQuery extends ParametrizedMigrationQuery implements 
         $this->value = $value;
     }
 
+    #[\Override]
     public function getDescription()
     {
         $messages = [];
@@ -36,6 +37,7 @@ class UpdateFallbackExcludedQuery extends ParametrizedMigrationQuery implements 
         return $messages;
     }
 
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         foreach ($this->getQueries() as $query) {

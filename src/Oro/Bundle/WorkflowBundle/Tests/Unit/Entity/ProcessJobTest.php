@@ -15,6 +15,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessJob */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new ProcessJob();

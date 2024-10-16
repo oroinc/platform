@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class EnumFieldConfiguration implements FieldConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'enum';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
@@ -48,6 +50,19 @@ class EnumFieldConfiguration implements FieldConfigInterface
                 ->info('`boolean` this attribute can be used to prohibit changing the enum state (no matter ' .
                     'whether it is enabled or not) for the entity. If TRUE than the current state cannot be changed.')
                 ->defaultFalse()
+            ->end()
+            ->arrayNode('immutable_codes')
+                ->info('`string[]` is an array of undetectable enum options. These options cannot be deleted but can ' .
+                    'still be edited.')
+                ->scalarPrototype()->end()
+            ->end()
+            ->scalarNode('entity_alias')
+                ->info('`string` stores an alias generated for a target entity of an enum field' .
+                ' and helps to resolve duplicate aliases.')
+            ->end()
+            ->scalarNode('entity_plural_alias')
+                ->info('`string` stores a plural alias generated for a target entity of an enum field' .
+                ' and helps to resolve duplicate aliases.')
             ->end()
         ;
     }

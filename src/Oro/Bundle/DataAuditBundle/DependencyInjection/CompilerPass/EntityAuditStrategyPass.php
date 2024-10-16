@@ -15,6 +15,7 @@ class EntityAuditStrategyPass implements CompilerPassInterface
     private const REGISTRY_SERVICE = 'oro_dataaudit.strategy_processor.entity_audit_strategy_registry';
     private const TAG = 'oro_dataaudit.entity_strategy_processor';
 
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::REGISTRY_SERVICE)) {

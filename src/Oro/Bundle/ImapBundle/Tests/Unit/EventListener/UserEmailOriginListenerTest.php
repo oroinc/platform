@@ -27,6 +27,7 @@ class UserEmailOriginListenerTest extends \PHPUnit\Framework\TestCase
     /** UserEmailOriginListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

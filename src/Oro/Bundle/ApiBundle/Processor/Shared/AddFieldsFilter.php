@@ -34,9 +34,7 @@ class AddFieldsFilter implements ProcessorInterface
         $this->valueNormalizer = $valueNormalizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */
@@ -64,7 +62,7 @@ class AddFieldsFilter implements ProcessorInterface
         if (ApiActionGroup::INITIALIZE === $context->getLastGroup()) {
             // add "fields" filters for the primary entity and all associated entities,
             // it is required to display them on the API Sandbox
-            $this->addFiltersForDocumentation($context, $filterTemplate);
+            $this->addFiltersForDocumentation($context, $filterTemplate, $config->isInclusionEnabled());
         } else {
             // add all requested "fields" filters
             $allFilterValues = $context->getFilterValues()->getGroup($filterGroupName);
@@ -74,8 +72,11 @@ class AddFieldsFilter implements ProcessorInterface
         }
     }
 
-    private function addFiltersForDocumentation(Context $context, string $filterTemplate): void
-    {
+    private function addFiltersForDocumentation(
+        Context $context,
+        string $filterTemplate,
+        bool $isInclusionEnabled
+    ): void {
         $metadata = $context->getMetadata();
         if (null === $metadata) {
             // the metadata does not exist
@@ -89,6 +90,9 @@ class AddFieldsFilter implements ProcessorInterface
         $this->addFilterForEntityClass($filterTemplate, $filterCollection, $context->getClassName(), $requestType);
 
         // the "fields" filters for associated entities
+        if (!$isInclusionEnabled) {
+            return;
+        }
         $config = $context->getConfig();
         $associations = $metadata->getAssociations();
         foreach ($associations as $associationName => $association) {

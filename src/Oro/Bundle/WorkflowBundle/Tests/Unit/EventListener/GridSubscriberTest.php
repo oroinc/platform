@@ -23,6 +23,7 @@ class GridSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var OrmResultBeforeQuery|\PHPUnit\Framework\MockObject\MockObject */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featurechecker = $this->createMock(FeatureChecker::class);

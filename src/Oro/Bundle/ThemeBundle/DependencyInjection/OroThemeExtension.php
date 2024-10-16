@@ -17,9 +17,7 @@ class OroThemeExtension extends Extension
     private const THEMES_SETTINGS_PARAMETER = 'oro_theme.settings';
     private const THEME_REGISTRY_SERVICE_ID = 'oro_theme.registry';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         array_unshift($configs, ['themes' => $this->getBundlesThemesSettings($container)]);

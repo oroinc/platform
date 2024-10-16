@@ -24,12 +24,14 @@ class TranslationTest extends RestJsonApiTestCase
     use ResolveTranslationIdTrait;
     use RolePermissionExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([LoadTranslations::class]);
     }
 
+    #[\Override]
     protected function normalizeYmlTemplate(array &$data, array $idReferences): void
     {
         parent::normalizeYmlTemplate($data, $idReferences);
@@ -49,6 +51,7 @@ class TranslationTest extends RestJsonApiTestCase
         }
     }
 
+    #[\Override]
     protected function getResponseData(array|string $expectedContent): array
     {
         $data = parent::getResponseData($expectedContent);

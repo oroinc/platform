@@ -26,9 +26,7 @@ class DataFixturesLoader extends Loader
         $this->aliceFixtureLoader = $container->get('oro_test.alice_fixture_loader');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addFixture($fixture)
     {
         $fixtureId = $this->identifierResolver->resolveId($fixture);
@@ -55,8 +53,8 @@ class DataFixturesLoader extends Loader
 
     /**
      * Converts fixture dependencies to be allow to set short path to alice file fixture as dependency.
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function getUnsequencedFixtures(array $sequences, $dependencies = null)
     {
         $fixtureIdentifierResolver = new AliceFixtureIdentifierResolver($this->container->get('kernel'));

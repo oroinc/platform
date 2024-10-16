@@ -9,6 +9,7 @@ class ArrayAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var ArrayAccessor */
     private $arrayAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->arrayAccessor = new ArrayAccessor();

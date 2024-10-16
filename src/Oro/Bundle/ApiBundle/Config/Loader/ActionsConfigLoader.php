@@ -39,9 +39,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
 
     private ?StatusCodesConfigLoader $statusCodesConfigLoader = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $config): mixed
     {
         $actions = new ActionsConfig();

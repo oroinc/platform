@@ -14,6 +14,7 @@ class SvgIconsSupportContextConfiguratorTest extends TestCase
 
     private SvgIconsSupportContextConfigurator $contextConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->svgIconsSupportProvider = $this->createMock(SvgIconsSupportProvider::class);

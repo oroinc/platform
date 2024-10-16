@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotEmptyFiltersValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): NotEmptyFiltersValidator
     {
         return new NotEmptyFiltersValidator();

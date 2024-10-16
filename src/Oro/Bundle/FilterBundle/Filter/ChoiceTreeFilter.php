@@ -31,17 +31,13 @@ class ChoiceTreeFilter extends AbstractFilter
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return ChoiceTreeFilterType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
@@ -64,9 +60,7 @@ class ChoiceTreeFilter extends AbstractFilter
         return $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         if (count($data['value']) > 1 || (isset($data['value'][0]) && '' != $data['value'][0])) {
@@ -80,17 +74,13 @@ class ChoiceTreeFilter extends AbstractFilter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         $data = parent::parseData($data);

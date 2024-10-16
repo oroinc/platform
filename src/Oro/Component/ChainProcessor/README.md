@@ -48,9 +48,7 @@ use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompi
 
 class AcmeTextRepresentationBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
@@ -85,9 +83,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 
 class TextRepresentationProcessor extends ActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         $context->setAction('get_text_representation');
@@ -191,9 +187,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class GetObjectId implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         if ($context->has('objectId')) {
@@ -228,9 +222,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class FormatClassNameIdPair implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         if ($context->hasResult()) {
@@ -272,9 +264,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class GetObjectIdForTestEntity implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         if ($context->has('objectId')) {
@@ -306,9 +296,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class DecorateClassNameIdPair implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         $context->setResult(sprintf('[%s]', $context->getResult()));

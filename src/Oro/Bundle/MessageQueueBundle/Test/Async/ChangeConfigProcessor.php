@@ -27,9 +27,7 @@ class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscribe
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         usleep(2000000); // Remove after BAP-16453 is fixed
@@ -42,9 +40,7 @@ class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscribe
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [ChangeConfigTestTopic::getName()];

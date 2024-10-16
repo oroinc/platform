@@ -16,9 +16,7 @@ class LoadFileData extends AbstractFixture
     public const FILE_2 = 'file_2';
     public const FILE_3 = 'file_3';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $file = new File();

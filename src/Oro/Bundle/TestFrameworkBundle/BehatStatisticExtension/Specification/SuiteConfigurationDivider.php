@@ -31,6 +31,7 @@ class SuiteConfigurationDivider implements SpecificationDividerInterface
      * @param int $divider limit in seconds
      * @return array
      */
+    #[\Override]
     public function divide($baseName, array $array, $divider)
     {
         $suiteDuration = $this->getSuiteDurations($array);

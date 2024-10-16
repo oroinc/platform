@@ -6,25 +6,19 @@ use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 
 class TestConverter extends ConfigValueConverterAbstract
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         return 'test value';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getViewValue($value)
     {
         return 'test view value';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormValue(array $converterAttributes, $value)
     {
         return $converterAttributes['value'];

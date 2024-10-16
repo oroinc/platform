@@ -29,6 +29,7 @@ class MigrationQueryExecutor implements MigrationQueryExecutorInterface
     /**
      * Sets a logger
      */
+    #[\Override]
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
@@ -37,6 +38,7 @@ class MigrationQueryExecutor implements MigrationQueryExecutorInterface
     /**
      * Gets a connection object this migration query executor works with
      */
+    #[\Override]
     public function getConnection(): Connection
     {
         return $this->connection;
@@ -48,6 +50,7 @@ class MigrationQueryExecutor implements MigrationQueryExecutorInterface
      * @param string|MigrationQuery $query
      * @param bool                  $dryRun
      */
+    #[\Override]
     public function execute($query, $dryRun): void
     {
         if ($query instanceof MigrationQuery) {

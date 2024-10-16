@@ -11,9 +11,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class UniqueKeysValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         /** @var UniqueKeys $constraint */

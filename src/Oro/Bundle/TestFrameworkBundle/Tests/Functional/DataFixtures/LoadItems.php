@@ -27,9 +27,7 @@ class LoadItems extends AbstractFixture
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->items as $name => $data) {

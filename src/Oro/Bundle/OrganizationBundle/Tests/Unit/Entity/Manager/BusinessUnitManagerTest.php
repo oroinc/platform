@@ -38,6 +38,7 @@ class BusinessUnitManagerTest extends TestCase
     /** @var BusinessUnitManager */
     private $businessUnitManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->buRepo = $this->createMock(BusinessUnitRepository::class);

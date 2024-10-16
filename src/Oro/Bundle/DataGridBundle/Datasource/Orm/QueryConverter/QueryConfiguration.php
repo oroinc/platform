@@ -9,9 +9,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class QueryConfiguration implements ConfigurationInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('query');

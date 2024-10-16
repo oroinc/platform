@@ -17,9 +17,7 @@ class ParentBusinessUnitSearchHandler extends BusinessUnitOwnerSearchHandler
         $this->ownerTreeProvider = $ownerTreeProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function searchIds($search, $firstResult, $maxResults)
     {
         list($searchString, $businessUnitId) = explode(';', $search);

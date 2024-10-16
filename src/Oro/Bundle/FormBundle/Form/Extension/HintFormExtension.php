@@ -19,9 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class HintFormExtension extends AbstractTypeExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['hint']);
@@ -30,9 +28,7 @@ class HintFormExtension extends AbstractTypeExtension
         $resolver->setDefaults(['hint_attr' => ['class' => 'oro-hint']]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if (!$form->getParent()) {
@@ -47,9 +43,7 @@ class HintFormExtension extends AbstractTypeExtension
         $view->vars['hint_position'] = $options['hint_position'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return ['Symfony\Component\Form\Extension\Core\Type\FormType'];

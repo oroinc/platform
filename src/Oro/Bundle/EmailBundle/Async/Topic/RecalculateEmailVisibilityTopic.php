@@ -12,16 +12,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RecalculateEmailVisibilityTopic extends AbstractTopic implements JobAwareTopicInterface
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.recalculate_email_visibility';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Recalculate the visibility of email users where the email address is used';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -36,6 +39,7 @@ class RecalculateEmailVisibilityTopic extends AbstractTopic implements JobAwareT
             });
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         $emailAddress = $messageBody['email'];

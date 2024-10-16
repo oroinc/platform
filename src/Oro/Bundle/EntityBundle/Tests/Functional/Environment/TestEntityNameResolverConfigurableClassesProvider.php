@@ -16,9 +16,7 @@ class TestEntityNameResolverConfigurableClassesProvider implements TestEntityNam
         $this->entityClasses = $entityClasses;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClasses(): array
     {
         $entityClasses = $this->innerProvider->getEntityClasses();

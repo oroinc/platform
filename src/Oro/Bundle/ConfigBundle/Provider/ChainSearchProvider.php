@@ -18,17 +18,13 @@ class ChainSearchProvider implements SearchProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($name)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData($name)
     {
         $data = [];

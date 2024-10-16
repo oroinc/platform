@@ -12,17 +12,13 @@ class ImpersonationAuthenticationException extends CustomUserMessageAuthenticati
 {
     private $user;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getUser()
     {
         return $this->user;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setUser($user): void
     {
         $this->user = $user;

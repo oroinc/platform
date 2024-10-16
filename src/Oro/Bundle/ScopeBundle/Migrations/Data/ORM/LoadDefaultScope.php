@@ -8,9 +8,7 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class LoadDefaultScope extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $scope = new Scope();

@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormInterface;
  */
 class PatchSubscriber implements EventSubscriberInterface
 {
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [FormEvents::PRE_SUBMIT => 'preSubmit'];

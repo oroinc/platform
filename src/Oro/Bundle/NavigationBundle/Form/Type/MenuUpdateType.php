@@ -30,9 +30,7 @@ class MenuUpdateType extends AbstractType
         $this->localizedFallbackValueCollectionSubscriber = $eventSubscriber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -101,9 +99,7 @@ class MenuUpdateType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

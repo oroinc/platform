@@ -25,9 +25,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
     /** @var AbstractDemoDataFixturesListener */
     protected $listener;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);

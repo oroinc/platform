@@ -18,6 +18,7 @@ class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AuditConfigProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

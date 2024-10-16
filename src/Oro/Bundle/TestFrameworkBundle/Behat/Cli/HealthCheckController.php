@@ -50,9 +50,7 @@ class HealthCheckController implements Controller, HealthCheckerAwareInterface
         $this->resultInterpretation = $resultInterpretation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -64,9 +62,7 @@ class HealthCheckController implements Controller, HealthCheckerAwareInterface
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (false === $input->getParameterOption('--check')) {

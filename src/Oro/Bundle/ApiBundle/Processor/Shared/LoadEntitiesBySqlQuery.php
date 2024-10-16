@@ -14,9 +14,7 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
  */
 class LoadEntitiesBySqlQuery implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */

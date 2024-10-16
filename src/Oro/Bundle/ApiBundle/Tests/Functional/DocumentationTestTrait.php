@@ -65,8 +65,8 @@ trait DocumentationTestTrait
             || (// custom entities (entities from "Extend\Entity" namespace), except enums
                 str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE)
                 && (
-                    !str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
-                    || str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_')
+                    !str_starts_with($entityClass, 'Extend\Entity\EV_')
+                    || str_starts_with($entityClass, 'Extend\Entity\EV_Test_')
                 )
             );
     }

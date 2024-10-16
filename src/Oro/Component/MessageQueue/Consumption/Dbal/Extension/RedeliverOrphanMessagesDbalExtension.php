@@ -43,9 +43,7 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $this->processPidSaved = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         if (!$this->isApplicable()) {
@@ -72,9 +70,7 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onInterrupted(Context $context)
     {
         if (!$this->isApplicable()) {

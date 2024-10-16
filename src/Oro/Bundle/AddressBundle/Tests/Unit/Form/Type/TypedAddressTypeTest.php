@@ -16,6 +16,7 @@ class TypedAddressTypeTest extends TestCase
     /** @var TypedAddressType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new TypedAddressType();

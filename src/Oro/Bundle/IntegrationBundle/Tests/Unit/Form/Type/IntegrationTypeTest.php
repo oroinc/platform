@@ -16,6 +16,7 @@ class IntegrationTypeTest extends \PHPUnit\Framework\TestCase
     /** @var IntegrationType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = $this->createMock(FormBuilder::class);

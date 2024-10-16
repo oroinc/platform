@@ -18,17 +18,20 @@ class CriteriaConnector
     private CriteriaNormalizer $criteriaNormalizer;
     private CriteriaPlaceholdersResolver $placeholdersResolver;
     private QueryExpressionVisitorFactory $expressionVisitorFactory;
+    private FieldDqlExpressionProviderInterface $fieldDqlExpressionProvider;
     private EntityClassResolver $entityClassResolver;
 
     public function __construct(
         CriteriaNormalizer $criteriaNormalizer,
         CriteriaPlaceholdersResolver $placeholdersResolver,
         QueryExpressionVisitorFactory $expressionVisitorFactory,
+        FieldDqlExpressionProviderInterface $fieldDqlExpressionProvider,
         EntityClassResolver $entityClassResolver
     ) {
         $this->criteriaNormalizer = $criteriaNormalizer;
         $this->placeholdersResolver = $placeholdersResolver;
         $this->expressionVisitorFactory = $expressionVisitorFactory;
+        $this->fieldDqlExpressionProvider = $fieldDqlExpressionProvider;
         $this->entityClassResolver = $entityClassResolver;
     }
 
@@ -169,8 +172,8 @@ class CriteriaConnector
                     $sort = $aliases[0] . '.' . $sort;
                 }
             }
-
             QueryBuilderUtil::checkField($sort);
+            $sort = $this->fieldDqlExpressionProvider->getFieldDqlExpression($qb, $sort) ?? $sort;
             $qb->addOrderBy($sort, QueryBuilderUtil::getSortOrder($order));
         }
     }

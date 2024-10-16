@@ -22,6 +22,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
 
     private ConfigFileValidator $configValidator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);

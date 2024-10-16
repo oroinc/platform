@@ -11,9 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType as SymfonyTextareaTy
 
 class TextareaTypeTest extends AbstractConfigTypeTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): AbstractType
     {
         return new TextareaType(

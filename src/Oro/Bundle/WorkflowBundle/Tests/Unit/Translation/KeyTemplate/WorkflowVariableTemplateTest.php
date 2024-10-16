@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableTemplate;
 
 class WorkflowVariableTemplateTest extends TemplateTestCase
 {
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplateInstance()
     {
         return new WorkflowVariableTemplate();
@@ -17,11 +17,13 @@ class WorkflowVariableTemplateTest extends TemplateTestCase
         $this->assertName(WorkflowVariableTemplate::NAME);
     }
 
+    #[\Override]
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.variable.{{ variable_name }}');
     }
 
+    #[\Override]
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'variable_name']);

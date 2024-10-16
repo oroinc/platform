@@ -28,6 +28,7 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
 
     private AdaptivelyValidCollection $adaptivelyValidCollectionConstraint;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityStateChecker = $this->createMock(EntityStateChecker::class);
@@ -45,6 +46,7 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createContext()
     {
         $translator = $this->createMock(TranslatorInterface::class);
@@ -66,6 +68,7 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
         return $context;
     }
 
+    #[\Override]
     protected function createValidator(): AdaptivelyValidCollectionValidator
     {
         return new AdaptivelyValidCollectionValidator($this->entityStateChecker);

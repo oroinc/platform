@@ -28,6 +28,7 @@ class SystemEmailTemplateSelectTypeTest extends TestCase
     /** @var QueryBuilder|MockObject */
     private $queryBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->queryBuilder = $this->createMock(QueryBuilder::class);

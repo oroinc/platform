@@ -22,6 +22,7 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
     /** @var CreateRelatedEntity */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

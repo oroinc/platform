@@ -14,6 +14,7 @@ class QueryUtilTest extends OrmTestCase
 {
     private EntityManagerInterface $em;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

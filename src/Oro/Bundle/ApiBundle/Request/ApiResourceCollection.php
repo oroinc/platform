@@ -84,17 +84,13 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
         return $this->resources;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->resources);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function count(): int
     {
         return \count($this->resources);

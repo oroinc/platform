@@ -9,9 +9,7 @@ use Symfony\Component\Validator\Constraints\Image as BaseImage;
  */
 class Image extends BaseImage
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return 'oro_attachment_image_validator';

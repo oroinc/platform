@@ -23,6 +23,7 @@ class EmailCacheManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailCacheManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

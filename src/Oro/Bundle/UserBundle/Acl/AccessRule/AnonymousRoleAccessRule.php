@@ -13,17 +13,13 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class AnonymousRoleAccessRule implements AccessRuleInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         $criteria->andExpression(new Comparison(new Path('role'), Comparison::NEQ, User::ROLE_ANONYMOUS));

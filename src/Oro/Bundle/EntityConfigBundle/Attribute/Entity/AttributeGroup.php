@@ -69,9 +69,6 @@ class AttributeGroup implements DatesAwareInterface, ExtendEntityInterface
     #[ORM\Column(name: 'is_visible', type: Types::BOOLEAN, nullable: false, options: ['default' => true])]
     private ?bool $isVisible = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
         $this->labels = new ArrayCollection();

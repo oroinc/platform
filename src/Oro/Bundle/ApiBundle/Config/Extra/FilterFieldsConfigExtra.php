@@ -16,7 +16,7 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
 
     /**
      * @param array $fieldFilters The list of fields that should be returned for a specified type of an entity.
-     *                            [entity type or entity class => [field name, ...], ...]
+     *                            [entity type or entity class => [field name, ...] or null, ...]
      */
     public function __construct(array $fieldFilters)
     {
@@ -26,45 +26,40 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     /**
      * Gets the list of fields that should be returned for a specified type of an entity.
      *
-     * @return array [entity type or entity class => [field name, ...], ...]
+     * @return array [entity type or entity class => [field name, ...] or null, ...]
      */
     public function getFieldFilters(): array
     {
         return $this->fieldFilters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ConfigContext $context): void
     {
         $context->set(self::NAME, $this->fieldFilters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPropagable(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         $result = '';
         foreach ($this->fieldFilters as $entity => $fields) {
-            $result .= $entity . '(' . implode(',', $fields) . ')';
+            $result .= $entity;
+            if (null !== $fields) {
+                $result .= '(' . implode(',', $fields) . ')';
+            }
         }
 
         return 'fields:' . $result;

@@ -27,9 +27,7 @@ class MultipleEntityType extends AbstractType
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -54,9 +52,7 @@ class MultipleEntityType extends AbstractType
         $builder->addEventSubscriber(new MultipleEntitySubscriber($this->doctrineHelper));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['class']);
@@ -76,9 +72,7 @@ class MultipleEntityType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $this->setOptionToView($view, $options, 'extra_config');
@@ -94,17 +88,12 @@ class MultipleEntityType extends AbstractType
             || $this->authorizationChecker->isGranted($options['add_acl_resource']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_multiple_entity';

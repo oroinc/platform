@@ -9,16 +9,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AuditChangedEntitiesTopic extends AbstractAuditTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.data_audit.entities_changed';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Create audit entries for regular entity properties.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

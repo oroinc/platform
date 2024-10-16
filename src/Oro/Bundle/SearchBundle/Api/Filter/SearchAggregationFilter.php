@@ -40,9 +40,7 @@ class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInt
         $this->fieldMappings = $fieldMappings;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         if (!$this->entityClass) {

@@ -21,6 +21,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
     /** @var CallServiceMethod */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

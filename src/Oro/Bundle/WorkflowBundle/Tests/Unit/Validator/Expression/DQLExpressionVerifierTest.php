@@ -16,6 +16,7 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionVerifierInterface */
     private $verifier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->verifier = new DQLExpressionVerifier();

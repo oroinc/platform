@@ -28,9 +28,7 @@ class EntityToIdTransformer extends AbstractEntityAssociationTransformer
         $this->includedEntities = $includedEntities;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getEntity(string $entityClass, mixed $entityId): ?object
     {
         $entity = $this->getIncludedEntity($entityClass, $entityId);

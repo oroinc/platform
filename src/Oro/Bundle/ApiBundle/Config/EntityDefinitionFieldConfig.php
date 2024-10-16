@@ -22,9 +22,7 @@ class EntityDefinitionFieldConfig extends FieldConfig
 {
     private ?string $dataType = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray(bool $excludeTargetEntity = false): array
     {
         $result = parent::toArray($excludeTargetEntity);
@@ -38,9 +36,7 @@ class EntityDefinitionFieldConfig extends FieldConfig
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isEmpty(): bool
     {
         return
@@ -51,6 +47,7 @@ class EntityDefinitionFieldConfig extends FieldConfig
     /**
      * Sets the configuration value.
      */
+    #[\Override]
     public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
@@ -446,9 +443,7 @@ class EntityDefinitionFieldConfig extends FieldConfig
         return $this->has(ConfigUtil::COLLAPSE);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setCollapsed(bool $collapse = true): void
     {
         $this->items[ConfigUtil::COLLAPSE] = $collapse;
@@ -566,7 +561,7 @@ class EntityDefinitionFieldConfig extends FieldConfig
      * IMPORTANT: the query builder must follow the rules described in AssociationQuery class.
      * @see \Oro\Component\EntitySerializer\AssociationQuery
      */
-    public function setAssociationQuery(QueryBuilder $query = null): void
+    public function setAssociationQuery(?QueryBuilder $query): void
     {
         if (null === $query) {
             unset($this->items[ConfigUtil::ASSOCIATION_QUERY]);

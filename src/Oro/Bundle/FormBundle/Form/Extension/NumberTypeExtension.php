@@ -24,9 +24,7 @@ class NumberTypeExtension extends AbstractTypeExtension
         $this->numberFormatter = $numberFormatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->replaceNumberToStringTransformer($builder, $options);
@@ -62,26 +60,20 @@ class NumberTypeExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('limit_decimals', true);
         $resolver->setAllowedTypes('limit_decimals', 'bool');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['attr']['data-limit-decimals'] = (int)$options['limit_decimals'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [NumberType::class];

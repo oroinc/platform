@@ -21,9 +21,7 @@ class EmailAddressWithContextPreferredLocalizationProvider extends AbstractPrefe
         $this->innerLocalizationProvider = $innerLocalizationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($entity): bool
     {
         return $entity instanceof EmailAddressWithContext;
@@ -33,6 +31,7 @@ class EmailAddressWithContextPreferredLocalizationProvider extends AbstractPrefe
      * @param EmailAddressWithContext $entity
      * @return Localization|null
      */
+    #[\Override]
     public function getPreferredLocalizationForEntity($entity): ?Localization
     {
         return $this->innerLocalizationProvider->getPreferredLocalization($entity->getContext());

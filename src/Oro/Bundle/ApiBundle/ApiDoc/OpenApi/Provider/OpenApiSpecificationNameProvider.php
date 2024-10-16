@@ -15,9 +15,7 @@ class OpenApiSpecificationNameProvider implements OpenApiSpecificationNameProvid
         $this->viewLabels = $viewLabels;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOpenApiSpecificationName(string $view): string
     {
         return $this->viewLabels[$view] ?? 'REST API';

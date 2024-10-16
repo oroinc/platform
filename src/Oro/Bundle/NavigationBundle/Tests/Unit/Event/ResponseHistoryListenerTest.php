@@ -28,6 +28,7 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ResponseHistoryListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

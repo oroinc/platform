@@ -9,16 +9,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ExportTopic extends PreExportTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.importexport.export';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Gets export result';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

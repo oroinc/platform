@@ -23,6 +23,7 @@ class WorkflowVariablesHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowVariablesHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

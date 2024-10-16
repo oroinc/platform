@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqOrNullComparisonEx
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
@@ -25,6 +26,7 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
         $field = 'e.test';
@@ -47,6 +49,7 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
         $field = 'e.test';
@@ -83,6 +86,7 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
         $field = 'e.test';
@@ -119,6 +123,7 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             new EntityClassResolver($this->doctrine)
         );
         $field = 'e.groups';
@@ -175,6 +180,7 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             new EntityClassResolver($this->doctrine)
         );
         $field = 'e.groups.name';

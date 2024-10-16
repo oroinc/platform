@@ -11,6 +11,7 @@ class AttributeRenderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeRenderRegistry */
     private $attributeRenderRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attributeRenderRegistry = new AttributeRenderRegistry();

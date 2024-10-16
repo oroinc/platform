@@ -28,9 +28,7 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
     /** @var array[] [['join' => join, 'alias' => alias, 'conditionType' => optional, 'condition' => optional], ...] */
     private $leftJoins = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         parent::reset();

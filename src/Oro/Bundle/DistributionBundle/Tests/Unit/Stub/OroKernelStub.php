@@ -15,25 +15,18 @@ class OroKernelStub extends OroKernel
         $this->appDir = $appDir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load($this->getProjectDir() . '/config/config_' . $this->getEnvironment() . '.yml');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFixturesDir()
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProjectDir(): string
     {
         $dir =  __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
@@ -41,9 +34,7 @@ class OroKernelStub extends OroKernel
         return $dir . ($this->appDir ? '/' . $this->appDir : '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheDir(): string
     {
         $appDir = ($this->appDir ? '/' . $this->appDir : '');
@@ -51,9 +42,7 @@ class OroKernelStub extends OroKernel
         return sys_get_temp_dir() . $appDir . '/var/cache/' . $this->environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLogDir(): string
     {
         $appDir = ($this->appDir ? '/' . $this->appDir : '');
@@ -61,9 +50,7 @@ class OroKernelStub extends OroKernel
         return sys_get_temp_dir() . $appDir . '/var/log';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function findBundles($roots = [])
     {
         return [
@@ -73,9 +60,7 @@ class OroKernelStub extends OroKernel
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerBundles(): iterable
     {
         return array_map(

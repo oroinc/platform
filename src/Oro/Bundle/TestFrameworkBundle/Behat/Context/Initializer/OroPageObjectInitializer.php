@@ -26,9 +26,7 @@ class OroPageObjectInitializer implements ContextInitializer
         $this->pageFactory = $pageFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initializeContext(Context $context)
     {
         if ($context instanceof OroPageObjectAware) {

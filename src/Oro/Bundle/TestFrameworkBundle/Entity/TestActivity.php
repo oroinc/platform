@@ -158,6 +158,7 @@ class TestActivity implements
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->description;

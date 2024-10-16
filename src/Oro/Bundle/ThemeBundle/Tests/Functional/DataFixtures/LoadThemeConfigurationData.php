@@ -23,6 +23,7 @@ class LoadThemeConfigurationData extends AbstractFixture
         ],
     ];
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var EntityManager $manager */

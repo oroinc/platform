@@ -19,17 +19,13 @@ class UserScopeManager extends AbstractScopeManager
         $this->securityContext = $securityContext;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getScopedEntityName(): string
     {
         return 'user';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getScopeId(): int
     {
         $this->ensureScopeIdInitialized();
@@ -37,9 +33,7 @@ class UserScopeManager extends AbstractScopeManager
         return $this->scopeId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setScopeId(?int $scopeId): void
     {
         $this->dispatchScopeIdChangeEvent();
@@ -47,17 +41,13 @@ class UserScopeManager extends AbstractScopeManager
         $this->scopeId = $scopeId ?? 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isSupportedScopeEntity(object $entity): bool
     {
         return $entity instanceof User;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getScopeEntityIdValue(object $entity): int
     {
         if ($entity instanceof User) {

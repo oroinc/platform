@@ -12,9 +12,7 @@ use Ratchet\Wamp\Topic;
  */
 class SyncFailTopic extends SecuredTopic
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
         $userId = $request->getAttributes()->get('user_id');

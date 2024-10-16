@@ -17,6 +17,7 @@ class TitleSetTokenParser extends AbstractTokenParser
      * @param  Token $token A Token instance
      * @return Node  A Node instance
      */
+    #[\Override]
     public function parse(Token $token)
     {
         $lineno = $token->getLine();
@@ -32,6 +33,7 @@ class TitleSetTokenParser extends AbstractTokenParser
      *
      * @return string The tag name
      */
+    #[\Override]
     public function getTag()
     {
         return 'oro_title_set';

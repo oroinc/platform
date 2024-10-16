@@ -21,9 +21,7 @@ class DateGroupingActionRemoverExtension extends AbstractExtension
         $this->calendarEntityClass = $calendarEntityClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return (
@@ -34,9 +32,7 @@ class DateGroupingActionRemoverExtension extends AbstractExtension
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $rows = $result->getData();
@@ -50,9 +46,7 @@ class DateGroupingActionRemoverExtension extends AbstractExtension
         $result->setData($rows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return -50;

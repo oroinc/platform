@@ -24,9 +24,7 @@ class ResourceChecker implements ResourceCheckerInterface
         $this->resourceType = $resourceType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isResourceEnabled(
         string $entityClass,
         string $action,

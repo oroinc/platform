@@ -23,17 +23,13 @@ class InverseAssociationAccessor implements AccessorInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'inverse_association';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($entity, FieldMetadata $metadata)
     {
         return
@@ -42,9 +38,7 @@ class InverseAssociationAccessor implements AccessorInterface
             && $this->isToOneAssociation($metadata->getDoctrineMetadata());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($entity, FieldMetadata $metadata)
     {
         $doctrineMetadata = $metadata->getDoctrineMetadata();
@@ -54,9 +48,7 @@ class InverseAssociationAccessor implements AccessorInterface
         return $this->doctrineHelper->getEntityRepository($className)->findBy([$fieldName => $entity]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($entity, FieldMetadata $metadata, $value)
     {
         $oldRelatedEntities = [];

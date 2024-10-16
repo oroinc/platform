@@ -18,9 +18,7 @@ class TranslatableProperty extends FieldProperty
     /** @var array */
     protected $excludeParams = [self::DOMAIN_KEY, self::LOCALE_KEY];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRawValue(ResultRecordInterface $record)
     {
         $value = parent::getRawValue($record);

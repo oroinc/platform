@@ -40,25 +40,19 @@ class EmailSyncNotificationAlert implements NotificationAlertInterface
 
     protected array $additionalInfo = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSourceType(): string
     {
         return self::SOURCE_TYPE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $data = [

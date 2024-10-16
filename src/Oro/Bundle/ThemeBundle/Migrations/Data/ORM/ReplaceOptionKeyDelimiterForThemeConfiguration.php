@@ -17,6 +17,7 @@ class ReplaceOptionKeyDelimiterForThemeConfiguration extends AbstractFixture imp
 {
     use ContainerAwareTrait;
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         // Only for upgrade application

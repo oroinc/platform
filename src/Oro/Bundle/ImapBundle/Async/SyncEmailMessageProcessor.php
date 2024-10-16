@@ -21,9 +21,7 @@ class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->emailSynchronizer = $emailSynchronizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $this->emailSynchronizer->syncOrigins([$message->getBody()['id']]);
@@ -31,9 +29,7 @@ class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [SyncEmailTopic::getName()];

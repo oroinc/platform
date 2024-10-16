@@ -26,9 +26,7 @@ class SetSynchronousOperationResultDocument implements ProcessorInterface
         $this->valueNormalizer = $valueNormalizer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */

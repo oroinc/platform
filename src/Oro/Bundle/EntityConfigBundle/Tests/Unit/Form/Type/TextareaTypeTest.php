@@ -11,6 +11,7 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
     /** @var TextareaType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

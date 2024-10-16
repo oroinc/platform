@@ -11,17 +11,13 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class LoadWorkflowDefinitionScopes extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadWorkflowDefinitions::class, LoadTestActivitiesForScopes::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->addScopesForWorkflow(

@@ -32,6 +32,7 @@ class ChildJobFailingExtension extends AbstractExtension
         $this->ignoredJobStatuses = $ignoredJobStatuses;
     }
 
+    #[\Override]
     public function onPostReceived(Context $context): void
     {
         parent::onPostReceived($context);

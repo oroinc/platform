@@ -17,14 +17,13 @@ class MappingConfigurationProvider extends MappingConfigurationProviderAbstract
     /**
      * Gets website search mapping configuration.
      */
+    #[\Override]
     public function getConfiguration(): array
     {
         return $this->doGetConfig();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];

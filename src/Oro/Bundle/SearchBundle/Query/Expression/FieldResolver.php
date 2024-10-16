@@ -9,17 +9,13 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 class FieldResolver implements FieldResolverInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolveFieldName(string $fieldName): string
     {
         return $fieldName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolveFieldType(string $fieldName): string
     {
         return Query::TYPE_TEXT;

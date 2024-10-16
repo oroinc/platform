@@ -10,9 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\ByStepNormalizeResultActionProcessor;
  */
 class BatchUpdateProcessor extends ByStepNormalizeResultActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): BatchUpdateContext
     {
         return new BatchUpdateContext();

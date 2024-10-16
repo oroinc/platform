@@ -33,9 +33,7 @@ class EntityManagerMock extends \Doctrine\ORM\EntityManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUnitOfWork()
     {
         return isset($this->uowMock) ? $this->uowMock : parent::getUnitOfWork();
@@ -60,6 +58,7 @@ class EntityManagerMock extends \Doctrine\ORM\EntityManager
     /**
      * @return ProxyFactory
      */
+    #[\Override]
     public function getProxyFactory()
     {
         return isset($this->proxyFactoryMock) ? $this->proxyFactoryMock : parent::getProxyFactory();
@@ -73,6 +72,7 @@ class EntityManagerMock extends \Doctrine\ORM\EntityManager
      * @param EventManager|null $eventManager
      * @return EntityManagerMock
      */
+    #[\Override]
     public static function create($conn, Configuration $config = null, EventManager $eventManager = null)
     {
         if (is_null($config)) {
@@ -88,17 +88,13 @@ class EntityManagerMock extends \Doctrine\ORM\EntityManager
         return new EntityManagerMock($conn, $config, $eventManager);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flush($entity = null)
     {
         $this->getUnitOfWork()->commit($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function persist($entity)
     {
         if (!is_object($entity)) {

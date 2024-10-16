@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CachePoolConfigurationPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition(CacheConfigurationPass::DATA_CACHE_POOL)) {

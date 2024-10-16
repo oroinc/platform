@@ -234,9 +234,7 @@ class ConnectionController extends AbstractController
         return $this->container->get('doctrine')->getManagerForClass($entityClass);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

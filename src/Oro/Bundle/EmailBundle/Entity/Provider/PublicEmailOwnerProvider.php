@@ -39,9 +39,7 @@ class PublicEmailOwnerProvider implements ResetInterface
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->cache = [];

@@ -40,6 +40,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
         ],
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

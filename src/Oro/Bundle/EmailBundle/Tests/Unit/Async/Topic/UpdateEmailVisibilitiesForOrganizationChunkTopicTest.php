@@ -10,11 +10,13 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class UpdateEmailVisibilitiesForOrganizationChunkTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new UpdateEmailVisibilitiesForOrganizationChunkTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         return [
@@ -62,6 +64,7 @@ class UpdateEmailVisibilitiesForOrganizationChunkTopicTest extends AbstractTopic
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

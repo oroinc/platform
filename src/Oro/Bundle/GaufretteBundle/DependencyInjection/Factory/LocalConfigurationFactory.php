@@ -7,9 +7,7 @@ namespace Oro\Bundle\GaufretteBundle\DependencyInjection\Factory;
  */
 class LocalConfigurationFactory implements ConfigurationFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAdapterConfiguration(string $configString): array
     {
         return [
@@ -19,17 +17,13 @@ class LocalConfigurationFactory implements ConfigurationFactoryInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getKey(): string
     {
         return 'local';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHint(): string
     {
         return

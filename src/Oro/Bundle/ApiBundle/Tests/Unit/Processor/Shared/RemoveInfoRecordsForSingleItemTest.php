@@ -16,6 +16,7 @@ class RemoveInfoRecordsForSingleItemTest extends GetListProcessorTestCase
     /** @var RemoveInfoRecordsForSingleItem */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

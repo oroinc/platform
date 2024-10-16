@@ -10,6 +10,7 @@ class OroRedisConfigExtensionTest extends \PHPUnit\Framework\TestCase
     private ContainerBuilder $container;
     private OroRedisConfigExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

@@ -53,6 +53,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     /** @var DynamicAttributesExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -205,17 +206,20 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         return [
             'one item' => [
                 'fields' => ['attributeName' => 1],
-                'attributes' => [new FieldConfigModel('attributeName')],
+                'attributes' => [new FieldConfigModel('attributeName', 'type')],
                 'expectAdds' => 1,
             ],
             'two items' => [
                 'fields' => ['attributeName' => 1, 'attributeName2' => 2],
-                'attributes' => [new FieldConfigModel('attributeName'), new FieldConfigModel('attributeName2')],
+                'attributes' => [
+                    new FieldConfigModel('attributeName', 'type'),
+                    new FieldConfigModel('attributeName2', 'type')
+                ],
                 'expectAdds' => 2,
             ],
             'one item not from family' => [
                 'fields' => ['attributeName' => 1, 'attributeName2' => 2],
-                'attributes' => [new FieldConfigModel('attributeName')],
+                'attributes' => [new FieldConfigModel('attributeName', 'type')],
                 'expectAdds' => 1,
             ]
         ];

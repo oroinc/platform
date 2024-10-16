@@ -32,8 +32,8 @@ class UserGridFieldValidator implements CustomGridFieldValidatorInterface
     /**
      * @param User $entity
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function hasAccessEditField($entity, $fieldName)
     {
         if (!$entity instanceof User) {
@@ -59,8 +59,8 @@ class UserGridFieldValidator implements CustomGridFieldValidatorInterface
     /**
      * @param User $entity
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function hasField($entity, $fieldName)
     {
         try {

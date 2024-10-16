@@ -32,9 +32,7 @@ class WebsocketPingTopic extends AbstractTopic implements TopicPeriodicTimerInte
         $this->setLogger(new NullLogger());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPublish(
         ConnectionInterface $connection,
         Topic $topic,
@@ -45,9 +43,7 @@ class WebsocketPingTopic extends AbstractTopic implements TopicPeriodicTimerInte
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function registerPeriodicTimer(Topic $topic): void
     {
         $this->periodicTimer->addPeriodicTimer(

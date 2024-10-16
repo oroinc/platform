@@ -35,6 +35,7 @@ class DoctrineTagGeneratorTest extends TestCase
     /** @var DoctrineTagGenerator */
     private $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

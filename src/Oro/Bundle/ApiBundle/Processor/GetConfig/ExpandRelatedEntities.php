@@ -43,9 +43,7 @@ class ExpandRelatedEntities implements ProcessorInterface
         $this->customDataTypeHelper = $customDataTypeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

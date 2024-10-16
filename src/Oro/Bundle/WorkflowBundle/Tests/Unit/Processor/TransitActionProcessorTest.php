@@ -28,6 +28,7 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var TransitActionProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();

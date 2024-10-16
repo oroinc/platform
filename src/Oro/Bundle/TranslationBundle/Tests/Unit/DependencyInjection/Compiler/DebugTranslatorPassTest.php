@@ -14,6 +14,7 @@ class DebugTranslatorPassTest extends \PHPUnit\Framework\TestCase
     /** @var DebugTranslatorPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new DebugTranslatorPass();

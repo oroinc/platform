@@ -39,49 +39,37 @@ final class LayoutItem implements LayoutItemInterface
         $this->alias = $alias;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAlias()
     {
         return $this->alias;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeName()
     {
         return $this->rawLayoutBuilder->getType($this->id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOptions()
     {
         return $this->rawLayoutBuilder->getOptions($this->id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParentId()
     {
         return $this->rawLayoutBuilder->getParentId($this->id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRootId(): ?string
     {
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
@@ -89,9 +77,7 @@ final class LayoutItem implements LayoutItemInterface
         return !$rawLayout->isEmpty() ? $rawLayout->getRootId() : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContext()
     {
         return $this->context;

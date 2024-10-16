@@ -11,9 +11,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
  */
 class DateRangeFilter extends AbstractDateFilter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setParameter(FilterDatasourceAdapterInterface $ds, $key, $value, $type = null)
     {
         if (null === $type && $value instanceof \DateTime) {
@@ -23,9 +21,7 @@ class DateRangeFilter extends AbstractDateFilter
         parent::setParameter($ds, $key, $value, $type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return DateRangeFilterType::class;

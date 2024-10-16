@@ -29,6 +29,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
     /** @var WorkflowDefinitionNotificationSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
@@ -109,9 +110,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

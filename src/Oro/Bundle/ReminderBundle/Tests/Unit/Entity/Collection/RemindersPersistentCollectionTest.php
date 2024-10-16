@@ -22,6 +22,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var RemindersPersistentCollection */
     private $collection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(ReminderRepository::class);

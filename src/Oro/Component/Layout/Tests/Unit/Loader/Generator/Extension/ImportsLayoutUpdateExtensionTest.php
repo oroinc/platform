@@ -13,6 +13,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ImportsLayoutUpdateExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new ImportsLayoutUpdateExtension();

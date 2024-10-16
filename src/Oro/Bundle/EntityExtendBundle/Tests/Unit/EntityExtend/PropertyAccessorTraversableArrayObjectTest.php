@@ -6,6 +6,7 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\Traversable
 
 class PropertyAccessorTraversableArrayObjectTest extends PropertyAccessorCollectionTest
 {
+    #[\Override]
     protected function getContainer(array $array)
     {
         return new TraversableArrayObject($array);

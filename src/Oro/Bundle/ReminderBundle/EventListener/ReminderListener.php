@@ -23,9 +23,7 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -33,9 +31,7 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSubscribedEvents()
     {
         return [

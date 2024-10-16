@@ -43,17 +43,13 @@ class FieldAclExtension extends AbstractExtension
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return parent::isApplicable($config) && $config->isOrmDatasource();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $validated = $this->validateConfiguration(
@@ -64,17 +60,13 @@ class FieldAclExtension extends AbstractExtension
         $config->offsetSetByPath(Configuration::FIELDS_ACL, $validated);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return 255;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         if (empty($this->fieldAclConfig) || empty($this->ownershipFields)) {
@@ -97,9 +89,7 @@ class FieldAclExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         /** @var OrmDatasource $datasource */

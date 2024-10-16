@@ -14,9 +14,7 @@ class LoadBusinessUnit extends AbstractFixture implements InitialFixtureInterfac
 {
     public const BUSINESS_UNIT = 'business_unit';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $businessUnit = $manager->getRepository(BusinessUnit::class)

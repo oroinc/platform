@@ -18,6 +18,7 @@ class DictionaryFilterTest extends WebTestCase
 {
     private DictionaryFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

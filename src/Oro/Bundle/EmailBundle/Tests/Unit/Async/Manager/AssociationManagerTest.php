@@ -32,6 +32,7 @@ class AssociationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AssociationManager */
     private $associationManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

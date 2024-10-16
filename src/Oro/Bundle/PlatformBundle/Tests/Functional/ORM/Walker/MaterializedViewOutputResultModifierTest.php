@@ -19,6 +19,7 @@ class MaterializedViewOutputResultModifierTest extends WebTestCase
 
     private MaterializedViewManager $materializedViewManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
@@ -26,6 +27,7 @@ class MaterializedViewOutputResultModifierTest extends WebTestCase
         $this->materializedViewManager = self::getContainer()->get('oro_platform.materialized_view.manager');
     }
 
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         self::deleteAllMaterializedViews(self::getContainer());

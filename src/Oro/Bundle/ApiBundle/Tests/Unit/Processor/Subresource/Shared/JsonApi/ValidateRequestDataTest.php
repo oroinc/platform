@@ -13,6 +13,7 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
     /** @var ValidateRequestData */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

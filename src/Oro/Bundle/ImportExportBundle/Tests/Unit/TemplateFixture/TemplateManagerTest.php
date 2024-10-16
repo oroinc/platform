@@ -18,6 +18,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateManager */
     private $templateManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityRegistry = $this->createMock(TemplateEntityRegistry::class);

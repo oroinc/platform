@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DebugWorkflowItemSerializerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->getParameter('kernel.debug')) {

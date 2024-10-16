@@ -12,6 +12,7 @@ class NormalizedBooleanNodeDefinition extends BooleanNodeDefinition
     /**
      * Instantiate a Node.
      */
+    #[\Override]
     protected function instantiateNode(): NormalizedBooleanNode
     {
         return new NormalizedBooleanNode($this->name, $this->parent, $this->pathSeparator);

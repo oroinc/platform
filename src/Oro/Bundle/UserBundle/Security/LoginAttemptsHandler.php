@@ -40,9 +40,7 @@ class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
         $this->loginSourceProvidersForFailedRequest = $loginSourceProvidersForFailedRequest;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function onInteractiveLogin(InteractiveLoginEvent $event): void
     {
         $token = $event->getAuthenticationToken();
@@ -63,9 +61,7 @@ class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function onAuthenticationFailure(LoginFailureEvent $event): void
     {
         $user = $event->getRequest()->attributes->get('user');

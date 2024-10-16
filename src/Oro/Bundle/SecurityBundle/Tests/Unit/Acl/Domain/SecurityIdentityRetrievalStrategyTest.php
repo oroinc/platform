@@ -13,6 +13,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
 {
     private SecurityIdentityRetrievalStrategy $strategy;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->strategy = new SecurityIdentityRetrievalStrategy();

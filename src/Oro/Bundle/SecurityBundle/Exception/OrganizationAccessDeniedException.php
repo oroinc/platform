@@ -32,27 +32,25 @@ class OrganizationAccessDeniedException extends AuthenticationException
         $this->organizationName = $organizationName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMessageKey(): string
     {
         return 'oro.security.organization.access_denied';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMessageData(): array
     {
         return ['%organization_name%' => $this->organizationName];
     }
 
+    #[\Override]
     public function __serialize(): array
     {
         return [parent::__serialize(), $this->organizationName];
     }
 
+    #[\Override]
     public function __unserialize(array $data): void
     {
         [$parentData, $this->organizationName] = $data;

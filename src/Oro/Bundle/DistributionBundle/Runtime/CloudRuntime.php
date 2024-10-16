@@ -17,6 +17,7 @@ use Symfony\Component\Runtime\SymfonyRuntime;
  */
 class CloudRuntime extends SymfonyRuntime
 {
+    #[\Override]
     public function getRunner(?object $application): RunnerInterface
     {
         if (ini_get('display_errors') === 'stderr') {

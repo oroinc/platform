@@ -157,7 +157,7 @@ services:
     oro_email.api.add_email_thread_context_item_id_meta_property:
         class: Oro\Bundle\EmailBundle\Api\Processor\AddEmailThreadContextItemIdMetaProperty
         tags:
-            - { name: oro.api.processor, action: get_metadata, requestType: json_api, targetAction: get, parentAction: create|add_relationship, class: Oro\Bundle\EmailBundle\Entity\Email, priority: -90 }
+            - { name: oro.api.processor, action: get_metadata, requestType: json_api, class: Oro\Bundle\EmailBundle\Entity\Email, targetAction: get, parentAction: create|add_relationship, priority: -90 }
 
     oro_email.api.create.create_email_entity:
         class: Oro\Bundle\EmailBundle\Api\Processor\CreateEmailEntity

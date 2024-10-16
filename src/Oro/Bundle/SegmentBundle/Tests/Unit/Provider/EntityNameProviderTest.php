@@ -13,6 +13,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = $this->createMock(AbstractQueryDesigner::class);

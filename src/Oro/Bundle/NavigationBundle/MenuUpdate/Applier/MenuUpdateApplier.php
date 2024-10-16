@@ -21,6 +21,7 @@ class MenuUpdateApplier implements MenuUpdateApplierInterface
         $this->menuUpdateToMenuItemPropagator = $menuUpdateToMenuItemPropagator;
     }
 
+    #[\Override]
     public function applyMenuUpdate(
         MenuUpdateInterface $menuUpdate,
         ItemInterface $menu,

@@ -13,6 +13,7 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBodyBuilder */
     private $emailBodyBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

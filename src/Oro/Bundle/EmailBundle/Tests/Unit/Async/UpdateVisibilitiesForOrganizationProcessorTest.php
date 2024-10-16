@@ -26,6 +26,7 @@ class UpdateVisibilitiesForOrganizationProcessorTest extends \PHPUnit\Framework\
     /** @var UpdateVisibilitiesForOrganizationProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailAddressVisibilityManager = $this->createMock(EmailAddressVisibilityManager::class);

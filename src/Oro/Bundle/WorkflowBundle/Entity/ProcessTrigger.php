@@ -69,9 +69,7 @@ class ProcessTrigger implements EventTriggerInterface
     #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
     protected ?\DateTimeInterface $updatedAt = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getId()
     {
         return $this->id;
@@ -102,6 +100,7 @@ class ProcessTrigger implements EventTriggerInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getEvent()
     {
         return $this->event;
@@ -118,9 +117,7 @@ class ProcessTrigger implements EventTriggerInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getField()
     {
         return $this->field;
@@ -229,9 +226,7 @@ class ProcessTrigger implements EventTriggerInterface
         return $this->definition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClass()
     {
         return $this->getDefinition() ? $this->getDefinition()->getRelatedEntity() : null;

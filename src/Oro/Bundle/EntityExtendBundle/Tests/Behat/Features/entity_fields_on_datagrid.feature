@@ -26,8 +26,6 @@ Feature: Entity Fields on Datagrid
       | Add To Grid Settings | Yes and do not display |
     And I save and close form
     And I should see "Field saved" flash message
-    When I click update schema
-    Then I should see "Schema updated" flash message
 
   Scenario: Ensure custom field column on datagrid can be loaded when enabled
     Given I go to System/User Management/Users

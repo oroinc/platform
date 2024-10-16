@@ -15,6 +15,7 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var StepAssembler */
     private $assembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->assembler = new StepAssembler();

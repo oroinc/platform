@@ -33,9 +33,7 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(string $variable, array $processorArguments, TemplateData $data): void
     {
         $data->setComputedVariable($variable, $this->getUrl($processorArguments['route'], $variable, $data));

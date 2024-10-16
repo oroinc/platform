@@ -25,6 +25,7 @@ class TurnstileCaptchaServiceTest extends TestCase
 
     private TurnstileCaptchaService $captchaService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->httpClient = $this->createMock(HTTPClientInterface::class);

@@ -26,6 +26,7 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
     private IsLanguageTranslationInstallAvailableCondition $condition2;
     private IsLanguageTranslationInstallAvailableCondition $condition3;
 
+    #[\Override]
     protected function setUp(): void
     {
         $now = new \DateTime();

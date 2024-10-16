@@ -11,17 +11,13 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterTypeInterface;
  */
 class NumberRangeFilter extends NumberFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return NumberRangeFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         if (!$this->isApplicable($data)) {
@@ -170,9 +166,7 @@ class NumberRangeFilter extends NumberFilter
         return $ds->expr()->gt($fieldName, $parameterEnd, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         $type = null;
@@ -200,9 +194,9 @@ class NumberRangeFilter extends NumberFilter
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function parseValue(array $data)
     {
         if (!$this->isApplicable($data)) {

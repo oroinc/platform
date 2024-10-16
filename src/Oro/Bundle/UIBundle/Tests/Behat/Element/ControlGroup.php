@@ -16,6 +16,7 @@ class ControlGroup extends Element
      *
      * @return string|array|null
      */
+    #[\Override]
     public function getValue()
     {
         if (!$this->isValid()) {

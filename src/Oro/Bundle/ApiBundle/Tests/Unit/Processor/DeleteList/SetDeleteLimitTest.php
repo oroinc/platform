@@ -13,6 +13,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
     /** @var SetDeleteLimit */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -44,9 +44,7 @@ class MenuUpdateDatasource implements DatasourceInterface
         $this->configurationProvider = $configurationProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(DatagridInterface $grid, array $config)
     {
         $datasource = clone $this;
@@ -59,6 +57,7 @@ class MenuUpdateDatasource implements DatasourceInterface
     /**
      * @return array
      */
+    #[\Override]
     public function getResults()
     {
         $rows = [];

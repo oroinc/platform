@@ -10,6 +10,7 @@ use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
  */
 class BasicPropagator implements MenuItemToMenuUpdatePropagatorInterface
 {
+    #[\Override]
     public function isApplicable(MenuUpdateInterface $menuUpdate, ItemInterface $menuItem, string $strategy): bool
     {
         return in_array(
@@ -22,6 +23,7 @@ class BasicPropagator implements MenuItemToMenuUpdatePropagatorInterface
         );
     }
 
+    #[\Override]
     public function propagateFromMenuItem(
         MenuUpdateInterface $menuUpdate,
         ItemInterface $menuItem,

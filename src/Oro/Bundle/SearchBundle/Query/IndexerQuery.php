@@ -17,17 +17,12 @@ class IndexerQuery extends AbstractSearchQuery
         $this->query   = $query;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __call($name, $args)
     {
         return call_user_func_array(array($this->query, $name), $args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function query()
     {
         return $this->indexer->query($this->query);

@@ -30,6 +30,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
     /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     private $request;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->consumerHeartbeat = $this->createMock(ConsumerHeartbeat::class);

@@ -22,9 +22,7 @@ class DefaultCurrencyValueProvider implements ValueProviderInterface
         $this->localeDataConfigProvider = $localeDataConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue()
     {
         $localeData = $this->localeDataConfigProvider->getConfiguration();

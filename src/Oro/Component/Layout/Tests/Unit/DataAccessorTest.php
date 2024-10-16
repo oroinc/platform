@@ -22,6 +22,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var DataAccessor */
     private $dataAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(LayoutRegistryInterface::class);

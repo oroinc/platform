@@ -22,9 +22,7 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualRelation($className, $fieldName)
     {
         $items = $this->getItems();
@@ -32,9 +30,7 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
         return !empty($items[$className][$fieldName]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualRelationQuery($className, $fieldName)
     {
         $items = $this->getItems();
@@ -46,9 +42,7 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
         return $items[$className][$fieldName]['query'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualRelations($className)
     {
         $items = $this->getItems();
@@ -64,8 +58,8 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
      * Return alias for single join
      * Get from option for multiple joins
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null)
     {
         if (!$this->isVirtualRelation($className, $fieldName)) {
@@ -112,9 +106,7 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getConfiguration()
     {
         return $this->configProvider->getConfiguration(EntityConfiguration::VIRTUAL_RELATIONS);

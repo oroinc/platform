@@ -20,6 +20,7 @@ class SaveEntityTest extends FormProcessorTestCase
     /** @var SaveEntity */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -13,9 +13,7 @@ class LayoutFormStub extends AbstractType
         $this->name = $name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return $this->name;

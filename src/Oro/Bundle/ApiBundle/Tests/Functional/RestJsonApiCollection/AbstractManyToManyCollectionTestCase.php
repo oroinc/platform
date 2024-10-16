@@ -7,19 +7,19 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollectionItem;
 
 abstract class AbstractManyToManyCollectionTestCase extends AbstractCollectionTestCase
 {
+    #[\Override]
     protected function getCollectionEntityClass(): string
     {
         return TestCollection::class;
     }
 
+    #[\Override]
     protected function getCollectionItemEntityClass(): string
     {
         return TestCollectionItem::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isManyToMany(): bool
     {
         return true;

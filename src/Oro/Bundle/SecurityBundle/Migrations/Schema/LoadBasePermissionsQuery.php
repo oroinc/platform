@@ -17,9 +17,7 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
         'ASSIGN'
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
         $query = 'INSERT INTO oro_security_permission (name, label, is_apply_to_all, group_names, description) ' .

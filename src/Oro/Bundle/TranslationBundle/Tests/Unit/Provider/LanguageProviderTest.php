@@ -23,6 +23,7 @@ class LanguageProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LanguageProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(LanguageRepository::class);

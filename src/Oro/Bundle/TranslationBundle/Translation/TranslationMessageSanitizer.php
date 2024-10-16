@@ -17,17 +17,13 @@ class TranslationMessageSanitizer implements TranslationMessageSanitizerInterfac
         $this->htmlTagHelper = $htmlTagHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isMessageSanitizationRequired(string $message): bool
     {
         return strip_tags($message) !== $message;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function sanitizeMessage(string $message): string
     {
         // HtmlTagHelper should not collect errors (argument $collectErrors must be false) during sanitization

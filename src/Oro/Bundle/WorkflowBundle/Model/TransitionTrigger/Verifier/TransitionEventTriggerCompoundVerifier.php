@@ -14,9 +14,7 @@ class TransitionEventTriggerCompoundVerifier implements TransitionEventTriggerVe
         $this->verifiers[] = $triggerVerifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function verifyTrigger(TransitionEventTrigger $trigger)
     {
         foreach ($this->verifiers as $triggerVerifier) {

@@ -13,6 +13,7 @@ class LayoutContextHolderTest extends \PHPUnit\Framework\TestCase
     /** @var ContextInterface */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->layoutContextHolder = new LayoutContextHolder();

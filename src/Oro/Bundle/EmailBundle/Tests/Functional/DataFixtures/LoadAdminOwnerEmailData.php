@@ -7,9 +7,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadAdminOwnerEmailData extends LoadEmailData
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getEmailOwner(): User
     {
         return $this->getReference(LoadUser::USER);

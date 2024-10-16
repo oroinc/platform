@@ -25,6 +25,7 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
     /** @var Acl|\PHPUnit\Framework\MockObject\MockObject */
     private $rootAcl;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->acl = $this->createMock(Acl::class);

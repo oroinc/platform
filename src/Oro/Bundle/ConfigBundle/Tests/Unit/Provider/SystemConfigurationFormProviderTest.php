@@ -18,17 +18,13 @@ class SystemConfigurationFormProviderTest extends AbstractProviderTest
     protected const CONFIG_SCOPE = 'app';
     protected const TREE_NAME = 'system_configuration';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getParentCheckboxLabel(): string
     {
         return 'oro.config.system_configuration.use_default';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProvider(
         ConfigBag $configBag,
         TranslatorInterface $translator,
@@ -51,9 +47,7 @@ class SystemConfigurationFormProviderTest extends AbstractProviderTest
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFilePath(string $fileName): string
     {
         return __DIR__ . '/../Fixtures/Provider/' . $fileName;

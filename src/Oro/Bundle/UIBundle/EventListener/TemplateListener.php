@@ -195,9 +195,7 @@ class TemplateListener implements ServiceSubscriberInterface
         return $this->inflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

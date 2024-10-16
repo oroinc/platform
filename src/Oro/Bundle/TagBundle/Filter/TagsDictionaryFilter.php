@@ -16,16 +16,11 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class TagsDictionaryFilter extends DictionaryFilter
 {
-    /**
-     * {@inheritdoc}
-     */
     protected $joinOperators = [
         DictionaryFilterType::TYPE_NOT_IN => DictionaryFilterType::TYPE_IN,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
@@ -117,9 +112,6 @@ class TagsDictionaryFilter extends DictionaryFilter
         return str_replace('\\', '_', $entityClassName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getEntityClassName()
     {
         return $this->get('entity_class');

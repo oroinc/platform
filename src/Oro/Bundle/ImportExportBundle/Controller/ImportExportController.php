@@ -548,9 +548,7 @@ class ImportExportController extends AbstractController
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

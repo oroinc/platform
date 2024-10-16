@@ -56,9 +56,7 @@ class FlashMessage extends AbstractAction
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -80,9 +78,7 @@ class FlashMessage extends AbstractAction
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $message = $options['message'] ?? null;

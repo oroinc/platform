@@ -79,6 +79,7 @@ class NameVariantsIterator implements \IteratorAggregate
     /**
      * @return \Generator
      */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         yield $this->name;

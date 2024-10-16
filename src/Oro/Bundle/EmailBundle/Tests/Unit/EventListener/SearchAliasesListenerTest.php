@@ -11,6 +11,7 @@ class SearchAliasesListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SearchAliasesListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new SearchAliasesListener();

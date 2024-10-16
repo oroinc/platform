@@ -10,9 +10,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureEntityNode(NodeBuilder $node): void
     {
         parent::configureEntityNode($node);
@@ -23,6 +21,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
             ->end()
             ->scalarNode(ConfigUtil::IDENTIFIER_DESCRIPTION)->end()
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
+            ->booleanNode(ConfigUtil::ENABLE_VALIDATION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
             ->arrayNode(ConfigUtil::DISABLE_META_PROPERTIES)
                 ->treatFalseLike([false])
@@ -55,9 +54,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_REPLACE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function postProcessConfig(array $config): array
     {
         $config = parent::postProcessConfig($config);
@@ -88,9 +85,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         return $config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function configureFieldNode(NodeBuilder $node): void
     {
         parent::configureFieldNode($node);

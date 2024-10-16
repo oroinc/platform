@@ -19,9 +19,7 @@ class TranslationNormalizer implements ContextAwareDenormalizerInterface
         $this->translationManager = $translationManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!is_array($data) || !isset($data['domain'], $data['key'], $data['value'])) {
@@ -40,9 +38,7 @@ class TranslationNormalizer implements ContextAwareDenormalizerInterface
         return $translation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return $type === Translation::class && !empty($context['language_code']);

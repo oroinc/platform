@@ -19,6 +19,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
      * @param array $context
      * @return array
      */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = [])
     {
         $result = array();
@@ -46,6 +47,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
      *
      * @return ArrayCollection
      */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $result = parent::denormalize($data, $type, $format, $context);
@@ -58,9 +60,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         if ($data instanceof Collection && !$data->isEmpty()) {
@@ -74,9 +74,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = array()): bool
     {
         $itemType = $this->getItemType($type);

@@ -12,6 +12,7 @@ class FeatureProvider50SupportDecoratorTest extends \PHPUnit\Framework\TestCase
 
     private FeatureProvider50SupportDecorator $dataProviderDecorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureProvider = $this->createMock(FeatureProvider::class);

@@ -42,6 +42,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     /** @var ProcessSchedulePolicy|\PHPUnit\Framework\MockObject\MockObject */
     private $schedulePolicy;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -730,9 +731,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         self::assertMessagesEmpty(ExecuteProcessJobTopic::getName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTriggers(string $triggerName = null): array|object
     {
         if (!$this->triggers) {

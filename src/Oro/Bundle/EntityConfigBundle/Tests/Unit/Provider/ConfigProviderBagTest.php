@@ -19,6 +19,7 @@ class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProviderBag */
     private $configProviderBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configBag = $this->createMock(PropertyConfigBag::class);

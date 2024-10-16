@@ -17,6 +17,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
     /** @var OroEncodedPlaceholderPasswordType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);
@@ -25,9 +26,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

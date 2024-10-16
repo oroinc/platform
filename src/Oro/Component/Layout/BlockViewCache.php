@@ -21,6 +21,7 @@ class BlockViewCache implements BlockViewCacheInterface
         $this->serializer = $serializer;
     }
 
+    #[\Override]
     public function save(ContextInterface $context, BlockView $rootView): void
     {
         $cacheKey = UniversalCacheKeyGenerator::normalizeCacheKey($context->getHash());
@@ -30,6 +31,7 @@ class BlockViewCache implements BlockViewCacheInterface
         });
     }
 
+    #[\Override]
     public function fetch(ContextInterface $context): ?BlockView
     {
         $hash = $context->getHash();
@@ -48,6 +50,7 @@ class BlockViewCache implements BlockViewCacheInterface
         return $value;
     }
 
+    #[\Override]
     public function reset(): void
     {
         $this->cache->clear();

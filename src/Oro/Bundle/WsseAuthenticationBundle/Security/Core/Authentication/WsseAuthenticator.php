@@ -52,6 +52,7 @@ class WsseAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
     ) {
     }
 
+    #[\Override]
     public function supports(Request $request): ?bool
     {
         if (!$this->featureDependAuthenticatorChecker->isEnabled($this, $this->firewallName)) {
@@ -68,6 +69,7 @@ class WsseAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return true;
     }
 
+    #[\Override]
     public function authenticate(Request $request): Passport
     {
         if (empty($this->firewallName)) {
@@ -96,6 +98,7 @@ class WsseAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return $passport;
     }
 
+    #[\Override]
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         $user = $passport->getUser();
@@ -114,16 +117,19 @@ class WsseAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return $authenticatedToken;
     }
 
+    #[\Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
     }
 
+    #[\Override]
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
         return $this->authenticationEntryPoint->start($request, $authException);
     }
 
+    #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return $this->start($request, $exception);

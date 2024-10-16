@@ -724,7 +724,7 @@ services:
            - '@oro_security.owner.entity_owner_accessor'
            - '@security.authorization_checker'
            - '@oro_security.token_accessor'
-           - '@oro_security.ownership_tree_provider'
+           - '@oro_security.ownership_tree_provider.chain'
            - '@security.acl.voter.basic_permissions'
 
     oro_security.provider.console.console_context_global_options_provider:

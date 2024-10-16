@@ -25,6 +25,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $relationFullName;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

@@ -28,6 +28,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var DependentJobMessageProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->producer = $this->createMock(MessageProducerInterface::class);

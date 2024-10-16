@@ -20,9 +20,7 @@ class LoadUsersWithAvatars extends AbstractFixture implements DependentFixtureIn
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -33,9 +31,7 @@ class LoadUsersWithAvatars extends AbstractFixture implements DependentFixtureIn
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $user1 = $this->createUser($manager, 1, User::ROLE_ANONYMOUS);

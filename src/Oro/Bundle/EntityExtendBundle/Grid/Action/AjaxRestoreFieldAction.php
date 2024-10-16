@@ -9,6 +9,7 @@ class AjaxRestoreFieldAction extends AjaxAction
     /**
      * @return array
      */
+    #[\Override]
     public function getOptions()
     {
         $options = parent::getOptions();

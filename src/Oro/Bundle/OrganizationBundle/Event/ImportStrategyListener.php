@@ -46,9 +46,9 @@ class ImportStrategyListener implements ImportStrategyListenerInterface
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function onProcessAfter(StrategyEvent $event)
     {
         $entity = $event->getEntity();
@@ -98,9 +98,7 @@ class ImportStrategyListener implements ImportStrategyListenerInterface
         $this->getPropertyAccessor()->setValue($entity, $organizationField, $entityOrganization);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onClear()
     {
         $this->defaultOrganization = null;

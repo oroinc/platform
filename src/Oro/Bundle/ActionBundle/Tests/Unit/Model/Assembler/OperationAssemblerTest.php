@@ -20,6 +20,7 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var OperationAssembler */
     private $assembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->assembler = new OperationAssembler(

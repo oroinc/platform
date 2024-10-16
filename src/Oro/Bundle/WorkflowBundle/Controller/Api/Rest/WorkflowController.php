@@ -291,9 +291,7 @@ class WorkflowController extends AbstractFOSRestController
         return $this->handleView($this->view(['message' => $message], $code));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function handleView(View $view)
     {
         $view->getContext()->setSerializeNull(true);

@@ -70,6 +70,7 @@ class EmailApiHandler extends ApiFormHandler
      *
      * @return EmailModel
      */
+    #[\Override]
     protected function prepareFormData($entity)
     {
         return parent::prepareFormData(new EmailModel($entity));
@@ -80,6 +81,7 @@ class EmailApiHandler extends ApiFormHandler
      *
      * @return Email
      */
+    #[\Override]
     protected function onSuccess($entity)
     {
         $this->processEmailModel($entity);

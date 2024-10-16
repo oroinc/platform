@@ -27,6 +27,7 @@ class WebpAwareImagineUrlProvider implements ImagineUrlProviderInterface
         $this->webpConfiguration = $webpConfiguration;
     }
 
+    #[\Override]
     public function getFilteredImageUrl(
         string $path,
         string $filterName,

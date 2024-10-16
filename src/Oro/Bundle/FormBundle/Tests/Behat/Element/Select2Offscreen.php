@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
  */
 class Select2Offscreen extends Element
 {
+    #[\Override]
     public function getValue()
     {
         $valueElement = $this->getParent()->find('css', 'span.select2-chosen');

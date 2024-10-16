@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableFormOption
 
 class WorkflowVariableFormOptionTemplateTest extends TemplateTestCase
 {
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplateInstance()
     {
         return new WorkflowVariableFormOptionTemplate();
@@ -17,11 +17,13 @@ class WorkflowVariableFormOptionTemplateTest extends TemplateTestCase
         $this->assertEquals(WorkflowVariableFormOptionTemplate::NAME, $this->getTemplateInstance()->getName());
     }
 
+    #[\Override]
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.variable.{{ variable_name }}.{{ option_name }}');
     }
 
+    #[\Override]
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'variable_name', 'option_name']);

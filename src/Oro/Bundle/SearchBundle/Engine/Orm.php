@@ -37,9 +37,7 @@ class Orm extends AbstractEngine
         $this->mapper = $mapper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doSearch(Query $query)
     {
         $resultsCallback = function () use ($query) {
@@ -88,14 +86,13 @@ class Orm extends AbstractEngine
      *  <Entity ClassName> => <Documents Count>
      * ]
      */
+    #[\Override]
     protected function doGetDocumentsCountGroupByEntityFQCN(Query $query): array
     {
         return $this->getIndexRepository()->getDocumentsCountGroupByEntityFQCN($query);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function buildResult(Query $query, array $data)
     {
         return new LazyResult(

@@ -30,9 +30,7 @@ class UserWithoutCurrentHandler extends UserSearchHandler
         parent::__construct($pictureSourcesProvider, $userEntityName, $properties);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function searchIds($search, $firstResult, $maxResults)
     {
         $userIds = parent::searchIds($search, $firstResult, $maxResults + 1);

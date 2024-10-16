@@ -23,17 +23,13 @@ class RemoveInvalidEntityConfigQuery implements MigrationQuery, ConnectionAwareI
         'precision' => null,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Removes invalid configs from entity configs';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $steps = ceil($this->getEntityConfigsCount() / static::LIMIT);

@@ -25,6 +25,7 @@ class MigrationsLoaderTest extends \PHPUnit\Framework\TestCase
 
     private Connection|\PHPUnit\Framework\MockObject\MockObject $connection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel          = $this->createMock(Kernel::class);

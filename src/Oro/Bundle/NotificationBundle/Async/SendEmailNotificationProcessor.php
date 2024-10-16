@@ -34,9 +34,7 @@ class SendEmailNotificationProcessor implements MessageProcessorInterface, Logge
         $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $symfonyEmail = $this->createEmailMessage($message->getBody());

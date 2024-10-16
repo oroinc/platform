@@ -6,13 +6,14 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Validates Duplication of MultiEnum entity field.
+ */
 class MultiEnumSnapshotFieldValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.multi_enum_snapshot';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         /** @var FieldConfigModel $value */
@@ -26,7 +27,7 @@ class MultiEnumSnapshotFieldValidator extends AbstractFieldValidator
             $guessedName = substr($fieldName, 0, $snapshotSuffixOffset);
             if (!empty($guessedName)) {
                 $existingFieldName = $this->validationHelper->getSimilarExistingFieldData($className, $guessedName);
-                if ($existingFieldName && $existingFieldName[1] === 'multiEnum') {
+                if ($existingFieldName && ExtendHelper::isMultiEnumType($existingFieldName[1])) {
                     $this->addViolation(
                         $constraint->duplicateSnapshotMessage,
                         $fieldName,
@@ -34,7 +35,7 @@ class MultiEnumSnapshotFieldValidator extends AbstractFieldValidator
                     );
                 }
             }
-        } elseif ($value->getType() === 'multiEnum') {
+        } elseif (ExtendHelper::isMultiEnumType($value->getType())) {
             $existingFieldName = $this->validationHelper->getSimilarExistingFieldData(
                 $className,
                 $fieldName . ExtendHelper::ENUM_SNAPSHOT_SUFFIX

@@ -17,6 +17,7 @@ class NavigateAction extends AbstractAction
         ]
     ];
 
+    #[\Override]
     public function getOptions()
     {
         $options = parent::getOptions();

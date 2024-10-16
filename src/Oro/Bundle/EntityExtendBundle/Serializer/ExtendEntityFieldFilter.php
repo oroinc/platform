@@ -21,9 +21,7 @@ class ExtendEntityFieldFilter implements EntityFieldFilterInterface
         $this->allowExtendedFields = $allowExtendedFields;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicableField(string $className, string $fieldName): bool
     {
         if (null === $this->configManager->getConfigModelId($className, $fieldName)) {

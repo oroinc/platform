@@ -33,9 +33,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
         $this->entitiesWithWorkflowCache = $entitiesWithWorkflowCache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualRelation($className, $fieldName)
     {
         return
@@ -43,9 +41,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
             && $this->hasEntityActiveWorkflow($className);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualRelations($className)
     {
         if (!$this->hasEntityActiveWorkflow($className)) {
@@ -91,9 +87,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualRelationQuery($className, $fieldName)
     {
         if (!$this->isVirtualRelation($className, $fieldName)) {
@@ -110,9 +104,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null)
     {
         return $fieldName;

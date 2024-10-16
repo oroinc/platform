@@ -12,6 +12,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAddressHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = new EmailAddressHelper();

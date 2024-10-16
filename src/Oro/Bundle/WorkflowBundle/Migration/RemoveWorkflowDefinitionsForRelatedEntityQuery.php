@@ -20,6 +20,7 @@ class RemoveWorkflowDefinitionsForRelatedEntityQuery extends ParametrizedMigrati
         $this->entityClassName = $entityClassName;
     }
 
+    #[\Override]
     public function getDescription()
     {
         return \sprintf('Removes all workflow definitions for %s related entity.', $this->entityClassName);
@@ -28,6 +29,7 @@ class RemoveWorkflowDefinitionsForRelatedEntityQuery extends ParametrizedMigrati
     /**
      * @throws \Doctrine\DBAL\DBALException
      */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $sql = 'DELETE FROM oro_workflow_definition WHERE related_entity = :entity';

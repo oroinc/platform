@@ -37,6 +37,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridActionButtonProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->buttonProvider = $this->createMock(ButtonProvider::class);

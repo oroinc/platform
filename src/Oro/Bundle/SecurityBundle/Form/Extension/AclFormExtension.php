@@ -29,25 +29,19 @@ class AclFormExtension implements FormExtensionInterface
         $this->innerExtension = $innerExtension;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getType($name): FormTypeInterface
     {
         return $this->innerExtension->getType($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasType($name): bool
     {
         return $this->innerExtension->hasType($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTypeExtensions($name): array
     {
         $extensions = $this->innerExtension->getTypeExtensions($name);
@@ -59,17 +53,13 @@ class AclFormExtension implements FormExtensionInterface
         return $extensions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasTypeExtensions($name): bool
     {
         return $this->innerExtension->hasTypeExtensions($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         return $this->innerExtension->getTypeGuesser();

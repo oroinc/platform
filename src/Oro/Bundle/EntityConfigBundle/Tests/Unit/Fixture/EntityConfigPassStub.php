@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\EntityConfigPass;
  */
 class EntityConfigPassStub extends EntityConfigPass
 {
+    #[\Override]
     protected function getAppConfigPath(): string
     {
         return '../../config/oro/entity';

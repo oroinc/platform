@@ -54,6 +54,7 @@ final class AliceFixtureReferenceResolver implements ChainableValueResolverInter
         $this->generator = $generator;
     }
 
+    #[\Override]
     public function withObjectGenerator(ObjectGeneratorInterface $generator): self
     {
         $newResolver = new self($generator);
@@ -62,6 +63,7 @@ final class AliceFixtureReferenceResolver implements ChainableValueResolverInter
         return $newResolver;
     }
 
+    #[\Override]
     public function canResolve(ValueInterface $value): bool
     {
         return $value instanceof FixtureReferenceValue;
@@ -82,6 +84,7 @@ final class AliceFixtureReferenceResolver implements ChainableValueResolverInter
      *
      * @throws UnresolvableValueException
      */
+    #[\Override]
     public function resolve(
         ValueInterface $value,
         FixtureInterface $fixture,

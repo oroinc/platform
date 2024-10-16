@@ -9,6 +9,7 @@ class FilesTemplateProviderTest extends TestCase
 {
     private FilesTemplateProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new FilesTemplateProvider();

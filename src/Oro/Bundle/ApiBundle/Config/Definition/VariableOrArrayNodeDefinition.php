@@ -10,9 +10,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
  */
 class VariableOrArrayNodeDefinition extends NodeDefinition
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createNode(): NodeInterface
     {
         return new VariableOrArrayNode($this->name, $this->parent);

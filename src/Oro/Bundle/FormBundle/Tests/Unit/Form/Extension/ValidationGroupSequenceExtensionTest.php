@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Validation;
 
 class ValidationGroupSequenceExtensionTest extends FormIntegrationTestCase
 {
+    #[\Override]
     protected function getTypeExtensions(): array
     {
         return array_merge(

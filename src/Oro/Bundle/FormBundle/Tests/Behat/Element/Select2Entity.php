@@ -34,14 +34,13 @@ class Select2Entity extends Element implements ClearableInterface
      *
      * @return bool
      */
+    #[\Override]
     public function isVisible()
     {
         return $this->getParent()->isVisible();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($value)
     {
         if (empty($value)) {
@@ -115,9 +114,7 @@ class Select2Entity extends Element implements ClearableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function selectOption($option, $multiple = false)
     {
         $this->setValue($option);
@@ -414,6 +411,7 @@ JS;
         return null;
     }
 
+    #[\Override]
     public function clear()
     {
         $close = $this->getParent()->find('css', '.select2-search-choice-close');
@@ -425,6 +423,7 @@ JS;
     /**
      * @return string|null
      */
+    #[\Override]
     public function getValue()
     {
         $span = $this->getParent()->find('css', 'span.select2-chosen');

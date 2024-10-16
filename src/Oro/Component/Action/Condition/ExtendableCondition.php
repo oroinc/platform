@@ -62,9 +62,7 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isConditionAllowed($context)
     {
         $eventData = $this->getEventData($context);
@@ -111,14 +109,13 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
      *
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return static::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $resolver = $this->getOptionsResolver();

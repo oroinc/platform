@@ -12,6 +12,7 @@ class ActionGroupDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var ActionGroupDefinition */
     private $actionGroupDefinition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionGroupDefinition = new ActionGroupDefinition();

@@ -19,6 +19,7 @@ class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $unsupportedProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->highPriorityProvider = $this->createMock(WidgetProviderInterface::class);

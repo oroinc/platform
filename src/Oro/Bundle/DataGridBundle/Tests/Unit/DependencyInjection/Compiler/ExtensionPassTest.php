@@ -16,6 +16,7 @@ class ExtensionPassTest extends \PHPUnit\Framework\TestCase
 
     private ExtensionsPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

@@ -26,6 +26,7 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
     /** @var ActivityListEntityConfigDumperExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listProvider = $this->createMock(ActivityListChainProvider::class);

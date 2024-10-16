@@ -20,6 +20,7 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
     /** @var SaveParentEntity */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

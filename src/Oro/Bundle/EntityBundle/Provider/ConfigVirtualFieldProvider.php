@@ -21,9 +21,7 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualField($className, $fieldName)
     {
         $items = $this->getItems();
@@ -31,9 +29,7 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
         return isset($items[$className][$fieldName]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFieldQuery($className, $fieldName)
     {
         $items = $this->getItems();
@@ -41,9 +37,7 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
         return $items[$className][$fieldName]['query'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFields($className)
     {
         $items = $this->getItems();
@@ -51,9 +45,7 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
         return isset($items[$className]) ? array_keys($items[$className]) : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getConfiguration()
     {
         return $this->configProvider->getConfiguration(EntityConfiguration::VIRTUAL_FIELDS);

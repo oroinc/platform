@@ -27,6 +27,7 @@ class ActivityAssociationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityAssociationProvider */
     private $activityAssociationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

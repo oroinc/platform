@@ -19,9 +19,7 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessMimeType(string $path): ?string
     {
         $extension = UploadedFileExtensionHelper::getExtensionByPath($path);
@@ -44,9 +42,7 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
         return $this->typesMap[$extension][$bytes];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isGuesserSupported(): bool
     {
         return true;

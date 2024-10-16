@@ -23,17 +23,13 @@ class CrowdinCatalogueLoader implements CatalogueLoaderInterface
         $this->translationReader = $translationReader;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLoaderName(): string
     {
         return 'crowdin';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCatalogue(string $locale): MessageCatalogue
     {
         $tmpDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;

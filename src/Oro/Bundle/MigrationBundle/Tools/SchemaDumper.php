@@ -31,9 +31,7 @@ class SchemaDumper extends AbstractVisitor
         $this->twig = $twig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function acceptSchema(Schema $schema)
     {
         $this->schema = $schema;

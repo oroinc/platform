@@ -173,7 +173,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: 10 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: 10 }
 
     oro_api.set_default_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultMaxRelatedEntities
@@ -193,7 +197,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -20 }
 
     oro_api.handle_fields_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\HandleFieldsFilter
@@ -203,7 +211,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -20 }
 
     oro_api.handle_meta_property_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter
@@ -213,7 +225,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -20 }
 
     oro_api.register_configured_filters:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters
@@ -280,7 +296,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -200 }
 
     oro_api.add_fields_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\AddFieldsFilter
@@ -290,7 +310,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -200 }
 
     oro_api.remove_meta_property_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveMetaPropertyFilter
@@ -299,7 +323,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -200 }
 
     #
     # resource_check
@@ -374,7 +402,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: normalize_input, priority: 250 }
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 250 }
+            - { name: oro.api.processor, action: create, group: normalize_input, priority: 250 }
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: 250 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_input, priority: 250 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_input, priority: 250 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_input, priority: 250 }
 
     oro_api.subresource.validate_parent_entity_id_exists:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityIdExists
@@ -451,6 +483,12 @@ services:
 
     oro_api.json_api.disable_update_operation:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\DisableUpdateOperation
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!batch, priority: 47 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api&!batch, priority: 47 }
+
+    oro_api.json_api.disable_validate_operation:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\DisableValidateOperation
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!batch, priority: 47 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api&!batch, priority: 47 }
@@ -782,6 +820,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_id_helper'
             - '@oro_api.query_acl_helper'
+            - '@oro_entity.query_hint_resolver'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: load_data, priority: 100 }
             - { name: oro.api.processor, action: get_relationship, group: load_data, priority: 100 }
@@ -814,6 +853,7 @@ services:
             - '@oro_api.entity_serializer'
             - '@oro_api.doctrine_helper'
             - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_entity.query_hint_resolver'
         tags:
             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false, priority: -10 }

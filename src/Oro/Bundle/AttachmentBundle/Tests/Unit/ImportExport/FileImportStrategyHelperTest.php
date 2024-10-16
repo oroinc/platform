@@ -40,6 +40,7 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     private FileImportStrategyHelper $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldHelper = $this->createMock(FieldHelper::class);

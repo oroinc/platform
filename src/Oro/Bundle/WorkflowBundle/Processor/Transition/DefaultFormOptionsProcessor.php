@@ -11,6 +11,7 @@ class DefaultFormOptionsProcessor implements ProcessorInterface
     /**
      * @param ContextInterface|TransitionContext $context
      */
+    #[\Override]
     public function process(ContextInterface $context)
     {
         $transition = $context->getTransition();

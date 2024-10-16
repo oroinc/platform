@@ -17,6 +17,7 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var Processor */
     private $mailProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->user = new User();

@@ -24,9 +24,7 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -51,9 +49,7 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         parent::buildView($view, $form, $options);
@@ -96,25 +92,18 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
         $view->vars['configs']['data'] = $pickerData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return HiddenType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_simple_color_picker';

@@ -18,6 +18,7 @@ class UniqueJobsProcessedConstraint extends \PHPUnit\Framework\Constraint\Constr
     }
 
     /** @param JobManager $jobManager */
+    #[\Override]
     public function matches($jobManager): bool
     {
         if (!($jobManager instanceof JobManager)) {
@@ -50,11 +51,13 @@ class UniqueJobsProcessedConstraint extends \PHPUnit\Framework\Constraint\Constr
         return false;
     }
 
+    #[\Override]
     public function toString(): string
     {
         return 'the unique jobs table is empty';
     }
 
+    #[\Override]
     protected function failureDescription($jobManager): string
     {
         return 'the unique jobs table is not empty';

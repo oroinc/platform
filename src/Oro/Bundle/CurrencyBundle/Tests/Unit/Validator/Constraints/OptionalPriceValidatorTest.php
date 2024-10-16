@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class OptionalPriceValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): Constraints\OptionalPriceValidator
     {
         return new Constraints\OptionalPriceValidator();

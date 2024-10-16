@@ -33,11 +33,13 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     {
     }
 
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];
     }
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$this->isApplicable($options)) {
@@ -47,6 +49,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit'], -10);
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if (!$this->isApplicable($options)) {

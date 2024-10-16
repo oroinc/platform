@@ -64,17 +64,13 @@ class LoadTransitionTriggers extends AbstractFixture implements DependentFixture
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadWorkflowDefinitions::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach (self::$triggers as $key => $config) {

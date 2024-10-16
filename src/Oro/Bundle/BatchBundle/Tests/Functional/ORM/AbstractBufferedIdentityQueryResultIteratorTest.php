@@ -18,6 +18,7 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
  */
 abstract class AbstractBufferedIdentityQueryResultIteratorTest extends WebTestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         $this->initClient();

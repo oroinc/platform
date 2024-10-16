@@ -9,14 +9,15 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\EntitySerializer\EntityConfigInterface;
 
 /**
  * Makes sure that the filters configuration contains all supported filters
  * and all filters are fully configured.
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CompleteFilters extends CompleteSection
@@ -28,22 +29,22 @@ class CompleteFilters extends CompleteSection
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param ConfigManager  $configManager
      * @param string[]       $disallowArrayDataTypes
      * @param string[]       $disallowRangeDataTypes
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
+        ConfigManager $configManager,
         array $disallowArrayDataTypes,
         array $disallowRangeDataTypes
     ) {
-        parent::__construct($doctrineHelper);
+        parent::__construct($doctrineHelper, $configManager);
         $this->disallowArrayDataTypes = array_fill_keys($disallowArrayDataTypes, true);
         $this->disallowRangeDataTypes = array_fill_keys($disallowRangeDataTypes, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
@@ -51,9 +52,7 @@ class CompleteFilters extends CompleteSection
         $this->complete($context->getFilters(), $context->getClassName(), $context->getResult());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function completeFields(
         EntityConfigInterface $section,
         string $entityClass,
@@ -132,16 +131,6 @@ class CompleteFilters extends CompleteSection
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ): void {
-        if (is_subclass_of($metadata->name, AbstractEnumValue::class)) {
-            $enumIdFieldName = $this->getEnumIdentifierFieldName($definition);
-            if (null !== $enumIdFieldName) {
-                $enumIdFilter = $filters->getOrAddField($enumIdFieldName);
-                if (!$enumIdFilter->hasArrayAllowed()) {
-                    $enumIdFilter->setArrayAllowed();
-                }
-            }
-        }
-
         $idFieldNames = $definition->getIdentifierFieldNames();
         foreach ($idFieldNames as $fieldName) {
             $field = $definition->getField($fieldName);
@@ -171,7 +160,7 @@ class CompleteFilters extends CompleteSection
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ): void {
-        $fields = $this->getFilterFields($metadata);
+        $fields = $this->getIndexedFields($metadata);
         foreach ($fields as $propertyPath => $dataType) {
             $filter = $filters->findField($propertyPath, true);
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
@@ -188,28 +177,16 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    private function getFilterFields(ClassMetadata $metadata): array
-    {
-        $fields = $this->doctrineHelper->getIndexedFields($metadata);
-        if (is_subclass_of($metadata->name, AbstractEnumValue::class)
-            && !isset($fields['priority'])
-            && $metadata->hasField('priority')
-        ) {
-            $fields['priority'] = $metadata->getTypeOfField('priority');
-        }
-
-        return $fields;
-    }
-
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function completeFiltersForAssociations(
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ): void {
-        $indexedAssociations = $this->doctrineHelper->getIndexedAssociations($metadata);
+        $indexedAssociations = $this->getIndexedAssociations($metadata);
         foreach ($indexedAssociations as $propertyPath => $dataType) {
             $filter = $filters->findField($propertyPath, true);
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
@@ -221,14 +198,7 @@ class CompleteFilters extends CompleteSection
                 $field = $definition->getField($fieldName);
                 $targetDefinition = $field->getTargetEntity();
                 if (null !== $targetDefinition) {
-                    $targetClass = $field->getTargetClass();
-                    $dataType = $this->getExactType($targetDefinition, $targetClass, $dataType);
-                    if ($targetClass && is_subclass_of($targetClass, AbstractEnumValue::class)) {
-                        $enumIdFieldName = $this->getEnumIdentifierFieldName($targetDefinition);
-                        if (null !== $enumIdFieldName && !$filter->hasArrayAllowed()) {
-                            $filter->setArrayAllowed();
-                        }
-                    }
+                    $dataType = $this->getExactType($targetDefinition, $field->getTargetClass(), $dataType);
                 }
 
                 if (!$filter->hasDataType()) {
@@ -238,7 +208,7 @@ class CompleteFilters extends CompleteSection
                 $this->setFilterRangeAllowed($filter);
                 if (!$filter->hasType()
                     && !$filter->hasCollection()
-                    && $metadata->isCollectionValuedAssociation($propertyPath)
+                    && $this->isCollectionValuedAssociation($metadata, $propertyPath)
                 ) {
                     $filter->setIsCollection(true);
                 }
@@ -281,22 +251,6 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    private function getEnumIdentifierFieldName(EntityDefinitionConfig $definition): ?string
-    {
-        $idFieldNames = $definition->getIdentifierFieldNames();
-        if (\count($idFieldNames) !== 1) {
-            return null;
-        }
-
-        $idFieldName = $idFieldNames[0];
-        $idField = $definition->getField($idFieldName);
-        if (null === $idField || $idField->getPropertyPath($idFieldName) !== 'id') {
-            return null;
-        }
-
-        return $idFieldName;
-    }
-
     private function setFilterArrayAllowed(FilterFieldConfig $filter): void
     {
         if (!$filter->hasArrayAllowed()) {
@@ -332,32 +286,18 @@ class CompleteFilters extends CompleteSection
         return $this->doctrineHelper->getFieldDataType($metadata, $lastFieldName);
     }
 
-    private function isCollectionValuedAssociation(ClassMetadata $metadata, string $propertyPath): bool
-    {
-        $path = ConfigUtil::explodePropertyPath($propertyPath);
-        $lastFieldName = array_pop($path);
-        if (!empty($path)) {
-            $parentMetadata = $this->doctrineHelper->findEntityMetadataByPath($metadata->name, $path);
-            if (null === $parentMetadata) {
-                return false;
-            }
-            $metadata = $parentMetadata;
-        }
-
-        return
-            $metadata->hasAssociation($lastFieldName)
-            && $metadata->isCollectionValuedAssociation($lastFieldName);
-    }
-
     private function getExactType(
         EntityDefinitionConfig $targetDefinition,
         ?string $targetClass,
         string $defaultDataType
     ): string {
-        if (\count($targetDefinition->getIdentifierFieldNames()) === 1) {
+        if ($targetClass && \count($targetDefinition->getIdentifierFieldNames()) === 1) {
             $identifierFieldName = $targetDefinition->getIdentifierFieldNames()[0];
             $idPropertyPath = $targetDefinition->getField($identifierFieldName)?->getPropertyPath();
             if ($idPropertyPath && $idPropertyPath !== $identifierFieldName) {
+                if (ExtendHelper::isOutdatedEnumOptionEntity($targetClass)) {
+                    $targetClass = EnumOption::class;
+                }
                 $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
                 $defaultDataType = $targetMetadata?->getTypeOfField($idPropertyPath) ?? $defaultDataType;
             }

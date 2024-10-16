@@ -25,17 +25,20 @@ class EntityManagementGridActionExtension extends AbstractExtension
     /**
      * Should be applied after FormatterExtension.
      */
+    #[\Override]
     public function getPriority()
     {
         return -5;
     }
 
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return $config->isOrmDatasource() &&
             in_array($config->getOrmQuery()->getRootEntity(), [EntityConfigModel::class, FieldConfigModel::class]);
     }
 
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $data = $result->getData();

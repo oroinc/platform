@@ -10,15 +10,16 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityTitleProvider */
+    /** @var EntityTitleProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityTitleProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpandedAssociationExtractor */
+    /** @var ExpandedAssociationExtractor|\PHPUnit\Framework\MockObject\MockObject */
     private $expandedAssociationExtractor;
 
     /** @var LoadTitleMetaPropertyForCollection */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,8 +35,7 @@ class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
     }
 
     /**
-     * The all other tests are in LoadTitleMetaPropertyForSingleItemTest
-     * @see \Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\LoadTitleMetaPropertyForSingleItemTest
+     * The all other tests are in {@see LoadTitleMetaPropertyForSingleItemTest}
      */
     public function testProcessForPrimaryEntityOnly()
     {

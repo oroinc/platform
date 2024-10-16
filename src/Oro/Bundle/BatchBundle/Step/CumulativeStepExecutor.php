@@ -9,9 +9,7 @@ use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
  */
 class CumulativeStepExecutor extends StepExecutor
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         try {

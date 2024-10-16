@@ -52,6 +52,7 @@ class BuilderChainProvider implements MenuProviderInterface
         $this->cache = $cache;
     }
 
+    #[\Override]
     public function get(string $name, array $options = []): ItemInterface
     {
         self::assertAliasNotEmpty($name);
@@ -77,6 +78,7 @@ class BuilderChainProvider implements MenuProviderInterface
         return $menu;
     }
 
+    #[\Override]
     public function has(string $name, array $options = []): bool
     {
         self::assertAliasNotEmpty($name);

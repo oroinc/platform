@@ -19,6 +19,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
     /** @var EntityDataAccessor|\PHPUnit\Framework\MockObject\MockObject */
     private $entityDataAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityVariableComputer = $this->createMock(EntityVariableComputer::class);

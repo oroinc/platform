@@ -10,6 +10,7 @@ class PreMigrationEventTest extends \PHPUnit\Framework\TestCase
     /** @var PreMigrationEvent */
     private $preMigrationEvent;
 
+    #[\Override]
     protected function setUp(): void
     {
         $connection = $this->createMock(Connection::class);

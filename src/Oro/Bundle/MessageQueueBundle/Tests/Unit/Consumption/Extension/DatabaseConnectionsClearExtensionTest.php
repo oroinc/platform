@@ -25,9 +25,7 @@ class DatabaseConnectionsClearExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineClearIdentityMapExtension */
     private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

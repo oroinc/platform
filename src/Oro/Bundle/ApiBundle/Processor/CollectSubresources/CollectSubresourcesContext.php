@@ -18,9 +18,7 @@ class CollectSubresourcesContext extends ApiContext
     /** @var string[] */
     private array $accessibleResources = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function initialize(): void
     {
         parent::initialize();

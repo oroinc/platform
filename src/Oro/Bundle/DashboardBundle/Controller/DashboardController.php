@@ -377,9 +377,7 @@ class DashboardController extends AbstractController
         return $this->container->get('doctrine')->getRepository(Dashboard::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [

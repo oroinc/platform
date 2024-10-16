@@ -20,9 +20,7 @@ use Twig\TokenParser\AbstractTokenParser;
  */
 class PlaceholderTokenParser extends AbstractTokenParser
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function parse(Token $token)
     {
         $stream           = $this->parser->getStream();
@@ -79,9 +77,7 @@ class PlaceholderTokenParser extends AbstractTokenParser
         return new PrintNode($expr, $token->getLine(), $this->getTag());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTag()
     {
         return 'placeholder';

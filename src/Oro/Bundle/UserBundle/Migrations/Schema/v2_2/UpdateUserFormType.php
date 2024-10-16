@@ -11,9 +11,7 @@ use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
 
 class UpdateUserFormType implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(

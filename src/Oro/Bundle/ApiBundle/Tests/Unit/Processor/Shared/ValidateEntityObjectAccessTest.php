@@ -18,6 +18,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
     /** @var ValidateEntityObjectAccess */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

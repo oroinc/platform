@@ -17,6 +17,7 @@ class TestListener implements BaseListener
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function endTest(Test $test, float $time): void
     {
         $reflection = new \ReflectionClass($test);
@@ -46,6 +47,7 @@ class TestListener implements BaseListener
         }
     }
 
+    #[\Override]
     public function startTest(Test $test): void
     {
         AnnotationReader::addGlobalIgnoredName('mixin');

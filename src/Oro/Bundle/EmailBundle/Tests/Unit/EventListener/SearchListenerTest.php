@@ -16,6 +16,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SearchListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new SearchListener();

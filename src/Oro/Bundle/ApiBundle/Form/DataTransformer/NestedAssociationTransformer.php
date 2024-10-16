@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
  */
 class NestedAssociationTransformer extends AbstractEntityAssociationTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getEntity(string $entityClass, mixed $entityId): EntityIdentifier
     {
         $resolvedEntityClass = $this->resolveEntityClass($entityClass);

@@ -10,6 +10,7 @@ class DsnFromSmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 {
     private DsnFromSmtpSettingsFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new DsnFromSmtpSettingsFactory();

@@ -21,9 +21,7 @@ class ArrayLogger extends AbstractLogger
         return $this->message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function log($level, $message, array $context = array())
     {
         $this->message[] = $message;

@@ -22,9 +22,7 @@ class WidgetSortByType extends AbstractType
         $this->fieldProvider = $fieldProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -44,9 +42,7 @@ class WidgetSortByType extends AbstractType
             ->add('className', HiddenType::class, ['data' => $options['class_name']]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('class_name');
@@ -59,17 +55,12 @@ class WidgetSortByType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_type_widget_sort_by';

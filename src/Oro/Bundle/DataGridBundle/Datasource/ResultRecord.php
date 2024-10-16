@@ -48,9 +48,7 @@ class ResultRecord implements ResultRecordInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($name, $value)
     {
         foreach ($this->valueContainers as $key => $data) {
@@ -72,9 +70,7 @@ class ResultRecord implements ResultRecordInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($name)
     {
         foreach ($this->valueContainers as $data) {
@@ -104,6 +100,7 @@ class ResultRecord implements ResultRecordInterface
      *
      * @return object|null
      */
+    #[\Override]
     public function getRootEntity()
     {
         foreach ($this->valueContainers as $value) {
@@ -127,6 +124,7 @@ class ResultRecord implements ResultRecordInterface
         return $this->propertyAccessor;
     }
 
+    #[\Override]
     public function getDataArray(): array
     {
         return array_merge(...array_reverse(array_filter($this->valueContainers, 'is_array')));

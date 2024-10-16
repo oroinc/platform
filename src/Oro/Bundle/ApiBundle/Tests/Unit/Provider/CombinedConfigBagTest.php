@@ -21,6 +21,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
     /** @var CombinedConfigBag */
     private $combinedConfigBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configBag1 = $this->createMock(ConfigBag::class);

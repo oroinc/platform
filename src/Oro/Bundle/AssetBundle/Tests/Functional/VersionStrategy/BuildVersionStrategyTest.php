@@ -11,6 +11,7 @@ class BuildVersionStrategyTest extends WebTestCase
 
     public const VERSION_REGEXP = '/' . self::VERSION_REGEXP_BASE . '(\&|\s+|$)/';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

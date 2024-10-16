@@ -16,17 +16,13 @@ class DebugActionCommandTest extends AbstractDebugCommandTestCase
         $this->assertEquals(DebugActionCommand::getDefaultName(), $this->command->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getArgumentName(): string
     {
         return DebugActionCommand::ARGUMENT_NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getCommandInstance(ContainerInterface $container, FactoryWithTypesInterface $factory): Command
     {
         return new DebugActionCommand($container, $factory);

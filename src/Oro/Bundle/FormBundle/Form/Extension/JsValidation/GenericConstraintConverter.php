@@ -26,17 +26,13 @@ class GenericConstraintConverter implements ConstraintConverterInterface
         $this->constraintConverter = $constraintConverter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(Constraint $constraint, ?FormInterface $form = null): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function convertConstraint(Constraint $constraint, ?FormInterface $form = null): ?Constraint
     {
         if (isset($constraint->payload['jsValidation']['type'])) {

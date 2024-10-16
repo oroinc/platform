@@ -12,6 +12,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
     /** @var RequiredAttributesListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new RequiredAttributesListener();

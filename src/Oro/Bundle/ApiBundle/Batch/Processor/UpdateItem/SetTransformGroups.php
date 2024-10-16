@@ -12,9 +12,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
  */
 class SetTransformGroups extends SetGroups
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setGroups(Context $targetContext, string $targetAction): void
     {
         if (ApiAction::CREATE === $targetAction || ApiAction::UPDATE === $targetAction) {

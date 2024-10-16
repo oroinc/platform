@@ -11,6 +11,7 @@ class HideEmptyItemsBuilderTest extends \PHPUnit\Framework\TestCase
 {
     private HideEmptyItemsBuilder $hideEmptyItemsBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->hideEmptyItemsBuilder = new HideEmptyItemsBuilder();

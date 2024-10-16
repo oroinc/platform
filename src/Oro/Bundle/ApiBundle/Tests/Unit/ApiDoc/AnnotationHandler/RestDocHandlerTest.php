@@ -49,6 +49,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var RestDocHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->docViewDetector = $this->createMock(RestDocViewDetector::class);

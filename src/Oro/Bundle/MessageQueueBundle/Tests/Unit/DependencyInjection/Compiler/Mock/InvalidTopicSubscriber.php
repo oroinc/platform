@@ -6,6 +6,7 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 
 class InvalidTopicSubscriber implements TopicSubscriberInterface
 {
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [12345];

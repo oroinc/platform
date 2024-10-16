@@ -205,6 +205,7 @@ class MergeController extends AbstractController
     /**
      * @return array
      */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

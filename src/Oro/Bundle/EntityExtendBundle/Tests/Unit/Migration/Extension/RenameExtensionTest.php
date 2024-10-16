@@ -21,6 +21,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var RenameExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->optionsManager = $this->createMock(ExtendOptionsManager::class);

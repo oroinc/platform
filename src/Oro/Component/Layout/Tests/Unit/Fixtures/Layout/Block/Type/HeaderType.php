@@ -6,9 +6,7 @@ use Oro\Component\Layout\Block\Type\AbstractContainerType;
 
 class HeaderType extends AbstractContainerType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'header';

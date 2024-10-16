@@ -17,6 +17,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
     /** @var OrmQueryConfiguration */
     private $query;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->config = DatagridConfiguration::create([]);

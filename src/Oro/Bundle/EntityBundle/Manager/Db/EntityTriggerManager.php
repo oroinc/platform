@@ -44,17 +44,11 @@ class EntityTriggerManager
         $this->drivers[$driver->getName()] = $driver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function disable()
     {
         return $this->getDriver()->disable();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function enable()
     {
         return $this->getDriver()->enable();

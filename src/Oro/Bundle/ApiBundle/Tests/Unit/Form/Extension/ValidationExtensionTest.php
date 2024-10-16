@@ -16,6 +16,7 @@ class ValidationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ValidationExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);

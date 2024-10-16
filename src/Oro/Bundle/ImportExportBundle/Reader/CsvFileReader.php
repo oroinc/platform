@@ -41,9 +41,7 @@ class CsvFileReader extends AbstractFileReader
         $this->escape = chr(0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function read($context = null)
     {
         if ($this->isEof()) {
@@ -124,6 +122,7 @@ class CsvFileReader extends AbstractFileReader
     /**
      * @throws InvalidConfigurationException
      */
+    #[\Override]
     protected function initializeFromContext(ContextInterface $context)
     {
         parent::initializeFromContext($context);
@@ -141,9 +140,7 @@ class CsvFileReader extends AbstractFileReader
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close()
     {
         $this->file = null;

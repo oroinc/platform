@@ -15,9 +15,7 @@ class ConfigurationGmailType extends AbstractOAuthAwareConfigurationType
 {
     const NAME = 'oro_imap_configuration_gmail';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
@@ -54,17 +52,13 @@ class ConfigurationGmailType extends AbstractOAuthAwareConfigurationType
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getAccountType(): string
     {
         return AccountTypeModel::ACCOUNT_TYPE_GMAIL;

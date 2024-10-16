@@ -21,6 +21,7 @@ class ScopeManagerTest extends WebTestCase
 {
     private const TEST_SCOPE = 'test_scope';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

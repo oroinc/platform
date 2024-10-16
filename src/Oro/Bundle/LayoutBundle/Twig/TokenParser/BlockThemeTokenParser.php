@@ -17,9 +17,7 @@ use Twig\TokenParser\AbstractTokenParser;
  */
 class BlockThemeTokenParser extends AbstractTokenParser
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function parse(Token $token)
     {
         $lineno = $token->getLine();
@@ -42,9 +40,7 @@ class BlockThemeTokenParser extends AbstractTokenParser
         return new BlockThemeNode($block, $resources, $lineno, $this->getTag());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTag()
     {
         return 'block_theme';

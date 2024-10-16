@@ -17,6 +17,7 @@ class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var DynamicAssetVersionManager */
     private $assetVersionManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheItemPoolInterface::class);

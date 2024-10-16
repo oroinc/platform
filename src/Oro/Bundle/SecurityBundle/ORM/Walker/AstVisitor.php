@@ -33,9 +33,7 @@ class AstVisitor extends Visitor
         $this->queryComponents = $queryComponents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparison(Expr\Comparison $comparison): mixed
     {
         $operator = $comparison->getOperator();
@@ -66,9 +64,7 @@ class AstVisitor extends Visitor
         return $primaryConditional;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkValue(Expr\Value $value): mixed
     {
         // unfortunately we have to use literals
@@ -91,9 +87,7 @@ class AstVisitor extends Visitor
         return $this->getValueLiteral($value->getValue());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(Expr\CompositeExpression $expr): mixed
     {
         $factors = [];
@@ -119,9 +113,7 @@ class AstVisitor extends Visitor
         return new AST\ConditionalExpression($terms);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkAccessDenied(Expr\AccessDenied $accessDenied): mixed
     {
         $leftExpression = new AST\ArithmeticExpression();
@@ -138,9 +130,7 @@ class AstVisitor extends Visitor
         return $primaryConditional;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkAssociation(Expr\Association $association): mixed
     {
         $alias = $this->alias;
@@ -200,9 +190,7 @@ class AstVisitor extends Visitor
         return $existExpression->visit($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkPath(Expr\Path $path): mixed
     {
         $alias = $path->getAlias() ?: $this->alias;
@@ -227,9 +215,7 @@ class AstVisitor extends Visitor
         return $expression;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSubquery(Expr\Subquery $subquery): mixed
     {
         $from = $subquery->getFrom();
@@ -260,9 +246,7 @@ class AstVisitor extends Visitor
         return $subSelect;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkExists(Expr\Exists $existsExpr): mixed
     {
         $exist = new AST\ExistsExpression($existsExpr->getExpression()->visit($this));
@@ -274,9 +258,7 @@ class AstVisitor extends Visitor
         return $primaryConditional;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkNullComparison(Expr\NullComparison $comparison): mixed
     {
         $expression = new AST\NullComparisonExpression($comparison->getExpression()->visit($this));

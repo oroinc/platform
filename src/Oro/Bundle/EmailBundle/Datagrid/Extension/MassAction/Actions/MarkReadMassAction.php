@@ -12,9 +12,7 @@ class MarkReadMassAction extends AbstractMassAction
     /** @var array */
     protected $requiredOptions = ['handler', 'entity_name', 'data_identifier'];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['handler'])) {
@@ -43,17 +41,13 @@ class MarkReadMassAction extends AbstractMassAction
         return parent::setOptions($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAllowedRequestTypes()
     {
         return [Request::METHOD_POST];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequestType()
     {
         return Request::METHOD_POST;

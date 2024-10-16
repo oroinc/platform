@@ -34,6 +34,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AuditManager */
     private $auditManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

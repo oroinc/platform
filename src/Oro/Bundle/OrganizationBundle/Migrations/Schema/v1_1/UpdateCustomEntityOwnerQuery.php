@@ -13,9 +13,7 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
     const NEW_OWNER_LABEL = 'oro.custom_entity.owner.label';
     const NEW_OWNER_DESCRIPTION = 'oro.custom_entity.owner.description';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -24,9 +22,7 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->migrateConfigs($logger);

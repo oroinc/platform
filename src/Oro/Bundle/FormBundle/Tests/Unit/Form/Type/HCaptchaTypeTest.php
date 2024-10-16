@@ -12,12 +12,14 @@ class HCaptchaTypeTest extends TypeTestCase
 {
     private $captchaService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->captchaService = $this->createMock(CaptchaServiceInterface::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

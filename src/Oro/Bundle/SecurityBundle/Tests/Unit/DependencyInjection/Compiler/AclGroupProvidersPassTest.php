@@ -16,6 +16,7 @@ class AclGroupProvidersPassTest extends \PHPUnit\Framework\TestCase
 
     private AclGroupProvidersPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

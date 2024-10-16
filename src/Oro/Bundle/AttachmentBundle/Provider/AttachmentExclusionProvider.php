@@ -12,9 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class AttachmentExclusionProvider extends AbstractExclusionProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         if ($metadata->name !== 'Oro\Bundle\AttachmentBundle\Entity\Attachment') {

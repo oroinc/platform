@@ -17,25 +17,19 @@ class BadCredentialsException extends BaseBadCredentialsException
         $this->messageKey = $messageKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMessageKey(): string
     {
         return $this->messageKey ?? '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __serialize(): array
     {
         return [$this->messageKey, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __unserialize(array $data): void
     {
         $this->setMessageKey($data[0]);

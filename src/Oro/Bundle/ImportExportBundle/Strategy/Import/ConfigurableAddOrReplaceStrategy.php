@@ -80,9 +80,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->entityOwnershipAssociationsSetter = $entityOwnershipAssociationsSetter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($entity)
     {
         $this->assertEnvironment($entity);

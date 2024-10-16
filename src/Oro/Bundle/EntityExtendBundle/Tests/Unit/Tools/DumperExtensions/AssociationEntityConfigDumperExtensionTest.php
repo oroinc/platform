@@ -21,6 +21,7 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Test
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $associationBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

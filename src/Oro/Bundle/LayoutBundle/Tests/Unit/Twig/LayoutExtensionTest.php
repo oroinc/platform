@@ -24,6 +24,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->renderer = $this->createMock(TwigRendererInterface::class);

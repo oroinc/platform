@@ -35,6 +35,7 @@ class DatabaseEmailTemplateLoader implements EmailTemplateLoaderInterface
         $this->translatedEmailTemplateProvider = $translatedEmailTemplateProvider;
     }
 
+    #[\Override]
     public function exists($name): bool
     {
         [$emailTemplateCriteria, $templateContext] = $this->createEmailTemplateCriteriaAndTemplateContext($name);
@@ -70,16 +71,19 @@ class DatabaseEmailTemplateLoader implements EmailTemplateLoaderInterface
         return [$emailTemplateCriteria, $templateContext];
     }
 
+    #[\Override]
     public function getCacheKey($name): string
     {
         return $name;
     }
 
+    #[\Override]
     public function isFresh($name, $time): bool
     {
         return true;
     }
 
+    #[\Override]
     public function getSourceContext($name): Source
     {
         $emailTemplate = $this->getEmailTemplate($name);
@@ -87,6 +91,7 @@ class DatabaseEmailTemplateLoader implements EmailTemplateLoaderInterface
         return new Source($emailTemplate->getContent(), $name);
     }
 
+    #[\Override]
     public function getEmailTemplate(string $name): EmailTemplateModel
     {
         [$emailTemplateCriteria, $templateContext] = $this->createEmailTemplateCriteriaAndTemplateContext($name);

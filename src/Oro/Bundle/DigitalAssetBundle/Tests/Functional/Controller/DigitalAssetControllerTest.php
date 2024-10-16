@@ -11,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DigitalAssetControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -50,9 +51,7 @@ class DigitalAssetControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         // Disables DAM for user avatar field.

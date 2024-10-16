@@ -14,9 +14,7 @@ class EmailTemplatePerLocalization implements Migration, DatabasePlatformAwareIn
 {
     use DatabasePlatformAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         if (!$schema->hasTable('oro_email_template_localized')) {

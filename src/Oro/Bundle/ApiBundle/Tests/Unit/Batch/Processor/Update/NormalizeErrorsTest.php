@@ -16,6 +16,7 @@ class NormalizeErrorsTest extends BatchUpdateProcessorTestCase
     /** @var NormalizeErrors */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

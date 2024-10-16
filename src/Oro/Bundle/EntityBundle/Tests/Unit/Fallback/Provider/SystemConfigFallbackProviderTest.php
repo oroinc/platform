@@ -19,6 +19,7 @@ class SystemConfigFallbackProviderTest extends TestCase
 
     private SystemConfigFallbackProvider $systemConfigFallbackProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

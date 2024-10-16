@@ -41,9 +41,7 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
         $this->entityAliasResolver    = $entityAliasResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
         if ($route->getOption('group') !== self::ROUTE_GROUP) {

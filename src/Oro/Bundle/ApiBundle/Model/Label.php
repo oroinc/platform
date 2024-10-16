@@ -50,6 +50,7 @@ class Label
     /**
      * Returns a human-readable representation of this object.
      */
+    #[\Override]
     public function __toString()
     {
         return sprintf('Label: %s', $this->name);

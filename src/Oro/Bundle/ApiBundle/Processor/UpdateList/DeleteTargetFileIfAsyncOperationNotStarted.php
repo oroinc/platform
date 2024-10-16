@@ -19,9 +19,7 @@ class DeleteTargetFileIfAsyncOperationNotStarted implements ProcessorInterface
         $this->fileManager = $fileManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */

@@ -22,9 +22,7 @@ class AttributeFieldConfigExtension extends AbstractTypeExtension
         $this->attributeConfigProvider = $attributeConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'onPostSetData']);
@@ -48,9 +46,7 @@ class AttributeFieldConfigExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [FieldType::class];

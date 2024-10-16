@@ -11,6 +11,7 @@ class NormalizeIncludeHeaderTest extends GetListProcessorTestCase
     /** @var NormalizeIncludeHeader */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

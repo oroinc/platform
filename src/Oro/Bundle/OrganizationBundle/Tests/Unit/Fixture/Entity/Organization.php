@@ -9,6 +9,7 @@ class Organization extends ParentOrganization
     /**
      * @param int $id
      */
+    #[\Override]
     public function setId($id)
     {
         $this->id = $id;

@@ -15,6 +15,7 @@ class AssociationCompositeIdentifierFilterFactoryTest extends \PHPUnit\Framework
     /** @var AssociationCompositeIdentifierFilterFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->idTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);

@@ -41,6 +41,7 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RecentEmailRecipientsProvider */
     private $emailRecipientsProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

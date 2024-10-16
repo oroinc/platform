@@ -10,6 +10,7 @@ class UpdateListContextTest extends \PHPUnit\Framework\TestCase
 {
     private UpdateListContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new UpdateListContext(

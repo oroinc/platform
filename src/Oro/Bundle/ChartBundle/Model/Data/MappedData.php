@@ -34,6 +34,7 @@ class MappedData implements DataInterface
     /**
      * @return array
      */
+    #[\Override]
     public function toArray()
     {
         $result = array();

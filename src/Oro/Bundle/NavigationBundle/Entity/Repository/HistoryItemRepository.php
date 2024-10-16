@@ -15,9 +15,7 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
 {
     const DEFAULT_SORT_ORDER = 'DESC';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNavigationItems($user, Organization $organization, $type = null, $options = array())
     {
         $qb = $this->_em->createQueryBuilder();

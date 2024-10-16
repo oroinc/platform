@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class CustomEntityTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -67,12 +68,12 @@ class CustomEntityTest extends RestJsonApiTestCase
                     ],
                     'relationships' => [
                         'enumField'      => [
-                            'data' => ['type' => 'testapienum1', 'id' => '<toString(@enum1_1->id)>']
+                            'data' => ['type' => 'testapienum1', 'id' => '<toString(@enum1_1->internalId)>']
                         ],
                         'multiEnumField' => [
                             'data' => [
-                                ['type' => 'testapienum2', 'id' => '<toString(@enum2_1->id)>'],
-                                ['type' => 'testapienum2', 'id' => '<toString(@enum2_2->id)>']
+                                ['type' => 'testapienum2', 'id' => '<toString(@enum2_1->internalId)>'],
+                                ['type' => 'testapienum2', 'id' => '<toString(@enum2_2->internalId)>']
                             ]
                         ],
                         'uniM2O'         => [
@@ -166,12 +167,12 @@ class CustomEntityTest extends RestJsonApiTestCase
                     ],
                     'relationships' => [
                         'renamedEnumField'      => [
-                            'data' => ['type' => 'testapienum1', 'id' => '<toString(@enum1_1->id)>']
+                            'data' => ['type' => 'testapienum1', 'id' => '<toString(@enum1_1->internalId)>']
                         ],
                         'renamedMultiEnumField' => [
                             'data' => [
-                                ['type' => 'testapienum2', 'id' => '<toString(@enum2_1->id)>'],
-                                ['type' => 'testapienum2', 'id' => '<toString(@enum2_2->id)>']
+                                ['type' => 'testapienum2', 'id' => '<toString(@enum2_1->internalId)>'],
+                                ['type' => 'testapienum2', 'id' => '<toString(@enum2_2->internalId)>']
                             ]
                         ],
                         'renamedUniM2O'         => [

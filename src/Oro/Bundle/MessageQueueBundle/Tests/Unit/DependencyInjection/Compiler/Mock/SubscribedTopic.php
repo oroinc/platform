@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SubscribedTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'subscribed_topic_name';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Subscribed topic to test BuildTopicMetaRegistryPass.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
     }

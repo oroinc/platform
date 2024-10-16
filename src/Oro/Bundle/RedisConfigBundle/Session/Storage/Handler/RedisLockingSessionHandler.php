@@ -129,6 +129,7 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
         $this->ttl = $ttl;
     }
 
+    #[\Override]
     public function close(): bool
     {
         if ($this->locking && $this->locked) {
@@ -138,9 +139,7 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateTimestamp(string $id, string $data): bool
     {
         if (0 < $this->ttl) {
@@ -150,18 +149,14 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function gc($maxlifetime): int|false
     {
         // not required here because redis will auto expire the keys as long as ttl is set
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doRead($sessionId): string
     {
         if ($this->locking && !$this->locked && !$this->lockSession($sessionId)) {
@@ -171,9 +166,7 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
         return $this->redis->get($this->getRedisKey($sessionId)) ?: '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doWrite($sessionId, $data): bool
     {
         if (0 < $this->ttl) {
@@ -185,9 +178,7 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doDestroy($sessionId): bool
     {
         $this->redis->del($this->getRedisKey($sessionId));

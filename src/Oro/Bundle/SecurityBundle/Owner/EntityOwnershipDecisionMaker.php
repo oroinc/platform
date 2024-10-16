@@ -23,9 +23,7 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports()
     {
         return $this->tokenAccessor->getUser() instanceof User;

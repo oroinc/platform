@@ -83,9 +83,7 @@ class FieldNodeDefinition extends AbstractNodeDefinition
         return $this->definition['page_reload'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function prepareDefinition(array $definition)
     {
         if (!isset($definition['options'])) {

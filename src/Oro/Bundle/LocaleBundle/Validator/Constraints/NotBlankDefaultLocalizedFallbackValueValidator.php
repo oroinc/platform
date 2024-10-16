@@ -36,6 +36,7 @@ class NotBlankDefaultLocalizedFallbackValueValidator extends ConstraintValidator
      * @param null|Collection|AbstractLocalizedFallbackValue[] $value
      * @param NotBlankDefaultLocalizedFallbackValue|Constraint $constraint
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof NotBlankDefaultLocalizedFallbackValue) {

@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +28,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[Route(path: '/attribute')]
 class AttributeController extends AbstractController
 {
+    /** Customization start */
+    protected DbIdentifierNameGenerator $nameGenerator;
+    /** Customization end */
+
     /**
      *
      * @param Request $request
@@ -78,6 +83,14 @@ class AttributeController extends AbstractController
     }
 
     /**
+     * Customization start
+     */
+    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator): void
+    {
+        $this->nameGenerator = $nameGenerator;
+    }
+
+    /**
      * @param array|RedirectResponse $response
      * @param string $alias
      * @return array|RedirectResponse
@@ -112,7 +125,6 @@ class AttributeController extends AbstractController
         $response = $this->container
             ->get(ConfigFieldHandler::class)
             ->handleUpdate($fieldConfigModel, $formAction, $successMessage);
-
         $aliasResolver = $this->getEntityAliasResolver();
 
         return $this->addInfoToResponse($response, $aliasResolver->getAlias($entityConfigModel->getClassName()));
@@ -274,9 +286,7 @@ class AttributeController extends AbstractController
         return $this->container->get(EntityConfigProviderHelper::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

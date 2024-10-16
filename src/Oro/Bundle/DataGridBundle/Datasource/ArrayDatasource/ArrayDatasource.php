@@ -20,13 +20,13 @@ class ArrayDatasource implements DatasourceInterface
      */
     protected $arraySource = [];
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function process(DatagridInterface $grid, array $config)
     {
         $grid->setDatasource(clone $this);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function getResults()
     {
         $rows = [];

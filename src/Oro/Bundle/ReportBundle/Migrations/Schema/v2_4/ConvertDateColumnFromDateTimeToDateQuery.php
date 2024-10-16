@@ -12,6 +12,7 @@ class ConvertDateColumnFromDateTimeToDateQuery extends ParametrizedMigrationQuer
     private const ID_COLUMN = 'id';
     private const DATE_COLUMN = 'date';
 
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -27,6 +28,7 @@ class ConvertDateColumnFromDateTimeToDateQuery extends ParametrizedMigrationQuer
         return $logger->getMessages();
     }
 
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $updateSQL = sprintf(

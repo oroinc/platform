@@ -18,6 +18,7 @@ class TwigServiceLocatorPassTest extends \PHPUnit\Framework\TestCase
     /** @var TwigServiceLocatorPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new TwigServiceLocatorPass();

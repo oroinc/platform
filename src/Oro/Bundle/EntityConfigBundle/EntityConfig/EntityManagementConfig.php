@@ -13,11 +13,13 @@ class EntityManagementConfig implements EntityConfigInterface
 
     public const OPTION = 'enabled';
 
+    #[\Override]
     public function getSectionName(): string
     {
         return self::SECTION;
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

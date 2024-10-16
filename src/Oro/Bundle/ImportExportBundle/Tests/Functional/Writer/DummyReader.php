@@ -16,6 +16,7 @@ class DummyReader implements ReaderInterface
         $this->source->rewind();
     }
 
+    #[\Override]
     public function read()
     {
         $result = null;
@@ -27,6 +28,7 @@ class DummyReader implements ReaderInterface
         return $result;
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
     }

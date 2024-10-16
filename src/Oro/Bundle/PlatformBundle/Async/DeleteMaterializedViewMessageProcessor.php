@@ -21,11 +21,13 @@ class DeleteMaterializedViewMessageProcessor implements MessageProcessorInterfac
         $this->materializedViewManager = $materializedViewManager;
     }
 
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [DeleteMaterializedViewTopic::getName()];
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $messageBody = $message->getBody();

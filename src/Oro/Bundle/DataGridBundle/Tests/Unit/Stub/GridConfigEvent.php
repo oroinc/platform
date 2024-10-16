@@ -15,6 +15,7 @@ class GridConfigEvent extends Event implements GridConfigurationEventInterface
         $this->configuration = $configuration;
     }
 
+    #[\Override]
     public function getConfig()
     {
         return $this->configuration;

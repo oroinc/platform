@@ -14,19 +14,19 @@ use Oro\Bundle\DraftBundle\Manager\DraftManager;
  */
 class DateTimeExtension extends AbstractDuplicatorExtension
 {
+    #[\Override]
     public function getFilter(): Filter
     {
         return new DateTimeFilter();
     }
 
+    #[\Override]
     public function getMatcher(): Matcher
     {
         return new PropertyTypeMatcher(\DateTime::class);
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function isSupport(DraftableInterface $source): bool
     {
         return $this->getContext()->offsetGet('action') === DraftManager::ACTION_CREATE_DRAFT;

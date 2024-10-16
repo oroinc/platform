@@ -172,6 +172,7 @@ abstract class EmailAddress
      *
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return sprintf('EmailAddress(%s)', $this->email);

@@ -26,9 +26,7 @@ class LoadEntitiesByEntitySerializer implements ProcessorInterface
         $this->entitySerializer = $entitySerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */

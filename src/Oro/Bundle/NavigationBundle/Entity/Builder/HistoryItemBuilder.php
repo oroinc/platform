@@ -12,6 +12,7 @@ class HistoryItemBuilder extends AbstractBuilder
      * @param $params
      * @return NavigationHistoryItem|null
      */
+    #[\Override]
     public function buildItem($params)
     {
         return new $this->className($params);
@@ -23,6 +24,7 @@ class HistoryItemBuilder extends AbstractBuilder
      * @param  int                        $itemId
      * @return NavigationHistoryItem|null
      */
+    #[\Override]
     public function findItem($itemId)
     {
         return $this->getEntityManager()->find($this->className, $itemId);

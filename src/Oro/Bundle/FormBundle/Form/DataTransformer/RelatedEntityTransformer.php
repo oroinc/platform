@@ -31,9 +31,7 @@ class RelatedEntityTransformer implements DataTransformerInterface
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -50,9 +48,7 @@ class RelatedEntityTransformer implements DataTransformerInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

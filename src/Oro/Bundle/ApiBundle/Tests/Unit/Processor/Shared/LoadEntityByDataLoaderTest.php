@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
@@ -25,20 +26,26 @@ class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
     /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityClassResolver;
 
+    /** @var QueryHintResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $queryHintResolver;
+
     /** @var LoadEntityByDataLoader */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->dataLoader = $this->createMock(DataLoaderInterface::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $this->queryHintResolver = $this->createMock(QueryHintResolverInterface::class);
 
         $this->processor = new LoadEntityByDataLoader(
             $this->dataLoader,
             $this->doctrineHelper,
-            $this->entityClassResolver
+            $this->entityClassResolver,
+            $this->queryHintResolver
         );
     }
 
@@ -170,8 +177,9 @@ class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
         $entityClass = Group::class;
         $entityAlias = 'test';
 
+        $query = new Query($this->em);
+        $query->setDQL(sprintf('SELECT %2$s.id FROM %1$s AS %2$s', $entityClass, $entityAlias));
         $qb = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(AbstractQuery::class);
         $qb->expects(self::once())
             ->method('getRootEntities')
             ->willReturn([$entityClass]);
@@ -181,11 +189,14 @@ class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
         $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
-        $query->expects(self::once())
-            ->method('getOneOrNullResult')
-            ->willReturn(null);
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            $query->getSQL(),
+            []
+        );
 
         $entityDefinitionConfig = new EntityDefinitionConfig();
+        $entityDefinitionConfig->addHint('HINT_TEST');
         $config = new Config();
         $config->setDefinition($entityDefinitionConfig);
         $this->configProvider->expects(self::once())
@@ -213,6 +224,10 @@ class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
             ->method('getEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
+
+        $this->queryHintResolver->expects(self::once())
+            ->method('resolveHints')
+            ->with(self::identicalTo($query), ['HINT_TEST']);
 
         $this->context->setClassName($entityClass);
         $this->context->setQuery($qb);
@@ -230,8 +245,9 @@ class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
         $entityClass = Group::class;
         $entityAlias = 'test';
 
+        $query = new Query($this->em);
+        $query->setDQL(sprintf('SELECT %2$s.id FROM %1$s AS %2$s', $entityClass, $entityAlias));
         $qb = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(AbstractQuery::class);
         $qb->expects(self::once())
             ->method('getRootEntities')
             ->willReturn([$entityClass]);
@@ -241,11 +257,14 @@ class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
         $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
-        $query->expects(self::once())
-            ->method('getOneOrNullResult')
-            ->willReturn(['id' => 123]);
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            $query->getSQL(),
+            [['id_0' => 123]]
+        );
 
         $entityDefinitionConfig = new EntityDefinitionConfig();
+        $entityDefinitionConfig->addHint('HINT_TEST');
         $config = new Config();
         $config->setDefinition($entityDefinitionConfig);
         $this->configProvider->expects(self::once())
@@ -273,6 +292,10 @@ class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
             ->method('getEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
+
+        $this->queryHintResolver->expects(self::once())
+            ->method('resolveHints')
+            ->with(self::identicalTo($query), ['HINT_TEST']);
 
         $this->context->setClassName($entityClass);
         $this->context->setQuery($qb);

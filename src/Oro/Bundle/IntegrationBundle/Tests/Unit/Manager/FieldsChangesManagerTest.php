@@ -24,6 +24,7 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FieldsChangesManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repo = $this->createMock(EntityRepository::class);

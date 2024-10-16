@@ -9,6 +9,7 @@ class CronHelperTest extends \PHPUnit\Framework\TestCase
 {
     private CronHelper $cronHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cronHelper = new CronHelper();

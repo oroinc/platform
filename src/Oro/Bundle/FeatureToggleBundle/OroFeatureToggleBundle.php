@@ -11,9 +11,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroFeatureToggleBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
@@ -22,9 +20,7 @@ class OroFeatureToggleBundle extends Bundle
         $container->addCompilerPass(new FeatureToggleablePass());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getContainerExtension(): ?ExtensionInterface
     {
         if (null === $this->extension) {

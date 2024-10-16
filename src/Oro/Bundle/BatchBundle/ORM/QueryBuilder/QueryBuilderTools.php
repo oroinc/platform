@@ -13,9 +13,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class QueryBuilderTools extends AbstractQueryBuilderTools
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function prepareFieldAliases(array $selects)
     {
         $this->resetFieldAliases();
@@ -38,9 +36,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function prepareJoinTablePaths(array $joins)
     {
         $this->resetJoinTablePaths();

@@ -101,6 +101,7 @@ class TestAuditDataChild implements
         $this->stringProperty = $stringProperty;
     }
 
+    #[\Override]
     public function __toString()
     {
         return 'ToStringTestAuditDataChild';
@@ -169,9 +170,7 @@ class TestAuditDataChild implements
         $this->additionalFields = $fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAdditionalFields()
     {
         return $this->additionalFields;

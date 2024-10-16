@@ -13,6 +13,7 @@ class FieldDataEventTest extends \PHPUnit\Framework\TestCase
     /** @var FieldDataEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldData = $this->createMock(FieldData::class);

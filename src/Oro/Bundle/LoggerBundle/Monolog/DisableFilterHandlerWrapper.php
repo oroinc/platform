@@ -22,15 +22,13 @@ class DisableFilterHandlerWrapper extends HandlerWrapper
 
     private bool $filterHandlerIsDisabled = false;
 
-    /**
-     * {@inheritDoc}
-     */
     public function __construct(LogLevelConfig $config, FilterHandler $handler)
     {
         parent::__construct($handler);
         $this->logLevelConfig = $config;
     }
 
+    #[\Override]
     public function handle(array $record): bool
     {
         $this->setMinLevel();
@@ -38,6 +36,7 @@ class DisableFilterHandlerWrapper extends HandlerWrapper
         return parent::handle($record);
     }
 
+    #[\Override]
     public function handleBatch(array $records): void
     {
         $this->setMinLevel();
@@ -73,6 +72,7 @@ class DisableFilterHandlerWrapper extends HandlerWrapper
         }
     }
 
+    #[\Override]
     public function reset()
     {
         $nestedHandler = $this->handler->getHandler();

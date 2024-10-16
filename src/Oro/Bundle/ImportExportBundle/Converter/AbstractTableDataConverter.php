@@ -46,9 +46,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
         $this->attributeConfigHelper = $attributeConfigHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
         $exportedRecord = $this->dispatchFormatConversionEvent(Events::BEFORE_EXPORT_FORMAT_CONVERSION, $exportedRecord)
@@ -72,9 +70,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
         ->getResult();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
         $importedRecord = $this->dispatchFormatConversionEvent(Events::BEFORE_IMPORT_FORMAT_CONVERSION, $importedRecord)

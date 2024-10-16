@@ -18,6 +18,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
     /** @var LanguageFilterType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(LanguageCodeFormatter::class);

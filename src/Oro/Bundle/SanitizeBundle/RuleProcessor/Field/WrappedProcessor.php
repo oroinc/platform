@@ -25,6 +25,7 @@ class WrappedProcessor implements ProcessorInterface
         $this->options = $options;
     }
 
+    #[\Override]
     public static function getProcessorName(): string
     {
         throw new \RuntimeException(
@@ -32,6 +33,7 @@ class WrappedProcessor implements ProcessorInterface
         );
     }
 
+    #[\Override]
     public function getIncompatibilityMessages(
         string $fieldName,
         ClassMetadata $metadata,
@@ -42,6 +44,7 @@ class WrappedProcessor implements ProcessorInterface
         return $this->innerProcessor->getIncompatibilityMessages($fieldName, $metadata, $sanitizeRuleOptions);
     }
 
+    #[\Override]
     public function prepareSerializedFieldUpdate(
         string $fieldName,
         ClassMetadata $metadata,
@@ -52,6 +55,7 @@ class WrappedProcessor implements ProcessorInterface
         $this->innerProcessor->prepareSerializedFieldUpdate($fieldName, $metadata, $sanitizeRuleOptions);
     }
 
+    #[\Override]
     public function getSqls(
         string $fieldName,
         ClassMetadata $metadata,

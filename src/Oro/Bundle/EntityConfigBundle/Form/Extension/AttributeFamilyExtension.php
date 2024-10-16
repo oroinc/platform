@@ -38,9 +38,7 @@ class AttributeFamilyExtension extends AbstractTypeExtension
         $this->entityNameResolver = $entityNameResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$this->isApplicable($options)) {

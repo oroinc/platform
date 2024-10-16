@@ -53,9 +53,7 @@ class ThemeConfiguration implements ConfigurationInterface
         return array_merge(...$fileNames);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

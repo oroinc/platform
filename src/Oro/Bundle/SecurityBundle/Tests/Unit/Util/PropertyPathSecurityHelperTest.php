@@ -27,6 +27,7 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
     /** @var PropertyPathSecurityHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

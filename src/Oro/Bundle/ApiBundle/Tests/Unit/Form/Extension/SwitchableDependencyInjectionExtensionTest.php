@@ -23,6 +23,7 @@ class SwitchableDependencyInjectionExtensionTest extends \PHPUnit\Framework\Test
     /** @var SwitchableDependencyInjectionExtension */
     private $switchableExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

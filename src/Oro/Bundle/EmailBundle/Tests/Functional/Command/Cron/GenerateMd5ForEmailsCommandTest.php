@@ -12,6 +12,7 @@ class GenerateMd5ForEmailsCommandTest extends WebTestCase
     use ConfigManagerAwareTestTrait;
     use CommandTestingTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -18,6 +18,7 @@ class NamePartsGuesser implements GuesserInterface
     {
     }
 
+    #[\Override]
     public function guessProcessor(string $fieldName, ClassMetadata $metadata): ?ProcessorInterface
     {
         if ($this->helper->getFieldType($fieldName, $metadata) === 'string'

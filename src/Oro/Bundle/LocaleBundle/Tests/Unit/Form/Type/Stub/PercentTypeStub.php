@@ -9,17 +9,12 @@ class PercentTypeStub extends PercentType
 {
     private const NAME = 'percent_stub';
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);

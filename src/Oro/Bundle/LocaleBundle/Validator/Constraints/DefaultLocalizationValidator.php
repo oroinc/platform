@@ -22,9 +22,7 @@ class DefaultLocalizationValidator extends ConstraintValidator
         $this->localizationManager = $localizationManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($defaultLocalization, Constraint $constraint)
     {
         $rootForm = $this->context->getRoot();

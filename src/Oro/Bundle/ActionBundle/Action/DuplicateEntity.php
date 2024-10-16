@@ -34,9 +34,7 @@ class DuplicateEntity extends AbstractAction
      */
     protected $options;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $target = $this->getEntity($context);
@@ -58,6 +56,7 @@ class DuplicateEntity extends AbstractAction
      * @return ActionInterface
      * @throws InvalidParameterException
      */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!empty($options[self::OPTION_KEY_TARGET])) {

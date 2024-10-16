@@ -23,6 +23,7 @@ class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
     /** @var ResolveDestinationPage */
     protected $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resolver = $this->createMock(DestinationPageResolver::class);

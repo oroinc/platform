@@ -25,9 +25,7 @@ class EmailUserVirtualRelationsProvider implements VirtualRelationProviderInterf
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isVirtualRelation($className, $fieldName)
     {
         return
@@ -35,17 +33,13 @@ class EmailUserVirtualRelationsProvider implements VirtualRelationProviderInterf
             && \in_array($fieldName, array_values($this->getTargets()), true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getVirtualRelationQuery($className, $fieldName)
     {
         return $this->getQueryPart($fieldName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getVirtualRelations($className)
     {
         if (!is_a($className, EmailUser::class, true)) {
@@ -67,9 +61,7 @@ class EmailUserVirtualRelationsProvider implements VirtualRelationProviderInterf
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null)
     {
         return $fieldName;

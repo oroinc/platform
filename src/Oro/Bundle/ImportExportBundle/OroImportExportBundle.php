@@ -19,9 +19,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class OroImportExportBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function boot(): void
     {
         parent::boot();
@@ -29,9 +27,7 @@ class OroImportExportBundle extends Bundle
         MimeTypes::getDefault()->registerGuesser(new CsvMimeTypeGuesser());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

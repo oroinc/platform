@@ -13,15 +13,14 @@ class ColorsConfigBlock extends Form
     /** @var NodeElement */
     private $colorsStoreElement;
 
+    #[\Override]
     protected function init()
     {
         $this->colorsStoreElement = $this->find('css', "input[type='hidden']");
         self::assertNotNull($this->colorsStoreElement, "Hidden input which store current colors not found");
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($values)
     {
         $values = $this->parseValues($values);

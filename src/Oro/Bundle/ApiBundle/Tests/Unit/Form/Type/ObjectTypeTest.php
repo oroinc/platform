@@ -25,9 +25,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class ObjectTypeTest extends ApiFormTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

@@ -41,6 +41,7 @@ class EmailNotificationManagerTest extends TestCase
 
     private EmailNotificationManager $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);

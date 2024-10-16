@@ -19,6 +19,7 @@ class EmailOwnerProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailOwnerProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->storage = $this->createMock(EmailOwnerProviderStorage::class);

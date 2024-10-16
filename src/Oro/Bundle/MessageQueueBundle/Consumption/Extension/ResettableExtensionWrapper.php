@@ -31,57 +31,43 @@ class ResettableExtensionWrapper implements ResettableExtensionInterface
         $this->extensionServiceId = $extensionServiceId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context)
     {
         $this->getExtension()->onStart($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         $this->getExtension()->onBeforeReceive($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreReceived(Context $context)
     {
         $this->getExtension()->onPreReceived($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $this->getExtension()->onPostReceived($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onIdle(Context $context)
     {
         $this->getExtension()->onIdle($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onInterrupted(Context $context)
     {
         $this->getExtension()->onInterrupted($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->extension = null;

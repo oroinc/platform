@@ -25,12 +25,10 @@ class ExtendTable extends TableWithNameGenerator
         parent::__construct($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createColumnObject(array $args)
     {
-        $args['tableName']            = $this->getName();
+        $args['tableName'] = $this->getName();
         $args['extendOptionsManager'] = $this->extendOptionsManager;
 
         return parent::createColumnObject($args);
@@ -38,10 +36,11 @@ class ExtendTable extends TableWithNameGenerator
 
     /**
      * @param string $name
-     * @param mixed  $value Can be scalar type, array or OroOptions object
+     * @param mixed $value Can be scalar type, array or OroOptions object
      *
      * @return \Doctrine\DBAL\Schema\Table
      */
+    #[\Override]
     public function addOption($name, $value)
     {
         if ($name === OroOptions::KEY) {
@@ -56,9 +55,28 @@ class ExtendTable extends TableWithNameGenerator
         return parent::addOption($name, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function addExtendColumnOption(
+        string $assocationColumn,
+        string $scope,
+        string $propertyPath,
+        array $optionValue
+    ): self {
+        $existendOptions = [];
+        $extendColumnOptions = $this->extendOptionsManager->getColumnOptions($this->getName(), $assocationColumn);
+        if (isset($extendColumnOptions[$scope][$propertyPath])) {
+            $existendOptions = $extendColumnOptions[$scope][$propertyPath];
+        }
+        $appendOptions = [
+            $scope => [
+                $propertyPath => array_merge($existendOptions, $optionValue)
+            ]
+        ];
+        $this->extendOptionsManager->setColumnOptions($this->getName(), $assocationColumn, $appendOptions);
+
+        return $this;
+    }
+
+    #[\Override]
     public function addColumn($columnName, $typeName, array $options = [])
     {
         $oroOptions = null;
@@ -91,9 +109,7 @@ class ExtendTable extends TableWithNameGenerator
         return $column;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function dropColumn($columnName)
     {
         $this->extendOptionsManager->removeColumnOptions($this->getName(), $columnName);

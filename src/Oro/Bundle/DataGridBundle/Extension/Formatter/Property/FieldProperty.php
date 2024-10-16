@@ -20,9 +20,7 @@ class FieldProperty extends AbstractProperty
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initialize()
     {
         $type = $this->getOr(self::FRONTEND_TYPE_KEY);
@@ -39,9 +37,7 @@ class FieldProperty extends AbstractProperty
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRawValue(ResultRecordInterface $record)
     {
         try {

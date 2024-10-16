@@ -21,9 +21,7 @@ abstract class AbstractEntityHierarchyProvider implements EntityHierarchyProvide
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHierarchy()
     {
         $this->ensureHierarchyInitialized();
@@ -31,9 +29,7 @@ abstract class AbstractEntityHierarchyProvider implements EntityHierarchyProvide
         return $this->hierarchy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHierarchyForClassName($className)
     {
         $this->ensureHierarchyInitialized();

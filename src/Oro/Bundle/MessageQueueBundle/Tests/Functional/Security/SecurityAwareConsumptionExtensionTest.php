@@ -14,6 +14,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
 {
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -21,6 +22,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
         self::purgeMessageQueue();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         self::getContainer()->get('security.token_storage')->setToken(null);

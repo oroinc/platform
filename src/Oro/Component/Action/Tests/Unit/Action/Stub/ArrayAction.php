@@ -19,6 +19,7 @@ class ArrayAction extends ArrayCollection implements ActionInterface
      *
      * @param mixed $context
      */
+    #[\Override]
     public function execute($context)
     {
     }
@@ -28,6 +29,7 @@ class ArrayAction extends ArrayCollection implements ActionInterface
      * @return ActionInterface
      * @throws InvalidParameterException
      */
+    #[\Override]
     public function initialize(array $options)
     {
         $this->set('parameters', $options);
@@ -38,6 +40,7 @@ class ArrayAction extends ArrayCollection implements ActionInterface
      * @param ExpressionInterface $condition
      * @return mixed
      */
+    #[\Override]
     public function setCondition(ExpressionInterface $condition)
     {
         $this->condition = $condition;

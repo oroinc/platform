@@ -9,6 +9,7 @@ class FilterIdentifierFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var FilterIdentifierFieldsConfigExtra */
     private $extra;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extra = new FilterIdentifierFieldsConfigExtra();

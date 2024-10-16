@@ -21,6 +21,7 @@ class MaterializedViewByDatagridFactoryTest extends \PHPUnit\Framework\TestCase
 
     private MaterializedViewByDatagridFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->materializedViewManager = $this->createMock(MaterializedViewManager::class);

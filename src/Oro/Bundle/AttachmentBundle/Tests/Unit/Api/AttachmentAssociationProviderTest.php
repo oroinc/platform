@@ -19,6 +19,7 @@ class AttachmentAssociationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentAssociationProvider */
     private $attachmentAssociationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

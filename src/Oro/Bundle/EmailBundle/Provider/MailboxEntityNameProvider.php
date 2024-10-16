@@ -22,9 +22,7 @@ class MailboxEntityNameProvider implements EntityNameProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if (!$entity instanceof Mailbox) {
@@ -38,9 +36,7 @@ class MailboxEntityNameProvider implements EntityNameProviderInterface
         return $entity->getLabel() . ' ' . $this->trans(self::TRANSLATION_KEY, $locale);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if (!is_a($className, Mailbox::class, true)) {

@@ -71,6 +71,7 @@ class FieldTypeTest extends TypeTestCase
 
     private array $expectedChoicesView;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->expectedChoicesView = $this->prepareExpectedChoicesView($this->defaultFieldTypeChoices);
@@ -127,9 +128,7 @@ class FieldTypeTest extends TypeTestCase
         return $expectedChoicesView;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $constraintsProvider = $this->createMock(ConstraintsProviderInterface::class);

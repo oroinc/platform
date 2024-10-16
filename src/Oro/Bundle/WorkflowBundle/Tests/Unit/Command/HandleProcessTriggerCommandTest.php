@@ -34,6 +34,7 @@ class HandleProcessTriggerCommandTest extends TestCase
     /** @var HandleProcessTriggerCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processHandler = $this->createMock(ProcessHandler::class);

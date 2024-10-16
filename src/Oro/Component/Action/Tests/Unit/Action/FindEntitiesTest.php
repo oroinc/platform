@@ -24,6 +24,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
     /** @var FindEntities */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

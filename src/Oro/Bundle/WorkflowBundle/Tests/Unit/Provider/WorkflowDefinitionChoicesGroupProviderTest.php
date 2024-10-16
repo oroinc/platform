@@ -16,6 +16,7 @@ class WorkflowDefinitionChoicesGroupProviderTest extends \PHPUnit\Framework\Test
     /** @var WorkflowDefinitionChoicesGroupProvider */
     private $choicesProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowDefinitionRepo = $this->createMock(WorkflowDefinitionRepository::class);

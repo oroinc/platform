@@ -12,9 +12,7 @@ class NameFormatConfiguration implements ConfigurationInterface
 {
     public const ROOT_NODE = 'name_format';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

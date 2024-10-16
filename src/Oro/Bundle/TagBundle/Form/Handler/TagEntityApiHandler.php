@@ -31,9 +31,7 @@ class TagEntityApiHandler extends ApiFormHandler
         $this->taggableHelper = $helper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function prepareFormData($entity)
     {
         $tags = new ArrayCollection();
@@ -42,9 +40,7 @@ class TagEntityApiHandler extends ApiFormHandler
         return ['target' => $entity, 'tags' => $tags];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($entity)
     {
         if (!$this->taggableHelper->isTaggable($entity)) {
@@ -54,9 +50,7 @@ class TagEntityApiHandler extends ApiFormHandler
         return parent::process($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function onSuccess($entity)
     {
         $targetEntity = $entity['target'];

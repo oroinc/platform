@@ -112,9 +112,7 @@ final class EntityMaskBuilder extends MaskBuilder
         return $this->identity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->mask = $this->identity;
@@ -122,9 +120,7 @@ final class EntityMaskBuilder extends MaskBuilder
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function add($mask)
     {
         $this->mask |= $this->parseMask($mask) & self::REMOVE_SERVICE_BITS;
@@ -132,9 +128,7 @@ final class EntityMaskBuilder extends MaskBuilder
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($mask)
     {
         $this->mask = ($this->mask & ~$this->parseMask($mask)) | $this->getIdentity();

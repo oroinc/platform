@@ -12,6 +12,7 @@ class WidgetConfigVisibilityFilterTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetConfigVisibilityFilter */
     private $widgetConfigVisibilityFilter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $resolver = $this->createMock(ResolverInterface::class);

@@ -25,6 +25,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var IndexEntityConfigDumperExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -9,6 +9,7 @@ class SegmentQueryConverterContextTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentQueryConverterContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new SegmentQueryConverterContext();

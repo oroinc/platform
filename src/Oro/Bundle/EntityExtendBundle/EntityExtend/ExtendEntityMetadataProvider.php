@@ -32,11 +32,13 @@ class ExtendEntityMetadataProvider implements ExtendEntityMetadataProviderInterf
         return $this->doctrineHelper->isManageableEntityClass($class);
     }
 
+    #[\Override]
     public function getExtendEntityMetadata(string $class): ConfigInterface
     {
         return $this->configManager->getEntityConfig(self::SCOPE, $this->obtainClassName($class));
     }
 
+    #[\Override]
     public function getExtendEntityFieldsMetadata(string $class): array
     {
         $class = $this->obtainClassName($class);

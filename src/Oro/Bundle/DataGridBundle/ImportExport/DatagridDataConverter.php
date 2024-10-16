@@ -61,9 +61,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         $this->formatterProvider = $formatterProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
         $columns = $this->getGridColumns();
@@ -99,9 +97,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         return $this->gridColumns;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
         throw new RuntimeException('The convertToImportFormat method is not implemented.');
@@ -175,9 +171,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context)
     {
         $this->context = $context;

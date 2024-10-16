@@ -27,9 +27,7 @@ class OroUserBundle implements
     use ConnectionAwareTrait;
     use LoggerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         //add attachment extend field

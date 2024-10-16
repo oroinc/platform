@@ -18,9 +18,7 @@ class PreviewConfigurationValidator implements ConfigurationValidatorInterface
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function validate(array $config): array
     {
         $messages = [];

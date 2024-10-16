@@ -39,6 +39,7 @@ class RelationCalculator implements RelationCalculatorInterface
      * @return int
      * @throws LogicException
      */
+    #[\Override]
     public function getMaxRelatedEntities($entityName, $fieldName)
     {
         /** @var EntityManager $entityManager */

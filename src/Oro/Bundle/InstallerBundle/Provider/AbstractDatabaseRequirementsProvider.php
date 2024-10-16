@@ -21,9 +21,7 @@ abstract class AbstractDatabaseRequirementsProvider extends AbstractRequirements
         $this->registry = $registry;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getOroRequirements(): ?RequirementCollection
     {
         $collection = new RequirementCollection();

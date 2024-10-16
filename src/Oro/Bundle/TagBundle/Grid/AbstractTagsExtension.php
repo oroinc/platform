@@ -38,9 +38,7 @@ abstract class AbstractTagsExtension extends AbstractExtension
         $this->entityClassResolver = $entityClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return

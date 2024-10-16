@@ -24,9 +24,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
         try {
@@ -42,25 +40,19 @@ class FormPropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getValue($objectOrArray, $propertyPath): mixed
     {
         return $this->propertyAccessor->getValue($objectOrArray, $propertyPath);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isWritable($objectOrArray, $propertyPath): bool
     {
         return $this->propertyAccessor->isWritable($objectOrArray, $propertyPath);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isReadable($objectOrArray, $propertyPath): bool
     {
         return $this->propertyAccessor->isReadable($objectOrArray, $propertyPath);

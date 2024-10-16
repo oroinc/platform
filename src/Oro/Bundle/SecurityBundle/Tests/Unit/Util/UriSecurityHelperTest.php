@@ -11,6 +11,7 @@ class UriSecurityHelperTest extends \PHPUnit\Framework\TestCase
     /** @var UriSecurityHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = new UriSecurityHelper(self::PROTOCOLS);

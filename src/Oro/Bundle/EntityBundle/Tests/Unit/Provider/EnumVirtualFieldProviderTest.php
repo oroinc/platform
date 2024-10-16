@@ -6,7 +6,8 @@ use Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,11 +17,16 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumVirtualFieldProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->provider = new EnumVirtualFieldProvider($this->configManager);
+        $this->provider = new EnumVirtualFieldProvider(
+            $this->configManager,
+            $this->createMock(ConfigProvider::class),
+            $this->createMock(TokenAccessorInterface::class)
+        );
     }
 
     public function testGetVirtualFields()
@@ -58,15 +64,17 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'         => 'target.targetField',
+                    'expr'         => 'target.enumField',
                     'return_type'  => 'enum',
                     'filter_by_id' => true
                 ],
                 'join'   => [
                     'left' => [
                         [
-                            'join'  => 'entity.enumField',
-                            'alias' => 'target'
+                            'join' => 'Oro\Bundle\EntityExtendBundle\Entity\EnumOption',
+                            'alias' => 'target',
+                            'conditionType' => 'WITH',
+                            'condition' => 'JSON_EXTRACT(entity.serialized_data, \'enumField\') = target'
                         ]
                     ]
                 ]
@@ -83,8 +91,8 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'         => 'entity.' . ExtendHelper::getMultiEnumSnapshotFieldName('multiEnumField'),
-                    'return_type'  => 'multiEnum',
+                    'expr' => 'JSON_EXTRACT(entity.serialized_data, \'multiEnumField\') AS multiEnumField',
+                    'return_type' => 'multiEnum',
                     'filter_by_id' => true
                 ]
             ],
@@ -105,7 +113,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
                 $enumFieldConfig->getId(),
                 $multiEnumFieldConfig->getId()
             ]);
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(3))
             ->method('getFieldConfig')
             ->willReturnMap([
                 ['extend', $className, 'enumField', $enumFieldConfig],

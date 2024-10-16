@@ -14,6 +14,7 @@ class DefaultAuthenticationFailureHandler extends Authentication\DefaultAuthenti
 {
     use ProcessRequestParameterLikeRouteTrait;
 
+    #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         $this->processRequestParameter($request, $this->options['failure_path_parameter']);

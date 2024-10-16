@@ -20,6 +20,7 @@ class TranslationCreateTest extends RestJsonApiTestCase
     use ResolveTranslationIdTrait;
     use RolePermissionExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

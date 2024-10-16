@@ -20,9 +20,7 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
     /** @var int */
     private $lastItemId = 1;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->generateEntities($manager, [LoadWorkflowDefinitions::NO_START_STEP, LoadWorkflowDefinitions::MULTISTEP]);
@@ -82,9 +80,7 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return ['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions'];

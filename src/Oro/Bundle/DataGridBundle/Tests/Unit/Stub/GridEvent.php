@@ -15,6 +15,7 @@ class GridEvent extends Event implements GridEventInterface
         $this->datagrid = $datagrid;
     }
 
+    #[\Override]
     public function getDatagrid()
     {
         return $this->datagrid;

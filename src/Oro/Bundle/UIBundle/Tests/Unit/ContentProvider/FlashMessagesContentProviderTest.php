@@ -18,6 +18,7 @@ class FlashMessagesContentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FlashMessagesContentProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->session = $this->createMock(Session::class);

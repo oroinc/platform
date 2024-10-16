@@ -19,9 +19,7 @@ class MessageTransformer implements MessageTransformerInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform(array $entities, array $context = [])
     {
         $messages = [];

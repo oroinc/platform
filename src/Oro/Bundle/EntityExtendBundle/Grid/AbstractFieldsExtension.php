@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
+use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -15,8 +16,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -26,26 +27,15 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
  */
 abstract class AbstractFieldsExtension extends AbstractExtension
 {
-    protected ConfigManager $configManager;
-    protected EntityClassResolver $entityClassResolver;
-    protected DatagridGuesser $datagridGuesser;
-    protected FieldsHelper $fieldsHelper;
-
     public function __construct(
-        ConfigManager $configManager,
-        EntityClassResolver $entityClassResolver,
-        DatagridGuesser $datagridGuesser,
-        FieldsHelper $fieldsHelper
+        protected ConfigManager $configManager,
+        protected EntityClassResolver $entityClassResolver,
+        protected DatagridGuesser $datagridGuesser,
+        protected FieldsHelper $fieldsHelper
     ) {
-        $this->configManager = $configManager;
-        $this->entityClassResolver = $entityClassResolver;
-        $this->datagridGuesser = $datagridGuesser;
-        $this->fieldsHelper = $fieldsHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config): bool
     {
         return
@@ -53,9 +43,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
             && $config->isOrmDatasource();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config): void
     {
         $fields = $this->getFields($config);
@@ -140,7 +128,12 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $extendFieldConfig = $this->getFieldConfig('extend', $field);
                     $join = sprintf('%s.%s', $alias, $fieldName);
                     $joinAlias = $query->getJoinAlias($join);
-                    $query->addLeftJoin($join, $joinAlias);
+                    $query->addLeftJoin(
+                        EnumOption::class,
+                        $joinAlias,
+                        Join::WITH,
+                        sprintf("JSON_EXTRACT(order1.serialized_data, '%s') = %s", $fieldName, $joinAlias)
+                    );
                     $columnDataName = $fieldName;
 
                     $targetField = $extendFieldConfig->get('target_field');
@@ -153,9 +146,9 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $selectExpr = [$selectExpr, $sorterSelectExpr];
                     break;
                 case 'multiEnum':
-                    $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
-                    $sorterDataName = sprintf('%s.%s', $alias, $columnDataName);
-                    $filterDataName = sprintf('%s.%s', $alias, $fieldName);
+                    $columnDataName = $fieldName;
+                    $sorterDataName = sprintf("JSON_EXTRACT(order1.serialized_data, '%s') = %s", $fieldName, $alias);
+                    $filterDataName = sprintf("JSON_EXTRACT(order1.serialized_data, '%s') = %s", $fieldName, $alias);
                     $selectExpr = $sorterDataName;
                     break;
                 case RelationType::MANY_TO_ONE:
@@ -216,9 +209,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority(): int
     {
         return 250;

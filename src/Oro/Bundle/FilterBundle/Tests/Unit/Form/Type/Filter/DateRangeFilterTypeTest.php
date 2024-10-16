@@ -19,6 +19,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
     /** @var DateRangeFilterType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
@@ -42,9 +43,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTestFormType(): AbstractType
     {
         return $this->type;
@@ -53,6 +52,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
     /**
      * @dataProvider configureOptionsDataProvider
      */
+    #[\Override]
     public function testConfigureOptions(array $defaultOptions, array $requiredOptions = [])
     {
         $resolver = new OptionsResolver();
@@ -62,9 +62,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
         self::assertEquals($defaultOptions, $resolvedOptions);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptionsDataProvider(): array
     {
         return [
@@ -97,9 +95,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function bindDataProvider(): array
     {
         return [

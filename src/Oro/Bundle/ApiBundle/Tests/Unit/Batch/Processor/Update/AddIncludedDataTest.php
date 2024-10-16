@@ -14,6 +14,7 @@ class AddIncludedDataTest extends BatchUpdateProcessorTestCase
     /** @var AddIncludedData */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

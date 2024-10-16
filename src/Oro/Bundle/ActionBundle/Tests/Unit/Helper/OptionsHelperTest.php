@@ -14,6 +14,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var OptionsHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);

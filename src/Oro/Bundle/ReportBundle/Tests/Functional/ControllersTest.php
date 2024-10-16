@@ -14,6 +14,7 @@ class ControllersTest extends WebTestCase
 {
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient(
@@ -23,6 +24,7 @@ class ControllersTest extends WebTestCase
         $this->client->useHashNavigation(true);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         parent::tearDown();

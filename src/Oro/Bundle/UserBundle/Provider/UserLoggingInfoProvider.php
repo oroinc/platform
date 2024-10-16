@@ -17,6 +17,7 @@ class UserLoggingInfoProvider implements UserLoggingInfoProviderInterface
         $this->requestStack = $requestStack;
     }
 
+    #[\Override]
     public function getUserLoggingInfo(mixed $user): array
     {
         $info = [];

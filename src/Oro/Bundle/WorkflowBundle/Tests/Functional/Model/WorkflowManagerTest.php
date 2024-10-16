@@ -15,6 +15,7 @@ use Oro\Component\Testing\Doctrine\StubEventListener;
  */
 class WorkflowManagerTest extends WorkflowTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

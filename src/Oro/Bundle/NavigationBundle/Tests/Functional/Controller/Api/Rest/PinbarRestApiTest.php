@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PinbarRestApiTest extends AbstractRestApiTest
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -20,11 +21,13 @@ class PinbarRestApiTest extends AbstractRestApiTest
         $this->loadFixtures([PinbarTabData::class]);
     }
 
+    #[\Override]
     protected function getItemType(): string
     {
         return 'pinbar';
     }
 
+    #[\Override]
     protected function getItemId(): int
     {
         return $this->getReference(PinbarTabData::PINBAR_TAB_1)->getId();

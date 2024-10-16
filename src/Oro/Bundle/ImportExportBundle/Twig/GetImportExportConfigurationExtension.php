@@ -22,9 +22,7 @@ class GetImportExportConfigurationExtension extends AbstractExtension implements
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -42,9 +40,7 @@ class GetImportExportConfigurationExtension extends AbstractExtension implements
         return $this->getImportExportConfigurationRegistry()->getConfigurations($alias);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

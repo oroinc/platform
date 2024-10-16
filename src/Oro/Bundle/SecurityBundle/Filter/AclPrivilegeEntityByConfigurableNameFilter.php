@@ -30,9 +30,7 @@ class AclPrivilegeEntityByConfigurableNameFilter extends AclPrivilegeEntityFilte
         $this->identityIds[] = 'entity:' . $entity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(AclPrivilege $aclPrivilege, ConfigurablePermission $configurablePermission)
     {
         $result = parent::filter($aclPrivilege, $configurablePermission);
@@ -40,9 +38,7 @@ class AclPrivilegeEntityByConfigurableNameFilter extends AclPrivilegeEntityFilte
         return $result ? $configurablePermission->getName() !== $this->filteredConfigurableName : $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSupported(AclPrivilege $aclPrivileges)
     {
         $identity = $aclPrivileges->getIdentity();

@@ -33,9 +33,7 @@ class WorkflowImportProcessorSupervisor implements ConfigImportProcessorInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(array $content, \SplFileInfo $contentSource): array
     {
         /** @var WorkflowImportProcessor $processor */
@@ -75,7 +73,7 @@ class WorkflowImportProcessorSupervisor implements ConfigImportProcessorInterfac
         return isset($this->processed[$this->getProcessorKey($processor)]);
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function setParent(ConfigImportProcessorInterface $parentProcessor)
     {
         $this->parent = $parentProcessor;

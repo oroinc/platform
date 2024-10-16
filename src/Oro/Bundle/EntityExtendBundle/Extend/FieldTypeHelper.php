@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * The helper class that provides methods related to extended field types.
@@ -40,15 +42,36 @@ class FieldTypeHelper
         );
     }
 
-    /**
-     * @param string $type
-     *
-     * @return string
-     */
-    public function getUnderlyingType($type)
+    public function getUnderlyingType(?string $type, ConfigInterface $fieldConfig = null): ?string
     {
+        if (null !== $fieldConfig && ExtendHelper::isEnumerableType($type)) {
+            return $this->getEnumUnderlyingType($fieldConfig);
+        }
         $underlyingTypes = $this->configurationProvider->getUnderlyingTypes();
 
         return $underlyingTypes[$type] ?? $type;
+    }
+
+
+    /**
+     * Needed for oro platform update with enums based on relations.
+     */
+    protected function getEnumUnderlyingType(ConfigInterface $fieldConfig): string
+    {
+        $fieldType = $fieldConfig->getId()->getFieldType();
+        if ($fieldConfig->is('is_serialized')) {
+            return $fieldType;
+        }
+
+        return self::matchEnumUnderlyingType($fieldType);
+    }
+
+    public static function matchEnumUnderlyingType(string $type): string
+    {
+        return match ($type) {
+            'enum' => RelationType::MANY_TO_ONE,
+            'multiEnum' => RelationType::MANY_TO_MANY,
+            default => $type
+        };
     }
 }

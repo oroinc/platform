@@ -20,6 +20,7 @@ class FormattingCodeFormatterTest extends TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
     private $localeSettings;
 
+    #[\Override]
     protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);

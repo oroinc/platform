@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
- * The utility class to get values of "update" and "upsert" meta options.
+ * The utility class to get values of "update", "upsert" and "validate" meta options.
  */
 class MetaOperationParser
 {
@@ -22,6 +22,7 @@ class MetaOperationParser
         array $meta,
         string $updateFlagName,
         string $upsertFlagName,
+        string $validateFlagName,
         ?string $metaPointer = null,
         ?FormContext $context = null
     ): ?array {
@@ -59,12 +60,31 @@ class MetaOperationParser
             }
         }
 
-        if ($updateFlag && $upsertFlag) {
+        $validateFlag = null;
+        if (\array_key_exists($validateFlagName, $meta)) {
+            $validateFlag = self::getValidateFlag($meta, $validateFlagName);
+            if (null === $validateFlag) {
+                if (null !== $context) {
+                    self::addValidationError(
+                        $context,
+                        Constraint::VALUE,
+                        'This value should be a boolean.',
+                        self::buildPointer($metaPointer, $validateFlagName)
+                    );
+                }
+
+                return null;
+            }
+        }
+
+        $flags = [$updateFlag, $upsertFlag, $validateFlag];
+        $flags = array_filter($flags, static fn ($flag) => (bool)$flag === true);
+        if (count($flags) > 1) {
             if (null !== $context) {
                 self::addValidationError(
                     $context,
                     Constraint::REQUEST_DATA,
-                    sprintf('Both "%s" and "%s" options cannot be set.', $updateFlagName, $upsertFlagName),
+                    'Only one meta option can be used.',
                     $metaPointer
                 );
             }
@@ -76,7 +96,7 @@ class MetaOperationParser
             $upsertFlag = true;
         }
 
-        return [$updateFlag, $upsertFlag];
+        return [$updateFlag, $upsertFlag, $validateFlag];
     }
 
     private static function getUpdateFlag(array $meta, string $updateFlagName): ?bool
@@ -96,6 +116,16 @@ class MetaOperationParser
             return $value;
         }
         if (\is_array($value) && self::isValidListOfFieldNames($value)) {
+            return $value;
+        }
+
+        return null;
+    }
+
+    private static function getValidateFlag(array $meta, string $validateFlagName): ?bool
+    {
+        $value = $meta[$validateFlagName];
+        if (false === $value || true === $value) {
             return $value;
         }
 

@@ -85,6 +85,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         return $methods;
     }
 
+    #[\Override]
     public function getMethods(EntityFieldProcessTransport $transport): array
     {
         return array_keys($this->getMethodsData($transport));
@@ -142,9 +143,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         $transport->setResult($transport->getObject());
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function get(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport)) {
@@ -159,9 +158,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         $transport->setProcessed(true);
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function set(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport)) {
@@ -178,9 +175,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         $transport->setProcessed(true);
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function call(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport)) {
@@ -200,17 +195,13 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         }
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function isset(EntityFieldProcessTransport $transport): void
     {
         $this->propertyExists($transport);
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function propertyExists(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport)) {
@@ -223,6 +214,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         }
     }
 
+    #[\Override]
     public function methodExists(EntityFieldProcessTransport $transport): void
     {
         if (!$this->isApplicable($transport)) {
@@ -236,6 +228,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         }
     }
 
+    #[\Override]
     public function getMethodInfo(EntityFieldProcessTransport $transport): void
     {
         $methods = $this->getMethodsData($transport);

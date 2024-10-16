@@ -36,9 +36,7 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [UpdateListStartChunkJobsTopic::getName()];
@@ -52,9 +50,7 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
         $this->batchSize = $batchSize;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);

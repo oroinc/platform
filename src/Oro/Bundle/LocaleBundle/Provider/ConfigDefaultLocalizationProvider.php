@@ -21,11 +21,13 @@ class ConfigDefaultLocalizationProvider implements LocalizationProviderInterface
     /**
      * @return Localization
      */
+    #[\Override]
     public function getCurrentLocalization()
     {
         return $this->localizationManager->getDefaultLocalization();
     }
 
+    #[\Override]
     public function setCurrentLocalization(?Localization $localization): void
     {
     }

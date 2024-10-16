@@ -25,6 +25,7 @@ class ContentProviderPass implements CompilerPassInterface
         $this->contentProviderTagName = $contentProviderTagName;
     }
 
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $items = [];

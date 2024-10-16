@@ -29,9 +29,7 @@ class ConsumptionExtension extends AbstractExtension
         $this->topicNames[] = $topicName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreReceived(Context $context): void
     {
         if (!$this->isApplicable($context->getMessage())) {

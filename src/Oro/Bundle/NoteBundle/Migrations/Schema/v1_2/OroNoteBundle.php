@@ -12,9 +12,7 @@ class OroNoteBundle implements Migration, AttachmentExtensionAwareInterface
 {
     use AttachmentExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->attachmentExtension->addFileRelation($schema, 'oro_note', 'attachment');

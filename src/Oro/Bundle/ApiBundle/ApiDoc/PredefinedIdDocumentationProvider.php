@@ -17,9 +17,7 @@ class PredefinedIdDocumentationProvider implements DocumentationProviderInterfac
         $this->entityIdResolverRegistry = $entityIdResolverRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDocumentation(RequestType $requestType): ?string
     {
         $descriptions = $this->entityIdResolverRegistry->getDescriptions($requestType);

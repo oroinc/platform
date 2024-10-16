@@ -25,6 +25,7 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
     /** @var WorkflowDefinitionType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
@@ -112,9 +113,7 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         $this->assertEquals(WorkflowDefinitionType::NAME, $this->formType->getBlockPrefix());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $choiceType = $this->createMock(OroChoiceType::class);

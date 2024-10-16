@@ -38,9 +38,7 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
         $this->messageProcessorClassProvider = $messageProcessorClassProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         // remember the current processor
@@ -49,15 +47,14 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
         );
     }
 
+    #[\Override]
     public function onIdle(Context $context)
     {
         // reset the extension state if no messages to process
         $this->lastProcessorClassName = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onInterrupted(Context $context)
     {
         if ($this->lastProcessorClassName) {

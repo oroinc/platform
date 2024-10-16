@@ -10,9 +10,7 @@ use Oro\Bundle\FilterBundle\Filter\AbstractDateFilter;
  */
 class DateRangeFilter extends AbstractDateFilter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return WidgetDateRangeType::class;

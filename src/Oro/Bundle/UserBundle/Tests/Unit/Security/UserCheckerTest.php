@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -28,6 +28,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var UserChecker */
     private $userChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -35,12 +36,12 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker = new UserChecker($this->tokenStorage);
     }
 
-    private function getAuthStatus(string $id): AbstractEnumValue
+    private function getAuthStatus(string $internalId): EnumOptionInterface
     {
-        $authStatus = $this->createMock(AbstractEnumValue::class);
+        $authStatus = $this->createMock(EnumOptionInterface::class);
         $authStatus->expects(self::any())
-            ->method('getId')
-            ->willReturn($id);
+            ->method('getInternalId')
+            ->willReturn($internalId);
 
         return $authStatus;
     }

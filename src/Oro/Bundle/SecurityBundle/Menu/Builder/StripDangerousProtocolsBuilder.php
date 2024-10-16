@@ -19,9 +19,7 @@ class StripDangerousProtocolsBuilder implements BuilderInterface
         $this->uriSecurityHelper = $uriSecurityHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ItemInterface $menu, array $options = [], $alias = null): void
     {
         $this->stripRecursively($menu);

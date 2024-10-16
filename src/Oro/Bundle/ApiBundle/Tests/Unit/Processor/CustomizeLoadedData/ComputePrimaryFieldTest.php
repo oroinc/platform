@@ -10,6 +10,7 @@ class ComputePrimaryFieldTest extends CustomizeLoadedDataProcessorTestCase
     /** @var ComputePrimaryField */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

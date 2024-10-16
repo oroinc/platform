@@ -14,6 +14,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /** @var File|\PHPUnit\Framework\MockObject\MockObject */
     private $image;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->image = $this->createMock(File::class);
@@ -26,6 +27,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): ImageValidator
     {
         $configManager = $this->createMock(ConfigManager::class);

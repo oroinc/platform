@@ -19,6 +19,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityPaginationManager */
     private $entityPaginationManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

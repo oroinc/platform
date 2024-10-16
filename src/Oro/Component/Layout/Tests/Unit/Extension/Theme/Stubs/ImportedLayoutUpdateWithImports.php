@@ -14,14 +14,17 @@ class ImportedLayoutUpdateWithImports implements
     LayoutUpdateImportInterface,
     ImportsAwareLayoutUpdateInterface
 {
+    #[\Override]
     public function getImport()
     {
     }
 
+    #[\Override]
     public function setImport(LayoutUpdateImport $import)
     {
     }
 
+    #[\Override]
     public function setParentUpdate(ImportsAwareLayoutUpdateInterface $parentLayoutUpdate)
     {
     }
@@ -29,13 +32,12 @@ class ImportedLayoutUpdateWithImports implements
     /**
      * @return array
      */
+    #[\Override]
     public function getImports()
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
     }

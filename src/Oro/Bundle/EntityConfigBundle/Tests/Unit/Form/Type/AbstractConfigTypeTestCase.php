@@ -15,6 +15,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $typeHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->typeHelper = $this->createMock(ConfigTypeHelper::class);

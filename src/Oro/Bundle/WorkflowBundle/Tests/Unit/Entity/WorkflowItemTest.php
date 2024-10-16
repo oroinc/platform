@@ -25,6 +25,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowItem */
     private $workflowItem;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowItem = new WorkflowItem();

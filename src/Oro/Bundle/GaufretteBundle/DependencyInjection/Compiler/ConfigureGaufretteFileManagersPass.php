@@ -17,9 +17,7 @@ class ConfigureGaufretteFileManagersPass implements CompilerPassInterface
 {
     private const SUB_DIRECTORY_AWARE_FILESYSTEM_NAMES = ['private', 'public'];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $filesystemMap = $this->getFilesystemMap($container);

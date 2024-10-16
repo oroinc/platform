@@ -13,6 +13,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var OroSearchExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $twigService = $this->createMock(Environment::class);

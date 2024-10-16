@@ -39,6 +39,7 @@ class EmailTemplateSyntaxValidatorTest extends ConstraintValidatorTestCase
     /** @var EmailTemplate */
     private $template;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailRenderer = $this->createMock(EmailRenderer::class);
@@ -55,6 +56,7 @@ class EmailTemplateSyntaxValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         $translator = $this->createMock(TranslatorInterface::class);

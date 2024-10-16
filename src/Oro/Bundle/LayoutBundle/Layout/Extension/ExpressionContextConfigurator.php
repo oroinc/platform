@@ -7,9 +7,7 @@ use Oro\Component\Layout\ContextInterface;
 
 class ExpressionContextConfigurator implements ContextConfiguratorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()

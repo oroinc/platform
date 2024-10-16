@@ -16,6 +16,7 @@ class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
     /** @var FieldConfigId|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldConfigId;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldConfigId = $this->createMock(FieldConfigId::class);

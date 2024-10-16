@@ -99,6 +99,7 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
         return array_values($this->localCache[$securityType]);
     }
 
+    #[\Override]
     public function warmUpCache(): void
     {
         $securityTypes = [];
@@ -114,6 +115,7 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
         }
     }
 
+    #[\Override]
     public function clearCache(): void
     {
         $this->localCache = [];

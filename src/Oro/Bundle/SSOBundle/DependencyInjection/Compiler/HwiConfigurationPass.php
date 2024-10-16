@@ -13,9 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class HwiConfigurationPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('security.authenticator.oauth.main')

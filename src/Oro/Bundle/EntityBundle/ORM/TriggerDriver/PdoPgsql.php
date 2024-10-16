@@ -4,25 +4,19 @@ namespace Oro\Bundle\EntityBundle\ORM\TriggerDriver;
 
 class PdoPgsql extends AbstractDriver
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::DRIVER_POSTGRESQL;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getSqlDisable()
     {
         return 'ALTER TABLE %s DISABLE TRIGGER ALL';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getSqlEnable()
     {
         return 'ALTER TABLE %s ENABLE TRIGGER ALL';

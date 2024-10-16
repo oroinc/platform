@@ -29,6 +29,7 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
     /** @var FlashMessage */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

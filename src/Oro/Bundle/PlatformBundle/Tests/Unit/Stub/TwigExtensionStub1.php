@@ -8,9 +8,7 @@ use Twig\Extension\AbstractExtension;
 
 class TwigExtensionStub1 extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

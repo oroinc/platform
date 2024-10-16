@@ -49,6 +49,7 @@ class ImportVisitor implements VisitorInterface
         $this->themeManager = $themeManager;
     }
 
+    #[\Override]
     public function walkUpdates(array &$updates, ContextInterface $context)
     {
         $this->updates = &$updates;

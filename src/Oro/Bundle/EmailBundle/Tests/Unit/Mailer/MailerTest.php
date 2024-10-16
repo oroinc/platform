@@ -20,6 +20,7 @@ class MailerTest extends \PHPUnit\Framework\TestCase
 
     private Mailer $mailer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transport = $this->createMock(TransportInterface::class);

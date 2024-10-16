@@ -9,9 +9,7 @@ use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
  */
 class LocalizedFallbackValueExtractor implements LocalizedFallbackValueExtractorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function extractValue(AbstractLocalizedFallbackValue $value): ?string
     {
         return $value->getString() ?? $value->getText();

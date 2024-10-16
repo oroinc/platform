@@ -9,25 +9,18 @@ class WidgetPreviousDateRangeType extends AbstractType
 {
     const NAME = 'oro_type_widget_previous_date_range';
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return CheckboxType::class;

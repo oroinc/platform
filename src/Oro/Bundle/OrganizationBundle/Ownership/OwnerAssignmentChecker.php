@@ -10,9 +10,7 @@ use Doctrine\ORM\QueryBuilder;
  */
 class OwnerAssignmentChecker implements OwnerAssignmentCheckerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasAssignments(
         $ownerId,
         string $entityClassName,

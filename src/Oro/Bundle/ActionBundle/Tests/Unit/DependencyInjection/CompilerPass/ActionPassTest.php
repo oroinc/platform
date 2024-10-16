@@ -18,6 +18,7 @@ class ActionPassTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ActionPass();

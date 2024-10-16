@@ -12,6 +12,7 @@ class NavigationItemBuilder extends AbstractBuilder
      * @param $params
      * @return NavigationItem|null
      */
+    #[\Override]
     public function buildItem($params)
     {
         $navigationItem = new $this->className($params);
@@ -26,6 +27,7 @@ class NavigationItemBuilder extends AbstractBuilder
      * @param  int                 $itemId
      * @return NavigationItem|null
      */
+    #[\Override]
     public function findItem($itemId)
     {
         return $this->getEntityManager()->find($this->className, $itemId);

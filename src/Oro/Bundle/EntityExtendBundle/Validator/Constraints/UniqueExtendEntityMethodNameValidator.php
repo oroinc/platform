@@ -37,8 +37,8 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
     /**
      * @param UniqueExtendEntityMethodName $constraint
      * @param FieldConfigModel $value
-     * {@inheritdoc}
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         $this->assertValidatingValue($value);

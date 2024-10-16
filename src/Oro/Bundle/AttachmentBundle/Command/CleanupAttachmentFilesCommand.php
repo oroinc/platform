@@ -71,17 +71,13 @@ abstract class CleanupAttachmentFilesCommand extends Command implements Signalab
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSubscribedSignals(): array
     {
         return [\SIGINT, \SIGTERM];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handleSignal(int $signal): void
     {
         if (\SIGINT === $signal || \SIGTERM === $signal) {
@@ -93,9 +89,9 @@ abstract class CleanupAttachmentFilesCommand extends Command implements Signalab
     }
 
     /**
-     * {@inheritDoc}
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -124,9 +120,9 @@ HELP
     }
 
     /**
-     * {@inheritDoc}
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

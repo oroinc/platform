@@ -31,6 +31,7 @@ class EntityApiBaseHandlerTest extends TestCase
         ];
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

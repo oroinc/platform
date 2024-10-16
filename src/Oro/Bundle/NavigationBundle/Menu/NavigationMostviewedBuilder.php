@@ -33,6 +33,7 @@ class NavigationMostviewedBuilder extends NavigationItemBuilder
      * @param array $options
      * @param string|null $alias
      */
+    #[\Override]
     public function build(ItemInterface $menu, array $options = array(), $alias = null)
     {
         $options['order_by'] = array(array('field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISIT_COUNT));

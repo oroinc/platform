@@ -15,6 +15,7 @@ class BuildMonologHandlersPass implements CompilerPassInterface
 {
     private const VERBOSITY_FILTER_HANDLER_ID = 'oro_message_queue.log.handler.verbosity_filter';
 
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $extension = $container->getExtension('monolog');

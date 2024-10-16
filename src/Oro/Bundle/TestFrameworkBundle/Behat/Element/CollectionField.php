@@ -7,9 +7,7 @@ use Behat\Mink\Element\NodeElement;
 
 class CollectionField extends Element
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($values)
     {
         $this->removeAllRows();

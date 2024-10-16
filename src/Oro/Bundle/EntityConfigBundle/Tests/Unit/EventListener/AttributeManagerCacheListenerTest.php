@@ -16,6 +16,7 @@ class AttributeManagerCacheListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attributeManager = $this->createMock(AttributeManager::class);

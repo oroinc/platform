@@ -21,9 +21,7 @@ class ConvertApiKeyDataFormatQuery extends ParametrizedSqlMigrationQuery
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
         $keys = $this->connection->createQueryBuilder()

@@ -10,9 +10,7 @@ class InlcudeHandlersPass implements CompilerPassInterface
     const TAG                         = 'oro_soap.include_handler';
     const DELEGATE_HANDLER_SERVICE_ID = 'oro_soap.handler.include_delegate';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->has(self::DELEGATE_HANDLER_SERVICE_ID)) {

@@ -9,6 +9,7 @@ class SystemVariablesTemplateProcessorTest extends TestCase
 {
     private SystemVariablesTemplateProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new SystemVariablesTemplateProcessor();

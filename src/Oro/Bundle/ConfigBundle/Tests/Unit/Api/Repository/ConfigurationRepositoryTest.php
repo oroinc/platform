@@ -15,6 +15,7 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationRepository */
     private $configRepository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigApiManager::class);

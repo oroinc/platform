@@ -37,9 +37,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface
         ]
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $thread = new EmailThread();

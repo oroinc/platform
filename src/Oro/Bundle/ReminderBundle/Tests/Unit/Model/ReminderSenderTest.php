@@ -15,6 +15,7 @@ class ReminderSenderTest extends \PHPUnit\Framework\TestCase
     /** @var ReminderSender */
     private $sender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(SendProcessorRegistry::class);

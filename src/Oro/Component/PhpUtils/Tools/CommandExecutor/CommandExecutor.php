@@ -42,6 +42,7 @@ class CommandExecutor extends AbstractCommandExecutor implements CommandExecutor
      *
      * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
      */
+    #[\Override]
     public function runCommand(string $command, array $params = [], LoggerInterface $logger = null): int
     {
         $params = $this->prepareParameters($command, $params);
@@ -90,17 +91,13 @@ class CommandExecutor extends AbstractCommandExecutor implements CommandExecutor
         return $exitCode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultOption(string $name)
     {
         return $this->defaultOptions[$name] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setDefaultOption(string $name, $value = true): CommandExecutorInterface
     {
         $this->defaultOptions[$name] = $value;

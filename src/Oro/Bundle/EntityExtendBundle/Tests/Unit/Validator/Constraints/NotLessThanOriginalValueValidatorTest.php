@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): NotLessThanOriginalValueValidator
     {
         return new NotLessThanOriginalValueValidator();

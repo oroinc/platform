@@ -16,6 +16,7 @@ class PermissionsPolicyHeaderRequestListenerTest extends TestCase
     private PermissionsPolicyHeaderProvider|MockObject $headerProvider;
     private PermissionsPolicyHeaderRequestListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->headerProvider = $this->createMock(PermissionsPolicyHeaderProvider::class);

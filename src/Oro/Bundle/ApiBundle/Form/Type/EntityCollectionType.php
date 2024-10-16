@@ -9,9 +9,7 @@ use Symfony\Component\Form\AbstractType;
  */
 class EntityCollectionType extends AbstractType
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return CollectionType::class;

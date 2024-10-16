@@ -27,6 +27,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessEntityNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

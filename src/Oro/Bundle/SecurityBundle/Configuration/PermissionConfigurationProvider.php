@@ -37,9 +37,7 @@ class PermissionConfigurationProvider extends PhpArrayConfigProvider
         return $permissions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];

@@ -44,9 +44,7 @@ class NoteActivityListProvider implements
         $this->commentAssociationHelper = $commentAssociationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicableTarget($entityClass, $accessible = true)
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
@@ -56,9 +54,7 @@ class NoteActivityListProvider implements
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRoutes($entity): array
     {
         return [
@@ -69,94 +65,84 @@ class NoteActivityListProvider implements
     }
 
     /**
-     * {@inheritdoc}
      * @param Note $entity
      */
+    #[\Override]
     public function getSubject($entity): string
     {
         return $this->truncate(\strip_tags((string)$entity->getMessage()), 100);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription($entity): ?string
     {
         return null;
     }
 
     /**
-     * {@inheritdoc}
      * @param Note $entity
      */
+    #[\Override]
     public function getOwner($entity): ?User
     {
         return $entity->getOwner();
     }
 
     /**
-     * {@inheritdoc}
      * @param Note $entity
      */
+    #[\Override]
     public function getUpdatedBy($entity): ?User
     {
         return $entity->getUpdatedBy();
     }
 
     /**
-     * {@inheritdoc}
      * @param Note $entity
      */
+    #[\Override]
     public function getCreatedAt($entity): ?\DateTime
     {
         return $entity->getCreatedAt();
     }
 
     /**
-     * {@inheritdoc}
      * @param Note $entity
      */
+    #[\Override]
     public function getUpdatedAt($entity): ?\DateTime
     {
         return $entity->getUpdatedAt();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData(ActivityList $activityList): array
     {
         return [];
     }
 
     /**
-     * {@inheritdoc}
      * @param Note $entity
      */
+    #[\Override]
     public function getOrganization($entity): ?Organization
     {
         return $entity->getOrganization();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplate(): string
     {
         return '@OroNote/Note/js/activityItemTemplate.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActivityId($entity)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable($entity): bool
     {
         if (\is_object($entity)) {
@@ -167,26 +153,24 @@ class NoteActivityListProvider implements
     }
 
     /**
-     * {@inheritdoc}
      * @param Note $entity
      */
+    #[\Override]
     public function getTargetEntities($entity): array
     {
         return $entity->getActivityTargets();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isCommentsEnabled($entityClass): bool
     {
         return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
     }
 
     /**
-     * {@inheritdoc}
      * @param Note $entity
      */
+    #[\Override]
     public function getActivityOwners($entity, ActivityList $activityList): array
     {
         $organization = $this->getOrganization($entity);
@@ -204,9 +188,7 @@ class NoteActivityListProvider implements
         return [$activityOwner];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isActivityListApplicable(ActivityList $activityList): bool
     {
         return true;

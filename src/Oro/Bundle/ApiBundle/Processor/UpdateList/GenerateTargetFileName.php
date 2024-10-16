@@ -18,9 +18,7 @@ class GenerateTargetFileName implements ProcessorInterface
         $this->fileNameProvider = $fileNameProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */

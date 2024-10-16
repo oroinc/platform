@@ -23,9 +23,7 @@ class TranslationDataLoader implements DataLoaderInterface
         $this->queryModifier = $queryModifier;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function loadData(QueryBuilder $qb, EntityDefinitionConfig $config, array $context): array
     {
         $preparedQuery = $this->entitySerializer->buildQuery(
@@ -43,9 +41,7 @@ class TranslationDataLoader implements DataLoaderInterface
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function serializeData(array $data, EntityDefinitionConfig $config, array $context): array
     {
         return $this->entitySerializer->serializeEntities($data, TranslationKey::class, $config, $context);

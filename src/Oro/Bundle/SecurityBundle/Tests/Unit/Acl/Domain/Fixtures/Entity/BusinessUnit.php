@@ -16,11 +16,13 @@ class BusinessUnit extends BaseBusinessUnit
         $this->owner = $owner;
     }
 
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
+    #[\Override]
     public function getOwner()
     {
         return $this->owner;

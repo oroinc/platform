@@ -53,6 +53,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *
      * @return bool
      */
+    #[\Override]
     public function isGranted($attribute, $subject = null): bool
     {
         if (\is_string($attribute) && !empty($attribute) && $aclAttribute = $this->getAttribute($attribute)) {

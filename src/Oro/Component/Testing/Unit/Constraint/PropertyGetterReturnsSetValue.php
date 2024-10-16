@@ -33,9 +33,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
         $this->testValue = $testValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toString(): string
     {
         return sprintf(
@@ -45,9 +43,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
             $this->exporter()->export($this->testValue)
         );
     }
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function failureDescription($other): string
     {
         return sprintf(
@@ -59,9 +55,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function matches($other): bool
     {
         $setter = 'set' . ucfirst($this->propertyName);

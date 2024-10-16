@@ -26,6 +26,7 @@ class ExpressionConditionVisitor implements VisitorInterface
         $this->expressionLanguage = $expressionLanguage;
     }
 
+    #[\Override]
     public function startVisit(VisitContext $visitContext): void
     {
         $class  = $visitContext->getClass();
@@ -51,6 +52,7 @@ CODE
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function endVisit(VisitContext $visitContext): void
     {
     }

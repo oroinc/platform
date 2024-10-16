@@ -28,6 +28,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldStateChecker */
     private $entityFieldStateChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -24,6 +24,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
     /** @var EntityManagerInterface */
     private $emMock;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emMock = $this->getTestEntityManager();

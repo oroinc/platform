@@ -14,9 +14,7 @@ class DynamicTranslationLoaderStub implements DynamicTranslationLoaderInterface
         $this->translations = $translations;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function loadTranslations(array $locales, bool $includeSystem): array
     {
         $result = [];

@@ -25,6 +25,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAttachmentType */
     private $emailAttachmentType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

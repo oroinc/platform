@@ -46,9 +46,7 @@ class MessageProducer implements MessageProducerInterface, LoggerAwareInterface
         $this->middlewares = $middlewares;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send($topic, $message): void
     {
         try {

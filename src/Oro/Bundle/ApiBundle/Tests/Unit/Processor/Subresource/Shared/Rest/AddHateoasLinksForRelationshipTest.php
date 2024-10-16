@@ -28,6 +28,7 @@ class AddHateoasLinksForRelationshipTest extends GetSubresourceProcessorTestCase
     /** @var AddHateoasLinksForRelationship */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

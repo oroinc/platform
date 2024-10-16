@@ -42,9 +42,7 @@ class ConsumerHeartbeatCommand extends Command implements
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return \sprintf(
@@ -54,6 +52,7 @@ class ConsumerHeartbeatCommand extends Command implements
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure()
     {
         $this->setDescription('Pushes a websocket notification if there are no available MQ consumers.')
@@ -73,6 +72,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // do nothing if check was disabled with 0 config option value

@@ -20,9 +20,7 @@ class RoleDeleteHandlerExtension extends AbstractEntityDeleteHandlerExtension
         $this->aclSidManager = $aclSidManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertDeleteGranted($entity): void
     {
         /** @var Role $entity */
@@ -34,9 +32,7 @@ class RoleDeleteHandlerExtension extends AbstractEntityDeleteHandlerExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function postFlush($entity, array $options): void
     {
         if ($this->aclSidManager->isAclEnabled()) {

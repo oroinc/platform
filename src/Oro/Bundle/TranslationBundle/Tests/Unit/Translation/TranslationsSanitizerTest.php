@@ -14,6 +14,7 @@ class TranslationsSanitizerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationsSanitizer */
     private $sanitizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationMessageSanitizer = $this->createMock(TranslationMessageSanitizerInterface::class);

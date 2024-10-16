@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LocalizationValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): LocalizationValidator
     {
         return new LocalizationValidator();

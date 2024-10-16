@@ -9,6 +9,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ScalarFieldDenormalizer */
     private $denormalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->denormalizer = new ScalarFieldDenormalizer();

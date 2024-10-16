@@ -14,6 +14,7 @@ class DuplicatorMatcherPassTest extends \PHPUnit\Framework\TestCase
     /** @var DuplicatorMatcherPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new DuplicatorMatcherPass();

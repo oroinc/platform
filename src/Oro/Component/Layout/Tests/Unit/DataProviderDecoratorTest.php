@@ -10,6 +10,7 @@ class DataProviderDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var DataProviderDecorator */
     private $decorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->decorator = new DataProviderDecorator(new DataProviderStub(['key1' => 'value1']));

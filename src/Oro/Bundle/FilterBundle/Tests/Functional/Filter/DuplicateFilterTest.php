@@ -18,6 +18,7 @@ class DuplicateFilterTest extends WebTestCase
 {
     private DuplicateFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

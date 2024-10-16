@@ -34,9 +34,7 @@ class NestedTreeComparisonExpression implements ComparisonExpressionInterface
         $this->includeRoot = $includeRoot;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
         string $field,

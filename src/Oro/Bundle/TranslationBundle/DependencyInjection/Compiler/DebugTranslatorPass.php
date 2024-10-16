@@ -13,9 +13,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class DebugTranslatorPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->getParameter('oro_translation.debug_translator')) {

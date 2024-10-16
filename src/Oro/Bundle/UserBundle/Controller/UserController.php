@@ -277,9 +277,7 @@ class UserController extends AbstractController
         $em->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

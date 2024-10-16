@@ -40,6 +40,7 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
         $this->cronFormatTransformer = $cronFormatTransformer;
     }
 
+    #[\Override]
     public function handle(DataStorageInterface $dataStorage)
     {
         $scheduleTime = $dataStorage->get(self::PARAM_INVALIDATE_TIME);

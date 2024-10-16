@@ -41,6 +41,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ExecuteOperationHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

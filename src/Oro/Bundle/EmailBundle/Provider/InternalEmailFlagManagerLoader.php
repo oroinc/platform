@@ -13,17 +13,13 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
  */
 class InternalEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(EmailOrigin $origin)
     {
         return $origin instanceof InternalEmailOrigin;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function select(EmailFolder $folder, OroEntityManager $em)
     {
         return new InternalEmailFlagManager();

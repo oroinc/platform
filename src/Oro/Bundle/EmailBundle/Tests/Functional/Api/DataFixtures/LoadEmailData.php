@@ -31,18 +31,16 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ'
         . 'AAAABHNCSVQICAgIfAhkiAAAAAtJREFUCJlj+A8EAAn7A/3jVfKcAAAAAElFTkSuQmCC';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganization::class, LoadBusinessUnit::class, LoadUser::class];
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var EmailEntityBuilder $emailBuilder */

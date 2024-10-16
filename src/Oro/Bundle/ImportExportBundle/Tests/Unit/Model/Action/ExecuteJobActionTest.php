@@ -18,6 +18,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
     /** @var ExecuteJobAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobExecutor = $this->createMock(JobExecutor::class);
