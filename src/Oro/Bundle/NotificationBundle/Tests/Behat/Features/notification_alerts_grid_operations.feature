@@ -9,7 +9,7 @@ Feature: Notification Alerts Grid operations
   Scenario: Check notifications alerts grid
     Given I login as administrator
     When I go to System/Alerts
-    Then there are 9 records in grid
+    Then there are 10 records in grid
 
   Scenario: Check notifications alerts grid "Operation" filter
     When I set filter "Operation" as is equal to "import" and press Enter key
@@ -43,14 +43,14 @@ Feature: Notification Alerts Grid operations
 
   Scenario: Check notifications alerts grid "Item ID" filter
     When I filter Item ID as is empty
-    Then there is 3 record in grid
+    Then there is 4 record in grid
     When I filter Item ID as is not empty
     Then there is 6 record in grid
     And I reset "Item ID" filter
 
   Scenario: Check notifications alerts grid "External ID" filter
     When I filter External ID as is empty
-    Then there is 3 record in grid
+    Then there is 4 record in grid
     When I filter External ID as is not empty
     Then there is 6 record in grid
     And I reset "External ID" filter
@@ -78,9 +78,13 @@ Feature: Notification Alerts Grid operations
     And click Delete mass action
     And confirm deletion
     And I reset "Resource" filter
-    Then there is 3 records in grid
+    Then there is 4 records in grid
 
   Scenario: Check notifications alerts grid record delete action
+    When I click delete "oauth2_private_key" in grid
+    And I confirm deletion
+    And I should see "Notification Alert deleted" flash message
+    Then there is 3 records in grid
     When I click delete "118" in grid
     And I confirm deletion
     And I should see "Notification Alert deleted" flash message

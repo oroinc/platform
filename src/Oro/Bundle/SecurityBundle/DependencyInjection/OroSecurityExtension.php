@@ -36,6 +36,11 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $this->configurePermissionsPolicy($container, $config);
 
         $container->setParameter('oro_security.login_target_path_excludes', $config['login_target_path_excludes']);
+
+        $container->setParameter(
+            'oro_security.session.storage.options',
+            $container->getParameter('session.storage.options')
+        );
     }
 
     #[\Override]

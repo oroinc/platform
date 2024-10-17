@@ -125,6 +125,24 @@ class UrlUtil
         return '';
     }
 
+    public static function getSchemeAndHttpHost(string $url): string
+    {
+        $urlParts = parse_url($url);
+
+        if (empty($urlParts['scheme'])) {
+            $scheme = '//';
+        } else {
+            $scheme = $urlParts['scheme'] . '://';
+        }
+
+        $httpHost = self::getHttpHost($url);
+        if (empty($httpHost)) {
+            return '';
+        }
+
+        return $scheme . $httpHost;
+    }
+
     public static function addQueryParameters(string $url, array $extraParameters, bool $override = false): string
     {
         $urlParts = parse_url($url);

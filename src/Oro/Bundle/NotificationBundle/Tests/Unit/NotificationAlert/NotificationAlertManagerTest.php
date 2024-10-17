@@ -434,6 +434,74 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         self::assertIsString($this->notificationAlertManager->addNotificationAlert($notificationAlert));
     }
 
+    public function testAddNotificationAlertWhenAlreadyExists(): void
+    {
+        $dateTime = $this->createDateTime();
+        $userId = 12;
+        $organizationId = 37;
+
+        $notificationAlert = new TestNotificationAlert(
+            'test_integration',
+            [
+                'operation'    => 'import',
+                'step'         => 'get',
+                'createdAt'    => $dateTime,
+                'updatedAt'    => $dateTime,
+                'itemId'       => 456,
+                'externalId'   => 'test_item_id',
+                'resourceType' => 'test_entity',
+                'alertType'    => 'sync',
+                'message'      => 'sample_message',
+            ]
+        );
+
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUserId')
+            ->willReturn($userId);
+        $this->tokenAccessor->expects(self::once())
+            ->method('getOrganizationId')
+            ->willReturn($organizationId);
+
+        $this->connection->expects(self::atMost(2))
+            ->method('fetchOne')
+            ->willReturn(456);
+        $this->connection->expects(self::atMost(2))
+            ->method('update')
+            ->with(
+                'oro_notification_alert',
+                self::isType('array'),
+                ['id' => 456],
+                [
+                    'message'    => 'text',
+                    'updated_at' => 'datetime',
+                ]
+            )
+            ->willReturnCallback(function (string $table, array $data) use ($dateTime) {
+                self::assertSame($dateTime, $data['updated_at']);
+                self::assertSame('sample_message', $data['message']);
+
+                return 1;
+            });
+
+        $this->logger->expects(self::once())
+            ->method('notice')
+            ->willReturnCallback(function (string $message, array $context) {
+                self::assertEquals('Notification alert was updated.', $message);
+                unset($context['alertData']['updatedAt']);
+                self::assertEquals(
+                    [
+                        'alertUuid' => 456,
+                        'alertData' => ['message' => 'sample_message'],
+                    ],
+                    $context
+                );
+            });
+        $this->logger->expects(self::never())
+            ->method('error');
+
+        self::assertIsString($this->notificationAlertManager->addNotificationAlert($notificationAlert));
+    }
+
     public function testHasNotificationAlerts(): void
     {
         $userId = 1;

@@ -439,7 +439,11 @@ class NotificationAlertManager
             $sql = 'SELECT alert.id as similarNotificationAlert FROM %s AS alert WHERE %s ORDER BY %s';
             $criteria = [];
             foreach ($data as $column => $value) {
-                $criteria[] = 'alert.' . $column . ' = :' . $column;
+                if ($value === null) {
+                    $criteria[] = 'alert.' . $column . ' IS NULL';
+                } else {
+                    $criteria[] = 'alert.' . $column . ' = :' . $column;
+                }
             }
             $criteria = implode(' AND ', $criteria);
             $orderBy = 'alert.updated_at DESC, alert.created_at DESC';

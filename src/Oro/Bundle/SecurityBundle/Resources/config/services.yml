@@ -2,6 +2,19 @@ parameters:
     oro_security.allowed_protocols: ['http', 'https']
 
 services:
+    oro_security.http_kernel.session_path:
+        class: \Oro\Bundle\SecurityBundle\Request\SessionHttpKernelDecorator
+        decorates: http_kernel
+        decoration_priority: 250
+        arguments:
+            - '@.inner'
+            - '@oro_security.request.session_storage_options_manipulator'
+
+    oro_security.request.session_storage_options_manipulator:
+        class: Oro\Bundle\SecurityBundle\Request\SessionStorageOptionsManipulator
+        arguments:
+            - '@service_container'
+
     oro_security.authorization_checker:
         class: Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker
         decorates: security.authorization_checker

@@ -1,0 +1,13 @@
+services:
+    oro_distribution.event_listener.route_prioritizing.web_debug_toolbar:
+        class: Oro\Bundle\DistributionBundle\EventListener\RoutePrioritizingListener
+        calls:
+            - [ setRoutesPriorities, [
+                {
+                    '/^_profiler_.+$/': 100,
+                    '/^_profiler$/': 100,
+                    '/^_wdt$/': 100,
+                    '/^_preview_error$/': 100,
+                } ] ]
+        tags:
+            - { name: kernel.event_listener, event: oro_distribution.route_collection.all, method: onCollectionLoad }

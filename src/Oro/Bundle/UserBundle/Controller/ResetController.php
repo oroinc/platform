@@ -39,13 +39,23 @@ class ResetController extends AbstractController
      *
      * @return RedirectResponse
      */
-    #[Route(path: '/send-email', name: 'oro_user_reset_send_email', methods: ['POST'])]
+    #[Route(
+        path: '/send-email',
+        name: 'oro_user_reset_send_email',
+        methods: ['POST'],
+        defaults: [
+            '_target_route' => 'oro_user_reset_check_email',
+            '_return_route' => 'oro_user_reset_request',
+        ]
+    )]
     public function sendEmailAction(Request $request)
     {
         if (!$this->isCsrfTokenValid('oro-user-password-reset-request', $request->get('_csrf_token'))) {
             $request->getSession()->getFlashBag()
                 ->add('warn', 'The CSRF token is invalid. Please try to resubmit the form.');
-            return $this->redirect($this->generateUrl('oro_user_reset_request'));
+            return $this->redirect(
+                $this->generateUrl($request->attributes->get('_return_route', 'oro_user_reset_request'))
+            );
         }
         $email = $request->request->get('username');
         $inputData = $email;
@@ -80,7 +90,9 @@ class ResetController extends AbstractController
                                 ->trans('oro.email.handler.unable_to_send_email')
                         );
 
-                    return $this->redirect($this->generateUrl('oro_user_reset_request'));
+                    return $this->redirect(
+                        $this->generateUrl($request->attributes->get('_return_route', 'oro_user_reset_request'))
+                    );
                 }
 
                 $securityLogMessage = 'Reset password email has been sent';
@@ -95,7 +107,9 @@ class ResetController extends AbstractController
 
         $request->getSession()->set(static::SESSION_EMAIL, $inputData);
 
-        return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
+        return $this->redirect(
+            $this->generateUrl($request->attributes->get('_target_route', 'oro_user_reset_check_email'))
+        );
     }
 
     #[Route(path: '/reset-request', name: 'oro_user_reset_request', methods: ['GET'])]
