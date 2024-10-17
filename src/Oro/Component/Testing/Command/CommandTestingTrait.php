@@ -14,6 +14,7 @@ use PHPUnit\Framework\Exception;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -23,13 +24,37 @@ use Symfony\Component\Console\Tester\CommandTester;
 trait CommandTestingTrait
 {
     /**
+     * @param string $command
+
+     * @return Command
+     */
+    private function findCommand(string $command): Command
+    {
+        if (!$this instanceof KernelTestCase) {
+            throw new Exception(
+                sprintf(
+                    '%s accepts command name (string) as the first parameter' .
+                    ' only in functional tests (or other tests based on KernelTestCase)',
+                    __METHOD__
+                )
+            );
+        }
+
+        $command = (new Application(static::$kernel ?? static::bootKernel()))->find($command);
+        if ($command instanceof LazyCommand) {
+            $command = $command->getCommand();
+        }
+
+        return $command;
+    }
+
+    /**
      * @param Command|string $command Command instance or command name (execute by name is supported only in functional
      *                                  tests or other tests based on KernelTestCase.
-     * @param array $input
-     * @param array $options Additional options that will be used when instantiating the command (e.g. 'verbosity').
+
      * @return CommandTester
      */
-    private function doExecuteCommand($command, array $input = [], array $options = []): CommandTester
+    private function getCommandTester(Command|string $command): CommandTester
     {
         if (\is_string($command)) {
             if (!$this instanceof KernelTestCase) {
@@ -42,7 +67,20 @@ trait CommandTestingTrait
             $app = new Application(static::$kernel ?? static::bootKernel());
             $command = $app->find($command);
         }
-        $commandTester = new CommandTester($command);
+
+        return new CommandTester($command);
+    }
+
+    /**
+     * @param Command|string $command Command instance or command name (execute by name is supported only in functional
+     *                                  tests or other tests based on KernelTestCase.
+     * @param array $input
+     * @param array $options Additional options that will be used when instantiating the command (e.g. 'verbosity').
+     * @return CommandTester
+     */
+    private function doExecuteCommand($command, array $input = [], array $options = []): CommandTester
+    {
+        $commandTester = $this->getCommandTester($command);
         $commandTester->execute($input, $options);
 
         return $commandTester;

@@ -12,7 +12,7 @@
                 {% set showLabels = (resetLabel|length <= 9) and (cancelLabel|length <= 9) %}
                 {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
                 {{ form_start(form, {
-                    'action': path('oro_user_reset_reset', { token: token }),
+                    'action': resetFormActionPath|default(path('oro_user_reset_reset', { token: token })),
                     'attr': {
                         'class': 'form-vertical form-signin form-signin--reset ' ~ layoutName
                     }
@@ -29,7 +29,7 @@
                         {{ form_rest(form) }}
                         <div class="form-row form-signin__footer">
                             <button class="btn extra-submit btn-uppercase btn-primary" type="submit">{{ resetLabel }}</button>
-                            <a href="{{ path('oro_user_security_login') }}" class="btn">{{ cancelLabel }}</a>
+                            <a href="{{ resetFormReturnPath|default(path('oro_user_security_login')) }}" class="btn">{{ cancelLabel }}</a>
                         </div>
                     </fieldset>
                 {{ form_end(form) }}

@@ -5,6 +5,13 @@ parameters:
     container.dumper.inline_factories: false
 
 services:
+    oro_distribution.delegating_routing_loader:
+        class: Oro\Bundle\DistributionBundle\Routing\DelegatingLoader
+        decorates: routing.loader
+        arguments:
+            - '@.inner'
+            - '@event_dispatcher'
+
     oro_distribution.routing_loader:
         class: Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
         arguments:
@@ -72,9 +79,14 @@ services:
         public: true
         alias: oro_distribution.handler.application_status
 
-    oro_shipping.cache_warmer.set_is_installed:
+    oro_distribution.cache_warmer.set_is_installed:
         class: Oro\Bundle\DistributionBundle\CacheWarmer\SetIsInstalledCacheWarmer
         arguments:
             - '@oro_distribution.handler.application_status'
         tags:
             - { name: oro_entity_extend.warmer, priority: 300 }
+
+    oro_distribution.event_listener.controller_template_override:
+        class: Oro\Bundle\DistributionBundle\EventListener\ControllerTemplateListener
+        tags:
+            - { name: kernel.event_subscriber }

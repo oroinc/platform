@@ -55,8 +55,8 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
     #[\Override]
     public function resolveGlobalOptions(InputInterface $input)
     {
-        $user = $input->getParameterOption('--current-user');
-        $organization = $input->getParameterOption('--current-organization');
+        $user = $input->getOption('current-user');
+        $organization = $input->getOption('current-organization');
 
         if (!$user && !$organization) {
             return;

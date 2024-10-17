@@ -1345,7 +1345,7 @@ abstract class WebTestCase extends BaseWebTestCase
         } catch (SessionNotFoundException $e) {
             $session = $this->createSession();
 
-            $masterRequest = new Request();
+            $masterRequest = Request::create('/');
             $masterRequest->setSession($session);
 
             $requestStack->push($masterRequest);

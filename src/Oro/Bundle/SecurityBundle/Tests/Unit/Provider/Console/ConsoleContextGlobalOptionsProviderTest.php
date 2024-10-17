@@ -117,10 +117,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
     {
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn(null, null);
 
@@ -132,10 +132,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 777;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn(null, $organizationId);
 
@@ -147,10 +147,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($userId, null);
 
@@ -170,10 +170,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($userId, null);
 
@@ -202,10 +202,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($userId, null);
 
@@ -235,10 +235,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($userId, null);
 
@@ -270,10 +270,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($userId, null);
 
@@ -297,10 +297,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $username = 'username';
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($username, null);
 
@@ -329,10 +329,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 777;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($username, $organizationId);
 
@@ -359,10 +359,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 555;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($username, $organizationId);
 
@@ -392,10 +392,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 555;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($username, $organizationId);
 
@@ -430,10 +430,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 555;
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
-            ->method('getParameterOption')
+            ->method('getOption')
             ->withConsecutive(
-                ['--' . 'current-user'],
-                ['--' . 'current-organization']
+                ['current-user'],
+                ['current-organization']
             )
             ->willReturn($username, $organizationId);
 

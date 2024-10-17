@@ -11,6 +11,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
+        $container->setParameter('session.storage.options', ['cookie_lifetime' => 3600]);
 
         $extension = new OroSecurityExtension();
         $extension->load([], $container);
@@ -21,9 +22,9 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
                 [
                     'settings' => [
                         'resolved' => true,
-                        'symfony_profiler_collection_of_voter_decisions' => ['value' => false, 'scope' => 'app']
-                    ]
-                ]
+                        'symfony_profiler_collection_of_voter_decisions' => ['value' => false, 'scope' => 'app'],
+                    ],
+                ],
             ],
             $container->getExtensionConfig('oro_security')
         );
@@ -37,5 +38,10 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $permissionsPolicyProviderDef = $container->getDefinition('oro_security.permission_policy_header_provider');
         self::assertFalse($permissionsPolicyProviderDef->getArgument(0));
         self::assertEquals([], $permissionsPolicyProviderDef->getArgument(1));
+
+        self::assertEquals(
+            ['cookie_lifetime' => 3600],
+            $container->getParameter('oro_security.session.storage.options')
+        );
     }
 }

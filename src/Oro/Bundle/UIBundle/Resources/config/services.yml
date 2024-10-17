@@ -369,8 +369,13 @@ services:
         arguments:
             - '@url_helper'
             - '@request_stack'
-            - '@?request_context'
+            - '@router.request_context'
 
+    oro_ui.tools.request_context_manipulator:
+        class: Oro\Bundle\UIBundle\Tools\RouterRequestContextManipulator
+        arguments:
+            - '@router.request_context'
+            - '@property_accessor'
 
     Oro\Bundle\UIBundle\Asset\RuntimeAssetVersionStrategy:
         abstract: true
