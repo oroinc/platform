@@ -7,6 +7,15 @@
         <title>{{ apiName }}</title>
         <style type="text/css">
             {{ css|raw }}
+
+            .add_filter {
+                margin-bottom: 10px;
+            }
+
+            .buttons input[type='submit'] {
+                font-size: 18px;
+                padding: 5px 20px;
+            }
         </style>
         <script>
             {{ js|raw }}
@@ -795,6 +804,14 @@
                     $(this).before(html);
 
                     return false;
+                });
+
+                $(document).on('click', '.pane.sandbox .add_filter', function() {
+                  var html = $(this).parents('.pane').find('.filters_tuple_template').html();
+
+                  $(this).before(html);
+
+                  return false;
                 });
 
                 $(document).on('click', '.pane.sandbox .remove', function() {

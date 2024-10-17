@@ -32,6 +32,7 @@ The current file describes significant changes in the code that may affect the u
 
 #### ApiBundle
 * Added new `crypted_text` doctrine type as a data type to `api_doc_data_types` and `open_api` sections of ORO API configuration.
+* Added an "Add filter" button to each resource for API sandbox.
 * Added a new meta `validate` flag to create and update operations, making API requests with transaction rollback instead of commit.
 * Added a new `rollback_validated_request` event for `customize_form_data` action.
 
