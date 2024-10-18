@@ -15,12 +15,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class DisableValidateOperation implements ProcessorInterface
 {
-    /**
-     * @param ContextInterface&FormContext $context
-     */
     #[\Override]
     public function process(ContextInterface $context): void
     {
+        /** @var FormContext $context */
+
         if (!$context->has(SetOperationFlags::VALIDATE_FLAG)) {
             // the validate operation was not requested
             return;

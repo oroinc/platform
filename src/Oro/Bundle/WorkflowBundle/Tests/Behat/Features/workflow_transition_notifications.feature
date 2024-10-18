@@ -36,7 +36,8 @@ Feature: Workflow transition notifications
       | Email    | test@example.com    |
     And I save and close form
     Then I should see "Email notification rule saved" flash message
-    And I should see First Workflow in grid with following data:
+    When I check "User" in "Entity Name" filter
+    Then I should see First Workflow in grid with following data:
       | Entity Name     | User                                         |
       | Event Name      | Workflow transition                          |
       | Workflow        | First Workflow                               |

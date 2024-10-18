@@ -3,15 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\WorkflowBundle\Provider\TransitionPageFormTemplateDataProvider;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
 class TransitionPageFormTemplateDataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransitionPageFormTemplateDataProvider */
-    private $provider;
+    private TransitionPageFormTemplateDataProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +17,7 @@ class TransitionPageFormTemplateDataProviderTest extends \PHPUnit\Framework\Test
         $this->provider = new TransitionPageFormTemplateDataProvider();
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $formView = $this->createMock(FormView::class);
 
@@ -28,7 +26,7 @@ class TransitionPageFormTemplateDataProviderTest extends \PHPUnit\Framework\Test
             ->method('createView')
             ->willReturn($formView);
 
-        $entity = $this->createMock(StubEntity::class);
+        $entity = new \stdClass();
 
         $request = $this->createMock(Request::class);
 

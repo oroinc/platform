@@ -38,7 +38,7 @@ class UpdateTest extends RestJsonApiTestCase
             $response = $this->patch(
                 ['entity' => $entityType, 'id' => $entityId],
                 [
-                    'fields' => sprintf('fields[%s]=id', $entityType),
+                    'filters' => sprintf('fields[%s]=id', $entityType),
                     'data' => ['type' => $entityType, 'id' => $entityId]
                 ],
                 [],
