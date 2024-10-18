@@ -54,7 +54,7 @@ class UserProfileTest extends RestJsonApiTestCase
         self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $user = $this->getCurrentUser();
-        $this->assertResponseContains($this->getExpectedContentWithPaginationLinks([
+        $this->assertResponseContains([
             'data' => [
                 'type'          => 'userprofile',
                 'id'            => (string)$user->getId(),
@@ -71,7 +71,7 @@ class UserProfileTest extends RestJsonApiTestCase
                     ]
                 ]
             ]
-        ]), $response);
+        ], $response);
     }
 
     public function testOptions()

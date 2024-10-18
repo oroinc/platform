@@ -3,33 +3,23 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Provider\RunningWorkflowProvider;
 
+/**
+ * Allows only one running workflow from the sane exclusive record group.
+ */
 class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterInterface
 {
-    /**
-     * @var DoctrineHelper
-     */
-    private $doctrineHelper;
-
-    /**
-     * @var WorkflowItemRepository
-     */
-    private $itemsRepository;
-
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(
+        private readonly RunningWorkflowProvider $runningWorkflowProvider
+    ) {
     }
 
     #[\Override]
-    public function filter(ArrayCollection $workflows, WorkflowRecordContext $context)
+    public function filter(ArrayCollection $workflows, WorkflowRecordContext $context): ArrayCollection
     {
         $lockedGroup = $this->retrieveLockedGroups($workflows, $context);
-
-        if (count($lockedGroup) === 0) {
+        if (!$lockedGroup) {
             return $workflows;
         }
 
@@ -39,7 +29,7 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
                 if ($definition->hasExclusiveRecordGroups()) {
                     $name = $workflow->getName();
                     foreach ($definition->getExclusiveRecordGroups() as $recordGroup) {
-                        if (array_key_exists($recordGroup, $lockedGroup) && $lockedGroup[$recordGroup] !== $name) {
+                        if (\array_key_exists($recordGroup, $lockedGroup) && $lockedGroup[$recordGroup] !== $name) {
                             return false;
                         }
                     }
@@ -50,30 +40,22 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
         );
     }
 
-    /**
-     * @param ArrayCollection $workflows
-     * @param WorkflowRecordContext $context
-     * @return array
-     */
-    private function retrieveLockedGroups(ArrayCollection $workflows, WorkflowRecordContext $context)
+    private function retrieveLockedGroups(ArrayCollection $workflows, WorkflowRecordContext $context): array
     {
-        $runningWorkflowNames = $this->getRunningWorkflowNames($context->getEntity());
-
-        $lockedGroups = [];
-
-        if (count($runningWorkflowNames) === 0) {
-            //no locks as no workflows in progress
-            return $lockedGroups;
+        $runningWorkflowNames = $this->runningWorkflowProvider->getRunningWorkflowNames($context->getEntity());
+        if (!$runningWorkflowNames) {
+            // no locks as no workflows in progress
+            return [];
         }
 
-        //as workflows comes in order of its priorities then highest one must replace/override lower one
+        $lockedGroups = [];
+        // as workflows comes in order of its priorities then highest one must replace/override lower one
         $workflows = array_reverse($workflows->toArray());
-
-        /**@var Workflow[] $workflows */
+        /**@var Workflow $workflow */
         foreach ($workflows as $workflow) {
             $definition = $workflow->getDefinition();
             $workflowName = $definition->getName();
-            if ($definition->hasExclusiveRecordGroups() && in_array($workflowName, $runningWorkflowNames, true)) {
+            if ($definition->hasExclusiveRecordGroups() && \in_array($workflowName, $runningWorkflowNames, true)) {
                 foreach ($definition->getExclusiveRecordGroups() as $recordGroup) {
                     $lockedGroups[$recordGroup] = $workflowName;
                 }
@@ -81,36 +63,5 @@ class WorkflowExclusiveRecordGroupFilter implements WorkflowApplicabilityFilterI
         }
 
         return $lockedGroups;
-    }
-
-    /**
-     * @param object $entity
-     * @return array|string[] prioritized array of workflow names
-     */
-    private function getRunningWorkflowNames($entity)
-    {
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        $identifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
-        $repository = $this->getItemsRepository();
-
-        return array_map(
-            function (WorkflowItem $workflowItem) {
-                return $workflowItem->getWorkflowName();
-            },
-            $repository->findAllByEntityMetadata($entityClass, $identifier)
-        );
-    }
-
-    /**
-     * @return WorkflowItemRepository
-     */
-    private function getItemsRepository()
-    {
-        if (null === $this->itemsRepository) {
-            $this->itemsRepository = $this->doctrineHelper->getEntityRepository(WorkflowItem::class);
-        }
-
-        return $this->itemsRepository;
     }
 }

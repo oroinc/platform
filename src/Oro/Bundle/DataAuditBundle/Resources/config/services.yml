@@ -36,12 +36,11 @@ services:
             - '@oro_dataaudit.model.additional_entity_changes_to_audit_storage'
             - '@oro_dataaudit.converter.entity_to_entity_change_array'
             - '@oro_dataaudit.audit_config_provider'
-            - '@logger'
             - '@oro_dataaudit.provider.audit_message_body_provider'
             - '@oro_distribution.handler.application_status'
-        calls:
-            - [setEntityNameResolver, ['@oro_entity.entity_name_resolver']]
-            - [setPropertyAccessor, ['@property_accessor']]
+            - '@oro_entity.entity_name_resolver'
+            - '@property_accessor'
+            - '@logger'
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: -255 }
             - { name: doctrine.event_listener, event: postFlush, priority: -255 }

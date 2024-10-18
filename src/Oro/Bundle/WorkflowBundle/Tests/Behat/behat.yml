@@ -73,3 +73,6 @@ oro_behat_extension:
 
     Default Step Dropdown:
       selector: 'label:contains("Default step") + .controls > .select2-container > a'
+
+    Workflow Current Step:
+      selector: '.workflow-steps-item.active .workflow-step-name'

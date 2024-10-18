@@ -89,29 +89,6 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             }
             unset($parameters['filters']);
         }
-        if ('GET' !== $method) {
-            if (array_key_exists('meta', $parameters) && is_string($parameters['meta'])) {
-                $meta = $parameters['meta'];
-                if ($meta) {
-                    $uri .= (str_contains($uri, '?') ? '&' : '?') . $meta;
-                }
-                unset($parameters['meta']);
-            }
-            if (array_key_exists('fields', $parameters)) {
-                $fields = $parameters['fields'];
-                if ($fields) {
-                    $uri .= (str_contains($uri, '?') ? '&' : '?') . $fields;
-                }
-                unset($parameters['fields']);
-            }
-            if (array_key_exists('include', $parameters)) {
-                $include = $parameters['include'];
-                if ($include) {
-                    $uri .= (str_contains($uri, '?') ? '&' : '?') . $include;
-                }
-                unset($parameters['include']);
-            }
-        }
 
         if (!\array_key_exists('HTTP_ACCEPT', $server)) {
             $server['HTTP_ACCEPT'] = self::JSON_API_MEDIA_TYPE;

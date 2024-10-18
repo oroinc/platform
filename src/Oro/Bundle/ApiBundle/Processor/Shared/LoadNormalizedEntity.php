@@ -74,7 +74,9 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setParentAction($context->getAction());
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());
-        if ($this->isReuseExistingEntity($context)) {
+        if ($context->hasResult()
+            && ($this->reuseExistingEntity || $context->getConfig()?->isValidationEnabled())
+        ) {
             $getContext->setResult($context->getResult());
         }
         $getContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
@@ -122,10 +124,5 @@ class LoadNormalizedEntity implements ProcessorInterface
             $context->setInfoRecords($getContext->getInfoRecords());
             $context->setResult($getContext->getResult());
         }
-    }
-
-    private function isReuseExistingEntity(CreateContext|UpdateContext $context): bool
-    {
-        return $context->hasResult() && $this->reuseExistingEntity || $context->getConfig()?->isValidationEnabled();
     }
 }

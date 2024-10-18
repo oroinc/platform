@@ -14,7 +14,7 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
     private const ENTITY_CLASS = 'stdClass';
 
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
+    private $workflowManager;
 
     /** @var WorkflowAvailableByRecordGroup */
     private $condition;
@@ -22,29 +22,42 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->manager = $this->createMock(WorkflowManager::class);
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
 
-        $this->condition = new WorkflowAvailableByRecordGroup($this->manager);
+        $this->condition = new WorkflowAvailableByRecordGroup($this->workflowManager);
     }
 
-    public function testGetName()
+    private function getWorkflow(): Workflow
     {
-        $this->assertEquals(WorkflowAvailableByRecordGroup::NAME, $this->condition->getName());
+        $definition = new WorkflowDefinition();
+        $definition->setExclusiveRecordGroups([self::GROUP_NAME]);
+
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects(self::any())
+            ->method('getDefinition')
+            ->willReturn($definition);
+
+        return $workflow;
+    }
+
+    public function testGetName(): void
+    {
+        $this->assertEquals('workflow_available_by_record_group', $this->condition->getName());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, bool $expectedResult)
+    public function testEvaluate(array $options, bool $expectedResult): void
     {
-        $this->manager->expects($this->any())
+        $this->workflowManager->expects(self::any())
             ->method('getApplicableWorkflows')
             ->willReturnCallback(function ($entityClass) {
-                return $entityClass === self::ENTITY_CLASS ? [$this->createWorkflow()] : [];
+                return $entityClass === self::ENTITY_CLASS ? [$this->getWorkflow()] : [];
             });
 
-        $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertEquals($expectedResult, $this->condition->evaluate([]));
+        self::assertSame($this->condition, $this->condition->initialize($options));
+        self::assertEquals($expectedResult, $this->condition->evaluate([]));
     }
 
     public function evaluateDataProvider(): array
@@ -65,23 +78,10 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function createWorkflow(): Workflow
-    {
-        $definition = new WorkflowDefinition();
-        $definition->setExclusiveRecordGroups([self::GROUP_NAME]);
-
-        $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->any())
-            ->method('getDefinition')
-            ->willReturn($definition);
-
-        return $workflow;
-    }
-
     /**
      * @dataProvider initializeExceptionProvider
      */
-    public function testInitializeException(array $options, string $exception, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exception, string $exceptionMessage): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);

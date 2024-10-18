@@ -52,6 +52,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         /** @var User $user */
         $user = $this->getReference(LoadUser::USER);
         $user1 = $this->loadUser($manager, 'user1', $organization);
+        $user2 = $this->loadUser($manager, 'user2', $organization);
 
         $this->updateMainUserEmailOrigin($user);
 
@@ -135,6 +136,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $user
         );
         $email6->getEmail()->setRefs('<other@email-api.func-test>');
+        $email6->getEmail()->addActivityTarget($user2);
 
         $emailBuilder->getBatch()->persist($manager);
         $manager->flush();

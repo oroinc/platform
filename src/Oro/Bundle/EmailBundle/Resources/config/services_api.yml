@@ -32,6 +32,8 @@ services:
             - '@oro_api.action_processor_bag'
         tags:
             - { name: oro.api.processor, action: add_relationship, group: normalize_data, parentClass: Oro\Bundle\EmailBundle\Entity\Email, association: activityTargets, priority: -10 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_data, parentClass: Oro\Bundle\EmailBundle\Entity\Email, association: activityTargets, priority: -10 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_data, parentClass: Oro\Bundle\EmailBundle\Entity\Email, association: activityTargets, priority: -10 }
 
     oro_email.api.add_email_context_search_entity_url_link:
         class: Oro\Bundle\SearchBundle\Api\Processor\AddSearchEntityUrlLink
@@ -152,12 +154,12 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: customize_loaded_data, requestType: json_api, parentAction: create|add_relationship, class: Oro\Bundle\EmailBundle\Entity\Email }
+            - { name: oro.api.processor, action: customize_loaded_data, requestType: json_api, parentAction: create|update|add_relationship|delete_relationship|update_relationship, class: Oro\Bundle\EmailBundle\Entity\Email }
 
     oro_email.api.add_email_thread_context_item_id_meta_property:
         class: Oro\Bundle\EmailBundle\Api\Processor\AddEmailThreadContextItemIdMetaProperty
         tags:
-            - { name: oro.api.processor, action: get_metadata, requestType: json_api, class: Oro\Bundle\EmailBundle\Entity\Email, targetAction: get, parentAction: create|add_relationship, priority: -90 }
+            - { name: oro.api.processor, action: get_metadata, requestType: json_api, class: Oro\Bundle\EmailBundle\Entity\Email, targetAction: get, parentAction: create|update|add_relationship|delete_relationship|update_relationship, priority: -90 }
 
     oro_email.api.create.create_email_entity:
         class: Oro\Bundle\EmailBundle\Api\Processor\CreateEmailEntity
