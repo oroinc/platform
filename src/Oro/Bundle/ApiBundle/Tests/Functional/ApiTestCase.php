@@ -240,19 +240,15 @@ abstract class ApiTestCase extends WebTestCase
         if (is_string($expectedContent)) {
             $expectedContent = $this->loadYamlData($expectedContent, $this->getResponseDataFolderName());
         }
+        array_walk_recursive($expectedContent, function (&$val) {
+            if (is_string($val) && str_contains($val, '{baseUrl}')) {
+                $val = str_replace('{baseUrl}', $this->getApiBaseUrl(), $val);
+            }
+
+            return $val;
+        });
 
         return self::processTemplateData($expectedContent);
-    }
-
-    /**
-     * Resolves "{baseUrl}" placeholders and all entity references in the given expected content.
-     */
-    protected function getExpectedContentWithPaginationLinks(array $expectedContent): array
-    {
-        $content = Yaml::dump($expectedContent);
-        $content = str_replace('{baseUrl}', $this->getApiBaseUrl(), $content);
-
-        return self::processTemplateData(Yaml::parse($content));
     }
 
     /**

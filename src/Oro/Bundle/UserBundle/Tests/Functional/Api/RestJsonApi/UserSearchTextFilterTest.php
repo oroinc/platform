@@ -95,7 +95,7 @@ class UserSearchTextFilterTest extends RestJsonApiTestCase
         $url = '{baseUrl}/users';
         $urlWithFilter = $url . '?filter%5BsearchText%5D=rob';
         $this->assertResponseContains(
-            $this->getExpectedContentWithPaginationLinks([
+            [
                 'data'  => [
                     ['type' => 'users', 'id' => '<toString(@user1->id)>', 'attributes' => ['username' => 'user1']],
                     ['type' => 'users', 'id' => '<toString(@user2->id)>', 'attributes' => ['username' => 'user2']],
@@ -104,7 +104,7 @@ class UserSearchTextFilterTest extends RestJsonApiTestCase
                     'self' => $url,
                     'next' => $urlWithFilter . '&page%5Bsize%5D=2&page%5Bnumber%5D=2&sort=id',
                 ]
-            ]),
+            ],
             $response
         );
     }
@@ -119,7 +119,7 @@ class UserSearchTextFilterTest extends RestJsonApiTestCase
         $url = '{baseUrl}/users';
         $urlWithFilter = $url . '?filter%5BsearchText%5D=rob';
         $this->assertResponseContains(
-            $this->getExpectedContentWithPaginationLinks([
+            [
                 'data'  => [
                     ['type' => 'users', 'id' => '<toString(@user15->id)>', 'attributes' => ['username' => 'user15']],
                 ],
@@ -128,7 +128,7 @@ class UserSearchTextFilterTest extends RestJsonApiTestCase
                     'first' => $urlWithFilter . '&page%5Bsize%5D=2&sort=id',
                     'prev'  => $urlWithFilter . '&page%5Bnumber%5D=7&page%5Bsize%5D=2&sort=id',
                 ]
-            ]),
+            ],
             $response
         );
     }
@@ -143,7 +143,7 @@ class UserSearchTextFilterTest extends RestJsonApiTestCase
         $url = '{baseUrl}/users';
         $urlWithFilter = $url . '?filter%5BsearchText%5D=rob';
         $this->assertResponseContains(
-            $this->getExpectedContentWithPaginationLinks([
+            [
                 'data'  => [
                     ['type' => 'users', 'id' => '<toString(@user5->id)>', 'attributes' => ['username' => 'user5']],
                     ['type' => 'users', 'id' => '<toString(@user6->id)>', 'attributes' => ['username' => 'user6']],
@@ -154,7 +154,7 @@ class UserSearchTextFilterTest extends RestJsonApiTestCase
                     'prev'  => $urlWithFilter . '&page%5Bnumber%5D=2&page%5Bsize%5D=2&sort=id',
                     'next'  => $urlWithFilter . '&page%5Bnumber%5D=4&page%5Bsize%5D=2&sort=id',
                 ]
-            ]),
+            ],
             $response
         );
     }
