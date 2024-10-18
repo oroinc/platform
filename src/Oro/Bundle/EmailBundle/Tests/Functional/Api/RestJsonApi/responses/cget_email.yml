@@ -208,5 +208,8 @@ data:
                     -
                         type: users
                         id: '<toString(@user->id)>'
+                    -
+                        type: users
+                        id: '<toString(@user2->id)>'
             emailAttachments:
                 data: []
