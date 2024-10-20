@@ -10,7 +10,7 @@ services:
         arguments:
             - '@.inner'
         calls:
-            - [ addSkippedEntity, [ 'Oro\Bundle\AttachmentBundle\Entity\File', [ 'create' ] ] ]
+            - [addSkippedEntity, ['Oro\Bundle\AttachmentBundle\Entity\File', ['create']]]
 
     oro_attachment.tests.media_cache_manager_registry:
         alias: oro_attachment.media_cache_manager_registry
