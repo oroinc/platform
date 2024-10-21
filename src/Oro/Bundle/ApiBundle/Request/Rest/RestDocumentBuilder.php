@@ -61,6 +61,9 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     #[\Override]
     protected function convertObjectToArray(
         mixed $object,
@@ -78,19 +81,23 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
             $result = $data;
         } else {
             $metadata = $this->getTargetMetadataProvider()->getTargetMetadata($object, $metadata);
+            $hasIdentifierFields = $metadata->hasIdentifierFields();
             $objectClass = $this->objectAccessor->getClassName($object);
             if (!$objectClass) {
                 $objectClass = $metadata->getClassName();
             }
             $objectAlias = $this->getEntityAlias($objectClass, $requestType);
+            $objectId = $hasIdentifierFields
+                ? $this->getEntityId($object, $requestType, $metadata)
+                : null;
 
             $entityData = $data;
             $entityData[DataAccessorInterface::ENTITY_CLASS] = $objectClass;
             if ($objectAlias) {
                 $entityData[DataAccessorInterface::ENTITY_TYPE] = $objectAlias;
             }
-            if ($metadata->hasIdentifierFields()) {
-                $entityData[DataAccessorInterface::ENTITY_ID] = $this->getEntityId($object, $requestType, $metadata);
+            if ($hasIdentifierFields) {
+                $entityData[DataAccessorInterface::ENTITY_ID] = $objectId;
             }
             $this->resultDataAccessor->setEntity($entityData);
 
@@ -102,6 +109,10 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
             $this->addLinks($result, $metadata->getLinks());
             $this->addAttributes($result, $data, $metadata);
             $this->addRelationships($result, $data, $requestType, $metadata);
+            $idFieldNames = $metadata->getIdentifierFieldNames();
+            if (\count($idFieldNames) === 1) {
+                $result[$idFieldNames[0]] = $objectId;
+            }
         }
 
         return $result;

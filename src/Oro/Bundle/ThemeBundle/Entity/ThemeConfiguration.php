@@ -9,7 +9,6 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\AuditableBusinessUnitAwareTrait;
-use Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType;
 use Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType as ThemeConfigurationFormType;
 
 /**
@@ -57,14 +56,8 @@ class ThemeConfiguration implements DatesAwareInterface, OrganizationAwareInterf
     #[ORM\Column]
     protected ?int $id = null;
 
-    #[ORM\Column(
-        type: Types::STRING,
-        length: 255,
-        nullable: false,
-        enumType: ThemeConfigurationType::class,
-        options: ['default' => 'Storefront']
-    )]
-    protected ThemeConfigurationType $type = ThemeConfigurationType::Storefront;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $type = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     protected ?string $name = null;
@@ -95,12 +88,12 @@ class ThemeConfiguration implements DatesAwareInterface, OrganizationAwareInterf
         return $this;
     }
 
-    public function getType(): ThemeConfigurationType
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType(ThemeConfigurationType $type): self
+    public function setType(string $type): self
     {
         $this->type = $type;
 
@@ -173,10 +166,5 @@ class ThemeConfiguration implements DatesAwareInterface, OrganizationAwareInterf
     public function preUpdate(): void
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-    }
-
-    public static function getTypes(): array
-    {
-        return ThemeConfigurationType::cases();
     }
 }

@@ -14,11 +14,11 @@ class DeleteListTest extends RestPlainApiTestCase
 {
     use CheckSkippedEntityTrait;
 
-    public function testDeleteList()
+    public function testDeleteList(): void
     {
         $this->runForEntities(function (string $entityClass, array $excludedActions) {
-            if (in_array(ApiAction::DELETE_LIST, $excludedActions, true)
-                || in_array(ApiAction::GET_LIST, $excludedActions, true)
+            if (\in_array(ApiAction::DELETE_LIST, $excludedActions, true)
+                || \in_array(ApiAction::GET_LIST, $excludedActions, true)
             ) {
                 return;
             }
@@ -35,6 +35,9 @@ class DeleteListTest extends RestPlainApiTestCase
                 'GET',
                 $this->getUrl($this->getListRouteName(), ['entity' => $entityType, 'limit' => 1])
             );
+            if ($response->getStatusCode() === 400) {
+                $response = $this->request('GET', $this->getUrl($this->getListRouteName(), ['entity' => $entityType]));
+            }
             self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
 
             $content = self::jsonToArray($response->getContent());

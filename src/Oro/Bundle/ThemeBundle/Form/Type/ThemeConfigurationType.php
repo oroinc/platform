@@ -3,11 +3,9 @@
 namespace Oro\Bundle\ThemeBundle\Form\Type;
 
 use Oro\Bundle\FrontendBundle\Form\Type\ThemeSelectType;
-use Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType as EnumConfigurationType;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Bundle\ThemeBundle\Form\EventListener\ThemeConfigurationSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -43,15 +41,6 @@ class ThemeConfigurationType extends AbstractType
                 [
                     'label'    => 'oro.theme.themeconfiguration.description.label',
                     'required' => false,
-                ]
-            )
-            ->add(
-                'type',
-                EnumType::class,
-                [
-                    'label' => 'oro.theme.themeconfiguration.type.label',
-                    'class' => EnumConfigurationType::class,
-                    'required' => true,
                 ]
             )
             ->add(

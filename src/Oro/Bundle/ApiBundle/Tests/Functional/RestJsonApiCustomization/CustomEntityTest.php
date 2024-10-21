@@ -27,31 +27,31 @@ class CustomEntityTest extends RestJsonApiTestCase
             TestEntity1::class,
             [
                 'fields' => [
-                    'renamedName'            => ['property_path' => 'name'],
+                    'renamedName' => ['property_path' => 'name'],
                     'renamedSerializedField' => ['property_path' => 'serializedField'],
-                    'renamedEnumField'       => ['property_path' => 'enumField'],
-                    'renamedMultiEnumField'  => ['property_path' => 'multiEnumField'],
-                    'renamedUniM2O'          => ['property_path' => 'uniM2O'],
-                    'renamedBiM2O'           => ['property_path' => 'biM2O'],
-                    'renamedUniM2M'          => ['property_path' => 'uniM2M'],
-                    'renamedDefaultUniM2M'   => ['property_path' => 'default_uniM2M'],
-                    'renamedUniM2MnD'        => ['property_path' => 'uniM2MnD'],
-                    'renamedBiM2M'           => ['property_path' => 'biM2M'],
-                    'renamedDefaultBiM2M'    => ['property_path' => 'default_biM2M'],
-                    'renamedBiM2MnD'         => ['property_path' => 'biM2MnD'],
-                    'renamedUniO2M'          => ['property_path' => 'uniO2M'],
-                    'renamedDefaultUniO2M'   => ['property_path' => 'default_uniO2M'],
-                    'renamedUniO2MnD'        => ['property_path' => 'uniO2MnD'],
-                    'renamedBiO2M'           => ['property_path' => 'biO2M'],
-                    'renamedDefaultBiO2M'    => ['property_path' => 'default_biO2M'],
-                    'renamedBiO2MnD'         => ['property_path' => 'biO2MnD'],
+                    'renamedEnumField' => ['property_path' => 'enumField'],
+                    'renamedMultiEnumField' => ['property_path' => 'multiEnumField'],
+                    'renamedUniM2O' => ['property_path' => 'uniM2O'],
+                    'renamedBiM2O' => ['property_path' => 'biM2O'],
+                    'renamedUniM2M' => ['property_path' => 'uniM2M'],
+                    'renamedDefaultUniM2M' => ['property_path' => 'default_uniM2M'],
+                    'renamedUniM2MnD' => ['property_path' => 'uniM2MnD'],
+                    'renamedBiM2M' => ['property_path' => 'biM2M'],
+                    'renamedDefaultBiM2M' => ['property_path' => 'default_biM2M'],
+                    'renamedBiM2MnD' => ['property_path' => 'biM2MnD'],
+                    'renamedUniO2M' => ['property_path' => 'uniO2M'],
+                    'renamedDefaultUniO2M' => ['property_path' => 'default_uniO2M'],
+                    'renamedUniO2MnD' => ['property_path' => 'uniO2MnD'],
+                    'renamedBiO2M' => ['property_path' => 'biO2M'],
+                    'renamedDefaultBiO2M' => ['property_path' => 'default_biO2M'],
+                    'renamedBiO2MnD' => ['property_path' => 'biO2MnD'],
                 ]
             ],
             true
         );
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $response = $this->get(
             ['entity' => 'testapientity1', 'id' => '<toString(@entity1_1->id)>']
@@ -60,14 +60,14 @@ class CustomEntityTest extends RestJsonApiTestCase
         $this->assertResponseContains(
             [
                 'data' => [
-                    'type'          => 'testapientity1',
-                    'id'            => '<toString(@entity1_1->id)>',
-                    'attributes'    => [
-                        'name'            => 'Entity 1 (1)',
+                    'type' => 'testapientity1',
+                    'id' => '<toString(@entity1_1->id)>',
+                    'attributes' => [
+                        'name' => 'Entity 1 (1)',
                         'serializedField' => 'serialized 1'
                     ],
                     'relationships' => [
-                        'enumField'      => [
+                        'enumField' => [
                             'data' => ['type' => 'testapienum1', 'id' => '<toString(@enum1_1->internalId)>']
                         ],
                         'multiEnumField' => [
@@ -76,13 +76,13 @@ class CustomEntityTest extends RestJsonApiTestCase
                                 ['type' => 'testapienum2', 'id' => '<toString(@enum2_2->internalId)>']
                             ]
                         ],
-                        'uniM2O'         => [
+                        'uniM2O' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'biM2O'          => [
+                        'biM2O' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'uniM2M'         => [
+                        'uniM2M' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
@@ -91,28 +91,28 @@ class CustomEntityTest extends RestJsonApiTestCase
                         'default_uniM2M' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'uniM2MnD'       => [
+                        'uniM2MnD' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'biM2M'          => [
+                        'biM2M' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'default_biM2M'  => [
+                        'default_biM2M' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'biM2MnD'        => [
+                        'biM2MnD' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'uniO2M'         => [
+                        'uniO2M' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
@@ -121,22 +121,22 @@ class CustomEntityTest extends RestJsonApiTestCase
                         'default_uniO2M' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'uniO2MnD'       => [
+                        'uniO2MnD' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'biO2M'          => [
+                        'biO2M' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'default_biO2M'  => [
+                        'default_biO2M' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'biO2MnD'        => [
+                        'biO2MnD' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
@@ -149,7 +149,7 @@ class CustomEntityTest extends RestJsonApiTestCase
         );
     }
 
-    public function testGetForRenamedFields()
+    public function testGetForRenamedFields(): void
     {
         $this->renameTestEntity1Fields();
         $response = $this->get(
@@ -159,14 +159,14 @@ class CustomEntityTest extends RestJsonApiTestCase
         $this->assertResponseContains(
             [
                 'data' => [
-                    'type'          => 'testapientity1',
-                    'id'            => '<toString(@entity1_1->id)>',
-                    'attributes'    => [
-                        'renamedName'            => 'Entity 1 (1)',
+                    'type' => 'testapientity1',
+                    'id' => '<toString(@entity1_1->id)>',
+                    'attributes' => [
+                        'renamedName' => 'Entity 1 (1)',
                         'renamedSerializedField' => 'serialized 1'
                     ],
                     'relationships' => [
-                        'renamedEnumField'      => [
+                        'renamedEnumField' => [
                             'data' => ['type' => 'testapienum1', 'id' => '<toString(@enum1_1->internalId)>']
                         ],
                         'renamedMultiEnumField' => [
@@ -175,72 +175,150 @@ class CustomEntityTest extends RestJsonApiTestCase
                                 ['type' => 'testapienum2', 'id' => '<toString(@enum2_2->internalId)>']
                             ]
                         ],
-                        'renamedUniM2O'         => [
+                        'renamedUniM2O' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'renamedBiM2O'          => [
+                        'renamedBiM2O' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'renamedUniM2M'         => [
+                        'renamedUniM2M' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'renamedDefaultUniM2M'  => [
+                        'renamedDefaultUniM2M' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'renamedUniM2MnD'       => [
+                        'renamedUniM2MnD' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'renamedBiM2M'          => [
+                        'renamedBiM2M' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'renamedDefaultBiM2M'   => [
+                        'renamedDefaultBiM2M' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'renamedBiM2MnD'        => [
+                        'renamedBiM2MnD' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'renamedUniO2M'         => [
+                        'renamedUniO2M' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'renamedDefaultUniO2M'  => [
+                        'renamedDefaultUniO2M' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'renamedUniO2MnD'       => [
+                        'renamedUniO2MnD' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'renamedBiO2M'          => [
+                        'renamedBiO2M' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
-                        'renamedDefaultBiO2M'   => [
+                        'renamedDefaultBiO2M' => [
                             'data' => ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>']
                         ],
-                        'renamedBiO2MnD'        => [
+                        'renamedBiO2MnD' => [
                             'data' => [
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_1->id)>'],
                                 ['type' => 'testapientity2', 'id' => '<toString(@entity2_2->id)>']
                             ]
                         ],
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListForEnumEntity(): void
+    {
+        $response = $this->cget(['entity' => 'testapienum1']);
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '0',
+                        'attributes' => [
+                            'name' => 'Item 0',
+                            'priority' => -1,
+                            'default' => true
+                        ]
+                    ],
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '1',
+                        'attributes' => [
+                            'name' => 'Item 1',
+                            'priority' => 0,
+                            'default' => false
+                        ]
+                    ],
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '2',
+                        'attributes' => [
+                            'name' => 'Item 2',
+                            'priority' => 1,
+                            'default' => false
+                        ]
+                    ],
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '3',
+                        'attributes' => [
+                            'name' => 'Item 3',
+                            'priority' => 2,
+                            'default' => false
+                        ]
+                    ],
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '4',
+                        'attributes' => [
+                            'name' => 'Item 4',
+                            'priority' => 3,
+                            'default' => false
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetForEnumEntity(): void
+    {
+        $response = $this->get(['entity' => 'testapienum1', 'id' => '0']);
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type' => 'testapienum1',
+                    'id' => '0',
+                    'attributes' => [
+                        'name' => 'Item 0',
+                        'priority' => -1,
+                        'default' => true
                     ]
                 ]
             ],

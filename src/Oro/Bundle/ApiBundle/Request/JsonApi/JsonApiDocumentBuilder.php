@@ -112,10 +112,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 $objectClass = $metadata->getClassName();
             }
             $objectAlias = $this->getEntityAlias($objectClass, $requestType);
-            $objectId = null;
-            if ($hasIdentifierFields) {
-                $objectId = $this->getEntityId($object, $requestType, $metadata);
-            }
+            $objectId = $hasIdentifierFields
+                ? $this->getEntityId($object, $requestType, $metadata)
+                : null;
 
             $entityData = $data;
             $entityData[DataAccessorInterface::ENTITY_CLASS] = $objectClass;

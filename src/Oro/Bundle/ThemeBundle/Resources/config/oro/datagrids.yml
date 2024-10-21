@@ -23,10 +23,7 @@ datagrids:
         renderable: false
       type:
         label: 'oro.theme.themeconfiguration.type.label'
-        frontend_type: select
         renderable: false
-        choices:
-          Storefront: Storefront
       name:
         label: 'oro.theme.themeconfiguration.name.label'
       description:
@@ -59,14 +56,8 @@ datagrids:
           type: number
         type:
           data_name: tc.type
-          type: choice
           renderable: false
-          options:
-            field_options:
-              choices:
-                oro.theme.themeconfiguration.fields.type.choices.storefront: Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType::Storefront
-              translatable_options: true
-              multiple: true
+          type: string
         name:
           data_name: tc.name
           type: string
