@@ -3,15 +3,18 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\SecurityBundle\Cache\FilesystemCacheInstantiator;
+use Oro\Component\Testing\TempDirExtension;
 
 class FilesystemCacheInstantiatorTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var FilesystemCacheInstantiator */
     private $instantiator;
 
     protected function setUp(): void
     {
-        $this->instantiator = new FilesystemCacheInstantiator(123, 'someDir');
+        $this->instantiator = new FilesystemCacheInstantiator(123, $this->getTempDir('someDir'));
     }
 
     public function testGetCacheInstanceMultipleTimes(): void
