@@ -4,7 +4,6 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +17,7 @@ class ThemeConfigurationTest extends TestCase
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $properties = [
             ['id', 1],
-            ['type', ThemeConfigurationType::Storefront],
+            ['type', 'test type'],
             ['name', 'test'],
             ['description', null],
             ['description', 'Test Description'],

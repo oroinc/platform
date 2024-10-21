@@ -54,15 +54,7 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
                 continue;
             }
 
-            $definition = $this->themeDefinitionBag->getThemeDefinition($frontendTheme);
-            $organization = $this->getOrganization($scope);
-
-            $themeConfiguration = (new ThemeConfiguration())
-                ->setTheme($frontendTheme)
-                ->setName($this->getThemeConfigurationName($definition, $scope))
-                ->setOrganization($organization)
-                ->setOwner($this->getOwner($scope, $organization))
-                ->setConfiguration($this->buildConfigurationFromDefinition($definition, $scope));
+            $themeConfiguration = $this->createThemeConfiguration($frontendTheme, $scope);
 
             $this->manager->persist($themeConfiguration);
             $manager->flush();
@@ -82,6 +74,19 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
         $this->manager = $manager;
         $this->themeDefinitionBag = $this->container->get('oro_layout.theme_extension.configuration.provider');
         $this->configManager = $this->getConfigManager();
+    }
+
+    protected function createThemeConfiguration(string $frontendTheme, object|null $scope): ThemeConfiguration
+    {
+        $definition = $this->themeDefinitionBag->getThemeDefinition($frontendTheme);
+        $organization = $this->getOrganization($scope);
+
+        return (new ThemeConfiguration())
+            ->setTheme($frontendTheme)
+            ->setName($this->getThemeConfigurationName($definition, $scope))
+            ->setOrganization($organization)
+            ->setOwner($this->getOwner($scope, $organization))
+            ->setConfiguration($this->buildConfigurationFromDefinition($definition, $scope));
     }
 
     protected function getFrontendTheme(ConfigManager $configManager, ?object $scope): ?string

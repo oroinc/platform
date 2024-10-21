@@ -3,7 +3,7 @@ Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration:
         name: 'Default'
         description: 'Default Description'
         theme: 'default'
-        type: 'Storefront'
+        type: 'storefront'
         organization: '@organization'
         owner: '@business_unit'
 
@@ -11,6 +11,6 @@ Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration:
         name: 'Custom'
         description: 'Custom'
         theme: 'custom'
-        type: 'Storefront'
+        type: 'storefront'
         organization: '@organization'
         owner: '@business_unit'

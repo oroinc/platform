@@ -47,6 +47,9 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### ThemeBundle
+* Changed a field value of the `type` field on a string instead of the removed `\Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType` enum for `\Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration` entity.
+
 #### ApiBundle
 * Changed `\Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface` to be able to use filters by same field but with different operators, e.g. `?filter[id][gt]=1&filter[id][lt]=10`:
   - added `getOne` method
