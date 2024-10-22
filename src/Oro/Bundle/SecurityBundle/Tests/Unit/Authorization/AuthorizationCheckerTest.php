@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authorization;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
@@ -28,12 +29,16 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var AuthorizationChecker */
     private $authorizationChecker;
 
+    /** @var AclGroupProviderInterface */
+    private $groupProvider;
+
     protected function setUp(): void
     {
         $this->innerAuthorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->objectIdentityFactory = $this->createMock(ObjectIdentityFactory::class);
         $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->groupProvider = $this->createMock(AclGroupProviderInterface::class);
 
         $this->authorizationChecker = new AuthorizationChecker(
             $this->innerAuthorizationChecker,
@@ -41,6 +46,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
             $this->annotationProvider,
             $this->logger
         );
+
+        $this->authorizationChecker->setGroupProvider($this->groupProvider);
     }
 
     public function testIsGrantedWithAclAnnotationIdAndNoObject(): void
@@ -141,6 +148,9 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('findAnnotationById')
             ->with('PERMISSION')
             ->willReturn(null);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('');
         $this->objectIdentityFactory->expects(self::once())
             ->method('get')
             ->with($obj)
@@ -195,6 +205,52 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('PERMISSION', $obj)
+            ->willReturn(true);
+
+        $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
+        self::assertTrue($result);
+    }
+
+    public function testIsGrantedWithStringAndNotDefaultAclGroup(): void
+    {
+        $oid = new ObjectIdentity('entity', 'TestType');
+        $this->annotationProvider->expects(self::once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('group');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with('entity:group@TestType')
+            ->willReturn($oid);
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('PERMISSION', $oid)
+            ->willReturn(true);
+
+        $result = $this->authorizationChecker->isGranted('PERMISSION', 'entity:TestType');
+        self::assertTrue($result);
+    }
+
+    public function testIsGrantedWithStringThatContainsAclGroup(): void
+    {
+        $oid = new ObjectIdentity('entity', 'SomeClass');
+        $obj = 'entity:group@SomeClass';
+        $this->annotationProvider->expects(self::once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with($obj)
+            ->willReturn($oid);
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('PERMISSION', $oid)
             ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);

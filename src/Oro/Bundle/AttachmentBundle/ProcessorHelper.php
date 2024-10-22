@@ -41,6 +41,10 @@ class ProcessorHelper
 
     public static function getBinary(string $name, ?string $binary): ?string
     {
+        if (empty($binary)) {
+            return null;
+        }
+
         if (!is_executable($binary)) {
             throw new ProcessorsException($name);
         }

@@ -45,7 +45,6 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
             return $configuration;
         }
 
-        $entityAlias = null;
         $identifiers = $this->doctrineHelper->getEntityMetadataForClass($className)->getIdentifier();
         $primaryKey = array_shift($identifiers);
         $entityAlias = $configuration->getOrmQuery()->findRootAlias($className);

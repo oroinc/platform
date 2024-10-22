@@ -3,6 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Authorization;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Psr\Log\LoggerInterface;
@@ -19,6 +21,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     private ObjectIdentityFactory $objectIdentityFactory;
     private AclAnnotationProvider $annotationProvider;
     private LoggerInterface $logger;
+    private AclGroupProviderInterface $groupProvider;
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
@@ -91,6 +94,18 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
     private function tryGetObjectIdentity(mixed $val): ?ObjectIdentity
     {
+        if (\is_string($val) && !ObjectIdentityHelper::hasGroupName($val)) {
+            $group = $this->groupProvider->getGroup();
+            if ($group) {
+                [$id, $type, $fieldName] = ObjectIdentityHelper::parseIdentityString($val);
+                $val = ObjectIdentityHelper::encodeFieldIdentityString(
+                    $id,
+                    ObjectIdentityHelper::buildType($type, $group),
+                    $fieldName
+                );
+            }
+        }
+
         try {
             return $this->objectIdentityFactory->get($val);
         } catch (InvalidDomainObjectException $e) {
@@ -98,5 +113,10 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
             return null;
         }
+    }
+
+    public function setGroupProvider(AclGroupProviderInterface $groupProvider): void
+    {
+        $this->groupProvider = $groupProvider;
     }
 }

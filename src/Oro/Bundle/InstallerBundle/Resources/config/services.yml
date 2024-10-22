@@ -36,6 +36,13 @@ services:
         tags:
             - { name: oro.requirements_provider }
 
+    oro_installer.public_media_directory_requirements_provider:
+        class: Oro\Bundle\InstallerBundle\Provider\PublicMediaDirectoryRequirementsProvider
+        arguments:
+            - '%kernel.project_dir%'
+        tags:
+            - { name: oro.requirements_provider }
+
     oro_installer.requirements_provider.database.mysql:
         class: Oro\Bundle\InstallerBundle\Provider\MysqlDatabaseRequirementsProvider
         arguments:
