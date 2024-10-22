@@ -102,16 +102,7 @@ define(function(require) {
          * @private
          */
         _postponeSchemaUpdate(data) {
-            const {id, operationTimeout, status} = data;
-
-            if (!id) {
-                throw new Error('Option "id" is required');
-            }
-
-            if (!operationTimeout) {
-                throw new Error('Option "operationTimeout" is required');
-            }
-
+            const {status, postponeRequest} = data;
             if (!status) {
                 throw new Error('Option "status" is required');
             }
@@ -121,28 +112,45 @@ define(function(require) {
                 return;
             }
 
-            const waitingTime = Date.now() + operationTimeout * 1000;
+            if (!postponeRequest) {
+                throw new Error('Option "postponeRequest" is required');
+            }
+            const {
+                url: postponeRequestUrl,
+                method: postponeRequestMethod,
+                contentType: postponeRequestContentType,
+                content: postponeRequestContent,
+                timeout: postponeRequestTimeout
+            } = postponeRequest;
+            if (!postponeRequestUrl) {
+                throw new Error('Option "postponeRequest.url" is required');
+            }
+            if (!postponeRequestMethod) {
+                throw new Error('Option "postponeRequest.method" is required');
+            }
+            if (!postponeRequestContentType) {
+                throw new Error('Option "postponeRequest.contentType" is required');
+            }
+            if (!postponeRequestContent) {
+                throw new Error('Option "postponeRequest.content" is required');
+            }
+            if (!postponeRequestTimeout) {
+                throw new Error('Option "postponeRequest.timeout" is required');
+            }
+
+            const waitingTime = Date.now() + postponeRequestTimeout * 1000;
             // Time before next reconnection attempt, 10 sec
             const retryDelay = 10000;
-            const URL = routing.generate(
-                'oro_rest_api_item',
-                {
-                    entity: 'multihostoperationstatus',
-                    id: id
-                }
-            );
             let retryCount = 0;
 
             const checkStatus = () => {
                 return $.ajax({
-                    type: 'PATCH',
-                    url: URL,
-                    dataType: 'json',
+                    type: postponeRequestMethod,
+                    url: postponeRequestUrl,
+                    contentType: postponeRequestContentType,
+                    data: postponeRequestContent,
                     // Max time to wait until response
-                    timeout: operationTimeout * 1000,
-                    data: {
-                        id: id
-                    },
+                    timeout: postponeRequestTimeout * 1000,
                     errorHandlerMessage: false
                 }).done((data, textStatus, jqXHR) => {
                     switch (data.status) {
