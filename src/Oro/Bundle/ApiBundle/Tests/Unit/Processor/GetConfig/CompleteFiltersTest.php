@@ -39,7 +39,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $this->processor = new CompleteFilters(
             $this->doctrineHelper,
             $this->configManager,
-            ['string', 'datetime'],
+            ['string', 'text'],
             ['string']
         );
     }
@@ -297,7 +297,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $filters = [
             'fields' => [
                 'field1' => [
-                    'data_type' => 'datetime'
+                    'data_type' => 'text'
                 ]
             ]
         ];
@@ -337,7 +337,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'data_type'   => 'datetime',
+                        'data_type'   => 'text',
                         'allow_range' => true
                     ]
                 ]
@@ -354,7 +354,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $filters = [
             'fields' => [
                 'field1' => [
-                    'data_type'   => 'datetime',
+                    'data_type'   => 'text',
                     'allow_array' => true
                 ]
             ]
@@ -395,7 +395,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'data_type'   => 'datetime',
+                        'data_type'   => 'text',
                         'allow_array' => true,
                         'allow_range' => true
                     ]
@@ -787,7 +787,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedFields')
             ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn(['field1' => 'datetime']);
+            ->willReturn(['field1' => 'text']);
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
@@ -806,7 +806,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'data_type'   => 'datetime',
+                        'data_type'   => 'text',
                         'allow_range' => true
                     ]
                 ]
@@ -876,7 +876,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $filters = [
             'fields' => [
                 'field1' => [
-                    'data_type' => 'datetime'
+                    'data_type' => 'text'
                 ]
             ]
         ];
@@ -913,7 +913,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'data_type'   => 'datetime',
+                        'data_type'   => 'text',
                         'allow_range' => true
                     ]
                 ]
@@ -1007,7 +1007,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedFields')
             ->with(self::identicalTo($rootEntityMetadata))
-            ->willReturn(['field1' => 'datetime']);
+            ->willReturn(['field1' => 'text']);
         $this->doctrineHelper->expects(self::once())
             ->method('getIndexedAssociations')
             ->with(self::identicalTo($rootEntityMetadata))
@@ -1026,7 +1026,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'data_type'   => 'datetime',
+                        'data_type'   => 'text',
                         'allow_array' => true,
                         'allow_range' => true
                     ]
