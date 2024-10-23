@@ -5,7 +5,7 @@ Parameters - array:
     [
         'class' - default class
         'btnCss' - additional css class for 'button' tag
-        'iconName' - svg icon name
+        'icon' - svg icon name
         'iconExtraClass' - additional css class for svg icon
         'ariaLabel' - aria-label text for button
         'dataId' - data-id parameter
@@ -38,10 +38,10 @@ Parameters - array:
                 {%- endif -%}
         >
         {%- apply spaceless -%}
-            {%- if parameters.iconName is defined -%}
+            {%- if parameters.icon is defined -%}
                 {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
                 {{- renderIcon.icon({
-                    name: parameters.iconName,
+                    name: parameters.icon,
                     extraClass: parameters.iconExtraClass|default(null),
                 }) -}}
             {%- endif -%}
@@ -71,7 +71,7 @@ Parameters - array:
     [
         'class' - default class
         'aCss' - additional css class for 'a' tag
-        'iconName' - svg icon name
+        'icon' - svg icon name
         'iconExtraClass' - additional css class for svg icon
         'dataId' - data-id parameter
         'dataUrl' - data-url parameter
@@ -97,14 +97,67 @@ Parameters - array:
             data-url="{{ parameters.dataUrl }}"
         {%- endif -%}
             {{- UIMacro.clientControlAttrs(parameters) -}}>
-        {%- if parameters.iconName is defined -%}
+        {%- if parameters.icon is defined -%}
             {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
             {{- renderIcon.icon({
-                name: parameters.iconName,
+                name: parameters.icon,
                 extraClass: parameters.iconExtraClass|default(null),
             }) -}}
         {%- endif -%}
             {{- parameters.label is defined ? parameters.label : '' -}}
+        </a>
+    {% endapply %}
+{% endmacro %}
+
+
+{#
+Create the link
+Parameters - array:
+    [
+        'path'  - button url
+        'class' - default class
+        'aCss'  - additional button class
+        'title' - button title
+        'icon'  - svg icon name
+        'iconExtraClass' - additional css class for svg icon
+        'label' - button label
+        'role'  - link role HTML attribute
+        'target' - target attribute
+    ]
+#}
+{% macro link(parameters) %}
+    {% apply spaceless %}
+        <a href="{{ parameters.path }}"
+                {% if (parameters.id is defined) %}
+                    id="{{ parameters.id }}"
+                {% endif %}
+                {% if parameters.data is defined %}
+                    {% for dataItemName,dataItemValue in parameters.data %}
+                        data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
+                    {% endfor %}
+                {% endif %}
+                {% set classes = '' %}
+                {% if parameters.class is defined %}
+                    {% set classes = classes ~ ' ' ~ parameters.class|trim %}
+                {% endif %}
+                {% if parameters.aCss is defined %}
+                    {% set classes = classes ~ ' ' ~ parameters.aCss|trim %}
+                {% endif %}
+                {% if classes|length %}
+                    class="{{ classes|split(' ')|array_unique|join(' ') }}"
+                {% endif %}
+                {% if parameters.role is defined %}role="{{ parameters.role }}"{% endif %}
+                {% if parameters.target is defined%}target="{{ parameters.target }}"{% endif %}
+                {% if parameters.title is defined and parameters.title is not empty %}title="{{ parameters.title }}"{% endif %}
+        >
+        {%- if parameters.icon is defined -%}
+            {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
+            {{- renderIcon.icon({
+                name: parameters.icon,
+                extraClass: parameters.iconExtraClass|default(null),
+            }) -}}
+        {%- endif -%}
+            {{- parameters.label|trim }}
         </a>
     {% endapply %}
 {% endmacro %}

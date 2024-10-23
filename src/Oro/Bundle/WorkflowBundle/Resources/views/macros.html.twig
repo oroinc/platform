@@ -89,21 +89,36 @@
         {{ transition.frontendOptions.class|default('') }}
     {% endset %}
 
-    {% set iCss = noIcon|default(false) ? false : transition.frontendOptions.icon|default('') %}
 
-    {# Transaltions temporary disabled due to BAP-5355 #}
-    {{ ui.link({
-        'path': '#',
-        'id': 'transition-%s-%s-%s'|format(workflow.name, transition.name, random()),
-        'iCss': iCss,
-        'title': title,
-        'role': 'button',
-        'class': class,
-        'data': data,
-        'label': label,
-        'role': 'button',
-        'noIconText': noIconText|default(true),
-    }) }}
+    {% if app.request.attributes.get('_layout')|default(false) and transition.frontendOptions.icon is defined %}
+        {% import '@OroUI/layouts/macros.html.twig' as LayoutUI %}
+        {{ LayoutUI.link({
+            'path': '#',
+            'id': 'transition-%s-%s-%s'|format(workflow.name, transition.name, random()),
+            'icon': transition.frontendOptions.icon|default(''),
+            'title': title,
+            'role': 'button',
+            'class': class,
+            'data': data,
+            'label': label,
+            'role': 'button',
+            'noIconText': noIconText|default(true),
+        }) }}
+    {% else %}
+        {# Transaltions temporary disabled due to BAP-5355 #}
+        {{ ui.link({
+            'path': '#',
+            'id': 'transition-%s-%s-%s'|format(workflow.name, transition.name, random()),
+            'iCss': noIcon|default(false) ? false : transition.frontendOptions.icon|default(''),
+            'title': title,
+            'role': 'button',
+            'class': class,
+            'data': data,
+            'label': label,
+            'role': 'button',
+            'noIconText': noIconText|default(true),
+        }) }}
+    {% endif %}
 {% endmacro %}
 
 {% macro renderGoToTranslationsIconByLink(link, large) %}
