@@ -44,6 +44,8 @@ class Configuration implements ConfigurationInterface
         $this->appendActionsNode($node);
         $this->appendFiltersNode($node);
         $this->appendFilterOperatorsNode($node);
+        $this->appendFilterDisallowArrayDataTypes($node);
+        $this->appendFilterDisallowRangeDataTypes($node);
         $this->appendFormTypesNode($node);
         $this->appendFormTypeExtensionsNode($node);
         $this->appendFormTypeGuessersNode($node);
@@ -448,8 +450,7 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('config_extensions')
                 ->info('The configuration extensions for "Resources/config/oro/api.yml".')
                 ->example(['oro_api.config_extension.filters', 'oro_api.config_extension.sorters'])
-                ->prototype('scalar')
-                ->end()
+                ->prototype('scalar')->cannotBeEmpty()->end()
             ->end();
     }
 
@@ -526,8 +527,27 @@ class Configuration implements ConfigurationInterface
                     'regexp' => null
                 ])
                 ->useAttributeAsKey('name')
-                ->prototype('scalar')
-                ->end()
+                ->prototype('scalar')->end()
+            ->end();
+    }
+
+    private function appendFilterDisallowArrayDataTypes(NodeBuilder $node): void
+    {
+        $node
+            ->arrayNode('filter_disallow_array_data_types')
+                ->info('The data types for which it is disallowed to use an array filter.')
+                ->example(['string', 'text'])
+                ->prototype('scalar')->cannotBeEmpty()->end()
+            ->end();
+    }
+
+    private function appendFilterDisallowRangeDataTypes(NodeBuilder $node): void
+    {
+        $node
+            ->arrayNode('filter_disallow_range_data_types')
+                ->info('The data types for which it is disallowed to use a range filter.')
+                ->example(['string', 'text'])
+                ->prototype('scalar')->cannotBeEmpty()->end()
             ->end();
     }
 
@@ -596,12 +616,8 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('form_types')
                 ->info('The form types that can be reused in API.')
-                ->example([
-                    FormType::class,
-                    'oro_api.form.type.entity'
-                ])
-                ->prototype('scalar')
-                ->end()
+                ->example([FormType::class, 'oro_api.form.type.entity'])
+                ->prototype('scalar')->end()
             ->end();
     }
 
@@ -611,8 +627,7 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('form_type_extensions')
                 ->info('The form type extensions that can be reused in API.')
                 ->example(['form.type_extension.form.http_foundation'])
-                ->prototype('scalar')
-                ->end()
+                ->prototype('scalar')->end()
             ->end();
     }
 
@@ -622,8 +637,7 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('form_type_guessers')
                 ->info('The form type guessers that can be reused in API.')
                 ->example(['form.type_guesser.validator'])
-                ->prototype('scalar')
-                ->end()
+                ->prototype('scalar')->end()
             ->end();
     }
 

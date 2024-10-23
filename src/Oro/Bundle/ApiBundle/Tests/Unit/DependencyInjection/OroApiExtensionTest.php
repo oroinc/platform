@@ -1304,6 +1304,36 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([$config], $container);
     }
 
+    public function testLoadFilterDisallowDataTypes()
+    {
+        $container = $this->getContainer();
+
+        $extension = new OroApiExtension();
+        $extension->load(
+            [
+                [
+                    'filter_disallow_array_data_types' => ['text'],
+                    'filter_disallow_range_data_types' => ['string']
+                ],
+                [
+                    'filter_disallow_array_data_types' => ['string'],
+                    'filter_disallow_range_data_types' => ['boolean']
+                ]
+            ],
+            $container
+        );
+
+        $completeFiltersProcessorDef = $container->getDefinition('oro_api.get_config.complete_filters');
+        self::assertEquals(
+            ['text', 'string'],
+            $completeFiltersProcessorDef->getArgument(1)
+        );
+        self::assertEquals(
+            ['string', 'boolean'],
+            $completeFiltersProcessorDef->getArgument(2)
+        );
+    }
+
     public function testRegisterDefaultConfigParameters()
     {
         $container = $this->getContainer();

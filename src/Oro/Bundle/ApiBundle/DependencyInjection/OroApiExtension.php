@@ -28,14 +28,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private const REST_API_PREFIX_CONFIG = 'rest_api_prefix';
     private const REST_API_PATTERN_CONFIG = 'rest_api_pattern';
 
-    private const ACTION_PROCESSOR_BAG_SERVICE_ID = 'oro_api.action_processor_bag';
-    private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID = 'oro_api.config_extension_registry';
-    private const FILTER_OPERATOR_REGISTRY_SERVICE_ID = 'oro_api.filter_operator_registry';
-    private const REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID = 'oro_api.rest.filter_value_accessor_factory';
-    private const CORS_SETTINGS_SERVICE_ID = 'oro_api.rest.cors_settings';
-    private const CONFIG_CACHE_WARMER_SERVICE_ID = 'oro_api.config_cache_warmer';
-    private const CACHE_MANAGER_SERVICE_ID = 'oro_api.cache_manager';
-
     /**
      * {@inheritDoc}
      */
@@ -95,6 +87,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $this->registerConfigParameters($container, $config);
         $this->registerActionProcessors($container, $config);
         $this->registerFilterOperators($container, $config);
+        $this->registerFilterDisallowDataTypes($container, $config);
         $this->registerConfigExtensions($container, $config);
 
         try {
@@ -219,8 +212,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
     private function registerConfigParameters(ContainerBuilder $container, array $config): void
     {
-        $container
-            ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
+        $container->getDefinition('oro_api.config_extension_registry')
             ->replaceArgument(0, $config['config_max_nesting_level']);
 
         $apiDocViews = $config['api_doc_views'];
@@ -241,11 +233,9 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             $cacheManagerApiDocViews[$view] = $viewConfig['request_type'] ?? [];
         }
 
-        $container
-            ->getDefinition(self::CONFIG_CACHE_WARMER_SERVICE_ID)
+        $container->getDefinition('oro_api.config_cache_warmer')
             ->replaceArgument(0, $configFiles);
-        $container
-            ->getDefinition(self::CACHE_MANAGER_SERVICE_ID)
+        $container->getDefinition('oro_api.cache_manager')
             ->replaceArgument(0, $cacheManagerApiDocViews);
     }
 
@@ -253,7 +243,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     {
         $actionProcessorBagServiceDef = DependencyInjectionUtil::findDefinition(
             $container,
-            self::ACTION_PROCESSOR_BAG_SERVICE_ID
+            'oro_api.action_processor_bag'
         );
         if (null === $actionProcessorBagServiceDef) {
             return;
@@ -326,17 +316,24 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
     private function registerFilterOperators(ContainerBuilder $container, array $config): void
     {
-        DependencyInjectionUtil::findDefinition($container, self::FILTER_OPERATOR_REGISTRY_SERVICE_ID)
+        DependencyInjectionUtil::findDefinition($container, 'oro_api.filter_operator_registry')
             ?->replaceArgument(0, $config['filter_operators']);
-        DependencyInjectionUtil::findDefinition($container, self::REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID)
+        DependencyInjectionUtil::findDefinition($container, 'oro_api.rest.filter_value_accessor_factory')
             ?->replaceArgument(1, $config['filter_operators']);
+    }
+
+    private function registerFilterDisallowDataTypes(ContainerBuilder $container, array $config): void
+    {
+        $container->getDefinition('oro_api.get_config.complete_filters')
+            ->replaceArgument(1, $config['filter_disallow_array_data_types'])
+            ->replaceArgument(2, $config['filter_disallow_range_data_types']);
     }
 
     private function registerConfigExtensions(ContainerBuilder $container, array $config): void
     {
         $configExtensionRegistryDef = DependencyInjectionUtil::findDefinition(
             $container,
-            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID
+            'oro_api.config_extension_registry'
         );
         if (null !== $configExtensionRegistryDef) {
             foreach ($config['config_extensions'] as $serviceId) {
@@ -364,7 +361,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private function configureCors(ContainerBuilder $container, array $config): void
     {
         $corsConfig = $config['cors'];
-        $container->getDefinition(self::CORS_SETTINGS_SERVICE_ID)
+        $container->getDefinition('oro_api.rest.cors_settings')
             ->replaceArgument(0, $corsConfig['preflight_max_age'])
             ->replaceArgument(1, $corsConfig['allow_origins'])
             ->replaceArgument(2, $corsConfig['allow_credentials'])

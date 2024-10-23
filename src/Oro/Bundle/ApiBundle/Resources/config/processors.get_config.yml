@@ -202,8 +202,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteFilters
         arguments:
             - '@oro_api.doctrine_helper'
-            - ['string', 'text', 'boolean', 'datetime', 'date', 'time']
-            - ['string', 'text', 'boolean', 'guid', 'currency']
+            - [] # disallowArrayDataTypes. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - [] # disallowRangeDataTypes. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
         tags:
             - { name: oro.api.processor, action: get_config, extra: 'filters&!identifier_fields_only', priority: -80 }
 

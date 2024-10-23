@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\Value;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
+use Oro\Bundle\ApiBundle\Model\NormalizedDateTime;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -267,7 +268,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     protected function buildEqualToExpression(string $field, mixed $value): Expression
     {
         if (\is_array($value)) {
-            return $this->buildComparisonExpression($field, Comparison::IN, $value);
+            return $this->buildInExpression($field, $value);
         }
         if ($value instanceof Range) {
             // expression: (field >= fromValue AND field <= toValue)
@@ -279,13 +280,13 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
             );
         }
 
-        return $this->buildComparisonExpression($field, Comparison::EQ, $value);
+        return $this->buildSingleValueEqualToExpression($field, $value);
     }
 
     protected function buildNotEqualToExpression(string $field, mixed $value): Expression
     {
         if (\is_array($value)) {
-            return $this->buildComparisonExpression($field, Comparison::NIN, $value);
+            return $this->buildNotInExpression($field, $value);
         }
         if ($value instanceof Range) {
             // expression: (field < fromValue OR field > toValue)
@@ -294,6 +295,30 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
             return Criteria::expr()->orX(
                 $this->buildComparisonExpression($field, Comparison::LT, $value->getFromValue()),
                 $this->buildComparisonExpression($field, Comparison::GT, $value->getToValue())
+            );
+        }
+
+        return $this->buildSingleValueNotEqualToExpression($field, $value);
+    }
+
+    protected function buildSingleValueEqualToExpression(string $field, mixed $value): Expression
+    {
+        if ($value instanceof NormalizedDateTime && $value->getPrecision() < NormalizedDateTime::PRECISION_SECOND) {
+            return Criteria::expr()->andX(
+                $this->buildComparisonExpression($field, Comparison::GTE, $value),
+                $this->buildComparisonExpression($field, Comparison::LT, $this->getNormalizedDateTimeEndValue($value))
+            );
+        }
+
+        return $this->buildComparisonExpression($field, Comparison::EQ, $value);
+    }
+
+    protected function buildSingleValueNotEqualToExpression(string $field, mixed $value): Expression
+    {
+        if ($value instanceof NormalizedDateTime && $value->getPrecision() < NormalizedDateTime::PRECISION_SECOND) {
+            return Criteria::expr()->orX(
+                $this->buildComparisonExpression($field, Comparison::LT, $value),
+                $this->buildComparisonExpression($field, Comparison::GTE, $this->getNormalizedDateTimeEndValue($value))
             );
         }
 
@@ -309,6 +334,34 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         }
 
         return new Comparison($field, $operator, new Value($value));
+    }
+
+    protected function buildInExpression(string $field, array $values): Expression
+    {
+        if ($this->hasDateTimeValue($values)) {
+            $expressions = [];
+            foreach ($values as $value) {
+                $expressions[] = $this->buildSingleValueEqualToExpression($field, $value);
+            }
+
+            return Criteria::expr()->orX(...$expressions);
+        }
+
+        return $this->buildComparisonExpression($field, Comparison::IN, $values);
+    }
+
+    protected function buildNotInExpression(string $field, array $values): Expression
+    {
+        if ($this->hasDateTimeValue($values)) {
+            $expressions = [];
+            foreach ($values as $value) {
+                $expressions[] = $this->buildSingleValueNotEqualToExpression($field, $value);
+            }
+
+            return Criteria::expr()->andX(...$expressions);
+        }
+
+        return $this->buildComparisonExpression($field, Comparison::NIN, $values);
     }
 
     protected function buildEmptyValueComparisonExpression(string $field, mixed $value): Comparison
@@ -332,5 +385,43 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         }
 
         return $value;
+    }
+
+    private function hasDateTimeValue(array $values): bool
+    {
+        foreach ($values as $value) {
+            if ($value instanceof \DateTimeInterface) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getNormalizedDateTimeEndValue(NormalizedDateTime $value): \DateTime
+    {
+        $result = new \DateTime(
+            $value->format('Y-m-d\TH:i:s.u'),
+            $value->getTimezone() ?: null
+        );
+        switch ($value->getPrecision()) {
+            case NormalizedDateTime::PRECISION_MINUTE:
+                $result->add(new \DateInterval('PT1M'));
+                break;
+            case NormalizedDateTime::PRECISION_HOUR:
+                $result->add(new \DateInterval('PT1H'));
+                break;
+            case NormalizedDateTime::PRECISION_DAY:
+                $result->add(new \DateInterval('P1D'));
+                break;
+            case NormalizedDateTime::PRECISION_MONTH:
+                $result->add(new \DateInterval('P1M'));
+                break;
+            case NormalizedDateTime::PRECISION_YEAR:
+                $result->add(new \DateInterval('P1Y'));
+                break;
+        }
+
+        return $result;
     }
 }

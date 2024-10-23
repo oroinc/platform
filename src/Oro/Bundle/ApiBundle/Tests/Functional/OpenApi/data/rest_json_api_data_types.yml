@@ -1085,7 +1085,7 @@ components:
     datetime:
       type: string
       format: datetime
-      pattern: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
+      pattern: '\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?)?'
     guid:
       type: string
       format: guid
@@ -1113,7 +1113,7 @@ components:
     time:
       type: string
       format: time
-      pattern: '\d{2}:\d{2}(:\d{2}(\.\d+)?)?'
+      pattern: '\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?'
     linksForTopLevelCollection:
       properties:
         self:
@@ -1267,19 +1267,23 @@ components:
       type: array
       items:
         type: string
-    datetimeUnionRange:
+    datetimeUnionArrayRange:
       oneOf:
         -
           $ref: '#/components/schemas/datetime'
         -
+          $ref: '#/components/schemas/datetimeArray'
+        -
           $ref: '#/components/schemas/datetimeRange'
     datetimeRange:
       type: string
-      pattern: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?\.\.\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
-    dateUnionRange:
+      pattern: '\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?)?\.\.\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?)?'
+    dateUnionArrayRange:
       oneOf:
         -
           $ref: '#/components/schemas/date'
+        -
+          $ref: '#/components/schemas/dateArray'
         -
           $ref: '#/components/schemas/dateRange'
     dateRange:
@@ -1360,15 +1364,17 @@ components:
     smallintRange:
       type: string
       pattern: '-?\d+\.\.-?\d+'
-    timeUnionRange:
+    timeUnionArrayRange:
       oneOf:
         -
           $ref: '#/components/schemas/time'
         -
+          $ref: '#/components/schemas/timeArray'
+        -
           $ref: '#/components/schemas/timeRange'
     timeRange:
       type: string
-      pattern: '\d{2}:\d{2}(:\d{2}(\.\d+)?)?\.\.\d{2}:\d{2}(:\d{2}(\.\d+)?)?'
+      pattern: '\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?\.\.\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?'
     unsignedInteger_1:
       type: integer
       default: 1
@@ -1633,43 +1639,43 @@ components:
       in: query
       description: "Filter records by 'fieldDateTime' field."
       schema:
-        $ref: '#/components/schemas/datetimeUnionRange'
+        $ref: '#/components/schemas/datetimeUnionArrayRange'
     filterFieldDateTimeEq:
       name: 'filter[fieldDateTime][eq]'
       in: query
       description: "Filter records by 'fieldDateTime' field."
       schema:
-        $ref: '#/components/schemas/datetimeUnionRange'
+        $ref: '#/components/schemas/datetimeUnionArrayRange'
     filterFieldDateTimeNeq:
       name: 'filter[fieldDateTime][neq]'
       in: query
       description: "Filter records by 'fieldDateTime' field."
       schema:
-        $ref: '#/components/schemas/datetimeUnionRange'
+        $ref: '#/components/schemas/datetimeUnionArrayRange'
     filterFieldDateTimeLt:
       name: 'filter[fieldDateTime][lt]'
       in: query
       description: "Filter records by 'fieldDateTime' field."
       schema:
-        $ref: '#/components/schemas/datetimeUnionRange'
+        $ref: '#/components/schemas/datetimeUnionArrayRange'
     filterFieldDateTimeLte:
       name: 'filter[fieldDateTime][lte]'
       in: query
       description: "Filter records by 'fieldDateTime' field."
       schema:
-        $ref: '#/components/schemas/datetimeUnionRange'
+        $ref: '#/components/schemas/datetimeUnionArrayRange'
     filterFieldDateTimeGt:
       name: 'filter[fieldDateTime][gt]'
       in: query
       description: "Filter records by 'fieldDateTime' field."
       schema:
-        $ref: '#/components/schemas/datetimeUnionRange'
+        $ref: '#/components/schemas/datetimeUnionArrayRange'
     filterFieldDateTimeGte:
       name: 'filter[fieldDateTime][gte]'
       in: query
       description: "Filter records by 'fieldDateTime' field."
       schema:
-        $ref: '#/components/schemas/datetimeUnionRange'
+        $ref: '#/components/schemas/datetimeUnionArrayRange'
     filterFieldDateTimeExists:
       name: 'filter[fieldDateTime][exists]'
       in: query
@@ -1681,49 +1687,49 @@ components:
       in: query
       description: "Filter records by 'fieldDateTime' field."
       schema:
-        $ref: '#/components/schemas/datetimeUnionRange'
+        $ref: '#/components/schemas/datetimeUnionArrayRange'
     filterFieldDate:
       name: 'filter[fieldDate]'
       in: query
       description: "Filter records by 'fieldDate' field."
       schema:
-        $ref: '#/components/schemas/dateUnionRange'
+        $ref: '#/components/schemas/dateUnionArrayRange'
     filterFieldDateEq:
       name: 'filter[fieldDate][eq]'
       in: query
       description: "Filter records by 'fieldDate' field."
       schema:
-        $ref: '#/components/schemas/dateUnionRange'
+        $ref: '#/components/schemas/dateUnionArrayRange'
     filterFieldDateNeq:
       name: 'filter[fieldDate][neq]'
       in: query
       description: "Filter records by 'fieldDate' field."
       schema:
-        $ref: '#/components/schemas/dateUnionRange'
+        $ref: '#/components/schemas/dateUnionArrayRange'
     filterFieldDateLt:
       name: 'filter[fieldDate][lt]'
       in: query
       description: "Filter records by 'fieldDate' field."
       schema:
-        $ref: '#/components/schemas/dateUnionRange'
+        $ref: '#/components/schemas/dateUnionArrayRange'
     filterFieldDateLte:
       name: 'filter[fieldDate][lte]'
       in: query
       description: "Filter records by 'fieldDate' field."
       schema:
-        $ref: '#/components/schemas/dateUnionRange'
+        $ref: '#/components/schemas/dateUnionArrayRange'
     filterFieldDateGt:
       name: 'filter[fieldDate][gt]'
       in: query
       description: "Filter records by 'fieldDate' field."
       schema:
-        $ref: '#/components/schemas/dateUnionRange'
+        $ref: '#/components/schemas/dateUnionArrayRange'
     filterFieldDateGte:
       name: 'filter[fieldDate][gte]'
       in: query
       description: "Filter records by 'fieldDate' field."
       schema:
-        $ref: '#/components/schemas/dateUnionRange'
+        $ref: '#/components/schemas/dateUnionArrayRange'
     filterFieldDateExists:
       name: 'filter[fieldDate][exists]'
       in: query
@@ -1735,7 +1741,7 @@ components:
       in: query
       description: "Filter records by 'fieldDate' field."
       schema:
-        $ref: '#/components/schemas/dateUnionRange'
+        $ref: '#/components/schemas/dateUnionArrayRange'
     filterFieldDecimalDefault:
       name: 'filter[fieldDecimalDefault]'
       in: query
@@ -2347,43 +2353,43 @@ components:
       in: query
       description: "Filter records by 'fieldTime' field."
       schema:
-        $ref: '#/components/schemas/timeUnionRange'
+        $ref: '#/components/schemas/timeUnionArrayRange'
     filterFieldTimeEq:
       name: 'filter[fieldTime][eq]'
       in: query
       description: "Filter records by 'fieldTime' field."
       schema:
-        $ref: '#/components/schemas/timeUnionRange'
+        $ref: '#/components/schemas/timeUnionArrayRange'
     filterFieldTimeNeq:
       name: 'filter[fieldTime][neq]'
       in: query
       description: "Filter records by 'fieldTime' field."
       schema:
-        $ref: '#/components/schemas/timeUnionRange'
+        $ref: '#/components/schemas/timeUnionArrayRange'
     filterFieldTimeLt:
       name: 'filter[fieldTime][lt]'
       in: query
       description: "Filter records by 'fieldTime' field."
       schema:
-        $ref: '#/components/schemas/timeUnionRange'
+        $ref: '#/components/schemas/timeUnionArrayRange'
     filterFieldTimeLte:
       name: 'filter[fieldTime][lte]'
       in: query
       description: "Filter records by 'fieldTime' field."
       schema:
-        $ref: '#/components/schemas/timeUnionRange'
+        $ref: '#/components/schemas/timeUnionArrayRange'
     filterFieldTimeGt:
       name: 'filter[fieldTime][gt]'
       in: query
       description: "Filter records by 'fieldTime' field."
       schema:
-        $ref: '#/components/schemas/timeUnionRange'
+        $ref: '#/components/schemas/timeUnionArrayRange'
     filterFieldTimeGte:
       name: 'filter[fieldTime][gte]'
       in: query
       description: "Filter records by 'fieldTime' field."
       schema:
-        $ref: '#/components/schemas/timeUnionRange'
+        $ref: '#/components/schemas/timeUnionArrayRange'
     filterFieldTimeExists:
       name: 'filter[fieldTime][exists]'
       in: query
@@ -2395,7 +2401,7 @@ components:
       in: query
       description: "Filter records by 'fieldTime' field."
       schema:
-        $ref: '#/components/schemas/timeUnionRange'
+        $ref: '#/components/schemas/timeUnionArrayRange'
     filterId:
       name: 'filter[id]'
       in: query
