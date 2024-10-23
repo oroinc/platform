@@ -236,6 +236,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('variable')->end()
                 ->end()
                 ->arrayNode('data')
+                    ->normalizeKeys(false)
                     ->prototype('variable')->end()
                 ->end()
             ->end();

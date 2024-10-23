@@ -73,6 +73,9 @@ The current file describes significant changes in the code that may affect the u
 #### SanitizeBundle
 * Updated sanitize logic, it takes into account a new `crypted_text` doctrine type now.
 
+#### ActionBundle
+* Disabled key normalization for `data` attributes of the `button_options` section for operations. Now, using the dash symbol for data attribute naming is possible.
+
 # Oro Enum Changes
 
 Updating the ORO Enum implementation is caused by:
