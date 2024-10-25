@@ -980,12 +980,12 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
         abstract: true
         arguments:
-            - '@file_locator'
+            - '@oro_api.file_locator_decorator'
 
     oro_api.resource_doc_parser.default:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
         arguments:
-            - '@file_locator'
+            - '@oro_api.file_locator_decorator'
         tags:
             - { name: oro.api.resource_doc_parser, requestType: rest&json_api, priority: -10 }
             - { name: oro.api.resource_doc_parser, requestType: rest, priority: -20 }
@@ -1371,3 +1371,10 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
             - { name: monolog.logger, channel: api }
+
+    oro_api.file_locator_decorator:
+        class: Oro\Bundle\ApiBundle\Decorator\OroFileLocatorDecorator
+        public: false
+        arguments:
+            $decorated: '@file_locator'
+            $projectDir: '%kernel.project_dir%'
