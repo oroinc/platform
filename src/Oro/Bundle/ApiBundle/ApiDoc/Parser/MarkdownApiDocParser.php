@@ -93,10 +93,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
             return false;
         }
 
-        if (!str_starts_with($resource, '/') && !str_starts_with($resource, '@') && '' !== $resource) {
-            $resource = realpath($resource) ? realpath($resource) : $resource;
-        }
-
         /** @var string $filePath */
         $filePath = $this->fileLocator->locate($resource);
         if (!isset($this->parsedFiles[$filePath])) {
