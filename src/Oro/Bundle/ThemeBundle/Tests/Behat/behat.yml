@@ -15,7 +15,7 @@ oro_behat_extension:
       selector: 'div[data-name="field__header--quick-access-button"]'
     Quick Access Button Label Input:
       selector: '[name="theme_configuration[configuration][header__quick_access_button][label][default]"]'
-    Quick Access Button Frontend Menu Input:
+    Quick Access Button Storefront Menu Input:
       selector: '[name="theme_configuration[configuration][header__quick_access_button][menu]"]'
   suites:
     OroThemeBundle:

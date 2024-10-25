@@ -40,7 +40,7 @@ Feature: Theme Configuration
       | Quick Links Menu                  | frontend_menu           |
       | Quick Access Button Label         | Quick access button     |
       | Quick Access Button Type          | menu                    |
-      | Quick Access Button Frontend Menu | frontend_menu           |
+      | Quick Access Button Storefront Menu | frontend_menu           |
       | Standalone Main Menu              | true                    |
       | Search On Smaller Screens         | integrated              |
       | Page Template                     | wide                    |
@@ -60,8 +60,8 @@ Feature: Theme Configuration
       | Top Navigation Menu               | frontend_menu           |
       | Quick Links Menu                  | frontend_menu           |
       | Quick Access Button Label         | Quick access button     |
-      | Quick Access Button Type          | Frontend Menu           |
-      | Quick Access Button Frontend Menu | frontend_menu           |
+      | Quick Access Button Type          | Storefront Menu         |
+      | Quick Access Button Storefront Menu | frontend_menu           |
       | Standalone Main Menu              | true                    |
       | Search On Smaller Screens         | Integrated              |
       | Page Template                     | wide                    |
@@ -79,7 +79,7 @@ Feature: Theme Configuration
       | Quick Links Menu                  | commerce_top_nav            |
       | Quick Access Button Type          | menu                        |
       | Quick Access Button Label         | Quick access button         |
-      | Quick Access Button Frontend Menu | commerce_top_nav            |
+      | Quick Access Button Storefront Menu | commerce_top_nav            |
       | Language and Currency Switchers   | always_in_hamburger_menu    |
       | Standalone Main Menu              | false                       |
       | Search On Smaller Screens         | standalone                  |
@@ -98,9 +98,9 @@ Feature: Theme Configuration
       | Type                              | Storefront                     |
       | Top Navigation Menu               | commerce_top_nav               |
       | Quick Links Menu                  | commerce_top_nav               |
-      | Quick Access Button Type          | Frontend Menu                  |
+      | Quick Access Button Type          | Storefront Menu                  |
       | Quick Access Button Label         | Quick access button            |
-      | Quick Access Button Frontend Menu | commerce_top_nav               |
+      | Quick Access Button Storefront Menu | commerce_top_nav               |
       | Language and Currency Switchers   | Always in the "hamburger" menu |
       | Standalone Main Menu              | false                          |
       | Search On Smaller Screens         | Standalone                     |
@@ -112,11 +112,11 @@ Feature: Theme Configuration
     Given I go to System / Theme Configurations
     When I click "Create Theme Configuration"
     Then I should not see "Quick Access Button Label Input" element inside "Quick Access Button Field" element
-    And I should not see "Quick Access Button Frontend Menu Input" element inside "Quick Access Button Field" element
+    And I should not see "Quick Access Button Storefront Menu Input" element inside "Quick Access Button Field" element
     When I fill "Theme Configuration Form" with:
       | Quick Access Button Type | menu |
     Then I should see "Quick Access Button Label Input" element inside "Quick Access Button Field" element
-    And I should see "Quick Access Button Frontend Menu Input" element inside "Quick Access Button Field" element
+    And I should see "Quick Access Button Storefront Menu Input" element inside "Quick Access Button Field" element
     And click "Cancel"
 
   Scenario: Change Top Navigation Menu to "frontend_menu"
@@ -161,10 +161,10 @@ Feature: Theme Configuration
     When I go to System / Theme Configurations
     And I click "Edit" on row "Refreshing Teal" in grid
     And I fill "Theme Configuration Form" with:
-      | Top Navigation Menu               | frontend_menu               |
-      | Quick Access Button Label         | Changed Quick access button |
-      | Quick Access Button Type          | menu                        |
-      | Quick Access Button Frontend Menu | commerce_top_nav            |
+      | Top Navigation Menu                 | frontend_menu               |
+      | Quick Access Button Label           | Changed Quick access button |
+      | Quick Access Button Type            | menu                        |
+      | Quick Access Button Storefront Menu | commerce_top_nav            |
     And I save form
     Then I should see "Theme Configuration" flash message
 
