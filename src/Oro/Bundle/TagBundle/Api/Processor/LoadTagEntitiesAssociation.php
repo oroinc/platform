@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
+use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadCustomAssociationUtil;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
@@ -51,25 +51,16 @@ class LoadTagEntitiesAssociation implements ProcessorInterface
 
     private function loadData(SubresourceContext $context): array
     {
-        $parentClassName = $context->getParentClassName();
-        $associationName = $context->getAssociationName();
-
-        $configExtras = TargetConfigExtraBuilder::buildParentConfigExtras(
-            $context->getConfigExtras(),
-            $parentClassName,
-            $associationName
-        );
-        $config = $this->configProvider
-            ->getConfig($parentClassName, $context->getVersion(), $context->getRequestType(), $configExtras)
-            ->getDefinition();
-        TargetConfigExtraBuilder::normalizeParentConfig($config, $associationName, $configExtras);
-
-        $query = $this->doctrineHelper->createQueryBuilder($parentClassName, 'e')
+        $query = $this->doctrineHelper->createQueryBuilder($context->getParentClassName(), 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $context->getParentId());
 
-        $data = $this->entitySerializer->serialize($query, $config, $context->getNormalizationContext());
+        $data = $this->entitySerializer->serialize(
+            $query,
+            LoadCustomAssociationUtil::buildParentEntityConfig($context, $this->configProvider),
+            $context->getNormalizationContext()
+        );
 
-        return $data[0][$associationName] ?? [];
+        return $data[0][$context->getAssociationName()] ?? [];
     }
 }
