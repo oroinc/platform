@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -100,26 +99,7 @@ abstract class LoadCustomAssociation implements ProcessorInterface
 
     protected function getLoadParentEntityDataConfig(SubresourceContext $context): EntityDefinitionConfig
     {
-        $configExtras = TargetConfigExtraBuilder::buildParentConfigExtras(
-            $context->getConfigExtras(),
-            $context->getParentClassName(),
-            $context->getAssociationName()
-        );
-        $config = $this->configProvider
-            ->getConfig(
-                $context->getParentClassName(),
-                $context->getVersion(),
-                $context->getRequestType(),
-                $configExtras
-            )
-            ->getDefinition();
-        TargetConfigExtraBuilder::normalizeParentConfig(
-            $config,
-            $context->getAssociationName(),
-            $configExtras
-        );
-
-        return $config;
+        return LoadCustomAssociationUtil::buildParentEntityConfig($context, $this->configProvider);
     }
 
     protected function getAssociationData(mixed $parentEntityData, string $associationName, bool $isCollection): ?array
