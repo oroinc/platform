@@ -66,7 +66,9 @@ class HandleEmailFolders implements ProcessorInterface
             } else {
                 $emailUser->removeFolder($folder);
                 $emailUser->addFolder($emailOriginFolder);
-                $batch->addFolder($emailOriginFolder);
+                if (null === $this->findFolderInBatch($batch, $folderType, $folderFullName)) {
+                    $batch->addFolder($emailOriginFolder);
+                }
                 $this->syncFolderName($folder, $emailOriginFolder);
             }
         }
