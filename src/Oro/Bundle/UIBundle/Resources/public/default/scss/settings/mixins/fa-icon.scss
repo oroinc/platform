@@ -7,7 +7,46 @@
 // Use: @include fa-icon($view-product-gallery-icon, before, true) {
 //  extra rules
 // }
+
+[class^='fa-'],
+[class*=' fa-'] {
+    background-color: red !important;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+
+    &::before {
+        display: inline-flex !important;
+        content: 'FA';
+        font-size: 14px;
+        color: black !important;
+        font-weight: bold !important;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+}
+
 @mixin fa-icon($icon: null, $state: before, $extra-rules: false, $rawIcon: false) {
+    background-color: red !important;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+
+    &::before {
+        display: inline-flex !important;
+        content: 'FA';
+        font-size: 14px;
+        color: black !important;
+        font-weight: bold !important;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+
+    $icon: false;
     @if ($icon) {
         $content: $icon;
 
@@ -22,8 +61,8 @@
             font-family: $icon-font;
 
             @if ($extra-rules) {
-                @content;
             }
+            @content;
         }
     }
 }

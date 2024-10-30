@@ -85,17 +85,6 @@ $theme-fonts: (
           ),
           'formats': ('woff2', 'woff')
     ),
-    'font-awesome': (
-        'family': 'FontAwesome',
-        'variants': (
-            (
-                'path': '~@oroinc/font-awesome/fonts/fontawesome-webfont',
-                'weight': normal,
-                'style': normal
-            )
-        ),
-        'formats': ('woff2', 'woff')
-    ),
     'only-bullets': (
         'family': 'only-bullets',
         'variants': (
