@@ -21,7 +21,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
      */
     public function getMigrationVersion()
     {
-        return 'v1_16';
+        return 'v1_17';
     }
 
     /**
