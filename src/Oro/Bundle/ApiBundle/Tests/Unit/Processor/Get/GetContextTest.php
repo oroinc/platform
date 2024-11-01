@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 class GetContextTest extends \PHPUnit\Framework\TestCase
@@ -54,6 +55,8 @@ class GetContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($version, $normalizationContext['version']);
         self::assertSame($requestType, $normalizationContext['requestType']);
         self::assertSame($sharedData, $normalizationContext['sharedData']);
+        self::assertArrayNotHasKey('parentAction', $normalizationContext);
+        self::assertArrayNotHasKey('skip_acl_for_root_entity', $normalizationContext);
 
         $parentAction = 'test_parent_action';
         $this->context->setParentAction($parentAction);
@@ -64,5 +67,16 @@ class GetContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($requestType, $normalizationContext['requestType']);
         self::assertSame($sharedData, $normalizationContext['sharedData']);
         self::assertSame($parentAction, $normalizationContext['parentAction']);
+        self::assertArrayNotHasKey('skip_acl_for_root_entity', $normalizationContext);
+
+        $this->context->skipGroup(ApiActionGroup::DATA_SECURITY_CHECK);
+        $normalizationContext = $this->context->getNormalizationContext();
+        self::assertCount(6, $normalizationContext);
+        self::assertSame($action, $normalizationContext['action']);
+        self::assertSame($version, $normalizationContext['version']);
+        self::assertSame($requestType, $normalizationContext['requestType']);
+        self::assertSame($sharedData, $normalizationContext['sharedData']);
+        self::assertSame($parentAction, $normalizationContext['parentAction']);
+        self::assertTrue($normalizationContext['skip_acl_for_root_entity']);
     }
 }

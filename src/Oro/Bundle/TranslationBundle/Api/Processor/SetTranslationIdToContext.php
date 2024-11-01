@@ -21,6 +21,16 @@ class SetTranslationIdToContext implements ProcessorInterface
     {
         /** @var CreateContext $context */
 
+        if ($context->isProcessed(SetEntityIdToContext::OPERATION_NAME)) {
+            // the entity identifier was already set
+            return;
+        }
+
+        if ($context->isExisting()) {
+            // the setting of an entity identifier to the context is needed only for a new entity
+            return;
+        }
+
         $entity = $context->getResult();
         if (!$entity instanceof TranslationKey) {
             return;

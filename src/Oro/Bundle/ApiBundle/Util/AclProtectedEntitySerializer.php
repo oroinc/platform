@@ -92,6 +92,7 @@ class AclProtectedEntitySerializer extends EntitySerializer
             // clear the context
             $this->configConverter->setRequestType(null);
             $this->queryFactory->setRequestType(null);
+            $this->queryFactory->setOptions(null);
             $this->fieldAccessor->setRequestType(null);
         }
     }
@@ -103,6 +104,13 @@ class AclProtectedEntitySerializer extends EntitySerializer
             $this->configConverter->setRequestType($requestType);
             $this->queryFactory->setRequestType($requestType);
             $this->fieldAccessor->setRequestType($requestType);
+        }
+        $queryFactoryOptions = [];
+        if ($context[AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY] ?? false) {
+            $queryFactoryOptions[AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY] = true;
+        }
+        if ($queryFactoryOptions) {
+            $this->queryFactory->setOptions($queryFactoryOptions);
         }
     }
 

@@ -415,6 +415,7 @@ class EmailTest extends RestJsonApiTestCase
         $department = new TestDepartment();
         $department->setName('Test Department');
         $department->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT));
+        $department->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
         $em->persist($department);
         $em->flush();
 
@@ -441,6 +442,8 @@ class EmailTest extends RestJsonApiTestCase
             ]
         ];
         $this->assertResponseContains($expectedData, $response);
+
+        self::assertEquals([$department->getId()], $this->getActivityTargetIds($createdEmail));
 
         /** @var EmailAttachment $emailAttachment */
         $emailAttachment = $createdEmail->getEmailBody()->getAttachments()->first();
@@ -702,6 +705,7 @@ class EmailTest extends RestJsonApiTestCase
         $department = new TestDepartment();
         $department->setName('Test Department');
         $department->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT));
+        $department->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
         $em->persist($department);
         /** @var ActivityManager $activityManager */
         $activityManager = self::getContainer()->get('oro_activity.manager');
