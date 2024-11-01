@@ -34,7 +34,9 @@ class ConfigConverter extends BaseConfigConverter
     {
         parent::buildEntityConfig($result, $config);
 
-        if (!empty($config[ConfigUtil::PARENT_RESOURCE_CLASS])) {
+        if (($config[AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY] ?? false)
+            || !empty($config[ConfigUtil::PARENT_RESOURCE_CLASS])
+        ) {
             $result->set(AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY, true);
         }
     }

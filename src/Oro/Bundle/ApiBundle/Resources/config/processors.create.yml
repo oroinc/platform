@@ -114,22 +114,9 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: save_data, priority: -10 }
 
-    oro_api.create.set_entity_id_to_context:
-        class: Oro\Bundle\ApiBundle\Processor\Create\SetEntityIdToContext
-        tags:
-            - { name: oro.api.processor, action: create, group: save_data, priority: -20 }
-
     #
     # normalize_data
     #
-
-    oro_api.create.load_normalized_entity:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity
-        arguments:
-            - '@oro_api.action_processor_bag'
-            - true # prevent loading of the entity by the "get" action and use the entity from the current context
-        tags:
-            - { name: oro.api.processor, action: create, group: normalize_data, priority: -10 }
 
     #
     # finalize
