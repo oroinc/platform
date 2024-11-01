@@ -115,6 +115,8 @@
     .cm-panels {
         background-color: $primary-900;
         color: $primary-200;
+        // due to problems with z-index and calendar popover, e.g on the price list creation page.
+        z-index: initial;
     }
 
     .cm-panels-top {
