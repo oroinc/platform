@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Processor\Update\SetEntityIdToContext;
+use Oro\Bundle\ApiBundle\Processor\Shared\SetEntityIdToContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\CreateProcessorTestCase;
 
-class SetEntityIdToContextTest extends UpdateProcessorTestCase
+class SetEntityIdToContextTest extends CreateProcessorTestCase
 {
     private SetEntityIdToContext $processor;
 
@@ -44,6 +45,7 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
         $metadata->expects(self::never())
             ->method('getIdentifierValue');
 
+        $this->context->setExisting(true);
         $this->context->setId($entityId);
         $this->context->setResult(new \stdClass());
         $this->context->setMetadata($metadata);
@@ -68,7 +70,6 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
 
     public function testProcessWhenNoApiMetadata(): void
     {
-        $this->context->setExisting(false);
         $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
 
@@ -76,7 +77,7 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
         self::assertFalse($this->context->isProcessed(SetEntityIdToContext::OPERATION_NAME));
     }
 
-    public function testProcessForNewEntityWithoutIdentifier(): void
+    public function testProcessForEntityWithoutIdentifier(): void
     {
         $entity = new \stdClass();
 
@@ -84,7 +85,6 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
         $metadata->expects(self::never())
             ->method('getIdentifierValue');
 
-        $this->context->setExisting(false);
         $this->context->setResult($entity);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
@@ -93,7 +93,7 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
         self::assertFalse($this->context->isProcessed(SetEntityIdToContext::OPERATION_NAME));
     }
 
-    public function testProcessForNewEntityWithSingleId(): void
+    public function testProcessForEntityWithSingleId(): void
     {
         $entity = new \stdClass();
         $entityId = 123;
@@ -107,7 +107,6 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
             ->with(self::identicalTo($entity))
             ->willReturn($entityId);
 
-        $this->context->setExisting(false);
         $this->context->setResult($entity);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
@@ -116,7 +115,7 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(SetEntityIdToContext::OPERATION_NAME));
     }
 
-    public function testProcessForNewEntityWithCompositeId(): void
+    public function testProcessForEntityWithCompositeId(): void
     {
         $entity = new \stdClass();
         $entityId = ['id1' => 1, 'id2' => 2];
@@ -130,7 +129,6 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
             ->with(self::identicalTo($entity))
             ->willReturn($entityId);
 
-        $this->context->setExisting(false);
         $this->context->setResult($entity);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
@@ -139,7 +137,7 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(SetEntityIdToContext::OPERATION_NAME));
     }
 
-    public function testProcessWhenNewEntityIdIsNull(): void
+    public function testProcessWhenEntityIdIsNull(): void
     {
         $entity = new \stdClass();
 
@@ -152,7 +150,6 @@ class SetEntityIdToContextTest extends UpdateProcessorTestCase
             ->with(self::identicalTo($entity))
             ->willReturn(null);
 
-        $this->context->setExisting(false);
         $this->context->setResult($entity);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);

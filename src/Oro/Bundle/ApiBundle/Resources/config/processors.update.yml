@@ -99,21 +99,9 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: save_data, priority: -10 }
 
-    oro_api.update.set_entity_id_to_context:
-        class: Oro\Bundle\ApiBundle\Processor\Update\SetEntityIdToContext
-        tags:
-            - { name: oro.api.processor, action: update, group: save_data, priority: -20 }
-
     #
     # normalize_data
     #
-
-    oro_api.update.load_normalized_entity:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity
-        arguments:
-            - '@oro_api.action_processor_bag'
-        tags:
-            - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
 
     #
     # finalize

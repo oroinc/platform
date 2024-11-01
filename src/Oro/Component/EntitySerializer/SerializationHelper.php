@@ -115,7 +115,10 @@ class SerializationHelper
             if (\array_key_exists($firstField, $serializedData)) {
                 $currentData = $serializedData[$firstField];
                 $currentConfig = $this->getTargetEntityConfig($entityConfig, $firstField);
-                if (null !== $currentConfig && \is_array($currentData)) {
+                if (null !== $currentConfig && (\is_array($currentData) || $currentData instanceof \ArrayObject)) {
+                    if ($currentData instanceof \ArrayObject) {
+                        $currentData = $currentData->getArrayCopy();
+                    }
                     $lastIndex = \count($propertyPath) - 1;
                     $index = 1;
                     while ($index < $lastIndex) {
