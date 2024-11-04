@@ -43,7 +43,7 @@ abstract class AbstractSelectedFieldsProvider implements SelectedFieldsProviderI
      */
     protected function getState(DatagridConfiguration $datagridConfiguration, ParameterBag $datagridParameters)
     {
-        return (array)$this->datagridStateProvider->getState($datagridConfiguration, $datagridParameters);
+        return $this->datagridStateProvider->getStateFromParameters($datagridConfiguration, $datagridParameters);
     }
 
     /**
