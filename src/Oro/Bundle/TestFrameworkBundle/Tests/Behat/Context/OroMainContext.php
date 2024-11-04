@@ -858,7 +858,9 @@ class OroMainContext extends MinkContext implements
      */
     public function iClickOn($element)
     {
-        $this->createElement($element)->click();
+        $elementNode = $this->createElement($element);
+        $this->scrollToXpath($elementNode->getXpath());
+        $elementNode->click();
     }
 
     /**
@@ -2905,7 +2907,7 @@ JS;
     document
         .evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
         .singleNodeValue
-        .scrollIntoView(false);
+        ?.scrollIntoView({block: 'center'});
 })()
 JS;
         $this->getSession()->getDriver()->evaluateScript($javascipt);
